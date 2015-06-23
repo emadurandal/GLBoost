@@ -1,0 +1,3 @@
+[submodule "tmlib.js"]
+	path = tmlib.js
+	url = git@github.com:emadurandal/tmlib.js.git
