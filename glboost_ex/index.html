@@ -12,11 +12,13 @@
         <script>
             // TODO: ここにコードを書いていく
             tm.main(function() {
-                alert("tmlib.js バッチリ読み込まれてるよ！！");
+                console.log("tmlib.js バッチリ読み込まれてるよ！！");
+                var app = tm.webgl.WebGLApp("#world");
+                app.run();
             });
         </script>
     </head>
     <body>
-        
+        <canvas id="world"></canvas>
     </body>
 </html>
