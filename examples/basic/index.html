@@ -1,24 +1,34 @@
-<!DOCTYPE html>
- 
+<!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, user-scalable=no" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
- 
-        <title>start tmlib.js</title>
- 
-        <script src="../libs/tmlib.js"></script>
-        <script>
-            // TODO: ここにコードを書いていく
-            tm.main(function() {
-                console.log("tmlib.js バッチリ読み込まれてるよ！！");
-                var app = tm.webgl.WebGLApp("#world");
-                app.run();
-            });
-        </script>
-    </head>
-    <body>
-        <canvas id="world"></canvas>
-    </body>
+<head>
+  <title>GLBoost basic example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../build/glboost.js"></script>
+  <script src="../../libs/tmlib.js"></script>
+  <script>
+    // TODO: ここにコードを書いていく
+    tm.main(function() {
+      console.log("tmlib.js バッチリ読み込まれてるよ！！");
+      var app = tm.webgl.WebGLApp("#world");
+      app.run();
+    });
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost basic example</p>
+</header>
+<nav>
+  <ul class="menu">
+    <li class="menu-list"><a href="http://gulpjs.com/" title="gulp.js">gulp.js</a></li>
+    <li class="menu-list"><a href="http://learnboost.github.io/stylus/" title="stylus">stylus</a></li>
+  </ul>
+</nav>
+<main>
+  <canvas id="world"></canvas>
+</main>
+</body>
 </html>

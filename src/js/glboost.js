@@ -1,60 +1,66 @@
-var GLBoost = GLBoost || { REVISION: '1' };
+window.GLBoost = window.GLBoost || { REVISION: '1' };
 
-GLBoost.Renderer = function ( parameters ) {
-    var _canvas = parameters.canvas;
-    var _clearColor = parameters.clearColor
+class Renderer {
+    constructor(parameters) {
+        var _canvas = parameters.canvas;
+        var _clearColor = parameters.clearColor;
 
-    var initGL = function(canvas) {
-        var gl = canvas.getContext("webgl");
+        var initGL = function initGL(canvas) {
+            var gl = canvas.getContext("webgl");
 
-        if (!gl) {
-            // WebGL not supported
-            return false;
-        }
+            if (!gl) {
+                // WebGL not supported
+                return false;
+            }
 
-        //if (!gl instanceof WebGL2RenderingContext)
-        if (!gl instanceof WebGLRenderingContext) {
-            // unexpected rendering context.
-            return false;
-        }
+            //if (!gl instanceof WebGL2RenderingContext)
+            if (!gl instanceof WebGLRenderingContext) {
+                // unexpected rendering context.
+                return false;
+            }
 
-        console.log(gl)
+            console.log(gl);
 
-        return gl;
-    };
+            return gl;
+        };
 
-    var _gl = initGL(_canvas);
+        this._gl = initGL(_canvas);
 
-    var setDefaultGLStates = function() {
-        _gl.frontFace( _gl.CCW );
-        _gl.cullFace( _gl.BACK );
-        _gl.enable( _gl.CULL_FACE );
+        var gl = this._gl;
 
-        _gl.enable( _gl.DEPTH_TEST );
-        _gl.depthFunc( _gl.LEQUAL );
+        var setDefaultGLStates = function setDefaultGLStates() {
+            gl.frontFace( gl.CCW );
+            gl.cullFace( gl.BACK );
+            gl.enable( gl.CULL_FACE );
 
-        _gl.enable( _gl.BLEND );
-        _gl.blendEquation( _gl.FUNC_ADD );
-        _gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
+            gl.enable( gl.DEPTH_TEST );
+            gl.depthFunc( gl.LEQUAL );
 
-        _gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
-        _gl.clearDepth( 1 );
-        _gl.clearStencil( 0 );
-    };
+            gl.enable( gl.BLEND );
+            gl.blendEquation( gl.FUNC_ADD );
+            gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
-    setDefaultGLStates();
+            gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+            gl.clearDepth( 1 );
+            gl.clearStencil( 0 );
+        };
 
+        setDefaultGLStates();
+    }
 
-    // メソッド定義
-    this.clearCanvas = function ( color_flg, depth_flg, stencil_flg ) {
+    clearCanvas( color_flg, depth_flg, stencil_flg ) {
+
+        var gl = this._gl;
 
         var bufferBits = 0;
 
-        if ( color_flg === void 0 || color_flg ) bufferBits |= _gl.COLOR_BUFFER_BIT;
-        if ( depth_flg === void 0 || depth_flg ) bufferBits |= _gl.DEPTH_BUFFER_BIT;
-        if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= _gl.STENCIL_BUFFER_BIT;
+        if ( color_flg === void 0 || color_flg ) bufferBits |= gl.COLOR_BUFFER_BIT;
+        if ( depth_flg === void 0 || depth_flg ) bufferBits |= gl.DEPTH_BUFFER_BIT;
+        if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= gl.STENCIL_BUFFER_BIT;
 
-        _gl.clear( bufferBits );
+        gl.clear( bufferBits );
 
     };
-};
+}
+
+window.GLBoost["Renderer"] = Renderer;
