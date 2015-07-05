@@ -1,9 +1,14 @@
+import GLContext from './GLContext'
+import GLExtentionsManager from './GLExtentionsManager'
+import ShaderManager from './ShaderManager'
+
 export default class Mesh {
   constructor() {
 
   }
 
   setVerticesData() {
+    var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
 
@@ -39,5 +44,23 @@ export default class Mesh {
     extVAO.bindVertexArrayOES(null)
 
     this._vao = vao;
+  }
+
+  draw() {
+    var gl = GLContext.getInstance().gl;
+    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+    var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
+
+    // draw
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.useProgram(glslProgram);
+
+    extVAO.bindVertexArrayOES(this._vao);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    extVAO.bindVertexArrayOES(null);
+
   }
 }

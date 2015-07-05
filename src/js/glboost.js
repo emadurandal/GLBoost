@@ -1,7 +1,5 @@
 import Mesh from './Mesh'
 import GLContext from './GLContext'
-import GLExtentionsManager from './GLExtentionsManager'
-import ShaderManager from './ShaderManager'
 
 window.GLBoost = window.GLBoost || { REVISION: '1' };
 
@@ -32,64 +30,13 @@ class Renderer {
     };
 
     setDefaultGLStates();
-    var glem = GLExtentionsManager.getInstance(gl);
-    this._glslProgram = ShaderManager.getInstance(gl).simpleProgram;
 
-    var that = this;
-    var initVertexBuffers = function initVertexBuffers(gl, glslProgram, extVAO)
-    {
-      // create VAO
-      var vao = extVAO.createVertexArrayOES();
-      extVAO.bindVertexArrayOES(vao);
-
-      // create VBO
-      var squareVerticesBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
-
-      var vertexData = new Float32Array([
-        // posx posy posz colr colg colb
-        -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-        0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-        0.0,  0.5, 0.0, 0.0, 0.0, 1.0
-      ]);
-      // ストライド（頂点のサイズ）
-      var stride = 24; // float6個分
-
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-
-      // 頂点レイアウト設定
-      // 位置
-      gl.enableVertexAttribArray(glslProgram.vertexAttributePosition);
-      gl.vertexAttribPointer(glslProgram.vertexAttributePosition, 3, gl.FLOAT, gl.FALSE, stride, 0)
-      // 色
-      gl.enableVertexAttribArray(glslProgram.vertexAttributeColor);
-      gl.vertexAttribPointer(glslProgram.vertexAttributeColor, 2, gl.FLOAT, gl.FALSE, stride, 12)
-
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-      extVAO.bindVertexArrayOES(null)
-
-      that._vao = vao;
-    };
-
-    initVertexBuffers(gl, this._glslProgram, glem.extVAO);
+    this.mesh = new Mesh();
+    this.mesh.setVerticesData();
   }
 
   draw() {
-    var gl = this._gl;
-    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
-
-    // draw
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gl.useProgram(this._glslProgram);
-
-    extVAO.bindVertexArrayOES(this._vao);
-
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-
-    extVAO.bindVertexArrayOES(null);
-
-    var mesh = new Mesh();
+    this.mesh.draw();
   }
 
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
