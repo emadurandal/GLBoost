@@ -1,4 +1,5 @@
 import Mesh from './Mesh'
+import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import ShaderManager from './ShaderManager'
 
@@ -9,26 +10,7 @@ class Renderer {
     var _canvas = parameters.canvas;
     var _clearColor = parameters.clearColor;
 
-    var initGL = function initGL(canvas) {
-      var gl = canvas.getContext("webgl");
-
-      if (!gl) {
-          // WebGL not supported
-          return false;
-      }
-
-      //if (!gl instanceof WebGL2RenderingContext)
-      if (!gl instanceof WebGLRenderingContext) {
-          // unexpected rendering context.
-          return false;
-      }
-
-      console.log(gl);
-
-      return gl;
-    };
-
-    this._gl = initGL(_canvas);
+    this._gl = GLContext.getInstance(_canvas).gl;
 
     var gl = this._gl;
 
