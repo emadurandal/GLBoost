@@ -1,5 +1,18 @@
 export default class ShaderManager {
-  static getShader(gl, theSource, type) {
+  constructor(gl) {
+    if (ShaderManager._instance) {
+        return ShaderManager._instance;
+    }
+    if (gl === void 0 || !gl instanceof WebGLRenderingContext) {
+      throw new Error("Failed to create ShaderManager due to no WebGL Context.");
+    }
+
+    this._simpleProgram = this.getSimpleShaderPrograms(gl);
+
+    ShaderManager._instance = this;
+  }
+
+  getShader(gl, theSource, type) {
     var shader;
 
     if (type == "x-shader/x-fragment") {
@@ -25,7 +38,7 @@ export default class ShaderManager {
     return shader;
   }
 
-  static initShaders(gl, vertexShaderStr, fragmentShaderStr) {
+  initShaders(gl, vertexShaderStr, fragmentShaderStr) {
     var vertexShader = this.getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this.getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
 
@@ -45,7 +58,7 @@ export default class ShaderManager {
     return shaderProgram;
   }
 
-  static getSimpleVertexShaderString() {
+  getSimpleVertexShaderString() {
     return `
 precision mediump float;
 
@@ -60,7 +73,7 @@ void main(void) {
 `;
   }
 
-  static getSimpleFragmentShaderString() {
+  getSimpleFragmentShaderString() {
     return `
 precision mediump float;
 varying vec4 color;
@@ -71,7 +84,7 @@ void main(void){
 `;
   }
 
-  static getSimpleShaderPrograms(gl) {
+  getSimpleShaderPrograms(gl) {
     var shaderProgram = this.initShaders(gl, this.getSimpleVertexShaderString(), this.getSimpleFragmentShaderString());
     shaderProgram.vertexAttributePosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
     gl.enableVertexAttribArray(shaderProgram.vertexAttributePosition);
@@ -80,4 +93,13 @@ void main(void){
 
     return shaderProgram;
   }
+
+  static getInstance(canvas) {
+    return new ShaderManager(canvas);
+  }
+
+  get simpleProgram() {
+    return this._simpleProgram;
+  }
 }
+ShaderManager._instance = null;

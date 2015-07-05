@@ -33,7 +33,7 @@ class Renderer {
 
     setDefaultGLStates();
     var glem = GLExtentionsManager.getInstance(gl);
-    this._glslProgram = ShaderManager.getSimpleShaderPrograms(gl);
+    this._glslProgram = ShaderManager.getInstance(gl).simpleProgram;
 
     var that = this;
     var initVertexBuffers = function initVertexBuffers(gl, glslProgram, extVAO)
