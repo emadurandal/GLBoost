@@ -18941,6 +18941,7 @@ tm.webgl = tm.webgl || {};
 
         _draw: function() {
             this.renderer.clearCanvas();
+            this.renderer.draw();
         }
 
     });
