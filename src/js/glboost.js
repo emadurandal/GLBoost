@@ -1,7 +1,9 @@
+import GLBoost from './globals'
+
 import Mesh from './Mesh'
 import GLContext from './GLContext'
+import Vector3 from './Vector3'
 
-window.GLBoost = window.GLBoost || { REVISION: '1' };
 
 class Renderer {
   constructor(parameters) {
@@ -32,7 +34,20 @@ class Renderer {
     setDefaultGLStates();
 
     this.mesh = new Mesh();
-    this.mesh.setVerticesData();
+
+    var positions = [
+      new Vector3(-0.5, -0.5, 0.0),
+      new Vector3(0.5, -0.5, 0.0),
+      new Vector3(0.0,  0.5, 0.0)
+      ];
+
+    var colors = [
+      new Vector3(1.0, 0.0, 0.0),
+      new Vector3(0.0, 1.0, 0.0),
+      new Vector3(0.0, 0.0, 1.0)
+      ];
+
+    this.mesh.setVerticesData(positions, colors);
   }
 
   draw() {
@@ -54,4 +69,4 @@ class Renderer {
   };
 }
 
-window.GLBoost["Renderer"] = Renderer;
+GLBoost["Renderer"] = Renderer;

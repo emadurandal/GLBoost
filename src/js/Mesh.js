@@ -7,7 +7,7 @@ export default class Mesh {
 
   }
 
-  setVerticesData() {
+  setVerticesData(positons, colors) {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
@@ -21,12 +21,17 @@ export default class Mesh {
     var squareVerticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
-    var vertexData = new Float32Array([
-      // posx posy posz colr colg colb
-      -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-      0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-      0.0,  0.5, 0.0, 0.0, 0.0, 1.0
-    ]);
+    var vertexData = [];
+
+    positons.forEach((element, index, array) => {
+      vertexData.push(element.x);
+      vertexData.push(element.y);
+      vertexData.push(element.z);
+      vertexData.push(colors[index].x);
+      vertexData.push(colors[index].y);
+      vertexData.push(colors[index].z);
+    });
+
     // ストライド（頂点のサイズ）
     var stride = 24; // float6個分
 
@@ -38,7 +43,7 @@ export default class Mesh {
     gl.vertexAttribPointer(glslProgram.vertexAttributePosition, 3, gl.FLOAT, gl.FALSE, stride, 0)
     // 色
     gl.enableVertexAttribArray(glslProgram.vertexAttributeColor);
-    gl.vertexAttribPointer(glslProgram.vertexAttributeColor, 2, gl.FLOAT, gl.FALSE, stride, 12)
+    gl.vertexAttribPointer(glslProgram.vertexAttributeColor, 3, gl.FLOAT, gl.FALSE, stride, 12)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     extVAO.bindVertexArrayOES(null)
