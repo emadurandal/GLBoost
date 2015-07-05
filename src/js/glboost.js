@@ -1,35 +1,8 @@
 import Mesh from './Mesh'
+import GLExtentionsManager from './GLExtentionsManager'
 import ShaderManager from './ShaderManager'
 
 window.GLBoost = window.GLBoost || { REVISION: '1' };
-
-
-
-class GLExtentionsManager {
-
-  constructor(gl) {
-    if (this._instance) {
-        return this._instance;
-    }
-
-    this._extVAO = gl.getExtension("OES_vertex_array_object");
-    if (!this._extVAO) {
-        throw("OES_vertex_array_objectをサポートしていません");
-    }
-
-    this._instance = this;
-  }
-  static getInstance(gl) {
-    return new GLExtentionsManager(gl);
-  }
-
-  get extVAO() {
-    return this._extVAO;
-  }
-
-}
-GLExtentionsManager._instance = null;
-
 
 class Renderer {
   constructor(parameters) {
