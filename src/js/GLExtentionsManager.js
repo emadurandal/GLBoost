@@ -7,7 +7,7 @@ export default class GLExtentionsManager {
 
     this._extVAO = gl.getExtension("OES_vertex_array_object");
     if (!this._extVAO) {
-        throw("OES_vertex_array_objectをサポートしていません");
+        throw new Error("OES_vertex_array_objectをサポートしていません");
     }
 
     GLExtentionsManager._instance = this;
