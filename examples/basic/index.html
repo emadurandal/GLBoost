@@ -9,12 +9,56 @@
   <script src="../../build/glboost.js"></script>
   <script src="../../libs/tmlib.js"></script>
   <script>
-    // TODO: ここにコードを書いていく
-    tm.main(function() {
-      console.log("tmlib.js バッチリ読み込まれてるよ！！");
+  /*
+   * constant
+   */
+  var SCREEN_WIDTH    = 465;              // 画面幅
+  var SCREEN_HEIGHT   = 465;              // 画面高さ
+  var SCREEN_CENTER_X = SCREEN_WIDTH/2;   // 画面中央X座標値
+  var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
+
+  /*
+   * main
+   */
+  tm.main(function() {
+  	// アプリケーション
       var app = tm.webgl.WebGLApp("#world");
+      app.replaceScene(MainScene());
+
+      // 実行
       app.run();
-    });
+  });
+
+
+  /*
+   * scene
+   */
+  var MainScene = tm.createClass({
+      // three.js 用シーンを継承
+      superClass: tm.webgl.Scene,
+
+      init: function() {
+          this.superInit();
+
+          var positions = [
+            new tm.geom.Vector3(-0.5, -0.5, 0.0),
+            new tm.geom.Vector3(0.5, -0.5, 0.0),
+            new tm.geom.Vector3(0.0,  0.5, 0.0)
+            ];
+
+          var colors = [
+            new tm.geom.Vector3(1.0, 0.0, 0.0),
+            new tm.geom.Vector3(0.0, 1.0, 0.0),
+            new tm.geom.Vector3(0.0, 0.0, 1.0)
+            ];
+
+          var mesh = tm.webgl.MeshElement();
+          mesh.setVerticesData(positions, colors);
+
+          this.add( mesh );
+
+      }
+  });
   </script>
 </head>
 <body>
