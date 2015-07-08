@@ -1,10 +1,12 @@
+import GLBoost from './globals'
+import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import ShaderManager from './ShaderManager'
 
-export default class Mesh {
+export default class Mesh extends Element {
   constructor() {
-
+    super();
   }
 
   setVerticesData(positons, colors) {
@@ -69,3 +71,5 @@ export default class Mesh {
 
   }
 }
+
+GLBoost["Mesh"] = Mesh;

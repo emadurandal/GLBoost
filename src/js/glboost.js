@@ -4,6 +4,7 @@ import Mesh from './Mesh'
 import GLContext from './GLContext'
 import Vector3 from './Vector3'
 
+import Scene from './Scene'
 
 class Renderer {
   constructor(parameters) {
@@ -33,25 +34,12 @@ class Renderer {
 
     setDefaultGLStates();
 
-    this.mesh = new Mesh();
-
-    var positions = [
-      new Vector3(-0.5, -0.5, 0.0),
-      new Vector3(0.5, -0.5, 0.0),
-      new Vector3(0.0,  0.5, 0.0)
-      ];
-
-    var colors = [
-      new Vector3(1.0, 0.0, 0.0),
-      new Vector3(0.0, 1.0, 0.0),
-      new Vector3(0.0, 0.0, 1.0)
-      ];
-
-    this.mesh.setVerticesData(positions, colors);
   }
 
-  draw() {
-    this.mesh.draw();
+  draw(scene) {
+    scene.meshes.forEach((mesh)=> {
+      mesh.draw();
+    });
   }
 
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
