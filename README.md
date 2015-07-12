@@ -2,6 +2,16 @@
 
 A New WebGL Rendering Library for 3D Graphics Geeks
 
+## Attention
+
+[en]
+This library is now the earliest stage of development.
+Please wait until it becomes usable level.
+
+[ja]
+このライブラリはまだ開発の最初期段階です。
+使い物になる状態になるまで、もうしばらくお待ちください。
+
 ## Concept
 
 [en]
