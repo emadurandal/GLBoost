@@ -43,18 +43,40 @@
           var positions = [
             new tm.geom.Vector3(-0.5, -0.5, 0.0),
             new tm.geom.Vector3(0.5, -0.5, 0.0),
-            new tm.geom.Vector3(0.0,  0.5, 0.0)
+            new tm.geom.Vector3(-0.5,  0.5, 0.0),
+
+            new tm.geom.Vector3(-0.5, 0.5, 0.0),
+            new tm.geom.Vector3(0.5, -0.5, 0.0),
+            new tm.geom.Vector3(0.5,  0.5, 0.0)
             ];
 
           var colors = [
             new tm.geom.Vector3(1.0, 0.0, 0.0),
             new tm.geom.Vector3(0.0, 1.0, 0.0),
+            new tm.geom.Vector3(0.0, 0.0, 1.0),
+
+            new tm.geom.Vector3(1.0, 0.0, 0.0),
+            new tm.geom.Vector3(0.0, 1.0, 0.0),
             new tm.geom.Vector3(0.0, 0.0, 1.0)
+
+            ];
+          var texcoords = [
+            new tm.geom.Vector2(0.0, 0.0),
+            new tm.geom.Vector2(1.0, 0.0),
+            new tm.geom.Vector2(0.0, 1.0),
+
+            new tm.geom.Vector2(0.0, 1.0),
+            new tm.geom.Vector2(1.0, 0.0),
+            new tm.geom.Vector2(1.0, 1.0)
             ];
 
           var mesh = tm.webgl.MeshElement();
-          mesh.setVerticesData(positions, colors);
+          mesh.setVerticesData(positions, colors, texcoords);
 
+          var texture = new GLBoost.Texture('resouces/texture.png');
+          var material = new GLBoost.ClassicMaterial();
+          material.diffuseTexture = texture;
+          mesh.material = material;
           this.add( mesh );
 
       }
