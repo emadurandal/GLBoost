@@ -2,7 +2,7 @@ import GLBoost from './globals'
 import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
-import Shader from './Shader'
+import SimpleShader from './SimpleShader'
 
 export default class Mesh extends Element {
   constructor() {
@@ -33,7 +33,7 @@ export default class Mesh extends Element {
   }
 
   _getSheder(result) {
-    return Shader.getInstance().getSimpleShaderPrograms(result);
+    return SimpleShader.getInstance().getShaderPrograms(result);
   }
 
   setVerticesData(vertices) {
