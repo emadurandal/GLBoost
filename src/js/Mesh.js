@@ -2,7 +2,7 @@ import GLBoost from './globals'
 import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
-import ShaderManager from './ShaderManager'
+import ShaderManager from './Shader'
 
 export default class Mesh extends Element {
   constructor() {
