@@ -1,14 +1,14 @@
 import GLContext from './GLContext'
 
-export default class ShaderManager {
+export default class Shader {
   constructor() {
-    if (ShaderManager._instance) {
-        return ShaderManager._instance;
+    if (Shader._instance) {
+        return Shader._instance;
     }
 
     this._gl = GLContext.getInstance().gl;;
 
-    ShaderManager._instance = this;
+    Shader._instance = this;
   }
 
   getShader(gl, theSource, type) {
@@ -134,10 +134,10 @@ export default class ShaderManager {
     return shaderProgram;
   }
 
-  static getInstance(canvas) {
-    return new ShaderManager(canvas);
+  static getInstance() {
+    return new Shader();
   }
 
 }
 
-ShaderManager._instance = null;
+Shader._instance = null;
