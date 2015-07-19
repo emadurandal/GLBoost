@@ -64,11 +64,14 @@ precision mediump float;
 
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexColor;
+attribute vec2 aVertexTexcoord;
 varying vec4 color;
+varying vec2 texcoord;
 
 void main(void) {
   gl_Position = vec4(aVertexPosition, 1.0);
   color = vec4(aVertexColor, 1.0);
+  texcoord = aVertexTexcoord;
 }
 `;
   }
@@ -77,9 +80,13 @@ void main(void) {
     return `
 precision mediump float;
 varying vec4 color;
+varying vec2 texcoord;
+uniform sampler2D texture;
 
 void main(void){
-  gl_FragColor = color;
+  //gl_FragColor = color;
+  gl_FragColor = texture2D(texture, texcoord);
+//  gl_FragColor = vec4(texcoord, 0.0, 1.0);
 }
 `;
   }
@@ -90,6 +97,11 @@ void main(void){
     gl.enableVertexAttribArray(shaderProgram.vertexAttributePosition);
     shaderProgram.vertexAttributeColor = gl.getAttribLocation(shaderProgram, "aVertexColor");
     gl.enableVertexAttribArray(shaderProgram.vertexAttributeColor);
+    shaderProgram.vertexAttributeTexcoord = gl.getAttribLocation(shaderProgram, "aVertexTexcoord");
+    gl.enableVertexAttribArray(shaderProgram.vertexAttributeTexcoord);
+    shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
+    // サンプラーにテクスチャユニット０を指定する
+    gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
 
     return shaderProgram;
   }

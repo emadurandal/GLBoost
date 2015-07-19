@@ -1,10 +1,13 @@
+// 依存ファイル
 import GLBoost from './globals'
-
 import Mesh from './Mesh'
 import GLContext from './GLContext'
-import Vector3 from './Vector3'
 
+// GLBoostとして読み込ませるためのファイル
 import Scene from './Scene'
+import Vector3 from './Vector3'
+import ClassicMaterial from './ClassicMaterial'
+import Texture from './Texture'
 
 class Renderer {
   constructor(parameters) {

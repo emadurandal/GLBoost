@@ -7,13 +7,14 @@ import ShaderManager from './ShaderManager'
 export default class Mesh extends Element {
   constructor() {
     super();
+    this._material = null;
+    this._vertexN = 0;
   }
 
-  setVerticesData(positons, colors) {
+  setVerticesData(positons, colors, texcoords) {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
-
 
     // create VAO
     var vao = extVAO.createVertexArrayOES();
@@ -22,6 +23,8 @@ export default class Mesh extends Element {
     // create VBO
     var squareVerticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
+
+    this._vertexN = positons.length;
 
     var vertexData = [];
 
@@ -32,10 +35,12 @@ export default class Mesh extends Element {
       vertexData.push(colors[index].x);
       vertexData.push(colors[index].y);
       vertexData.push(colors[index].z);
+      vertexData.push(texcoords[index].x);
+      vertexData.push(texcoords[index].y);
     });
 
     // ストライド（頂点のサイズ）
-    var stride = 24; // float6個分
+    var stride = 32; // float6個分
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
 
@@ -46,6 +51,9 @@ export default class Mesh extends Element {
     // 色
     gl.enableVertexAttribArray(glslProgram.vertexAttributeColor);
     gl.vertexAttribPointer(glslProgram.vertexAttributeColor, 3, gl.FLOAT, gl.FALSE, stride, 12)
+    // テクスチャ座標
+    gl.enableVertexAttribArray(glslProgram.vertexAttributeTexcoord);
+    gl.vertexAttribPointer(glslProgram.vertexAttributeTexcoord, 2, gl.FLOAT, gl.FALSE, stride, 24)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     extVAO.bindVertexArrayOES(null)
@@ -57,7 +65,7 @@ export default class Mesh extends Element {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
-
+    var material = this._material;
     // draw
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -65,10 +73,22 @@ export default class Mesh extends Element {
 
     extVAO.bindVertexArrayOES(this._vao);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (material) {
+      material.setUp();
+    }
+
+    gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+
+    if (material) {
+      material.tearDown();
+    }
 
     extVAO.bindVertexArrayOES(null);
 
+  }
+
+  set material(mat) {
+    this._material = mat;
   }
 }
 
