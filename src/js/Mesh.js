@@ -32,13 +32,17 @@ export default class Mesh extends Element {
     return attribNameArray;
   }
 
+  _getSheder(result) {
+    return ShaderManager.getInstance().getSimpleShaderPrograms(result);
+  }
+
   setVerticesData(vertices) {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
 
     // GLSLプログラム作成。
     var result = this._decideAndModifyShaderFunctions(vertices);
-    var glslProgram = ShaderManager.getInstance(gl).getSimpleShaderPrograms(result);
+    var glslProgram = this._getSheder(result);
 
     // create VAO
     var vao = extVAO.createVertexArrayOES();
