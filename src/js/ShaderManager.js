@@ -1,13 +1,12 @@
+import GLContext from './GLContext'
+
 export default class ShaderManager {
-  constructor(gl) {
+  constructor() {
     if (ShaderManager._instance) {
         return ShaderManager._instance;
     }
-    if (gl === void 0 || !gl instanceof WebGLRenderingContext) {
-      throw new Error("Failed to create ShaderManager due to no WebGL Context.");
-    }
 
-    this._gl = gl;
+    this._gl = GLContext.getInstance().gl;;
 
     ShaderManager._instance = this;
   }
