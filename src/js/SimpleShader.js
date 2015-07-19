@@ -75,7 +75,7 @@ export default class SimpleShader extends Shader {
       gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
     });
 
-    if (functions.indexOf("texcoord") >= 0) {
+    if (this._exist(functions, GLBoost.TEXCOORD)) {
       shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
       // サンプラーにテクスチャユニット０を指定する
       gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
