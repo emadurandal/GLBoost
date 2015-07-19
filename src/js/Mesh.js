@@ -7,6 +7,7 @@ import SimpleShader from './SimpleShader'
 export default class Mesh extends Element {
   constructor() {
     super();
+    this._gl = GLContext.getInstance().gl;
     this._material = null;
     this._vertexN = 0;
     this._stride = 0;
@@ -37,7 +38,7 @@ export default class Mesh extends Element {
   }
 
   setVerticesData(vertices) {
-    var gl = GLContext.getInstance().gl;
+    var gl = this._gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
 
     // GLSLプログラム作成。

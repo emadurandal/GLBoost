@@ -19029,7 +19029,7 @@ tm.webgl = tm.webgl || {};
          * @constructor
          */
         init: function() {
-            GLBoost.Element.constructor.call(this);
+            GLBoost.Element.prototype.constructor.call(this);
 
             tm.event.EventDispatcher.prototype.init.call(this);
         },
@@ -19088,6 +19088,31 @@ tm.webgl = tm.webgl || {};
 
 })();
 
+(function() {
+
+    if (!tm.global.GLBoost) return ;
+
+    /**
+     * @class tm.webgl.BlendShapeMeshElement
+     * @TODO ?
+     */
+    tm.webgl.BlendShapeMeshElement = tm.createClass({
+        superClass: GLBoost.BlendShapeMesh,
+
+        /**
+         * @constructor
+         */
+        init: function(geometry, material) {
+            GLBoost.BlendShapeMesh.prototype.constructor.call(this);
+
+            tm.webgl.MeshElement.prototype.init.call(this);
+        }
+    });
+
+    // tm.webgl.MeshElement を継承
+    tm.webgl.BlendShapeMeshElement.prototype.$safe(tm.webgl.MeshElement.prototype);
+
+})();
 
 (function() {
 
@@ -19108,7 +19133,7 @@ tm.webgl = tm.webgl || {};
          */
         init: function(fov, aspect) {
             // THREE.Scene の初期化
-            GLBoost.Scene.call(this);
+            GLBoost.Scene.prototype.constructor.call(this);
 
             // tm.three.Element を継承
             tm.webgl.Element.prototype.init.call(this);
