@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost basic example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../build/glboost.js"></script>
+  <script src="../../libs/tmlib.js"></script>
+  <script>
+  /*
+   * constant
+   */
+  var SCREEN_WIDTH    = 465;              // 画面幅
+  var SCREEN_HEIGHT   = 465;              // 画面高さ
+  var SCREEN_CENTER_X = SCREEN_WIDTH/2;   // 画面中央X座標値
+  var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
+
+  /*
+   * main
+   */
+  tm.main(function() {
+  	// アプリケーション
+      var app = tm.webgl.WebGLApp("#world");
+      app.replaceScene(MainScene());
+
+      // 実行
+      app.run();
+  });
+
+
+  /*
+   * scene
+   */
+  var MainScene = tm.createClass({
+      // three.js 用シーンを継承
+      superClass: tm.webgl.Scene,
+
+      init: function() {
+          this.superInit();
+
+          var positions = [
+            /*
+              new tm.geom.Vector3(-0.5, -0.5, 0.0),
+              new tm.geom.Vector3(0.5, -0.5, 0.0),
+              new tm.geom.Vector3(-0.5,  0.5, 0.0),
+
+              new tm.geom.Vector3(-0.5, 0.5, 0.0),
+              new tm.geom.Vector3(0.5, -0.5, 0.0),
+              new tm.geom.Vector3(0.5,  0.5, 0.0)
+              */
+              new tm.geom.Vector3(-0.5, -1.0, 0.0),
+              new tm.geom.Vector3(0.5, -1.0, 0.0),
+              new tm.geom.Vector3(-0.5,  1.0, 0.0),
+
+              new tm.geom.Vector3(-0.5, 1.0, 0.0),
+              new tm.geom.Vector3(0.5, -1.0, 0.0),
+              new tm.geom.Vector3(0.5,  1.0, 0.0)
+
+            ];
+          var shapetarget_1 = [
+              new tm.geom.Vector3(-1.0, -0.5, 0.0),
+              new tm.geom.Vector3(1.0, -0.5, 0.0),
+              new tm.geom.Vector3(-1.0,  0.5, 0.0),
+
+              new tm.geom.Vector3(-1.0, 0.5, 0.0),
+              new tm.geom.Vector3(1.0, -0.5, 0.0),
+              new tm.geom.Vector3(1.0,  0.5, 0.0)
+            ];
+
+          var colors = [
+              new tm.geom.Vector3(1.0, 0.0, 0.0),
+              new tm.geom.Vector3(0.0, 1.0, 0.0),
+              new tm.geom.Vector3(0.0, 0.0, 1.0),
+
+              new tm.geom.Vector3(1.0, 0.0, 0.0),
+              new tm.geom.Vector3(0.0, 1.0, 0.0),
+              new tm.geom.Vector3(0.0, 0.0, 1.0)
+            ];
+          var texcoords = [
+              new tm.geom.Vector2(0.0, 0.0),
+              new tm.geom.Vector2(1.0, 0.0),
+              new tm.geom.Vector2(0.0, 1.0),
+
+              new tm.geom.Vector2(0.0, 1.0),
+              new tm.geom.Vector2(1.0, 0.0),
+              new tm.geom.Vector2(1.0, 1.0)
+            ];
+
+          var mesh = tm.webgl.BlendShapeMeshElement();
+          var texture = new GLBoost.Texture('resouces/texture.png');
+          var material = new GLBoost.ClassicMaterial();
+          material.diffuseTexture = texture;
+          mesh.material = material;
+          mesh.setVerticesData({
+            position: positions,
+            color: colors,
+            texcoord: texcoords,
+            shapetarget_1: shapetarget_1
+          });
+
+          this.add( mesh );
+
+          mesh.blendWeight_1 = 0.0;
+
+          this.tw = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+          this.ctw = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+          self = this;
+          this.tw.on("finish", function (e) { self.ctw.start(); });
+          this.ctw.on("finish", function (e) { self.tw.start(); });
+          this.tw.start();
+
+      }
+  });
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost basic example</p>
+</header>
+<nav>
+</nav>
+<main>
+  <canvas id="world" width="465" height="465"></canvas>
+</main>
+</body>
+</html>
