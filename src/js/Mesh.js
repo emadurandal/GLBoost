@@ -9,12 +9,36 @@ export default class Mesh extends Element {
     super();
     this._material = null;
     this._vertexN = 0;
+    this._stride = 0;
+    this._glslProgram = null;
   }
 
-  setVerticesData(positons, colors, texcoords) {
+  // シェーダーで有効にする機能を判断する。また、状況に応じて、意味のない頂点データは破棄する。
+  _decideAndModifyShaderFunctions(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      if (attribName === GLBoost.TEXCOORD) {
+        // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
+        if ((this._material !== null) && this._material.diffuseTexture !== null) {
+          attribNameArray.push(attribName);
+        } else {
+          delete vertices[GLBoost.TEXCOORD];
+        }
+      } else {
+        attribNameArray.push(attribName);
+      }
+    }
+
+    return attribNameArray;
+  }
+
+  setVerticesData(vertices) {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
-    var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
+
+    // GLSLプログラム作成。
+    var result = this._decideAndModifyShaderFunctions(vertices);
+    var glslProgram = ShaderManager.getInstance(gl).getSimpleShaderPrograms(result);
 
     // create VAO
     var vao = extVAO.createVertexArrayOES();
@@ -24,52 +48,53 @@ export default class Mesh extends Element {
     var squareVerticesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
 
-    this._vertexN = positons.length;
+    this._vertexN = vertices.position.length;
 
     var vertexData = [];
 
-    positons.forEach((element, index, array) => {
-      vertexData.push(element.x);
-      vertexData.push(element.y);
-      vertexData.push(element.z);
-      vertexData.push(colors[index].x);
-      vertexData.push(colors[index].y);
-      vertexData.push(colors[index].z);
-      vertexData.push(texcoords[index].x);
-      vertexData.push(texcoords[index].y);
+    this._stride = 0;
+    vertices.position.forEach((elem, index, array) => {
+      for (var attribName in vertices) {
+        var element = vertices[attribName][index];
+        vertexData.push(element.x);
+        vertexData.push(element.y );
+        if (element.z !== void 0) {
+          vertexData.push(element.z);
+        }
+      }
     });
 
-    // ストライド（頂点のサイズ）
-    var stride = 32; // float6個分
+    for (var attribName in vertices) {
+      var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
+      this._stride += numberOfComponentOfVector * 4;
+    }
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
 
     // 頂点レイアウト設定
-    // 位置
-    gl.enableVertexAttribArray(glslProgram.vertexAttributePosition);
-    gl.vertexAttribPointer(glslProgram.vertexAttributePosition, 3, gl.FLOAT, gl.FALSE, stride, 0)
-    // 色
-    gl.enableVertexAttribArray(glslProgram.vertexAttributeColor);
-    gl.vertexAttribPointer(glslProgram.vertexAttributeColor, 3, gl.FLOAT, gl.FALSE, stride, 12)
-    // テクスチャ座標
-    gl.enableVertexAttribArray(glslProgram.vertexAttributeTexcoord);
-    gl.vertexAttribPointer(glslProgram.vertexAttributeTexcoord, 2, gl.FLOAT, gl.FALSE, stride, 24)
-
+    var offset = 0;
+    for (var attribName in vertices) {
+      gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
+      gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
+        numberOfComponentOfVector, gl.FLOAT, gl.FALSE, this._stride, offset);
+      offset += numberOfComponentOfVector * 4;
+    }
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     extVAO.bindVertexArrayOES(null)
 
     this._vao = vao;
+    this._glslProgram = glslProgram;
   }
 
   draw() {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
-    var glslProgram = ShaderManager.getInstance(gl).simpleProgram;
     var material = this._material;
     // draw
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl.useProgram(glslProgram);
+    gl.useProgram(this._glslProgram);
 
     extVAO.bindVertexArrayOES(this._vao);
 

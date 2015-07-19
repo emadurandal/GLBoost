@@ -71,12 +71,16 @@
             ];
 
           var mesh = tm.webgl.MeshElement();
-          mesh.setVerticesData(positions, colors, texcoords);
-
           var texture = new GLBoost.Texture('resouces/texture.png');
           var material = new GLBoost.ClassicMaterial();
           material.diffuseTexture = texture;
           mesh.material = material;
+          mesh.setVerticesData({
+            position: positions,
+            color: colors,
+            texcoord: texcoords
+          });
+
           this.add( mesh );
 
       }

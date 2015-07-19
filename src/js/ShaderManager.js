@@ -7,7 +7,7 @@ export default class ShaderManager {
       throw new Error("Failed to create ShaderManager due to no WebGL Context.");
     }
 
-    this._simpleProgram = this.getSimpleShaderPrograms(gl);
+    this._gl = gl;
 
     ShaderManager._instance = this;
   }
@@ -58,50 +58,79 @@ export default class ShaderManager {
     return shaderProgram;
   }
 
-  getSimpleVertexShaderString() {
-    return `
-precision mediump float;
-
-attribute vec3 aVertexPosition;
-attribute vec3 aVertexColor;
-attribute vec2 aVertexTexcoord;
-varying vec4 color;
-varying vec2 texcoord;
-
-void main(void) {
-  gl_Position = vec4(aVertexPosition, 1.0);
-  color = vec4(aVertexColor, 1.0);
-  texcoord = aVertexTexcoord;
-}
-`;
+  _exist(functions, attribute) {
+    return functions.indexOf(attribute) >= 0
   }
 
-  getSimpleFragmentShaderString() {
-    return `
-precision mediump float;
-varying vec4 color;
-varying vec2 texcoord;
-uniform sampler2D texture;
+  getSimpleVertexShaderString(functions) {
+    var f = functions;
+    var shaderText = '';
 
-void main(void){
-  //gl_FragColor = color;
-  gl_FragColor = texture2D(texture, texcoord);
-//  gl_FragColor = vec4(texcoord, 0.0, 1.0);
-}
-`;
+    shaderText +=   'precision mediump float;\n';
+    shaderText +=   'attribute vec3 aVertex_position;\n';
+    if (this._exist(f, GLBoost.COLOR)) {
+      shaderText += 'attribute vec3 aVertex_color;\n';
+      shaderText += 'varying vec4 color;\n';
+    }
+    if (this._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += 'attribute vec2 aVertex_texcoord;\n';
+      shaderText += 'varying vec2 texcoord;\n';
+    }
+    shaderText +=   'void main(void) {\n';
+    shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
+    if (this._exist(f, GLBoost.COLOR)) {
+      shaderText += '  color = vec4(aVertex_color, 1.0);\n';
+    }
+    if (this._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  texcoord = aVertex_texcoord;\n';
+    }
+    shaderText +=   '}\n';
+
+    return shaderText;
   }
 
-  getSimpleShaderPrograms(gl) {
-    var shaderProgram = this.initShaders(gl, this.getSimpleVertexShaderString(), this.getSimpleFragmentShaderString());
-    shaderProgram.vertexAttributePosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(shaderProgram.vertexAttributePosition);
-    shaderProgram.vertexAttributeColor = gl.getAttribLocation(shaderProgram, "aVertexColor");
-    gl.enableVertexAttribArray(shaderProgram.vertexAttributeColor);
-    shaderProgram.vertexAttributeTexcoord = gl.getAttribLocation(shaderProgram, "aVertexTexcoord");
-    gl.enableVertexAttribArray(shaderProgram.vertexAttributeTexcoord);
-    shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
-    // サンプラーにテクスチャユニット０を指定する
-    gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+  getSimpleFragmentShaderString(functions) {
+    var f = functions;
+    var shaderText = '';
+
+    shaderText +=   'precision mediump float;\n';
+    if (this._exist(f, GLBoost.COLOR)) {
+      shaderText += 'varying vec4 color;\n';
+    }
+    if (this._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += 'varying vec2 texcoord;\n\n';
+      shaderText += 'uniform sampler2D texture;\n';
+    }
+    shaderText +=   'void main(void) {\n';
+
+    if (this._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  gl_FragColor = texture2D(texture, texcoord);\n';
+    } else if (this._exist(f, GLBoost.COLOR)) {
+      shaderText += '  gl_FragColor = color;\n';
+    } else {
+      shaderText += '  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n';
+    }
+
+    shaderText +=   '}\n';
+
+    return shaderText;
+
+  }
+
+  getSimpleShaderPrograms(functions) {
+    var gl = this._gl;
+    var shaderProgram = this.initShaders(gl, this.getSimpleVertexShaderString(functions), this.getSimpleFragmentShaderString(functions));
+
+    functions.forEach((attribName)=>{
+      shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+    });
+
+    if (functions.indexOf("texcoord") >= 0) {
+      shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
+      // サンプラーにテクスチャユニット０を指定する
+      gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+    }
 
     return shaderProgram;
   }
@@ -110,8 +139,6 @@ void main(void){
     return new ShaderManager(canvas);
   }
 
-  get simpleProgram() {
-    return this._simpleProgram;
-  }
 }
+
 ShaderManager._instance = null;

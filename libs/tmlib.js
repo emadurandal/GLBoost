@@ -18945,11 +18945,7 @@ tm.webgl = tm.webgl || {};
 
         _draw: function() {
             this.renderer.clearCanvas();
-/*
-            for (var i=0; i<this._scenes.lenght; ++i) {
-                this.renderer.draw(this._scenes[i]);
-            }
-            */
+
             for (var i=0, len=this._scenes.length; i<len; ++i) {
                 this.renderer.draw(this.currentScene);
             }
@@ -19081,7 +19077,7 @@ tm.webgl = tm.webgl || {};
          * @constructor
          */
         init: function(geometry, material) {
-            GLBoost.Mesh.constructor.call(this);
+            GLBoost.Mesh.prototype.constructor.call(this);
 
             tm.webgl.Element.prototype.init.call(this);
         }
