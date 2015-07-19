@@ -33,7 +33,7 @@ export default class Mesh extends Element {
   }
 
   _getSheder(result) {
-    return SimpleShader.getInstance().getShaderPrograms(result);
+    return SimpleShader.getInstance().getShaderProgram(result);
   }
 
   setVerticesData(vertices) {

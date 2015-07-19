@@ -66,7 +66,7 @@ export default class SimpleShader extends Shader {
 
   }
 
-  getShaderPrograms(functions) {
+  getShaderProgram(functions) {
     var gl = this._gl;
     var shaderProgram = this._initShaders(gl, this._getSimpleVertexShaderString(functions), this._getSimpleFragmentShaderString(functions));
 
