@@ -25,14 +25,27 @@ export default class BlendShapeShader extends Shader {
       shaderText += 'attribute vec2 aVertex_texcoord;\n';
       shaderText += 'varying vec2 texcoord;\n';
     }
-    shaderText +=   'attribute vec3 aVertex_shapetarget_1;\n';
-    shaderText +=   'uniform float blendWeight_shapetarget_1;\n';
-
+    functions.forEach((attribName)=>{
+      if (this._isShapeTarget(attribName)) {
+        shaderText+='attribute vec3 aVertex_' + attribName  + ';\n';
+        shaderText+='uniform float blendWeight_' + attribName  + ';\n';
+      }
+    });
     shaderText +=   'void main(void) {\n';
+    shaderText +=     'float sumOfWeights = 0.0;\n';
+    functions.forEach((attribName)=>{
+      if (this._isShapeTarget(attribName)) {
+        shaderText += 'sumOfWeights += blendWeight_' + attribName +';\n';
+      }
+    });
+    var numOfShapeTargets = this._numberOfShapeTargets(functions);
+    shaderText += '    vec3 blendedPosition = aVertex_position * max(1.0 - sumOfWeights/float(' + numOfShapeTargets + '), 0.0);\n';
+    functions.forEach((attribName)=>{
+      if (this._isShapeTarget(attribName)) {
+        shaderText += 'blendedPosition += aVertex_' + attribName + ' * blendWeight_' + attribName + '/float(' + numOfShapeTargets + ');\n';
+      }
+    });
 
-    if (this._exist(f, GLBoost.BLENDTARGET1)) {
-      shaderText += '  vec3 blendedPosition = aVertex_position * (1.0 - blendWeight_shapetarget_1) + aVertex_shapetarget_1 * blendWeight_shapetarget_1;\n';
-    }
     shaderText +=   '  gl_Position = vec4(blendedPosition, 1.0);\n';
     if (this._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = vec4(aVertex_color, 1.0);\n';
@@ -73,6 +86,20 @@ export default class BlendShapeShader extends Shader {
 
   }
 
+  _numberOfShapeTargets(attributes) {
+    var count = 0;
+    attributes.forEach((attribName)=>{
+      if (this._isShapeTarget(attribName)) {
+        count += 1;
+      }
+    });
+    return count;
+  }
+
+  _isShapeTarget(attribName) {
+    return !this._exist(attribName, GLBoost.POSITION) && !this._exist(attribName, GLBoost.COLOR) && !this._exist(attribName, GLBoost.TEXCOORD);
+  }
+
   getShaderProgram(functions) {
     var gl = this._gl;
     var shaderProgram = this._initShaders(gl, this._getBlendShapeVertexShaderString(functions), this._getBlendShapeFragmentShaderString(functions));
@@ -88,12 +115,13 @@ export default class BlendShapeShader extends Shader {
       gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
     }
 
-    if (this._exist(functions, GLBoost.BLENDTARGET1)) {
-      shaderProgram['uniformFloatSampler_blendWeight_' + GLBoost.BLENDTARGET1] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + GLBoost.BLENDTARGET1);
-      // とりあえずゼロ初期化
-      gl.uniform1f(shaderProgram['uniformFloatSampler_blendWeight_' + GLBoost.BLENDTARGET1], 0.0);
-    }
-
+    functions.forEach((attribName)=>{
+      if (this._isShapeTarget(attribName)) {
+        shaderProgram['uniformFloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
+        // とりあえずゼロ初期化
+        gl.uniform1f(shaderProgram['uniformFloatSampler_blendWeight_' + attribName], 0.0);
+      }
+    });
 
     return shaderProgram;
   }
