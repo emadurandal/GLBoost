@@ -42,6 +42,10 @@ export default class Matrix4x4 {
       return this;
   }
 
+  static zero() {
+    return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
   set m00(val) {
     this.m[0] = val;
   }
@@ -169,10 +173,7 @@ export default class Matrix4x4 {
   get m33() {
     return this.m[15];
   }
-
-  static zero() {
-    return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  }
+  
 }
 
 GLBoost["Matrix4x4"] = Matrix4x4;

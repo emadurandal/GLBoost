@@ -37,6 +37,20 @@ export default class Vector3 {
   }
 
   /**
+   * 内積
+   */
+  dot(vec3) {
+      return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
+  }
+
+  /**
+   * 内積（static版）
+   */
+  static dot(lv, rv) {
+      return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
+  }
+
+  /**
    * 外積
    */
   cross(v) {

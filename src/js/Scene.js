@@ -4,15 +4,15 @@ import Element from './Element'
 export default class Scene extends Element {
   constructor() {
     super();
-    this._meshes = [];
+    this._elements = [];
   }
 
   add(mesh) {
-    this._meshes.push(mesh);
+    this._elements.push(mesh);
   }
 
-  get meshes() {
-    return this._meshes;
+  get elements() {
+    return this._elements;
   }
 }
 

@@ -33,8 +33,10 @@ class Renderer {
   }
 
   draw(scene) {
-    scene.meshes.forEach((mesh)=> {
-      mesh.draw();
+    scene.elements.forEach((elm)=> {
+      if(elm instanceof Mesh) {
+        elm.draw();
+      }
     });
   }
 
