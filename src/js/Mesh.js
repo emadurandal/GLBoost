@@ -15,8 +15,11 @@ export default class Mesh extends Element {
     this._vertices = null;
   }
 
-  // シェーダーで有効にする機能を判断する。また、状況に応じて、意味のない頂点データは破棄する。
-  _decideAndModifyShaderFunctions(vertices) {
+  /**
+   * データとして利用する頂点属性を判断し、そのリストを返す
+   * 不必要な頂点属性のデータは無視する。
+   */
+  _decideNeededVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
       if (attribName === GLBoost.TEXCOORD) {
@@ -34,22 +37,22 @@ export default class Mesh extends Element {
     return attribNameArray;
   }
 
-  _getSheder(result) {
-    return SimpleShader.getInstance().getShaderProgram(result);
+  _getSheder(result, existCamera_f) {
+    return SimpleShader.getInstance().getShaderProgram(result, existCamera_f);
   }
 
   setVerticesData(vertices) {
     this._vertices = vertices;
   }
 
-  prepareForRender() {
+  prepareForRender(existCamera_f) {
     var vertices = this._vertices;
     var gl = this._gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
 
     // GLSLプログラム作成。
-    var result = this._decideAndModifyShaderFunctions(vertices);
-    var glslProgram = this._getSheder(result);
+    var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
+    var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
 
     // create VAO
     var vao = extVAO.createVertexArrayOES();
@@ -65,32 +68,32 @@ export default class Mesh extends Element {
 
     this._stride = 0;
     vertices.position.forEach((elem, index, array) => {
-      for (var attribName in vertices) {
+      optimizedVertexAttrib.forEach((attribName)=> {
         var element = vertices[attribName][index];
         vertexData.push(element.x);
         vertexData.push(element.y );
         if (element.z !== void 0) {
           vertexData.push(element.z);
         }
-      }
+      });
     });
 
-    for (var attribName in vertices) {
+    optimizedVertexAttrib.forEach((attribName)=> {
       var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
       this._stride += numberOfComponentOfVector * 4;
-    }
+    });
 
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
 
     // 頂点レイアウト設定
     var offset = 0;
-    for (var attribName in vertices) {
+    optimizedVertexAttrib.forEach((attribName)=> {
       gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
       var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
       gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
         numberOfComponentOfVector, gl.FLOAT, gl.FALSE, this._stride, offset);
       offset += numberOfComponentOfVector * 4;
-    }
+    });
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     extVAO.bindVertexArrayOES(null)
 
