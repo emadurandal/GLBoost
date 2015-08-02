@@ -11,6 +11,13 @@ export default class Scene extends Element {
     this._elements.push(mesh);
   }
 
+  prepareForRender() {
+    this._elements.forEach((elm)=> {
+      if (elm.prepareForRender === void 0) return;
+      elm.prepareForRender();
+    });
+  }
+
   get elements() {
     return this._elements;
   }

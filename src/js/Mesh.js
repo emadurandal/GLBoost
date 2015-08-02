@@ -12,6 +12,7 @@ export default class Mesh extends Element {
     this._vertexN = 0;
     this._stride = 0;
     this._glslProgram = null;
+    this._vertices = null;
   }
 
   // シェーダーで有効にする機能を判断する。また、状況に応じて、意味のない頂点データは破棄する。
@@ -38,6 +39,11 @@ export default class Mesh extends Element {
   }
 
   setVerticesData(vertices) {
+    this._vertices = vertices;
+  }
+
+  prepareForRender() {
+    var vertices = this._vertices;
     var gl = this._gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
 

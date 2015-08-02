@@ -102,6 +102,8 @@
 
           this.add( mesh );
 
+          this.prepareForRender();
+
           this.tw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
           this.ctw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
           this.tw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
