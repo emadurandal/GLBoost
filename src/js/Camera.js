@@ -15,25 +15,29 @@ export default class Camera extends Element {
     this.aspect = perspective.aspect;
     this.zNear = perspective.zNear;
     this.zFar = perspective.zFar;
+
+    this.setASMainCamera()
   }
 
   lookAtRHMatrix() {
+//    return Matrix4x4.identity();
     return Camera.lookAtRHMatrix(this.eye, this.center, this.up);
   }
 
   static lookAtRHMatrix(eye, center, up) {
 
-    var f = Vector3.normalize(center - eye);
+    var f = Vector3.normalize(Vector3.subtract(center, eye));
     var s = Vector3.normalize(Vector3.cross(f, up));
     var u = Vector3.cross(s, f);
 
-    return new Matrix4x4(s.x, s.y, s.z, -dot(s,eye),
-                         u.x, u.y, u.z, -dot(u,eye),
-                         -f.x, -f.y -f.z -dot(f,eye),
+    return new Matrix4x4(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+                         u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
+                         -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
                          0, 0, 0, 1);
   }
 
   perspectiveRHMatrix() {
+//    return Matrix4x4.identity();
     return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
   }
 
@@ -43,12 +47,22 @@ export default class Camera extends Element {
     var xscale = yscale / aspect;
 
     return new Matrix4x4(
-        xscale, 0.0, 0.0, 0.0,
-        0.0, yscale, 0.0, 0.0,
-        0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
-        0.0, 0.0, - 1.0, 0.0
+      xscale, 0.0, 0.0, 0.0,
+      0.0, yscale, 0.0, 0.0,
+      0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
+      0.0, 0.0, -1.0, 0.0
     );
+
+  }
+
+  setASMainCamera() {
+    Camera._mainCamera = this;
+  }
+
+  get isMainCamera() {
+    return Camera._mainCamera === this;
   }
 }
+Camera._mainCamera = null;
 
 GLBoost["Camera"] = Camera;

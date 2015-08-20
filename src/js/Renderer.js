@@ -1,5 +1,7 @@
 import GLBoost from './globals'
 import Mesh from './Mesh'
+import Camera from './Camera'
+import Matrix4x4 from './Matrix4x4'
 import GLContext from './GLContext'
 
 class Renderer {
@@ -33,9 +35,18 @@ class Renderer {
   }
 
   draw(scene) {
+    var projectionAndViewMatrix = null;
+    scene.elements.forEach((elm)=> {
+      if(elm instanceof Camera) {
+        if (elm.isMainCamera) {
+          projectionAndViewMatrix = Matrix4x4.multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
+          projectionAndViewMatrix = Matrix4x4.transpose(projectionAndViewMatrix);
+        }
+      }
+    });
     scene.elements.forEach((elm)=> {
       if(elm instanceof Mesh) {
-        elm.draw();
+        elm.draw(projectionAndViewMatrix);
       }
     });
   }

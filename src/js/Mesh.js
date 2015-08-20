@@ -1,5 +1,6 @@
 import GLBoost from './globals'
 import Element from './Element'
+import Matrix4x4 from './Matrix4x4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import SimpleShader from './SimpleShader'
@@ -101,14 +102,17 @@ export default class Mesh extends Element {
     this._glslProgram = glslProgram;
   }
 
-  draw() {
+  draw(projectionAndViewMatrix) {
     var gl = GLContext.getInstance().gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var material = this._material;
-    // draw
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.useProgram(this._glslProgram);
+
+    if (projectionAndViewMatrix) {
+      var pv_m = projectionAndViewMatrix;
+      gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
+    }
 
     extVAO.bindVertexArrayOES(this._vao);
 

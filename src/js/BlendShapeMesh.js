@@ -10,8 +10,8 @@ export default class BlendShapeMesh extends Mesh {
     super();
   }
 
-  _getSheder(result) {
-    return BlendShapeShader.getInstance().getShaderProgram(result);
+  _getSheder(result, existCamera_f) {
+    return BlendShapeShader.getInstance().getShaderProgram(result, existCamera_f);
   }
 
   set blendWeight_1(weight) {

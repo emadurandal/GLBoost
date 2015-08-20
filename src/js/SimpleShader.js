@@ -11,7 +11,7 @@ export default class SimpleShader extends Shader {
     SimpleShader._instance = this;
   }
 
-  _getSimpleVertexShaderString(functions) {
+  _getSimpleVertexShaderString(functions, existCamera_f) {
     var f = functions;
     var shaderText = '';
 
@@ -25,8 +25,16 @@ export default class SimpleShader extends Shader {
       shaderText += 'attribute vec2 aVertex_texcoord;\n';
       shaderText += 'varying vec2 texcoord;\n';
     }
+    if (existCamera_f) {
+      shaderText += 'uniform mat4 projectionAndViewMatrix;\n';
+    }
     shaderText +=   'void main(void) {\n';
-    shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
+
+    if (existCamera_f) {
+      shaderText +=   '  gl_Position = projectionAndViewMatrix * vec4(aVertex_position, 1.0);\n';
+    } else {
+      shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
+    }
     if (this._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = vec4(aVertex_color, 1.0);\n';
     }
@@ -66,19 +74,23 @@ export default class SimpleShader extends Shader {
 
   }
 
-  getShaderProgram(functions) {
+  getShaderProgram(vertexAttribs, existCamera_f) {
     var gl = this._gl;
-    var shaderProgram = this._initShaders(gl, this._getSimpleVertexShaderString(functions), this._getSimpleFragmentShaderString(functions));
+    var shaderProgram = this._initShaders(gl, this._getSimpleVertexShaderString(vertexAttribs, existCamera_f), this._getSimpleFragmentShaderString(vertexAttribs));
 
-    functions.forEach((attribName)=>{
+    vertexAttribs.forEach((attribName)=>{
       shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
       gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
     });
 
-    if (this._exist(functions, GLBoost.TEXCOORD)) {
+    if (this._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
       // サンプラーにテクスチャユニット０を指定する
       gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+    }
+
+    if (existCamera_f) {
+      shaderProgram.projectionAndViewMatrix = gl.getUniformLocation(shaderProgram, 'projectionAndViewMatrix');
     }
 
     return shaderProgram;

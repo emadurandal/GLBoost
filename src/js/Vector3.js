@@ -39,14 +39,14 @@ export default class Vector3 {
   /**
    * 内積
    */
-  dot(vec3) {
+  dotProduct(vec3) {
       return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
   }
 
   /**
    * 内積（static版）
    */
-  static dot(lv, rv) {
+  static dotProduct(lv, rv) {
       return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
   }
 
@@ -79,7 +79,7 @@ export default class Vector3 {
    */
   normalize() {
     var length = this.length();
-    this.div(length);
+    this.divide(length);
 
     return this;
   }
@@ -89,11 +89,48 @@ export default class Vector3 {
    */
   static normalize(vec3) {
     var length = vec3.length();
-    vec3.div(length);
+    vec3.divide(length);
 
     return vec3;
   }
 
+  /**
+   * 減算
+   */
+  subtract(v) {
+    this.x -= v.x;
+    this.y -= v.y;
+    this.z -= v.z;
+
+    return this;
+  }
+
+  /**
+   * 減算（static版）
+   */
+  static subtract(lv, rv) {
+    return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
+  }
+
+  /**
+   * 除算
+   */
+  divide(val) {
+    console.assert(val != 0, "0 division!");
+    this.x /= val;
+    this.y /= val;
+    this.z /= val;
+
+    return this;
+  }
+
+  /**
+   * 除算（static版）
+   */
+  static divide(vec3, val) {
+    console.assert(val != 0, "0 division!");
+    return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+  }
 }
 
 GLBoost["Vector3"] = Vector3;
