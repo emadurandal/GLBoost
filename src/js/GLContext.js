@@ -24,5 +24,4 @@ export default class GLContext {
   }
 
 }
-GLContext._instance = null;
 GLContext._instances = new Object();

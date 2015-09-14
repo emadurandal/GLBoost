@@ -49,6 +49,7 @@ class Renderer {
         elm.draw(projectionAndViewMatrix);
       }
     });
+
   }
 
   clearCanvas( color_flg, depth_flg, stencil_flg ) {

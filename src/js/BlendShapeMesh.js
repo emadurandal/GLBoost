@@ -11,10 +11,12 @@ export default class BlendShapeMesh extends Mesh {
   }
 
   _getSheder(result, existCamera_f) {
-    return BlendShapeShader.getInstance(this.canvas).getShaderProgram(result, existCamera_f);
+    var blendShapeShader = BlendShapeShader.getInstance(this.canvas);
+    return blendShapeShader.getShaderProgram(result, existCamera_f);
   }
 
   set blendWeight_1(weight) {
+//    console.log(this._gl.canvas.id);
     this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + GLBoost.BLENDTARGET1], weight);
   }
   set blendWeight_2(weight) {

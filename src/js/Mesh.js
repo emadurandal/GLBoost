@@ -7,7 +7,7 @@ import SimpleShader from './SimpleShader'
 
 export default class Mesh extends Element {
   constructor(canvas) {
-    super()
+    super();
     this._gl = GLContext.getInstance(canvas).gl;
     this.canvas = canvas;
     this._material = null;
@@ -101,6 +101,7 @@ export default class Mesh extends Element {
 
     this._vao = vao;
     this._glslProgram = glslProgram;
+
   }
 
   draw(projectionAndViewMatrix) {
@@ -128,7 +129,6 @@ export default class Mesh extends Element {
     }
 
     extVAO.bindVertexArrayOES(null);
-
   }
 
   set material(mat) {

@@ -1,8 +1,19 @@
 import GLContext from './GLContext'
 
 export default class Shader {
-  constructor(canvas) {
+  constructor(canvas, childClass) {
+    if (typeof canvas === 'string') {
+      var canvas = window.document.querySelector(canvas);
+    }
+
+    if (Shader._instances[canvas.id] instanceof childClass) {
+      return Shader._instances[canvas.id];
+    }
+
     this._gl = GLContext.getInstance(canvas).gl;
+
+    Shader._instances[canvas.id] = this;
+
   }
 
   _getShader(gl, theSource, type) {
@@ -56,3 +67,5 @@ export default class Shader {
   }
 
 }
+
+Shader._instances = new Object();

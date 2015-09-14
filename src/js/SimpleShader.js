@@ -2,13 +2,9 @@ import Shader from './Shader'
 
 export default class SimpleShader extends Shader {
   constructor(canvas) {
-    if (SimpleShader._instance) {
-        return SimpleShader._instance;
-    }
 
-    super(canvas);
+    super(canvas, SimpleShader);
 
-    SimpleShader._instance = this;
   }
 
   _getSimpleVertexShaderString(functions, existCamera_f) {
@@ -101,5 +97,3 @@ export default class SimpleShader extends Shader {
   }
 
 }
-
-SimpleShader._instance = null;

@@ -34,89 +34,96 @@
    * scene
    */
   var MainScene = tm.createClass({
-      // three.js 用シーンを継承
-      superClass: tm.webgl.Scene,
+    // three.js 用シーンを継承
+    superClass: tm.webgl.Scene,
 
-      init: function() {
-          this.superInit();
+    init: function() {
+      this.superInit();
 
-          var positions = [
-              new tm.geom.Vector3(-0.5, -0.5, 0.0),
-              new tm.geom.Vector3(0.5, -0.5, 0.0),
-              new tm.geom.Vector3(-0.5,  0.5, 0.0),
+      var positions = [
+          new tm.geom.Vector3(-0.5, -0.5, 0.0),
+          new tm.geom.Vector3(0.5, -0.5, 0.0),
+          new tm.geom.Vector3(-0.5,  0.5, 0.0),
 
-              new tm.geom.Vector3(-0.5, 0.5, 0.0),
-              new tm.geom.Vector3(0.5, -0.5, 0.0),
-              new tm.geom.Vector3(0.5,  0.5, 0.0)
+          new tm.geom.Vector3(-0.5, 0.5, 0.0),
+          new tm.geom.Vector3(0.5, -0.5, 0.0),
+          new tm.geom.Vector3(0.5,  0.5, 0.0)
 
-            ];
-          var shapetarget_1 = [
-              new tm.geom.Vector3(-1.0, -0.5, 0.0),
-              new tm.geom.Vector3(1.0, -0.5, 0.0),
-              new tm.geom.Vector3(-1.0,  0.5, 0.0),
+        ];
+      var shapetarget_1 = [
+          new tm.geom.Vector3(-1.0, -0.5, 0.0),
+          new tm.geom.Vector3(1.0, -0.5, 0.0),
+          new tm.geom.Vector3(-1.0,  0.5, 0.0),
 
-              new tm.geom.Vector3(-1.0, 0.5, 0.0),
-              new tm.geom.Vector3(1.0, -0.5, 0.0),
-              new tm.geom.Vector3(1.0,  0.5, 0.0)
-            ];
-          var shapetarget_2 = [
-              new tm.geom.Vector3(-0.5, -1.0, 0.0),
-              new tm.geom.Vector3(0.5, -1.0, 0.0),
-              new tm.geom.Vector3(-0.5,  1.0, 0.0),
+          new tm.geom.Vector3(-1.0, 0.5, 0.0),
+          new tm.geom.Vector3(1.0, -0.5, 0.0),
+          new tm.geom.Vector3(1.0,  0.5, 0.0)
+        ];
+      var shapetarget_2 = [
+          new tm.geom.Vector3(-0.5, -1.0, 0.0),
+          new tm.geom.Vector3(0.5, -1.0, 0.0),
+          new tm.geom.Vector3(-0.5,  1.0, 0.0),
 
-              new tm.geom.Vector3(-0.5, 1.0, 0.0),
-              new tm.geom.Vector3(0.5, -1.0, 0.0),
-              new tm.geom.Vector3(0.5,  1.0, 0.0)
-            ];
-          var colors = [
-              new tm.geom.Vector3(1.0, 0.0, 0.0),
-              new tm.geom.Vector3(0.0, 1.0, 0.0),
-              new tm.geom.Vector3(0.0, 0.0, 1.0),
+          new tm.geom.Vector3(-0.5, 1.0, 0.0),
+          new tm.geom.Vector3(0.5, -1.0, 0.0),
+          new tm.geom.Vector3(0.5,  1.0, 0.0)
+        ];
+      var colors = [
+          new tm.geom.Vector3(1.0, 0.0, 0.0),
+          new tm.geom.Vector3(0.0, 1.0, 0.0),
+          new tm.geom.Vector3(0.0, 0.0, 1.0),
 
-              new tm.geom.Vector3(1.0, 0.0, 0.0),
-              new tm.geom.Vector3(0.0, 1.0, 0.0),
-              new tm.geom.Vector3(0.0, 0.0, 1.0)
-            ];
-          var texcoords = [
-              new tm.geom.Vector2(0.0, 0.0),
-              new tm.geom.Vector2(1.0, 0.0),
-              new tm.geom.Vector2(0.0, 1.0),
+          new tm.geom.Vector3(1.0, 0.0, 0.0),
+          new tm.geom.Vector3(0.0, 1.0, 0.0),
+          new tm.geom.Vector3(0.0, 0.0, 1.0)
+        ];
+      var texcoords = [
+          new tm.geom.Vector2(0.0, 0.0),
+          new tm.geom.Vector2(1.0, 0.0),
+          new tm.geom.Vector2(0.0, 1.0),
 
-              new tm.geom.Vector2(0.0, 1.0),
-              new tm.geom.Vector2(1.0, 0.0),
-              new tm.geom.Vector2(1.0, 1.0)
-            ];
+          new tm.geom.Vector2(0.0, 1.0),
+          new tm.geom.Vector2(1.0, 0.0),
+          new tm.geom.Vector2(1.0, 1.0)
+        ];
 
-          var mesh = tm.webgl.BlendShapeMeshElement('#world');
-          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
-          var material = new GLBoost.ClassicMaterial('#world');
-          material.diffuseTexture = texture;
-          mesh.material = material;
-          mesh.setVerticesData({
-            position: positions,
-            color: colors,
-            texcoord: texcoords,
-            shapetarget_1: shapetarget_1,
-            shapetarget_2: shapetarget_2
-          });
+      var mesh = tm.webgl.BlendShapeMeshElement('#world');
+      var texture = new GLBoost.Texture('resouces/texture.png', '#world');
+      var material = new GLBoost.ClassicMaterial('#world');
+      material.diffuseTexture = texture;
+      mesh.material = material;
+      mesh.setVerticesData({
+        position: positions,
+        color: colors,
+        texcoord: texcoords,
+        shapetarget_1: shapetarget_1,
+        shapetarget_2: shapetarget_2
+      });
 
-          this.add( mesh );
+      this.add( mesh );
 
-          this.prepareForRender();
+      this.prepareForRender();
 
-          this.tw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
-          this.ctw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
-          this.tw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
-          this.ctw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+      var tw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+      var ctw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+      var tw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+      var ctw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
 
-          self = this;
-          this.tw1.on("finish", function (e) { self.tw2.start(); });
-          this.tw2.on("finish", function (e) { self.ctw1.start(); });
-          this.ctw1.on("finish", function (e) { self.ctw2.start(); });
-          this.ctw2.on("finish", function (e) { self.tw1.start(); });
-          this.tw1.start();
+      tw1.on("finish", function (e) {
+        tw2.start();
+      });
+      tw2.on("finish", function (e) {
+        ctw1.start();
+      });
+      ctw1.on("finish", function (e) {
+        ctw2.start();
+      });
+      ctw2.on("finish", function (e) {
+        tw1.start();
+      });
+      tw1.start();
 
-      }
+    }
   });
   </script>
 </head>

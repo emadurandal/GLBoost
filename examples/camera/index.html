@@ -141,17 +141,24 @@
 
           this.prepareForRender();
 
-        this.tw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
-        this.ctw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
-        this.tw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
-        this.ctw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+        var tw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+        var ctw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+        var tw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+        var ctw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
 
-        self = this;
-        this.tw1.on("finish", function (e) { self.tw2.start(); });
-        this.tw2.on("finish", function (e) { self.ctw1.start(); });
-        this.ctw1.on("finish", function (e) { self.ctw2.start(); });
-        this.ctw2.on("finish", function (e) { self.tw1.start(); });
-        this.tw1.start();
+        tw1.on("finish", function (e) {
+          tw2.start();
+        });
+        tw2.on("finish", function (e) {
+          ctw1.start();
+        });
+        ctw1.on("finish", function (e) {
+          ctw2.start();
+        });
+        ctw2.on("finish", function (e) {
+          tw1.start();
+        });
+        tw1.start();
 
       }
   });

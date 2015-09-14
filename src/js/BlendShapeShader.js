@@ -2,13 +2,9 @@ import Shader from './Shader'
 
 export default class BlendShapeShader extends Shader {
   constructor(canvas) {
-    if (BlendShapeShader._instance) {
-        return BlendShapeShader._instance;
-    }
 
-    super(canvas);
+    super(canvas, BlendShapeShader);
 
-    BlendShapeShader._instance = this;
   }
 
   _getBlendShapeVertexShaderString(functions, existCamera_f) {
@@ -143,5 +139,3 @@ export default class BlendShapeShader extends Shader {
   }
 
 }
-
-BlendShapeShader._instance = null;
