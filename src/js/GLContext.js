@@ -1,3 +1,5 @@
+import GLContextWebGL1Impl from './impl/GLContextWebGL1Impl'
+
 export default class GLContext {
 
   constructor(canvas) {
@@ -5,23 +7,7 @@ export default class GLContext {
         return GLContext._instance;
     }
 
-    if (canvas === void 0) {
-      throw new Error("Failed to create WebGL Context due to no canvas object.");
-    }
-
-    var gl = canvas.getContext("webgl");
-
-    if (!gl) {
-        throw new Error("This platform doesn't support WebGL.");
-    }
-
-    //if (!gl instanceof WebGL2RenderingContext)
-    if (!gl instanceof WebGLRenderingContext) {
-        throw new Error("Unexpected rendering context.");
-    }
-
-    this._gl = gl;
-    this._canvas = canvas;
+    this.impl = new GLContextWebGL1Impl(canvas, this);
 
     GLContext._instance = this;
   }
@@ -31,7 +17,7 @@ export default class GLContext {
   }
 
   get gl() {
-    return this._gl;
+    return this.impl._gl;
   }
 
 }
