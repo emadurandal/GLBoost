@@ -17,7 +17,7 @@ export default class GLContextImpl {
     }
 
     this._canvas = canvas;
-    this._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
+    this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
 
     if (this.gl === undefined) {
       throw new TypeError("Must override method.");

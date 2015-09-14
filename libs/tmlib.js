@@ -19076,8 +19076,8 @@ tm.webgl = tm.webgl || {};
         /**
          * @constructor
          */
-        init: function() {
-            GLBoost.Mesh.prototype.constructor.call(this);
+        init: function(canvas) {
+            GLBoost.Mesh.prototype.constructor.call(this, canvas);
 
             tm.webgl.Element.prototype.init.call(this);
         }
@@ -19128,10 +19128,10 @@ tm.webgl = tm.webgl || {};
         /**
          * @constructor
          */
-        init: function(geometry, material) {
-            GLBoost.BlendShapeMesh.prototype.constructor.call(this);
+        init: function(canvas) {
+            GLBoost.BlendShapeMesh.prototype.constructor.call(this, canvas);
 
-            tm.webgl.MeshElement.prototype.init.call(this);
+            tm.webgl.MeshElement.prototype.init.call(this, canvas);
         }
     });
 
@@ -19164,7 +19164,7 @@ tm.webgl = tm.webgl || {};
             // tm.three.Element を継承
             tm.webgl.Element.prototype.init.call(this);
 
-        },
+        }
 
     });
 

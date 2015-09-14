@@ -3,22 +3,26 @@ import GLContextWebGL1Impl from './impl/GLContextWebGL1Impl'
 export default class GLContext {
 
   constructor(canvas) {
-    if (GLContext._instance) {
-        return GLContext._instance;
+    if (GLContext._instances[canvas.id] instanceof GLContext) {
+      return GLContext._instances[canvas.id];
     }
 
     this.impl = new GLContextWebGL1Impl(canvas, this);
 
-    GLContext._instance = this;
+    GLContext._instances[canvas.id] = this;
   }
 
   static getInstance(canvas) {
+    if (typeof canvas === 'string') {
+      var canvas = window.document.querySelector(canvas);
+    }
     return new GLContext(canvas);
   }
 
   get gl() {
-    return this.impl._gl;
+    return this.impl.gl;
   }
 
 }
 GLContext._instance = null;
+GLContext._instances = new Object();

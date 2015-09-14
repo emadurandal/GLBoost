@@ -97,9 +97,9 @@
             new GLBoost.Vector2(1.0, 1.0)
             ];
 
-          var mesh = tm.webgl.MeshElement();
-          var texture = new GLBoost.Texture('resouces/texture.png');
-          var material = new GLBoost.ClassicMaterial();
+          var mesh = tm.webgl.MeshElement('#world');
+          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
+          var material = new GLBoost.ClassicMaterial('#world');
           material.diffuseTexture = texture;
           mesh.material = material;
           mesh.setVerticesData({
@@ -109,9 +109,9 @@
           });
           this.add( mesh );
 
-          var blendMesh = tm.webgl.BlendShapeMeshElement();
-          var blendMeshMaterial = new GLBoost.ClassicMaterial();
-          var texture = new GLBoost.Texture('resouces/texture.png');
+          var blendMesh = tm.webgl.BlendShapeMeshElement('#world');
+          var blendMeshMaterial = new GLBoost.ClassicMaterial('#world');
+          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
 
           blendMeshMaterial.diffuseTexture = texture;
           blendMesh.material = blendMeshMaterial;

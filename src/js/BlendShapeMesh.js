@@ -6,12 +6,12 @@ import BlendShapeShader from './BlendShapeShader'
 import Mesh from './Mesh'
 
 export default class BlendShapeMesh extends Mesh {
-  constructor() {
-    super();
+  constructor(canvas) {
+    super(canvas);
   }
 
   _getSheder(result, existCamera_f) {
-    return BlendShapeShader.getInstance().getShaderProgram(result, existCamera_f);
+    return BlendShapeShader.getInstance(this.canvas).getShaderProgram(result, existCamera_f);
   }
 
   set blendWeight_1(weight) {

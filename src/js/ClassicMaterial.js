@@ -2,9 +2,9 @@ import GLBoost from './globals'
 import GLContext from './GLContext'
 
 export default class ClassicMaterial {
-  constructor() {
+  constructor(canvas) {
     this._diffuseTexture = null;
-    this._gl = GLContext.getInstance().gl;
+    this._gl = GLContext.getInstance(canvas).gl;
   }
 
   set diffuseTexture(tex) {

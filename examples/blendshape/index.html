@@ -87,9 +87,9 @@
               new tm.geom.Vector2(1.0, 1.0)
             ];
 
-          var mesh = tm.webgl.BlendShapeMeshElement();
-          var texture = new GLBoost.Texture('resouces/texture.png');
-          var material = new GLBoost.ClassicMaterial();
+          var mesh = tm.webgl.BlendShapeMeshElement('#world');
+          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
+          var material = new GLBoost.ClassicMaterial('#world');
           material.diffuseTexture = texture;
           mesh.material = material;
           mesh.setVerticesData({

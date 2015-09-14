@@ -1,12 +1,12 @@
 import Shader from './Shader'
 
 export default class SimpleShader extends Shader {
-  constructor() {
+  constructor(canvas) {
     if (SimpleShader._instance) {
         return SimpleShader._instance;
     }
 
-    super();
+    super(canvas);
 
     SimpleShader._instance = this;
   }
@@ -96,8 +96,8 @@ export default class SimpleShader extends Shader {
     return shaderProgram;
   }
 
-  static getInstance() {
-    return new SimpleShader();
+  static getInstance(canvas) {
+    return new SimpleShader(canvas);
   }
 
 }

@@ -1,8 +1,8 @@
 import GLContext from './GLContext'
 
 export default class Shader {
-  constructor() {
-    this._gl = GLContext.getInstance().gl;;
+  constructor(canvas) {
+    this._gl = GLContext.getInstance(canvas).gl;
   }
 
   _getShader(gl, theSource, type) {

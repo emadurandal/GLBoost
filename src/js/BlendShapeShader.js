@@ -1,12 +1,12 @@
 import Shader from './Shader'
 
 export default class BlendShapeShader extends Shader {
-  constructor() {
+  constructor(canvas) {
     if (BlendShapeShader._instance) {
         return BlendShapeShader._instance;
     }
 
-    super();
+    super(canvas);
 
     BlendShapeShader._instance = this;
   }
@@ -138,8 +138,8 @@ export default class BlendShapeShader extends Shader {
     return shaderProgram;
   }
 
-  static getInstance() {
-    return new BlendShapeShader();
+  static getInstance(canvas) {
+    return new BlendShapeShader(canvas);
   }
 
 }

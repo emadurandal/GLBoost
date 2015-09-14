@@ -16,13 +16,12 @@ export default class GLContextWebGL1Impl extends GLContextImpl {
       throw new Error("Unexpected rendering context.");
     }
 
-    this._gl = gl;
-
+    canvas._gl = gl;
 
   }
 
   get gl() {
-    return this._gl;
+    return this._canvas._gl;
   }
 
 }

@@ -2,9 +2,9 @@ import GLBoost from './globals'
 import GLContext from './GLContext'
 
 export default class Texture {
-  constructor(imageUrl) {
+  constructor(imageUrl, canvas) {
     this._isTextureReady = false;
-    this._gl = GLContext.getInstance().gl;
+    this._gl = GLContext.getInstance(canvas).gl;
     var img = new Image();
     this._texture = null;
     img.onload = ()=> {
@@ -18,7 +18,7 @@ export default class Texture {
 
       this._texture = texture;
       this._isTextureReady = true;
-    }
+    };
 
     img.src = imageUrl;
   }

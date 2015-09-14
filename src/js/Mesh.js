@@ -6,9 +6,10 @@ import GLExtentionsManager from './GLExtentionsManager'
 import SimpleShader from './SimpleShader'
 
 export default class Mesh extends Element {
-  constructor() {
-    super();
-    this._gl = GLContext.getInstance().gl;
+  constructor(canvas) {
+    super()
+    this._gl = GLContext.getInstance(canvas).gl;
+    this.canvas = canvas;
     this._material = null;
     this._vertexN = 0;
     this._stride = 0;
@@ -39,7 +40,7 @@ export default class Mesh extends Element {
   }
 
   _getSheder(result, existCamera_f) {
-    return SimpleShader.getInstance().getShaderProgram(result, existCamera_f);
+    return SimpleShader.getInstance(this.canvas).getShaderProgram(result, existCamera_f);
   }
 
   setVerticesData(vertices) {
@@ -103,7 +104,7 @@ export default class Mesh extends Element {
   }
 
   draw(projectionAndViewMatrix) {
-    var gl = GLContext.getInstance().gl;
+    var gl = this._gl;
     var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
     var material = this._material;
 
