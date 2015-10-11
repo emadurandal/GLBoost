@@ -7,23 +7,27 @@ export default class BlendShapeShader extends Shader {
 
   }
 
-  _getBlendShapeVertexShaderString(functions, existCamera_f) {
+  _getBlendShapeVertexShaderString(gl, functions, existCamera_f) {
     var f = functions;
     var shaderText = '';
 
+    var in_ = super._in_onVert(gl);
+    var out_ = super._out_onVert(gl);
+
+    shaderText +=   super._glslVer(gl);
     shaderText +=   'precision mediump float;\n';
-    shaderText +=   'attribute vec3 aVertex_position;\n';
+    shaderText +=   `${in_} vec3 aVertex_position;\n`;
     if (this._exist(f, GLBoost.COLOR)) {
-      shaderText += 'attribute vec3 aVertex_color;\n';
-      shaderText += 'varying vec4 color;\n';
+      shaderText += `${in_} vec3 aVertex_color;\n`;
+      shaderText += `${out_} vec4 color;\n`;
     }
     if (this._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += 'attribute vec2 aVertex_texcoord;\n';
-      shaderText += 'varying vec2 texcoord;\n';
+      shaderText += `${in_} vec2 aVertex_texcoord;\n`;
+      shaderText += `${out_} vec2 texcoord;\n`;
     }
     functions.forEach((attribName)=>{
       if (this._isShapeTarget(attribName)) {
-        shaderText+='attribute vec3 aVertex_' + attribName  + ';\n';
+        shaderText+=`${in_} vec3 aVertex_${attribName};\n`;
         shaderText+='uniform float blendWeight_' + attribName  + ';\n';
       }
     });
@@ -61,27 +65,33 @@ export default class BlendShapeShader extends Shader {
     return shaderText;
   }
 
-  _getBlendShapeFragmentShaderString(functions) {
+  _getBlendShapeFragmentShaderString(gl, functions) {
     var f = functions;
     var shaderText = '';
 
+    var in_ = super._in_onFrag(gl);
+
+    shaderText +=   super._glslVer(gl);
     shaderText +=   'precision mediump float;\n';
+    shaderText +=   super._set_outColor_onFrag(gl);
     if (this._exist(f, GLBoost.COLOR)) {
-      shaderText += 'varying vec4 color;\n';
+      shaderText += `${in_} vec4 color;\n`;
     }
     if (this._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += 'varying vec2 texcoord;\n\n';
-      shaderText += 'uniform sampler2D texture;\n';
+      shaderText += `${in_} vec2 texcoord;\n\n`;
+      shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText +=   'void main(void) {\n';
 
+    var textureFunc = super._texture_func(gl);
     if (this._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += '  gl_FragColor = texture2D(texture, texcoord);\n';
+      shaderText += `  rt1 = ${textureFunc}(uTexture, texcoord);\n`;
     } else if (this._exist(f, GLBoost.COLOR)) {
-      shaderText += '  gl_FragColor = color;\n';
+      shaderText += '  rt1 = color;\n';
     } else {
-      shaderText += '  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n';
+      shaderText += '  rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n';
     }
+    shaderText +=   super._set_glFragColor_inGLVer1(gl);
 
     shaderText +=   '}\n';
 
@@ -105,7 +115,10 @@ export default class BlendShapeShader extends Shader {
 
   getShaderProgram(vertexAttribs, existCamera_f) {
     var gl = this._gl;
-    var shaderProgram = this._initShaders(gl, this._getBlendShapeVertexShaderString(vertexAttribs, existCamera_f), this._getBlendShapeFragmentShaderString(vertexAttribs));
+    var shaderProgram = this._initShaders(gl,
+      this._getBlendShapeVertexShaderString(gl, vertexAttribs, existCamera_f),
+      this._getBlendShapeFragmentShaderString(gl, vertexAttribs)
+    );
 
     vertexAttribs.forEach((attribName)=>{
       shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);

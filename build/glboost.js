@@ -2520,25 +2520,29 @@
 
 	  _createClass(BlendShapeShader, [{
 	    key: '_getBlendShapeVertexShaderString',
-	    value: function _getBlendShapeVertexShaderString(functions, existCamera_f) {
+	    value: function _getBlendShapeVertexShaderString(gl, functions, existCamera_f) {
 	      var _this = this;
 
 	      var f = functions;
 	      var shaderText = '';
 
+	      var in_ = _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_in_onVert', this).call(this, gl);
+	      var out_ = _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_out_onVert', this).call(this, gl);
+
+	      shaderText += _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_glslVer', this).call(this, gl);
 	      shaderText += 'precision mediump float;\n';
-	      shaderText += 'attribute vec3 aVertex_position;\n';
+	      shaderText += in_ + ' vec3 aVertex_position;\n';
 	      if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += 'attribute vec3 aVertex_color;\n';
-	        shaderText += 'varying vec4 color;\n';
+	        shaderText += in_ + ' vec3 aVertex_color;\n';
+	        shaderText += out_ + ' vec4 color;\n';
 	      }
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += 'attribute vec2 aVertex_texcoord;\n';
-	        shaderText += 'varying vec2 texcoord;\n';
+	        shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+	        shaderText += out_ + ' vec2 texcoord;\n';
 	      }
 	      functions.forEach(function (attribName) {
 	        if (_this._isShapeTarget(attribName)) {
-	          shaderText += 'attribute vec3 aVertex_' + attribName + ';\n';
+	          shaderText += in_ + ' vec3 aVertex_' + attribName + ';\n';
 	          shaderText += 'uniform float blendWeight_' + attribName + ';\n';
 	        }
 	      });
@@ -2577,27 +2581,33 @@
 	    }
 	  }, {
 	    key: '_getBlendShapeFragmentShaderString',
-	    value: function _getBlendShapeFragmentShaderString(functions) {
+	    value: function _getBlendShapeFragmentShaderString(gl, functions) {
 	      var f = functions;
 	      var shaderText = '';
 
+	      var in_ = _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_in_onFrag', this).call(this, gl);
+
+	      shaderText += _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_glslVer', this).call(this, gl);
 	      shaderText += 'precision mediump float;\n';
+	      shaderText += _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_set_outColor_onFrag', this).call(this, gl);
 	      if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += 'varying vec4 color;\n';
+	        shaderText += in_ + ' vec4 color;\n';
 	      }
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += 'varying vec2 texcoord;\n\n';
-	        shaderText += 'uniform sampler2D texture;\n';
+	        shaderText += in_ + ' vec2 texcoord;\n\n';
+	        shaderText += 'uniform sampler2D uTexture;\n';
 	      }
 	      shaderText += 'void main(void) {\n';
 
+	      var textureFunc = _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_texture_func', this).call(this, gl);
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += '  gl_FragColor = texture2D(texture, texcoord);\n';
+	        shaderText += '  rt1 = ' + textureFunc + '(uTexture, texcoord);\n';
 	      } else if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += '  gl_FragColor = color;\n';
+	        shaderText += '  rt1 = color;\n';
 	      } else {
-	        shaderText += '  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n';
+	        shaderText += '  rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n';
 	      }
+	      shaderText += _get(Object.getPrototypeOf(BlendShapeShader.prototype), '_set_glFragColor_inGLVer1', this).call(this, gl);
 
 	      shaderText += '}\n';
 
@@ -2627,7 +2637,7 @@
 	      var _this3 = this;
 
 	      var gl = this._gl;
-	      var shaderProgram = this._initShaders(gl, this._getBlendShapeVertexShaderString(vertexAttribs, existCamera_f), this._getBlendShapeFragmentShaderString(vertexAttribs));
+	      var shaderProgram = this._initShaders(gl, this._getBlendShapeVertexShaderString(gl, vertexAttribs, existCamera_f), this._getBlendShapeFragmentShaderString(gl, vertexAttribs));
 
 	      vertexAttribs.forEach(function (attribName) {
 	        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
