@@ -11,8 +11,8 @@ export default class GLExtentionsManager {
     }
 
     this._extDBs = gl.getExtension("WEBGL_draw_buffers");
-    if (!this._extDBs)
-      throw("WEBGL_draw_buffersをサポートしていません");
+//    if (!this._extDBs)
+//      throw("WEBGL_draw_buffersをサポートしていません");
 
     GLExtentionsManager._instance = this;
   }
@@ -38,6 +38,12 @@ export default class GLExtentionsManager {
     return GLBoost.isThisGLVersion_2(gl) ?
       gl.bindVertexArray(vao) :
       this._extVAO.bindVertexArrayOES(vao);
+  }
+
+  drawBuffers(gl, buffers) {
+    return this._extDBs ?
+      this.extDBs.drawBuffersWEBGL(buffers) :
+      gl.drawBuffers(buffers);
   }
 
   colorAttachiment(gl, index) {

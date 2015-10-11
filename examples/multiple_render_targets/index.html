@@ -16,6 +16,7 @@
   var SCREEN_HEIGHT   = 465;              // 画面高さ
   var SCREEN_CENTER_X = SCREEN_WIDTH/2;   // 画面中央X座標値
   var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
+  var CANVAS_ID = "#world";
 
   GLBoost.TARGET_WEBGL_VERSION = 2;
 
@@ -24,7 +25,7 @@
    */
   tm.main(function() {
       // アプリケーション
-      var app = tm.webgl.WebGLApp("#world");
+      var app = tm.webgl.WebGLApp(CANVAS_ID);
       window.renderer = app.getRenderer();
       app.replaceScene(MainScene());
       // 実行
@@ -42,52 +43,109 @@
       init: function() {
           this.superInit();
 
-          window.renderer.createTexturesForRenderTarget();
+          var renderTextures = window.renderer.createTexturesForRenderTarget(465, 465, 1);
+          var renderPasses = window.renderer.createRenderPasses(2);
 
           var positions = [
-            new tm.geom.Vector3(-0.5, -0.5, 0.0),
-            new tm.geom.Vector3(0.5, -0.5, 0.0),
-            new tm.geom.Vector3(-0.5,  0.5, 0.0),
+              new tm.geom.Vector3(-0.5, -0.5, 0.0),
+              new tm.geom.Vector3(0.5, -0.5, 0.0),
+              new tm.geom.Vector3(-0.5,  0.5, 0.0),
 
-            new tm.geom.Vector3(-0.5, 0.5, 0.0),
-            new tm.geom.Vector3(0.5, -0.5, 0.0),
-            new tm.geom.Vector3(0.5,  0.5, 0.0)
+              new tm.geom.Vector3(-0.5, 0.5, 0.0),
+              new tm.geom.Vector3(0.5, -0.5, 0.0),
+              new tm.geom.Vector3(0.5,  0.5, 0.0)
+
             ];
+          var shapetarget_1 = [
+              new tm.geom.Vector3(-1.0, -0.5, 0.0),
+              new tm.geom.Vector3(1.0, -0.5, 0.0),
+              new tm.geom.Vector3(-1.0,  0.5, 0.0),
 
+              new tm.geom.Vector3(-1.0, 0.5, 0.0),
+              new tm.geom.Vector3(1.0, -0.5, 0.0),
+              new tm.geom.Vector3(1.0,  0.5, 0.0)
+            ];
+          var shapetarget_2 = [
+              new tm.geom.Vector3(-0.5, -1.0, 0.0),
+              new tm.geom.Vector3(0.5, -1.0, 0.0),
+              new tm.geom.Vector3(-0.5,  1.0, 0.0),
+
+              new tm.geom.Vector3(-0.5, 1.0, 0.0),
+              new tm.geom.Vector3(0.5, -1.0, 0.0),
+              new tm.geom.Vector3(0.5,  1.0, 0.0)
+            ];
           var colors = [
-            new tm.geom.Vector3(1.0, 0.0, 0.0),
-            new tm.geom.Vector3(0.0, 1.0, 0.0),
-            new tm.geom.Vector3(0.0, 0.0, 1.0),
+              new tm.geom.Vector3(1.0, 0.0, 0.0),
+              new tm.geom.Vector3(0.0, 1.0, 0.0),
+              new tm.geom.Vector3(0.0, 0.0, 1.0),
 
-            new tm.geom.Vector3(1.0, 0.0, 0.0),
-            new tm.geom.Vector3(0.0, 1.0, 0.0),
-            new tm.geom.Vector3(0.0, 0.0, 1.0)
-
+              new tm.geom.Vector3(1.0, 0.0, 0.0),
+              new tm.geom.Vector3(0.0, 1.0, 0.0),
+              new tm.geom.Vector3(0.0, 0.0, 1.0)
             ];
           var texcoords = [
-            new tm.geom.Vector2(0.0, 0.0),
-            new tm.geom.Vector2(1.0, 0.0),
-            new tm.geom.Vector2(0.0, 1.0),
+              new tm.geom.Vector2(0.0, 0.0),
+              new tm.geom.Vector2(1.0, 0.0),
+              new tm.geom.Vector2(0.0, 1.0),
 
-            new tm.geom.Vector2(0.0, 1.0),
-            new tm.geom.Vector2(1.0, 0.0),
-            new tm.geom.Vector2(1.0, 1.0)
+              new tm.geom.Vector2(0.0, 1.0),
+              new tm.geom.Vector2(1.0, 0.0),
+              new tm.geom.Vector2(1.0, 1.0)
             ];
 
-          var mesh = tm.webgl.MeshElement('#world');
-          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
-          var material = new GLBoost.ClassicMaterial('#world');
+          var mesh = tm.webgl.BlendShapeMeshElement(CANVAS_ID);
+          var texture = new GLBoost.Texture('resouces/texture.png', CANVAS_ID);
+          var material = new GLBoost.ClassicMaterial(CANVAS_ID);
           material.diffuseTexture = texture;
           mesh.material = material;
           mesh.setVerticesData({
             position: positions,
             color: colors,
-            texcoord: texcoords
+            texcoord: texcoords,
+            shapetarget_1: shapetarget_1,
+            shapetarget_2: shapetarget_2
           });
 
           this.add( mesh );
+          renderPasses[0].addMeshes([mesh]);
+          renderPasses[0].setClearColor([0, 0, 0, 1]);
+          renderPasses[0].specifyRenderTargetTextures(CANVAS_ID, renderTextures);
+
+
+          var mesh2 = tm.webgl.MeshElement(CANVAS_ID);
+          var material2 = new GLBoost.ClassicMaterial(CANVAS_ID);
+          material2.diffuseTexture = renderTextures[0];
+          mesh2.material = material2;
+          mesh2.setVerticesData({
+            position: positions,
+            color: colors,
+            texcoord: texcoords
+          });
+          this.add( mesh2 );
+
+          renderPasses[1].addMeshes([mesh2]);
+          renderPasses[1].setClearColor([1, 0, 0, 1]);
 
           this.prepareForRender();
+
+          var tw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+          var ctw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+          var tw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+          var ctw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+
+          tw1.on("finish", function (e) {
+            tw2.start();
+          });
+          tw2.on("finish", function (e) {
+            ctw1.start();
+          });
+          ctw1.on("finish", function (e) {
+            ctw2.start();
+          });
+          ctw2.on("finish", function (e) {
+            tw1.start();
+          });
+          tw1.start();
 
       }
   });

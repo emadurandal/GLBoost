@@ -40,7 +40,8 @@ export default class Mesh extends Element {
   }
 
   _getSheder(result, existCamera_f) {
-    return SimpleShader.getInstance(this.canvas).getShaderProgram(result, existCamera_f);
+    var simpleShader = SimpleShader.getInstance(this.canvas);
+    return simpleShader.getShaderProgram(result, existCamera_f);
   }
 
   setVerticesData(vertices) {

@@ -105,7 +105,11 @@ export default class SimpleShader extends Shader {
   }
 
   static getInstance(canvas) {
-    return new SimpleShader(canvas);
+    if (Shader._instances[canvas.id] instanceof SimpleShader) {
+      return Shader._instances[canvas.id];
+    } else {
+      return new SimpleShader(canvas);
+    }
   }
 
 }

@@ -52,15 +52,15 @@
 
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 
-	var _Scene = __webpack_require__(48);
+	var _Scene = __webpack_require__(49);
 
 	var _Scene2 = _interopRequireDefault(_Scene);
 
-	var _Vector2 = __webpack_require__(49);
+	var _Vector2 = __webpack_require__(50);
 
 	var _Vector22 = _interopRequireDefault(_Vector2);
 
-	var _Vector3 = __webpack_require__(35);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
@@ -68,19 +68,19 @@
 
 	var _Vector42 = _interopRequireDefault(_Vector4);
 
-	var _ClassicMaterial = __webpack_require__(50);
+	var _ClassicMaterial = __webpack_require__(51);
 
 	var _ClassicMaterial2 = _interopRequireDefault(_ClassicMaterial);
 
-	var _Texture = __webpack_require__(51);
+	var _Texture = __webpack_require__(52);
 
 	var _Texture2 = _interopRequireDefault(_Texture);
 
-	var _Camera = __webpack_require__(6);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
-	var _BlendShapeMesh = __webpack_require__(52);
+	var _BlendShapeMesh = __webpack_require__(53);
 
 	var _BlendShapeMesh2 = _interopRequireDefault(_BlendShapeMesh);
 
@@ -184,7 +184,7 @@
 
 	'use strict';
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -194,29 +194,33 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Mesh = __webpack_require__(38);
+	var _Mesh = __webpack_require__(10);
 
 	var _Mesh2 = _interopRequireDefault(_Mesh);
 
-	var _Camera = __webpack_require__(6);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
-	var _Matrix4x4 = __webpack_require__(37);
+	var _Matrix4x4 = __webpack_require__(36);
 
 	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(43);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
 	var _MutableTexture = __webpack_require__(46);
 
 	var _MutableTexture2 = _interopRequireDefault(_MutableTexture);
+
+	var _RenderPass = __webpack_require__(48);
+
+	var _RenderPass2 = _interopRequireDefault(_RenderPass);
 
 	var Renderer = (function () {
 	  function Renderer(parameters) {
@@ -249,11 +253,14 @@
 	    setDefaultGLStates();
 
 	    this._currentRenderTargetTextures = [];
+	    this._renderPasses = null;
 	  }
 
 	  _createClass(Renderer, [{
 	    key: 'draw',
 	    value: function draw(scene) {
+	      var _this = this;
+
 	      var projectionAndViewMatrix = null;
 	      scene.elements.forEach(function (elm) {
 	        if (elm instanceof _Camera2['default']) {
@@ -263,11 +270,43 @@
 	          }
 	        }
 	      });
-	      scene.elements.forEach(function (elm) {
-	        if (elm instanceof _Mesh2['default']) {
-	          elm.draw(projectionAndViewMatrix);
-	        }
-	      });
+
+	      var gl = this._gl;
+	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
+
+	      // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
+	      if (this._renderPasses === null) {
+	        glem.drawBuffers(gl, [gl.BACK]);
+
+	        scene.elements.forEach(function (elm) {
+	          if (elm instanceof _Mesh2['default']) {
+	            elm.draw(projectionAndViewMatrix);
+	          }
+	        });
+	      } else {
+	        // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
+	        this._renderPasses.forEach(function (renderPass) {
+
+	          if (renderPass.buffersToDraw[0] !== gl.BACK) {
+	            gl.bindFramebuffer(gl.FRAMEBUFFER, _this._fbo);
+	          }
+	          glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+
+	          if (renderPass.clearColor) {
+	            var color = renderPass.clearColor;
+	            gl.clearColor(color[0], color[1], color[2], color[3]);
+	            gl.clear(gl.COLOR_BUFFER_BIT);
+	          }
+
+	          var meshes = renderPass.getMeshes();
+	          meshes.forEach(function (mesh) {
+	            mesh.draw(projectionAndViewMatrix);
+	          });
+
+	          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	          glem.drawBuffers(gl, [gl.BACK]);
+	        });
+	      }
 	    }
 	  }, {
 	    key: 'clearCanvas',
@@ -301,7 +340,7 @@
 	      this._fbo.height = height ? height : gl._canvas.height;
 
 	      for (var i = 0; i < textureNum; i++) {
-	        var texture = new _MutableTexture2['default'](gl._canvas);
+	        var texture = new _MutableTexture2['default'](gl._canvas, this._fbo.width, this._fbo.height);
 	        this._currentRenderTargetTextures.push(texture);
 	      }
 
@@ -311,15 +350,29 @@
 	      gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this._fbo.width, this._fbo.height);
 
 	      // Attach Buffers
-	      this._currentRenderTargetTextures.forEach(function (texture) {
-	        var glTexture = texture.glTextureResource();
-	        gl.framebufferTexture2D(gl.FRAMEBUFFER, glem.colorAttachiment(gl, 0), gl.TEXTURE_2D, glTexture, 0);
+	      this._currentRenderTargetTextures.forEach(function (texture, i) {
+	        var glTexture = texture.glTextureResource;
+	        var attachimentId = glem.colorAttachiment(gl, i);
+	        texture.colorAttachiment = attachimentId;
+	        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 	      });
 	      gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 
 	      gl.bindTexture(gl.TEXTURE_2D, null);
 	      gl.bindRenderbuffer(gl.RENDERBUFFER, null);
 	      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+	      return this._currentRenderTargetTextures;
+	    }
+	  }, {
+	    key: 'createRenderPasses',
+	    value: function createRenderPasses(number) {
+	      this._renderPasses = [];
+	      for (var i = 0; i < number; i++) {
+	        this._renderPasses.push(new _RenderPass2['default'](this._gl));
+	      }
+
+	      return this._renderPasses;
 	    }
 	  }]);
 
@@ -332,13 +385,75 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	var _Object$defineProperty = __webpack_require__(7)["default"];
+
+	exports["default"] = (function () {
+	  function defineProperties(target, props) {
+	    for (var i = 0; i < props.length; i++) {
+	      var descriptor = props[i];
+	      descriptor.enumerable = descriptor.enumerable || false;
+	      descriptor.configurable = true;
+	      if ("value" in descriptor) descriptor.writable = true;
+
+	      _Object$defineProperty(target, descriptor.key, descriptor);
+	    }
+	  }
+
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	})();
+
+	exports.__esModule = true;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(8), __esModule: true };
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(9);
+	module.exports = function defineProperty(it, key, desc){
+	  return $.setDesc(it, key, desc);
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	var $Object = Object;
+	module.exports = {
+	  create:     $Object.create,
+	  getProto:   $Object.getPrototypeOf,
+	  isEnum:     {}.propertyIsEnumerable,
+	  getDesc:    $Object.getOwnPropertyDescriptor,
+	  setDesc:    $Object.defineProperty,
+	  setDescs:   $Object.defineProperties,
+	  getKeys:    $Object.keys,
+	  getNames:   $Object.getOwnPropertyNames,
+	  getSymbols: $Object.getOwnPropertySymbols,
+	  each:       [].forEach
+	};
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -352,98 +467,186 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(35);
-
-	var _Vector32 = _interopRequireDefault(_Vector3);
-
-	var _Element2 = __webpack_require__(36);
+	var _Element2 = __webpack_require__(35);
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Matrix4x4 = __webpack_require__(37);
+	var _Matrix4x4 = __webpack_require__(36);
 
 	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
 
-	var Camera = (function (_Element) {
-	  _inherits(Camera, _Element);
+	var _GLContext = __webpack_require__(37);
 
-	  function Camera(lookat, perspective) {
-	    _classCallCheck(this, Camera);
+	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	    _get(Object.getPrototypeOf(Camera.prototype), 'constructor', this).call(this);
+	var _GLExtentionsManager = __webpack_require__(41);
 
-	    this.eye = lookat.eye;
-	    this.center = lookat.center;
-	    this.up = lookat.up;
+	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	    this.fovy = perspective.fovy;
-	    this.aspect = perspective.aspect;
-	    this.zNear = perspective.zNear;
-	    this.zFar = perspective.zFar;
+	var _SimpleShader = __webpack_require__(42);
 
-	    this.setAsMainCamera();
+	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
+
+	var Mesh = (function (_Element) {
+	  _inherits(Mesh, _Element);
+
+	  function Mesh(canvas) {
+	    _classCallCheck(this, Mesh);
+
+	    _get(Object.getPrototypeOf(Mesh.prototype), 'constructor', this).call(this);
+	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
+	    this.canvas = canvas;
+	    this._material = null;
+	    this._vertexN = 0;
+	    this._stride = 0;
+	    this._glslProgram = null;
+	    this._vertices = null;
 	  }
 
-	  _createClass(Camera, [{
-	    key: 'lookAtRHMatrix',
-	    value: function lookAtRHMatrix() {
-	      //    return Matrix4x4.identity();
-	      return Camera.lookAtRHMatrix(this.eye, this.center, this.up);
+	  /**
+	   * データとして利用する頂点属性を判断し、そのリストを返す
+	   * 不必要な頂点属性のデータは無視する。
+	   */
+
+	  _createClass(Mesh, [{
+	    key: '_decideNeededVertexAttribs',
+	    value: function _decideNeededVertexAttribs(vertices) {
+	      var attribNameArray = [];
+	      for (var attribName in vertices) {
+	        if (attribName === _globals2['default'].TEXCOORD) {
+	          // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
+	          if (this._material !== null && this._material.diffuseTexture !== null) {
+	            attribNameArray.push(attribName);
+	          } else {
+	            delete vertices[_globals2['default'].TEXCOORD];
+	          }
+	        } else {
+	          attribNameArray.push(attribName);
+	        }
+	      }
+
+	      return attribNameArray;
 	    }
 	  }, {
-	    key: 'perspectiveRHMatrix',
-	    value: function perspectiveRHMatrix() {
-	      //    return Matrix4x4.identity();
-	      return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
+	    key: '_getSheder',
+	    value: function _getSheder(result, existCamera_f) {
+	      var simpleShader = _SimpleShader2['default'].getInstance(this.canvas);
+	      return simpleShader.getShaderProgram(result, existCamera_f);
 	    }
 	  }, {
-	    key: 'setAsMainCamera',
-	    value: function setAsMainCamera() {
-	      Camera._mainCamera = this;
+	    key: 'setVerticesData',
+	    value: function setVerticesData(vertices) {
+	      this._vertices = vertices;
 	    }
 	  }, {
-	    key: 'isMainCamera',
-	    get: function get() {
-	      return Camera._mainCamera === this;
-	    }
-	  }], [{
-	    key: 'lookAtRHMatrix',
-	    value: function lookAtRHMatrix(eye, center, up) {
+	    key: 'prepareForRender',
+	    value: function prepareForRender(existCamera_f) {
+	      var _this = this;
 
-	      var f = _Vector32['default'].normalize(_Vector32['default'].subtract(center, eye));
-	      var s = _Vector32['default'].normalize(_Vector32['default'].cross(f, up));
-	      var u = _Vector32['default'].cross(s, f);
+	      var vertices = this._vertices;
+	      var gl = this._gl;
+	      //    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
 
-	      return new _Matrix4x42['default'](s.x, s.y, s.z, -_Vector32['default'].dotProduct(s, eye), u.x, u.y, u.z, -_Vector32['default'].dotProduct(u, eye), -f.x, -f.y, -f.z, _Vector32['default'].dotProduct(f, eye), 0, 0, 0, 1);
+	      // GLSLプログラム作成。
+	      var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
+	      var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
+
+	      // create VAO
+	      var vao = glem.createVertexArray(gl);
+	      glem.bindVertexArray(gl, vao);
+
+	      // create VBO
+	      var squareVerticesBuffer = gl.createBuffer();
+	      gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
+
+	      this._vertexN = vertices.position.length;
+
+	      var vertexData = [];
+
+	      this._stride = 0;
+	      vertices.position.forEach(function (elem, index, array) {
+	        optimizedVertexAttrib.forEach(function (attribName) {
+	          var element = vertices[attribName][index];
+	          vertexData.push(element.x);
+	          vertexData.push(element.y);
+	          if (element.z !== void 0) {
+	            vertexData.push(element.z);
+	          }
+	        });
+	      });
+
+	      optimizedVertexAttrib.forEach(function (attribName) {
+	        var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
+	        _this._stride += numberOfComponentOfVector * 4;
+	      });
+
+	      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+
+	      // 頂点レイアウト設定
+	      var offset = 0;
+	      optimizedVertexAttrib.forEach(function (attribName) {
+	        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+	        var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
+	        gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], numberOfComponentOfVector, gl.FLOAT, gl.FALSE, _this._stride, offset);
+	        offset += numberOfComponentOfVector * 4;
+	      });
+	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	      glem.bindVertexArray(gl, null);
+
+	      this._vao = vao;
+	      this._glslProgram = glslProgram;
 	    }
 	  }, {
-	    key: 'perspectiveRHMatrix',
-	    value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+	    key: 'draw',
+	    value: function draw(projectionAndViewMatrix) {
+	      var gl = this._gl;
+	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
+	      var material = this._material;
 
-	      var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
-	      var xscale = yscale / aspect;
+	      gl.useProgram(this._glslProgram);
 
-	      return new _Matrix4x42['default'](xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+	      if (projectionAndViewMatrix) {
+	        var pv_m = projectionAndViewMatrix;
+	        gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
+	      }
+
+	      glem.bindVertexArray(gl, this._vao);
+
+	      if (material) {
+	        material.setUp();
+	      }
+
+	      gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+
+	      if (material) {
+	        material.tearDown();
+	      }
+
+	      glem.bindVertexArray(gl, null);
+	    }
+	  }, {
+	    key: 'material',
+	    set: function set(mat) {
+	      this._material = mat;
 	    }
 	  }]);
 
-	  return Camera;
+	  return Mesh;
 	})(_Element3['default']);
 
-	exports['default'] = Camera;
+	exports['default'] = Mesh;
 
-	Camera._mainCamera = null;
-
-	_globals2['default']["Camera"] = Camera;
+	_globals2['default']["Mesh"] = Mesh;
 	module.exports = exports['default'];
 
 /***/ },
-/* 7 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _Object$getOwnPropertyDescriptor = __webpack_require__(8)["default"];
+	var _Object$getOwnPropertyDescriptor = __webpack_require__(12)["default"];
 
 	exports["default"] = function get(_x, _x2, _x3) {
 	  var _again = true;
@@ -487,75 +690,57 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 8 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(9), __esModule: true };
+	module.exports = { "default": __webpack_require__(13), __esModule: true };
 
 /***/ },
-/* 9 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $ = __webpack_require__(10);
-	__webpack_require__(11);
+	var $ = __webpack_require__(9);
+	__webpack_require__(14);
 	module.exports = function getOwnPropertyDescriptor(it, key){
 	  return $.getDesc(it, key);
 	};
 
 /***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	var $Object = Object;
-	module.exports = {
-	  create:     $Object.create,
-	  getProto:   $Object.getPrototypeOf,
-	  isEnum:     {}.propertyIsEnumerable,
-	  getDesc:    $Object.getOwnPropertyDescriptor,
-	  setDesc:    $Object.defineProperty,
-	  setDescs:   $Object.defineProperties,
-	  getKeys:    $Object.keys,
-	  getNames:   $Object.getOwnPropertyNames,
-	  getSymbols: $Object.getOwnPropertySymbols,
-	  each:       [].forEach
-	};
-
-/***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-	var toIObject = __webpack_require__(12);
+	var toIObject = __webpack_require__(15);
 
-	__webpack_require__(16)('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor){
+	__webpack_require__(19)('getOwnPropertyDescriptor', function($getOwnPropertyDescriptor){
 	  return function getOwnPropertyDescriptor(it, key){
 	    return $getOwnPropertyDescriptor(toIObject(it), key);
 	  };
 	});
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// to indexed object, toObject with fallback for non-array-like ES3 strings
-	var IObject = __webpack_require__(13)
-	  , defined = __webpack_require__(15);
+	var IObject = __webpack_require__(16)
+	  , defined = __webpack_require__(18);
 	module.exports = function(it){
 	  return IObject(defined(it));
 	};
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// indexed object, fallback for non-array-like ES3 strings
-	var cof = __webpack_require__(14);
+	var cof = __webpack_require__(17);
 	module.exports = 0 in Object('z') ? Object : function(it){
 	  return cof(it) == 'String' ? it.split('') : Object(it);
 	};
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -565,7 +750,7 @@
 	};
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports) {
 
 	// 7.2.1 RequireObjectCoercible(argument)
@@ -575,24 +760,24 @@
 	};
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// most Object methods by ES6 should accept primitives
 	module.exports = function(KEY, exec){
-	  var $def = __webpack_require__(17)
-	    , fn   = (__webpack_require__(19).Object || {})[KEY] || Object[KEY]
+	  var $def = __webpack_require__(20)
+	    , fn   = (__webpack_require__(22).Object || {})[KEY] || Object[KEY]
 	    , exp  = {};
 	  exp[KEY] = exec(fn);
-	  $def($def.S + $def.F * __webpack_require__(20)(function(){ fn(1); }), 'Object', exp);
+	  $def($def.S + $def.F * __webpack_require__(23)(function(){ fn(1); }), 'Object', exp);
 	};
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var global    = __webpack_require__(18)
-	  , core      = __webpack_require__(19)
+	var global    = __webpack_require__(21)
+	  , core      = __webpack_require__(22)
 	  , PROTOTYPE = 'prototype';
 	var ctx = function(fn, that){
 	  return function(){
@@ -640,7 +825,7 @@
 	module.exports = $def;
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports) {
 
 	// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
@@ -650,14 +835,14 @@
 	if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports) {
 
 	var core = module.exports = {version: '1.2.1'};
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = function(exec){
@@ -669,14 +854,14 @@
 	};
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _Object$create = __webpack_require__(22)["default"];
+	var _Object$create = __webpack_require__(25)["default"];
 
-	var _Object$setPrototypeOf = __webpack_require__(24)["default"];
+	var _Object$setPrototypeOf = __webpack_require__(27)["default"];
 
 	exports["default"] = function (subClass, superClass) {
 	  if (typeof superClass !== "function" && superClass !== null) {
@@ -697,50 +882,50 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(23), __esModule: true };
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(10);
-	module.exports = function create(P, D){
-	  return $.create(P, D);
-	};
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(25), __esModule: true };
-
-/***/ },
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(26);
-	module.exports = __webpack_require__(19).Object.setPrototypeOf;
+	module.exports = { "default": __webpack_require__(26), __esModule: true };
 
 /***/ },
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 19.1.3.19 Object.setPrototypeOf(O, proto)
-	var $def = __webpack_require__(17);
-	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(27).set});
+	var $ = __webpack_require__(9);
+	module.exports = function create(P, D){
+	  return $.create(P, D);
+	};
 
 /***/ },
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = { "default": __webpack_require__(28), __esModule: true };
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(29);
+	module.exports = __webpack_require__(22).Object.setPrototypeOf;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.3.19 Object.setPrototypeOf(O, proto)
+	var $def = __webpack_require__(20);
+	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(30).set});
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/* eslint-disable no-proto */
-	var getDesc  = __webpack_require__(10).getDesc
-	  , isObject = __webpack_require__(28)
-	  , anObject = __webpack_require__(29);
+	var getDesc  = __webpack_require__(9).getDesc
+	  , isObject = __webpack_require__(31)
+	  , anObject = __webpack_require__(32);
 	var check = function(O, proto){
 	  anObject(O);
 	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
@@ -749,7 +934,7 @@
 	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line no-proto
 	    function(test, buggy, set){
 	      try {
-	        set = __webpack_require__(30)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+	        set = __webpack_require__(33)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
 	        set(test, []);
 	        buggy = !(test instanceof Array);
 	      } catch(e){ buggy = true; }
@@ -764,7 +949,7 @@
 	};
 
 /***/ },
-/* 28 */
+/* 31 */
 /***/ function(module, exports) {
 
 	module.exports = function(it){
@@ -772,21 +957,21 @@
 	};
 
 /***/ },
-/* 29 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(28);
+	var isObject = __webpack_require__(31);
 	module.exports = function(it){
 	  if(!isObject(it))throw TypeError(it + ' is not an object!');
 	  return it;
 	};
 
 /***/ },
-/* 30 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// optional / simple context binding
-	var aFunction = __webpack_require__(31);
+	var aFunction = __webpack_require__(34);
 	module.exports = function(fn, that, length){
 	  aFunction(fn);
 	  if(that === undefined)return fn;
@@ -807,7 +992,7 @@
 	};
 
 /***/ },
-/* 31 */
+/* 34 */
 /***/ function(module, exports) {
 
 	module.exports = function(it){
@@ -816,242 +1001,7 @@
 	};
 
 /***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _Object$defineProperty = __webpack_require__(33)["default"];
-
-	exports["default"] = (function () {
-	  function defineProperties(target, props) {
-	    for (var i = 0; i < props.length; i++) {
-	      var descriptor = props[i];
-	      descriptor.enumerable = descriptor.enumerable || false;
-	      descriptor.configurable = true;
-	      if ("value" in descriptor) descriptor.writable = true;
-
-	      _Object$defineProperty(target, descriptor.key, descriptor);
-	    }
-	  }
-
-	  return function (Constructor, protoProps, staticProps) {
-	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-	    if (staticProps) defineProperties(Constructor, staticProps);
-	    return Constructor;
-	  };
-	})();
-
-	exports.__esModule = true;
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(34), __esModule: true };
-
-/***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(10);
-	module.exports = function defineProperty(it, key, desc){
-	  return $.setDesc(it, key, desc);
-	};
-
-/***/ },
 /* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _createClass = __webpack_require__(32)["default"];
-
-	var _classCallCheck = __webpack_require__(2)["default"];
-
-	var _interopRequireDefault = __webpack_require__(3)["default"];
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _globals = __webpack_require__(4);
-
-	var _globals2 = _interopRequireDefault(_globals);
-
-	var Vector3 = (function () {
-	  function Vector3(x, y, z) {
-	    _classCallCheck(this, Vector3);
-
-	    this.x = x;
-	    this.y = y;
-	    this.z = z;
-	  }
-
-	  /**
-	   * 長さ
-	   */
-
-	  _createClass(Vector3, [{
-	    key: "length",
-	    value: function length() {
-	      return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-	    }
-
-	    /**
-	     * 長さ（static版）
-	     */
-	  }, {
-	    key: "lengthSquared",
-
-	    /**
-	     * 長さの2乗
-	     */
-	    value: function lengthSquared() {
-	      return this.x * this.x + this.y * this.y + this.z * this.z;
-	    }
-
-	    /**
-	     * 長さの2乗（static版）
-	     */
-	  }, {
-	    key: "lengthSquared",
-	    value: function lengthSquared(vec3) {
-	      return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
-	    }
-
-	    /**
-	     * 内積
-	     */
-	  }, {
-	    key: "dotProduct",
-	    value: function dotProduct(vec3) {
-	      return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
-	    }
-
-	    /**
-	     * 内積（static版）
-	     */
-	  }, {
-	    key: "cross",
-
-	    /**
-	     * 外積
-	     */
-	    value: function cross(v) {
-	      var x = this.y * v.z - this.z * v.y;
-	      var y = this.z * v.x - this.x * v.z;
-	      var z = this.x * v.y - this.y * v.x;
-
-	      this.setComponents(x, y, z);
-
-	      return this;
-	    }
-
-	    /**
-	    * 外積(static版)
-	    */
-	  }, {
-	    key: "normalize",
-
-	    /**
-	     * 正規化
-	     */
-	    value: function normalize() {
-	      var length = this.length();
-	      this.divide(length);
-
-	      return this;
-	    }
-
-	    /**
-	     * 正規化（static版）
-	     */
-	  }, {
-	    key: "subtract",
-
-	    /**
-	     * 減算
-	     */
-	    value: function subtract(v) {
-	      this.x -= v.x;
-	      this.y -= v.y;
-	      this.z -= v.z;
-
-	      return this;
-	    }
-
-	    /**
-	     * 減算（static版）
-	     */
-	  }, {
-	    key: "divide",
-
-	    /**
-	     * 除算
-	     */
-	    value: function divide(val) {
-	      console.assert(val != 0, "0 division!");
-	      this.x /= val;
-	      this.y /= val;
-	      this.z /= val;
-
-	      return this;
-	    }
-
-	    /**
-	     * 除算（static版）
-	     */
-	  }], [{
-	    key: "length",
-	    value: function length(vec3) {
-	      return Math.sqrt(vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z);
-	    }
-	  }, {
-	    key: "dotProduct",
-	    value: function dotProduct(lv, rv) {
-	      return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
-	    }
-	  }, {
-	    key: "cross",
-	    value: function cross(lv, rv) {
-	      var x = lv.y * rv.z - lv.z * rv.y;
-	      var y = lv.z * rv.x - lv.x * rv.z;
-	      var z = lv.x * rv.y - lv.y * rv.x;
-
-	      return new Vector3(x, y, z);
-	    }
-	  }, {
-	    key: "normalize",
-	    value: function normalize(vec3) {
-	      var length = vec3.length();
-	      vec3.divide(length);
-
-	      return vec3;
-	    }
-	  }, {
-	    key: "subtract",
-	    value: function subtract(lv, rv) {
-	      return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
-	    }
-	  }, {
-	    key: "divide",
-	    value: function divide(vec3, val) {
-	      console.assert(val != 0, "0 division!");
-	      return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
-	    }
-	  }]);
-
-	  return Vector3;
-	})();
-
-	exports["default"] = Vector3;
-
-	_globals2["default"]["Vector3"] = Vector3;
-	module.exports = exports["default"];
-
-/***/ },
-/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1080,12 +1030,12 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 37 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _createClass = __webpack_require__(32)["default"];
+	var _createClass = __webpack_require__(6)["default"];
 
 	var _classCallCheck = __webpack_require__(2)["default"];
 
@@ -1396,16 +1346,12 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 38 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
-
-	var _inherits = __webpack_require__(21)['default'];
-
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -1415,203 +1361,11 @@
 	  value: true
 	});
 
-	var _globals = __webpack_require__(4);
-
-	var _globals2 = _interopRequireDefault(_globals);
-
-	var _Element2 = __webpack_require__(36);
-
-	var _Element3 = _interopRequireDefault(_Element2);
-
-	var _Matrix4x4 = __webpack_require__(37);
-
-	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
-
-	var _GLContext = __webpack_require__(39);
-
-	var _GLContext2 = _interopRequireDefault(_GLContext);
-
-	var _GLExtentionsManager = __webpack_require__(43);
-
-	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
-
-	var _SimpleShader = __webpack_require__(44);
-
-	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
-
-	var Mesh = (function (_Element) {
-	  _inherits(Mesh, _Element);
-
-	  function Mesh(canvas) {
-	    _classCallCheck(this, Mesh);
-
-	    _get(Object.getPrototypeOf(Mesh.prototype), 'constructor', this).call(this);
-	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
-	    this.canvas = canvas;
-	    this._material = null;
-	    this._vertexN = 0;
-	    this._stride = 0;
-	    this._glslProgram = null;
-	    this._vertices = null;
-	  }
-
-	  /**
-	   * データとして利用する頂点属性を判断し、そのリストを返す
-	   * 不必要な頂点属性のデータは無視する。
-	   */
-
-	  _createClass(Mesh, [{
-	    key: '_decideNeededVertexAttribs',
-	    value: function _decideNeededVertexAttribs(vertices) {
-	      var attribNameArray = [];
-	      for (var attribName in vertices) {
-	        if (attribName === _globals2['default'].TEXCOORD) {
-	          // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-	          if (this._material !== null && this._material.diffuseTexture !== null) {
-	            attribNameArray.push(attribName);
-	          } else {
-	            delete vertices[_globals2['default'].TEXCOORD];
-	          }
-	        } else {
-	          attribNameArray.push(attribName);
-	        }
-	      }
-
-	      return attribNameArray;
-	    }
-	  }, {
-	    key: '_getSheder',
-	    value: function _getSheder(result, existCamera_f) {
-	      return _SimpleShader2['default'].getInstance(this.canvas).getShaderProgram(result, existCamera_f);
-	    }
-	  }, {
-	    key: 'setVerticesData',
-	    value: function setVerticesData(vertices) {
-	      this._vertices = vertices;
-	    }
-	  }, {
-	    key: 'prepareForRender',
-	    value: function prepareForRender(existCamera_f) {
-	      var _this = this;
-
-	      var vertices = this._vertices;
-	      var gl = this._gl;
-	      //    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
-	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
-
-	      // GLSLプログラム作成。
-	      var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
-	      var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
-
-	      // create VAO
-	      var vao = glem.createVertexArray(gl);
-	      glem.bindVertexArray(gl, vao);
-
-	      // create VBO
-	      var squareVerticesBuffer = gl.createBuffer();
-	      gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
-
-	      this._vertexN = vertices.position.length;
-
-	      var vertexData = [];
-
-	      this._stride = 0;
-	      vertices.position.forEach(function (elem, index, array) {
-	        optimizedVertexAttrib.forEach(function (attribName) {
-	          var element = vertices[attribName][index];
-	          vertexData.push(element.x);
-	          vertexData.push(element.y);
-	          if (element.z !== void 0) {
-	            vertexData.push(element.z);
-	          }
-	        });
-	      });
-
-	      optimizedVertexAttrib.forEach(function (attribName) {
-	        var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
-	        _this._stride += numberOfComponentOfVector * 4;
-	      });
-
-	      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
-
-	      // 頂点レイアウト設定
-	      var offset = 0;
-	      optimizedVertexAttrib.forEach(function (attribName) {
-	        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-	        var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
-	        gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], numberOfComponentOfVector, gl.FLOAT, gl.FALSE, _this._stride, offset);
-	        offset += numberOfComponentOfVector * 4;
-	      });
-	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	      glem.bindVertexArray(gl, null);
-
-	      this._vao = vao;
-	      this._glslProgram = glslProgram;
-	    }
-	  }, {
-	    key: 'draw',
-	    value: function draw(projectionAndViewMatrix) {
-	      var gl = this._gl;
-	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
-	      var material = this._material;
-
-	      gl.useProgram(this._glslProgram);
-
-	      if (projectionAndViewMatrix) {
-	        var pv_m = projectionAndViewMatrix;
-	        gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
-	      }
-
-	      glem.bindVertexArray(gl, this._vao);
-
-	      if (material) {
-	        material.setUp();
-	      }
-
-	      gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
-
-	      if (material) {
-	        material.tearDown();
-	      }
-
-	      glem.bindVertexArray(gl, null);
-	    }
-	  }, {
-	    key: 'material',
-	    set: function set(mat) {
-	      this._material = mat;
-	    }
-	  }]);
-
-	  return Mesh;
-	})(_Element3['default']);
-
-	exports['default'] = Mesh;
-
-	_globals2['default']["Mesh"] = Mesh;
-	module.exports = exports['default'];
-
-/***/ },
-/* 39 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = __webpack_require__(32)['default'];
-
-	var _classCallCheck = __webpack_require__(2)['default'];
-
-	var _interopRequireDefault = __webpack_require__(3)['default'];
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _implGLContextWebGL1Impl = __webpack_require__(40);
+	var _implGLContextWebGL1Impl = __webpack_require__(38);
 
 	var _implGLContextWebGL1Impl2 = _interopRequireDefault(_implGLContextWebGL1Impl);
 
-	var _implGLContextWebGL2Impl = __webpack_require__(42);
+	var _implGLContextWebGL2Impl = __webpack_require__(40);
 
 	var _implGLContextWebGL2Impl2 = _interopRequireDefault(_implGLContextWebGL2Impl);
 
@@ -1656,16 +1410,16 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -1675,7 +1429,7 @@
 	  value: true
 	});
 
-	var _GLContextImpl2 = __webpack_require__(41);
+	var _GLContextImpl2 = __webpack_require__(39);
 
 	var _GLContextImpl3 = _interopRequireDefault(_GLContextImpl2);
 
@@ -1704,12 +1458,12 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _createClass = __webpack_require__(32)["default"];
+	var _createClass = __webpack_require__(6)["default"];
 
 	var _classCallCheck = __webpack_require__(2)["default"];
 
@@ -1719,7 +1473,7 @@
 	  value: true
 	});
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -1774,16 +1528,16 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -1793,7 +1547,7 @@
 	  value: true
 	});
 
-	var _GLContextImpl2 = __webpack_require__(41);
+	var _GLContextImpl2 = __webpack_require__(39);
 
 	var _GLContextImpl3 = _interopRequireDefault(_GLContextImpl2);
 
@@ -1822,12 +1576,12 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _createClass = __webpack_require__(32)["default"];
+	var _createClass = __webpack_require__(6)["default"];
 
 	var _classCallCheck = __webpack_require__(2)["default"];
 
@@ -1849,7 +1603,8 @@
 	    }
 
 	    this._extDBs = gl.getExtension("WEBGL_draw_buffers");
-	    if (!this._extDBs) throw "WEBGL_draw_buffersをサポートしていません";
+	    //    if (!this._extDBs)
+	    //      throw("WEBGL_draw_buffersをサポートしていません");
 
 	    GLExtentionsManager._instance = this;
 	  }
@@ -1863,6 +1618,11 @@
 	    key: "bindVertexArray",
 	    value: function bindVertexArray(gl, vao) {
 	      return GLBoost.isThisGLVersion_2(gl) ? gl.bindVertexArray(vao) : this._extVAO.bindVertexArrayOES(vao);
+	    }
+	  }, {
+	    key: "drawBuffers",
+	    value: function drawBuffers(gl, buffers) {
+	      return this._extDBs ? this.extDBs.drawBuffersWEBGL(buffers) : gl.drawBuffers(buffers);
 	    }
 	  }, {
 	    key: "colorAttachiment",
@@ -1895,16 +1655,16 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -1914,7 +1674,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(45);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -2026,7 +1786,11 @@
 	  }], [{
 	    key: 'getInstance',
 	    value: function getInstance(canvas) {
-	      return new SimpleShader(canvas);
+	      if (_Shader3['default']._instances[canvas.id] instanceof SimpleShader) {
+	        return _Shader3['default']._instances[canvas.id];
+	      } else {
+	        return new SimpleShader(canvas);
+	      }
 	    }
 	  }]);
 
@@ -2037,12 +1801,12 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2052,7 +1816,7 @@
 	  value: true
 	});
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2062,10 +1826,6 @@
 
 	    if (typeof canvas === 'string') {
 	      var canvas = window.document.querySelector(canvas);
-	    }
-
-	    if (Shader._instances[canvas.id] instanceof childClass) {
-	      return Shader._instances[canvas.id];
 	    }
 
 	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
@@ -2159,7 +1919,7 @@
 	  }, {
 	    key: '_set_outColor_onFrag',
 	    value: function _set_outColor_onFrag(gl) {
-	      return GLBoost.isThisGLVersion_2(gl) ? 'out vec4 rt1;' : 'vec4 rt1;';
+	      return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = 0) out vec4 rt1;' : 'vec4 rt1;';
 	    }
 	  }, {
 	    key: '_set_glFragColor_inGLVer1',
@@ -2177,14 +1937,16 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
+
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2198,7 +1960,307 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(39);
+	var _Vector3 = __webpack_require__(45);
+
+	var _Vector32 = _interopRequireDefault(_Vector3);
+
+	var _Element2 = __webpack_require__(35);
+
+	var _Element3 = _interopRequireDefault(_Element2);
+
+	var _Matrix4x4 = __webpack_require__(36);
+
+	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
+
+	var Camera = (function (_Element) {
+	  _inherits(Camera, _Element);
+
+	  function Camera(lookat, perspective) {
+	    _classCallCheck(this, Camera);
+
+	    _get(Object.getPrototypeOf(Camera.prototype), 'constructor', this).call(this);
+
+	    this.eye = lookat.eye;
+	    this.center = lookat.center;
+	    this.up = lookat.up;
+
+	    this.fovy = perspective.fovy;
+	    this.aspect = perspective.aspect;
+	    this.zNear = perspective.zNear;
+	    this.zFar = perspective.zFar;
+
+	    this.setAsMainCamera();
+	  }
+
+	  _createClass(Camera, [{
+	    key: 'lookAtRHMatrix',
+	    value: function lookAtRHMatrix() {
+	      //    return Matrix4x4.identity();
+	      return Camera.lookAtRHMatrix(this.eye, this.center, this.up);
+	    }
+	  }, {
+	    key: 'perspectiveRHMatrix',
+	    value: function perspectiveRHMatrix() {
+	      //    return Matrix4x4.identity();
+	      return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
+	    }
+	  }, {
+	    key: 'setAsMainCamera',
+	    value: function setAsMainCamera() {
+	      Camera._mainCamera = this;
+	    }
+	  }, {
+	    key: 'isMainCamera',
+	    get: function get() {
+	      return Camera._mainCamera === this;
+	    }
+	  }], [{
+	    key: 'lookAtRHMatrix',
+	    value: function lookAtRHMatrix(eye, center, up) {
+
+	      var f = _Vector32['default'].normalize(_Vector32['default'].subtract(center, eye));
+	      var s = _Vector32['default'].normalize(_Vector32['default'].cross(f, up));
+	      var u = _Vector32['default'].cross(s, f);
+
+	      return new _Matrix4x42['default'](s.x, s.y, s.z, -_Vector32['default'].dotProduct(s, eye), u.x, u.y, u.z, -_Vector32['default'].dotProduct(u, eye), -f.x, -f.y, -f.z, _Vector32['default'].dotProduct(f, eye), 0, 0, 0, 1);
+	    }
+	  }, {
+	    key: 'perspectiveRHMatrix',
+	    value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+
+	      var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
+	      var xscale = yscale / aspect;
+
+	      return new _Matrix4x42['default'](xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+	    }
+	  }]);
+
+	  return Camera;
+	})(_Element3['default']);
+
+	exports['default'] = Camera;
+
+	Camera._mainCamera = null;
+
+	_globals2['default']["Camera"] = Camera;
+	module.exports = exports['default'];
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = __webpack_require__(6)["default"];
+
+	var _classCallCheck = __webpack_require__(2)["default"];
+
+	var _interopRequireDefault = __webpack_require__(3)["default"];
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _globals = __webpack_require__(4);
+
+	var _globals2 = _interopRequireDefault(_globals);
+
+	var Vector3 = (function () {
+	  function Vector3(x, y, z) {
+	    _classCallCheck(this, Vector3);
+
+	    this.x = x;
+	    this.y = y;
+	    this.z = z;
+	  }
+
+	  /**
+	   * 長さ
+	   */
+
+	  _createClass(Vector3, [{
+	    key: "length",
+	    value: function length() {
+	      return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	    }
+
+	    /**
+	     * 長さ（static版）
+	     */
+	  }, {
+	    key: "lengthSquared",
+
+	    /**
+	     * 長さの2乗
+	     */
+	    value: function lengthSquared() {
+	      return this.x * this.x + this.y * this.y + this.z * this.z;
+	    }
+
+	    /**
+	     * 長さの2乗（static版）
+	     */
+	  }, {
+	    key: "lengthSquared",
+	    value: function lengthSquared(vec3) {
+	      return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
+	    }
+
+	    /**
+	     * 内積
+	     */
+	  }, {
+	    key: "dotProduct",
+	    value: function dotProduct(vec3) {
+	      return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
+	    }
+
+	    /**
+	     * 内積（static版）
+	     */
+	  }, {
+	    key: "cross",
+
+	    /**
+	     * 外積
+	     */
+	    value: function cross(v) {
+	      var x = this.y * v.z - this.z * v.y;
+	      var y = this.z * v.x - this.x * v.z;
+	      var z = this.x * v.y - this.y * v.x;
+
+	      this.setComponents(x, y, z);
+
+	      return this;
+	    }
+
+	    /**
+	    * 外積(static版)
+	    */
+	  }, {
+	    key: "normalize",
+
+	    /**
+	     * 正規化
+	     */
+	    value: function normalize() {
+	      var length = this.length();
+	      this.divide(length);
+
+	      return this;
+	    }
+
+	    /**
+	     * 正規化（static版）
+	     */
+	  }, {
+	    key: "subtract",
+
+	    /**
+	     * 減算
+	     */
+	    value: function subtract(v) {
+	      this.x -= v.x;
+	      this.y -= v.y;
+	      this.z -= v.z;
+
+	      return this;
+	    }
+
+	    /**
+	     * 減算（static版）
+	     */
+	  }, {
+	    key: "divide",
+
+	    /**
+	     * 除算
+	     */
+	    value: function divide(val) {
+	      console.assert(val != 0, "0 division!");
+	      this.x /= val;
+	      this.y /= val;
+	      this.z /= val;
+
+	      return this;
+	    }
+
+	    /**
+	     * 除算（static版）
+	     */
+	  }], [{
+	    key: "length",
+	    value: function length(vec3) {
+	      return Math.sqrt(vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z);
+	    }
+	  }, {
+	    key: "dotProduct",
+	    value: function dotProduct(lv, rv) {
+	      return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
+	    }
+	  }, {
+	    key: "cross",
+	    value: function cross(lv, rv) {
+	      var x = lv.y * rv.z - lv.z * rv.y;
+	      var y = lv.z * rv.x - lv.x * rv.z;
+	      var z = lv.x * rv.y - lv.y * rv.x;
+
+	      return new Vector3(x, y, z);
+	    }
+	  }, {
+	    key: "normalize",
+	    value: function normalize(vec3) {
+	      var length = vec3.length();
+	      vec3.divide(length);
+
+	      return vec3;
+	    }
+	  }, {
+	    key: "subtract",
+	    value: function subtract(lv, rv) {
+	      return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
+	    }
+	  }, {
+	    key: "divide",
+	    value: function divide(vec3, val) {
+	      console.assert(val != 0, "0 division!");
+	      return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+	    }
+	  }]);
+
+	  return Vector3;
+	})();
+
+	exports["default"] = Vector3;
+
+	_globals2["default"]["Vector3"] = Vector3;
+	module.exports = exports["default"];
+
+/***/ },
+/* 46 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _get = __webpack_require__(11)['default'];
+
+	var _inherits = __webpack_require__(24)['default'];
+
+	var _createClass = __webpack_require__(6)['default'];
+
+	var _classCallCheck = __webpack_require__(2)['default'];
+
+	var _interopRequireDefault = __webpack_require__(3)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _globals = __webpack_require__(4);
+
+	var _globals2 = _interopRequireDefault(_globals);
+
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2226,7 +2288,18 @@
 	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+	    gl.bindTexture(gl.TEXTURE_2D, null);
 	  }
+
+	  _createClass(MutableTexture, [{
+	    key: 'colorAttachiment',
+	    set: function set(attachmentId) {
+	      this._attachmentId = attachmentId;
+	    },
+	    get: function get() {
+	      return this._attachmentId;
+	    }
+	  }]);
 
 	  return MutableTexture;
 	})(_AbstractTexture3['default']);
@@ -2242,7 +2315,7 @@
 
 	'use strict';
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2256,7 +2329,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2312,11 +2385,7 @@
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
-
-	var _inherits = __webpack_require__(21)['default'];
-
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2330,11 +2399,110 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Element2 = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
+
+	var _GLContext2 = _interopRequireDefault(_GLContext);
+
+	var _Mesh = __webpack_require__(10);
+
+	var _Mesh2 = _interopRequireDefault(_Mesh);
+
+	var RenderPass = (function () {
+	  function RenderPass(gl) {
+	    _classCallCheck(this, RenderPass);
+
+	    this._meshes = [];
+	    this._drawBuffers = [gl.BACK];
+	    this._clearColor = null;
+	  }
+
+	  _createClass(RenderPass, [{
+	    key: 'addMeshes',
+	    value: function addMeshes(meshes) {
+	      var _this = this;
+
+	      meshes.forEach(function (mesh) {
+	        if (!(mesh instanceof _Mesh2['default'])) {
+	          throw new TypeError("RenderPass accepts Mesh objects only.");
+	        }
+	        _this._meshes.push(mesh);
+	      });
+	    }
+	  }, {
+	    key: 'getMeshes',
+	    value: function getMeshes() {
+	      return this._meshes;
+	    }
+	  }, {
+	    key: 'specifyRenderTargetTextures',
+	    value: function specifyRenderTargetTextures(canvas, renderTargetTextures) {
+	      var _this2 = this;
+
+	      var gl = _GLContext2['default'].getInstance(canvas).gl;
+
+	      if (renderTargetTextures) {
+	        this._drawBuffers = [];
+	        renderTargetTextures.forEach(function (texture) {
+	          _this2._drawBuffers.push(texture.colorAttachiment);
+	        });
+	      } else {
+	        this._drawBuffers = [gl.BACK];
+	      }
+	    }
+	  }, {
+	    key: 'setClearColor',
+	    value: function setClearColor(color) {
+	      this._clearColor = color;
+	    }
+	  }, {
+	    key: 'buffersToDraw',
+	    get: function get() {
+	      return this._drawBuffers;
+	    }
+	  }, {
+	    key: 'clearColor',
+	    get: function get() {
+	      return this._clearColor;
+	    }
+	  }]);
+
+	  return RenderPass;
+	})();
+
+	exports['default'] = RenderPass;
+
+	_globals2['default']["RenderPass"] = RenderPass;
+	module.exports = exports['default'];
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _get = __webpack_require__(11)['default'];
+
+	var _inherits = __webpack_require__(24)['default'];
+
+	var _createClass = __webpack_require__(6)['default'];
+
+	var _classCallCheck = __webpack_require__(2)['default'];
+
+	var _interopRequireDefault = __webpack_require__(3)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _globals = __webpack_require__(4);
+
+	var _globals2 = _interopRequireDefault(_globals);
+
+	var _Element2 = __webpack_require__(35);
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Camera = __webpack_require__(6);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -2386,7 +2554,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2416,12 +2584,12 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2435,7 +2603,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2483,16 +2651,16 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2506,7 +2674,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2562,16 +2730,16 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 52 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2585,23 +2753,23 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Element = __webpack_require__(36);
+	var _Element = __webpack_require__(35);
 
 	var _Element2 = _interopRequireDefault(_Element);
 
-	var _GLContext = __webpack_require__(39);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(43);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _BlendShapeShader = __webpack_require__(53);
+	var _BlendShapeShader = __webpack_require__(54);
 
 	var _BlendShapeShader2 = _interopRequireDefault(_BlendShapeShader);
 
-	var _Mesh2 = __webpack_require__(38);
+	var _Mesh2 = __webpack_require__(10);
 
 	var _Mesh3 = _interopRequireDefault(_Mesh2);
 
@@ -2623,53 +2791,92 @@
 	  }, {
 	    key: 'blendWeight_1',
 	    set: function set(weight) {
-	      //    console.log(this._gl.canvas.id);
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET1], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_2',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET2], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_3',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET3], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_4',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET4], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_5',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET5], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_6',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET6], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_7',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET7], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_8',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET8], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_9',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET9], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }, {
 	    key: 'blendWeight_10',
 	    set: function set(weight) {
+	      var gl = this._gl;
+	      var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
+	      gl.useProgram(this._glslProgram);
 	      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + _globals2['default'].BLENDTARGET10], weight);
+	      gl.useProgram(currentProgram);
 	    }
 	  }]);
 
@@ -2682,16 +2889,16 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 53 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _get = __webpack_require__(7)['default'];
+	var _get = __webpack_require__(11)['default'];
 
-	var _inherits = __webpack_require__(21)['default'];
+	var _inherits = __webpack_require__(24)['default'];
 
-	var _createClass = __webpack_require__(32)['default'];
+	var _createClass = __webpack_require__(6)['default'];
 
 	var _classCallCheck = __webpack_require__(2)['default'];
 
@@ -2701,7 +2908,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(45);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -2863,7 +3070,11 @@
 	  }], [{
 	    key: 'getInstance',
 	    value: function getInstance(canvas) {
-	      return new BlendShapeShader(canvas);
+	      if (_Shader3['default']._instances[canvas.id] instanceof BlendShapeShader) {
+	        return _Shader3['default']._instances[canvas.id];
+	      } else {
+	        return new BlendShapeShader(canvas);
+	      }
 	    }
 	  }]);
 

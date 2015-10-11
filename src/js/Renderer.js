@@ -5,6 +5,7 @@ import Matrix4x4 from './Matrix4x4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import MutableTexture from './MutableTexture'
+import RenderPass from './RenderPass'
 
 class Renderer {
   constructor(parameters) {
@@ -35,6 +36,7 @@ class Renderer {
     setDefaultGLStates();
 
     this._currentRenderTargetTextures = [];
+    this._renderPasses = null;
   }
 
   draw(scene) {
@@ -47,12 +49,43 @@ class Renderer {
         }
       }
     });
-    scene.elements.forEach((elm)=> {
-      if(elm instanceof Mesh) {
-        elm.draw(projectionAndViewMatrix);
-      }
-    });
 
+    var gl = this._gl;
+    var glem = GLExtentionsManager.getInstance(gl);
+
+    // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
+    if (this._renderPasses === null) {
+      glem.drawBuffers(gl, [gl.BACK]);
+
+      scene.elements.forEach((elm)=> {
+        if(elm instanceof Mesh) {
+          elm.draw(projectionAndViewMatrix);
+        }
+      });
+    } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
+      this._renderPasses.forEach((renderPass)=>{
+
+        if (renderPass.buffersToDraw[0] !== gl.BACK) {
+          gl.bindFramebuffer(gl.FRAMEBUFFER, this._fbo);
+        }
+        glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+
+        if (renderPass.clearColor) {
+          var color = renderPass.clearColor;
+          gl.clearColor(color[0], color[1], color[2], color[3]);
+          gl.clear( gl.COLOR_BUFFER_BIT );
+        }
+
+        var meshes = renderPass.getMeshes();
+        meshes.forEach((mesh)=> {
+          mesh.draw(projectionAndViewMatrix);
+        });
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        glem.drawBuffers(gl, [gl.BACK]);
+
+      });
+    }
   }
 
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
@@ -86,7 +119,7 @@ class Renderer {
     this._fbo.height = height ? height : gl._canvas.height;
 
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(gl._canvas);
+      let texture = new MutableTexture(gl._canvas, this._fbo.width, this._fbo.height);
       this._currentRenderTargetTextures.push(texture);
     }
 
@@ -96,16 +129,30 @@ class Renderer {
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this._fbo.width, this._fbo.height);
 
     // Attach Buffers
-    this._currentRenderTargetTextures.forEach((texture)=>{
-      var glTexture = texture.glTextureResource();
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, glem.colorAttachiment(gl, 0), gl.TEXTURE_2D, glTexture, 0);
+    this._currentRenderTargetTextures.forEach((texture, i)=>{
+      var glTexture = texture.glTextureResource;
+      var attachimentId = glem.colorAttachiment(gl, i);
+      texture.colorAttachiment = attachimentId;
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
     });
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 
     gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return this._currentRenderTargetTextures;
   }
+
+  createRenderPasses(number) {
+    this._renderPasses = [];
+    for (let i=0; i<number; i++) {
+      this._renderPasses.push(new RenderPass(this._gl));
+    }
+
+    return this._renderPasses;
+  }
+
 }
 
 GLBoost["Renderer"] = Renderer;

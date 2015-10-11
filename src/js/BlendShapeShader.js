@@ -148,7 +148,11 @@ export default class BlendShapeShader extends Shader {
   }
 
   static getInstance(canvas) {
-    return new BlendShapeShader(canvas);
+    if (Shader._instances[canvas.id] instanceof BlendShapeShader) {
+      return Shader._instances[canvas.id];
+    } else {
+      return new BlendShapeShader(canvas);
+    }
   }
 
 }

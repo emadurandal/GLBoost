@@ -6,10 +6,6 @@ export default class Shader {
       var canvas = window.document.querySelector(canvas);
     }
 
-    if (Shader._instances[canvas.id] instanceof childClass) {
-      return Shader._instances[canvas.id];
-    }
-
     this._gl = GLContext.getInstance(canvas).gl;
 
     Shader._instances[canvas.id] = this;
@@ -89,7 +85,7 @@ export default class Shader {
   }
 
   _set_outColor_onFrag(gl) {
-    return GLBoost.isThisGLVersion_2(gl) ? 'out vec4 rt1;' : 'vec4 rt1;';
+    return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = 0) out vec4 rt1;' : 'vec4 rt1;';
   }
 
   _set_glFragColor_inGLVer1(gl) {
