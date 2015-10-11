@@ -1867,7 +1867,7 @@
 	    this.zNear = perspective.zNear;
 	    this.zFar = perspective.zFar;
 
-	    this.setASMainCamera();
+	    this.setAsMainCamera();
 	  }
 
 	  _createClass(Camera, [{
@@ -1883,8 +1883,8 @@
 	      return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
 	    }
 	  }, {
-	    key: 'setASMainCamera',
-	    value: function setASMainCamera() {
+	    key: 'setAsMainCamera',
+	    value: function setAsMainCamera() {
 	      Camera._mainCamera = this;
 	    }
 	  }, {
