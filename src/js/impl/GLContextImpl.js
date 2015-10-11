@@ -37,6 +37,7 @@ export default class GLContextImpl {
       throw new Error("Unexpected rendering context.");
     }
 
+    gl._canvas = this._canvas;
     this._canvas._gl = gl;
 
   }

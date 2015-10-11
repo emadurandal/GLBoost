@@ -1,12 +1,15 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
+import AbstractTexture from './AbstractTexture'
 
-export default class Texture {
+export default class Texture extends AbstractTexture {
   constructor(imageUrl, canvas) {
+    super(canvas);
+
     this._isTextureReady = false;
-    this._gl = GLContext.getInstance(canvas).gl;
-    var img = new Image();
     this._texture = null;
+
+    var img = new Image();
     img.onload = ()=> {
       var gl = this._gl;
       var texture = gl.createTexture();
@@ -18,6 +21,8 @@ export default class Texture {
 
       this._texture = texture;
       this._isTextureReady = true;
+      this._width = img.width;
+      this._height = img.width;
     };
 
     img.src = imageUrl;
@@ -25,18 +30,6 @@ export default class Texture {
 
   get isTextureReady() {
     return this._isTextureReady;
-  }
-
-  get glTextureResource() {
-    return this._texture;
-  }
-
-  setUp() {
-    this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
-  }
-
-  tearDown() {
-    this._gl.bindTexture(this._gl.TEXTURE_2D, null);
   }
 
 }

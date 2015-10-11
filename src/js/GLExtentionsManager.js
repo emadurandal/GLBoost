@@ -10,6 +10,10 @@ export default class GLExtentionsManager {
         throw new Error("OES_vertex_array_objectをサポートしていません");
     }
 
+    this._extDBs = gl.getExtension("WEBGL_draw_buffers");
+    if (!this._extDBs)
+      throw("WEBGL_draw_buffersをサポートしていません");
+
     GLExtentionsManager._instance = this;
   }
   static getInstance(gl) {
@@ -18,6 +22,10 @@ export default class GLExtentionsManager {
 
   get extVAO() {
     return this._extVAO;
+  }
+
+  get extDBs() {
+    return this._extDBs;
   }
 
   createVertexArray(gl) {
@@ -30,6 +38,12 @@ export default class GLExtentionsManager {
     return GLBoost.isThisGLVersion_2(gl) ?
       gl.bindVertexArray(vao) :
       this._extVAO.bindVertexArrayOES(vao);
+  }
+
+  colorAttachiment(gl, index) {
+    return this._extDBs ?
+      this._extDBs[`COLOR_ATTACHMENT${index}_WEBGL`] :
+      gl[`COLOR_ATTACHMENT${index}`];
   }
 
 }
