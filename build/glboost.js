@@ -148,14 +148,15 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
-	Object.defineProperty(exports, '__esModule', {
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	window.GLBoost = window.GLBoost || { REVISION: '1' };
 
 	var global = window;
+	global.GLBoost["TARGET_WEBGL_VERSION"] = 1;
 	global.GLBoost["POSITION"] = 'position';
 	global.GLBoost["COLOR"] = 'color';
 	global.GLBoost["TEXCOORD"] = 'texcoord';
@@ -170,12 +171,12 @@
 	global.GLBoost["BLENDTARGET9"] = 'shapetarget_9';
 	global.GLBoost["BLENDTARGET10"] = 'shapetarget_10';
 
-	exports['default'] = global.GLBoost;
+	exports["default"] = global.GLBoost;
 
 	global.GLBoost.isThisGLVersion_2 = function (gl) {
 	  return gl instanceof WebGL2RenderingContext;
 	};
-	module.exports = exports['default'];
+	module.exports = exports["default"];
 
 /***/ },
 /* 5 */
@@ -1274,7 +1275,11 @@
 	      return GLContext._instances[canvas.id];
 	    }
 
-	    this.impl = new _implGLContextWebGL1Impl2['default'](canvas, this);
+	    if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+	      this.impl = new _implGLContextWebGL1Impl2['default'](canvas, this);
+	    } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+	      this.impl = new _implGLContextWebGL2Impl2['default'](canvas, this);
+	    }
 
 	    GLContext._instances[canvas.id] = this;
 	  }

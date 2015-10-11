@@ -8,7 +8,11 @@ export default class GLContext {
       return GLContext._instances[canvas.id];
     }
 
-    this.impl = new GLContextWebGL1Impl(canvas, this);
+    if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+      this.impl = new GLContextWebGL1Impl(canvas, this);
+    } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+      this.impl = new GLContextWebGL2Impl(canvas, this);
+    }
 
     GLContext._instances[canvas.id] = this;
   }
