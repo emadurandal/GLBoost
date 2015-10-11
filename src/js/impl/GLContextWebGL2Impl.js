@@ -1,0 +1,16 @@
+import GLContextImpl from './GLContextImpl'
+
+export default class GLContextWebGL2Impl extends GLContextImpl {
+
+  constructor(canvas, parent) {
+    super(canvas, parent);
+
+    super.init('webgl2', WebGL2RenderingContext);
+
+  }
+
+  get gl() {
+    return this._canvas._gl;
+  }
+
+}
