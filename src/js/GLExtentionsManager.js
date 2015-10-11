@@ -6,7 +6,7 @@ export default class GLExtentionsManager {
     }
 
     this._extVAO = gl.getExtension("OES_vertex_array_object");
-    if (!this._extVAO) {
+    if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
         throw new Error("OES_vertex_array_objectをサポートしていません");
     }
 
@@ -18,6 +18,18 @@ export default class GLExtentionsManager {
 
   get extVAO() {
     return this._extVAO;
+  }
+
+  createVertexArray(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ?
+      gl.createVertexArray() :
+      this._extVAO.createVertexArrayOES();
+  }
+
+  bindVertexArray(gl, vao) {
+    return GLBoost.isThisGLVersion_2(gl) ?
+      gl.bindVertexArray(vao) :
+      this._extVAO.bindVertexArrayOES(vao);
   }
 
 }

@@ -50,15 +50,16 @@ export default class Mesh extends Element {
   prepareForRender(existCamera_f) {
     var vertices = this._vertices;
     var gl = this._gl;
-    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+//    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+    var glem = GLExtentionsManager.getInstance(gl);
 
     // GLSLプログラム作成。
     var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
     var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
 
     // create VAO
-    var vao = extVAO.createVertexArrayOES();
-    extVAO.bindVertexArrayOES(vao);
+    var vao = glem.createVertexArray(gl);
+    glem.bindVertexArray(gl, vao);
 
     // create VBO
     var squareVerticesBuffer = gl.createBuffer();
@@ -97,7 +98,7 @@ export default class Mesh extends Element {
       offset += numberOfComponentOfVector * 4;
     });
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    extVAO.bindVertexArrayOES(null)
+    glem.bindVertexArray(gl, null)
 
     this._vao = vao;
     this._glslProgram = glslProgram;
@@ -106,7 +107,7 @@ export default class Mesh extends Element {
 
   draw(projectionAndViewMatrix) {
     var gl = this._gl;
-    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+    var glem = GLExtentionsManager.getInstance(gl);
     var material = this._material;
 
     gl.useProgram(this._glslProgram);
@@ -116,7 +117,7 @@ export default class Mesh extends Element {
       gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
     }
 
-    extVAO.bindVertexArrayOES(this._vao);
+    glem.bindVertexArray(gl, this._vao);
 
     if (material) {
       material.setUp();
@@ -128,7 +129,7 @@ export default class Mesh extends Element {
       material.tearDown();
     }
 
-    extVAO.bindVertexArrayOES(null);
+    glem.bindVertexArray(gl, null);
   }
 
   set material(mat) {

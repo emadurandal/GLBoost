@@ -1,4 +1,5 @@
 import GLContextWebGL1Impl from './impl/GLContextWebGL1Impl'
+import GLContextWebGL2Impl from './impl/GLContextWebGL2Impl'
 
 export default class GLContext {
 

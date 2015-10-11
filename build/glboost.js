@@ -52,15 +52,15 @@
 
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 
-	var _Scene = __webpack_require__(45);
+	var _Scene = __webpack_require__(46);
 
 	var _Scene2 = _interopRequireDefault(_Scene);
 
-	var _Vector2 = __webpack_require__(46);
+	var _Vector2 = __webpack_require__(47);
 
 	var _Vector22 = _interopRequireDefault(_Vector2);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
@@ -68,19 +68,19 @@
 
 	var _Vector42 = _interopRequireDefault(_Vector4);
 
-	var _ClassicMaterial = __webpack_require__(47);
+	var _ClassicMaterial = __webpack_require__(48);
 
 	var _ClassicMaterial2 = _interopRequireDefault(_ClassicMaterial);
 
-	var _Texture = __webpack_require__(48);
+	var _Texture = __webpack_require__(49);
 
 	var _Texture2 = _interopRequireDefault(_Texture);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
-	var _BlendShapeMesh = __webpack_require__(49);
+	var _BlendShapeMesh = __webpack_require__(50);
 
 	var _BlendShapeMesh2 = _interopRequireDefault(_BlendShapeMesh);
 
@@ -171,6 +171,10 @@
 	global.GLBoost["BLENDTARGET10"] = 'shapetarget_10';
 
 	exports['default'] = global.GLBoost;
+
+	global.GLBoost.isThisGLVersion_2 = function (gl) {
+	  return gl instanceof WebGL2RenderingContext;
+	};
 	module.exports = exports['default'];
 
 /***/ },
@@ -193,7 +197,7 @@
 
 	var _Mesh2 = _interopRequireDefault(_Mesh);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -311,11 +315,11 @@
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(40);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _SimpleShader = __webpack_require__(41);
+	var _SimpleShader = __webpack_require__(42);
 
 	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
 
@@ -376,15 +380,16 @@
 
 	      var vertices = this._vertices;
 	      var gl = this._gl;
-	      var extVAO = _GLExtentionsManager2['default'].getInstance(gl).extVAO;
+	      //    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
 
 	      // GLSLプログラム作成。
 	      var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
 	      var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
 
 	      // create VAO
-	      var vao = extVAO.createVertexArrayOES();
-	      extVAO.bindVertexArrayOES(vao);
+	      var vao = glem.createVertexArray(gl);
+	      glem.bindVertexArray(gl, vao);
 
 	      // create VBO
 	      var squareVerticesBuffer = gl.createBuffer();
@@ -422,7 +427,7 @@
 	        offset += numberOfComponentOfVector * 4;
 	      });
 	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
-	      extVAO.bindVertexArrayOES(null);
+	      glem.bindVertexArray(gl, null);
 
 	      this._vao = vao;
 	      this._glslProgram = glslProgram;
@@ -431,7 +436,7 @@
 	    key: 'draw',
 	    value: function draw(projectionAndViewMatrix) {
 	      var gl = this._gl;
-	      var extVAO = _GLExtentionsManager2['default'].getInstance(gl).extVAO;
+	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
 	      var material = this._material;
 
 	      gl.useProgram(this._glslProgram);
@@ -441,7 +446,7 @@
 	        gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
 	      }
 
-	      extVAO.bindVertexArrayOES(this._vao);
+	      glem.bindVertexArray(gl, this._vao);
 
 	      if (material) {
 	        material.setUp();
@@ -453,7 +458,7 @@
 	        material.tearDown();
 	      }
 
-	      extVAO.bindVertexArrayOES(null);
+	      glem.bindVertexArray(gl, null);
 	    }
 	  }, {
 	    key: 'material',
@@ -1257,6 +1262,10 @@
 
 	var _implGLContextWebGL1Impl2 = _interopRequireDefault(_implGLContextWebGL1Impl);
 
+	var _implGLContextWebGL2Impl = __webpack_require__(40);
+
+	var _implGLContextWebGL2Impl2 = _interopRequireDefault(_implGLContextWebGL2Impl);
+
 	var GLContext = (function () {
 	  function GLContext(canvas) {
 	    _classCallCheck(this, GLContext);
@@ -1414,6 +1423,54 @@
 /* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	var _get = __webpack_require__(7)['default'];
+
+	var _inherits = __webpack_require__(21)['default'];
+
+	var _createClass = __webpack_require__(32)['default'];
+
+	var _classCallCheck = __webpack_require__(2)['default'];
+
+	var _interopRequireDefault = __webpack_require__(3)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _GLContextImpl2 = __webpack_require__(39);
+
+	var _GLContextImpl3 = _interopRequireDefault(_GLContextImpl2);
+
+	var GLContextWebGL2Impl = (function (_GLContextImpl) {
+	  _inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+	  function GLContextWebGL2Impl(canvas, parent) {
+	    _classCallCheck(this, GLContextWebGL2Impl);
+
+	    _get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'constructor', this).call(this, canvas, parent);
+
+	    _get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', this).call(this, 'webgl2', WebGL2RenderingContext);
+	  }
+
+	  _createClass(GLContextWebGL2Impl, [{
+	    key: 'gl',
+	    get: function get() {
+	      return this._canvas._gl;
+	    }
+	  }]);
+
+	  return GLContextWebGL2Impl;
+	})(_GLContextImpl3['default']);
+
+	exports['default'] = GLContextWebGL2Impl;
+	module.exports = exports['default'];
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
 	"use strict";
 
 	var _createClass = __webpack_require__(32)["default"];
@@ -1433,7 +1490,7 @@
 	    }
 
 	    this._extVAO = gl.getExtension("OES_vertex_array_object");
-	    if (!this._extVAO) {
+	    if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
 	      throw new Error("OES_vertex_array_objectをサポートしていません");
 	    }
 
@@ -1441,6 +1498,16 @@
 	  }
 
 	  _createClass(GLExtentionsManager, [{
+	    key: "createVertexArray",
+	    value: function createVertexArray(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? gl.createVertexArray() : this._extVAO.createVertexArrayOES();
+	    }
+	  }, {
+	    key: "bindVertexArray",
+	    value: function bindVertexArray(gl, vao) {
+	      return GLBoost.isThisGLVersion_2(gl) ? gl.bindVertexArray(vao) : this._extVAO.bindVertexArrayOES(vao);
+	    }
+	  }, {
 	    key: "extVAO",
 	    get: function get() {
 	      return this._extVAO;
@@ -1461,7 +1528,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1480,7 +1547,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(42);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -1495,19 +1562,23 @@
 
 	  _createClass(SimpleShader, [{
 	    key: '_getSimpleVertexShaderString',
-	    value: function _getSimpleVertexShaderString(functions, existCamera_f) {
+	    value: function _getSimpleVertexShaderString(gl, functions, existCamera_f) {
 	      var f = functions;
 	      var shaderText = '';
 
+	      var in_ = _get(Object.getPrototypeOf(SimpleShader.prototype), '_in_onVert', this).call(this, gl);
+	      var out_ = _get(Object.getPrototypeOf(SimpleShader.prototype), '_out_onVert', this).call(this, gl);
+
+	      shaderText += _get(Object.getPrototypeOf(SimpleShader.prototype), '_glslVer', this).call(this, gl);
 	      shaderText += 'precision mediump float;\n';
-	      shaderText += 'attribute vec3 aVertex_position;\n';
+	      shaderText += in_ + ' vec3 aVertex_position;\n';
 	      if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += 'attribute vec3 aVertex_color;\n';
-	        shaderText += 'varying vec4 color;\n';
+	        shaderText += in_ + ' vec3 aVertex_color;\n';
+	        shaderText += out_ + ' vec4 color;\n';
 	      }
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += 'attribute vec2 aVertex_texcoord;\n';
-	        shaderText += 'varying vec2 texcoord;\n';
+	        shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+	        shaderText += out_ + ' vec2 texcoord;\n';
 	      }
 	      if (existCamera_f) {
 	        shaderText += 'uniform mat4 projectionAndViewMatrix;\n';
@@ -1531,28 +1602,33 @@
 	    }
 	  }, {
 	    key: '_getSimpleFragmentShaderString',
-	    value: function _getSimpleFragmentShaderString(functions) {
+	    value: function _getSimpleFragmentShaderString(gl, functions) {
 	      var f = functions;
 	      var shaderText = '';
 
+	      var in_ = _get(Object.getPrototypeOf(SimpleShader.prototype), '_in_onFrag', this).call(this, gl);
+
+	      shaderText += _get(Object.getPrototypeOf(SimpleShader.prototype), '_glslVer', this).call(this, gl);
 	      shaderText += 'precision mediump float;\n';
+	      shaderText += _get(Object.getPrototypeOf(SimpleShader.prototype), '_set_outColor_onFrag', this).call(this, gl);
 	      if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += 'varying vec4 color;\n';
+	        shaderText += in_ + ' vec4 color;\n';
 	      }
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += 'varying vec2 texcoord;\n\n';
-	        shaderText += 'uniform sampler2D texture;\n';
+	        shaderText += in_ + ' vec2 texcoord;\n\n';
+	        shaderText += 'uniform sampler2D uTexture;\n';
 	      }
 	      shaderText += 'void main(void) {\n';
 
+	      var textureFunc = _get(Object.getPrototypeOf(SimpleShader.prototype), '_texture_func', this).call(this, gl);
 	      if (this._exist(f, GLBoost.TEXCOORD)) {
-	        shaderText += '  gl_FragColor = texture2D(texture, texcoord);\n';
+	        shaderText += '  rt1 = ' + textureFunc + '(uTexture, texcoord);\n';
 	      } else if (this._exist(f, GLBoost.COLOR)) {
-	        shaderText += '  gl_FragColor = color;\n';
+	        shaderText += '  rt1 = color;\n';
 	      } else {
-	        shaderText += '  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n';
+	        shaderText += '  rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n';
 	      }
-
+	      shaderText += _get(Object.getPrototypeOf(SimpleShader.prototype), '_set_glFragColor_inGLVer1', this).call(this, gl);
 	      shaderText += '}\n';
 
 	      return shaderText;
@@ -1561,7 +1637,7 @@
 	    key: 'getShaderProgram',
 	    value: function getShaderProgram(vertexAttribs, existCamera_f) {
 	      var gl = this._gl;
-	      var shaderProgram = this._initShaders(gl, this._getSimpleVertexShaderString(vertexAttribs, existCamera_f), this._getSimpleFragmentShaderString(vertexAttribs));
+	      var shaderProgram = this._initShaders(gl, this._getSimpleVertexShaderString(gl, vertexAttribs, existCamera_f), this._getSimpleFragmentShaderString(gl, vertexAttribs));
 
 	      vertexAttribs.forEach(function (attribName) {
 	        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
@@ -1594,7 +1670,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1683,6 +1759,46 @@
 	    value: function _exist(functions, attribute) {
 	      return functions.indexOf(attribute) >= 0;
 	    }
+	  }, {
+	    key: 'isThisGLVersion_2',
+	    value: function isThisGLVersion_2(gl) {
+	      return gl instanceof WebGL2RenderingContext;
+	    }
+	  }, {
+	    key: '_glslVer',
+	    value: function _glslVer(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? '#version 300 es\n' : '';
+	    }
+	  }, {
+	    key: '_in_onVert',
+	    value: function _in_onVert(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
+	    }
+	  }, {
+	    key: '_out_onVert',
+	    value: function _out_onVert(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? 'out' : 'varying';
+	    }
+	  }, {
+	    key: '_in_onFrag',
+	    value: function _in_onFrag(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'varying';
+	    }
+	  }, {
+	    key: '_texture_func',
+	    value: function _texture_func(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
+	    }
+	  }, {
+	    key: '_set_outColor_onFrag',
+	    value: function _set_outColor_onFrag(gl) {
+	      return GLBoost.isThisGLVersion_2(gl) ? 'out vec4 rt1;' : 'vec4 rt1;';
+	    }
+	  }, {
+	    key: '_set_glFragColor_inGLVer1',
+	    value: function _set_glFragColor_inGLVer1(gl) {
+	      return !GLBoost.isThisGLVersion_2(gl) ? 'gl_FragColor = rt1;' : '';
+	    }
 	  }]);
 
 	  return Shader;
@@ -1694,7 +1810,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1717,7 +1833,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
@@ -1803,7 +1919,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1994,7 +2110,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2021,7 +2137,7 @@
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -2073,7 +2189,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2103,7 +2219,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2170,7 +2286,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2250,7 +2366,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2281,11 +2397,11 @@
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(40);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _BlendShapeShader = __webpack_require__(50);
+	var _BlendShapeShader = __webpack_require__(51);
 
 	var _BlendShapeShader2 = _interopRequireDefault(_BlendShapeShader);
 
@@ -2370,7 +2486,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2389,7 +2505,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(42);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 

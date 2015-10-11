@@ -66,6 +66,35 @@ export default class Shader {
     return functions.indexOf(attribute) >= 0
   }
 
+  isThisGLVersion_2(gl) {
+    return gl instanceof WebGL2RenderingContext;
+  }
+
+  _glslVer(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? '#version 300 es\n' : '';
+  }
+
+  _in_onVert(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
+  }
+  _out_onVert(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'out' : 'varying';
+  }
+  _in_onFrag(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'varying';
+  }
+
+  _texture_func(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
+  }
+
+  _set_outColor_onFrag(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'out vec4 rt1;' : 'vec4 rt1;';
+  }
+
+  _set_glFragColor_inGLVer1(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? 'gl_FragColor = rt1;' : '';
+  }
 }
 
 Shader._instances = new Object();

@@ -16,3 +16,7 @@ global.GLBoost["BLENDTARGET9"] = 'shapetarget_9';
 global.GLBoost["BLENDTARGET10"] = 'shapetarget_10';
 
 export default global.GLBoost;
+
+global.GLBoost.isThisGLVersion_2 = function(gl) {
+  return gl instanceof WebGL2RenderingContext;
+}
