@@ -686,7 +686,7 @@
 /* 19 */
 /***/ function(module, exports) {
 
-	var core = module.exports = {};
+	var core = module.exports = {version: '1.2.1'};
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ },
@@ -779,20 +779,20 @@
 	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
 	};
 	module.exports = {
-	  set: Object.setPrototypeOf || ('__proto__' in {} // eslint-disable-line
-	    ? function(buggy, set){
-	        try {
-	          set = __webpack_require__(30)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
-	          set({}, []);
-	        } catch(e){ buggy = true; }
-	        return function setPrototypeOf(O, proto){
-	          check(O, proto);
-	          if(buggy)O.__proto__ = proto;
-	          else set(O, proto);
-	          return O;
-	        };
-	      }()
-	    : undefined),
+	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line no-proto
+	    function(test, buggy, set){
+	      try {
+	        set = __webpack_require__(30)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+	        set(test, []);
+	        buggy = !(test instanceof Array);
+	      } catch(e){ buggy = true; }
+	      return function setPrototypeOf(O, proto){
+	        check(O, proto);
+	        if(buggy)O.__proto__ = proto;
+	        else set(O, proto);
+	        return O;
+	      };
+	    }({}, false) : undefined),
 	  check: check
 	};
 
@@ -800,9 +800,8 @@
 /* 28 */
 /***/ function(module, exports) {
 
-	// http://jsperf.com/core-js-isobject
 	module.exports = function(it){
-	  return it !== null && (typeof it == 'object' || typeof it == 'function');
+	  return typeof it === 'object' ? it !== null : typeof it === 'function';
 	};
 
 /***/ },
@@ -834,9 +833,10 @@
 	    case 3: return function(a, b, c){
 	      return fn.call(that, a, b, c);
 	    };
-	  } return function(/* ...args */){
-	      return fn.apply(that, arguments);
-	    };
+	  }
+	  return function(/* ...args */){
+	    return fn.apply(that, arguments);
+	  };
 	};
 
 /***/ },
@@ -1297,19 +1297,19 @@
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var _get = __webpack_require__(7)["default"];
+	var _get = __webpack_require__(7)['default'];
 
-	var _inherits = __webpack_require__(21)["default"];
+	var _inherits = __webpack_require__(21)['default'];
 
-	var _createClass = __webpack_require__(32)["default"];
+	var _createClass = __webpack_require__(32)['default'];
 
-	var _classCallCheck = __webpack_require__(2)["default"];
+	var _classCallCheck = __webpack_require__(2)['default'];
 
-	var _interopRequireDefault = __webpack_require__(3)["default"];
+	var _interopRequireDefault = __webpack_require__(3)['default'];
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 
@@ -1323,40 +1323,31 @@
 	  function GLContextWebGL1Impl(canvas, parent) {
 	    _classCallCheck(this, GLContextWebGL1Impl);
 
-	    _get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), "constructor", this).call(this, canvas, parent);
+	    _get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'constructor', this).call(this, canvas, parent);
 
-	    var gl = canvas.getContext("webgl");
-
-	    if (!gl) {
-	      throw new Error("This platform doesn't support WebGL.");
-	    }
-
-	    //if (!gl instanceof WebGL2RenderingContext)
-	    if (!gl instanceof WebGLRenderingContext) {
-	      throw new Error("Unexpected rendering context.");
-	    }
-
-	    canvas._gl = gl;
+	    _get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', this).call(this, 'webgl', WebGLRenderingContext);
 	  }
 
 	  _createClass(GLContextWebGL1Impl, [{
-	    key: "gl",
+	    key: 'gl',
 	    get: function get() {
 	      return this._canvas._gl;
 	    }
 	  }]);
 
 	  return GLContextWebGL1Impl;
-	})(_GLContextImpl3["default"]);
+	})(_GLContextImpl3['default']);
 
-	exports["default"] = GLContextWebGL1Impl;
-	module.exports = exports["default"];
+	exports['default'] = GLContextWebGL1Impl;
+	module.exports = exports['default'];
 
 /***/ },
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+
+	var _createClass = __webpack_require__(32)["default"];
 
 	var _classCallCheck = __webpack_require__(2)["default"];
 
@@ -1370,29 +1361,51 @@
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var GLContextImpl = function GLContextImpl(canvas, parent) {
-	  _classCallCheck(this, GLContextImpl);
+	var GLContextImpl = (function () {
+	  function GLContextImpl(canvas, parent) {
+	    _classCallCheck(this, GLContextImpl);
 
-	  //    if (new.target === GLContextImpl) {
-	  if (this.constructor === GLContextImpl) {
-	    throw new TypeError("Cannot construct GLContextImpl instances directly");
+	    //    if (new.target === GLContextImpl) {
+	    if (this.constructor === GLContextImpl) {
+	      throw new TypeError("Cannot construct GLContextImpl instances directly");
+	    }
+
+	    if (!(parent instanceof _GLContext2["default"])) {
+	      throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+	    }
+
+	    if (canvas === void 0) {
+	      throw new Error("Failed to create WebGL Context due to no canvas object.");
+	    }
+
+	    this._canvas = canvas;
+	    this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
+
+	    if (this.gl === undefined) {
+	      throw new TypeError("Must override gl getter.");
+	    }
 	  }
 
-	  if (!(parent instanceof _GLContext2["default"])) {
-	    throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-	  }
+	  _createClass(GLContextImpl, [{
+	    key: "init",
+	    value: function init(glVersionString, ContextType) {
 
-	  if (canvas === void 0) {
-	    throw new Error("Failed to create WebGL Context due to no canvas object.");
-	  }
+	      var gl = this._canvas.getContext(glVersionString);
 
-	  this._canvas = canvas;
-	  this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
+	      if (!gl) {
+	        throw new Error("This platform doesn't support WebGL.");
+	      }
 
-	  if (this.gl === undefined) {
-	    throw new TypeError("Must override method.");
-	  }
-	};
+	      if (!gl instanceof ContextType) {
+	        throw new Error("Unexpected rendering context.");
+	      }
+
+	      this._canvas._gl = gl;
+	    }
+	  }]);
+
+	  return GLContextImpl;
+	})();
 
 	exports["default"] = GLContextImpl;
 	module.exports = exports["default"];
