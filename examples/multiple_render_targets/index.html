@@ -12,8 +12,8 @@
   /*
    * constant
    */
-  var SCREEN_WIDTH    = 465;              // 画面幅
-  var SCREEN_HEIGHT   = 465;              // 画面高さ
+  var SCREEN_WIDTH    = 512;              // 画面幅
+  var SCREEN_HEIGHT   = 512;              // 画面高さ
   var SCREEN_CENTER_X = SCREEN_WIDTH/2;   // 画面中央X座標値
   var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
   var CANVAS_ID = "#world";
@@ -43,7 +43,7 @@
       init: function() {
           this.superInit();
 
-          var renderTextures = window.renderer.createTexturesForRenderTarget(465, 465, 1);
+          var renderTextures = window.renderer.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 1);
           var renderPasses = window.renderer.createRenderPasses(2);
 
           var positions = [
@@ -125,6 +125,7 @@
 
           renderPasses[1].addMeshes([mesh2]);
           renderPasses[1].setClearColor([1, 0, 0, 1]);
+
 
           this.prepareForRender();
 
