@@ -496,7 +496,7 @@
 	            delete vertices[_globals2['default'].TEXCOORD];
 	          }
 	        } else {
-	          if (attribName !== 'indices') {
+	          if (attribName !== 'index') {
 	            attribNameArray.push(attribName);
 	          }
 	        }
@@ -570,12 +570,12 @@
 	      });
 	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-	      if (vertices.indices) {
+	      if (vertices.index) {
 	        // create Index Buffer
 	        this._indicesBuffer = gl.createBuffer();
-	        this._indicesN = vertices.indices.length;
+	        this._indicesN = vertices.index.length;
 	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-	        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices), gl.STATIC_DRAW);
+	        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.index), gl.STATIC_DRAW);
 	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 	      } else {
 	        this._indicesBuffer = null;
@@ -3312,10 +3312,10 @@
 
 	      var objTextRows = objText.split('\n');
 
-	      var dwVCount = 0; //読み込みカウンター
-	      var dwFCount = 0; //読み込みカウンター
-	      var dwVNCount = 0; //読み込みカウンター
-	      var dwVTCount = 0; //読み込みカウンター
+	      var vCount = 0;
+	      var fCount = 0;
+	      var vnCount = 0;
+	      var vtCount = 0;
 
 	      var outputRows = [];
 	      for (var i = 0; i < objTextRows.length; i++) {
@@ -3330,32 +3330,32 @@
 	        }
 	        // Vertex
 	        if (matchArray[1] === "v") {
-	          dwVCount++;
+	          vCount++;
 	        }
 	        // Vertex Normal
 	        if (matchArray[1] === "vn") {
-	          dwVNCount++;
+	          vnCount++;
 	        }
 	        // Texcoord
 	        if (matchArray[1] === "vt") {
-	          dwVTCount++;
+	          vtCount++;
 	        }
 	        // Face
 	        if (matchArray[1] === "f") {
-	          dwFCount++;
+	          fCount++;
 	        }
 	        outputRows.push(matchArray[1] + ' ' + matchArray[2]);
 	      }
 
-	      var pvVertexBuffer = new Array(dwFCount * 3);
-	      var pvCoord = new Array(dwVCount);
-	      var pvNormal = new Array(dwVNCount);
-	      var pvTexture = new Array(dwVTCount);
+	      var verteces = new Array(fCount * 3);
+	      var pvCoord = new Array(vCount);
+	      var pvNormal = new Array(vnCount);
+	      var pvTexture = new Array(vtCount);
 
-	      dwVCount = 0;
-	      dwVNCount = 0;
-	      dwVTCount = 0;
-	      dwFCount = 0;
+	      vCount = 0;
+	      vnCount = 0;
+	      vtCount = 0;
+	      fCount = 0;
 
 	      for (var i = 0; i < objTextRows.length; i++) {
 	        //キーワード 読み込み
@@ -3367,31 +3367,83 @@
 
 	        //頂点 読み込み
 	        if (matchArray[1] === "v") {
-	          //          pvCoord[dwVCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-	          pvCoord[dwVCount] = new _Vector32['default']();
-	          pvCoord[dwVCount].x = parseFloat(matchArray[2]);
-	          pvCoord[dwVCount].y = parseFloat(matchArray[3]);
-	          pvCoord[dwVCount].z = parseFloat(matchArray[4]);
-	          dwVCount++;
+	          //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
+	          pvCoord[vCount] = new _Vector32['default']();
+	          pvCoord[vCount].x = parseFloat(matchArray[2]);
+	          pvCoord[vCount].y = parseFloat(matchArray[3]);
+	          pvCoord[vCount].z = parseFloat(matchArray[4]);
+	          vCount++;
 	        }
 
 	        //法線 読み込み
 	        if (matchArray[1] === "vn") {
-	          //          pvNormal[dwVNCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-	          pvNormal[dwVNCount] = new _Vector32['default']();
-	          pvNormal[dwVNCount].x = parseFloat(matchArray[2]);
-	          pvNormal[dwVNCount].y = parseFloat(matchArray[3]);
-	          pvNormal[dwVNCount].z = parseFloat(matchArray[4]);
-	          dwVNCount++;
+	          //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
+	          pvNormal[vnCount] = new _Vector32['default']();
+	          pvNormal[vnCount].x = parseFloat(matchArray[2]);
+	          pvNormal[vnCount].y = parseFloat(matchArray[3]);
+	          pvNormal[vnCount].z = parseFloat(matchArray[4]);
+	          vnCount++;
 	        }
 
 	        //テクスチャー座標 読み込み
 	        if (matchArray[1] === "vt") {
-	          pvTexture[dwVTCount] = new _Vector22['default']();
-	          pvTexture[dwVTCount].x = parseFloat(matchArray[2]);
-	          //          pvTexture[dwVTCount].y=1-y;//Y成分が逆なので合わせる
-	          pvTexture[dwVTCount].y = parseFloat(matchArray[3]);
-	          dwVTCount++;
+	          pvTexture[vtCount] = new _Vector22['default']();
+	          pvTexture[vtCount].x = parseFloat(matchArray[2]);
+	          //          pvTexture[vtCount].y=1-y;//Y成分が逆なので合わせる
+	          pvTexture[vtCount].y = parseFloat(matchArray[3]);
+	          vtCount++;
+	        }
+	      }
+
+	      this._indexBuffers = new Array(this._materials); //GLuint[g_dwNumMaterial];
+
+	      var boFlag = false;
+
+	      this._FaceN = fCount;
+	      var iFaceBufferArray = new Array(this._FaceN * 3);
+	      fCount = 0;
+	      var partFCount = 0;
+
+	      for (var i = 0; i < this._materials.length; i++) {
+	        partFCount = 0;
+
+	        for (var j = 0; j < objTextRows.length && fCount < this._FaceN; j++) {
+	          var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
+
+	          if (matchArray[1] === "usemtl") {
+	            if (matchArray[2] === matchArray[i].name) {
+	              boFlag = true;
+	            } else {
+	              boFlag = false;
+	            }
+	          }
+
+	          if (matchArray[1] === "f" && boFlag) {
+	            var v1 = 0,
+	                v2 = 0,
+	                v3 = 0;
+	            var vn1 = 0,
+	                vn2 = 0,
+	                vn3 = 0;
+	            var vt1 = 0,
+	                vt2 = 0,
+	                vt3 = 0;
+
+	            if (materials[i].diffuseTexture) {
+	              var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d+)\/(\d+) (\d+)\/(\d+)\/(\d+) (\d+)\/(\d+)\/(\d+)/);
+	              v1 = _matchArray[2];
+	              vt1 = _matchArray[3];
+	              vn1 = _matchArray[4];
+	              v2 = _matchArray[5];
+	              vt2 = _matchArray[6];
+	              vn2 = _matchArray[7];
+	              v3 = _matchArray[8];
+	              vt3 = _matchArray[9];
+	              vn3 = _matchArray[10];
+
+	              if (vt1) {}
+	            }
+	          }
 	        }
 	      }
 

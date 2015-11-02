@@ -32,7 +32,7 @@ export default class Mesh extends Element {
           delete vertices[GLBoost.TEXCOORD];
         }
       } else {
-        if (attribName !== 'indices') {
+        if (attribName !== 'index') {
           attribNameArray.push(attribName);
         }
       }
@@ -102,12 +102,12 @@ export default class Mesh extends Element {
     });
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    if (vertices.indices) {
+    if (vertices.index) {
       // create Index Buffer
       this._indicesBuffer = gl.createBuffer();
-      this._indicesN = vertices.indices.length;
+      this._indicesN = vertices.index.length;
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer );
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices), gl.STATIC_DRAW);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.index), gl.STATIC_DRAW);
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     } else {
       this._indicesBuffer = null;
