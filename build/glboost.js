@@ -496,7 +496,9 @@
 	            delete vertices[_globals2['default'].TEXCOORD];
 	          }
 	        } else {
-	          attribNameArray.push(attribName);
+	          if (attribName !== 'indices') {
+	            attribNameArray.push(attribName);
+	          }
 	        }
 	      }
 
@@ -532,8 +534,8 @@
 	      glem.bindVertexArray(gl, vao);
 
 	      // create VBO
-	      var squareVerticesBuffer = gl.createBuffer();
-	      gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
+	      var verticesBuffer = gl.createBuffer();
+	      gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
 
 	      this._vertexN = vertices.position.length;
 
@@ -567,6 +569,18 @@
 	        offset += numberOfComponentOfVector * 4;
 	      });
 	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+	      if (vertices.indices) {
+	        // create Index Buffer
+	        this._indicesBuffer = gl.createBuffer();
+	        this._indicesN = vertices.indices.length;
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+	        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices), gl.STATIC_DRAW);
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	      } else {
+	        this._indicesBuffer = null;
+	      }
+
 	      glem.bindVertexArray(gl, null);
 
 	      this._vao = vao;
@@ -592,7 +606,13 @@
 	        material.setUp();
 	      }
 
-	      gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+	      if (this._indicesBuffer) {
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
+	        gl.drawElements(gl.TRIANGLES, this._indicesN, gl.UNSIGNED_SHORT, 0);
+	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	      } else {
+	        gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+	      }
 
 	      if (material) {
 	        material.tearDown();
@@ -2317,6 +2337,7 @@
 	    }
 
 	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
+	    this._name = "";
 	  }
 
 	  _createClass(AbstractTexture, [{
@@ -2333,6 +2354,14 @@
 	    key: 'glTextureResource',
 	    get: function get() {
 	      return this._texture;
+	    }
+	  }, {
+	    key: 'name',
+	    set: function set(name) {
+	      this._name = name;
+	    },
+	    get: function get() {
+	      return this._name;
 	    }
 	  }, {
 	    key: 'width',
@@ -2614,12 +2643,20 @@
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
+	var _Vector3 = __webpack_require__(44);
+
+	var _Vector32 = _interopRequireDefault(_Vector3);
+
 	var ClassicMaterial = (function () {
 	  function ClassicMaterial(canvas) {
 	    _classCallCheck(this, ClassicMaterial);
 
 	    this._diffuseTexture = null;
 	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
+	    this._diffuseColor = new _Vector32['default'](1.0, 1.0, 1.0);
+	    this._specularColor = new _Vector32['default'](1.0, 1.0, 1.0);
+	    this._ambientColor = new _Vector32['default'](0.0, 0.0, 0.0);
+	    this._name = "";
 	  }
 
 	  _createClass(ClassicMaterial, [{
@@ -2646,6 +2683,38 @@
 	    },
 	    get: function get() {
 	      return this._diffuseTexture;
+	    }
+	  }, {
+	    key: 'diffuseColor',
+	    set: function set(vec) {
+	      this._diffuseColor = vec;
+	    },
+	    get: function get() {
+	      return this._diffuseColor;
+	    }
+	  }, {
+	    key: 'specularColor',
+	    set: function set(vec) {
+	      this._specularColor = vec;
+	    },
+	    get: function get() {
+	      return this._specularColor;
+	    }
+	  }, {
+	    key: 'ambientColor',
+	    set: function set(vec) {
+	      this._ambientColor = vec;
+	    },
+	    get: function get() {
+	      return this._ambientColor;
+	    }
+	  }, {
+	    key: 'name',
+	    set: function set(name) {
+	      this._name = name;
+	    },
+	    get: function get() {
+	      return this._name;
 	    }
 	  }]);
 
@@ -3123,6 +3192,14 @@
 
 	var _Vector22 = _interopRequireDefault(_Vector2);
 
+	var _ClassicMaterial = __webpack_require__(51);
+
+	var _ClassicMaterial2 = _interopRequireDefault(_ClassicMaterial);
+
+	var _Texture = __webpack_require__(52);
+
+	var _Texture2 = _interopRequireDefault(_Texture);
+
 	var singleton = _Symbol();
 	var singletonEnforcer = _Symbol();
 
@@ -3137,9 +3214,10 @@
 
 	  _createClass(ObjLoader, [{
 	    key: 'loadObj',
-	    value: function loadObj(url) {
+	    value: function loadObj(url, canvas) {
 	      var _this = this;
 
+	      this._numMaterial = 0;
 	      return new _Promise(function (resolve, reject) {
 	        var xmlHttp = new XMLHttpRequest();
 	        xmlHttp.onreadystatechange = function () {
@@ -3150,7 +3228,7 @@
 	            for (var i = 0; i < partsOfPath.length - 1; i++) {
 	              basePath += partsOfPath[i] + '/';
 	            }
-	            var mesh = _this.constructMesh(gotText, basePath);
+	            var mesh = _this.constructMesh(gotText, basePath, canvas);
 	            resolve(mesh);
 	          }
 	        };
@@ -3161,17 +3239,74 @@
 	    }
 	  }, {
 	    key: 'loadMaterialFromFile',
-	    value: function loadMaterialFromFile(filePath) {
+	    value: function loadMaterialFromFile(filePath, canvas) {
 	      console.log(filePath);
 
 	      var xmlHttp = new XMLHttpRequest();
 	      xmlHttp.open("GET", filePath, false);
 	      xmlHttp.send(null);
 	      console.log(xmlHttp.responseText);
+
+	      var mtlTextRows = xmlHttp.responseText.split('\n');
+
+	      // checking the number of material
+	      for (var i = 0; i < mtlTextRows.length; i++) {
+	        var matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
+	        if (matchArray === null) {
+	          continue;
+	        }
+
+	        if (matchArray[1] === "newmtl") {
+	          this._numMaterial++;
+	        }
+	      }
+
+	      var materials = new Array(this._numMaterial);
+	      var iMCount = -1;
+
+	      // main loading
+	      for (var i = 0; i < mtlTextRows.length; i++) {
+	        var matchArray = mtlTextRows[i].match(/^(\w+) (\w+) (\w+) (\w+)/);
+
+	        if (matchArray === null) {
+	          continue;
+	        }
+
+	        if (matchArray[1] === "newmtl") {
+	          iMCount++;
+	          materials[iMCount] = new _ClassicMaterial2['default'](canvas);
+	          materials[iMCount].name = matchArray[2];
+	        }
+
+	        if (matchArray[1] === "Ka") {
+	          materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
+	          materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
+	          materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
+	        }
+
+	        if (matchArray[1] === "Kd") {
+	          materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
+	          materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
+	          materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
+	        }
+
+	        if (matchArray[1] === "Ks") {
+	          materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
+	          materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
+	          materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
+	        }
+
+	        if (matchArray[1] === "map_Kd") {
+	          var texture = new _Texture2['default'](matchArray[2], canvas);
+	          texture.name = matchArray[2];
+	          materials[iMCount].diffuseTexture = texture;
+	        }
+	      }
+	      this._materials = materials;
 	    }
 	  }, {
 	    key: 'constructMesh',
-	    value: function constructMesh(objText, basePath) {
+	    value: function constructMesh(objText, basePath, canvas) {
 
 	      console.log(basePath);
 
@@ -3191,7 +3326,7 @@
 
 	        // material file
 	        if (matchArray[1] === "mtllib") {
-	          this.loadMaterialFromFile(basePath + matchArray[2] + '.mtl');
+	          this.loadMaterialFromFile(basePath + matchArray[2] + '.mtl', canvas);
 	        }
 	        // Vertex
 	        if (matchArray[1] === "v") {

@@ -32,7 +32,9 @@ export default class Mesh extends Element {
           delete vertices[GLBoost.TEXCOORD];
         }
       } else {
-        attribNameArray.push(attribName);
+        if (attribName !== 'indices') {
+          attribNameArray.push(attribName);
+        }
       }
     }
 
@@ -63,8 +65,8 @@ export default class Mesh extends Element {
     glem.bindVertexArray(gl, vao);
 
     // create VBO
-    var squareVerticesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVerticesBuffer);
+    var verticesBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
 
     this._vertexN = vertices.position.length;
 
@@ -99,6 +101,18 @@ export default class Mesh extends Element {
       offset += numberOfComponentOfVector * 4;
     });
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    if (vertices.indices) {
+      // create Index Buffer
+      this._indicesBuffer = gl.createBuffer();
+      this._indicesN = vertices.indices.length;
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer );
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices), gl.STATIC_DRAW);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    } else {
+      this._indicesBuffer = null;
+    }
+
     glem.bindVertexArray(gl, null)
 
     this._vao = vao;
@@ -124,7 +138,13 @@ export default class Mesh extends Element {
       material.setUp();
     }
 
-    gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+    if (this._indicesBuffer) {
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer );
+      gl.drawElements(gl.TRIANGLES, this._indicesN, gl.UNSIGNED_SHORT, 0);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    } else {
+      gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+    }
 
     if (material) {
       material.tearDown();
