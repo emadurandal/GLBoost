@@ -105,8 +105,8 @@ export default class Mesh extends Element {
     this._indicesBuffers = [];
     this._indicesNArray = [];
     if (vertices.indices) {
+      // create Index Buffer
       for (let i=0; i<vertices.indices.length; i++) {
-        // create Index Buffer
         this._indicesBuffers[i] = gl.createBuffer();
         this._indicesNArray[i] = vertices.indices[i].length;
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
@@ -119,7 +119,7 @@ export default class Mesh extends Element {
     this._vao = vao;
     this._glslProgram = glslProgram;
 
-    if (this._materials.length === 1 && this._materials[0].faceN === 0) {
+    if (this._materials && this._materials.length === 1 && this._materials[0].faceN === 0) {
       if (vertices.indices && vertices.indices.length > 0) {
         this._materials[0].faceN = vertices.indices[0].length / 3;
       } else {
@@ -143,22 +143,32 @@ export default class Mesh extends Element {
 
     glem.bindVertexArray(gl, this._vao);
 
-    for (let i=0; i<materials.length;i++) {
+    if (materials) {
+      for (let i=0; i<materials.length;i++) {
 
-      if (materials[i]) {
-        materials[i].setUp();
+        if (materials[i]) {
+          materials[i].setUp();
+        }
+
+        if (this._indicesBuffers.length > 0) {
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
+          gl.drawElements(gl.TRIANGLES, materials[i].faceN*3, gl.UNSIGNED_SHORT, 0);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        } else {
+          gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+        }
+
+        if (materials[i]) {
+          materials[i].tearDown();
+        }
       }
-
+    } else {
       if (this._indicesBuffers.length > 0) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
-        gl.drawElements(gl.TRIANGLES, materials[i].faceN*3, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[0] );
+        gl.drawElements(gl.TRIANGLES, this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
-      }
-
-      if (materials[i]) {
-        materials[i].tearDown();
       }
     }
 
