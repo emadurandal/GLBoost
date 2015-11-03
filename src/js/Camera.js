@@ -7,21 +7,21 @@ export default class Camera extends Element {
   constructor(lookat, perspective) {
     super();
 
-    this.eye = lookat.eye;
-    this.center = lookat.center;
-    this.up = lookat.up;
+    this._eye = lookat.eye;
+    this._center = lookat.center;
+    this._up = lookat.up;
 
-    this.fovy = perspective.fovy;
-    this.aspect = perspective.aspect;
-    this.zNear = perspective.zNear;
-    this.zFar = perspective.zFar;
+    this._fovy = perspective.fovy;
+    this._aspect = perspective.aspect;
+    this._zNear = perspective.zNear;
+    this._zFar = perspective.zFar;
 
     this.setAsMainCamera()
   }
 
   lookAtRHMatrix() {
 //    return Matrix4x4.identity();
-    return Camera.lookAtRHMatrix(this.eye, this.center, this.up);
+    return Camera.lookAtRHMatrix(this._eye, this._center, this._up);
   }
 
   static lookAtRHMatrix(eye, center, up) {
@@ -38,7 +38,7 @@ export default class Camera extends Element {
 
   perspectiveRHMatrix() {
 //    return Matrix4x4.identity();
-    return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
+    return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
   }
 
   static perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
@@ -61,6 +61,62 @@ export default class Camera extends Element {
 
   get isMainCamera() {
     return Camera._mainCamera === this;
+  }
+
+  set eye(vec) {
+    this._eye = vec;
+  }
+
+  get eye() {
+    return this._eye;
+  }
+
+  set center(vec) {
+    this._center = vec;
+  }
+
+  get center() {
+    return this._center;
+  }
+
+  set up(vec) {
+    this._up = vec;
+  }
+
+  get up() {
+    return this._up;
+  }
+
+  set fovy(value) {
+    this._fovy = value;
+  }
+
+  get fovy() {
+    return this._fovy;
+  }
+
+  set aspect(value) {
+    this._aspect = value;
+  }
+
+  get aspect() {
+    return this._aspect;
+  }
+
+  set zNear(value) {
+    this._zNear = value;
+  }
+
+  get zNear() {
+    return this._zNear;
+  }
+
+  set zFar(value) {
+    this._zFar = value;
+  }
+
+  get zFar() {
+    return this._zFar;
   }
 }
 Camera._mainCamera = null;

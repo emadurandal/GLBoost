@@ -1,4 +1,5 @@
 import GLBoost from './globals'
+import Vector4 from './Vector4'
 
 export default class Matrix4x4 {
 
@@ -43,6 +44,35 @@ export default class Matrix4x4 {
         0, 1, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1
+    );
+  }
+
+
+  /**
+   * Create Y oriented Rotation Matrix
+   */
+  rotateY(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    this.setComponents(
+      cos, 0, sin, 0,
+      0, 1, 0, 0,
+      -sin, 0, cos, 0,
+      0, 0, 0, 1
+    );
+    return this;
+  }
+  /**
+   * Create Y oriented Rotation Matrix
+  */
+  static rotateY(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return new Matrix4x4(
+      cos, 0, sin, 0,
+      0, 1, 0, 0,
+      -sin, 0, cos, 0,
+      0, 0, 0, 1
     );
   }
 
@@ -97,6 +127,15 @@ export default class Matrix4x4 {
       mat_t._swap(11, 14);
 
       return mat_t;
+  }
+
+  multiplyVector(vec) {
+    var x = this.m00*vec.x + this.m01*vec.y + this.m02*vec.z + this.m03*vec.w;
+    var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z + this.m13*vec.w;
+    var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
+    var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
+
+    return new Vector4(x, y, z, w);
   }
 
   /**

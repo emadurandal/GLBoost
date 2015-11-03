@@ -52,19 +52,19 @@
 
 	var _Renderer2 = _interopRequireDefault(_Renderer);
 
-	var _Scene = __webpack_require__(48);
+	var _Scene = __webpack_require__(49);
 
 	var _Scene2 = _interopRequireDefault(_Scene);
 
-	var _Vector2 = __webpack_require__(49);
+	var _Vector2 = __webpack_require__(50);
 
 	var _Vector22 = _interopRequireDefault(_Vector2);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
-	var _Vector4 = __webpack_require__(50);
+	var _Vector4 = __webpack_require__(36);
 
 	var _Vector42 = _interopRequireDefault(_Vector4);
 
@@ -76,7 +76,7 @@
 
 	var _Texture2 = _interopRequireDefault(_Texture);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -122,7 +122,7 @@
 
 	var _Mesh2 = _interopRequireDefault(_Mesh);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -130,19 +130,19 @@
 
 	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(40);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _MutableTexture = __webpack_require__(45);
+	var _MutableTexture = __webpack_require__(46);
 
 	var _MutableTexture2 = _interopRequireDefault(_MutableTexture);
 
-	var _RenderPass = __webpack_require__(47);
+	var _RenderPass = __webpack_require__(48);
 
 	var _RenderPass2 = _interopRequireDefault(_RenderPass);
 
@@ -450,15 +450,15 @@
 
 	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(40);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _SimpleShader = __webpack_require__(41);
+	var _SimpleShader = __webpack_require__(42);
 
 	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
 
@@ -1050,21 +1050,25 @@
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var _createClass = __webpack_require__(3)["default"];
+	var _createClass = __webpack_require__(3)['default'];
 
-	var _classCallCheck = __webpack_require__(7)["default"];
+	var _classCallCheck = __webpack_require__(7)['default'];
 
-	var _interopRequireDefault = __webpack_require__(1)["default"];
+	var _interopRequireDefault = __webpack_require__(1)['default'];
 
-	Object.defineProperty(exports, "__esModule", {
+	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
 
 	var _globals = __webpack_require__(8);
 
 	var _globals2 = _interopRequireDefault(_globals);
+
+	var _Vector4 = __webpack_require__(36);
+
+	var _Vector42 = _interopRequireDefault(_Vector4);
 
 	var Matrix4x4 = (function () {
 	  function Matrix4x4() {
@@ -1079,7 +1083,7 @@
 	  }
 
 	  _createClass(Matrix4x4, [{
-	    key: "setComponents",
+	    key: 'setComponents',
 	    value: function setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
 	      this.m00 = m00;this.m01 = m01;this.m02 = m02;this.m03 = m03;
 	      this.m10 = m10;this.m11 = m11;this.m12 = m12;this.m13 = m13;
@@ -1093,7 +1097,7 @@
 	     * 単位行列にする
 	     */
 	  }, {
-	    key: "identity",
+	    key: 'identity',
 	    value: function identity() {
 	      this.setComponents(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 	      return this;
@@ -1103,7 +1107,23 @@
 	     * 単位行列にする（static版）
 	     */
 	  }, {
-	    key: "zero",
+	    key: 'rotateY',
+
+	    /**
+	     * Create Y oriented Rotation Matrix
+	     */
+	    value: function rotateY(radian) {
+	      var cos = Math.cos(radian);
+	      var sin = Math.sin(radian);
+	      this.setComponents(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
+	      return this;
+	    }
+
+	    /**
+	     * Create Y oriented Rotation Matrix
+	    */
+	  }, {
+	    key: 'zero',
 
 	    /**
 	     * ゼロ行列
@@ -1113,12 +1133,12 @@
 	      return this;
 	    }
 	  }, {
-	    key: "flatten",
+	    key: 'flatten',
 	    value: function flatten() {
 	      return this.m;
 	    }
 	  }, {
-	    key: "_swap",
+	    key: '_swap',
 	    value: function _swap(l, r) {
 	      this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
 	    }
@@ -1127,7 +1147,7 @@
 	     * 転置
 	     */
 	  }, {
-	    key: "transpose",
+	    key: 'transpose',
 	    value: function transpose() {
 	      this._swap(1, 4);
 	      this._swap(2, 8);
@@ -1143,11 +1163,21 @@
 	     * 転置（static版）
 	     */
 	  }, {
-	    key: "multiply",
+	    key: 'multiplyVector',
+	    value: function multiplyVector(vec) {
+	      var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z + this.m03 * vec.w;
+	      var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z + this.m13 * vec.w;
+	      var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
+	      var w = this.m30 * vec.x + this.m31 * vec.y + this.m32 * vec.z + this.m33 * vec.w;
+
+	      return new _Vector42['default'](x, y, z, w);
+	    }
 
 	    /**
 	     * 行列同士の乗算
 	     */
+	  }, {
+	    key: 'multiply',
 	    value: function multiply(mat) {
 	      var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20 + this.m03 * mat.m30;
 	      var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21 + this.m03 * mat.m31;
@@ -1176,7 +1206,7 @@
 	     * 行列同士の乗算（static版）
 	     */
 	  }, {
-	    key: "m00",
+	    key: 'm00',
 	    set: function set(val) {
 	      this.m[0] = val;
 	    },
@@ -1184,7 +1214,7 @@
 	      return this.m[0];
 	    }
 	  }, {
-	    key: "m01",
+	    key: 'm01',
 	    set: function set(val) {
 	      this.m[1] = val;
 	    },
@@ -1192,7 +1222,7 @@
 	      return this.m[1];
 	    }
 	  }, {
-	    key: "m02",
+	    key: 'm02',
 	    set: function set(val) {
 	      this.m[2] = val;
 	    },
@@ -1200,7 +1230,7 @@
 	      return this.m[2];
 	    }
 	  }, {
-	    key: "m03",
+	    key: 'm03',
 	    set: function set(val) {
 	      this.m[3] = val;
 	    },
@@ -1208,7 +1238,7 @@
 	      return this.m[3];
 	    }
 	  }, {
-	    key: "m10",
+	    key: 'm10',
 	    set: function set(val) {
 	      this.m[4] = val;
 	    },
@@ -1216,7 +1246,7 @@
 	      return this.m[4];
 	    }
 	  }, {
-	    key: "m11",
+	    key: 'm11',
 	    set: function set(val) {
 	      this.m[5] = val;
 	    },
@@ -1224,7 +1254,7 @@
 	      return this.m[5];
 	    }
 	  }, {
-	    key: "m12",
+	    key: 'm12',
 	    set: function set(val) {
 	      this.m[6] = val;
 	    },
@@ -1232,7 +1262,7 @@
 	      return this.m[6];
 	    }
 	  }, {
-	    key: "m13",
+	    key: 'm13',
 	    set: function set(val) {
 	      this.m[7] = val;
 	    },
@@ -1240,7 +1270,7 @@
 	      return this.m[7];
 	    }
 	  }, {
-	    key: "m20",
+	    key: 'm20',
 	    set: function set(val) {
 	      this.m[8] = val;
 	    },
@@ -1248,7 +1278,7 @@
 	      return this.m[8];
 	    }
 	  }, {
-	    key: "m21",
+	    key: 'm21',
 	    set: function set(val) {
 	      this.m[9] = val;
 	    },
@@ -1256,7 +1286,7 @@
 	      return this.m[9];
 	    }
 	  }, {
-	    key: "m22",
+	    key: 'm22',
 	    set: function set(val) {
 	      this.m[10] = val;
 	    },
@@ -1264,7 +1294,7 @@
 	      return this.m[10];
 	    }
 	  }, {
-	    key: "m23",
+	    key: 'm23',
 	    set: function set(val) {
 	      this.m[11] = val;
 	    },
@@ -1272,7 +1302,7 @@
 	      return this.m[11];
 	    }
 	  }, {
-	    key: "m30",
+	    key: 'm30',
 	    set: function set(val) {
 	      this.m[12] = val;
 	    },
@@ -1280,7 +1310,7 @@
 	      return this.m[12];
 	    }
 	  }, {
-	    key: "m31",
+	    key: 'm31',
 	    set: function set(val) {
 	      this.m[13] = val;
 	    },
@@ -1288,7 +1318,7 @@
 	      return this.m[13];
 	    }
 	  }, {
-	    key: "m32",
+	    key: 'm32',
 	    set: function set(val) {
 	      this.m[14] = val;
 	    },
@@ -1296,7 +1326,7 @@
 	      return this.m[14];
 	    }
 	  }, {
-	    key: "m33",
+	    key: 'm33',
 	    set: function set(val) {
 	      this.m[15] = val;
 	    },
@@ -1304,17 +1334,24 @@
 	      return this.m[15];
 	    }
 	  }], [{
-	    key: "identity",
+	    key: 'identity',
 	    value: function identity() {
 	      return new Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 	    }
 	  }, {
-	    key: "zero",
+	    key: 'rotateY',
+	    value: function rotateY(radian) {
+	      var cos = Math.cos(radian);
+	      var sin = Math.sin(radian);
+	      return new Matrix4x4(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
+	    }
+	  }, {
+	    key: 'zero',
 	    value: function zero() {
 	      return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	    }
 	  }, {
-	    key: "transpose",
+	    key: 'transpose',
 	    value: function transpose(mat) {
 
 	      var mat_t = new Matrix4x4(mat.m00, mat.m01, mat.m02, mat.m03, mat.m10, mat.m11, mat.m12, mat.m13, mat.m20, mat.m21, mat.m22, mat.m23, mat.m30, mat.m31, mat.m32, mat.m33);
@@ -1328,7 +1365,7 @@
 	      return mat_t;
 	    }
 	  }, {
-	    key: "multiply",
+	    key: 'multiply',
 	    value: function multiply(l_m, r_m) {
 	      var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20 + l_m.m03 * r_m.m30;
 	      var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20 + l_m.m13 * r_m.m30;
@@ -1357,13 +1394,45 @@
 	  return Matrix4x4;
 	})();
 
-	exports["default"] = Matrix4x4;
+	exports['default'] = Matrix4x4;
 
-	_globals2["default"]["Matrix4x4"] = Matrix4x4;
-	module.exports = exports["default"];
+	_globals2['default']["Matrix4x4"] = Matrix4x4;
+	module.exports = exports['default'];
 
 /***/ },
 /* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _classCallCheck = __webpack_require__(7)["default"];
+
+	var _interopRequireDefault = __webpack_require__(1)["default"];
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _globals = __webpack_require__(8);
+
+	var _globals2 = _interopRequireDefault(_globals);
+
+	var Vector4 = function Vector4(x, y, z, w) {
+	  _classCallCheck(this, Vector4);
+
+	  this.x = x;
+	  this.y = y;
+	  this.z = z;
+	  this.w = w;
+	};
+
+	exports["default"] = Vector4;
+
+	_globals2["default"]["Vector4"] = Vector4;
+	module.exports = exports["default"];
+
+/***/ },
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1378,11 +1447,11 @@
 	  value: true
 	});
 
-	var _implGLContextWebGL1Impl = __webpack_require__(37);
+	var _implGLContextWebGL1Impl = __webpack_require__(38);
 
 	var _implGLContextWebGL1Impl2 = _interopRequireDefault(_implGLContextWebGL1Impl);
 
-	var _implGLContextWebGL2Impl = __webpack_require__(39);
+	var _implGLContextWebGL2Impl = __webpack_require__(40);
 
 	var _implGLContextWebGL2Impl2 = _interopRequireDefault(_implGLContextWebGL2Impl);
 
@@ -1427,7 +1496,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1446,7 +1515,7 @@
 	  value: true
 	});
 
-	var _GLContextImpl2 = __webpack_require__(38);
+	var _GLContextImpl2 = __webpack_require__(39);
 
 	var _GLContextImpl3 = _interopRequireDefault(_GLContextImpl2);
 
@@ -1475,7 +1544,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1490,7 +1559,7 @@
 	  value: true
 	});
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -1545,7 +1614,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1564,7 +1633,7 @@
 	  value: true
 	});
 
-	var _GLContextImpl2 = __webpack_require__(38);
+	var _GLContextImpl2 = __webpack_require__(39);
 
 	var _GLContextImpl3 = _interopRequireDefault(_GLContextImpl2);
 
@@ -1593,7 +1662,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1672,7 +1741,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1691,7 +1760,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(42);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -1818,7 +1887,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1833,7 +1902,7 @@
 	  value: true
 	});
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -1957,7 +2026,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1980,7 +2049,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
@@ -2000,14 +2069,14 @@
 
 	    _get(Object.getPrototypeOf(Camera.prototype), 'constructor', this).call(this);
 
-	    this.eye = lookat.eye;
-	    this.center = lookat.center;
-	    this.up = lookat.up;
+	    this._eye = lookat.eye;
+	    this._center = lookat.center;
+	    this._up = lookat.up;
 
-	    this.fovy = perspective.fovy;
-	    this.aspect = perspective.aspect;
-	    this.zNear = perspective.zNear;
-	    this.zFar = perspective.zFar;
+	    this._fovy = perspective.fovy;
+	    this._aspect = perspective.aspect;
+	    this._zNear = perspective.zNear;
+	    this._zFar = perspective.zFar;
 
 	    this.setAsMainCamera();
 	  }
@@ -2016,13 +2085,13 @@
 	    key: 'lookAtRHMatrix',
 	    value: function lookAtRHMatrix() {
 	      //    return Matrix4x4.identity();
-	      return Camera.lookAtRHMatrix(this.eye, this.center, this.up);
+	      return Camera.lookAtRHMatrix(this._eye, this._center, this._up);
 	    }
 	  }, {
 	    key: 'perspectiveRHMatrix',
 	    value: function perspectiveRHMatrix() {
 	      //    return Matrix4x4.identity();
-	      return Camera.perspectiveRHMatrix(this.fovy, this.aspect, this.zNear, this.zFar);
+	      return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
 	    }
 	  }, {
 	    key: 'setAsMainCamera',
@@ -2033,6 +2102,62 @@
 	    key: 'isMainCamera',
 	    get: function get() {
 	      return Camera._mainCamera === this;
+	    }
+	  }, {
+	    key: 'eye',
+	    set: function set(vec) {
+	      this._eye = vec;
+	    },
+	    get: function get() {
+	      return this._eye;
+	    }
+	  }, {
+	    key: 'center',
+	    set: function set(vec) {
+	      this._center = vec;
+	    },
+	    get: function get() {
+	      return this._center;
+	    }
+	  }, {
+	    key: 'up',
+	    set: function set(vec) {
+	      this._up = vec;
+	    },
+	    get: function get() {
+	      return this._up;
+	    }
+	  }, {
+	    key: 'fovy',
+	    set: function set(value) {
+	      this._fovy = value;
+	    },
+	    get: function get() {
+	      return this._fovy;
+	    }
+	  }, {
+	    key: 'aspect',
+	    set: function set(value) {
+	      this._aspect = value;
+	    },
+	    get: function get() {
+	      return this._aspect;
+	    }
+	  }, {
+	    key: 'zNear',
+	    set: function set(value) {
+	      this._zNear = value;
+	    },
+	    get: function get() {
+	      return this._zNear;
+	    }
+	  }, {
+	    key: 'zFar',
+	    set: function set(value) {
+	      this._zFar = value;
+	    },
+	    get: function get() {
+	      return this._zFar;
 	    }
 	  }], [{
 	    key: 'lookAtRHMatrix',
@@ -2066,7 +2191,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2257,7 +2382,7 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2280,11 +2405,11 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _AbstractTexture2 = __webpack_require__(46);
+	var _AbstractTexture2 = __webpack_require__(47);
 
 	var _AbstractTexture3 = _interopRequireDefault(_AbstractTexture2);
 
@@ -2330,7 +2455,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2349,7 +2474,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2409,7 +2534,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2428,7 +2553,7 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
@@ -2504,7 +2629,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2531,7 +2656,7 @@
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Camera = __webpack_require__(43);
+	var _Camera = __webpack_require__(44);
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
@@ -2583,7 +2708,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2613,38 +2738,6 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 50 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var _classCallCheck = __webpack_require__(7)["default"];
-
-	var _interopRequireDefault = __webpack_require__(1)["default"];
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _globals = __webpack_require__(8);
-
-	var _globals2 = _interopRequireDefault(_globals);
-
-	var Vector4 = function Vector4(x, y, z, w) {
-	  _classCallCheck(this, Vector4);
-
-	  this.x = x;
-	  this.y = y;
-	  this.z = z;
-	  this.w = w;
-	};
-
-	exports["default"] = Vector4;
-
-	_globals2["default"]["Vector4"] = Vector4;
-	module.exports = exports["default"];
-
-/***/ },
 /* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2664,11 +2757,11 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
@@ -2784,11 +2877,11 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _AbstractTexture2 = __webpack_require__(46);
+	var _AbstractTexture2 = __webpack_require__(47);
 
 	var _AbstractTexture3 = _interopRequireDefault(_AbstractTexture2);
 
@@ -2867,11 +2960,11 @@
 
 	var _Element2 = _interopRequireDefault(_Element);
 
-	var _GLContext = __webpack_require__(36);
+	var _GLContext = __webpack_require__(37);
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _GLExtentionsManager = __webpack_require__(40);
+	var _GLExtentionsManager = __webpack_require__(41);
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
@@ -3018,7 +3111,7 @@
 	  value: true
 	});
 
-	var _Shader2 = __webpack_require__(42);
+	var _Shader2 = __webpack_require__(43);
 
 	var _Shader3 = _interopRequireDefault(_Shader2);
 
@@ -3218,11 +3311,11 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(44);
+	var _Vector3 = __webpack_require__(45);
 
 	var _Vector32 = _interopRequireDefault(_Vector3);
 
-	var _Vector2 = __webpack_require__(49);
+	var _Vector2 = __webpack_require__(50);
 
 	var _Vector22 = _interopRequireDefault(_Vector2);
 
