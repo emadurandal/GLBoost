@@ -8,6 +8,7 @@ export default class AbstractTexture {
     }
 
     this._gl = GLContext.getInstance(canvas).gl;
+    this._name = "";
   }
 
   get glTextureResource() {
@@ -22,6 +23,14 @@ export default class AbstractTexture {
     this._gl.bindTexture(this._gl.TEXTURE_2D, null);
   }
 
+  set name(name) {
+    this._name = name;
+  }
+
+  get name() {
+    return this._name;
+  }
+
   get width() {
     return this._width;
   }
@@ -29,6 +38,8 @@ export default class AbstractTexture {
   get height() {
     return this._height;
   }
+
+
 
 }
 

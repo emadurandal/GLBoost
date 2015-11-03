@@ -18,7 +18,7 @@
   var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
   var CANVAS_ID = "#world";
 
-  GLBoost.TARGET_WEBGL_VERSION = 2;
+  GLBoost.TARGET_WEBGL_VERSION = 1;
 
   /*
    * main
@@ -97,7 +97,7 @@
           var texture = new GLBoost.Texture('resouces/texture.png', CANVAS_ID);
           var material = new GLBoost.ClassicMaterial(CANVAS_ID);
           material.diffuseTexture = texture;
-          mesh.material = material;
+          mesh.materials = [material];
           mesh.setVerticesData({
             position: positions,
             color: colors,
@@ -115,7 +115,7 @@
           var mesh2 = tm.webgl.MeshElement(CANVAS_ID);
           var material2 = new GLBoost.ClassicMaterial(CANVAS_ID);
           material2.diffuseTexture = renderTextures[0];
-          mesh2.material = material2;
+          mesh2.materials = [material2];
           mesh2.setVerticesData({
             position: positions,
             color: colors,

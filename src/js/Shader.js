@@ -63,6 +63,9 @@ export default class Shader {
   }
 
   isThisGLVersion_2(gl) {
+    if (typeof WebGL2RenderingContext === "undefined") {
+      return false;
+    }
     return gl instanceof WebGL2RenderingContext;
   }
 

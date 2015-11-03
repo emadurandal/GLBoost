@@ -111,7 +111,7 @@
       var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
 
       blendMeshMaterial.diffuseTexture = texture;
-      blendMesh.material = blendMeshMaterial;
+      blendMesh.materials = [blendMeshMaterial];
       blendMesh.setVerticesData({
         position: base_positions,
         color: colors,
@@ -228,7 +228,7 @@
       var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
 
       blendMeshMaterial.diffuseTexture = texture;
-      blendMesh.material = blendMeshMaterial;
+      blendMesh.materials = [blendMeshMaterial];
       blendMesh.setVerticesData({
         position: base_positions,
         color: colors,

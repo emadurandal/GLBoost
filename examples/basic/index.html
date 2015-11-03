@@ -76,7 +76,7 @@
           var texture = new GLBoost.Texture('resouces/texture.png', '#world');
           var material = new GLBoost.ClassicMaterial('#world');
           material.diffuseTexture = texture;
-          mesh.material = material;
+          mesh.materials = [material];
           mesh.setVerticesData({
             position: positions,
             color: colors,

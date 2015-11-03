@@ -26,13 +26,13 @@ export default class Mesh extends Element {
     for (var attribName in vertices) {
       if (attribName === GLBoost.TEXCOORD) {
         // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-        if ((this._material !== null) && this._material.diffuseTexture !== null) {
+        if ((this._materials[0] !== null) && this._materials[0].diffuseTexture !== null) {
           attribNameArray.push(attribName);
         } else {
           delete vertices[GLBoost.TEXCOORD];
         }
       } else {
-        if (attribName !== 'index') {
+        if (attribName !== 'indices' && attribName !== 'normal') {
           attribNameArray.push(attribName);
         }
       }
@@ -102,28 +102,37 @@ export default class Mesh extends Element {
     });
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    if (vertices.index) {
-      // create Index Buffer
-      this._indicesBuffer = gl.createBuffer();
-      this._indicesN = vertices.index.length;
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer );
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.index), gl.STATIC_DRAW);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    } else {
-      this._indicesBuffer = null;
+    this._indicesBuffers = [];
+    this._indicesNArray = [];
+    if (vertices.indices) {
+      for (let i=0; i<vertices.indices.length; i++) {
+        // create Index Buffer
+        this._indicesBuffers[i] = gl.createBuffer();
+        this._indicesNArray[i] = vertices.indices[i].length;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+      }
     }
-
     glem.bindVertexArray(gl, null)
 
     this._vao = vao;
     this._glslProgram = glslProgram;
+
+    if (this._materials.length === 1 && this._materials[0].faceN === 0) {
+      if (vertices.indices && vertices.indices.length > 0) {
+        this._materials[0].faceN = vertices.indices[0].length / 3;
+      } else {
+        this._materials[0].faceN = this._vertexN / 3;
+      }
+    }
 
   }
 
   draw(projectionAndViewMatrix) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
-    var material = this._material;
+    var materials = this._materials;
 
     gl.useProgram(this._glslProgram);
 
@@ -134,27 +143,30 @@ export default class Mesh extends Element {
 
     glem.bindVertexArray(gl, this._vao);
 
-    if (material) {
-      material.setUp();
-    }
+    for (let i=0; i<materials.length;i++) {
 
-    if (this._indicesBuffer) {
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer );
-      gl.drawElements(gl.TRIANGLES, this._indicesN, gl.UNSIGNED_SHORT, 0);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    } else {
-      gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
-    }
+      if (materials[i]) {
+        materials[i].setUp();
+      }
 
-    if (material) {
-      material.tearDown();
+      if (this._indicesBuffers.length > 0) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
+        gl.drawElements(gl.TRIANGLES, materials[i].faceN*3, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+      } else {
+        gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+      }
+
+      if (materials[i]) {
+        materials[i].tearDown();
+      }
     }
 
     glem.bindVertexArray(gl, null);
   }
 
-  set material(mat) {
-    this._material = mat;
+  set materials(materials) {
+    this._materials = materials;
   }
 }
 

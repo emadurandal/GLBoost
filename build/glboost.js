@@ -490,13 +490,13 @@
 	      for (var attribName in vertices) {
 	        if (attribName === _globals2['default'].TEXCOORD) {
 	          // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-	          if (this._material !== null && this._material.diffuseTexture !== null) {
+	          if (this._materials[0] !== null && this._materials[0].diffuseTexture !== null) {
 	            attribNameArray.push(attribName);
 	          } else {
 	            delete vertices[_globals2['default'].TEXCOORD];
 	          }
 	        } else {
-	          if (attribName !== 'index') {
+	          if (attribName !== 'indices' && attribName !== 'normal') {
 	            attribNameArray.push(attribName);
 	          }
 	        }
@@ -570,28 +570,37 @@
 	      });
 	      gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-	      if (vertices.index) {
-	        // create Index Buffer
-	        this._indicesBuffer = gl.createBuffer();
-	        this._indicesN = vertices.index.length;
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-	        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.index), gl.STATIC_DRAW);
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	      } else {
-	        this._indicesBuffer = null;
+	      this._indicesBuffers = [];
+	      this._indicesNArray = [];
+	      if (vertices.indices) {
+	        for (var i = 0; i < vertices.indices.length; i++) {
+	          // create Index Buffer
+	          this._indicesBuffers[i] = gl.createBuffer();
+	          this._indicesNArray[i] = vertices.indices[i].length;
+	          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
+	          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
+	          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	        }
 	      }
-
 	      glem.bindVertexArray(gl, null);
 
 	      this._vao = vao;
 	      this._glslProgram = glslProgram;
+
+	      if (this._materials.length === 1 && this._materials[0].faceN === 0) {
+	        if (vertices.indices && vertices.indices.length > 0) {
+	          this._materials[0].faceN = vertices.indices[0].length / 3;
+	        } else {
+	          this._materials[0].faceN = this._vertexN / 3;
+	        }
+	      }
 	    }
 	  }, {
 	    key: 'draw',
 	    value: function draw(projectionAndViewMatrix) {
 	      var gl = this._gl;
 	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
-	      var material = this._material;
+	      var materials = this._materials;
 
 	      gl.useProgram(this._glslProgram);
 
@@ -602,28 +611,31 @@
 
 	      glem.bindVertexArray(gl, this._vao);
 
-	      if (material) {
-	        material.setUp();
-	      }
+	      for (var i = 0; i < materials.length; i++) {
 
-	      if (this._indicesBuffer) {
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffer);
-	        gl.drawElements(gl.TRIANGLES, this._indicesN, gl.UNSIGNED_SHORT, 0);
-	        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-	      } else {
-	        gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
-	      }
+	        if (materials[i]) {
+	          materials[i].setUp();
+	        }
 
-	      if (material) {
-	        material.tearDown();
+	        if (this._indicesBuffers.length > 0) {
+	          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
+	          gl.drawElements(gl.TRIANGLES, materials[i].faceN * 3, gl.UNSIGNED_SHORT, 0);
+	          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+	        } else {
+	          gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+	        }
+
+	        if (materials[i]) {
+	          materials[i].tearDown();
+	        }
 	      }
 
 	      glem.bindVertexArray(gl, null);
 	    }
 	  }, {
-	    key: 'material',
-	    set: function set(mat) {
-	      this._material = mat;
+	    key: 'materials',
+	    set: function set(materials) {
+	      this._materials = materials;
 	    }
 	  }]);
 
@@ -1884,6 +1896,9 @@
 	  }, {
 	    key: 'isThisGLVersion_2',
 	    value: function isThisGLVersion_2(gl) {
+	      if (typeof WebGL2RenderingContext === "undefined") {
+	        return false;
+	      }
 	      return gl instanceof WebGL2RenderingContext;
 	    }
 	  }, {
@@ -2657,6 +2672,7 @@
 	    this._specularColor = new _Vector32['default'](1.0, 1.0, 1.0);
 	    this._ambientColor = new _Vector32['default'](0.0, 0.0, 0.0);
 	    this._name = "";
+	    this._faceN = 0;
 	  }
 
 	  _createClass(ClassicMaterial, [{
@@ -2715,6 +2731,14 @@
 	    },
 	    get: function get() {
 	      return this._name;
+	    }
+	  }, {
+	    key: 'faceN',
+	    set: function set(num) {
+	      this._faceN = num;
+	    },
+	    get: function get() {
+	      return this._faceN;
 	    }
 	  }]);
 
@@ -3200,6 +3224,10 @@
 
 	var _Texture2 = _interopRequireDefault(_Texture);
 
+	var _Mesh = __webpack_require__(9);
+
+	var _Mesh2 = _interopRequireDefault(_Mesh);
+
 	var singleton = _Symbol();
 	var singletonEnforcer = _Symbol();
 
@@ -3239,13 +3267,11 @@
 	    }
 	  }, {
 	    key: 'loadMaterialFromFile',
-	    value: function loadMaterialFromFile(filePath, canvas) {
-	      console.log(filePath);
+	    value: function loadMaterialFromFile(basePath, fileName, canvas) {
 
 	      var xmlHttp = new XMLHttpRequest();
-	      xmlHttp.open("GET", filePath, false);
+	      xmlHttp.open("GET", basePath + fileName, false);
 	      xmlHttp.send(null);
-	      console.log(xmlHttp.responseText);
 
 	      var mtlTextRows = xmlHttp.responseText.split('\n');
 
@@ -3266,7 +3292,7 @@
 
 	      // main loading
 	      for (var i = 0; i < mtlTextRows.length; i++) {
-	        var matchArray = mtlTextRows[i].match(/^(\w+) (\w+) (\w+) (\w+)/);
+	        var matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
 
 	        if (matchArray === null) {
 	          continue;
@@ -3279,25 +3305,29 @@
 	        }
 
 	        if (matchArray[1] === "Ka") {
+	          matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
 	          materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
 	          materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
 	          materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
 	        }
 
 	        if (matchArray[1] === "Kd") {
+	          matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
 	          materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
 	          materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
 	          materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
 	        }
 
 	        if (matchArray[1] === "Ks") {
+	          matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
 	          materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
 	          materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
 	          materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
 	        }
 
 	        if (matchArray[1] === "map_Kd") {
-	          var texture = new _Texture2['default'](matchArray[2], canvas);
+	          matchArray = mtlTextRows[i].match(/^(\w+) (\w+.\w+)/);
+	          var texture = new _Texture2['default'](basePath + matchArray[2], canvas);
 	          texture.name = matchArray[2];
 	          materials[iMCount].diffuseTexture = texture;
 	        }
@@ -3326,7 +3356,7 @@
 
 	        // material file
 	        if (matchArray[1] === "mtllib") {
-	          this.loadMaterialFromFile(basePath + matchArray[2] + '.mtl', canvas);
+	          this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas);
 	        }
 	        // Vertex
 	        if (matchArray[1] === "v") {
@@ -3347,7 +3377,6 @@
 	        outputRows.push(matchArray[1] + ' ' + matchArray[2]);
 	      }
 
-	      var verteces = new Array(fCount * 3);
 	      var pvCoord = new Array(vCount);
 	      var pvNormal = new Array(vnCount);
 	      var pvTexture = new Array(vtCount);
@@ -3355,11 +3384,10 @@
 	      vCount = 0;
 	      vnCount = 0;
 	      vtCount = 0;
-	      fCount = 0;
 
 	      for (var i = 0; i < objTextRows.length; i++) {
 	        //キーワード 読み込み
-	        var matchArray = objTextRows[i].match(/^(\w+) (\w+) (\w+) (\w+)/);
+	        var matchArray = objTextRows[i].match(/^(\w+) /);
 
 	        if (matchArray === null) {
 	          continue;
@@ -3367,6 +3395,7 @@
 
 	        //頂点 読み込み
 	        if (matchArray[1] === "v") {
+	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
 	          //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
 	          pvCoord[vCount] = new _Vector32['default']();
 	          pvCoord[vCount].x = parseFloat(matchArray[2]);
@@ -3377,6 +3406,7 @@
 
 	        //法線 読み込み
 	        if (matchArray[1] === "vn") {
+	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
 	          //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
 	          pvNormal[vnCount] = new _Vector32['default']();
 	          pvNormal[vnCount].x = parseFloat(matchArray[2]);
@@ -3387,13 +3417,20 @@
 
 	        //テクスチャー座標 読み込み
 	        if (matchArray[1] === "vt") {
+	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
 	          pvTexture[vtCount] = new _Vector22['default']();
 	          pvTexture[vtCount].x = parseFloat(matchArray[2]);
-	          //          pvTexture[vtCount].y=1-y;//Y成分が逆なので合わせる
 	          pvTexture[vtCount].y = parseFloat(matchArray[3]);
+	          pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
+
 	          vtCount++;
 	        }
 	      }
+
+	      var positions = new Array(fCount);
+	      var texcoords = new Array(fCount);
+	      var normals = new Array(fCount);
+	      var indices = [];
 
 	      this._indexBuffers = new Array(this._materials); //GLuint[g_dwNumMaterial];
 
@@ -3410,8 +3447,12 @@
 	        for (var j = 0; j < objTextRows.length && fCount < this._FaceN; j++) {
 	          var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
+	          if (matchArray === null) {
+	            continue;
+	          }
+
 	          if (matchArray[1] === "usemtl") {
-	            if (matchArray[2] === matchArray[i].name) {
+	            if (matchArray[2] === this._materials[i].name) {
 	              boFlag = true;
 	            } else {
 	              boFlag = false;
@@ -3429,8 +3470,9 @@
 	                vt2 = 0,
 	                vt3 = 0;
 
-	            if (materials[i].diffuseTexture) {
-	              var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d+)\/(\d+) (\d+)\/(\d+)\/(\d+) (\d+)\/(\d+)\/(\d+)/);
+	            if (this._materials[i].diffuseTexture) {
+
+	              var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
 	              v1 = _matchArray[2];
 	              vt1 = _matchArray[3];
 	              vn1 = _matchArray[4];
@@ -3441,13 +3483,101 @@
 	              vt3 = _matchArray[9];
 	              vn3 = _matchArray[10];
 
-	              if (vt1) {}
+	              if (vn1) {
+	                positions[fCount * 3] = pvCoord[v1 - 1];
+	                positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+	                positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+	                normals[fCount * 3] = pvNormal[vn1 - 1];
+	                normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+	                normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+	                texcoords[fCount * 3] = pvTexture[vt1 - 1];
+	                texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
+	                texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
+	              } else {
+	                var _matchArray2 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+	                v1 = _matchArray2[2];
+	                vn1 = _matchArray2[3];
+	                v2 = _matchArray2[4];
+	                vn2 = _matchArray2[5];
+	                v3 = _matchArray2[6];
+	                vn3 = _matchArray2[7];
+	                positions[fCount * 3] = pvCoord[v1 - 1];
+	                positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+	                positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+	                normals[fCount * 3] = pvNormal[vn1 - 1];
+	                normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+	                normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+	              }
+	            } else {
+	              var _matchArray3 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+	              v1 = _matchArray3[2];
+	              vn1 = _matchArray3[3];
+	              v2 = _matchArray3[4];
+	              vn2 = _matchArray3[5];
+	              v3 = _matchArray3[6];
+	              vn3 = _matchArray3[7];
+
+	              if (vn1) {
+	                positions[fCount * 3] = pvCoord[v1 - 1];
+	                positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+	                positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+	                normals[fCount * 3] = pvNormal[vn1 - 1];
+	                normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+	                normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+	              } else {
+	                var _matchArray4 = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+	                v1 = _matchArray4[2];
+	                vt1 = _matchArray4[3];
+	                vn1 = _matchArray4[4];
+	                v2 = _matchArray4[5];
+	                vt2 = _matchArray4[6];
+	                vn2 = _matchArray4[7];
+	                v3 = _matchArray4[8];
+	                vt3 = _matchArray4[9];
+	                vn3 = _matchArray4[10];
+
+	                positions[fCount * 3] = pvCoord[v1 - 1];
+	                positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+	                positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+	                normals[fCount * 3] = pvNormal[vn1 - 1];
+	                normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+	                normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+	                texcoords[fCount * 3] = pvTexture[vt1 - 1];
+	                texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
+	                texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
+	              }
 	            }
+
+	            iFaceBufferArray[partFCount * 3] = fCount * 3;
+	            iFaceBufferArray[partFCount * 3 + 1] = fCount * 3 + 1;
+	            iFaceBufferArray[partFCount * 3 + 2] = fCount * 3 + 2;
+
+	            partFCount++;
+	            fCount++;
 	          }
 	        }
+
+	        if (fCount === 0) //使用されていないマテリアル対策
+	          {
+	            this._indexBuffers[i] = null;
+	            continue;
+	          }
+
+	        this._materials[i].faceN = partFCount;
+
+	        indices[i] = iFaceBufferArray.concat();
 	      }
 
-	      return outputRows;
+	      var mesh = new _Mesh2['default'](canvas);
+	      mesh.materials = this._materials;
+	      mesh.setVerticesData({
+	        position: positions,
+	        texcoord: texcoords,
+	        normal: normals,
+	        indices: indices
+	      });
+
+	      return mesh;
 	    }
 	  }], [{
 	    key: 'getInstance',
