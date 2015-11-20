@@ -3,6 +3,7 @@ import Element from './Element'
 import Matrix4x4 from './Matrix4x4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
+import Shader from './Shader'
 import SimpleShader from './SimpleShader'
 
 export default class Mesh extends Element {
@@ -53,12 +54,13 @@ export default class Mesh extends Element {
   prepareForRender(existCamera_f) {
     var vertices = this._vertices;
     var gl = this._gl;
-//    var extVAO = GLExtentionsManager.getInstance(gl).extVAO;
+
     var glem = GLExtentionsManager.getInstance(gl);
 
     // GLSLプログラム作成。
-    var optimizedVertexAttrib = this._decideNeededVertexAttribs(vertices);
-    var glslProgram = this._getSheder(optimizedVertexAttrib, existCamera_f);
+    var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
+    var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f);
+    optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
     // create VAO
     var vao = glem.createVertexArray(gl);
@@ -74,17 +76,17 @@ export default class Mesh extends Element {
 
     this._stride = 0;
     vertices.position.forEach((elem, index, array) => {
-      optimizedVertexAttrib.forEach((attribName)=> {
+      optimizedVertexAttribs.forEach((attribName)=> {
         var element = vertices[attribName][index];
         vertexData.push(element.x);
-        vertexData.push(element.y );
+        vertexData.push(element.y);
         if (element.z !== void 0) {
           vertexData.push(element.z);
         }
       });
     });
 
-    optimizedVertexAttrib.forEach((attribName)=> {
+    optimizedVertexAttribs.forEach((attribName)=> {
       var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
       this._stride += numberOfComponentOfVector * 4;
     });
@@ -93,7 +95,7 @@ export default class Mesh extends Element {
 
     // 頂点レイアウト設定
     var offset = 0;
-    optimizedVertexAttrib.forEach((attribName)=> {
+    optimizedVertexAttribs.forEach((attribName)=> {
       gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
       var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
       gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
