@@ -115,18 +115,14 @@ export default class Matrix4x4 {
    */
   static transpose(mat) {
 
-      var mat_t = new Matrix4x4(mat.m00, mat.m01, mat.m02, mat.m03,
-                                mat.m10, mat.m11, mat.m12, mat.m13,
-                                mat.m20, mat.m21, mat.m22, mat.m23,
-                                mat.m30, mat.m31, mat.m32, mat.m33);
-      mat_t._swap(1, 4);
-      mat_t._swap(2, 8);
-      mat_t._swap(3, 12);
-      mat_t._swap(6, 9);
-      mat_t._swap(7, 13);
-      mat_t._swap(11, 14);
+    var mat_t = new Matrix4x4(
+      mat.m00, mat.m10, mat.m20, mat.m30,
+      mat.m01, mat.m11, mat.m21, mat.m31,
+      mat.m02, mat.m12, mat.m22, mat.m32,
+      mat.m03, mat.m13, mat.m23, mat.m33
+    );
 
-      return mat_t;
+    return mat_t;
   }
 
   multiplyVector(vec) {
