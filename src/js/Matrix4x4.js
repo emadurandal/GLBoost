@@ -1,5 +1,6 @@
 import GLBoost from './globals'
 import Vector4 from './Vector4'
+import Matrix3x3 from './Matrix3x3'
 
 export default class Matrix4x4 {
 
@@ -198,6 +199,21 @@ export default class Matrix4x4 {
     );
   }
 
+  toMatrix3x3() {
+    return new Matrix3x3(
+      this.m00, this.m01, this.m02,
+      this.m10, this.m11, this.m12,
+      this.m20, this.m21, this.m22
+    )
+  }
+
+  static toMatrix3x3(mat) {
+    return new Matrix3x3(
+      mat.m00, mat.m01, mat.m02,
+      mat.m10, mat.m11, mat.m12,
+      mat.m20, mat.m21, mat.m22
+    )
+  }
 
   set m00(val) {
     this.m[0] = val;
