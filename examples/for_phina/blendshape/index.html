@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost basic example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../../build/glboost.js"></script>
+  <script src="../../../libs/phina.js"></script>
+  <script>
+
+    GLBoost.TARGET_WEBGL_VERSION = 1;
+
+    phina.globalize();
+
+    phina.define('MainScene', {
+      superClass: 'CanvasScene',
+
+      init: function(options) {
+        this.superInit();
+
+        var SCREEN_WIDTH = 640;
+        var SCREEN_HEIGHT = 960;
+        var layer = phina.display.GLBoostLayer({
+          width: options.width,
+          height: options.height
+        }).addChildTo(this);
+
+
+        var positions = [
+          new GLBoost.Vector3(-0.5, -0.5, 0.0),
+          new GLBoost.Vector3(0.5, -0.5, 0.0),
+          new GLBoost.Vector3(-0.5,  0.5, 0.0),
+
+          new GLBoost.Vector3(-0.5, 0.5, 0.0),
+          new GLBoost.Vector3(0.5, -0.5, 0.0),
+          new GLBoost.Vector3(0.5,  0.5, 0.0)
+
+        ];
+        var shapetarget_1 = [
+          new GLBoost.Vector3(-1.0, -0.5, 0.0),
+          new GLBoost.Vector3(1.0, -0.5, 0.0),
+          new GLBoost.Vector3(-1.0,  0.5, 0.0),
+
+          new GLBoost.Vector3(-1.0, 0.5, 0.0),
+          new GLBoost.Vector3(1.0, -0.5, 0.0),
+          new GLBoost.Vector3(1.0,  0.5, 0.0)
+        ];
+        var shapetarget_2 = [
+          new GLBoost.Vector3(-0.5, -1.0, 0.0),
+          new GLBoost.Vector3(0.5, -1.0, 0.0),
+          new GLBoost.Vector3(-0.5,  1.0, 0.0),
+
+          new GLBoost.Vector3(-0.5, 1.0, 0.0),
+          new GLBoost.Vector3(0.5, -1.0, 0.0),
+          new GLBoost.Vector3(0.5,  1.0, 0.0)
+        ];
+        var colors = [
+          new GLBoost.Vector3(1.0, 0.0, 0.0),
+          new GLBoost.Vector3(0.0, 1.0, 0.0),
+          new GLBoost.Vector3(0.0, 0.0, 1.0),
+
+          new GLBoost.Vector3(1.0, 0.0, 0.0),
+          new GLBoost.Vector3(0.0, 1.0, 0.0),
+          new GLBoost.Vector3(0.0, 0.0, 1.0)
+        ];
+        var texcoords = [
+          new GLBoost.Vector2(0.0, 0.0),
+          new GLBoost.Vector2(1.0, 0.0),
+          new GLBoost.Vector2(0.0, 1.0),
+
+          new GLBoost.Vector2(0.0, 1.0),
+          new GLBoost.Vector2(1.0, 0.0),
+          new GLBoost.Vector2(1.0, 1.0)
+        ];
+
+        var mesh = new GLBoost.BlendShapeMesh(layer.canvas);
+        var texture = new GLBoost.Texture('resouces/texture.png', layer.canvas);
+        var material = new GLBoost.ClassicMaterial(layer.canvas);
+        material.diffuseTexture = texture;
+        mesh.materials = [material];
+        mesh.setVerticesData({
+          position: positions,
+          color: colors,
+          texcoord: texcoords,
+          shapetarget_1: shapetarget_1,
+          shapetarget_2: shapetarget_2
+        });
+
+        layer.scene.add( mesh );
+
+        layer.scene.prepareForRender();
+
+        var theta = 0.02;
+        var value = 0;
+        layer.update = function() {
+          value += theta;
+          mesh.blendWeight_1 = value;
+          mesh.blendWeight_2 = 1 - value;
+
+          if (value > 1.0) {
+            value = 1.0;
+            theta *= -1;
+          } else if (theta < 0) {
+            value = 0;
+            theta *= -1;
+          }
+
+        };
+
+
+        var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
+        label.fill = 'white';
+        label.stroke = 'black';
+        label.fontSize = 64;
+        label.strokeWidth = 4;
+        label.x = this.gridX.center();
+        label.y = this.gridY.center();
+      }
+    });
+
+    phina.main(function() {
+      var app = GameApp({
+        startLabel: 'main'
+      });
+
+      app.run();
+    });
+
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost basic example</p>
+</header>
+<main>
+  <canvas id="world" width="465" height="465"></canvas>
+</main>
+</body>
+</html>
