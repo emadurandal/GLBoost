@@ -1,5 +1,5 @@
 import Shader from './Shader'
-import {SimpleShaderSource} from './SimpleShader'
+import SimpleShader from './SimpleShader'
 
 export class BlendShapeShaderSource {
 
@@ -61,11 +61,10 @@ export class BlendShapeShaderSource {
 }
 
 
-export default class BlendShapeShader extends Shader {
+export default class BlendShapeShader extends SimpleShader {
   constructor(canvas) {
 
     super(canvas, BlendShapeShader);
-    BlendShapeShader.mixin(SimpleShaderSource);
     BlendShapeShader.mixin(BlendShapeShaderSource);
   }
 
