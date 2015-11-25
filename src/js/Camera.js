@@ -7,7 +7,7 @@ export default class Camera extends Element {
   constructor(lookat, perspective) {
     super();
 
-    this._eye = lookat.eye;
+    this._translate = lookat.eye;
     this._center = lookat.center;
     this._up = lookat.up;
 
@@ -21,7 +21,7 @@ export default class Camera extends Element {
 
   lookAtRHMatrix() {
 //    return Matrix4x4.identity();
-    return Camera.lookAtRHMatrix(this._eye, this._center, this._up);
+    return Camera.lookAtRHMatrix(this._translate, this._center, this._up);
   }
 
   static lookAtRHMatrix(eye, center, up) {
@@ -64,11 +64,11 @@ export default class Camera extends Element {
   }
 
   set eye(vec) {
-    this._eye = vec;
+    this._translate = vec;
   }
 
   get eye() {
-    return this._eye;
+    return this._translate;
   }
 
   set center(vec) {
