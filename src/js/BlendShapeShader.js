@@ -1,12 +1,12 @@
 import Shader from './Shader'
 import SimpleShader from './SimpleShader'
 
-export class BlendShapeShaderSource {
+export default class BlendShapeShaderSource {
 
   VSDefine_BlendShapeShaderSource(in_, out_, f) {
     var shaderText = '';
     f.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) {
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         shaderText+=`${in_} vec3 aVertex_${attribName};\n`;
         shaderText+='uniform float blendWeight_' + attribName  + ';\n';
       }
@@ -18,14 +18,14 @@ export class BlendShapeShaderSource {
     var shaderText = '';
     shaderText +=     'float sumOfWeights = 0.0;\n';
     f.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) {
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         shaderText += 'sumOfWeights += blendWeight_' + attribName +';\n';
       }
     });
-    var numOfShapeTargets = this._numberOfShapeTargets(f);
+    var numOfShapeTargets = this.BlendShapeShaderSource_numberOfShapeTargets(f);
     shaderText += '    vec3 blendedPosition = aVertex_position * max(1.0 - sumOfWeights/float(' + numOfShapeTargets + '), 0.0);\n';
     f.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) {
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         shaderText += 'blendedPosition += aVertex_' + attribName + ' * blendWeight_' + attribName + '/float(' + numOfShapeTargets + ');\n';
       }
     });
@@ -37,10 +37,10 @@ export class BlendShapeShaderSource {
     return shaderText;
   }
 
-  prepare_BlendShapeShaderSource(vertexAttribs, existCamera_f, shaderProgram, gl) {
+  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) { // if POSITION and ShapeTargets...
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) { // if POSITION and ShapeTargets...
         vertexAttribsAsResult.push(attribName);
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
         gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
@@ -48,7 +48,7 @@ export class BlendShapeShaderSource {
     });
 
     vertexAttribs.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) {
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         shaderProgram['uniformFloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
         // とりあえずゼロ初期化
         gl.uniform1f(shaderProgram['uniformFloatSampler_blendWeight_' + attribName], 0.0);
@@ -58,36 +58,17 @@ export class BlendShapeShaderSource {
     return vertexAttribsAsResult;
   }
 
-}
-
-
-export default class BlendShapeShader extends SimpleShader {
-  constructor(canvas) {
-
-    super(canvas, BlendShapeShader);
-    BlendShapeShader.mixin(BlendShapeShaderSource);
-  }
-
-  _isShapeTarget(attribName) {
+  BlendShapeShaderSource_isShapeTarget(attribName) {
     return !Shader._exist(attribName, GLBoost.POSITION) && !Shader._exist(attribName, GLBoost.COLOR) && !Shader._exist(attribName, GLBoost.TEXCOORD);
   }
 
-  _numberOfShapeTargets(attributes) {
+  BlendShapeShaderSource_numberOfShapeTargets(attributes) {
     var count = 0;
     attributes.forEach((attribName)=>{
-      if (this._isShapeTarget(attribName)) {
+      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         count += 1;
       }
     });
     return count;
   }
-
-  static getInstance(canvas) {
-    if (BlendShapeShader._instances[canvas.id] instanceof BlendShapeShader) {
-      return BlendShapeShader._instances[canvas.id];
-    } else {
-      return new BlendShapeShader(canvas);
-    }
-  }
-
 }

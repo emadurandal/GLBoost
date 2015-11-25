@@ -4,6 +4,7 @@ var global = window;
 global.GLBoost["TARGET_WEBGL_VERSION"] = 1;
 global.GLBoost["POSITION"] = 'position';
 global.GLBoost["COLOR"] = 'color';
+global.GLBoost["NORMAL"] = 'normal';
 global.GLBoost["TEXCOORD"] = 'texcoord';
 global.GLBoost["BLENDTARGET1"] = 'shapetarget_1';
 global.GLBoost["BLENDTARGET2"] = 'shapetarget_2';
@@ -23,4 +24,4 @@ global.GLBoost.isThisGLVersion_2 = function(gl) {
     return false;
   }
   return gl instanceof WebGL2RenderingContext;
-}
+};

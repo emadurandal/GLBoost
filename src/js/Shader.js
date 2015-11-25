@@ -1,14 +1,12 @@
 import GLContext from './GLContext'
 
 export default class Shader {
-  constructor(canvas, childClass) {
+  constructor(canvas) {
     if (typeof canvas === 'string') {
       var canvas = window.document.querySelector(canvas);
     }
 
     this._gl = GLContext.getInstance(canvas).gl;
-
-    childClass._instances[canvas.id] = this;
 
   }
 
@@ -168,7 +166,7 @@ export default class Shader {
     this._classNamesOfVSShade.forEach((className)=> {
       var method = this['VSShade_' + className];
       if (method) {
-        shaderText += method.bind(this, f)();
+        shaderText += method.bind(this, existCamera_f, f)();
       }
     });
 
@@ -256,15 +254,15 @@ export default class Shader {
   }
 
 
-  _prepareAssetsForShaders(vertexAttribs, existCamera_f, shaderProgram, gl) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight) {
     var vertexAttribsAsResult = [];
-    var position = this.prepare(vertexAttribs, existCamera_f, shaderProgram, gl);
+    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
     vertexAttribsAsResult.push(position);
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, vertexAttribs, existCamera_f, shaderProgram, gl)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, pointLight)();
         vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
       }
     });
@@ -272,7 +270,7 @@ export default class Shader {
     return vertexAttribsAsResult;
   }
 
-  prepare(vertexAttribs, existCamera_f, shaderProgram, gl) {
+  prepare(gl, shaderProgram, vertexAttribs, existCamera_f) {
     shaderProgram['vertexAttribute_position'] = gl.getAttribLocation(shaderProgram, 'aVertex_position');
     gl.enableVertexAttribArray(shaderProgram['vertexAttribute_position']);
 
@@ -334,14 +332,14 @@ export default class Shader {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f) {
+  getShaderProgram(vertexAttribs, existCamera_f, pointLight) {
     var gl = this._gl;
     var shaderProgram = this._initShaders(gl,
       this._getVertexShaderString(gl, vertexAttribs, existCamera_f),
       this._getFragmentShaderString(gl, vertexAttribs)
     );
 
-    shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(vertexAttribs, existCamera_f, shaderProgram, gl);
+    shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
 
     return shaderProgram;
   }

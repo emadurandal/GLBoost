@@ -1,6 +1,7 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
 import Vector3 from './Vector3'
+import SimpleShader from './SimpleShader'
 
 export default class ClassicMaterial {
   constructor(canvas) {
@@ -11,6 +12,15 @@ export default class ClassicMaterial {
     this._ambientColor = new Vector3(0.0, 0.0, 0.0);
     this._name = "";
     this._faceN = 0;
+    this._shader = new SimpleShader(canvas);
+  }
+
+  set shader(shader) {
+    this._shader = shader;
+  }
+
+  get shader() {
+    return this._shader;
   }
 
   set diffuseTexture(tex) {

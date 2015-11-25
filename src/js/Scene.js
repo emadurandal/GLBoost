@@ -1,6 +1,8 @@
 import GLBoost from './globals'
 import Element from './Element'
 import Camera from './Camera'
+import PointLight from './PointLight'
+import Mesh from './Mesh'
 
 export default class Scene extends Element {
   constructor() {
@@ -21,10 +23,19 @@ export default class Scene extends Element {
       }
     });
 
+    var pointLight = null;
+    this._elements.forEach((elm)=> {
+      if (elm instanceof PointLight) {
+        pointLight = elm;
+      }
+    });
+
     // レンダリングの準備をさせる。
     this._elements.forEach((elm)=> {
       if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
-      elm.prepareForRender(existCamera_f);
+      if (elm instanceof Mesh) {
+        elm.prepareForRender(existCamera_f, pointLight);
+      }
     });
   }
 

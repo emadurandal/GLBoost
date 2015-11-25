@@ -6,6 +6,7 @@ import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import MutableTexture from './MutableTexture'
 import RenderPass from './RenderPass'
+import PointLight from './PointLight'
 
 class Renderer {
   constructor(parameters) {
@@ -41,11 +42,15 @@ class Renderer {
 
   draw(scene) {
     var projectionAndViewMatrix = null;
+    var invNormalMatrix = null;
     scene.elements.forEach((elm)=> {
       if(elm instanceof Camera) {
         if (elm.isMainCamera) {
           projectionAndViewMatrix = Matrix4x4.multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
           projectionAndViewMatrix = Matrix4x4.transpose(projectionAndViewMatrix);
+          invNormalMatrix = projectionAndViewMatrix.toMatrix3x3();
+          invNormalMatrix = invNormalMatrix.invert();
+          invNormalMatrix = invNormalMatrix.transpose();
         }
       }
     });
@@ -53,15 +58,23 @@ class Renderer {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
 
+    let pointLight = null;
+    scene.elements.forEach((elm)=> {
+      if(elm instanceof PointLight) {
+        pointLight = elm;
+      }
+    });
+
     // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
     if (this._renderPasses === null) {
       glem.drawBuffers(gl, [gl.BACK]);
 
       scene.elements.forEach((elm)=> {
         if(elm instanceof Mesh) {
-          elm.draw(projectionAndViewMatrix);
+          elm.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
         }
       });
+
     } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
       this._renderPasses.forEach((renderPass)=>{
 
@@ -78,7 +91,7 @@ class Renderer {
 
         var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
-          mesh.draw(projectionAndViewMatrix);
+          mesh.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

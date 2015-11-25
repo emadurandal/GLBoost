@@ -14,7 +14,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  VSShade_SimpleShaderSource(f) {
+  VSShade_SimpleShaderSource(existCamera_f, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = vec4(aVertex_color, 1.0);\n';
@@ -48,7 +48,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  prepare_SimpleShaderSource(vertexAttribs, existCamera_f, shaderProgram, gl) {
+  prepare_SimpleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -72,16 +72,7 @@ export class SimpleShaderSource {
 export default class SimpleShader extends Shader {
   constructor(canvas) {
 
-    super(canvas, SimpleShader);
+    super(canvas);
     SimpleShader.mixin(SimpleShaderSource);
   }
-
-  static getInstance(canvas) {
-    if (SimpleShader._instances[canvas.id] instanceof SimpleShader) {
-      return SimpleShader._instances[canvas.id];
-    } else {
-      return new SimpleShader(canvas);
-    }
-  }
-
 }

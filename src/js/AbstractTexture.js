@@ -39,8 +39,6 @@ export default class AbstractTexture {
     return this._height;
   }
 
-
-
 }
 
 GLBoost["AbstractTexture"] = AbstractTexture;
