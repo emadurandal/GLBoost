@@ -121,7 +121,7 @@ export default class Matrix3x3 {
     var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z;
     var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z;
 
-    return new Vector4(x, y, z);
+    return new Vector3(x, y, z);
   }
 
   /**
@@ -193,7 +193,7 @@ export default class Matrix3x3 {
     var m21 = (this.m01*this.m20 - this.m00*this.m21) / det;
     var m22 = (this.m00*this.m11 - this.m01*this.m10) / det;
 
-    return Matrix3x3(
+    return new Matrix3x3(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
@@ -212,7 +212,7 @@ export default class Matrix3x3 {
     var m21 = (mat.m01*mat.m20 - mat.m00*mat.m21) / det;
     var m22 = (mat.m00*mat.m11 - mat.m01*mat.m10) / det;
 
-    return Matrix3x3(
+    return new Matrix3x3(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
