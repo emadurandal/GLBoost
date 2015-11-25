@@ -114,7 +114,7 @@ export default class Shader {
     }
   }
 
-  _getVertexShaderString(gl, functions, existCamera_f) {
+  _getVertexShaderString(gl, functions, existCamera_f, lights) {
     var f = functions;
     var shaderText = '';
 
@@ -129,12 +129,12 @@ export default class Shader {
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSDefine(in_, out_, f);
+    shaderText += this.VSDefine(in_, out_, f, lights);
     // and define variables as mixin shaders
     this._classNamesOfVSDefine.forEach((className)=> {
       var method = this['VSDefine_' + className];
       if (method) {
-        shaderText += method.bind(this, in_, out_, f)();
+        shaderText += method.bind(this, in_, out_, f, lights)();
       }
     });
 
@@ -150,12 +150,12 @@ export default class Shader {
 
     /// Transform
     // start transforming. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSTransform(existCamera_f, f);
+    shaderText += this.VSTransform(existCamera_f, f, lights);
     // and transform as mixin Shaders
     this._classNamesOfVSTransform.forEach((className)=> {
       var method = this['VSTransform_' + className];
       if (method) {
-        shaderText += method.bind(this, existCamera_f, f)();
+        shaderText += method.bind(this, existCamera_f, f, lights)();
       }
     });
 
@@ -179,7 +179,7 @@ export default class Shader {
   }
 
 
-  _getFragmentShaderString(gl, functions) {
+  _getFragmentShaderString(gl, functions, lights) {
     var f = functions;
     var shaderText = '';
 
@@ -194,12 +194,12 @@ export default class Shader {
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSDefine(in_, f);
+    shaderText += this.FSDefine(in_, f, lights);
     // and define variables as mixin shaders
     this._classNamesOfFSDefine.forEach((className)=> {
       var method = this['FSDefine_' + className];
       if (method) {
-        shaderText += method.bind(this, in_, f)();
+        shaderText += method.bind(this, in_, f, lights)();
       }
     });
 
@@ -210,12 +210,12 @@ export default class Shader {
 
     /// Shading
     // start shading. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSShading(f, gl);
+    shaderText += this.FSShading(f, gl, lights);
     // and shade as mixin Shaders
     this._classNamesOfFSShade.forEach((className)=> {
       var method = this['FSShade_' + className];
       if (method) {
-        shaderText += method.bind(this, f, gl)();
+        shaderText += method.bind(this, f, gl, lights)();
       }
     });
 
@@ -254,15 +254,15 @@ export default class Shader {
   }
 
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
     var vertexAttribsAsResult = [];
-    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
+    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
     vertexAttribsAsResult.push(position);
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, pointLight)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights)();
         vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
       }
     });
@@ -332,14 +332,14 @@ export default class Shader {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, pointLight) {
+  getShaderProgram(vertexAttribs, existCamera_f, lights) {
     var gl = this._gl;
     var shaderProgram = this._initShaders(gl,
-      this._getVertexShaderString(gl, vertexAttribs, existCamera_f),
-      this._getFragmentShaderString(gl, vertexAttribs)
+      this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights),
+      this._getFragmentShaderString(gl, vertexAttribs, lights)
     );
 
-    shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
+    shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
 
     return shaderProgram;
   }

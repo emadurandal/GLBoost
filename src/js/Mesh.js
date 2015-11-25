@@ -34,7 +34,7 @@ export default class Mesh extends Element {
           delete vertices[GLBoost.TEXCOORD];
         }
       } else {
-        if (attribName !== 'indices' && attribName !== 'normal') {
+        if (attribName !== 'indices') {// && attribName !== 'normal') {
           attribNameArray.push(attribName);
         }
       }
@@ -43,15 +43,15 @@ export default class Mesh extends Element {
     return attribNameArray;
   }
 
-  _getSheder(result, existCamera_f, pointLight) {
-    return this._shader_for_non_material.getShaderProgram(result, existCamera_f, pointLight);
+  _getSheder(result, existCamera_f, lights) {
+    return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
   }
 
   setVerticesData(vertices) {
     this._vertices = vertices;
   }
 
-  prepareForRender(existCamera_f, pointLight) {
+  prepareForRender(existCamera_f, lights) {
     var vertices = this._vertices;
     var gl = this._gl;
 
@@ -91,12 +91,12 @@ export default class Mesh extends Element {
     if (materials) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
-        var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, pointLight);
+        var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
         setVerticesLayout(glslProgram);
         materials[i].glslProgram = glslProgram;
       }
     } else {
-      var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, pointLight);
+      var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
       setVerticesLayout(glslProgram);
       this._glslProgram = glslProgram;
     }
@@ -148,7 +148,7 @@ export default class Mesh extends Element {
 
   }
 
-  draw(projectionAndViewMatrix, invNormalMatrix, pointLight) {
+  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -165,14 +165,21 @@ export default class Mesh extends Element {
           gl.uniformMatrix4fv(glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
         }
 
-        if (typeof glslProgram.invNormalMatrix !== "undefined") {
-          var in_m = invNormalMatrix;
-          gl.uniformMatrix4fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+        if (typeof glslProgram.modelViewMatrix !== "undefined") {
+          var mv_m = modelViewMatrix;
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.flatten()));
         }
 
-        if (pointLight) {
-          gl.uniformMatrix3f(glslProgram.lightPosition, pointLight.translate.x, pointLight.translate.y, pointLight.translate.z);
-          gl.uniformMatrix4f(glslProgram.lightDiffuse, pointLight.intensity.x, pointLight.intensity.y, pointLight.intensity.z, 1.0);
+        if (typeof glslProgram.invNormalMatrix !== "undefined") {
+          var in_m = invNormalMatrix;
+          gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+        }
+
+        if (lights.length !== 0) {
+          for(let i=0; i<lights.length; i++) {
+            gl.uniform3f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z);
+            gl.uniform4f(glslProgram[`lightDiffuse_${i}`], lights[i].intensity.x, lights[i].intensity.y, lights[i].intensity.z, 1.0);
+          }
         }
 
         if (materials[i]) {

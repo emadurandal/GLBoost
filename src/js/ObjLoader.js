@@ -4,6 +4,7 @@ import Vector2 from './Vector2'
 import ClassicMaterial from './ClassicMaterial'
 import Texture from './Texture'
 import Mesh from './Mesh'
+import LambertShader from './LambertShader'
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -24,7 +25,7 @@ export default class ObjLoader {
   }
 
   loadObj(url, canvas) {
-    this._numMaterial = 0
+    this._numMaterial = 0;
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -81,6 +82,7 @@ export default class ObjLoader {
       {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
+        materials[iMCount].shader = new LambertShader(canvas);
         materials[iMCount].name = matchArray[2];
       }
 

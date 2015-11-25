@@ -14,7 +14,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  VSShade_SimpleShaderSource(existCamera_f, f) {
+  VSTransform_SimpleShaderSource(existCamera_f, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = vec4(aVertex_color, 1.0);\n';

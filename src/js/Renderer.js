@@ -42,15 +42,18 @@ class Renderer {
 
   draw(scene) {
     var projectionAndViewMatrix = null;
+    var modelViewMatrix = null;
     var invNormalMatrix = null;
     scene.elements.forEach((elm)=> {
       if(elm instanceof Camera) {
         if (elm.isMainCamera) {
           projectionAndViewMatrix = Matrix4x4.multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
           projectionAndViewMatrix = Matrix4x4.transpose(projectionAndViewMatrix);
-          invNormalMatrix = projectionAndViewMatrix.toMatrix3x3();
+          modelViewMatrix = elm.lookAtRHMatrix();
+          invNormalMatrix = modelViewMatrix.toMatrix3x3();
           invNormalMatrix = invNormalMatrix.invert();
-          invNormalMatrix = invNormalMatrix.transpose();
+          //invNormalMatrix = invNormalMatrix.transpose();
+          modelViewMatrix = modelViewMatrix.transpose();
         }
       }
     });
@@ -58,10 +61,10 @@ class Renderer {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
 
-    let pointLight = null;
+    let lights = [];
     scene.elements.forEach((elm)=> {
       if(elm instanceof PointLight) {
-        pointLight = elm;
+        lights.push(elm);
       }
     });
 
@@ -71,7 +74,7 @@ class Renderer {
 
       scene.elements.forEach((elm)=> {
         if(elm instanceof Mesh) {
-          elm.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
+          elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
         }
       });
 
@@ -91,7 +94,7 @@ class Renderer {
 
         var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
-          mesh.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
+          mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

@@ -190,15 +190,18 @@
 	      var _this = this;
 
 	      var projectionAndViewMatrix = null;
+	      var modelViewMatrix = null;
 	      var invNormalMatrix = null;
 	      scene.elements.forEach(function (elm) {
 	        if (elm instanceof _Camera2['default']) {
 	          if (elm.isMainCamera) {
 	            projectionAndViewMatrix = _Matrix4x42['default'].multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
 	            projectionAndViewMatrix = _Matrix4x42['default'].transpose(projectionAndViewMatrix);
-	            invNormalMatrix = projectionAndViewMatrix.toMatrix3x3();
+	            modelViewMatrix = elm.lookAtRHMatrix();
+	            invNormalMatrix = modelViewMatrix.toMatrix3x3();
 	            invNormalMatrix = invNormalMatrix.invert();
-	            invNormalMatrix = invNormalMatrix.transpose();
+	            //invNormalMatrix = invNormalMatrix.transpose();
+	            modelViewMatrix = modelViewMatrix.transpose();
 	          }
 	        }
 	      });
@@ -206,10 +209,10 @@
 	      var gl = this._gl;
 	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
 
-	      var pointLight = null;
+	      var lights = [];
 	      scene.elements.forEach(function (elm) {
 	        if (elm instanceof _PointLight2['default']) {
-	          pointLight = elm;
+	          lights.push(elm);
 	        }
 	      });
 
@@ -219,7 +222,7 @@
 
 	        scene.elements.forEach(function (elm) {
 	          if (elm instanceof _Mesh2['default']) {
-	            elm.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
+	            elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
 	          }
 	        });
 	      } else {
@@ -239,7 +242,7 @@
 
 	          var meshes = renderPass.getMeshes();
 	          meshes.forEach(function (mesh) {
-	            mesh.draw(projectionAndViewMatrix, invNormalMatrix, pointLight);
+	            mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
 	          });
 
 	          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -1422,7 +1425,8 @@
 	            delete vertices[_globals2['default'].TEXCOORD];
 	          }
 	        } else {
-	          if (attribName !== 'indices' && attribName !== 'normal') {
+	          if (attribName !== 'indices') {
+	            // && attribName !== 'normal') {
 	            attribNameArray.push(attribName);
 	          }
 	        }
@@ -1432,8 +1436,8 @@
 	    }
 	  }, {
 	    key: '_getSheder',
-	    value: function _getSheder(result, existCamera_f, pointLight) {
-	      return this._shader_for_non_material.getShaderProgram(result, existCamera_f, pointLight);
+	    value: function _getSheder(result, existCamera_f, lights) {
+	      return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
 	    }
 	  }, {
 	    key: 'setVerticesData',
@@ -1442,7 +1446,7 @@
 	    }
 	  }, {
 	    key: 'prepareForRender',
-	    value: function prepareForRender(existCamera_f, pointLight) {
+	    value: function prepareForRender(existCamera_f, lights) {
 	      var _this = this;
 
 	      var vertices = this._vertices;
@@ -1483,12 +1487,12 @@
 	      if (materials) {
 	        for (var i = 0; i < materials.length; i++) {
 	          // GLSLプログラム作成。
-	          var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, pointLight);
+	          var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
 	          setVerticesLayout(glslProgram);
 	          materials[i].glslProgram = glslProgram;
 	        }
 	      } else {
-	        var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, pointLight);
+	        var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
 	        setVerticesLayout(glslProgram);
 	        this._glslProgram = glslProgram;
 	      }
@@ -1539,7 +1543,7 @@
 	    }
 	  }, {
 	    key: 'draw',
-	    value: function draw(projectionAndViewMatrix, invNormalMatrix, pointLight) {
+	    value: function draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights) {
 	      var gl = this._gl;
 	      var glem = _GLExtentionsManager2['default'].getInstance(gl);
 	      var materials = this._materials;
@@ -1556,14 +1560,21 @@
 	            gl.uniformMatrix4fv(glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
 	          }
 
-	          if (typeof glslProgram.invNormalMatrix !== "undefined") {
-	            var in_m = invNormalMatrix;
-	            gl.uniformMatrix4fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+	          if (typeof glslProgram.modelViewMatrix !== "undefined") {
+	            var mv_m = modelViewMatrix;
+	            gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.flatten()));
 	          }
 
-	          if (pointLight) {
-	            gl.uniformMatrix3f(glslProgram.lightPosition, pointLight.translate.x, pointLight.translate.y, pointLight.translate.z);
-	            gl.uniformMatrix4f(glslProgram.lightDiffuse, pointLight.intensity.x, pointLight.intensity.y, pointLight.intensity.z, 1.0);
+	          if (typeof glslProgram.invNormalMatrix !== "undefined") {
+	            var in_m = invNormalMatrix;
+	            gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+	          }
+
+	          if (lights.length !== 0) {
+	            for (var _i = 0; _i < lights.length; _i++) {
+	              gl.uniform3f(glslProgram['lightPosition_' + _i], lights[_i].translate.x, lights[_i].translate.y, lights[_i].translate.z);
+	              gl.uniform4f(glslProgram['lightDiffuse_' + _i], lights[_i].intensity.x, lights[_i].intensity.y, lights[_i].intensity.z, 1.0);
+	            }
 	          }
 
 	          if (materials[i]) {
@@ -2374,7 +2385,7 @@
 
 	  _createClass(Shader, [{
 	    key: '_getVertexShaderString',
-	    value: function _getVertexShaderString(gl, functions, existCamera_f) {
+	    value: function _getVertexShaderString(gl, functions, existCamera_f, lights) {
 	      var _this = this;
 
 	      var f = functions;
@@ -2390,12 +2401,12 @@
 
 	      /// define variables
 	      // start defining variables. first, BasicShader, then, sub class Shader, ...
-	      shaderText += this.VSDefine(in_, out_, f);
+	      shaderText += this.VSDefine(in_, out_, f, lights);
 	      // and define variables as mixin shaders
 	      this._classNamesOfVSDefine.forEach(function (className) {
 	        var method = _this['VSDefine_' + className];
 	        if (method) {
-	          shaderText += method.bind(_this, in_, out_, f)();
+	          shaderText += method.bind(_this, in_, out_, f, lights)();
 	        }
 	      });
 
@@ -2409,12 +2420,12 @@
 
 	      /// Transform
 	      // start transforming. first, BasicShader, then, sub class Shader, ...
-	      shaderText += this.VSTransform(existCamera_f, f);
+	      shaderText += this.VSTransform(existCamera_f, f, lights);
 	      // and transform as mixin Shaders
 	      this._classNamesOfVSTransform.forEach(function (className) {
 	        var method = _this['VSTransform_' + className];
 	        if (method) {
-	          shaderText += method.bind(_this, existCamera_f, f)();
+	          shaderText += method.bind(_this, existCamera_f, f, lights)();
 	        }
 	      });
 
@@ -2437,7 +2448,7 @@
 	    }
 	  }, {
 	    key: '_getFragmentShaderString',
-	    value: function _getFragmentShaderString(gl, functions) {
+	    value: function _getFragmentShaderString(gl, functions, lights) {
 	      var _this2 = this;
 
 	      var f = functions;
@@ -2453,12 +2464,12 @@
 
 	      /// define variables
 	      // start defining variables. first, BasicShader, then, sub class Shader, ...
-	      shaderText += this.FSDefine(in_, f);
+	      shaderText += this.FSDefine(in_, f, lights);
 	      // and define variables as mixin shaders
 	      this._classNamesOfFSDefine.forEach(function (className) {
 	        var method = _this2['FSDefine_' + className];
 	        if (method) {
-	          shaderText += method.bind(_this2, in_, f)();
+	          shaderText += method.bind(_this2, in_, f, lights)();
 	        }
 	      });
 
@@ -2467,12 +2478,12 @@
 
 	      /// Shading
 	      // start shading. first, BasicShader, then, sub class Shader, ...
-	      shaderText += this.FSShading(f, gl);
+	      shaderText += this.FSShading(f, gl, lights);
 	      // and shade as mixin Shaders
 	      this._classNamesOfFSShade.forEach(function (className) {
 	        var method = _this2['FSShade_' + className];
 	        if (method) {
-	          shaderText += method.bind(_this2, f, gl)();
+	          shaderText += method.bind(_this2, f, gl, lights)();
 	        }
 	      });
 
@@ -2518,17 +2529,17 @@
 	    }
 	  }, {
 	    key: '_prepareAssetsForShaders',
-	    value: function _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight) {
+	    value: function _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
 	      var _this3 = this;
 
 	      var vertexAttribsAsResult = [];
-	      var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
+	      var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
 	      vertexAttribsAsResult.push(position);
 	      // and shade as mixin Prepare Functions
 	      this._classNamesOfPrepare.forEach(function (className) {
 	        var method = _this3['prepare_' + className];
 	        if (method) {
-	          var verAttirbs = method.bind(_this3, gl, shaderProgram, vertexAttribs, existCamera_f, pointLight)();
+	          var verAttirbs = method.bind(_this3, gl, shaderProgram, vertexAttribs, existCamera_f, lights)();
 	          vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
 	        }
 	      });
@@ -2602,11 +2613,11 @@
 	    }
 	  }, {
 	    key: 'getShaderProgram',
-	    value: function getShaderProgram(vertexAttribs, existCamera_f, pointLight) {
+	    value: function getShaderProgram(vertexAttribs, existCamera_f, lights) {
 	      var gl = this._gl;
-	      var shaderProgram = this._initShaders(gl, this._getVertexShaderString(gl, vertexAttribs, existCamera_f), this._getFragmentShaderString(gl, vertexAttribs));
+	      var shaderProgram = this._initShaders(gl, this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights), this._getFragmentShaderString(gl, vertexAttribs, lights));
 
-	      shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, pointLight);
+	      shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
 
 	      return shaderProgram;
 	    }
@@ -2870,8 +2881,8 @@
 	      return shaderText;
 	    }
 	  }, {
-	    key: 'VSShade_SimpleShaderSource',
-	    value: function VSShade_SimpleShaderSource(existCamera_f, f) {
+	    key: 'VSTransform_SimpleShaderSource',
+	    value: function VSTransform_SimpleShaderSource(existCamera_f, f) {
 	      var shaderText = '';
 	      if (_Shader3['default']._exist(f, GLBoost.COLOR)) {
 	        shaderText += '  color = vec4(aVertex_color, 1.0);\n';
@@ -3399,7 +3410,7 @@
 	  function PointLight(intensity, canvas) {
 	    _classCallCheck(this, PointLight);
 
-	    _get(Object.getPrototypeOf(PointLight.prototype), 'constructor', this).call(this);
+	    _get(Object.getPrototypeOf(PointLight.prototype), 'constructor', this).call(this, canvas);
 
 	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
 	    this._name = "";
@@ -3460,7 +3471,7 @@
 	  function AbstractLight(canvas) {
 	    _classCallCheck(this, AbstractLight);
 
-	    _get(Object.getPrototypeOf(AbstractLight.prototype), 'constructor', this).call(this);
+	    _get(Object.getPrototypeOf(AbstractLight.prototype), 'constructor', this).call(this, canvas);
 
 	    if (this.constructor === AbstractLight) {
 	      throw new TypeError("Cannot construct AbstractLight instances directly.");
@@ -3542,10 +3553,10 @@
 	        }
 	      });
 
-	      var pointLight = null;
+	      var lights = [];
 	      this._elements.forEach(function (elm) {
 	        if (elm instanceof _PointLight2['default']) {
-	          pointLight = elm;
+	          lights.push(elm);
 	        }
 	      });
 
@@ -3553,7 +3564,7 @@
 	      this._elements.forEach(function (elm) {
 	        if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
 	        if (elm instanceof _Mesh2['default']) {
-	          elm.prepareForRender(existCamera_f, pointLight);
+	          elm.prepareForRender(existCamera_f, lights);
 	        }
 	      });
 	    }
@@ -4171,6 +4182,10 @@
 
 	var _Mesh2 = _interopRequireDefault(_Mesh);
 
+	var _LambertShader = __webpack_require__(109);
+
+	var _LambertShader2 = _interopRequireDefault(_LambertShader);
+
 	var singleton = _Symbol();
 	var singletonEnforcer = _Symbol();
 
@@ -4244,6 +4259,7 @@
 	        if (matchArray[1] === "newmtl") {
 	          iMCount++;
 	          materials[iMCount] = new _ClassicMaterial2['default'](canvas);
+	          materials[iMCount].shader = new _LambertShader2['default'](canvas);
 	          materials[iMCount].name = matchArray[2];
 	        }
 
@@ -5754,6 +5770,152 @@
 	  } catch(e){ /* empty */ }
 	  return safe;
 	};
+
+/***/ },
+/* 109 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = __webpack_require__(5)['default'];
+
+	var _classCallCheck = __webpack_require__(9)['default'];
+
+	var _get = __webpack_require__(15)['default'];
+
+	var _inherits = __webpack_require__(28)['default'];
+
+	var _interopRequireDefault = __webpack_require__(1)['default'];
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _Shader = __webpack_require__(44);
+
+	var _Shader2 = _interopRequireDefault(_Shader);
+
+	var _SimpleShader2 = __webpack_require__(49);
+
+	var _SimpleShader3 = _interopRequireDefault(_SimpleShader2);
+
+	var LambertShaderSource = (function () {
+	  function LambertShaderSource() {
+	    _classCallCheck(this, LambertShaderSource);
+	  }
+
+	  _createClass(LambertShaderSource, [{
+	    key: 'VSDefine_LambertShaderSource',
+	    value: function VSDefine_LambertShaderSource(in_, out_, f, lights) {
+	      var shaderText = '';
+	      if (_Shader2['default']._exist(f, GLBoost.NORMAL)) {
+	        shaderText += in_ + ' vec3 aVertex_normal;\n';
+	        shaderText += out_ + ' vec3 normal;\n';
+	      }
+	      shaderText += out_ + ' vec4 position;\n';
+	      shaderText += 'uniform mat4 modelViewMatrix;\n';
+	      shaderText += 'uniform mat3 invNormalMatrix;\n';
+	      shaderText += 'uniform vec3 lightPosition[' + lights.length + '];\n';
+	      shaderText += out_ + ' vec3 lightPos[' + lights.length + '];\n';
+
+	      return shaderText;
+	    }
+	  }, {
+	    key: 'VSTransform_LambertShaderSource',
+	    value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
+	      var shaderText = '';
+	      shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+	      if (_Shader2['default']._exist(f, GLBoost.NORMAL)) {
+	        if (existCamera_f) {
+	          shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+	        } else {
+	          shaderText += '  normal = aVertex_normal;\n';
+	        }
+	      }
+	      for (var i = 0; i < lights.length; i++) {
+	        if (existCamera_f) {
+	          shaderText += '  lightPos[' + i + '] = mat3(modelViewMatrix) * lightPosition[' + i + '];\n';
+	        } else {
+	          shaderText += '  lightPos[' + i + '] = lightPosition[' + i + '];\n';
+	        }
+	      }
+	      return shaderText;
+	    }
+	  }, {
+	    key: 'FSDefine_LambertShaderSource',
+	    value: function FSDefine_LambertShaderSource(in_, f, lights) {
+	      var shaderText = '';
+	      if (_Shader2['default']._exist(f, GLBoost.NORMAL)) {
+	        shaderText += in_ + ' vec3 normal;\n';
+	      }
+	      shaderText += in_ + ' vec4 position;\n';
+	      shaderText += in_ + ' vec3 lightPos[' + lights.length + '];\n';
+	      shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+
+	      return shaderText;
+	    }
+	  }, {
+	    key: 'FSShade_LambertShaderSource',
+	    value: function FSShade_LambertShaderSource(f, gl, lights) {
+	      var shaderText = '';
+
+	      shaderText += '  vec4 surfaceColor = rt1;\n';
+	      shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+	      shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+	      shaderText += '    vec3 light = normalize(lightPos[i] - position.xyz);\n';
+	      shaderText += '    float diffuse = dot(light, normal);\n';
+	      shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+	      shaderText += '  }\n';
+	      //shaderText += '  rt1.a = 1.0;\n';
+	      //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+	      return shaderText;
+	    }
+	  }, {
+	    key: 'prepare_LambertShaderSource',
+	    value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+	      var vertexAttribsAsResult = [];
+	      vertexAttribs.forEach(function (attribName) {
+	        if (attribName === GLBoost.NORMAL) {
+	          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+	          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+	          vertexAttribsAsResult.push(attribName);
+	        }
+	      });
+
+	      if (existCamera_f) {
+	        shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+	        shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+	      }
+	      for (var i = 0; i < lights.length; i++) {
+	        shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+	        shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+	      }
+
+	      return vertexAttribsAsResult;
+	    }
+	  }]);
+
+	  return LambertShaderSource;
+	})();
+
+	exports.LambertShaderSource = LambertShaderSource;
+
+	var LambertShader = (function (_SimpleShader) {
+	  _inherits(LambertShader, _SimpleShader);
+
+	  function LambertShader(canvas) {
+	    _classCallCheck(this, LambertShader);
+
+	    _get(Object.getPrototypeOf(LambertShader.prototype), 'constructor', this).call(this, canvas);
+	    LambertShader.mixin(LambertShaderSource);
+	  }
+
+	  return LambertShader;
+	})(_SimpleShader3['default']);
+
+	exports['default'] = LambertShader;
 
 /***/ }
 /******/ ]);

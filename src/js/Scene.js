@@ -23,10 +23,10 @@ export default class Scene extends Element {
       }
     });
 
-    var pointLight = null;
+    var lights = [];
     this._elements.forEach((elm)=> {
       if (elm instanceof PointLight) {
-        pointLight = elm;
+        lights.push(elm);
       }
     });
 
@@ -34,7 +34,7 @@ export default class Scene extends Element {
     this._elements.forEach((elm)=> {
       if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
       if (elm instanceof Mesh) {
-        elm.prepareForRender(existCamera_f, pointLight);
+        elm.prepareForRender(existCamera_f, lights);
       }
     });
   }
