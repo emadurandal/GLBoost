@@ -9,6 +9,13 @@ export default class Vector3 {
   }
 
   /**
+   * Zero Vector
+   */
+  static zero() {
+    return new Vector3(0, 0, 0);
+  }
+
+  /**
    * 長さ
    */
   length() {
