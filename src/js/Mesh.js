@@ -177,6 +177,8 @@ export default class Mesh extends Element {
           gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
         }
 
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
         if (lights.length !== 0) {
           for(let i=0; i<lights.length; i++) {
             if (lights[i] instanceof PointLight) {

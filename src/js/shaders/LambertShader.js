@@ -84,6 +84,9 @@ export class LambertShaderSource {
       shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
       shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
     }
+
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
       shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);

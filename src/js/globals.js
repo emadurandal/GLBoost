@@ -1,7 +1,7 @@
 window.GLBoost = window.GLBoost || { REVISION: '1' };
 
 var global = window;
-global.GLBoost["TARGET_WEBGL_VERSION"] = 1;
+
 global.GLBoost["POSITION"] = 'position';
 global.GLBoost["COLOR"] = 'color';
 global.GLBoost["NORMAL"] = 'normal';

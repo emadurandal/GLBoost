@@ -8,7 +8,7 @@ import MutableTexture from './textures/MutableTexture'
 import RenderPass from './RenderPass'
 import AbstractLight from './lights/AbstractLight'
 
-class Renderer {
+export default class Renderer {
   constructor(parameters) {
     var _canvas = parameters.canvas;
     var _clearColor = parameters.clearColor;

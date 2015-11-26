@@ -1,4 +1,6 @@
 import GLContext from './../GLContext'
+import PointLight from './../lights/PointLight'
+import Vector3 from './../math/Vector3'
 
 export default class Shader {
   constructor(canvas) {
@@ -334,6 +336,9 @@ export default class Shader {
 
   getShaderProgram(vertexAttribs, existCamera_f, lights) {
     var gl = this._gl;
+
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
     var shaderProgram = this._initShaders(gl,
       this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights),
       this._getFragmentShaderString(gl, vertexAttribs, lights)
@@ -344,6 +349,13 @@ export default class Shader {
     return shaderProgram;
   }
 
+  static getDefaultPointLightIfNotExsist(gl, lights) {
+    if (lights.length === 0) {
+      return [new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, gl._canvas)]
+    } else {
+      return lights;
+    }
+  }
 
   static _exist(functions, attribute) {
     return functions.indexOf(attribute) >= 0
