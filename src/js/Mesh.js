@@ -151,7 +151,7 @@ export default class Mesh extends Element {
 
   }
 
-  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f) {
+  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -182,13 +182,6 @@ export default class Mesh extends Element {
 
         if (lights.length !== 0) {
           for(let i=0; i<lights.length; i++) {
-            /*
-            if (lights[i] instanceof PointLight) {
-              gl.uniform4f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
-            } else if (lights[i] instanceof DirectionalLight) {
-              gl.uniform4f(glslProgram[`lightPosition_${i}`], -lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
-            }
-            */
 
             let lightVec = null;
             if (lights[i] instanceof PointLight) {
@@ -197,7 +190,7 @@ export default class Mesh extends Element {
               lightVec = new Vector4(-lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
             }
 
-            if (existCamera_f) {
+            if (camera) {
               let lightVecInCameraCoord = modelViewMatrix.transpose().multiplyVector(lightVec);
               gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
             } else {
@@ -205,6 +198,10 @@ export default class Mesh extends Element {
             }
             gl.uniform4f(glslProgram[`lightDiffuse_${i}`], lights[i].intensity.x, lights[i].intensity.y, lights[i].intensity.z, 1.0);
           }
+        }
+
+        if (typeof materials[i].shader.setUniforms !== "undefined") {
+          materials[i].shader.setUniforms(gl, glslProgram);
         }
 
         if (materials[i]) {

@@ -5,6 +5,7 @@ import ClassicMaterial from './ClassicMaterial'
 import Texture from './textures/Texture'
 import Mesh from './Mesh'
 import LambertShader from './shaders/LambertShader'
+import PhongShader from './shaders/PhongShader'
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -82,7 +83,7 @@ export default class ObjLoader {
       {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
-        materials[iMCount].shader = new LambertShader(canvas);
+        materials[iMCount].shader = new PhongShader(canvas);
         materials[iMCount].name = matchArray[2];
       }
 

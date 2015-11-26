@@ -41,7 +41,7 @@ export default class Renderer {
   }
 
   draw(scene) {
-    var existCamera_f = false;
+    var camera = false;
     var projectionAndViewMatrix = null;
     var modelViewMatrix = null;
     var invNormalMatrix = null;
@@ -55,7 +55,7 @@ export default class Renderer {
           invNormalMatrix = invNormalMatrix.invert();
           //invNormalMatrix = invNormalMatrix.transpose();
           modelViewMatrix = modelViewMatrix.transpose();
-          existCamera_f = true;
+          camera = elm;
         }
       }
     });
@@ -76,7 +76,7 @@ export default class Renderer {
 
       scene.elements.forEach((elm)=> {
         if(elm instanceof Mesh) {
-          elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
+          elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
         }
       });
 
@@ -96,7 +96,7 @@ export default class Renderer {
 
         var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
-          mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
+          mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

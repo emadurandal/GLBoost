@@ -1896,7 +1896,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f) {
+      value: function draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera) {
         var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
         var materials = this._materials;
@@ -1927,13 +1927,6 @@
 
             if (lights.length !== 0) {
               for (var _i = 0; _i < lights.length; _i++) {
-                /*
-                if (lights[i] instanceof PointLight) {
-                  gl.uniform4f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
-                } else if (lights[i] instanceof DirectionalLight) {
-                  gl.uniform4f(glslProgram[`lightPosition_${i}`], -lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
-                }
-                */
 
                 var lightVec = null;
                 if (lights[_i] instanceof PointLight) {
@@ -1942,7 +1935,7 @@
                   lightVec = new Vector4(-lights[_i].direction.x, -lights[_i].direction.y, -lights[_i].direction.z, 0.0);
                 }
 
-                if (existCamera_f) {
+                if (camera) {
                   var lightVecInCameraCoord = modelViewMatrix.transpose().multiplyVector(lightVec);
                   gl.uniform4f(glslProgram['lightPosition_' + _i], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
                 } else {
@@ -1950,6 +1943,10 @@
                 }
                 gl.uniform4f(glslProgram['lightDiffuse_' + _i], lights[_i].intensity.x, lights[_i].intensity.y, lights[_i].intensity.z, 1.0);
               }
+            }
+
+            if (typeof materials[i].shader.setUniforms !== "undefined") {
+              materials[i].shader.setUniforms(gl, glslProgram);
             }
 
             if (materials[i]) {
@@ -2316,7 +2313,7 @@
       value: function draw(scene) {
         var _this = this;
 
-        var existCamera_f = false;
+        var camera = false;
         var projectionAndViewMatrix = null;
         var modelViewMatrix = null;
         var invNormalMatrix = null;
@@ -2330,7 +2327,7 @@
               invNormalMatrix = invNormalMatrix.invert();
               //invNormalMatrix = invNormalMatrix.transpose();
               modelViewMatrix = modelViewMatrix.transpose();
-              existCamera_f = true;
+              camera = elm;
             }
           }
         });
@@ -2351,7 +2348,7 @@
 
           scene.elements.forEach(function (elm) {
             if (elm instanceof Mesh) {
-              elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
+              elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
             }
           });
         } else {
@@ -2371,7 +2368,7 @@
 
             var meshes = renderPass.getMeshes();
             meshes.forEach(function (mesh) {
-              mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
+              mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
             });
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2893,6 +2890,167 @@
 
   GLBoost$1["BlendShapeMesh"] = BlendShapeMesh;
 
+  var PhongShaderSource = (function () {
+    function PhongShaderSource() {
+      babelHelpers.classCallCheck(this, PhongShaderSource);
+    }
+
+    babelHelpers.createClass(PhongShaderSource, [{
+      key: 'VSDefine_PhongShaderSource',
+      value: function VSDefine_PhongShaderSource(in_, out_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+        shaderText += 'uniform mat3 invNormalMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_PhongShaderSource',
+      value: function VSTransform_PhongShaderSource(existCamera_f, f, lights) {
+        var shaderText = '';
+        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          if (existCamera_f) {
+            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+          } else {
+            shaderText += '  normal = aVertex_normal;\n';
+          }
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_PhongShaderSource',
+      value: function FSDefine_PhongShaderSource(in_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        shaderText += 'uniform float Kd;\n';
+        shaderText += 'uniform float Ks;\n';
+        shaderText += 'uniform float power;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_PhongShaderSource',
+      value: function FSShade_PhongShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt1;\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+        shaderText += '    rt1.rgb += Kd * lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '    vec3 viewPosition = vec3(0.0, 0.0, 0.0);\n';
+        shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
+        shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
+        shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
+        shaderText += '    rt1.rgb += Ks * lightDiffuse[i].rgb * specular;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt1.a = 1.0;\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_PhongShaderSource',
+      value: function prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+        }
+
+        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
+        shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return PhongShaderSource;
+  })();
+
+  var PhongShader = (function (_SimpleShader) {
+    babelHelpers.inherits(PhongShader, _SimpleShader);
+
+    function PhongShader(canvas) {
+      babelHelpers.classCallCheck(this, PhongShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PhongShader).call(this, canvas));
+
+      PhongShader.mixin(PhongShaderSource);
+
+      _this._Kd = 0.8;
+      _this._Ks = 0.5;
+      _this._power = 5.0;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(PhongShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram) {
+        gl.uniform1f(glslProgram.Kd, this._Kd);
+        gl.uniform1f(glslProgram.Ks, this._Ks);
+        gl.uniform1f(glslProgram.power, this._power);
+      }
+    }, {
+      key: 'Kd',
+      set: function set(value) {
+        this._Kd = value;
+      },
+      get: function get() {
+        return this._Kd;
+      }
+    }, {
+      key: 'Ks',
+      set: function set(value) {
+        this._Ks = value;
+      },
+      get: function get() {
+        return this._Ks;
+      }
+    }, {
+      key: 'power',
+      set: function set(value) {
+        this._power = value;
+      },
+      get: function get() {
+        return this._power;
+      }
+    }]);
+    return PhongShader;
+  })(SimpleShader);
+
   var LambertShaderSource = (function () {
     function LambertShaderSource() {
       babelHelpers.classCallCheck(this, LambertShaderSource);
@@ -2909,8 +3067,6 @@
         shaderText += out_ + ' vec4 position;\n';
         shaderText += 'uniform mat4 modelViewMatrix;\n';
         shaderText += 'uniform mat3 invNormalMatrix;\n';
-        //shaderText += `uniform vec4 lightPosition[${lights.length}];\n`; // TODO: CPU側で変換できるのでは？
-        //shaderText += `${out_} vec4 lightPos[${lights.length}];\n`;
 
         return shaderText;
       }
@@ -2926,16 +3082,7 @@
             shaderText += '  normal = aVertex_normal;\n';
           }
         }
-        /*
-        for(let i=0; i<lights.length; i++) {
-          if (existCamera_f) {
-            shaderText += `  lightPos[${i}].xyz = mat3(modelViewMatrix) * lightPosition[${i}].xyz;\n`;
-            shaderText += `  lightPos[${i}].w = lightPosition[${i}].w;\n`;
-          } else {
-            shaderText += `  lightPos[${i}] = lightPosition[${i}];\n`;
-          }
-        }
-        */
+
         return shaderText;
       }
     }, {
@@ -2946,7 +3093,6 @@
           shaderText += in_ + ' vec3 normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
-        //shaderText += `${in_} vec4 lightPos[${lights.length}];\n`;
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
 
@@ -2961,7 +3107,7 @@
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPos[i].w === 1.0      if DirecitonalLight: lightPos[i].w === 0.0
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
         shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
@@ -3090,7 +3236,7 @@
           if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
-            materials[iMCount].shader = new LambertShader(canvas);
+            materials[iMCount].shader = new PhongShader(canvas);
             materials[iMCount].name = matchArray[2];
           }
 
