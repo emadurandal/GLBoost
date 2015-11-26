@@ -1,4 +1,4 @@
-import GLBoost from './globals'
+import GLBoost from './../globals'
 import Vector4 from './Vector4'
 import Matrix3x3 from './Matrix3x3'
 

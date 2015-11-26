@@ -1,5 +1,5 @@
-import GLBoost from './globals'
-import GLContext from './GLContext'
+import GLBoost from './../globals'
+import GLContext from './../GLContext'
 import AbstractTexture from './AbstractTexture'
 
 export default class MutableTexture extends AbstractTexture {

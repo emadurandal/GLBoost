@@ -1,7 +1,7 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
-import Vector3 from './Vector3'
-import SimpleShader from './SimpleShader'
+import Vector3 from './math/Vector3'
+import SimpleShader from './shaders/SimpleShader'
 
 export default class ClassicMaterial {
   constructor(canvas) {

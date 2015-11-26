@@ -1,4 +1,4 @@
-import GLBoost from './globals'
+import GLBoost from './../globals'
 import Vector3 from './Vector3'
 
 export default class Matrix3x3 {

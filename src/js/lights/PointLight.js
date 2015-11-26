@@ -1,5 +1,5 @@
-import GLBoost from './globals'
-import GLContext from './GLContext'
+import GLBoost from './../globals'
+import GLContext from './../GLContext'
 import AbstractLight from './AbstractLight'
 
 export default class PointLight extends AbstractLight {

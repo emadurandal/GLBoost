@@ -1,12 +1,12 @@
 import GLBoost from './globals'
 import Mesh from './Mesh'
 import Camera from './Camera'
-import Matrix4x4 from './Matrix4x4'
+import Matrix4x4 from './math/Matrix4x4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
-import MutableTexture from './MutableTexture'
+import MutableTexture from './textures/MutableTexture'
 import RenderPass from './RenderPass'
-import AbstractLight from './AbstractLight'
+import AbstractLight from './lights/AbstractLight'
 
 class Renderer {
   constructor(parameters) {

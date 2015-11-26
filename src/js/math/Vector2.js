@@ -1,4 +1,4 @@
-import GLBoost from './globals'
+import GLBoost from './../globals'
 
 export default class Vector2 {
 

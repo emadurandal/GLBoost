@@ -1,5 +1,5 @@
 import GLBoost from './globals'
-import Vector3 from './Vector3'
+import Vector3 from './math/Vector3'
 
 export default class Element {
   constructor() {

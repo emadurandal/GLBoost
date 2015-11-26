@@ -1,7 +1,7 @@
 import GLBoost from './globals'
-import Vector3 from './Vector3'
+import Vector3 from './math/Vector3'
 import Element from './Element'
-import Matrix4x4 from './Matrix4x4'
+import Matrix4x4 from './math/Matrix4x4'
 
 export default class Camera extends Element {
   constructor(lookat, perspective) {

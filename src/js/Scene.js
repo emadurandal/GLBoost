@@ -1,7 +1,7 @@
 import GLBoost from './globals'
 import Element from './Element'
 import Camera from './Camera'
-import AbstractLight from './AbstractLight'
+import AbstractLight from './lights/AbstractLight'
 import Mesh from './Mesh'
 
 export default class Scene extends Element {

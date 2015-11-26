@@ -1,10 +1,10 @@
 import GLBoost from './globals'
-import Vector3 from './Vector3'
-import Vector2 from './Vector2'
+import Vector3 from './math/Vector3'
+import Vector2 from './math/Vector2'
 import ClassicMaterial from './ClassicMaterial'
-import Texture from './Texture'
+import Texture from './textures/Texture'
 import Mesh from './Mesh'
-import LambertShader from './LambertShader'
+import LambertShader from './shaders/LambertShader'
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();

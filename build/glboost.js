@@ -56,25 +56,25 @@
 
 	var _Scene2 = _interopRequireDefault(_Scene);
 
-	var _Vector2 = __webpack_require__(58);
+	var _mathVector2 = __webpack_require__(58);
 
-	var _Vector22 = _interopRequireDefault(_Vector2);
+	var _mathVector22 = _interopRequireDefault(_mathVector2);
 
-	var _Vector3 = __webpack_require__(12);
+	var _mathVector3 = __webpack_require__(12);
 
-	var _Vector32 = _interopRequireDefault(_Vector3);
+	var _mathVector32 = _interopRequireDefault(_mathVector3);
 
-	var _Vector4 = __webpack_require__(10);
+	var _mathVector4 = __webpack_require__(10);
 
-	var _Vector42 = _interopRequireDefault(_Vector4);
+	var _mathVector42 = _interopRequireDefault(_mathVector4);
 
 	var _ClassicMaterial = __webpack_require__(59);
 
 	var _ClassicMaterial2 = _interopRequireDefault(_ClassicMaterial);
 
-	var _Texture = __webpack_require__(60);
+	var _texturesTexture = __webpack_require__(60);
 
-	var _Texture2 = _interopRequireDefault(_Texture);
+	var _texturesTexture2 = _interopRequireDefault(_texturesTexture);
 
 	var _Camera = __webpack_require__(53);
 
@@ -126,9 +126,9 @@
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
-	var _Matrix4x4 = __webpack_require__(3);
+	var _mathMatrix4x4 = __webpack_require__(3);
 
-	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
+	var _mathMatrix4x42 = _interopRequireDefault(_mathMatrix4x4);
 
 	var _GLContext = __webpack_require__(39);
 
@@ -138,17 +138,17 @@
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _MutableTexture = __webpack_require__(54);
+	var _texturesMutableTexture = __webpack_require__(54);
 
-	var _MutableTexture2 = _interopRequireDefault(_MutableTexture);
+	var _texturesMutableTexture2 = _interopRequireDefault(_texturesMutableTexture);
 
 	var _RenderPass = __webpack_require__(56);
 
 	var _RenderPass2 = _interopRequireDefault(_RenderPass);
 
-	var _AbstractLight = __webpack_require__(51);
+	var _lightsAbstractLight = __webpack_require__(51);
 
-	var _AbstractLight2 = _interopRequireDefault(_AbstractLight);
+	var _lightsAbstractLight2 = _interopRequireDefault(_lightsAbstractLight);
 
 	var Renderer = (function () {
 	  function Renderer(parameters) {
@@ -195,8 +195,8 @@
 	      scene.elements.forEach(function (elm) {
 	        if (elm instanceof _Camera2['default']) {
 	          if (elm.isMainCamera) {
-	            projectionAndViewMatrix = _Matrix4x42['default'].multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
-	            projectionAndViewMatrix = _Matrix4x42['default'].transpose(projectionAndViewMatrix);
+	            projectionAndViewMatrix = _mathMatrix4x42['default'].multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
+	            projectionAndViewMatrix = _mathMatrix4x42['default'].transpose(projectionAndViewMatrix);
 	            modelViewMatrix = elm.lookAtRHMatrix();
 	            invNormalMatrix = modelViewMatrix.toMatrix3x3();
 	            invNormalMatrix = invNormalMatrix.invert();
@@ -211,7 +211,7 @@
 
 	      var lights = [];
 	      scene.elements.forEach(function (elm) {
-	        if (elm instanceof _AbstractLight2['default']) {
+	        if (elm instanceof _lightsAbstractLight2['default']) {
 	          lights.push(elm);
 	        }
 	      });
@@ -282,7 +282,7 @@
 	      this._fbo.height = height ? height : gl._canvas.height;
 
 	      for (var i = 0; i < textureNum; i++) {
-	        var texture = new _MutableTexture2['default'](gl._canvas, this._fbo.width, this._fbo.height);
+	        var texture = new _texturesMutableTexture2['default'](gl._canvas, this._fbo.width, this._fbo.height);
 	        this._currentRenderTargetTextures.push(texture);
 	      }
 
@@ -1370,9 +1370,9 @@
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Matrix4x4 = __webpack_require__(3);
+	var _mathMatrix4x4 = __webpack_require__(3);
 
-	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
+	var _mathMatrix4x42 = _interopRequireDefault(_mathMatrix4x4);
 
 	var _GLContext = __webpack_require__(39);
 
@@ -1382,21 +1382,21 @@
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _Shader = __webpack_require__(44);
+	var _shadersShader = __webpack_require__(44);
 
-	var _Shader2 = _interopRequireDefault(_Shader);
+	var _shadersShader2 = _interopRequireDefault(_shadersShader);
 
-	var _SimpleShader = __webpack_require__(49);
+	var _shadersSimpleShader = __webpack_require__(49);
 
-	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
+	var _shadersSimpleShader2 = _interopRequireDefault(_shadersSimpleShader);
 
-	var _PointLight = __webpack_require__(50);
+	var _lightsPointLight = __webpack_require__(50);
 
-	var _PointLight2 = _interopRequireDefault(_PointLight);
+	var _lightsPointLight2 = _interopRequireDefault(_lightsPointLight);
 
-	var _DirectionalLight = __webpack_require__(52);
+	var _lightsDirectionalLight = __webpack_require__(52);
 
-	var _DirectionalLight2 = _interopRequireDefault(_DirectionalLight);
+	var _lightsDirectionalLight2 = _interopRequireDefault(_lightsDirectionalLight);
 
 	var Mesh = (function (_Element) {
 	  _inherits(Mesh, _Element);
@@ -1412,7 +1412,7 @@
 	    this._stride = 0;
 	    this._glslProgram = null;
 	    this._vertices = null;
-	    this._shader_for_non_material = new _SimpleShader2['default'](this._canvas);
+	    this._shader_for_non_material = new _shadersSimpleShader2['default'](this._canvas);
 	  }
 
 	  /**
@@ -1580,9 +1580,9 @@
 
 	          if (lights.length !== 0) {
 	            for (var _i = 0; _i < lights.length; _i++) {
-	              if (lights[_i] instanceof _PointLight2['default']) {
+	              if (lights[_i] instanceof _lightsPointLight2['default']) {
 	                gl.uniform4f(glslProgram['lightPosition_' + _i], lights[_i].translate.x, lights[_i].translate.y, lights[_i].translate.z, 1.0);
-	              } else if (lights[_i] instanceof _DirectionalLight2['default']) {
+	              } else if (lights[_i] instanceof _lightsDirectionalLight2['default']) {
 	                gl.uniform4f(glslProgram['lightPosition_' + _i], -lights[_i].direction.x, -lights[_i].direction.y, -lights[_i].direction.z, 0.0);
 	              }
 
@@ -2020,16 +2020,16 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(12);
+	var _mathVector3 = __webpack_require__(12);
 
-	var _Vector32 = _interopRequireDefault(_Vector3);
+	var _mathVector32 = _interopRequireDefault(_mathVector3);
 
 	var Element = (function () {
 	  function Element() {
 	    _classCallCheck(this, Element);
 
 	    this.children = [];
-	    this._translate = _Vector32['default'].zero();
+	    this._translate = _mathVector32['default'].zero();
 	  }
 
 	  _createClass(Element, [{
@@ -3184,17 +3184,17 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(12);
+	var _mathVector3 = __webpack_require__(12);
 
-	var _Vector32 = _interopRequireDefault(_Vector3);
+	var _mathVector32 = _interopRequireDefault(_mathVector3);
 
 	var _Element2 = __webpack_require__(38);
 
 	var _Element3 = _interopRequireDefault(_Element2);
 
-	var _Matrix4x4 = __webpack_require__(3);
+	var _mathMatrix4x4 = __webpack_require__(3);
 
-	var _Matrix4x42 = _interopRequireDefault(_Matrix4x4);
+	var _mathMatrix4x42 = _interopRequireDefault(_mathMatrix4x4);
 
 	var Camera = (function (_Element) {
 	  _inherits(Camera, _Element);
@@ -3298,11 +3298,11 @@
 	    key: 'lookAtRHMatrix',
 	    value: function lookAtRHMatrix(eye, center, up) {
 
-	      var f = _Vector32['default'].normalize(_Vector32['default'].subtract(center, eye));
-	      var s = _Vector32['default'].normalize(_Vector32['default'].cross(f, up));
-	      var u = _Vector32['default'].cross(s, f);
+	      var f = _mathVector32['default'].normalize(_mathVector32['default'].subtract(center, eye));
+	      var s = _mathVector32['default'].normalize(_mathVector32['default'].cross(f, up));
+	      var u = _mathVector32['default'].cross(s, f);
 
-	      return new _Matrix4x42['default'](s.x, s.y, s.z, -_Vector32['default'].dotProduct(s, eye), u.x, u.y, u.z, -_Vector32['default'].dotProduct(u, eye), -f.x, -f.y, -f.z, _Vector32['default'].dotProduct(f, eye), 0, 0, 0, 1);
+	      return new _mathMatrix4x42['default'](s.x, s.y, s.z, -_mathVector32['default'].dotProduct(s, eye), u.x, u.y, u.z, -_mathVector32['default'].dotProduct(u, eye), -f.x, -f.y, -f.z, _mathVector32['default'].dotProduct(f, eye), 0, 0, 0, 1);
 	    }
 	  }, {
 	    key: 'perspectiveRHMatrix',
@@ -3311,7 +3311,7 @@
 	      var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
 	      var xscale = yscale / aspect;
 
-	      return new _Matrix4x42['default'](xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+	      return new _mathMatrix4x42['default'](xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
 	    }
 	  }]);
 
@@ -3604,9 +3604,9 @@
 
 	var _Camera2 = _interopRequireDefault(_Camera);
 
-	var _AbstractLight = __webpack_require__(51);
+	var _lightsAbstractLight = __webpack_require__(51);
 
-	var _AbstractLight2 = _interopRequireDefault(_AbstractLight);
+	var _lightsAbstractLight2 = _interopRequireDefault(_lightsAbstractLight);
 
 	var _Mesh = __webpack_require__(13);
 
@@ -3640,7 +3640,7 @@
 
 	      var lights = [];
 	      this._elements.forEach(function (elm) {
-	        if (elm instanceof _AbstractLight2['default']) {
+	        if (elm instanceof _lightsAbstractLight2['default']) {
 	          lights.push(elm);
 	        }
 	      });
@@ -3722,13 +3722,13 @@
 
 	var _GLContext2 = _interopRequireDefault(_GLContext);
 
-	var _Vector3 = __webpack_require__(12);
+	var _mathVector3 = __webpack_require__(12);
 
-	var _Vector32 = _interopRequireDefault(_Vector3);
+	var _mathVector32 = _interopRequireDefault(_mathVector3);
 
-	var _SimpleShader = __webpack_require__(49);
+	var _shadersSimpleShader = __webpack_require__(49);
 
-	var _SimpleShader2 = _interopRequireDefault(_SimpleShader);
+	var _shadersSimpleShader2 = _interopRequireDefault(_shadersSimpleShader);
 
 	var ClassicMaterial = (function () {
 	  function ClassicMaterial(canvas) {
@@ -3736,12 +3736,12 @@
 
 	    this._diffuseTexture = null;
 	    this._gl = _GLContext2['default'].getInstance(canvas).gl;
-	    this._diffuseColor = new _Vector32['default'](1.0, 1.0, 1.0);
-	    this._specularColor = new _Vector32['default'](1.0, 1.0, 1.0);
-	    this._ambientColor = new _Vector32['default'](0.0, 0.0, 0.0);
+	    this._diffuseColor = new _mathVector32['default'](1.0, 1.0, 1.0);
+	    this._specularColor = new _mathVector32['default'](1.0, 1.0, 1.0);
+	    this._ambientColor = new _mathVector32['default'](0.0, 0.0, 0.0);
 	    this._name = "";
 	    this._faceN = 0;
-	    this._shader = new _SimpleShader2['default'](canvas);
+	    this._shader = new _shadersSimpleShader2['default'](canvas);
 	  }
 
 	  _createClass(ClassicMaterial, [{
@@ -3942,9 +3942,9 @@
 
 	var _GLExtentionsManager2 = _interopRequireDefault(_GLExtentionsManager);
 
-	var _BlendShapeShader = __webpack_require__(62);
+	var _shadersBlendShapeShader = __webpack_require__(62);
 
-	var _BlendShapeShader2 = _interopRequireDefault(_BlendShapeShader);
+	var _shadersBlendShapeShader2 = _interopRequireDefault(_shadersBlendShapeShader);
 
 	var _Mesh2 = __webpack_require__(13);
 
@@ -3965,7 +3965,7 @@
 	        _classCallCheck(this, BlendShapeShader);
 
 	        _get(Object.getPrototypeOf(BlendShapeShader.prototype), 'constructor', this).call(this, canvas);
-	        BlendShapeShader.mixin(_BlendShapeShader2['default']);
+	        BlendShapeShader.mixin(_shadersBlendShapeShader2['default']);
 	      }
 
 	      return BlendShapeShader;
@@ -4247,29 +4247,29 @@
 
 	var _globals2 = _interopRequireDefault(_globals);
 
-	var _Vector3 = __webpack_require__(12);
+	var _mathVector3 = __webpack_require__(12);
 
-	var _Vector32 = _interopRequireDefault(_Vector3);
+	var _mathVector32 = _interopRequireDefault(_mathVector3);
 
-	var _Vector2 = __webpack_require__(58);
+	var _mathVector2 = __webpack_require__(58);
 
-	var _Vector22 = _interopRequireDefault(_Vector2);
+	var _mathVector22 = _interopRequireDefault(_mathVector2);
 
 	var _ClassicMaterial = __webpack_require__(59);
 
 	var _ClassicMaterial2 = _interopRequireDefault(_ClassicMaterial);
 
-	var _Texture = __webpack_require__(60);
+	var _texturesTexture = __webpack_require__(60);
 
-	var _Texture2 = _interopRequireDefault(_Texture);
+	var _texturesTexture2 = _interopRequireDefault(_texturesTexture);
 
 	var _Mesh = __webpack_require__(13);
 
 	var _Mesh2 = _interopRequireDefault(_Mesh);
 
-	var _LambertShader = __webpack_require__(110);
+	var _shadersLambertShader = __webpack_require__(110);
 
-	var _LambertShader2 = _interopRequireDefault(_LambertShader);
+	var _shadersLambertShader2 = _interopRequireDefault(_shadersLambertShader);
 
 	var singleton = _Symbol();
 	var singletonEnforcer = _Symbol();
@@ -4344,7 +4344,7 @@
 	        if (matchArray[1] === "newmtl") {
 	          iMCount++;
 	          materials[iMCount] = new _ClassicMaterial2['default'](canvas);
-	          materials[iMCount].shader = new _LambertShader2['default'](canvas);
+	          materials[iMCount].shader = new _shadersLambertShader2['default'](canvas);
 	          materials[iMCount].name = matchArray[2];
 	        }
 
@@ -4371,7 +4371,7 @@
 
 	        if (matchArray[1] === "map_Kd") {
 	          matchArray = mtlTextRows[i].match(/^(\w+) (\w+.\w+)/);
-	          var texture = new _Texture2['default'](basePath + matchArray[2], canvas);
+	          var texture = new _texturesTexture2['default'](basePath + matchArray[2], canvas);
 	          texture.name = matchArray[2];
 	          materials[iMCount].diffuseTexture = texture;
 	        }
@@ -4441,7 +4441,7 @@
 	        if (matchArray[1] === "v") {
 	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
 	          //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-	          pvCoord[vCount] = new _Vector32['default']();
+	          pvCoord[vCount] = new _mathVector32['default']();
 	          pvCoord[vCount].x = parseFloat(matchArray[2]);
 	          pvCoord[vCount].y = parseFloat(matchArray[3]);
 	          pvCoord[vCount].z = parseFloat(matchArray[4]);
@@ -4452,7 +4452,7 @@
 	        if (matchArray[1] === "vn") {
 	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
 	          //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-	          pvNormal[vnCount] = new _Vector32['default']();
+	          pvNormal[vnCount] = new _mathVector32['default']();
 	          pvNormal[vnCount].x = parseFloat(matchArray[2]);
 	          pvNormal[vnCount].y = parseFloat(matchArray[3]);
 	          pvNormal[vnCount].z = parseFloat(matchArray[4]);
@@ -4462,7 +4462,7 @@
 	        //テクスチャー座標 読み込み
 	        if (matchArray[1] === "vt") {
 	          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
-	          pvTexture[vtCount] = new _Vector22['default']();
+	          pvTexture[vtCount] = new _mathVector22['default']();
 	          pvTexture[vtCount].x = parseFloat(matchArray[2]);
 	          pvTexture[vtCount].y = parseFloat(matchArray[3]);
 	          pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる

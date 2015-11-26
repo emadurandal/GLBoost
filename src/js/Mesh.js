@@ -1,12 +1,12 @@
 import GLBoost from './globals'
 import Element from './Element'
-import Matrix4x4 from './Matrix4x4'
+import Matrix4x4 from './math/Matrix4x4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
-import Shader from './Shader'
-import SimpleShader from './SimpleShader'
-import PointLight from './PointLight'
-import DirectionalLight from './DirectionalLight'
+import Shader from './shaders/Shader'
+import SimpleShader from './shaders/SimpleShader'
+import PointLight from './lights/PointLight'
+import DirectionalLight from './lights/DirectionalLight'
 
 export default class Mesh extends Element {
   constructor(canvas) {

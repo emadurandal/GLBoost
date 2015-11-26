@@ -1,4 +1,4 @@
-import GLContext from './GLContext'
+import GLContext from './../GLContext'
 
 export default class Shader {
   constructor(canvas) {

@@ -1,6 +1,6 @@
-import GLBoost from './globals'
-import GLContext from './GLContext'
-import Element from './Element'
+import GLBoost from './../globals'
+import GLContext from './../GLContext'
+import Element from './../Element'
 
 export default class AbstractLight extends Element {
   constructor(canvas) {

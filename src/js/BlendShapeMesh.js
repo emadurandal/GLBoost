@@ -2,7 +2,7 @@ import GLBoost from './globals'
 import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
-import BlendShapeShaderSource from './BlendShapeShader'
+import BlendShapeShaderSource from './shaders/BlendShapeShader'
 import Mesh from './Mesh'
 
 export default class BlendShapeMesh extends Mesh {
