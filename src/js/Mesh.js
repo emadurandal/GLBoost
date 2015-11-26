@@ -1,6 +1,7 @@
 import GLBoost from './globals'
 import Element from './Element'
 import Matrix4x4 from './math/Matrix4x4'
+import Vector4 from './math/Vector4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import Shader from './shaders/Shader'
@@ -150,7 +151,7 @@ export default class Mesh extends Element {
 
   }
 
-  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights) {
+  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -181,12 +182,27 @@ export default class Mesh extends Element {
 
         if (lights.length !== 0) {
           for(let i=0; i<lights.length; i++) {
+            /*
             if (lights[i] instanceof PointLight) {
               gl.uniform4f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
             } else if (lights[i] instanceof DirectionalLight) {
               gl.uniform4f(glslProgram[`lightPosition_${i}`], -lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
             }
+            */
 
+            let lightVec = null;
+            if (lights[i] instanceof PointLight) {
+              lightVec = new Vector4(lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
+            } else if (lights[i] instanceof DirectionalLight) {
+              lightVec = new Vector4(-lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
+            }
+
+            if (existCamera_f) {
+              let lightVecInCameraCoord = modelViewMatrix.transpose().multiplyVector(lightVec);
+              gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
+            } else {
+              gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
+            }
             gl.uniform4f(glslProgram[`lightDiffuse_${i}`], lights[i].intensity.x, lights[i].intensity.y, lights[i].intensity.z, 1.0);
           }
         }

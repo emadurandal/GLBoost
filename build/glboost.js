@@ -234,6 +234,17 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
+  var Vector4 = function Vector4(x, y, z, w) {
+    babelHelpers.classCallCheck(this, Vector4);
+
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.w = w;
+  };
+
+  GLBoost$1["Vector4"] = Vector4;
+
   var Vector3 = (function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -1395,17 +1406,6 @@
 
   GLBoost$1["Matrix3x3"] = Matrix3x3;
 
-  var Vector4 = function Vector4(x, y, z, w) {
-    babelHelpers.classCallCheck(this, Vector4);
-
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = w;
-  };
-
-  GLBoost$1["Vector4"] = Vector4;
-
   var Matrix4x4 = (function () {
     function Matrix4x4() {
       babelHelpers.classCallCheck(this, Matrix4x4);
@@ -1896,7 +1896,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights) {
+      value: function draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f) {
         var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
         var materials = this._materials;
@@ -1927,12 +1927,27 @@
 
             if (lights.length !== 0) {
               for (var _i = 0; _i < lights.length; _i++) {
+                /*
+                if (lights[i] instanceof PointLight) {
+                  gl.uniform4f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
+                } else if (lights[i] instanceof DirectionalLight) {
+                  gl.uniform4f(glslProgram[`lightPosition_${i}`], -lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
+                }
+                */
+
+                var lightVec = null;
                 if (lights[_i] instanceof PointLight) {
-                  gl.uniform4f(glslProgram['lightPosition_' + _i], lights[_i].translate.x, lights[_i].translate.y, lights[_i].translate.z, 1.0);
+                  lightVec = new Vector4(lights[_i].translate.x, lights[_i].translate.y, lights[_i].translate.z, 1.0);
                 } else if (lights[_i] instanceof DirectionalLight) {
-                  gl.uniform4f(glslProgram['lightPosition_' + _i], -lights[_i].direction.x, -lights[_i].direction.y, -lights[_i].direction.z, 0.0);
+                  lightVec = new Vector4(-lights[_i].direction.x, -lights[_i].direction.y, -lights[_i].direction.z, 0.0);
                 }
 
+                if (existCamera_f) {
+                  var lightVecInCameraCoord = modelViewMatrix.transpose().multiplyVector(lightVec);
+                  gl.uniform4f(glslProgram['lightPosition_' + _i], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
+                } else {
+                  gl.uniform4f(glslProgram['lightPosition_' + _i], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
+                }
                 gl.uniform4f(glslProgram['lightDiffuse_' + _i], lights[_i].intensity.x, lights[_i].intensity.y, lights[_i].intensity.z, 1.0);
               }
             }
@@ -2301,6 +2316,7 @@
       value: function draw(scene) {
         var _this = this;
 
+        var existCamera_f = false;
         var projectionAndViewMatrix = null;
         var modelViewMatrix = null;
         var invNormalMatrix = null;
@@ -2314,6 +2330,7 @@
               invNormalMatrix = invNormalMatrix.invert();
               //invNormalMatrix = invNormalMatrix.transpose();
               modelViewMatrix = modelViewMatrix.transpose();
+              existCamera_f = true;
             }
           }
         });
@@ -2334,7 +2351,7 @@
 
           scene.elements.forEach(function (elm) {
             if (elm instanceof Mesh) {
-              elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
+              elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
             }
           });
         } else {
@@ -2354,7 +2371,7 @@
 
             var meshes = renderPass.getMeshes();
             meshes.forEach(function (mesh) {
-              mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights);
+              mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, existCamera_f);
             });
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -2892,8 +2909,8 @@
         shaderText += out_ + ' vec4 position;\n';
         shaderText += 'uniform mat4 modelViewMatrix;\n';
         shaderText += 'uniform mat3 invNormalMatrix;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += out_ + ' vec4 lightPos[' + lights.length + '];\n';
+        //shaderText += `uniform vec4 lightPosition[${lights.length}];\n`; // TODO: CPU側で変換できるのでは？
+        //shaderText += `${out_} vec4 lightPos[${lights.length}];\n`;
 
         return shaderText;
       }
@@ -2909,14 +2926,16 @@
             shaderText += '  normal = aVertex_normal;\n';
           }
         }
-        for (var i = 0; i < lights.length; i++) {
+        /*
+        for(let i=0; i<lights.length; i++) {
           if (existCamera_f) {
-            shaderText += '  lightPos[' + i + '].xyz = mat3(modelViewMatrix) * lightPosition[' + i + '].xyz;\n';
-            shaderText += '  lightPos[' + i + '].w = lightPosition[' + i + '].w;\n';
+            shaderText += `  lightPos[${i}].xyz = mat3(modelViewMatrix) * lightPosition[${i}].xyz;\n`;
+            shaderText += `  lightPos[${i}].w = lightPosition[${i}].w;\n`;
           } else {
-            shaderText += '  lightPos[' + i + '] = lightPosition[' + i + '];\n';
+            shaderText += `  lightPos[${i}] = lightPosition[${i}];\n`;
           }
         }
+        */
         return shaderText;
       }
     }, {
@@ -2927,7 +2946,8 @@
           shaderText += in_ + ' vec3 normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
-        shaderText += in_ + ' vec4 lightPos[' + lights.length + '];\n';
+        //shaderText += `${in_} vec4 lightPos[${lights.length}];\n`;
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
 
         return shaderText;
@@ -2942,7 +2962,7 @@
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPos[i].w === 1.0      if DirecitonalLight: lightPos[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPos[i].xyz - position.xyz * lightPos[i].w);\n';
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
         shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
         shaderText += '  }\n';
