@@ -11,8 +11,8 @@ export class LambertShaderSource {
     shaderText += `${out_} vec4 position;\n`;
     shaderText += 'uniform mat4 modelViewMatrix;\n';
     shaderText += 'uniform mat3 invNormalMatrix;\n';
-    shaderText += `uniform vec3 lightPosition[${lights.length}];\n`;
-    shaderText += `${out_} vec3 lightPos[${lights.length}];\n`;
+    shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
+    shaderText += `${out_} vec4 lightPos[${lights.length}];\n`;
 
     return shaderText;
   }
@@ -29,7 +29,8 @@ export class LambertShaderSource {
     }
     for(let i=0; i<lights.length; i++) {
       if (existCamera_f) {
-        shaderText += `  lightPos[${i}] = mat3(modelViewMatrix) * lightPosition[${i}];\n`;
+        shaderText += `  lightPos[${i}].xyz = mat3(modelViewMatrix) * lightPosition[${i}].xyz;\n`;
+        shaderText += `  lightPos[${i}].w = lightPosition[${i}].w;\n`;
       } else {
         shaderText += `  lightPos[${i}] = lightPosition[${i}];\n`;
       }
@@ -43,7 +44,7 @@ export class LambertShaderSource {
       shaderText += `${in_} vec3 normal;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
-    shaderText += `${in_} vec3 lightPos[${lights.length}];\n`;
+    shaderText += `${in_} vec4 lightPos[${lights.length}];\n`;
     shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
 
     return shaderText;
@@ -54,9 +55,11 @@ export class LambertShaderSource {
 
     shaderText += '  vec4 surfaceColor = rt1;\n';
     shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-    shaderText += '    vec3 light = normalize(lightPos[i] - position.xyz);\n';
-    shaderText += '    float diffuse = dot(light, normal);\n';
+    // if PointLight: lightPos[i].w === 1.0      if DirecitonalLight: lightPos[i].w === 0.0
+    shaderText += '    vec3 light = normalize(lightPos[i].xyz - position.xyz * lightPos[i].w);\n';
+    shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
     shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';

@@ -1,7 +1,7 @@
 import GLBoost from './globals'
 import Element from './Element'
 import Camera from './Camera'
-import PointLight from './PointLight'
+import AbstractLight from './AbstractLight'
 import Mesh from './Mesh'
 
 export default class Scene extends Element {
@@ -25,7 +25,7 @@ export default class Scene extends Element {
 
     var lights = [];
     this._elements.forEach((elm)=> {
-      if (elm instanceof PointLight) {
+      if (elm instanceof AbstractLight) {
         lights.push(elm);
       }
     });

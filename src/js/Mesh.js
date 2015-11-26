@@ -5,6 +5,8 @@ import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import Shader from './Shader'
 import SimpleShader from './SimpleShader'
+import PointLight from './PointLight'
+import DirectionalLight from './DirectionalLight'
 
 export default class Mesh extends Element {
   constructor(canvas) {
@@ -177,7 +179,12 @@ export default class Mesh extends Element {
 
         if (lights.length !== 0) {
           for(let i=0; i<lights.length; i++) {
-            gl.uniform3f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z);
+            if (lights[i] instanceof PointLight) {
+              gl.uniform4f(glslProgram[`lightPosition_${i}`], lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
+            } else if (lights[i] instanceof DirectionalLight) {
+              gl.uniform4f(glslProgram[`lightPosition_${i}`], -lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
+            }
+
             gl.uniform4f(glslProgram[`lightDiffuse_${i}`], lights[i].intensity.x, lights[i].intensity.y, lights[i].intensity.z, 1.0);
           }
         }

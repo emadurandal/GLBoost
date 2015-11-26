@@ -6,7 +6,7 @@ import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import MutableTexture from './MutableTexture'
 import RenderPass from './RenderPass'
-import PointLight from './PointLight'
+import AbstractLight from './AbstractLight'
 
 class Renderer {
   constructor(parameters) {
@@ -63,7 +63,7 @@ class Renderer {
 
     let lights = [];
     scene.elements.forEach((elm)=> {
-      if(elm instanceof PointLight) {
+      if(elm instanceof AbstractLight) {
         lights.push(elm);
       }
     });
