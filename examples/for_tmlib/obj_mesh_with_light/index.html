@@ -60,11 +60,10 @@
           this.add( camera );
 
           var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(1, 1, 1), '#world');
-          pointLight_1.translate = new GLBoost.Vector3(10, 10, 10);
-          var pointLight_2 = new GLBoost.PointLight(new GLBoost.Vector3(1, 1, 1), '#world');
-          pointLight_2.translate = new GLBoost.Vector3(-10, -10, -10);
+          pointLight_1.translate = new GLBoost.Vector3(10, 0, 0);
+          var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(10, 10, 0), '#world');
           this.add( pointLight_1 );
-          this.add( pointLight_2 );
+          this.add( directionalLight_2 );
 
         var objLoader = GLBoost.ObjLoader.getInstance();
           var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world');
