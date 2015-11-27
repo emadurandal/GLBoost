@@ -5,6 +5,7 @@ import ClassicMaterial from './ClassicMaterial'
 import Texture from './textures/Texture'
 import Mesh from './Mesh'
 import LambertShader from './shaders/LambertShader'
+import HalfLambertShader from './shaders/HalfLambertShader'
 import PhongShader from './shaders/PhongShader'
 
 let singleton = Symbol();
