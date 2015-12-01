@@ -141,9 +141,9 @@ export default class Shader {
     });
 
 
-    // Uniform projectionAndViewMatrix
+    // Uniform modelViewProjectionMatrix
     if (existCamera_f) {
-      shaderText += 'uniform mat4 projectionAndViewMatrix;\n';
+      shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
     }
 
     // begin of main function
@@ -235,7 +235,7 @@ export default class Shader {
   VSTransform(existCamera_f, f) {
     var shaderText = '';
     if (existCamera_f) {
-      shaderText +=   '  gl_Position = projectionAndViewMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
     } else {
       shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
     }
@@ -277,7 +277,7 @@ export default class Shader {
     gl.enableVertexAttribArray(shaderProgram['vertexAttribute_position']);
 
     if (existCamera_f) {
-      shaderProgram.projectionAndViewMatrix = gl.getUniformLocation(shaderProgram, 'projectionAndViewMatrix');
+      shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
     }
 
     return 'position';

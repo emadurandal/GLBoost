@@ -8,6 +8,14 @@ export default class Vector3 {
     this.z = z;
   }
 
+  isEqual(vec) {
+    if (this.x === vec.x && this.y === vec.y && this.z === vec.z) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   /**
    * Zero Vector
    */

@@ -30,7 +30,7 @@ export default class BlendShapeShaderSource {
       }
     });
     if (existCamera_f) {
-      shaderText += '  gl_Position = projectionAndViewMatrix * vec4(blendedPosition, 1.0);\n';
+      shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(blendedPosition, 1.0);\n';
     } else {
       shaderText += '  gl_Position = vec4(blendedPosition, 1.0);\n';
     }

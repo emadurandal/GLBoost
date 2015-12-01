@@ -164,13 +164,13 @@ export default class Mesh extends Element {
         gl.useProgram(glslProgram);
 
         if (viewMatrix && projectionMatrix) {
-          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._matrix);
-          gl.uniformMatrix4fv(glslProgram.projectionAndViewMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
+          gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
         if (typeof glslProgram.modelViewMatrix !== "undefined") {
-          var mv_m = viewMatrix.clone().multiply(this._matrix);
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.transpose().flatten()));
+          var mv_m = viewMatrix.clone().multiply(this.transformMatrix);
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
         }
 
         if (typeof glslProgram.invNormalMatrix !== "undefined") {
@@ -181,22 +181,23 @@ export default class Mesh extends Element {
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
         if (lights.length !== 0) {
-          for(let i=0; i<lights.length; i++) {
+          for(let j=0; j<lights.length; j++) {
+            if (glslProgram[`lightPosition_${j}`] && glslProgram[`lightDiffuse_${j}`]) {
+              let lightVec = null;
+              if (lights[j] instanceof PointLight) {
+                lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1.0);
+              } else if (lights[j] instanceof DirectionalLight) {
+                lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
+              }
 
-            let lightVec = null;
-            if (lights[i] instanceof PointLight) {
-              lightVec = new Vector4(lights[i].translate.x, lights[i].translate.y, lights[i].translate.z, 1.0);
-            } else if (lights[i] instanceof DirectionalLight) {
-              lightVec = new Vector4(-lights[i].direction.x, -lights[i].direction.y, -lights[i].direction.z, 0.0);
+              if (camera) {
+                let lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
+                gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
+              } else {
+                gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
+              }
+              gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
             }
-
-            if (camera) {
-              let lightVecInCameraCoord = mv_m.transpose().multiplyVector(lightVec);
-              gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
-            } else {
-              gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
-            }
-            gl.uniform4f(glslProgram[`lightDiffuse_${i}`], lights[i].intensity.x, lights[i].intensity.y, lights[i].intensity.z, 1.0);
           }
         }
 
@@ -223,9 +224,9 @@ export default class Mesh extends Element {
     } else {
       gl.useProgram(this._glslProgram);
 
-      if (projectionAndViewMatrix) {
-        var pv_m = projectionAndViewMatrix;
-        gl.uniformMatrix4fv(this._glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
+      if (viewMatrix && projectionMatrix) {
+        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._matrix);
+        gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
       }
 
       if (this._indicesBuffers.length > 0) {
