@@ -9,6 +9,14 @@ export default class Vector4 {
     this.w = w;
   }
 
+  isEqual(vec) {
+    if (this.x === vec.x && this.y === vec.y && this.z === vec.z) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }
 
 GLBoost["Vector4"] = Vector4;

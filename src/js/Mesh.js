@@ -151,7 +151,7 @@ export default class Mesh extends Element {
 
   }
 
-  draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera) {
+  draw(viewMatrix, projectionMatrix, lights, camera) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -163,18 +163,18 @@ export default class Mesh extends Element {
         let glslProgram = materials[i].glslProgram;
         gl.useProgram(glslProgram);
 
-        if (projectionAndViewMatrix) {
-          var pv_m = projectionAndViewMatrix;
-          gl.uniformMatrix4fv(glslProgram.projectionAndViewMatrix, false, new Float32Array(pv_m.flatten()));
+        if (viewMatrix && projectionMatrix) {
+          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._matrix);
+          gl.uniformMatrix4fv(glslProgram.projectionAndViewMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
         if (typeof glslProgram.modelViewMatrix !== "undefined") {
-          var mv_m = modelViewMatrix;
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.flatten()));
+          var mv_m = viewMatrix.clone().multiply(this._matrix);
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.transpose().flatten()));
         }
 
         if (typeof glslProgram.invNormalMatrix !== "undefined") {
-          var in_m = invNormalMatrix;
+          var in_m = mv_m.toMatrix3x3().invert();
           gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
         }
 
@@ -191,7 +191,7 @@ export default class Mesh extends Element {
             }
 
             if (camera) {
-              let lightVecInCameraCoord = modelViewMatrix.transpose().multiplyVector(lightVec);
+              let lightVecInCameraCoord = mv_m.transpose().multiplyVector(lightVec);
               gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
             } else {
               gl.uniform4f(glslProgram[`lightPosition_${i}`], lightVec.x, lightVec.y, lightVec.z, lightVec.w);

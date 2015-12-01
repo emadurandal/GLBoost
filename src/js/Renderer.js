@@ -42,19 +42,13 @@ export default class Renderer {
 
   draw(scene) {
     var camera = false;
-    var projectionAndViewMatrix = null;
-    var modelViewMatrix = null;
-    var invNormalMatrix = null;
+    var viewMatrix = null;
+    var projectionMatrix = null;
     scene.elements.forEach((elm)=> {
       if(elm instanceof Camera) {
         if (elm.isMainCamera) {
-          projectionAndViewMatrix = Matrix4x4.multiply(elm.perspectiveRHMatrix(), elm.lookAtRHMatrix());
-          projectionAndViewMatrix = Matrix4x4.transpose(projectionAndViewMatrix);
-          modelViewMatrix = elm.lookAtRHMatrix();
-          invNormalMatrix = modelViewMatrix.toMatrix3x3();
-          invNormalMatrix = invNormalMatrix.invert();
-          //invNormalMatrix = invNormalMatrix.transpose();
-          modelViewMatrix = modelViewMatrix.transpose();
+          viewMatrix = elm.lookAtRHMatrix();
+          projectionMatrix = elm.perspectiveRHMatrix();
           camera = elm;
         }
       }
@@ -76,7 +70,7 @@ export default class Renderer {
 
       scene.elements.forEach((elm)=> {
         if(elm instanceof Mesh) {
-          elm.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
+          elm.draw(viewMatrix, projectionMatrix, lights, camera);
         }
       });
 
@@ -96,7 +90,7 @@ export default class Renderer {
 
         var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
-          mesh.draw(projectionAndViewMatrix, modelViewMatrix, invNormalMatrix, lights, camera);
+          mesh.draw(viewMatrix, projectionMatrix, lights, camera);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

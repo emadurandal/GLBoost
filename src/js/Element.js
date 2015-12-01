@@ -1,5 +1,6 @@
 import GLBoost from './globals'
 import Vector3 from './math/Vector3'
+import Matrix4x4 from './math/Matrix4x4'
 
 export default class Element {
   constructor() {
