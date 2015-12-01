@@ -11,6 +11,8 @@
   <script>
 
     GLBoost.TARGET_WEBGL_VERSION = 1;
+    var SCREEN_WIDTH = 640;
+    var SCREEN_HEIGHT = 640;
 
     phina.globalize();
 
@@ -20,11 +22,9 @@
       init: function(options) {
         this.superInit();
 
-        var SCREEN_WIDTH = 640;
-        var SCREEN_HEIGHT = 960;
         var layer = phina.display.GLBoostLayer({
-          width: options.width,
-          height: options.height
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT
         }).addChildTo(this);
 
 
@@ -113,7 +113,7 @@
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
         label.fill = 'white';
         label.stroke = 'black';
-        label.fontSize = 64;
+        label.fontSize = 32;
         label.strokeWidth = 4;
         label.x = this.gridX.center();
         label.y = this.gridY.center();
@@ -122,7 +122,9 @@
 
     phina.main(function() {
       var app = GameApp({
-        startLabel: 'main'
+        startLabel: 'main',
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT
       });
 
       app.run();
