@@ -1,7 +1,7 @@
 import GLBoost from './globals'
 import Vector3 from './math/Vector3'
 import Element from './Element'
-import Matrix4x4 from './math/Matrix4x4'
+import Matrix44 from './math/Matrix44'
 
 export default class Camera extends Element {
   constructor(lookat, perspective) {
@@ -20,7 +20,7 @@ export default class Camera extends Element {
   }
 
   lookAtRHMatrix() {
-//    return Matrix4x4.identity();
+//    return Matrix44.identity();
     return Camera.lookAtRHMatrix(this._translate, this._center, this._up);
   }
 
@@ -30,14 +30,14 @@ export default class Camera extends Element {
     var s = Vector3.normalize(Vector3.cross(f, up));
     var u = Vector3.cross(s, f);
 
-    return new Matrix4x4(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+    return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
                          u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
                          -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
                          0, 0, 0, 1);
   }
 
   perspectiveRHMatrix() {
-//    return Matrix4x4.identity();
+//    return Matrix44.identity();
     return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
   }
 
@@ -46,7 +46,7 @@ export default class Camera extends Element {
     var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
     var xscale = yscale / aspect;
 
-    return new Matrix4x4(
+    return new Matrix44(
       xscale, 0.0, 0.0, 0.0,
       0.0, yscale, 0.0, 0.0,
       0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),

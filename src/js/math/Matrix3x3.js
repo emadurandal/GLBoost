@@ -1,7 +1,7 @@
 import GLBoost from './../globals'
 import Vector3 from './Vector3'
 
-export default class Matrix3x3 {
+export default class Matrix33 {
 
   constructor() {
     this.m = [];
@@ -37,7 +37,7 @@ export default class Matrix3x3 {
    * 単位行列にする（static版）
    */
   static identity() {
-    return new Matrix3x3(
+    return new Matrix33(
       1, 0, 0,
       0, 1, 0,
       0, 0, 1
@@ -64,7 +64,7 @@ export default class Matrix3x3 {
   static rotateY(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
-    return new Matrix3x3(
+    return new Matrix33(
       cos, 0, sin,
       0, 1, 0,
       -sin, 0, cos
@@ -80,7 +80,7 @@ export default class Matrix3x3 {
   }
 
   static zero() {
-    return new Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0);
+    return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
   }
 
   flatten() {
@@ -107,7 +107,7 @@ export default class Matrix3x3 {
    */
   static transpose(mat) {
 
-    var mat_t = new Matrix3x3(
+    var mat_t = new Matrix33(
       mat.m00, mat.m10, mat.m20,
       mat.m01, mat.m11, mat.m21,
       mat.m02, mat.m12, mat.m22
@@ -164,7 +164,7 @@ export default class Matrix3x3 {
     var m12 = l_m.m10*r_m.m02 + l_m.m11*r_m.m12 + l_m.m12*r_m.m22;
     var m22 = l_m.m20*r_m.m02 + l_m.m21*r_m.m12 + l_m.m22*r_m.m22;
 
-    return new Matrix3x3(
+    return new Matrix33(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
@@ -193,7 +193,7 @@ export default class Matrix3x3 {
     var m21 = (this.m01*this.m20 - this.m00*this.m21) / det;
     var m22 = (this.m00*this.m11 - this.m01*this.m10) / det;
 
-    return new Matrix3x3(
+    return new Matrix33(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
@@ -212,7 +212,7 @@ export default class Matrix3x3 {
     var m21 = (mat.m01*mat.m20 - mat.m00*mat.m21) / det;
     var m22 = (mat.m00*mat.m11 - mat.m01*mat.m10) / det;
 
-    return new Matrix3x3(
+    return new Matrix33(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
@@ -294,4 +294,4 @@ export default class Matrix3x3 {
 
 }
 
-GLBoost["Matrix3x3"] = Matrix3x3;
+GLBoost["Matrix33"] = Matrix33;

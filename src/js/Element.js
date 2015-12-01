@@ -1,6 +1,6 @@
 import GLBoost from './globals'
 import Vector3 from './math/Vector3'
-import Matrix4x4 from './math/Matrix4x4'
+import Matrix44 from './math/Matrix44'
 
 export default class Element {
   constructor() {
@@ -8,7 +8,7 @@ export default class Element {
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
-    this._matrix = Matrix4x4.identity();
+    this._matrix = Matrix44.identity();
     this._dirty = false;
   }
 
@@ -50,7 +50,7 @@ export default class Element {
 
   get transformMatrix() {
     if (this._dirty) {
-      var matrix = Matrix4x4.identity();
+      var matrix = Matrix44.identity();
       this._matrix = matrix.scale(this._scale).
         rotateX(this._rotate.x).
         rotateY(this._rotate.y).

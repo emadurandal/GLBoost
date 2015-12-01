@@ -71,7 +71,7 @@
           });
 
           setInterval(function(){
-            var rotateMatrix = GLBoost.Matrix3x3.rotateY(-0.02);
+            var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
             var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
             camera.eye = rotatedVector;
           }, 34);

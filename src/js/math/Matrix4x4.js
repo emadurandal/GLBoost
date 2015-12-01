@@ -1,8 +1,8 @@
 import GLBoost from './../globals'
 import Vector4 from './Vector4'
-import Matrix3x3 from './Matrix3x3'
+import Matrix33 from './Matrix33'
 
-export default class Matrix4x4 {
+export default class Matrix44 {
 
   constructor() {
     this.m = [];
@@ -24,7 +24,7 @@ export default class Matrix4x4 {
   }
 
   clone() {
-    return new Matrix4x4(
+    return new Matrix44(
       this.m00, this.m01, this.m02, this.m03,
       this.m10, this.m11, this.m12, this.m13,
       this.m20, this.m21, this.m22, this.m23,
@@ -49,7 +49,7 @@ export default class Matrix4x4 {
    * 単位行列にする（static版）
    */
   static identity() {
-    return new Matrix4x4(
+    return new Matrix44(
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
@@ -67,7 +67,7 @@ export default class Matrix4x4 {
   }
 
   static translate(vec) {
-    return new Matrix4x4(
+    return new Matrix44(
       1, 0, 0, vec.x,
       0, 1, 0, vec.y,
       0, 0, 1, vec.z,
@@ -85,7 +85,7 @@ export default class Matrix4x4 {
   }
 
   static scale(vec) {
-    return new Matrix4x4(
+    return new Matrix44(
       vec.x, 0, 0, 0,
       0, vec.y, 0, 0,
       0, 0, vec.z, 0,
@@ -112,7 +112,7 @@ export default class Matrix4x4 {
   static rotateX(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
-    return new Matrix4x4(
+    return new Matrix44(
       1, 0, 0, 0,
       0, cos, -sin, 0,
       0, sin, cos, 0,
@@ -139,7 +139,7 @@ export default class Matrix4x4 {
   static rotateY(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
-    return new Matrix4x4(
+    return new Matrix44(
       cos, 0, sin, 0,
       0, 1, 0, 0,
       -sin, 0, cos, 0,
@@ -166,7 +166,7 @@ export default class Matrix4x4 {
   static rotateZ(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
-    return new Matrix4x4(
+    return new Matrix44(
       cos, -sin, 0, 0,
       sin, cos, 0, 0,
       0, 0, 1, 0,
@@ -183,7 +183,7 @@ export default class Matrix4x4 {
   }
 
   static zero() {
-    return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    return new Matrix44(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   }
 
   flatten() {
@@ -213,7 +213,7 @@ export default class Matrix4x4 {
    */
   static transpose(mat) {
 
-    var mat_t = new Matrix4x4(
+    var mat_t = new Matrix44(
       mat.m00, mat.m10, mat.m20, mat.m30,
       mat.m01, mat.m11, mat.m21, mat.m31,
       mat.m02, mat.m12, mat.m22, mat.m32,
@@ -288,7 +288,7 @@ export default class Matrix4x4 {
     var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
     var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
 
-    return new Matrix4x4(
+    return new Matrix44(
         m00, m01, m02, m03,
         m10, m11, m12, m13,
         m20, m21, m22, m23,
@@ -296,16 +296,16 @@ export default class Matrix4x4 {
     );
   }
 
-  toMatrix3x3() {
-    return new Matrix3x3(
+  toMatrix33() {
+    return new Matrix33(
       this.m00, this.m01, this.m02,
       this.m10, this.m11, this.m12,
       this.m20, this.m21, this.m22
     )
   }
 
-  static toMatrix3x3(mat) {
-    return new Matrix3x3(
+  static toMatrix33(mat) {
+    return new Matrix33(
       mat.m00, mat.m01, mat.m02,
       mat.m10, mat.m11, mat.m12,
       mat.m20, mat.m21, mat.m22
@@ -442,4 +442,4 @@ export default class Matrix4x4 {
 
 }
 
-GLBoost["Matrix4x4"] = Matrix4x4;
+GLBoost["Matrix44"] = Matrix44;

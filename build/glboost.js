@@ -1,8 +1,10 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  factory();
-}(this, function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('./math/Matrix44')) :
+  typeof define === 'function' && define.amd ? define(['./math/Matrix44'], factory) :
+  factory(global.Matrix44);
+}(this, function (Matrix44) { 'use strict';
+
+  Matrix44 = 'default' in Matrix44 ? Matrix44['default'] : Matrix44;
 
   var babelHelpers = {};
 
@@ -439,699 +441,6 @@
 
   GLBoost$1["Vector3"] = Vector3;
 
-  var Matrix3x3 = (function () {
-    function Matrix3x3() {
-      babelHelpers.classCallCheck(this, Matrix3x3);
-
-      this.m = [];
-      if (arguments.length >= 9) {
-        this.setComponents.apply(this, arguments);
-      } else {
-        this.identity();
-      }
-    }
-
-    babelHelpers.createClass(Matrix3x3, [{
-      key: 'setComponents',
-      value: function setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
-        this.m00 = m00;this.m01 = m01;this.m02 = m02;
-        this.m10 = m10;this.m11 = m11;this.m12 = m12;
-        this.m20 = m20;this.m21 = m21;this.m22 = m22;
-
-        return this;
-      }
-
-      /**
-       * 単位行列にする
-       */
-
-    }, {
-      key: 'identity',
-      value: function identity() {
-        this.setComponents(1, 0, 0, 0, 1, 0, 0, 0, 1);
-        return this;
-      }
-
-      /**
-       * 単位行列にする（static版）
-       */
-
-    }, {
-      key: 'rotateY',
-
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-      value: function rotateY(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        this.setComponents(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
-        return this;
-      }
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'zero',
-
-      /**
-       * ゼロ行列
-       */
-      value: function zero() {
-        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
-        return this;
-      }
-    }, {
-      key: 'flatten',
-      value: function flatten() {
-        return this.m;
-      }
-    }, {
-      key: '_swap',
-      value: function _swap(l, r) {
-        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-      }
-
-      /**
-       * 転置
-       */
-
-    }, {
-      key: 'transpose',
-      value: function transpose() {
-        this._swap(1, 3);
-        this._swap(2, 6);
-        this._swap(5, 8);
-
-        return this;
-      }
-
-      /**
-       * 転置（static版）
-       */
-
-    }, {
-      key: 'multiplyVector',
-      value: function multiplyVector(vec) {
-        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z;
-        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z;
-        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z;
-
-        return new Vector3(x, y, z);
-      }
-
-      /**
-       * 行列同士の乗算
-       */
-
-    }, {
-      key: 'multiply',
-      value: function multiply(mat) {
-        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20;
-        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21;
-        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22;
-
-        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20;
-        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21;
-        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22;
-
-        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20;
-        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21;
-        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22;
-
-        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-
-      /**
-       * 行列同士の乗算（static版）
-       */
-
-    }, {
-      key: 'determinant',
-      value: function determinant() {
-        return this.m00 * this.m11 * this.m22 + this.m10 * this.m21 * this.m02 + this.m20 * this.m01 * this.m12 - this.m00 * this.m21 * this.m12 - this.m20 * this.m11 * this.m02 - this.m10 * this.m01 * this.m22;
-      }
-    }, {
-      key: 'invert',
-      value: function invert() {
-        var det = this.determinant();
-        var m00 = (this.m11 * this.m22 - this.m12 * this.m21) / det;
-        var m01 = (this.m02 * this.m21 - this.m01 * this.m22) / det;
-        var m02 = (this.m01 * this.m12 - this.m02 * this.m11) / det;
-        var m10 = (this.m12 * this.m20 - this.m10 * this.m22) / det;
-        var m11 = (this.m00 * this.m22 - this.m02 * this.m20) / det;
-        var m12 = (this.m02 * this.m10 - this.m00 * this.m12) / det;
-        var m20 = (this.m10 * this.m21 - this.m11 * this.m20) / det;
-        var m21 = (this.m01 * this.m20 - this.m00 * this.m21) / det;
-        var m22 = (this.m00 * this.m11 - this.m01 * this.m10) / det;
-
-        return new Matrix3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }, {
-      key: 'm00',
-      set: function set(val) {
-        this.m[0] = val;
-      },
-      get: function get() {
-        return this.m[0];
-      }
-    }, {
-      key: 'm01',
-      set: function set(val) {
-        this.m[1] = val;
-      },
-      get: function get() {
-        return this.m[1];
-      }
-    }, {
-      key: 'm02',
-      set: function set(val) {
-        this.m[2] = val;
-      },
-      get: function get() {
-        return this.m[2];
-      }
-    }, {
-      key: 'm10',
-      set: function set(val) {
-        this.m[3] = val;
-      },
-      get: function get() {
-        return this.m[3];
-      }
-    }, {
-      key: 'm11',
-      set: function set(val) {
-        this.m[4] = val;
-      },
-      get: function get() {
-        return this.m[4];
-      }
-    }, {
-      key: 'm12',
-      set: function set(val) {
-        this.m[5] = val;
-      },
-      get: function get() {
-        return this.m[5];
-      }
-    }, {
-      key: 'm20',
-      set: function set(val) {
-        this.m[6] = val;
-      },
-      get: function get() {
-        return this.m[6];
-      }
-    }, {
-      key: 'm21',
-      set: function set(val) {
-        this.m[7] = val;
-      },
-      get: function get() {
-        return this.m[7];
-      }
-    }, {
-      key: 'm22',
-      set: function set(val) {
-        this.m[8] = val;
-      },
-      get: function get() {
-        return this.m[8];
-      }
-    }], [{
-      key: 'identity',
-      value: function identity() {
-        return new Matrix3x3(1, 0, 0, 0, 1, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateY',
-      value: function rotateY(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix3x3(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
-      }
-    }, {
-      key: 'zero',
-      value: function zero() {
-        return new Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0);
-      }
-    }, {
-      key: 'transpose',
-      value: function transpose(mat) {
-
-        var mat_t = new Matrix3x3(mat.m00, mat.m10, mat.m20, mat.m01, mat.m11, mat.m21, mat.m02, mat.m12, mat.m22);
-
-        return mat_t;
-      }
-    }, {
-      key: 'multiply',
-      value: function multiply(l_m, r_m) {
-        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20;
-        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20;
-        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20;
-
-        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21;
-        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21;
-        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21;
-
-        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22;
-        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22;
-        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22;
-
-        return new Matrix3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }, {
-      key: 'determinant',
-      value: function determinant(mat) {
-        return mat.m00 * mat.m11 * mat.m22 + mat.m10 * mat.m21 * mat.m02 + mat.m20 * mat.m01 * mat.m12 - mat.m00 * mat.m21 * mat.m12 - mat.m20 * mat.m11 * mat.m02 - mat.m10 * mat.m01 * mat.m22;
-      }
-    }, {
-      key: 'invert',
-      value: function invert(mat) {
-        var det = mat.determinant();
-        var m00 = (mat.m11 * mat.m22 - mat.m12 * mat.m21) / det;
-        var m01 = (mat.m02 * mat.m21 - mat.m01 * mat.m22) / det;
-        var m02 = (mat.m01 * mat.m12 - mat.m02 * mat.m11) / det;
-        var m10 = (mat.m12 * mat.m20 - mat.m10 * mat.m22) / det;
-        var m11 = (mat.m00 * mat.m22 - mat.m02 * mat.m20) / det;
-        var m12 = (mat.m02 * mat.m10 - mat.m00 * mat.m12) / det;
-        var m20 = (mat.m10 * mat.m21 - mat.m11 * mat.m20) / det;
-        var m21 = (mat.m01 * mat.m20 - mat.m00 * mat.m21) / det;
-        var m22 = (mat.m00 * mat.m11 - mat.m01 * mat.m10) / det;
-
-        return new Matrix3x3(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }]);
-    return Matrix3x3;
-  })();
-
-  GLBoost$1["Matrix3x3"] = Matrix3x3;
-
-  var Matrix4x4 = (function () {
-    function Matrix4x4() {
-      babelHelpers.classCallCheck(this, Matrix4x4);
-
-      this.m = [];
-      if (arguments.length >= 16) {
-        this.setComponents.apply(this, arguments);
-      } else {
-        this.identity();
-      }
-    }
-
-    babelHelpers.createClass(Matrix4x4, [{
-      key: 'setComponents',
-      value: function setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-        this.m00 = m00;this.m01 = m01;this.m02 = m02;this.m03 = m03;
-        this.m10 = m10;this.m11 = m11;this.m12 = m12;this.m13 = m13;
-        this.m20 = m20;this.m21 = m21;this.m22 = m22;this.m23 = m23;
-        this.m30 = m30;this.m31 = m31;this.m32 = m32;this.m33 = m33;
-
-        return this;
-      }
-    }, {
-      key: 'clone',
-      value: function clone() {
-        return new Matrix4x4(this.m00, this.m01, this.m02, this.m03, this.m10, this.m11, this.m12, this.m13, this.m20, this.m21, this.m22, this.m23, this.m30, this.m31, this.m32, this.m33);
-      }
-
-      /**
-       * 単位行列にする
-       */
-
-    }, {
-      key: 'identity',
-      value: function identity() {
-        this.setComponents(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        return this;
-      }
-
-      /**
-       * 単位行列にする（static版）
-       */
-
-    }, {
-      key: 'translate',
-      value: function translate(vec) {
-        return this.setComponents(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'scale',
-      value: function scale(vec) {
-        return this.setComponents(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateX',
-
-      /**
-       * Create X oriented Rotation Matrix
-       */
-      value: function rotateX(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create X oriented Rotation Matrix
-      */
-
-    }, {
-      key: 'rotateY',
-
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-      value: function rotateY(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'rotateZ',
-
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-      value: function rotateZ(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'zero',
-
-      /**
-       * ゼロ行列
-       */
-      value: function zero() {
-        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        return this;
-      }
-    }, {
-      key: 'flatten',
-      value: function flatten() {
-        return this.m;
-      }
-    }, {
-      key: '_swap',
-      value: function _swap(l, r) {
-        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-      }
-
-      /**
-       * 転置
-       */
-
-    }, {
-      key: 'transpose',
-      value: function transpose() {
-        this._swap(1, 4);
-        this._swap(2, 8);
-        this._swap(3, 12);
-        this._swap(6, 9);
-        this._swap(7, 13);
-        this._swap(11, 14);
-
-        return this;
-      }
-
-      /**
-       * 転置（static版）
-       */
-
-    }, {
-      key: 'multiplyVector',
-      value: function multiplyVector(vec) {
-        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z + this.m03 * vec.w;
-        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z + this.m13 * vec.w;
-        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
-        var w = this.m30 * vec.x + this.m31 * vec.y + this.m32 * vec.z + this.m33 * vec.w;
-
-        return new Vector4(x, y, z, w);
-      }
-
-      /**
-       * 行列同士の乗算
-       */
-
-    }, {
-      key: 'multiply',
-      value: function multiply(mat) {
-        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20 + this.m03 * mat.m30;
-        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21 + this.m03 * mat.m31;
-        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22 + this.m03 * mat.m32;
-        var m03 = this.m00 * mat.m03 + this.m01 * mat.m13 + this.m02 * mat.m23 + this.m03 * mat.m33;
-
-        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20 + this.m13 * mat.m30;
-        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21 + this.m13 * mat.m31;
-        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22 + this.m13 * mat.m32;
-        var m13 = this.m10 * mat.m03 + this.m11 * mat.m13 + this.m12 * mat.m23 + this.m13 * mat.m33;
-
-        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20 + this.m23 * mat.m30;
-        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21 + this.m23 * mat.m31;
-        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22 + this.m23 * mat.m32;
-        var m23 = this.m20 * mat.m03 + this.m21 * mat.m13 + this.m22 * mat.m23 + this.m23 * mat.m33;
-
-        var m30 = this.m30 * mat.m00 + this.m31 * mat.m10 + this.m32 * mat.m20 + this.m33 * mat.m30;
-        var m31 = this.m30 * mat.m01 + this.m31 * mat.m11 + this.m32 * mat.m21 + this.m33 * mat.m31;
-        var m32 = this.m30 * mat.m02 + this.m31 * mat.m12 + this.m32 * mat.m22 + this.m33 * mat.m32;
-        var m33 = this.m30 * mat.m03 + this.m31 * mat.m13 + this.m32 * mat.m23 + this.m33 * mat.m33;
-
-        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-
-      /**
-       * 行列同士の乗算（static版）
-       */
-
-    }, {
-      key: 'toMatrix3x3',
-      value: function toMatrix3x3() {
-        return new Matrix3x3(this.m00, this.m01, this.m02, this.m10, this.m11, this.m12, this.m20, this.m21, this.m22);
-      }
-    }, {
-      key: 'm00',
-      set: function set(val) {
-        this.m[0] = val;
-      },
-      get: function get() {
-        return this.m[0];
-      }
-    }, {
-      key: 'm01',
-      set: function set(val) {
-        this.m[1] = val;
-      },
-      get: function get() {
-        return this.m[1];
-      }
-    }, {
-      key: 'm02',
-      set: function set(val) {
-        this.m[2] = val;
-      },
-      get: function get() {
-        return this.m[2];
-      }
-    }, {
-      key: 'm03',
-      set: function set(val) {
-        this.m[3] = val;
-      },
-      get: function get() {
-        return this.m[3];
-      }
-    }, {
-      key: 'm10',
-      set: function set(val) {
-        this.m[4] = val;
-      },
-      get: function get() {
-        return this.m[4];
-      }
-    }, {
-      key: 'm11',
-      set: function set(val) {
-        this.m[5] = val;
-      },
-      get: function get() {
-        return this.m[5];
-      }
-    }, {
-      key: 'm12',
-      set: function set(val) {
-        this.m[6] = val;
-      },
-      get: function get() {
-        return this.m[6];
-      }
-    }, {
-      key: 'm13',
-      set: function set(val) {
-        this.m[7] = val;
-      },
-      get: function get() {
-        return this.m[7];
-      }
-    }, {
-      key: 'm20',
-      set: function set(val) {
-        this.m[8] = val;
-      },
-      get: function get() {
-        return this.m[8];
-      }
-    }, {
-      key: 'm21',
-      set: function set(val) {
-        this.m[9] = val;
-      },
-      get: function get() {
-        return this.m[9];
-      }
-    }, {
-      key: 'm22',
-      set: function set(val) {
-        this.m[10] = val;
-      },
-      get: function get() {
-        return this.m[10];
-      }
-    }, {
-      key: 'm23',
-      set: function set(val) {
-        this.m[11] = val;
-      },
-      get: function get() {
-        return this.m[11];
-      }
-    }, {
-      key: 'm30',
-      set: function set(val) {
-        this.m[12] = val;
-      },
-      get: function get() {
-        return this.m[12];
-      }
-    }, {
-      key: 'm31',
-      set: function set(val) {
-        this.m[13] = val;
-      },
-      get: function get() {
-        return this.m[13];
-      }
-    }, {
-      key: 'm32',
-      set: function set(val) {
-        this.m[14] = val;
-      },
-      get: function get() {
-        return this.m[14];
-      }
-    }, {
-      key: 'm33',
-      set: function set(val) {
-        this.m[15] = val;
-      },
-      get: function get() {
-        return this.m[15];
-      }
-    }], [{
-      key: 'identity',
-      value: function identity() {
-        return new Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'translate',
-      value: function translate(vec) {
-        return new Matrix4x4(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'scale',
-      value: function scale(vec) {
-        return new Matrix4x4(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateX',
-      value: function rotateX(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix4x4(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateY',
-      value: function rotateY(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix4x4(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateZ',
-      value: function rotateZ(radian) {
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix4x4(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'zero',
-      value: function zero() {
-        return new Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      }
-    }, {
-      key: 'transpose',
-      value: function transpose(mat) {
-
-        var mat_t = new Matrix4x4(mat.m00, mat.m10, mat.m20, mat.m30, mat.m01, mat.m11, mat.m21, mat.m31, mat.m02, mat.m12, mat.m22, mat.m32, mat.m03, mat.m13, mat.m23, mat.m33);
-
-        return mat_t;
-      }
-    }, {
-      key: 'multiply',
-      value: function multiply(l_m, r_m) {
-        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20 + l_m.m03 * r_m.m30;
-        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20 + l_m.m13 * r_m.m30;
-        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20 + l_m.m23 * r_m.m30;
-        var m30 = l_m.m30 * r_m.m00 + l_m.m31 * r_m.m10 + l_m.m32 * r_m.m20 + l_m.m33 * r_m.m30;
-
-        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21 + l_m.m03 * r_m.m31;
-        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21 + l_m.m13 * r_m.m31;
-        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21 + l_m.m23 * r_m.m31;
-        var m31 = l_m.m30 * r_m.m01 + l_m.m31 * r_m.m11 + l_m.m32 * r_m.m21 + l_m.m33 * r_m.m31;
-
-        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22 + l_m.m03 * r_m.m32;
-        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22 + l_m.m13 * r_m.m32;
-        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22 + l_m.m23 * r_m.m32;
-        var m32 = l_m.m30 * r_m.m02 + l_m.m31 * r_m.m12 + l_m.m32 * r_m.m22 + l_m.m33 * r_m.m32;
-
-        var m03 = l_m.m00 * r_m.m03 + l_m.m01 * r_m.m13 + l_m.m02 * r_m.m23 + l_m.m03 * r_m.m33;
-        var m13 = l_m.m10 * r_m.m03 + l_m.m11 * r_m.m13 + l_m.m12 * r_m.m23 + l_m.m13 * r_m.m33;
-        var m23 = l_m.m20 * r_m.m03 + l_m.m21 * r_m.m13 + l_m.m22 * r_m.m23 + l_m.m23 * r_m.m33;
-        var m33 = l_m.m30 * r_m.m03 + l_m.m31 * r_m.m13 + l_m.m32 * r_m.m23 + l_m.m33 * r_m.m33;
-
-        return new Matrix4x4(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-    }, {
-      key: 'toMatrix3x3',
-      value: function toMatrix3x3(mat) {
-        return new Matrix3x3(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22);
-      }
-    }]);
-    return Matrix4x4;
-  })();
-
-  GLBoost$1["Matrix4x4"] = Matrix4x4;
-
   var Element = (function () {
     function Element() {
       babelHelpers.classCallCheck(this, Element);
@@ -1140,7 +449,7 @@
       this._translate = Vector3.zero();
       this._rotate = Vector3.zero();
       this._scale = new Vector3(1, 1, 1);
-      this._matrix = Matrix4x4.identity();
+      this._matrix = Matrix44.identity();
       this._dirty = false;
     }
 
@@ -1184,8 +493,8 @@
       key: 'transformMatrix',
       get: function get() {
         if (this._dirty) {
-          var matrix = Matrix4x4.identity();
-          this._matrix = matrix.scale(this._scale).rotateX(this._rotate.x).rotateY(this._rotate.y).rotateZ(this._rotate.z).translate(_translate);
+          var matrix = Matrix44.identity();
+          this._matrix = matrix.scale(this._scale).rotateX(this._rotate.x).rotateY(this._rotate.y).rotateZ(this._rotate.z).translate(this._translate);
           this._dirty = false;
           return this._matrix.clone();
         } else {
@@ -2052,7 +1361,7 @@
             }
 
             if (typeof glslProgram.invNormalMatrix !== "undefined") {
-              var in_m = mv_m.toMatrix3x3().invert();
+              var in_m = mv_m.toMatrix33().invert();
               gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
             }
 
@@ -2315,13 +1624,13 @@
     babelHelpers.createClass(Camera, [{
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
-        //    return Matrix4x4.identity();
+        //    return Matrix44.identity();
         return Camera.lookAtRHMatrix(this._translate, this._center, this._up);
       }
     }, {
       key: 'perspectiveRHMatrix',
       value: function perspectiveRHMatrix() {
-        //    return Matrix4x4.identity();
+        //    return Matrix44.identity();
         return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
       }
     }, {
@@ -2398,7 +1707,7 @@
         var s = Vector3.normalize(Vector3.cross(f, up));
         var u = Vector3.cross(s, f);
 
-        return new Matrix4x4(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
+        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
       }
     }, {
       key: 'perspectiveRHMatrix',
@@ -2407,7 +1716,7 @@
         var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
         var xscale = yscale / aspect;
 
-        return new Matrix4x4(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
     }]);
     return Camera;
@@ -3054,231 +2363,6 @@
 
   GLBoost$1["BlendShapeMesh"] = BlendShapeMesh;
 
-  var HalfLambertShaderSource = (function () {
-    function HalfLambertShaderSource() {
-      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
-    }
-
-    babelHelpers.createClass(HalfLambertShaderSource, [{
-      key: 'VSDefine_HalfLambertShaderSource',
-      value: function VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_HalfLambertShaderSource',
-      value: function VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
-        var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_HalfLambertShaderSource',
-      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_HalfLambertShaderSource',
-      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
-        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_HalfLambertShaderSource',
-      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return HalfLambertShaderSource;
-  })();
-
-  var HalfLambertShader = (function (_SimpleShader) {
-    babelHelpers.inherits(HalfLambertShader, _SimpleShader);
-
-    function HalfLambertShader(canvas) {
-      babelHelpers.classCallCheck(this, HalfLambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
-
-      HalfLambertShader.mixin(HalfLambertShaderSource);
-      return _this;
-    }
-
-    return HalfLambertShader;
-  })(SimpleShader);
-
-  var LambertShaderSource = (function () {
-    function LambertShaderSource() {
-      babelHelpers.classCallCheck(this, LambertShaderSource);
-    }
-
-    babelHelpers.createClass(LambertShaderSource, [{
-      key: 'VSDefine_LambertShaderSource',
-      value: function VSDefine_LambertShaderSource(in_, out_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_LambertShaderSource',
-      value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
-        var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_LambertShaderSource',
-      value: function FSDefine_LambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_LambertShaderSource',
-      value: function FSShade_LambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_LambertShaderSource',
-      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return LambertShaderSource;
-  })();
-
-  var LambertShader = (function (_SimpleShader) {
-    babelHelpers.inherits(LambertShader, _SimpleShader);
-
-    function LambertShader(canvas) {
-      babelHelpers.classCallCheck(this, LambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
-
-      LambertShader.mixin(LambertShaderSource);
-      return _this;
-    }
-
-    return LambertShader;
-  })(SimpleShader);
-
   var PhongShaderSource = (function () {
     function PhongShaderSource() {
       babelHelpers.classCallCheck(this, PhongShaderSource);
@@ -3440,6 +2524,231 @@
     return PhongShader;
   })(SimpleShader);
 
+  var LambertShaderSource = (function () {
+    function LambertShaderSource() {
+      babelHelpers.classCallCheck(this, LambertShaderSource);
+    }
+
+    babelHelpers.createClass(LambertShaderSource, [{
+      key: 'VSDefine_LambertShaderSource',
+      value: function VSDefine_LambertShaderSource(in_, out_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+        shaderText += 'uniform mat3 invNormalMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_LambertShaderSource',
+      value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
+        var shaderText = '';
+        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          if (existCamera_f) {
+            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+          } else {
+            shaderText += '  normal = aVertex_normal;\n';
+          }
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_LambertShaderSource',
+      value: function FSDefine_LambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_LambertShaderSource',
+      value: function FSShade_LambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt1;\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt1.a = 1.0;\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_LambertShaderSource',
+      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return LambertShaderSource;
+  })();
+
+  var LambertShader = (function (_SimpleShader) {
+    babelHelpers.inherits(LambertShader, _SimpleShader);
+
+    function LambertShader(canvas) {
+      babelHelpers.classCallCheck(this, LambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
+
+      LambertShader.mixin(LambertShaderSource);
+      return _this;
+    }
+
+    return LambertShader;
+  })(SimpleShader);
+
+  var HalfLambertShaderSource = (function () {
+    function HalfLambertShaderSource() {
+      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
+    }
+
+    babelHelpers.createClass(HalfLambertShaderSource, [{
+      key: 'VSDefine_HalfLambertShaderSource',
+      value: function VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+        shaderText += 'uniform mat3 invNormalMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_HalfLambertShaderSource',
+      value: function VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
+        var shaderText = '';
+        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          if (existCamera_f) {
+            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+          } else {
+            shaderText += '  normal = aVertex_normal;\n';
+          }
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_HalfLambertShaderSource',
+      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_HalfLambertShaderSource',
+      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt1;\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
+        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
+        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt1.a = 1.0;\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_HalfLambertShaderSource',
+      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return HalfLambertShaderSource;
+  })();
+
+  var HalfLambertShader = (function (_SimpleShader) {
+    babelHelpers.inherits(HalfLambertShader, _SimpleShader);
+
+    function HalfLambertShader(canvas) {
+      babelHelpers.classCallCheck(this, HalfLambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
+
+      HalfLambertShader.mixin(HalfLambertShaderSource);
+      return _this;
+    }
+
+    return HalfLambertShader;
+  })(SimpleShader);
+
   var singleton = Symbol();
   var singletonEnforcer = Symbol();
 
@@ -3513,7 +2822,7 @@
           if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
-            materials[iMCount].shader = new HalfLambertShader(canvas);
+            materials[iMCount].shader = new PhongShader(canvas);
             materials[iMCount].name = matchArray[2];
           }
 

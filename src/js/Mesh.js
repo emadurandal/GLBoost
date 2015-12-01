@@ -1,6 +1,6 @@
 import GLBoost from './globals'
 import Element from './Element'
-import Matrix4x4 from './math/Matrix4x4'
+import Matrix44 from './math/Matrix44'
 import Vector4 from './math/Vector4'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
@@ -174,7 +174,7 @@ export default class Mesh extends Element {
         }
 
         if (typeof glslProgram.invNormalMatrix !== "undefined") {
-          var in_m = mv_m.toMatrix3x3().invert();
+          var in_m = mv_m.toMatrix33().invert();
           gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
         }
 
