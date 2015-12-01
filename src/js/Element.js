@@ -55,7 +55,7 @@ export default class Element {
         rotateX(this._rotate.x).
         rotateY(this._rotate.y).
         rotateZ(this._rotate.z).
-        translate(_translate);
+        translate(this._translate);
       this._dirty = false;
       return this._matrix.clone();
     } else {
