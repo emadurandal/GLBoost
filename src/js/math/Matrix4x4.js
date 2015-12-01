@@ -48,6 +48,68 @@ export default class Matrix4x4 {
     );
   }
 
+  translate(vec) {
+    return this.setComponents(
+      1, 0, 0, vec.x,
+      0, 1, 0, vec.y,
+      0, 0, 1, vec.z,
+      0, 0, 0, 1
+    );
+  }
+
+  static translate(vec) {
+    return new Matrix4x4(
+      1, 0, 0, vec.x,
+      0, 1, 0, vec.y,
+      0, 0, 1, vec.z,
+      0, 0, 0, 1
+    );
+  }
+
+  scale(vec) {
+    return this.setComponents(
+      vec.x, 0, 0, 0,
+      0, vec.y, 0, 0,
+      0, 0, vec.z, 0,
+      0, 0, 0, 1
+    );
+  }
+
+  static scale(vec) {
+    return new Matrix4x4(
+      vec.x, 0, 0, 0,
+      0, vec.y, 0, 0,
+      0, 0, vec.z, 0,
+      0, 0, 0, 1
+    );
+  }
+
+  /**
+   * Create X oriented Rotation Matrix
+   */
+  rotateX(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return this.setComponents(
+      1, 0, 0, 0,
+      0, cos, -sin, 0,
+      0, sin, cos, 0,
+      0, 0, 0, 1
+    );
+  }
+  /**
+   * Create X oriented Rotation Matrix
+  */
+  static rotateX(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return new Matrix4x4(
+      1, 0, 0, 0,
+      0, cos, -sin, 0,
+      0, sin, cos, 0,
+      0, 0, 0, 1
+    );
+  }
 
   /**
    * Create Y oriented Rotation Matrix
@@ -55,17 +117,16 @@ export default class Matrix4x4 {
   rotateY(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
-    this.setComponents(
+    return this.setComponents(
       cos, 0, sin, 0,
       0, 1, 0, 0,
       -sin, 0, cos, 0,
       0, 0, 0, 1
     );
-    return this;
   }
   /**
    * Create Y oriented Rotation Matrix
-  */
+   */
   static rotateY(radian) {
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
@@ -73,6 +134,33 @@ export default class Matrix4x4 {
       cos, 0, sin, 0,
       0, 1, 0, 0,
       -sin, 0, cos, 0,
+      0, 0, 0, 1
+    );
+  }
+
+  /**
+   * Create Z oriented Rotation Matrix
+   */
+  rotateZ(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return this.setComponents(
+      cos, -sin, 0, 0,
+      sin, cos, 0, 0,
+      0, 0, 1, 0,
+      0, 0, 0, 1
+    );
+  }
+  /**
+   * Create Z oriented Rotation Matrix
+   */
+  static rotateZ(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return new Matrix4x4(
+      cos, -sin, 0, 0,
+      sin, cos, 0, 0,
+      0, 0, 1, 0,
       0, 0, 0, 1
     );
   }
