@@ -27,13 +27,17 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
 
-        var plane = new GLBoost.Plane(10, 10, new GLBoost.Vector3(1,0,0), layer.canvas);
+        var plane = new GLBoost.Plane(10, 10, new GLBoost.Vector3(1,1,1), layer.canvas);
         //plane.rotate = new GLBoost.Vector3(Math.PI/2, 0, 0);
+        var texture = new GLBoost.Texture('resouces/texture.png', layer.canvas);
+        var material = new GLBoost.ClassicMaterial(layer.canvas);
+        material.diffuseTexture = texture;
+        plane.materials = [material];
         layer.scene.add( plane );
 
         var camera = new GLBoost.Camera(
             {
-              eye: new GLBoost.Vector4(0.0, 1.5, 10.0, 1),
+              eye: new GLBoost.Vector4(0.0, 5, 15.0, 1),
               center: new GLBoost.Vector3(0.0, 0.0, 0.0),
               up: new GLBoost.Vector3(0.0, 1.0, 0.0)
             },
@@ -48,12 +52,12 @@
 
         layer.scene.prepareForRender();
 
-        /*
+
         layer.update = function() {
           var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
           var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           camera.eye = rotatedVector;
-        };*/
+        };
 
 
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
