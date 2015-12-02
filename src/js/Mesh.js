@@ -14,7 +14,7 @@ export default class Mesh extends Element {
     super();
     this._gl = GLContext.getInstance(canvas).gl;
     this._canvas = canvas;
-    this._material = null;
+    this._materials = [];
     this._vertexN = 0;
     this._stride = 0;
     this._glslProgram = null;
@@ -31,10 +31,10 @@ export default class Mesh extends Element {
     for (var attribName in vertices) {
       if (attribName === GLBoost.TEXCOORD) {
         // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-        if ((this._materials[0] !== null) && this._materials[0].diffuseTexture !== null) {
+        if ((this._materials[0] !== void 0) && this._materials[0].diffuseTexture !== null) {
           attribNameArray.push(attribName);
         } else {
-          delete vertices[GLBoost.TEXCOORD];
+          //delete vertices[GLBoost.TEXCOORD];
         }
       } else {
         if (attribName !== 'indices') {// && attribName !== 'normal') {
@@ -91,7 +91,7 @@ export default class Mesh extends Element {
     };
 
     let materials = this._materials;
-    if (materials) {
+    if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
         var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
@@ -161,7 +161,7 @@ export default class Mesh extends Element {
 
     glem.bindVertexArray(gl, this._vao);
 
-    if (materials) {
+    if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         let glslProgram = materials[i].glslProgram;
         gl.useProgram(glslProgram);

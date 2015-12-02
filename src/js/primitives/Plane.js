@@ -4,6 +4,7 @@ import GLContext from './../GLContext'
 import GLExtentionsManager from './../GLExtentionsManager'
 import Mesh from './../Mesh'
 import Vector3 from './../math/Vector3'
+import Vector2 from './../math/Vector2'
 
 export default class Plane extends Mesh {
   constructor(width, height, vertexColor, canvas) {
@@ -30,10 +31,17 @@ export default class Plane extends Mesh {
       new Vector3(vertexColor.x, vertexColor.y, vertexColor.z),
       new Vector3(vertexColor.x, vertexColor.y, vertexColor.z)
     ];
+    var texcoords = [
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0)
+    ];
 
     this.setVerticesData({
       position: positions,
       color: colors,
+      texcoord: texcoords,
       indices: [indices]
     });
   }

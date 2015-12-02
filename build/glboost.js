@@ -1885,7 +1885,7 @@
 
       _this._gl = GLContext.getInstance(canvas).gl;
       _this._canvas = canvas;
-      _this._material = null;
+      _this._materials = [];
       _this._vertexN = 0;
       _this._stride = 0;
       _this._glslProgram = null;
@@ -1906,17 +1906,17 @@
         for (var attribName in vertices) {
           if (attribName === GLBoost$1.TEXCOORD) {
             // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-            if (this._materials[0] !== null && this._materials[0].diffuseTexture !== null) {
+            if (this._materials[0] !== void 0 && this._materials[0].diffuseTexture !== null) {
               attribNameArray.push(attribName);
             } else {
-              delete vertices[GLBoost$1.TEXCOORD];
+              //delete vertices[GLBoost.TEXCOORD];
             }
           } else {
-            if (attribName !== 'indices') {
-              // && attribName !== 'normal') {
-              attribNameArray.push(attribName);
+              if (attribName !== 'indices') {
+                // && attribName !== 'normal') {
+                attribNameArray.push(attribName);
+              }
             }
-          }
         }
 
         return attribNameArray;
@@ -1971,7 +1971,7 @@
         };
 
         var materials = this._materials;
-        if (materials) {
+        if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             // GLSLプログラム作成。
             var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
@@ -2040,7 +2040,7 @@
 
         glem.bindVertexArray(gl, this._vao);
 
-        if (materials) {
+        if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             var glslProgram = materials[i].glslProgram;
             gl.useProgram(glslProgram);
@@ -3834,10 +3834,12 @@
 
         var positions = [new Vector3(-halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, halfHeight), new Vector3(-halfWidth, 0, halfHeight)];
         var colors = [new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z)];
+        var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
 
         this.setVerticesData({
           position: positions,
           color: colors,
+          texcoord: texcoords,
           indices: [indices]
         });
       }
