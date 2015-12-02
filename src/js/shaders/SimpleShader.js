@@ -4,7 +4,7 @@ export class SimpleShaderSource {
   VSDefine_SimpleShaderSource(in_, out_, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
-      shaderText += `${in_} vec3 aVertex_color;\n`;
+      shaderText += `${in_} vec4 aVertex_color;\n`;
       shaderText += `${out_} vec4 color;\n`;
     }
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -17,7 +17,7 @@ export class SimpleShaderSource {
   VSTransform_SimpleShaderSource(existCamera_f, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
-      shaderText += '  color = vec4(aVertex_color, 1.0);\n';
+      shaderText += '  color = aVertex_color;\n';
     }
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  texcoord = aVertex_texcoord;\n';

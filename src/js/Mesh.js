@@ -75,7 +75,7 @@ export default class Mesh extends Element {
 
       this._stride = 0;
       optimizedVertexAttribs.forEach((attribName)=> {
-        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
+        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
         this._stride += numberOfComponentOfVector * 4;
       });
 
@@ -83,7 +83,7 @@ export default class Mesh extends Element {
       var offset = 0;
       optimizedVertexAttribs.forEach((attribName)=> {
         gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : 3;
+        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
           numberOfComponentOfVector, gl.FLOAT, gl.FALSE, this._stride, offset);
         offset += numberOfComponentOfVector * 4;
@@ -116,6 +116,9 @@ export default class Mesh extends Element {
         if (element.z !== void 0) {
           vertexData.push(element.z);
         }
+        if (element.w !== void 0) {
+          vertexData.push(element.w);
+        }
       });
     });
 
@@ -136,7 +139,7 @@ export default class Mesh extends Element {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       }
     }
-    glem.bindVertexArray(gl, null)
+    glem.bindVertexArray(gl, null);
 
     this._vao = vao;
 

@@ -1788,7 +1788,7 @@
       value: function VSDefine_SimpleShaderSource(in_, out_, f) {
         var shaderText = '';
         if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec3 aVertex_color;\n';
+          shaderText += in_ + ' vec4 aVertex_color;\n';
           shaderText += out_ + ' vec4 color;\n';
         }
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -1802,7 +1802,7 @@
       value: function VSTransform_SimpleShaderSource(existCamera_f, f) {
         var shaderText = '';
         if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  color = vec4(aVertex_color, 1.0);\n';
+          shaderText += '  color = aVertex_color;\n';
         }
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  texcoord = aVertex_texcoord;\n';
@@ -1956,7 +1956,7 @@
 
           _this2._stride = 0;
           optimizedVertexAttribs.forEach(function (attribName) {
-            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
+            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
             _this2._stride += numberOfComponentOfVector * 4;
           });
 
@@ -1964,7 +1964,7 @@
           var offset = 0;
           optimizedVertexAttribs.forEach(function (attribName) {
             gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : 3;
+            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
             gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], numberOfComponentOfVector, gl.FLOAT, gl.FALSE, _this2._stride, offset);
             offset += numberOfComponentOfVector * 4;
           });
@@ -1995,6 +1995,9 @@
             vertexData.push(element.y);
             if (element.z !== void 0) {
               vertexData.push(element.z);
+            }
+            if (element.w !== void 0) {
+              vertexData.push(element.w);
             }
           });
         });
