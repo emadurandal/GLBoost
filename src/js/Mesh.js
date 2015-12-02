@@ -225,7 +225,7 @@ export default class Mesh extends Element {
       gl.useProgram(this._glslProgram);
 
       if (viewMatrix && projectionMatrix) {
-        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._matrix);
+        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
       }
 
