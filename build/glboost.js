@@ -1435,7 +1435,7 @@
     }, {
       key: 'FSShading',
       value: function FSShading(f, gl) {
-        var shaderText = 'rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        var shaderText = 'rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n';
         return shaderText;
       }
     }, {
@@ -1827,10 +1827,11 @@
       value: function FSShade_SimpleShaderSource(f, gl) {
         var shaderText = '';
         var textureFunc = Shader._texture_func(gl);
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += '  rt1 = ' + textureFunc + '(uTexture, texcoord);\n';
-        } else if (Shader._exist(f, GLBoost.COLOR)) {
+        if (Shader._exist(f, GLBoost.COLOR)) {
           shaderText += '  rt1 = color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += '  rt1 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
         return shaderText;
       }
@@ -2103,7 +2104,7 @@
           gl.useProgram(this._glslProgram);
 
           if (viewMatrix && projectionMatrix) {
-            var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._matrix);
+            var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
             gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
           }
 
@@ -3808,5 +3809,39 @@
 
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
   GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
+
+  var Plane = (function (_Mesh) {
+    babelHelpers.inherits(Plane, _Mesh);
+
+    function Plane(width, height, vertexColor, canvas) {
+      babelHelpers.classCallCheck(this, Plane);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
+
+      _this._setupVertexData(width / 2.0, height / 2.0, vertexColor);
+      return _this;
+    }
+
+    babelHelpers.createClass(Plane, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(halfWidth, halfHeight, vertexColor) {
+        var indices = [
+        //0, 1, 3, 3, 1, 2
+        3, 1, 0, 2, 1, 3];
+
+        var positions = [new Vector3(-halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, halfHeight), new Vector3(-halfWidth, 0, halfHeight)];
+        var colors = [new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z)];
+
+        this.setVerticesData({
+          position: positions,
+          color: colors,
+          indices: [indices]
+        });
+      }
+    }]);
+    return Plane;
+  })(Mesh);
+
+  GLBoost$1["Plane"] = Plane;
 
 }));

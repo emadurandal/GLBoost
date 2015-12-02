@@ -40,10 +40,11 @@ export class SimpleShaderSource {
   FSShade_SimpleShaderSource(f, gl) {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += `  rt1 = ${textureFunc}(uTexture, texcoord);\n`;
-    } else if (Shader._exist(f, GLBoost.COLOR)) {
+    if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt1 = color;\n';
+    }
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += `  rt1 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
     return shaderText;
   }

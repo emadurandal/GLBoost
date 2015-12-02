@@ -70,15 +70,6 @@
           new tm.geom.Vector3(0.5, -1.0, 0.0),
           new tm.geom.Vector3(0.5,  1.0, 0.0)
         ];
-      var colors = [
-          new tm.geom.Vector3(1.0, 0.0, 0.0),
-          new tm.geom.Vector3(0.0, 1.0, 0.0),
-          new tm.geom.Vector3(0.0, 0.0, 1.0),
-
-          new tm.geom.Vector3(1.0, 0.0, 0.0),
-          new tm.geom.Vector3(0.0, 1.0, 0.0),
-          new tm.geom.Vector3(0.0, 0.0, 1.0)
-        ];
       var texcoords = [
           new tm.geom.Vector2(0.0, 0.0),
           new tm.geom.Vector2(1.0, 0.0),
@@ -96,7 +87,6 @@
       mesh.materials = [material];
       mesh.setVerticesData({
         position: positions,
-        color: colors,
         texcoord: texcoords,
         shapetarget_1: shapetarget_1,
         shapetarget_2: shapetarget_2

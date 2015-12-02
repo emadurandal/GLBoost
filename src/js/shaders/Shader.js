@@ -251,7 +251,7 @@ export default class Shader {
   }
 
   FSShading(f, gl) {
-    var shaderText =   `rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n`;
+    var shaderText =   `rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n`;
     return shaderText;
   }
 
