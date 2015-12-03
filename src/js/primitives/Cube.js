@@ -122,9 +122,43 @@ export default class Cube extends Mesh {
       new Vector2(0.0, 1.0)
     ];
 
+    var normals = [
+      // upper
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      // lower
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      // front
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      // back
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      // right
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      // left
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+    ];
+
     this.setVerticesData({
       position: positions,
       color: colors,
+      normal: normals,
       texcoord: texcoords,
       indices: [indices]
     });

@@ -143,3 +143,5 @@ export default class PhongShader extends SimpleShader {
     return this._power;
   }
 }
+
+GLBoost["PhongShader"] = PhongShader;

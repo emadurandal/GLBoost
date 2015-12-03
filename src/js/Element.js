@@ -51,16 +51,20 @@ export default class Element {
   get transformMatrix() {
     if (this._dirty) {
       var matrix = Matrix44.identity();
-      this._matrix = matrix.scale(this._scale).
-        rotateX(this._rotate.x).
-        rotateY(this._rotate.y).
-        rotateZ(this._rotate.z).
-        translate(this._translate);
+      this._matrix = matrix.multiply(Matrix44.scale(this._scale)).
+        multiply(Matrix44.rotateX(this._rotate.x)).
+        multiply(Matrix44.rotateY(this._rotate.y)).
+        multiply(Matrix44.rotateZ(this._rotate.z)).
+        multiply(Matrix44.translate(this._translate));
       this._dirty = false;
       return this._matrix.clone();
     } else {
       return this._matrix.clone();
     }
+  }
+
+  set dirty(flg) {
+    this._dirty = flg;
   }
 }
 
