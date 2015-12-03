@@ -13,6 +13,7 @@ export default class ClassicMaterial {
     this._name = "";
     this._faceN = 0;
     this._shader = new SimpleShader(canvas);
+    this._meshes = {};
   }
 
   set shader(shader) {
@@ -62,13 +63,22 @@ export default class ClassicMaterial {
   get name() {
     return this._name;
   }
-
+  /*
   set faceN(num) {
     this._faceN = num;
   }
 
   get faceN() {
     return this._faceN;
+  }
+  */
+
+  setFaceN(mesh, num) {
+    this._meshes[mesh] = num;
+  }
+
+  getFaceN(mesh) {
+    return (typeof this._meshes[mesh] === "undefined") ? 0 : this._meshes[mesh];
   }
 
   setUp() {

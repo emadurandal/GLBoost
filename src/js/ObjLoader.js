@@ -84,7 +84,7 @@ export default class ObjLoader {
       {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
-        materials[iMCount].shader = new PhongShader(canvas);
+        materials[iMCount].shader = new HalfLambertShader(canvas);
         materials[iMCount].name = matchArray[2];
       }
 
@@ -236,6 +236,8 @@ export default class ObjLoader {
     fCount = 0;
     var partFCount = 0;
 
+    var mesh = new Mesh(canvas);
+
     for(let i=0; i<this._materials.length; i++) {
       partFCount = 0;
 
@@ -353,13 +355,13 @@ export default class ObjLoader {
           continue;
       }
 
-      this._materials[i].faceN = partFCount;
+      this._materials[i].setFaceN(mesh, partFCount);
 
       indices[i] = iFaceBufferArray.concat();
 
     }
 
-    var mesh = new Mesh(canvas);
+
     mesh.materials = this._materials;
     mesh.setVerticesData({
       position: positions,

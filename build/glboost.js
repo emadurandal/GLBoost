@@ -2023,11 +2023,11 @@
         this._vao = vao;
 
         // if this mesh has only one material...
-        if (this._materials && this._materials.length === 1 && this._materials[0].faceN === 0) {
+        if (this._materials && this._materials.length === 1 && this._materials[0].getFaceN(this) === 0) {
           if (vertices.indices && vertices.indices.length > 0) {
-            this._materials[0].faceN = vertices.indices[0].length / 3;
+            this._materials[0].setFaceN(this, vertices.indices[0].length / 3);
           } else {
-            this._materials[0].faceN = this._vertexN / 3;
+            this._materials[0].setFaceN(this, this._vertexN / 3);
           }
         }
       }
@@ -2093,7 +2093,7 @@
 
             if (this._indicesBuffers.length > 0) {
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
-              gl.drawElements(gl.TRIANGLES, materials[i].faceN * 3, gl.UNSIGNED_SHORT, 0);
+              gl.drawElements(gl.TRIANGLES, materials[i].getFaceN(this) * 3, gl.UNSIGNED_SHORT, 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
               gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
@@ -2691,9 +2691,30 @@
       this._name = "";
       this._faceN = 0;
       this._shader = new SimpleShader(canvas);
+      this._meshes = {};
     }
 
     babelHelpers.createClass(ClassicMaterial, [{
+      key: 'setFaceN',
+
+      /*
+      set faceN(num) {
+        this._faceN = num;
+      }
+       get faceN() {
+        return this._faceN;
+      }
+      */
+
+      value: function setFaceN(mesh, num) {
+        this._meshes[mesh] = num;
+      }
+    }, {
+      key: 'getFaceN',
+      value: function getFaceN(mesh) {
+        return typeof this._meshes[mesh] === "undefined" ? 0 : this._meshes[mesh];
+      }
+    }, {
       key: 'setUp',
       value: function setUp() {
         var gl = this._gl;
@@ -2757,14 +2778,6 @@
       },
       get: function get() {
         return this._name;
-      }
-    }, {
-      key: 'faceN',
-      set: function set(num) {
-        this._faceN = num;
-      },
-      get: function get() {
-        return this._faceN;
       }
     }]);
     return ClassicMaterial;
@@ -3058,6 +3071,231 @@
 
   GLBoost$1["BlendShapeMesh"] = BlendShapeMesh;
 
+  var HalfLambertShaderSource = (function () {
+    function HalfLambertShaderSource() {
+      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
+    }
+
+    babelHelpers.createClass(HalfLambertShaderSource, [{
+      key: 'VSDefine_HalfLambertShaderSource',
+      value: function VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+        shaderText += 'uniform mat3 invNormalMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_HalfLambertShaderSource',
+      value: function VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
+        var shaderText = '';
+        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          if (existCamera_f) {
+            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+          } else {
+            shaderText += '  normal = aVertex_normal;\n';
+          }
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_HalfLambertShaderSource',
+      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_HalfLambertShaderSource',
+      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt1;\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
+        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
+        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt1.a = 1.0;\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_HalfLambertShaderSource',
+      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return HalfLambertShaderSource;
+  })();
+
+  var HalfLambertShader = (function (_SimpleShader) {
+    babelHelpers.inherits(HalfLambertShader, _SimpleShader);
+
+    function HalfLambertShader(canvas) {
+      babelHelpers.classCallCheck(this, HalfLambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
+
+      HalfLambertShader.mixin(HalfLambertShaderSource);
+      return _this;
+    }
+
+    return HalfLambertShader;
+  })(SimpleShader);
+
+  var LambertShaderSource = (function () {
+    function LambertShaderSource() {
+      babelHelpers.classCallCheck(this, LambertShaderSource);
+    }
+
+    babelHelpers.createClass(LambertShaderSource, [{
+      key: 'VSDefine_LambertShaderSource',
+      value: function VSDefine_LambertShaderSource(in_, out_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+        shaderText += 'uniform mat3 invNormalMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_LambertShaderSource',
+      value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
+        var shaderText = '';
+        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          if (existCamera_f) {
+            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
+          } else {
+            shaderText += '  normal = aVertex_normal;\n';
+          }
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_LambertShaderSource',
+      value: function FSDefine_LambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_LambertShaderSource',
+      value: function FSShade_LambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt1;\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt1.a = 1.0;\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_LambertShaderSource',
+      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return LambertShaderSource;
+  })();
+
+  var LambertShader = (function (_SimpleShader) {
+    babelHelpers.inherits(LambertShader, _SimpleShader);
+
+    function LambertShader(canvas) {
+      babelHelpers.classCallCheck(this, LambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
+
+      LambertShader.mixin(LambertShaderSource);
+      return _this;
+    }
+
+    return LambertShader;
+  })(SimpleShader);
+
   var PhongShaderSource = (function () {
     function PhongShaderSource() {
       babelHelpers.classCallCheck(this, PhongShaderSource);
@@ -3219,231 +3457,6 @@
     return PhongShader;
   })(SimpleShader);
 
-  var LambertShaderSource = (function () {
-    function LambertShaderSource() {
-      babelHelpers.classCallCheck(this, LambertShaderSource);
-    }
-
-    babelHelpers.createClass(LambertShaderSource, [{
-      key: 'VSDefine_LambertShaderSource',
-      value: function VSDefine_LambertShaderSource(in_, out_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_LambertShaderSource',
-      value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
-        var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_LambertShaderSource',
-      value: function FSDefine_LambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_LambertShaderSource',
-      value: function FSShade_LambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_LambertShaderSource',
-      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return LambertShaderSource;
-  })();
-
-  var LambertShader = (function (_SimpleShader) {
-    babelHelpers.inherits(LambertShader, _SimpleShader);
-
-    function LambertShader(canvas) {
-      babelHelpers.classCallCheck(this, LambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
-
-      LambertShader.mixin(LambertShaderSource);
-      return _this;
-    }
-
-    return LambertShader;
-  })(SimpleShader);
-
-  var HalfLambertShaderSource = (function () {
-    function HalfLambertShaderSource() {
-      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
-    }
-
-    babelHelpers.createClass(HalfLambertShaderSource, [{
-      key: 'VSDefine_HalfLambertShaderSource',
-      value: function VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_HalfLambertShaderSource',
-      value: function VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
-        var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_HalfLambertShaderSource',
-      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_HalfLambertShaderSource',
-      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
-        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_HalfLambertShaderSource',
-      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return HalfLambertShaderSource;
-  })();
-
-  var HalfLambertShader = (function (_SimpleShader) {
-    babelHelpers.inherits(HalfLambertShader, _SimpleShader);
-
-    function HalfLambertShader(canvas) {
-      babelHelpers.classCallCheck(this, HalfLambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
-
-      HalfLambertShader.mixin(HalfLambertShaderSource);
-      return _this;
-    }
-
-    return HalfLambertShader;
-  })(SimpleShader);
-
   var singleton = Symbol();
   var singletonEnforcer = Symbol();
 
@@ -3517,7 +3530,7 @@
           if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
-            materials[iMCount].shader = new PhongShader(canvas);
+            materials[iMCount].shader = new HalfLambertShader(canvas);
             materials[iMCount].name = matchArray[2];
           }
 
@@ -3658,6 +3671,8 @@
         fCount = 0;
         var partFCount = 0;
 
+        var mesh = new Mesh(canvas);
+
         for (var i = 0; i < this._materials.length; i++) {
           partFCount = 0;
 
@@ -3780,12 +3795,11 @@
               continue;
             }
 
-          this._materials[i].faceN = partFCount;
+          this._materials[i].setFaceN(mesh, partFCount);
 
           indices[i] = iFaceBufferArray.concat();
         }
 
-        var mesh = new Mesh(canvas);
         mesh.materials = this._materials;
         mesh.setVerticesData({
           position: positions,
@@ -3821,6 +3835,8 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
 
+      Plane._instanceCount = typeof Plane._instanceCount === "undefined" ? 0 : Plane._instanceCount + 1;
+
       _this._setupVertexData(width / 2.0, height / 2.0, vertexColor);
       return _this;
     }
@@ -3828,9 +3844,7 @@
     babelHelpers.createClass(Plane, [{
       key: '_setupVertexData',
       value: function _setupVertexData(halfWidth, halfHeight, vertexColor) {
-        var indices = [
-        //0, 1, 3, 3, 1, 2
-        3, 1, 0, 2, 1, 3];
+        var indices = [3, 1, 0, 2, 1, 3];
 
         var positions = [new Vector3(-halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, halfHeight), new Vector3(-halfWidth, 0, halfHeight)];
         var colors = [new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z), new Vector3(vertexColor.x, vertexColor.y, vertexColor.z)];
@@ -3843,10 +3857,56 @@
           indices: [indices]
         });
       }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return 'Plane_' + Plane._instanceCount;
+      }
     }]);
     return Plane;
   })(Mesh);
 
   GLBoost$1["Plane"] = Plane;
+
+  var Cube = (function (_Mesh) {
+    babelHelpers.inherits(Cube, _Mesh);
+
+    function Cube(widthVector, vertexColor, canvas) {
+      babelHelpers.classCallCheck(this, Cube);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Cube).call(this, canvas));
+
+      Cube._instanceCount = typeof Cube._instanceCount === "undefined" ? 0 : Cube._instanceCount + 1;
+
+      _this._setupVertexData(widthVector.divide(2.0), vertexColor);
+      return _this;
+    }
+
+    babelHelpers.createClass(Cube, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(widthVector, vertexColor) {
+        var indices = [3, 1, 0, 2, 1, 3, 4, 5, 7, 7, 5, 6];
+
+        var positions = [new Vector3(-widthVector.x, widthVector.y, -widthVector.z), new Vector3(widthVector.x, widthVector.y, -widthVector.z), new Vector3(widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, widthVector.z), new Vector3(-widthVector.x, -widthVector.y, widthVector.z)];
+        var colors = [new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, 1.0)];
+        var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
+
+        this.setVerticesData({
+          position: positions,
+          color: colors,
+          texcoord: texcoords,
+          indices: [indices]
+        });
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return 'Cube_' + Cube._instanceCount;
+      }
+    }]);
+    return Cube;
+  })(Mesh);
+
+  GLBoost$1["Cube"] = Cube;
 
 }));

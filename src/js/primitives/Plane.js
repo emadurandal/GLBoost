@@ -10,12 +10,13 @@ export default class Plane extends Mesh {
   constructor(width, height, vertexColor, canvas) {
     super(canvas);
 
+    Plane._instanceCount = (typeof Plane._instanceCount === "undefined") ? 0 : (Plane._instanceCount + 1);
+
     this._setupVertexData(width/2.0, height/2.0, vertexColor);
   }
 
   _setupVertexData(halfWidth, halfHeight, vertexColor) {
     var indices = [
-      //0, 1, 3, 3, 1, 2
       3, 1, 0, 2, 1, 3
     ];
 
@@ -44,6 +45,10 @@ export default class Plane extends Mesh {
       texcoord: texcoords,
       indices: [indices]
     });
+  }
+
+  toString() {
+    return 'Plane_' + Plane._instanceCount;
   }
 
 }

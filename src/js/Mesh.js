@@ -144,11 +144,11 @@ export default class Mesh extends Element {
     this._vao = vao;
 
     // if this mesh has only one material...
-    if (this._materials && this._materials.length === 1 && this._materials[0].faceN === 0) {
+    if (this._materials && this._materials.length === 1 && this._materials[0].getFaceN(this) === 0) {
       if (vertices.indices && vertices.indices.length > 0) {
-        this._materials[0].faceN = vertices.indices[0].length / 3;
+        this._materials[0].setFaceN(this, vertices.indices[0].length / 3);
       } else {
-        this._materials[0].faceN = this._vertexN / 3;
+        this._materials[0].setFaceN(this,this._vertexN / 3);
       }
     }
 
@@ -214,7 +214,7 @@ export default class Mesh extends Element {
 
         if (this._indicesBuffers.length > 0) {
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
-          gl.drawElements(gl.TRIANGLES, materials[i].faceN*3, gl.UNSIGNED_SHORT, 0);
+          gl.drawElements(gl.TRIANGLES, materials[i].getFaceN(this)*3, gl.UNSIGNED_SHORT, 0);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         } else {
           gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
