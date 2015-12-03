@@ -3,6 +3,7 @@ import Element from './../Element'
 import GLContext from './../GLContext'
 import GLExtentionsManager from './../GLExtentionsManager'
 import Mesh from './../Mesh'
+import Vector4 from './../math/Vector4'
 import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'
 
@@ -27,10 +28,10 @@ export default class Plane extends Mesh {
       new Vector3(-halfWidth, 0, halfHeight)
     ];
     var colors = [
-      new Vector3(vertexColor.x, vertexColor.y, vertexColor.z),
-      new Vector3(vertexColor.x, vertexColor.y, vertexColor.z),
-      new Vector3(vertexColor.x, vertexColor.y, vertexColor.z),
-      new Vector3(vertexColor.x, vertexColor.y, vertexColor.z)
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
     ];
     var texcoords = [
       new Vector2(0.0, 0.0),
