@@ -334,17 +334,49 @@ export default class Shader {
     return shaderProgram;
   }
 
+  createHashValue(text) {
+    var first = text.charCodeAt(0);
+    var middle = text.charCodeAt(Math.floor(text.length/2));
+    var last = text.charCodeAt(text.length - 1);
+    return '' + (first*middle*last) + text.length;
+  }
+
   getShaderProgram(vertexAttribs, existCamera_f, lights) {
     var gl = this._gl;
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
-    var shaderProgram = this._initShaders(gl,
-      this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights),
-      this._getFragmentShaderString(gl, vertexAttribs, lights)
-    );
+    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights);
 
+    // lookup shaderHashTable
+    var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
+    var hash = this.createHashValue(baseText);
+    if (hash in Shader._shaderHashTable) {
+      if (Shader._shaderHashTable[hash].code === baseText) {
+        return Shader._shaderHashTable[hash].program;
+      } else {
+        for (let i=0; i<Shader._shaderHashTable[hash].collisionN; i++) {
+          if (Shader._shaderHashTable[hash + '_' + i].code === baseText) {
+            return Shader._shaderHashTable[hash + '_' + i].program;
+          }
+        }
+        Shader._shaderHashTable[hash].collisionN++;
+      }
+    }
+
+    // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
+    var shaderProgram = this._initShaders(gl, vertexShaderText, fragmentShaderText);
     shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
+
+    // register it to shaderHashTable.
+    var indexStr = null;
+    if (typeof Shader._shaderHashTable[hash] !== "undefined" && Shader._shaderHashTable[hash].collisionN > 0) {
+      indexStr = hash + '_' + Shader._shaderHashTable[hash].collisionN;
+    } else {
+      indexStr = hash;
+    }
+    Shader._shaderHashTable[indexStr] = {code:baseText, program:shaderProgram, collisionN:0};
 
     return shaderProgram;
   }
@@ -396,3 +428,4 @@ export default class Shader {
 }
 
 Shader._instances = new Object();
+Shader._shaderHashTable = {};
