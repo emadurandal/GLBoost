@@ -23,15 +23,25 @@ GLBoostはWebGLライブラリです。
 WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の幅を制約することのない、
 3Dグラフィックス開発の玄人向けのライブラリを目指しています。
 
+## Key features
+
+* ECMAScript 2015 based library (using Babel)
+* Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
+
 ## Roadmap
 
 ### Coming Soon
 
 * Custom Shaders
 * Allow access to WebGL Context and Resources
+* Safari/iOS Safari Support
 
 ### Near Future
 
 * Physically Based Rendering
 * Both Forward Rendering and Deferred Rendering Support
 * High-level API for beginners
+
+## LICENSE
+
+This library is released under the MIT License, see `LICENSE` file.
