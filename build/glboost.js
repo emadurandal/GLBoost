@@ -477,6 +477,21 @@
        */
 
     }, {
+      key: 'rotateX',
+
+      /**
+       * Create X oriented Rotation Matrix
+       */
+      value: function rotateX(radian) {
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(1, 0, 0, 0, cos, -sin, 0, sin, cos);
+      }
+      /**
+       * Create X oriented Rotation Matrix
+       */
+
+    }, {
       key: 'rotateY',
 
       /**
@@ -490,6 +505,21 @@
       }
       /**
        * Create Y oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'rotateZ',
+
+      /**
+       * Create Z oriented Rotation Matrix
+       */
+      value: function rotateZ(radian) {
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+      }
+      /**
+       * Create Z oriented Rotation Matrix
        */
 
     }, {
@@ -666,11 +696,25 @@
         return new Matrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
       }
     }, {
+      key: 'rotateX',
+      value: function rotateX(radian) {
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix33(1, 0, 0, 0, cos, -sin, 0, sin, cos);
+      }
+    }, {
       key: 'rotateY',
       value: function rotateY(radian) {
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix33(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
+      }
+    }, {
+      key: 'rotateZ',
+      value: function rotateZ(radian) {
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix33(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
       }
     }, {
       key: 'zero',

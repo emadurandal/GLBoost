@@ -44,6 +44,30 @@ export default class Matrix33 {
     );
   }
 
+  /**
+   * Create X oriented Rotation Matrix
+   */
+  rotateX(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return this.setComponents(
+      1, 0, 0,
+      0, cos, -sin,
+      0, sin, cos
+    );
+  }
+  /**
+   * Create X oriented Rotation Matrix
+   */
+  static rotateX(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return new Matrix33(
+      1, 0, 0,
+      0, cos, -sin,
+      0, sin, cos
+    );
+  }
 
   /**
    * Create Y oriented Rotation Matrix
@@ -68,6 +92,31 @@ export default class Matrix33 {
       cos, 0, sin,
       0, 1, 0,
       -sin, 0, cos
+    );
+  }
+
+  /**
+   * Create Z oriented Rotation Matrix
+   */
+  rotateZ(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return this.setComponents(
+      cos, -sin, 0,
+      sin, cos, 0,
+      0, 0, 1
+    );
+  }
+  /**
+   * Create Z oriented Rotation Matrix
+   */
+  static rotateZ(radian) {
+    var cos = Math.cos(radian);
+    var sin = Math.sin(radian);
+    return new Matrix33(
+      cos, -sin, 0,
+      sin, cos, 0,
+      0, 0, 1
     );
   }
 
