@@ -1846,7 +1846,7 @@
     }, {
       key: "drawBuffers",
       value: function drawBuffers(gl, buffers) {
-        return this._extDBs ? this.extDBs.drawBuffersWEBGL(buffers) : gl.drawBuffers(buffers);
+        return this._extDBs ? this.extDBs.drawBuffersWEBGL(buffers) : false;
       }
     }, {
       key: "colorAttachiment",

@@ -43,7 +43,7 @@ export default class GLExtentionsManager {
   drawBuffers(gl, buffers) {
     return this._extDBs ?
       this.extDBs.drawBuffersWEBGL(buffers) :
-      gl.drawBuffers(buffers);
+      false;
   }
 
   colorAttachiment(gl, index) {
