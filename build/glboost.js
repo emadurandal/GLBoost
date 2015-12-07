@@ -1822,10 +1822,10 @@
       }
 
       this._extVAO = gl.getExtension("OES_vertex_array_object");
-      if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
-        throw new Error("OES_vertex_array_objectをサポートしていません");
-      }
-
+      /*    if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
+              throw new Error("OES_vertex_array_objectをサポートしていません");
+          }
+      */
       this._extDBs = gl.getExtension("WEBGL_draw_buffers");
       //    if (!this._extDBs)
       //      throw("WEBGL_draw_buffersをサポートしていません");
@@ -1836,12 +1836,26 @@
     babelHelpers.createClass(GLExtentionsManager, [{
       key: "createVertexArray",
       value: function createVertexArray(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? gl.createVertexArray() : this._extVAO.createVertexArrayOES();
+        if (GLBoost.isThisGLVersion_2(gl)) {
+          return gl.createVertexArray();
+        } else if (this._extVAO) {
+          return this._extVAO.createVertexArrayOES();
+        } else {
+          return null;
+        }
       }
     }, {
       key: "bindVertexArray",
       value: function bindVertexArray(gl, vao) {
-        return GLBoost.isThisGLVersion_2(gl) ? gl.bindVertexArray(vao) : this._extVAO.bindVertexArrayOES(vao);
+        if (GLBoost.isThisGLVersion_2(gl)) {
+          gl.bindVertexArray(vao);
+          return true;
+        } else if (this._extVAO) {
+          this._extVAO.bindVertexArrayOES(vao);
+          return true;
+        } else {
+          return false;
+        }
       }
     }, {
       key: "drawBuffers",
@@ -1986,6 +2000,7 @@
       _this._stride = 0;
       _this._glslProgram = null;
       _this._vertices = null;
+      _this._vertexAttribComponentNDic = {};
       _this._shader_for_non_material = new SimpleShader(_this._canvas);
       return _this;
     }
@@ -2028,9 +2043,29 @@
         this._vertices = vertices;
       }
     }, {
+      key: 'setUpVertexAttribs',
+      value: function setUpVertexAttribs(gl, glslProgram) {
+        var _this2 = this;
+
+        var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+        this._stride = 0;
+        optimizedVertexAttribs.forEach(function (attribName) {
+          _this2._stride += _this2._vertexAttribComponentNDic[attribName] * 4;
+        });
+
+        // 頂点レイアウト設定
+        var offset = 0;
+        optimizedVertexAttribs.forEach(function (attribName) {
+          gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+          gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this2._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, _this2._stride, offset);
+          offset += _this2._vertexAttribComponentNDic[attribName] * 4;
+        });
+      }
+    }, {
       key: 'prepareForRender',
       value: function prepareForRender(existCamera_f, lights) {
-        var _this2 = this;
+        var _this3 = this;
 
         var vertices = this._vertices;
         var gl = this._gl;
@@ -2039,44 +2074,29 @@
 
         var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
 
+        optimizedVertexAttribs.forEach(function (attribName) {
+          _this3._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
+        });
+
         // create VAO
         var vao = glem.createVertexArray(gl);
         glem.bindVertexArray(gl, vao);
 
         // create VBO
-        var verticesBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
-
-        var setVerticesLayout = function setVerticesLayout(glslProgram) {
-          optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-
-          _this2._stride = 0;
-          optimizedVertexAttribs.forEach(function (attribName) {
-            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
-            _this2._stride += numberOfComponentOfVector * 4;
-          });
-
-          // 頂点レイアウト設定
-          var offset = 0;
-          optimizedVertexAttribs.forEach(function (attribName) {
-            gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-            var numberOfComponentOfVector = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], numberOfComponentOfVector, gl.FLOAT, gl.FALSE, _this2._stride, offset);
-            offset += numberOfComponentOfVector * 4;
-          });
-        };
+        this._vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
 
         var materials = this._materials;
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             // GLSLプログラム作成。
             var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
-            setVerticesLayout(glslProgram);
+            this.setUpVertexAttribs(gl, glslProgram);
             materials[i].glslProgram = glslProgram;
           }
         } else {
           var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
-          setVerticesLayout(glslProgram);
+          this.setUpVertexAttribs(gl, glslProgram);
           this._glslProgram = glslProgram;
         }
 
@@ -2134,12 +2154,17 @@
         var glem = GLExtentionsManager.getInstance(gl);
         var materials = this._materials;
 
-        glem.bindVertexArray(gl, this._vao);
+        var isVAOBound = glem.bindVertexArray(gl, this._vao);
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             var glslProgram = materials[i].glslProgram;
             gl.useProgram(glslProgram);
+
+            if (!isVAOBound) {
+              gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+              this.setUpVertexAttribs(gl, glslProgram);
+            }
 
             if (viewMatrix && projectionMatrix) {
               var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
@@ -2202,6 +2227,11 @@
         } else {
           gl.useProgram(this._glslProgram);
 
+          if (!isVAOBound) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+            this.setUpVertexAttribs(gl, this._glslProgram);
+          }
+
           if (viewMatrix && projectionMatrix) {
             var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
             gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
@@ -2216,6 +2246,7 @@
           }
         }
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
         glem.bindVertexArray(gl, null);
       }
     }, {

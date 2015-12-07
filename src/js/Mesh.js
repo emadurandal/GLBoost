@@ -19,6 +19,7 @@ export default class Mesh extends Element {
     this._stride = 0;
     this._glslProgram = null;
     this._vertices = null;
+    this._vertexAttribComponentNDic = {};
     this._shader_for_non_material = new SimpleShader(this._canvas);
   }
 
@@ -54,6 +55,24 @@ export default class Mesh extends Element {
     this._vertices = vertices;
   }
 
+  setUpVertexAttribs(gl, glslProgram) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    this._stride = 0;
+    optimizedVertexAttribs.forEach((attribName)=> {
+      this._stride += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+
+    // 頂点レイアウト設定
+    var offset = 0;
+    optimizedVertexAttribs.forEach((attribName)=> {
+      gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
+        this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, this._stride, offset);
+      offset += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+  }
+
   prepareForRender(existCamera_f, lights) {
     var vertices = this._vertices;
     var gl = this._gl;
@@ -62,45 +81,29 @@ export default class Mesh extends Element {
 
     var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
 
+    optimizedVertexAttribs.forEach((attribName)=> {
+      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
+    });
+
     // create VAO
     var vao = glem.createVertexArray(gl);
     glem.bindVertexArray(gl, vao);
 
     // create VBO
-    var verticesBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, verticesBuffer);
-
-    var setVerticesLayout = (glslProgram)=> {
-      optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-
-      this._stride = 0;
-      optimizedVertexAttribs.forEach((attribName)=> {
-        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
-        this._stride += numberOfComponentOfVector * 4;
-      });
-
-      // 頂点レイアウト設定
-      var offset = 0;
-      optimizedVertexAttribs.forEach((attribName)=> {
-        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-        var numberOfComponentOfVector = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
-        gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-          numberOfComponentOfVector, gl.FLOAT, gl.FALSE, this._stride, offset);
-        offset += numberOfComponentOfVector * 4;
-      });
-    };
+    this._vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
 
     let materials = this._materials;
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
         var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
-        setVerticesLayout(glslProgram);
+        this.setUpVertexAttribs(gl, glslProgram);
         materials[i].glslProgram = glslProgram;
       }
     } else {
       var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
-      setVerticesLayout(glslProgram);
+      this.setUpVertexAttribs(gl, glslProgram);
       this._glslProgram = glslProgram;
     }
 
@@ -159,12 +162,17 @@ export default class Mesh extends Element {
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
 
-    glem.bindVertexArray(gl, this._vao);
+    var isVAOBound = glem.bindVertexArray(gl, this._vao);
 
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         let glslProgram = materials[i].glslProgram;
         gl.useProgram(glslProgram);
+
+        if (!isVAOBound) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+          this.setUpVertexAttribs(gl, glslProgram);
+        }
 
         if (viewMatrix && projectionMatrix) {
           var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
@@ -227,6 +235,11 @@ export default class Mesh extends Element {
     } else {
       gl.useProgram(this._glslProgram);
 
+      if (!isVAOBound) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+        this.setUpVertexAttribs(gl, this._glslProgram);
+      }
+
       if (viewMatrix && projectionMatrix) {
         var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
@@ -241,6 +254,7 @@ export default class Mesh extends Element {
       }
     }
 
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
     glem.bindVertexArray(gl, null);
   }
 
