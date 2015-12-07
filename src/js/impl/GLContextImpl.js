@@ -30,7 +30,10 @@ export default class GLContextImpl {
     var gl = this._canvas.getContext(glVersionString);
 
     if (!gl) {
-      throw new Error("This platform doesn't support WebGL.");
+      gl = this._canvas.getContext('experimental-' + glVersionString);
+      if (!gl) {
+        throw new Error("This platform doesn't support WebGL.");
+      }
     }
 
     if (!gl instanceof ContextType) {
