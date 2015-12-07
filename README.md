@@ -34,6 +34,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Firefox (even WebGL 2.0 mode)
 * Safari
 * iOS Safari
+* Microsoft Edge (Xbox One included)
 
  (IE11 and Edge Support is work in progress.)
 
