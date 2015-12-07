@@ -2000,7 +2000,6 @@
       _this._canvas = canvas;
       _this._materials = [];
       _this._vertexN = 0;
-      _this._stride = 0;
       _this._glslProgram = null;
       _this._vertices = null;
       _this._vertexAttribComponentNDic = {};
@@ -2052,16 +2051,16 @@
 
         var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-        this._stride = 0;
+        var stride = 0;
         optimizedVertexAttribs.forEach(function (attribName) {
-          _this2._stride += _this2._vertexAttribComponentNDic[attribName] * 4;
+          stride += _this2._vertexAttribComponentNDic[attribName] * 4;
         });
 
         // 頂点レイアウト設定
         var offset = 0;
         optimizedVertexAttribs.forEach(function (attribName) {
           gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-          gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this2._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, _this2._stride, offset);
+          gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this2._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
           offset += _this2._vertexAttribComponentNDic[attribName] * 4;
         });
       }

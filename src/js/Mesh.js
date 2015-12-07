@@ -16,7 +16,6 @@ export default class Mesh extends Element {
     this._canvas = canvas;
     this._materials = [];
     this._vertexN = 0;
-    this._stride = 0;
     this._glslProgram = null;
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
@@ -58,9 +57,9 @@ export default class Mesh extends Element {
   setUpVertexAttribs(gl, glslProgram) {
     var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-    this._stride = 0;
+    var stride = 0;
     optimizedVertexAttribs.forEach((attribName)=> {
-      this._stride += this._vertexAttribComponentNDic[attribName] * 4;
+      stride += this._vertexAttribComponentNDic[attribName] * 4;
     });
 
     // 頂点レイアウト設定
@@ -68,7 +67,7 @@ export default class Mesh extends Element {
     optimizedVertexAttribs.forEach((attribName)=> {
       gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
       gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-        this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, this._stride, offset);
+        this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
       offset += this._vertexAttribComponentNDic[attribName] * 4;
     });
   }
