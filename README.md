@@ -28,13 +28,21 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * ECMAScript 2015 based library (using Babel)
 * Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
 
+## Supported Browser
+
+* Google Chrome (even WebGL 2.0 mode)
+* Firefox (even WebGL 2.0 mode)
+* Safari
+* iOS Safari
+
+ (IE11 and Edge Support is work in progress.)
+
 ## Roadmap
 
 ### Coming Soon
 
 * Custom Shaders
 * Allow access to WebGL Context and Resources
-* Safari/iOS Safari Support
 
 ### Near Future
 
