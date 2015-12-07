@@ -2094,11 +2094,13 @@
             // GLSLプログラム作成。
             var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
             this.setUpVertexAttribs(gl, glslProgram);
+            optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
             materials[i].glslProgram = glslProgram;
           }
         } else {
           var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
           this.setUpVertexAttribs(gl, glslProgram);
+          optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
           this._glslProgram = glslProgram;
         }
 
@@ -2248,8 +2250,8 @@
           }
         }
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
         glem.bindVertexArray(gl, null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
       }
     }, {
       key: 'materials',
