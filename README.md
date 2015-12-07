@@ -35,8 +35,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Safari
 * iOS Safari
 * Microsoft Edge (Xbox One included)
-
- (IE11 Support is work in progress.)
+* Internet Explorer 11 (note that [browser-polyfill.min.js](https://cdnjs.com/libraries/babel-core/5.8.34) is required)
 
 ## Roadmap
 
