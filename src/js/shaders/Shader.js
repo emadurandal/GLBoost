@@ -1,6 +1,7 @@
 import GLContext from './../GLContext'
 import PointLight from './../lights/PointLight'
 import Vector3 from './../math/Vector3'
+import Hash from './../misc/Hash'
 
 export default class Shader {
   constructor(canvas) {
@@ -334,13 +335,6 @@ export default class Shader {
     return shaderProgram;
   }
 
-  createHashValue(text) {
-    var first = text.charCodeAt(0);
-    var middle = text.charCodeAt(Math.floor(text.length/2));
-    var last = text.charCodeAt(text.length - 1);
-    return '' + (first*middle*last) + text.length;
-  }
-
   getShaderProgram(vertexAttribs, existCamera_f, lights) {
     var gl = this._gl;
 
@@ -351,7 +345,7 @@ export default class Shader {
 
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
-    var hash = this.createHashValue(baseText);
+    var hash = Hash.toCRC32(baseText);
     if (hash in Shader._shaderHashTable) {
       if (Shader._shaderHashTable[hash].code === baseText) {
         return Shader._shaderHashTable[hash].program;
