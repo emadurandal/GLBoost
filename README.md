@@ -36,7 +36,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * iOS Safari
 * Microsoft Edge (Xbox One included)
 
- (IE11 and Edge Support is work in progress.)
+ (IE11 Support is work in progress.)
 
 ## Roadmap
 
