@@ -61,12 +61,13 @@
 
           var objLoader = GLBoost.ObjLoader.getInstance();
           var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world');
-          promise.then((mesh)=> {
+          var self = this;
+          promise.then(function(mesh) {
 //            console.log(mesh);
 
-            this.add( mesh );
+            self.add( mesh );
 
-            this.prepareForRender();
+            self.prepareForRender();
 
           });
 

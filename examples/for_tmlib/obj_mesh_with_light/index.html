@@ -46,7 +46,6 @@
           var camera = tm.webgl.CameraElement(
               {
                 eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
-                //eye: new GLBoost.Vector3(10.0, 1.5, 0.0),
                 center: new GLBoost.Vector3(0.0, 1.5, 0.0),
                 up: new GLBoost.Vector3(0.0, 1.0, 0.0)
               },
@@ -61,19 +60,20 @@
 
           var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(1, 1, 1), '#world');
           pointLight_1.translate = new GLBoost.Vector3(0, 0, -10);
-          var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(0, 0, -10), '#world');
+          var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10), '#world');
           this.add( pointLight_1 );
           this.add( directionalLight_2 );
 
           var objLoader = GLBoost.ObjLoader.getInstance();
           var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world');
           //var promise = objLoader.loadObj('resouces/vignette/greta_simplified.obj', '#world');
-          promise.then((mesh)=> {
+          var self = this;
+          promise.then(function(mesh) {
 //            console.log(mesh);
 
-            this.add( mesh );
+            self.add( mesh );
 
-            this.prepareForRender();
+            self.prepareForRender();
 
           });
 

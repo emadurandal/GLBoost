@@ -44,7 +44,7 @@
 
         var objLoader = GLBoost.ObjLoader.getInstance();
         var promise = objLoader.loadObj('resouces/teapot/teapot.obj', layer.canvas);
-        promise.then((mesh)=> {
+        promise.then(function(mesh) {
 //            console.log(mesh);
 
           layer.scene.add( mesh );
