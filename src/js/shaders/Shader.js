@@ -346,16 +346,20 @@ export default class Shader {
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
     var hash = Hash.toCRC32(baseText);
-    if (hash in Shader._shaderHashTable) {
-      if (Shader._shaderHashTable[hash].code === baseText) {
-        return Shader._shaderHashTable[hash].program;
+    if (!Shader._shaderHashTable[gl._canvas.id]) {
+      Shader._shaderHashTable[gl._canvas.id] = {};
+    }
+    var hashTable = Shader._shaderHashTable[gl._canvas.id];
+    if (hash in hashTable) {
+      if (hashTable[hash].code === baseText) {
+        return hashTable[hash].program;
       } else {
-        for (let i=0; i<Shader._shaderHashTable[hash].collisionN; i++) {
-          if (Shader._shaderHashTable[hash + '_' + i].code === baseText) {
-            return Shader._shaderHashTable[hash + '_' + i].program;
+        for (let i=0; i<hashTable[hash].collisionN; i++) {
+          if (hashTable[hash + '_' + i].code === baseText) {
+            return hashTable[hash + '_' + i].program;
           }
         }
-        Shader._shaderHashTable[hash].collisionN++;
+        hashTable[hash].collisionN++;
       }
     }
 
@@ -365,12 +369,13 @@ export default class Shader {
 
     // register it to shaderHashTable.
     var indexStr = null;
-    if (typeof Shader._shaderHashTable[hash] !== "undefined" && Shader._shaderHashTable[hash].collisionN > 0) {
-      indexStr = hash + '_' + Shader._shaderHashTable[hash].collisionN;
+    if (typeof hashTable[hash] !== "undefined" && hashTable[hash].collisionN > 0) {
+      indexStr = hash + '_' + hashTable[hash].collisionN;
     } else {
       indexStr = hash;
     }
-    Shader._shaderHashTable[indexStr] = {code:baseText, program:shaderProgram, collisionN:0};
+    hashTable[indexStr] = {code:baseText, program:shaderProgram, collisionN:0};
+    Shader._shaderHashTable[gl._canvas.id] = hashTable;
 
     return shaderProgram;
   }
