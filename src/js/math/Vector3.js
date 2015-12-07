@@ -23,19 +23,20 @@ export default class Vector3 {
     return new Vector3(0, 0, 0);
   }
 
-  /**
-   * 長さ
-   */
+
   length() {
     return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
   }
 
-  /**
-   * 長さ（static版）
+
+  /*
+   * disabled for now because Safari's Function.prototype.length is not configurable yet.
    */
+  /*
   static length(vec3) {
     return Math.sqrt(vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z);
   }
+  */
 
   /**
    * 長さの2乗

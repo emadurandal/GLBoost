@@ -270,24 +270,25 @@
 
     }, {
       key: "length",
-
-      /**
-       * 長さ
-       */
       value: function length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
       }
 
-      /**
-       * 長さ（static版）
+      /*
+       * disabled for now because Safari's Function.prototype.length is not configurable yet.
        */
-
-    }, {
-      key: "lengthSquared",
+      /*
+      static length(vec3) {
+        return Math.sqrt(vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z);
+      }
+      */
 
       /**
        * 長さの2乗
        */
+
+    }, {
+      key: "lengthSquared",
       value: function lengthSquared() {
         return this.x * this.x + this.y * this.y + this.z * this.z;
       }
@@ -394,11 +395,6 @@
       key: "zero",
       value: function zero() {
         return new Vector3(0, 0, 0);
-      }
-    }, {
-      key: "length",
-      value: function length(vec3) {
-        return Math.sqrt(vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z);
       }
     }, {
       key: "dotProduct",
@@ -1612,16 +1608,20 @@
         // lookup shaderHashTable
         var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
         var hash = Hash.toCRC32(baseText);
-        if (hash in Shader._shaderHashTable) {
-          if (Shader._shaderHashTable[hash].code === baseText) {
-            return Shader._shaderHashTable[hash].program;
+        if (!Shader._shaderHashTable[gl._canvas.id]) {
+          Shader._shaderHashTable[gl._canvas.id] = {};
+        }
+        var hashTable = Shader._shaderHashTable[gl._canvas.id];
+        if (hash in hashTable) {
+          if (hashTable[hash].code === baseText) {
+            return hashTable[hash].program;
           } else {
-            for (var i = 0; i < Shader._shaderHashTable[hash].collisionN; i++) {
-              if (Shader._shaderHashTable[hash + '_' + i].code === baseText) {
-                return Shader._shaderHashTable[hash + '_' + i].program;
+            for (var i = 0; i < hashTable[hash].collisionN; i++) {
+              if (hashTable[hash + '_' + i].code === baseText) {
+                return hashTable[hash + '_' + i].program;
               }
             }
-            Shader._shaderHashTable[hash].collisionN++;
+            hashTable[hash].collisionN++;
           }
         }
 
@@ -1631,12 +1631,13 @@
 
         // register it to shaderHashTable.
         var indexStr = null;
-        if (typeof Shader._shaderHashTable[hash] !== "undefined" && Shader._shaderHashTable[hash].collisionN > 0) {
-          indexStr = hash + '_' + Shader._shaderHashTable[hash].collisionN;
+        if (typeof hashTable[hash] !== "undefined" && hashTable[hash].collisionN > 0) {
+          indexStr = hash + '_' + hashTable[hash].collisionN;
         } else {
           indexStr = hash;
         }
-        Shader._shaderHashTable[indexStr] = { code: baseText, program: shaderProgram, collisionN: 0 };
+        hashTable[indexStr] = { code: baseText, program: shaderProgram, collisionN: 0 };
+        Shader._shaderHashTable[gl._canvas.id] = hashTable;
 
         return shaderProgram;
       }
