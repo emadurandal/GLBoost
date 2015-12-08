@@ -1,3 +1,11 @@
+/* 
+ * phina.js 0.1.1
+ * phina.js is a game library in javascript
+ * MIT Licensed
+ * 
+ * Copyright (C) 2015 phi, http://phinajs.com
+ */
+
 /*
  *
  */
@@ -104,7 +112,7 @@
    */
   Object.prototype.method('$get', function(key) {
     return key.split('.').reduce(function(t, v) {
-      return t[v];
+      return t && t[v];
     }, this);
   });
 
@@ -118,6 +126,7 @@
         t[v] = value;
       }
       else {
+        if (!t[v]) t[v] = {};
         return t[v];
       }
     }, this);
@@ -1379,7 +1388,7 @@ var phina = phina || {};
   /**
    * バージョン
    */
-  phina.VERSION = '0.0.1';
+  phina.VERSION = '0.1.1';
 
   phina.method('isNode', function() {
     return (typeof module !== 'undefined');
@@ -1960,11 +1969,17 @@ phina.namespace(function() {
         min = min || 0;
         max = max || 360;
         len = len || 1;
-        return phina.geom.Vector2().setDegree(Math.randf(min, max), len);
+        return phina.geom.Vector2().setDegree(Math.randfloat(min, max), len);
       },
     },
 
   });
+
+  phina.geom.Vector2.ZERO = phina.geom.Vector2(0, 0);
+  phina.geom.Vector2.LEFT = phina.geom.Vector2(-1, 0);
+  phina.geom.Vector2.RIGHT= phina.geom.Vector2(1, 0);
+  phina.geom.Vector2.UP   = phina.geom.Vector2(0, -1);
+  phina.geom.Vector2.DOWN = phina.geom.Vector2(0, 1);
 
 });
 
@@ -3697,6 +3712,15 @@ phina.namespace(function() {
     randbool: function() {
       return this.randint(0, 1) === 1;
     },
+    randarray: function(len, min, max) {
+      len = len || 100;
+      min = min || 0;
+      max = max || 100;
+
+      return (len).map(function() {
+        return this.randint(min, max);
+      }, this);
+    },
 
     _accessor: {
       seed: {
@@ -3731,6 +3755,15 @@ phina.namespace(function() {
       },
       randbool: function() {
         return this.randint(0, 1) === 1;
+      },
+      randarray: function(len, min, max) {
+        len = len || 100;
+        min = min || 0;
+        max = max || 100;
+
+        return (len).map(function() {
+          return this.randint(min, max);
+        }, this);
       },
 
       xor32: function(seed) {
@@ -4077,7 +4110,7 @@ phina.namespace(function() {
      */
     init: function() {
       this.superInit();
-      this.context = phina.asset.Sound.audioContext;
+      this.context = phina.asset.Sound.getAudioContext();
       this.gainNode = this.context.createGain();
     },
 
@@ -4164,6 +4197,15 @@ phina.namespace(function() {
     },
 
     _load: function(r) {
+      if (/^data:/.test(this.src)) {
+        this._loadFromURIScheme(r);
+      }
+      else {
+        this._loadFromFile(r);
+      }
+    },
+
+    _loadFromFile: function(r) {
       var self = this;
 
       var xml = new XMLHttpRequest();
@@ -4189,6 +4231,34 @@ phina.namespace(function() {
 
       xml.responseType = 'arraybuffer';
       xml.send(null);
+    },
+
+    _loadFromURIScheme: function(r) {
+      var byteString = '';
+      if (this.src.split(',')[0].indexOf('base64') >= 0) {
+        byteString = atob(this.src.split(',')[1]);
+      }
+      else {
+        byteString = unescape(this.src.split(',')[1]);
+      }
+
+      var self = this;
+      var len = byteString.length;
+      var buffer = new Uint8Array(len);
+
+      for (var i=0; i<len; ++i) {
+        buffer[i] = byteString.charCodeAt(i);
+      }
+
+      // webaudio 用に変換
+      this.context.decodeAudioData(buffer.buffer, function(buffer) {
+        self.loadFromBuffer(buffer);
+        r(self);
+      }, function() {
+        console.warn("音声ファイルのデコードに失敗しました。(" + src + ")");
+        self.loaded = true;
+        r(self);
+      });
     },
 
     _accessor: {
@@ -4220,8 +4290,10 @@ phina.namespace(function() {
     },
 
     _static: {
-      audioContext: (function() {
+      getAudioContext: function() {
         if (phina.isNode()) return null;
+
+        if (this.context) return this.context;
 
         var g = phina.global;
         var context = null;
@@ -4236,8 +4308,10 @@ phina.namespace(function() {
             context = new mozAudioContext();
         }
 
+        this.context = context;
+
         return context;
-      })(),
+      },
     },
 
   });
@@ -5980,7 +6054,7 @@ phina.namespace(function() {
           pointer: p,
         });
 
-        if (obj.boundingType) {
+        if (obj.boundingType && obj.boundingType !== 'none') {
           this.app.domElement.style.cursor = this.cursor.hover;
         }
       }
@@ -6002,7 +6076,9 @@ phina.namespace(function() {
       }
 
       if (obj._touchFlags[p.id]) {
-        obj.flare('pointstay');
+        obj.flare('pointstay', {
+          pointer: p,
+        });
         if (p._moveFlag) {
           obj.flare('pointmove', {
             pointer: p,
@@ -6461,8 +6537,12 @@ phina.namespace(function() {
       if (this.boundingType === 'rect') {
         return this.hitTestRect(x, y);
       }
-      else {
+      else if (this.boundingType === 'circle') {
         return this.hitTestCircle(x, y);
+      }
+      else {
+        // none の場合
+        return true;
       }
     },
 
@@ -7319,10 +7399,12 @@ phina.namespace(function() {
       this.initialPosition = phina.geom.Vector2(0, 0);
       var self = this;
 
-      this.friction = 1.0;
+      this.friction = 0.9;
       this.velocity = phina.geom.Vector2(0, 0);
       this.vertical = true;
       this.horizontal = true;
+
+      this.cacheList = [];
 
       this.on('attached', function() {
         this.target.setInteractive(true);
@@ -7331,28 +7413,35 @@ phina.namespace(function() {
           self.initialPosition.set(this.x, this.y);
           self.velocity.set(0, 0);
         });
-        this.target.on('pointmove', function(e) {
+        this.target.on('pointstay', function(e) {
           if (self.horizontal) {
             this.x += e.pointer.dx;
           }
           if (self.vertical) {
             this.y += e.pointer.dy;
           }
+
+          if (self.cacheList.length > 3) self.cacheList.shift();
+          self.cacheList.push(e.pointer.deltaPosition.clone());
         });
 
         this.target.on('pointend', function(e) {
-          var dp = e.pointer.deltaPosition;
+          // 動きのある delta position を後ろから検索　
+          var delta = self.cacheList.reverse().find(function(v) {
+            return v.lengthSquared() > 10;
+          });
+          self.cacheList.clear();
 
-          if (dp.lengthSquared() > 10) {
-            self.velocity.x = dp.x;
-            self.velocity.y = dp.y;
+          if (delta) {
+            self.velocity.x = delta.x;
+            self.velocity.y = delta.y;
 
             self.flare('flickstart', {
-              direction: dp.clone().normalize(),
+              direction: delta.normalize(),
             });
           }
           else {
-            self.cancel();
+            self.flare('flickcancel');
           }
 
           // self.flare('flick');
@@ -9321,6 +9410,9 @@ phina.namespace(function() {
 
       // TODO: 一旦むりやり対応
       this.interactive = true;
+      this.setInteractive = function(flag) {
+        this.interactive = flag;
+      };
       this._overFlags = {};
       this._touchFlags = {};
     },
@@ -9430,50 +9522,6 @@ phina.namespace(function() {
 
     draw: function(canvas) {
       var domElement = this.renderer.domElement;
-      canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
-    },
-  });
-});
-
-
-phina.namespace(function() {
-
-  /**
-   * @class
-   */
-  phina.define('phina.display.GLBoostLayer', {
-    superClass: 'phina.display.CanvasElement',
-
-    scene: null,
-    camera: null,
-    light: null,
-    renderer: null,
-    canvas: null,
-
-    /** 子供を 自分のCanvasRenderer で描画するか */
-    renderChildBySelf: false,
-
-    init: function(params) {
-      this.superInit();
-
-      this.canvas = document.createElement("canvas");
-      this.canvas.id = 'glboost_world';
-      this.canvas.width = params.width;
-      this.canvas.height = params.height;
-      //document.body.appendChild(this.canvas);
-
-
-      // レンダラーを生成
-      this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:1, green:1, blue:1, alpha:1}});
-      this.scene = new GLBoost.Scene();
-      this.on('enterframe', function() {
-        this.renderer.clearCanvas();
-        this.renderer.draw(this.scene);
-      });
-    },
-
-    draw: function(canvas) {
-      var domElement = this.canvas;
       canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
     },
   });
@@ -9685,13 +9733,7 @@ phina.namespace(function() {
      * @constructor
      */
     init: function(options) {
-      options.$safe({
-        width: 640,
-        height: 960,
-        columns: 12,
-        fit: true,
-        append: true,
-      });
+      options = (options || {}).$safe(phina.display.CanvasApp.defaults);
       
       if (!options.query && !options.domElement) {
         options.domElement = document.createElement('canvas');
@@ -9753,6 +9795,16 @@ phina.namespace(function() {
 
     fitScreen: function() {
       this.canvas.fitScreen();
+    },
+
+    _static: {
+      defaults: {
+        width: 640,
+        height: 960,
+        columns: 12,
+        fit: true,
+        append: true,
+      },
     },
 
   });
@@ -9993,16 +10045,16 @@ phina.namespace(function() {
       // draw color
       if (this.fill) {
         this.canvas.context.fillStyle = this.fill;
-        this.canvas.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+        this.canvas.fillRect(-this.width/2, -this.height/2, this.width, this.height, this.cornerRadius);
       }
       // draw gauge
       this.canvas.context.fillStyle = this.gaugeColor;
-      this.canvas.fillRect(-this.width/2, -this.height/2, this.width*rate, this.height);
+      this.canvas.fillRect(-this.width/2, -this.height/2, this.width*rate, this.height, this.cornerRadius);
       // draw stroke
       if (this.stroke) {
         this.canvas.context.lineWidth = this.strokeWidth;
         this.canvas.strokeStyle = this.stroke;
-        this.canvas.strokeRect(-this.width/2, -this.height/2, this.width, this.height);
+        this.canvas.strokeRect(-this.width/2, -this.height/2, this.width, this.height, this.cornerRadius);
       }
     },
 
@@ -10202,7 +10254,7 @@ phina.namespace(function() {
           this.gotoScene(nextIndex, args);
       }
       else {
-          this.fire(tm.event.Event("finish"));
+          this.flare("finish");
       }
 
       return this;
@@ -10548,7 +10600,7 @@ phina.namespace(function() {
               value: 0,
               width: this.width,
               height: 12,
-              color: '#aaa',
+              fill: '#aaa',
               stroke: false,
               gaugeColor: 'hsla(200, 100%, 80%, 0.8)',
               padding: 0,
@@ -10722,7 +10774,7 @@ phina.namespace(function() {
 
       var startLabel = (options.assets) ? 'loading' : options.startLabel;
 
-      var scene = ManagerScene({
+      var scene = phina.game.ManagerScene({
         startLabel: startLabel,
 
         scenes: [
