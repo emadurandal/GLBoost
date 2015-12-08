@@ -9464,7 +9464,7 @@ phina.namespace(function() {
 
 
       // レンダラーを生成
-      this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:0, green:1, blue:0, alpha:1}});
+      this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:1, green:1, blue:1, alpha:1}});
       this.scene = new GLBoost.Scene();
       this.on('enterframe', function() {
         this.renderer.clearCanvas();
