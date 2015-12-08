@@ -242,7 +242,7 @@ export default class Matrix33 {
     var m21 = (this.m01*this.m20 - this.m00*this.m21) / det;
     var m22 = (this.m00*this.m11 - this.m01*this.m10) / det;
 
-    return new Matrix33(
+    return this.setComponents(
       m00, m01, m02,
       m10, m11, m12,
       m20, m21, m22
