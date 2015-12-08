@@ -159,7 +159,7 @@ export default class Mesh extends Element {
 
   }
 
-  draw(viewMatrix, projectionMatrix, lights, camera) {
+  draw(lights, camera) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -176,19 +176,22 @@ export default class Mesh extends Element {
           this.setUpVertexAttribs(gl, glslProgram);
         }
 
-        if (viewMatrix && projectionMatrix) {
+        if (camera) {
+          var viewMatrix = camera.lookAtRHMatrix();
+          var projectionMatrix = camera.perspectiveRHMatrix();
           var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
-        }
 
-        if (typeof glslProgram.modelViewMatrix !== "undefined") {
-          var mv_m = viewMatrix.clone().multiply(this.transformMatrix);
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
-        }
 
-        if (typeof glslProgram.invNormalMatrix !== "undefined") {
-          var in_m = mv_m.toMatrix33().invert();
-          gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+          if (typeof glslProgram.modelViewMatrix !== "undefined") {
+            var mv_m = viewMatrix.clone().multiply(this.transformMatrix);
+            gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
+          }
+
+          if (typeof glslProgram.invNormalMatrix !== "undefined") {
+            var in_m = mv_m.toMatrix33().invert();
+            gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
+          }
         }
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
@@ -242,7 +245,9 @@ export default class Mesh extends Element {
         this.setUpVertexAttribs(gl, this._glslProgram);
       }
 
-      if (viewMatrix && projectionMatrix) {
+      if (camera) {
+        var viewMatrix = camera.lookAtRHMatrix();
+        var projectionMatrix = camera.perspectiveRHMatrix();
         var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
       }

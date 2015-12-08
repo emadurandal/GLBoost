@@ -47,8 +47,6 @@ export default class Renderer {
     scene.elements.forEach((elm)=> {
       if(elm instanceof Camera) {
         if (elm.isMainCamera) {
-          viewMatrix = elm.lookAtRHMatrix();
-          projectionMatrix = elm.perspectiveRHMatrix();
           camera = elm;
         }
       }
@@ -70,7 +68,7 @@ export default class Renderer {
 
       scene.elements.forEach((elm)=> {
         if(elm instanceof Mesh) {
-          elm.draw(viewMatrix, projectionMatrix, lights, camera);
+          elm.draw(lights, camera);
         }
       });
 
@@ -90,7 +88,7 @@ export default class Renderer {
 
         var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
-          mesh.draw(viewMatrix, projectionMatrix, lights, camera);
+          mesh.draw(lights, camera);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

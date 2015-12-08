@@ -16,7 +16,7 @@ export default class Camera extends Element {
     this._zNear = perspective.zNear;
     this._zFar = perspective.zFar;
 
-    this.setAsMainCamera()
+    this.setAsMainCamera();
   }
 
   lookAtRHMatrix() {
