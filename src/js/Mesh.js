@@ -50,8 +50,9 @@ export default class Mesh extends Element {
     return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
   }
 
-  setVerticesData(vertices) {
+  setVerticesData(vertices, primitiveType) {
     this._vertices = vertices;
+    this._primitiveType = (primitiveType) ? primitiveType : GLBoost.TRIANGLES;
   }
 
   setUpVertexAttribs(gl, glslProgram) {
@@ -223,10 +224,10 @@ export default class Mesh extends Element {
 
         if (this._indicesBuffers.length > 0) {
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
-          gl.drawElements(gl.TRIANGLES, materials[i].getFaceN(this)*3, gl.UNSIGNED_SHORT, 0);
+          gl.drawElements(gl[this._primitiveType], materials[i].getFaceN(this)*3, gl.UNSIGNED_SHORT, 0);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         } else {
-          gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+          gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
         }
 
         if (materials[i]) {
@@ -248,10 +249,10 @@ export default class Mesh extends Element {
 
       if (this._indicesBuffers.length > 0) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[0] );
-        gl.drawElements(gl.TRIANGLES, this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl[this._primitiveType], this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
-        gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+        gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
       }
     }
 

@@ -217,6 +217,12 @@
   global.GLBoost["COLOR"] = 'color';
   global.GLBoost["NORMAL"] = 'normal';
   global.GLBoost["TEXCOORD"] = 'texcoord';
+  global.GLBoost["POINTS"] = 'POINTS';
+  global.GLBoost["LINES"] = 'LINES';
+  global.GLBoost["LINE_STRIP"] = 'LINE_STRIP';
+  global.GLBoost["LINE_LOOP"] = 'LINE_LOOP';
+  global.GLBoost["TRIANGLES"] = 'TRIANGLES';
+  global.GLBoost["TRIANGLE_STRIP"] = 'TRIANGLE_STRIP';
   global.GLBoost["BLENDTARGET1"] = 'shapetarget_1';
   global.GLBoost["BLENDTARGET2"] = 'shapetarget_2';
   global.GLBoost["BLENDTARGET3"] = 'shapetarget_3';
@@ -2041,8 +2047,9 @@
       }
     }, {
       key: 'setVerticesData',
-      value: function setVerticesData(vertices) {
+      value: function setVerticesData(vertices, primitiveType) {
         this._vertices = vertices;
+        this._primitiveType = primitiveType ? primitiveType : GLBoost$1.TRIANGLES;
       }
     }, {
       key: 'setUpVertexAttribs',
@@ -2218,10 +2225,10 @@
 
             if (this._indicesBuffers.length > 0) {
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
-              gl.drawElements(gl.TRIANGLES, materials[i].getFaceN(this) * 3, gl.UNSIGNED_SHORT, 0);
+              gl.drawElements(gl[this._primitiveType], materials[i].getFaceN(this) * 3, gl.UNSIGNED_SHORT, 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
-              gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+              gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
             }
 
             if (materials[i]) {
@@ -2243,10 +2250,10 @@
 
           if (this._indicesBuffers.length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[0]);
-            gl.drawElements(gl.TRIANGLES, this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl[this._primitiveType], this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
-            gl.drawArrays(gl.TRIANGLES, 0, this._vertexN);
+            gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
           }
         }
 
