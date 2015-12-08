@@ -76,9 +76,10 @@
           //var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
           //var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           theta += 0.5;
-          camera.eye.x = radius * Math.sin( theta * Math.PI / 180 );
-          camera.eye.y = radius * Math.sin( theta * Math.PI / 180 );
-          camera.eye.z = radius * Math.cos( theta * Math.PI / 180 );
+          camera.eye = new GLBoost.Vector3(
+              radius * Math.sin( theta * Math.PI / 180 ),
+              radius * Math.sin( theta * Math.PI / 180 ),
+              radius * Math.cos( theta * Math.PI / 180 ));
         };
 
 

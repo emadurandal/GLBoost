@@ -243,14 +243,28 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector4 = function Vector4(x, y, z, w) {
-    babelHelpers.classCallCheck(this, Vector4);
+  var Vector4 = (function () {
+    function Vector4(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Vector4);
 
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = w;
-  };
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Vector4, [{
+      key: "isEqual",
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }]);
+    return Vector4;
+  })();
 
   GLBoost$1["Vector4"] = Vector4;
 
@@ -1246,6 +1260,12 @@
       set: function set(flg) {
         this._dirty = flg;
       }
+      /*
+      get dirty() {
+        return this._dirty;
+      }
+      */
+
     }]);
     return Element;
   })();
@@ -2206,7 +2226,7 @@
                     lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
                   }
 
-                  if (camera) {
+                  if (camera && camera.dirty) {
                     var lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
                     gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
                   } else {
@@ -2446,20 +2466,33 @@
       _this._zFar = perspective.zFar;
 
       _this.setAsMainCamera();
+
+      _this._dirtyView = true;
+      _this._dirtyProjection = true;
       return _this;
     }
 
     babelHelpers.createClass(Camera, [{
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
-        //    return Matrix44.identity();
-        return Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+        if (this._dirtyView) {
+          this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._dirtyView = false;
+          return this._viewMatrix;
+        } else {
+          return this._viewMatrix;
+        }
       }
     }, {
       key: 'perspectiveRHMatrix',
       value: function perspectiveRHMatrix() {
-        //    return Matrix44.identity();
-        return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+        if (this._dirtyProjection) {
+          this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix;
+        } else {
+          return this._projectionMatrix;
+        }
       }
     }, {
       key: 'setAsMainCamera',
@@ -2472,8 +2505,23 @@
         return Camera._mainCamera === this;
       }
     }, {
+      key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        this._dirty = true;
+        this._dirtyView = true;
+        this._translate = vec;
+      }
+    }, {
       key: 'eye',
       set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        this._dirty = true;
+        this._dirtyView = true;
         this._translate = vec;
       },
       get: function get() {
@@ -2482,6 +2530,10 @@
     }, {
       key: 'center',
       set: function set(vec) {
+        if (this._center.isEqual(vec)) {
+          return;
+        }
+        this._dirtyView = true;
         this._center = vec;
       },
       get: function get() {
@@ -2490,6 +2542,10 @@
     }, {
       key: 'up',
       set: function set(vec) {
+        if (this._up.isEqual(vec)) {
+          return;
+        }
+        this._dirtyView = true;
         this._up = vec;
       },
       get: function get() {
@@ -2498,6 +2554,10 @@
     }, {
       key: 'fovy',
       set: function set(value) {
+        if (this._fovy === value) {
+          return;
+        }
+        this._dirtyProjection = true;
         this._fovy = value;
       },
       get: function get() {
@@ -2506,6 +2566,10 @@
     }, {
       key: 'aspect',
       set: function set(value) {
+        if (this._aspect === value) {
+          return;
+        }
+        this._dirtyProjection = true;
         this._aspect = value;
       },
       get: function get() {
@@ -2514,6 +2578,10 @@
     }, {
       key: 'zNear',
       set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._dirtyProjection = true;
         this._zNear = value;
       },
       get: function get() {
@@ -2522,11 +2590,27 @@
     }, {
       key: 'zFar',
       set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._dirtyProjection = true;
         this._zFar = value;
       },
       get: function get() {
         return this._zFar;
       }
+      /*
+      get dirty() {
+        return this._dirtyView || this._dirtyProjection;
+      }
+       get dirtyView() {
+        return this._dirtyView;
+      }
+       get dirtyProjection() {
+        return this._dirtyProjection;
+      }
+      */
+
     }], [{
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix(eye, center, up) {
@@ -2543,6 +2627,8 @@
 
         var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
         var xscale = yscale / aspect;
+
+        this._dirtyProjection = false;
 
         return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }

@@ -17,11 +17,19 @@ export default class Camera extends Element {
     this._zFar = perspective.zFar;
 
     this.setAsMainCamera();
+
+    this._dirtyView = true;
+    this._dirtyProjection = true;
   }
 
   lookAtRHMatrix() {
-//    return Matrix44.identity();
-    return Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+    if (this._dirtyView) {
+      this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+      this._dirtyView = false;
+      return this._viewMatrix;
+    } else {
+      return this._viewMatrix;
+    }
   }
 
   static lookAtRHMatrix(eye, center, up) {
@@ -37,14 +45,21 @@ export default class Camera extends Element {
   }
 
   perspectiveRHMatrix() {
-//    return Matrix44.identity();
-    return Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+    if (this._dirtyProjection) {
+      this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+      this._dirtyProjection = false;
+      return this._projectionMatrix;
+    } else {
+      return this._projectionMatrix;
+    }
   }
 
   static perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
 
     var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
     var xscale = yscale / aspect;
+
+    this._dirtyProjection = false;
 
     return new Matrix44(
       xscale, 0.0, 0.0, 0.0,
@@ -63,7 +78,21 @@ export default class Camera extends Element {
     return Camera._mainCamera === this;
   }
 
+  set translate(vec) {
+    if (this._translate.isEqual(vec)) {
+      return;
+    }
+    this._dirty = true;
+    this._dirtyView = true;
+    this._translate = vec;
+  }
+
   set eye(vec) {
+    if (this._translate.isEqual(vec)) {
+      return;
+    }
+    this._dirty = true;
+    this._dirtyView = true;
     this._translate = vec;
   }
 
@@ -72,6 +101,10 @@ export default class Camera extends Element {
   }
 
   set center(vec) {
+    if (this._center.isEqual(vec)) {
+      return;
+    }
+    this._dirtyView = true;
     this._center = vec;
   }
 
@@ -80,6 +113,10 @@ export default class Camera extends Element {
   }
 
   set up(vec) {
+    if (this._up.isEqual(vec)) {
+      return;
+    }
+    this._dirtyView = true;
     this._up = vec;
   }
 
@@ -88,6 +125,10 @@ export default class Camera extends Element {
   }
 
   set fovy(value) {
+    if (this._fovy === value) {
+      return;
+    }
+    this._dirtyProjection = true;
     this._fovy = value;
   }
 
@@ -96,6 +137,10 @@ export default class Camera extends Element {
   }
 
   set aspect(value) {
+    if (this._aspect === value) {
+      return;
+    }
+    this._dirtyProjection = true;
     this._aspect = value;
   }
 
@@ -104,6 +149,10 @@ export default class Camera extends Element {
   }
 
   set zNear(value) {
+    if (this._zNear === value) {
+      return;
+    }
+    this._dirtyProjection = true;
     this._zNear = value;
   }
 
@@ -112,12 +161,29 @@ export default class Camera extends Element {
   }
 
   set zFar(value) {
+    if (this._zFar === value) {
+      return;
+    }
+    this._dirtyProjection = true;
     this._zFar = value;
   }
 
   get zFar() {
     return this._zFar;
   }
+  /*
+  get dirty() {
+    return this._dirtyView || this._dirtyProjection;
+  }
+
+  get dirtyView() {
+    return this._dirtyView;
+  }
+
+  get dirtyProjection() {
+    return this._dirtyProjection;
+  }
+  */
 }
 Camera._mainCamera = null;
 
