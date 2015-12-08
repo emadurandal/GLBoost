@@ -11,9 +11,8 @@ export default class ClassicMaterial {
     this._specularColor = new Vector3(1.0, 1.0, 1.0);
     this._ambientColor = new Vector3(0.0, 0.0, 0.0);
     this._name = "";
-    this._faceN = 0;
     this._shader = new SimpleShader(canvas);
-    this._meshes = {};
+    this._vertexNofMeshes = {};
   }
 
   set shader(shader) {
@@ -73,12 +72,12 @@ export default class ClassicMaterial {
   }
   */
 
-  setFaceN(mesh, num) {
-    this._meshes[mesh] = num;
+  setVertexN(mesh, num) {
+    this._vertexNofMeshes[mesh] = num;
   }
 
-  getFaceN(mesh) {
-    return (typeof this._meshes[mesh] === "undefined") ? 0 : this._meshes[mesh];
+  getVertexN(mesh) {
+    return (typeof this._vertexNofMeshes[mesh] === "undefined") ? 0 : this._vertexNofMeshes[mesh];
   }
 
   setUp() {

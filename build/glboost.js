@@ -635,7 +635,7 @@
         var m21 = (this.m01 * this.m20 - this.m00 * this.m21) / det;
         var m22 = (this.m00 * this.m11 - this.m01 * this.m10) / det;
 
-        return new Matrix33(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
       }
     }, {
       key: 'm00',
@@ -1260,12 +1260,6 @@
       set: function set(flg) {
         this._dirty = flg;
       }
-      /*
-      get dirty() {
-        return this._dirty;
-      }
-      */
-
     }]);
     return Element;
   })();
@@ -2170,11 +2164,11 @@
         this._vao = vao;
 
         // if this mesh has only one material...
-        if (this._materials && this._materials.length === 1 && this._materials[0].getFaceN(this) === 0) {
+        if (this._materials && this._materials.length === 1 && this._materials[0].getVertexN(this) === 0) {
           if (vertices.indices && vertices.indices.length > 0) {
-            this._materials[0].setFaceN(this, vertices.indices[0].length / 3);
+            this._materials[0].setVertexN(this, vertices.indices[0].length);
           } else {
-            this._materials[0].setFaceN(this, this._vertexN / 3);
+            this._materials[0].setVertexN(this, this._vertexN);
           }
         }
       }
@@ -2226,7 +2220,7 @@
                     lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
                   }
 
-                  if (camera && camera.dirty) {
+                  if (camera) {
                     var lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
                     gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
                   } else {
@@ -2247,7 +2241,7 @@
 
             if (this._indicesBuffers.length > 0) {
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
-              gl.drawElements(gl[this._primitiveType], materials[i].getFaceN(this) * 3, gl.UNSIGNED_SHORT, 0);
+              gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_SHORT, 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
               gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -2879,13 +2873,12 @@
       this._specularColor = new Vector3(1.0, 1.0, 1.0);
       this._ambientColor = new Vector3(0.0, 0.0, 0.0);
       this._name = "";
-      this._faceN = 0;
       this._shader = new SimpleShader(canvas);
-      this._meshes = {};
+      this._vertexNofMeshes = {};
     }
 
     babelHelpers.createClass(ClassicMaterial, [{
-      key: 'setFaceN',
+      key: 'setVertexN',
 
       /*
       set faceN(num) {
@@ -2896,13 +2889,13 @@
       }
       */
 
-      value: function setFaceN(mesh, num) {
-        this._meshes[mesh] = num;
+      value: function setVertexN(mesh, num) {
+        this._vertexNofMeshes[mesh] = num;
       }
     }, {
-      key: 'getFaceN',
-      value: function getFaceN(mesh) {
-        return typeof this._meshes[mesh] === "undefined" ? 0 : this._meshes[mesh];
+      key: 'getVertexN',
+      value: function getVertexN(mesh) {
+        return typeof this._vertexNofMeshes[mesh] === "undefined" ? 0 : this._vertexNofMeshes[mesh];
       }
     }, {
       key: 'setUp',
@@ -3987,7 +3980,7 @@
               continue;
             }
 
-          this._materials[i].setFaceN(mesh, partFCount);
+          this._materials[i].setVertexN(mesh, partFCount * 3);
 
           indices[i] = iFaceBufferArray.concat();
         }

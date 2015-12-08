@@ -249,7 +249,7 @@ export default class ObjLoader {
         }
 
         if (matchArray[1] === "usemtl") {
-          if(matchArray[2] === this._materials[i].name) {
+          if (matchArray[2] === this._materials[i].name) {
             boFlag = true;
           } else {
             boFlag = false;
@@ -355,7 +355,7 @@ export default class ObjLoader {
           continue;
       }
 
-      this._materials[i].setFaceN(mesh, partFCount);
+      this._materials[i].setVertexN(mesh, partFCount*3);
 
       indices[i] = iFaceBufferArray.concat();
 
