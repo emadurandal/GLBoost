@@ -187,7 +187,7 @@ export default class Geometry {
     var result =
       this._updateCountOfCameraView !== camera.updateCountAsCameraView ||
       this._updateCountOfCameraProjectin !== camera.updateCountAsCameraProjection ||
-      this._updateCountOfMeshTransform !== camera.updateCountAsElement;
+      this._updateCountOfMeshTransform !== mesh.updateCountAsElement;
 
     this._updateCountOfCameraView = camera.updateCountAsCameraView;
     this._updateCountOfCameraProjectin = camera.updateCountAsCameraProjection;
