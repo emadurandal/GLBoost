@@ -103,7 +103,7 @@
           renderPasses[0].specifyRenderTargetTextures(CANVAS_ID, renderTextures);
 
 
-          var mesh2 = tm.webgl.MeshElement(CANVAS_ID);
+          var mesh2 = tm.webgl.GeometryElement(CANVAS_ID);
           var material2 = new GLBoost.ClassicMaterial(CANVAS_ID);
           material2.diffuseTexture = renderTextures[0];
           mesh2.materials = [material2];

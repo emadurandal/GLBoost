@@ -2008,13 +2008,13 @@
     return SimpleShader;
   })(Shader);
 
-  var Mesh = (function (_Element) {
-    babelHelpers.inherits(Mesh, _Element);
+  var Geometry = (function (_Element) {
+    babelHelpers.inherits(Geometry, _Element);
 
-    function Mesh(canvas) {
-      babelHelpers.classCallCheck(this, Mesh);
+    function Geometry(canvas) {
+      babelHelpers.classCallCheck(this, Geometry);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mesh).call(this));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Geometry).call(this));
 
       _this._gl = GLContext.getInstance(canvas).gl;
       _this._canvas = canvas;
@@ -2032,7 +2032,7 @@
      * 不必要な頂点属性のデータは無視する。
      */
 
-    babelHelpers.createClass(Mesh, [{
+    babelHelpers.createClass(Geometry, [{
       key: '_decideNeededVertexAttribs',
       value: function _decideNeededVertexAttribs(vertices) {
         var attribNameArray = [];
@@ -2284,10 +2284,10 @@
         this._materials = materials;
       }
     }]);
-    return Mesh;
+    return Geometry;
   })(Element);
 
-  GLBoost$1["Mesh"] = Mesh;
+  GLBoost$1["Geometry"] = Geometry;
 
   var RenderPass = (function () {
     function RenderPass(gl) {
@@ -2304,7 +2304,7 @@
         var _this = this;
 
         meshes.forEach(function (mesh) {
-          if (!(mesh instanceof Mesh)) {
+          if (!(mesh instanceof Geometry)) {
             throw new TypeError("RenderPass accepts Geometry objects only.");
           }
           _this._meshes.push(mesh);
@@ -2699,7 +2699,7 @@
           glem.drawBuffers(gl, [gl.BACK]);
 
           scene.elements.forEach(function (elm) {
-            if (elm instanceof Mesh) {
+            if (elm instanceof Geometry) {
               elm.draw(lights, camera);
             }
           });
@@ -2838,7 +2838,7 @@
         // レンダリングの準備をさせる。
         this._elements.forEach(function (elm) {
           if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
-          if (elm instanceof Mesh) {
+          if (elm instanceof Geometry) {
             elm.prepareForRender(existCamera_f, lights);
           }
         });
@@ -3102,8 +3102,8 @@
     return BlendShapeShaderSource;
   })();
 
-  var BlendShapeMesh = (function (_Mesh) {
-    babelHelpers.inherits(BlendShapeMesh, _Mesh);
+  var BlendShapeMesh = (function (_Geometry) {
+    babelHelpers.inherits(BlendShapeMesh, _Geometry);
 
     function BlendShapeMesh(canvas) {
       babelHelpers.classCallCheck(this, BlendShapeMesh);
@@ -3134,7 +3134,7 @@
       key: 'prepareForRender',
       value: function prepareForRender(existCamera_f, pointLight) {
 
-        // before prepareForRender of 'Mesh' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
+        // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
         var materials = this._materials;
         if (materials) {
           for (var i = 0; i < materials.length; i++) {
@@ -3250,7 +3250,7 @@
       }
     }]);
     return BlendShapeMesh;
-  })(Mesh);
+  })(Geometry);
 
   GLBoost$1["BlendShapeMesh"] = BlendShapeMesh;
 
@@ -3856,7 +3856,7 @@
         fCount = 0;
         var partFCount = 0;
 
-        var mesh = new Mesh(canvas);
+        var mesh = new Geometry(canvas);
 
         for (var i = 0; i < this._materials.length; i++) {
           partFCount = 0;
@@ -4049,7 +4049,7 @@
       }
     }]);
     return Plane;
-  })(Mesh);
+  })(Geometry);
 
   GLBoost$1["Plane"] = Plane;
 
@@ -4117,7 +4117,7 @@
       }
     }]);
     return Cube;
-  })(Mesh);
+  })(Geometry);
 
   GLBoost$1["Cube"] = Cube;
 

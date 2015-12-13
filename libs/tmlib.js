@@ -19074,8 +19074,8 @@ tm.webgl = tm.webgl || {};
      * @class tm.webgl.MeshElement
      * @TODO ?
      */
-    tm.webgl.MeshElement = tm.createClass({
-        superClass: GLBoost.Mesh,
+    tm.webgl.GeometryElement = tm.createClass({
+        superClass: GLBoost.Geometry,
 
         /**
          * @constructor
@@ -19083,12 +19083,12 @@ tm.webgl = tm.webgl || {};
         init: function(canvas) {
             tm.webgl.Element.prototype.init.call(this);
 
-            GLBoost.Mesh.prototype.constructor.call(this, canvas);
+            GLBoost.Geometry.prototype.constructor.call(this, canvas);
         }
     });
 
     // tm.webgl.Element を継承
-    tm.webgl.MeshElement.prototype.$safe(tm.webgl.Element.prototype);
+    tm.webgl.GeometryElement.prototype.$safe(tm.webgl.Element.prototype);
 
 })();
 
@@ -19133,14 +19133,14 @@ tm.webgl = tm.webgl || {};
          * @constructor
          */
         init: function(canvas) {
-            tm.webgl.MeshElement.prototype.init.call(this, canvas);
+            tm.webgl.GeometryElement.prototype.init.call(this, canvas);
 
             GLBoost.BlendShapeMesh.prototype.constructor.call(this, canvas);
         }
     });
 
     // tm.webgl.MeshElement を継承
-    tm.webgl.BlendShapeMeshElement.prototype.$safe(tm.webgl.MeshElement.prototype);
+    tm.webgl.BlendShapeMeshElement.prototype.$safe(tm.webgl.GeometryElement.prototype);
 
 })();
 
