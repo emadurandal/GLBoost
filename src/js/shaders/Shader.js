@@ -189,7 +189,7 @@ export default class Shader {
     var in_ = Shader._in_onFrag(gl);
 
     shaderText +=   Shader._glslVer(gl);
-    shaderText +=   'precision highp float;\n';
+    shaderText +=   'precision mediump float;\n';
     shaderText +=   Shader._set_outColor_onFrag(gl);
 
 
