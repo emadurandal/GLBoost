@@ -6,6 +6,10 @@ export default class Mesh extends Element {
     super();
     this.geometry = geometry;
     this.material = material;
+
+    if (this.name === 'Mesh') {
+      Mesh._instanceCount = (typeof Mesh._instanceCount === "undefined") ? 0 : (Mesh._instanceCount + 1);
+    }
   }
 
   prepareForRender(existCamera_f, lights) {
@@ -40,6 +44,10 @@ export default class Mesh extends Element {
 
   get material() {
     return this._material;
+  }
+
+  toString() {
+    return 'Mesh_' + Mesh._instanceCount;
   }
 }
 Mesh._geometries = {};

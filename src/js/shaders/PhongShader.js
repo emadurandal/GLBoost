@@ -9,22 +9,13 @@ export class PhongShaderSource {
       shaderText += `${out_} vec3 normal;\n`;
     }
     shaderText += `${out_} vec4 position;\n`;
-    shaderText += 'uniform mat4 modelViewMatrix;\n';
-    shaderText += 'uniform mat3 invNormalMatrix;\n';
-
     return shaderText;
   }
 
   VSTransform_PhongShaderSource(existCamera_f, f, lights) {
     var shaderText = '';
-    shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      if (existCamera_f) {
-        shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-      } else {
-        shaderText += '  normal = aVertex_normal;\n';
-      }
-    }
+    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+    shaderText += '  normal = aVertex_normal;\n';
 
     return shaderText;
   }
@@ -35,6 +26,7 @@ export class PhongShaderSource {
       shaderText += `${in_} vec3 normal;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
+    shaderText += `uniform vec3 viewPosition;\n`;
     shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
     shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     shaderText += `uniform float Kd;\n`;
@@ -51,11 +43,10 @@ export class PhongShaderSource {
     shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-    // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
     shaderText += '    rt1.rgb += Kd * lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-    shaderText += '    vec3 viewPosition = vec3(0.0, 0.0, 0.0);\n';
     shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
     shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
     shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
@@ -79,16 +70,13 @@ export class PhongShaderSource {
       }
     });
 
-    if (existCamera_f) {
-      shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-      shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-    }
-
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
     shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
     shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+    shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
