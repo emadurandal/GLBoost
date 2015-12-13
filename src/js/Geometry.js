@@ -9,7 +9,7 @@ import SimpleShader from './shaders/SimpleShader'
 import PointLight from './lights/PointLight'
 import DirectionalLight from './lights/DirectionalLight'
 
-export default class Mesh extends Element {
+export default class Geometry extends Element {
   constructor(canvas) {
     super();
     this._gl = GLContext.getInstance(canvas).gl;
@@ -270,4 +270,4 @@ export default class Mesh extends Element {
   }
 }
 
-GLBoost["Mesh"] = Mesh;
+GLBoost["Geometry"] = Geometry;

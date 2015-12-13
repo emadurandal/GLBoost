@@ -1,6 +1,6 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
-import Mesh from './Mesh'
+import Mesh from './Geometry'
 
 
 export default class RenderPass {
@@ -14,7 +14,7 @@ export default class RenderPass {
   addMeshes(meshes) {
     meshes.forEach((mesh)=>{
       if(!(mesh instanceof Mesh)) {
-        throw new TypeError("RenderPass accepts Mesh objects only.");
+        throw new TypeError("RenderPass accepts Geometry objects only.");
       }
       this._meshes.push(mesh);
     });

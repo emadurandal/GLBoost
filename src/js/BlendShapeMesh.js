@@ -3,7 +3,7 @@ import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import BlendShapeShaderSource from './shaders/BlendShapeShader'
-import Mesh from './Mesh'
+import Mesh from './Geometry'
 
 export default class BlendShapeMesh extends Mesh {
   constructor(canvas) {
@@ -22,7 +22,7 @@ export default class BlendShapeMesh extends Mesh {
 
   prepareForRender(existCamera_f, pointLight) {
 
-    // before prepareForRender of 'Mesh' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
+    // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
     let materials = this._materials;
     if (materials) {
       for (let i=0; i<materials.length;i++) {

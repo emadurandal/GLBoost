@@ -2305,7 +2305,7 @@
 
         meshes.forEach(function (mesh) {
           if (!(mesh instanceof Mesh)) {
-            throw new TypeError("RenderPass accepts Mesh objects only.");
+            throw new TypeError("RenderPass accepts Geometry objects only.");
           }
           _this._meshes.push(mesh);
         });
