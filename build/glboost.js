@@ -79,6 +79,28 @@
     return call && (typeof call === "object" || typeof call === "function") ? call : self;
   };
 
+  babelHelpers.set = function set(object, property, value, receiver) {
+    var desc = Object.getOwnPropertyDescriptor(object, property);
+
+    if (desc === undefined) {
+      var parent = Object.getPrototypeOf(object);
+
+      if (parent !== null) {
+        set(parent, property, value, receiver);
+      }
+    } else if ("value" in desc && desc.writable) {
+      desc.value = value;
+    } else {
+      var setter = desc.set;
+
+      if (setter !== undefined) {
+        setter.call(receiver, value);
+      }
+    }
+
+    return value;
+  };
+
   babelHelpers;
   var GLContextImpl = (function () {
     function GLContextImpl(canvas, parent) {
@@ -1204,17 +1226,29 @@
       this._rotate = Vector3.zero();
       this._scale = new Vector3(1, 1, 1);
       this._matrix = Matrix44.identity();
-      this._dirty = false;
+      this._dirtyAsElement = false;
+      this._updateCountAsElement = 0;
     }
 
     babelHelpers.createClass(Element, [{
+      key: '_needUpdate',
+      value: function _needUpdate() {
+        this._dirtyAsElement = true;
+        this._updateCountAsElement++;
+      }
+    }, {
+      key: 'updateCountAsElement',
+      get: function get() {
+        return this._updateCountAsElement;
+      }
+    }, {
       key: 'translate',
       set: function set(vec) {
         if (this._translate.isEqual(vec)) {
           return;
         }
         this._translate = vec;
-        this._dirty = true;
+        this._needUpdate();
       },
       get: function get() {
         return this._translate;
@@ -1226,7 +1260,7 @@
           return;
         }
         this._rotate = vec;
-        this._dirty = true;
+        this._needUpdate();
       },
       get: function get() {
         return this._rotate;
@@ -1238,7 +1272,7 @@
           return;
         }
         this._scale = vec;
-        this._dirty = true;
+        this._needUpdate();
       },
       get: function get() {
         return this._scale;
@@ -1246,10 +1280,10 @@
     }, {
       key: 'transformMatrix',
       get: function get() {
-        if (this._dirty) {
+        if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
           this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(Matrix44.rotateX(this._rotate.x)).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z)).multiply(Matrix44.translate(this._translate));
-          this._dirty = false;
+          this._dirtyAsElement = false;
           return this._matrix.clone();
         } else {
           return this._matrix.clone();
@@ -1258,7 +1292,10 @@
     }, {
       key: 'dirty',
       set: function set(flg) {
-        this._dirty = flg;
+        this._dirtyAsElement = flg;
+        if (flg) {
+          this._needUpdate();
+        }
       }
     }]);
     return Element;
@@ -1591,11 +1628,25 @@
       _this.setAsMainCamera();
 
       _this._dirtyView = true;
+      _this._updateCountAsCameraView = 0;
       _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
       return _this;
     }
 
     babelHelpers.createClass(Camera, [{
+      key: '_needUpdateView',
+      value: function _needUpdateView() {
+        this._dirtyView = true;
+        this._updateCountAsCameraView++;
+      }
+    }, {
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
@@ -1623,6 +1674,16 @@
         Camera._mainCamera = this;
       }
     }, {
+      key: 'updateCountAsCameraView',
+      get: function get() {
+        return this._updateCountAsCameraView;
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
       key: 'isMainCamera',
       get: function get() {
         return Camera._mainCamera === this;
@@ -1630,22 +1691,14 @@
     }, {
       key: 'translate',
       set: function set(vec) {
-        if (this._translate.isEqual(vec)) {
-          return;
-        }
-        this._dirty = true;
-        this._dirtyView = true;
-        this._translate = vec;
+        babelHelpers.set(Object.getPrototypeOf(Camera.prototype), 'translate', vec, this);
+        this._needUpdateView();
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        if (this._translate.isEqual(vec)) {
-          return;
-        }
-        this._dirty = true;
-        this._dirtyView = true;
-        this._translate = vec;
+        babelHelpers.set(Object.getPrototypeOf(Camera.prototype), 'translate', vec, this);
+        this._needUpdateView();
       },
       get: function get() {
         return this._translate;
@@ -1656,8 +1709,8 @@
         if (this._center.isEqual(vec)) {
           return;
         }
-        this._dirtyView = true;
         this._center = vec;
+        this._needUpdateView();
       },
       get: function get() {
         return this._center;
@@ -1668,8 +1721,8 @@
         if (this._up.isEqual(vec)) {
           return;
         }
-        this._dirtyView = true;
         this._up = vec;
+        this._needUpdateView();
       },
       get: function get() {
         return this._up;
@@ -1680,8 +1733,8 @@
         if (this._fovy === value) {
           return;
         }
-        this._dirtyProjection = true;
         this._fovy = value;
+        this._needUpdateProjection();
       },
       get: function get() {
         return this._fovy;
@@ -1692,8 +1745,8 @@
         if (this._aspect === value) {
           return;
         }
-        this._dirtyProjection = true;
         this._aspect = value;
+        this._needUpdateProjection();
       },
       get: function get() {
         return this._aspect;
@@ -1704,8 +1757,8 @@
         if (this._zNear === value) {
           return;
         }
-        this._dirtyProjection = true;
         this._zNear = value;
+        this._needUpdateProjection();
       },
       get: function get() {
         return this._zNear;
@@ -1716,24 +1769,12 @@
         if (this._zFar === value) {
           return;
         }
-        this._dirtyProjection = true;
         this._zFar = value;
+        this._needUpdateProjection();
       },
       get: function get() {
         return this._zFar;
       }
-      /*
-      get dirty() {
-        return this._dirtyView || this._dirtyProjection;
-      }
-       get dirtyView() {
-        return this._dirtyView;
-      }
-       get dirtyProjection() {
-        return this._dirtyProjection;
-      }
-      */
-
     }], [{
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix(eye, center, up) {
@@ -1750,8 +1791,6 @@
 
         var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
         var xscale = yscale / aspect;
-
-        this._dirtyProjection = false;
 
         return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
@@ -2891,6 +2930,14 @@
       this._vertexAttribComponentNDic = {};
       this._parent = null; // this can be any Mesh
       this._shader_for_non_material = new SimpleShader(this._canvas);
+      this._dirty = true;
+
+      this._existCamera_f = false;
+      var noMatchNumber = -9999;
+      this._updateCountOfCameraView = noMatchNumber;
+      this._updateCountOfCameraProjectin = noMatchNumber;
+      this._updateCountOfMeshTransform = noMatchNumber;
+      this._lights = [];
 
       if (this.name === 'Geometry') {
         Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
@@ -2934,6 +2981,7 @@
       value: function setVerticesData(vertices, primitiveType) {
         this._vertices = vertices;
         this._primitiveType = primitiveType ? primitiveType : GLBoost$1.TRIANGLES;
+        this._dirty = true;
       }
     }, {
       key: 'setUpVertexAttribs',
@@ -2959,6 +3007,8 @@
       key: 'prepareForRender',
       value: function prepareForRender(existCamera_f, lights) {
         var _this2 = this;
+
+        // TODO: Add prepare skipping using dirty flag
 
         var vertices = this._vertices;
         var gl = this._gl;
@@ -3041,6 +3091,30 @@
             this._materials[0].setVertexN(this, this._vertexN);
           }
         }
+
+        this._dirty = false;
+
+        return true;
+      }
+
+      /**
+       * Check updateCount of Camera View, Camera Projection, and Mesh's Transform, and Save them.
+       * @param camera
+       * @param mesh
+       * @returns {boolean} true: something is changed   false: No changed
+       * @private
+       */
+
+    }, {
+      key: '_checkAndSaveUpdateCountOfCameraAndMeshTransform',
+      value: function _checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh) {
+        var result = this._updateCountOfCameraView !== camera.updateCountAsCameraView || this._updateCountOfCameraProjectin !== camera.updateCountAsCameraProjection || this._updateCountOfMeshTransform !== camera.updateCountAsElement;
+
+        this._updateCountOfCameraView = camera.updateCountAsCameraView;
+        this._updateCountOfCameraProjectin = camera.updateCountAsCameraProjection;
+        this._updateCountOfMeshTransform = mesh.updateCountAsElement;
+
+        return result;
       }
     }, {
       key: 'draw',
@@ -3061,7 +3135,9 @@
               this.setUpVertexAttribs(gl, glslProgram);
             }
 
-            if (camera) {
+            var resultWhetherUpdated = this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh);
+
+            if (camera && resultWhetherUpdated) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
               var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
@@ -3090,7 +3166,7 @@
                     lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
                   }
 
-                  if (camera) {
+                  if (camera && resultWhetherUpdated) {
                     var lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
                     gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
                   } else {
@@ -3129,7 +3205,7 @@
             this.setUpVertexAttribs(gl, this._glslProgram);
           }
 
-          if (camera) {
+          if (camera && this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh)) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
@@ -3157,6 +3233,7 @@
       key: 'materials',
       set: function set(materials) {
         this._materials = materials;
+        this._dirty = true;
       }
     }]);
     return Geometry;

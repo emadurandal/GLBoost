@@ -19,6 +19,14 @@ export default class Geometry {
     this._vertexAttribComponentNDic = {};
     this._parent = null; // this can be any Mesh
     this._shader_for_non_material = new SimpleShader(this._canvas);
+    this._dirty = true;
+
+    this._existCamera_f = false;
+    var noMatchNumber = -9999;
+    this._updateCountOfCameraView = noMatchNumber;
+    this._updateCountOfCameraProjectin = noMatchNumber;
+    this._updateCountOfMeshTransform = noMatchNumber;
+    this._lights = [];
 
     if (this.name === 'Geometry') {
       Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
@@ -56,6 +64,7 @@ export default class Geometry {
   setVerticesData(vertices, primitiveType) {
     this._vertices = vertices;
     this._primitiveType = (primitiveType) ? primitiveType : GLBoost.TRIANGLES;
+    this._dirty = true;
   }
 
   setUpVertexAttribs(gl, glslProgram) {
@@ -77,6 +86,8 @@ export default class Geometry {
   }
 
   prepareForRender(existCamera_f, lights) {
+    // TODO: Add prepare skipping using dirty flag
+
     var vertices = this._vertices;
     var gl = this._gl;
 
@@ -160,6 +171,29 @@ export default class Geometry {
       }
     }
 
+    this._dirty = false;
+
+    return true;
+  }
+
+  /**
+   * Check updateCount of Camera View, Camera Projection, and Mesh's Transform, and Save them.
+   * @param camera
+   * @param mesh
+   * @returns {boolean} true: something is changed   false: No changed
+   * @private
+   */
+  _checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh) {
+    var result =
+      this._updateCountOfCameraView !== camera.updateCountAsCameraView ||
+      this._updateCountOfCameraProjectin !== camera.updateCountAsCameraProjection ||
+      this._updateCountOfMeshTransform !== camera.updateCountAsElement;
+
+    this._updateCountOfCameraView = camera.updateCountAsCameraView;
+    this._updateCountOfCameraProjectin = camera.updateCountAsCameraProjection;
+    this._updateCountOfMeshTransform = mesh.updateCountAsElement;
+
+    return result;
   }
 
   draw(lights, camera, mesh) {
@@ -179,7 +213,9 @@ export default class Geometry {
           this.setUpVertexAttribs(gl, glslProgram);
         }
 
-        if (camera) {
+        var resultWhetherUpdated = this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh);
+
+        if (camera && resultWhetherUpdated) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
           var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
@@ -195,6 +231,7 @@ export default class Geometry {
             var in_m = mv_m.toMatrix33().invert();
             gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
           }
+
         }
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
@@ -209,7 +246,7 @@ export default class Geometry {
                 lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
               }
 
-              if (camera) {
+              if (camera && resultWhetherUpdated) {
                 let lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
                 gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
               } else {
@@ -248,11 +285,12 @@ export default class Geometry {
         this.setUpVertexAttribs(gl, this._glslProgram);
       }
 
-      if (camera) {
+      if (camera && this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh)) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
         var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+
       }
 
       if (this._indicesBuffers.length > 0) {
@@ -266,10 +304,12 @@ export default class Geometry {
 
     glem.bindVertexArray(gl, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
   }
 
   set materials(materials) {
     this._materials = materials;
+    this._dirty = true;
   }
 
   toString() {

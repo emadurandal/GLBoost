@@ -19,7 +19,27 @@ export default class Camera extends Element {
     this.setAsMainCamera();
 
     this._dirtyView = true;
+    this._updateCountAsCameraView = 0;
     this._dirtyProjection = true;
+    this._updateCountAsCameraProjection = 0;
+  }
+
+  _needUpdateView() {
+    this._dirtyView = true;
+    this._updateCountAsCameraView++;
+  }
+
+  get updateCountAsCameraView() {
+    return this._updateCountAsCameraView;
+  }
+
+  _needUpdateProjection() {
+    this._dirtyProjection = true;
+    this._updateCountAsCameraProjection++;
+  }
+
+  get updateCountAsCameraProjection() {
+    return this._updateCountAsCameraProjection;
   }
 
   lookAtRHMatrix() {
@@ -59,8 +79,6 @@ export default class Camera extends Element {
     var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
     var xscale = yscale / aspect;
 
-    this._dirtyProjection = false;
-
     return new Matrix44(
       xscale, 0.0, 0.0, 0.0,
       0.0, yscale, 0.0, 0.0,
@@ -79,21 +97,13 @@ export default class Camera extends Element {
   }
 
   set translate(vec) {
-    if (this._translate.isEqual(vec)) {
-      return;
-    }
-    this._dirty = true;
-    this._dirtyView = true;
-    this._translate = vec;
+    super.translate = vec;
+    this._needUpdateView();
   }
 
   set eye(vec) {
-    if (this._translate.isEqual(vec)) {
-      return;
-    }
-    this._dirty = true;
-    this._dirtyView = true;
-    this._translate = vec;
+    super.translate = vec;
+    this._needUpdateView();
   }
 
   get eye() {
@@ -104,8 +114,8 @@ export default class Camera extends Element {
     if (this._center.isEqual(vec)) {
       return;
     }
-    this._dirtyView = true;
     this._center = vec;
+    this._needUpdateView();
   }
 
   get center() {
@@ -116,8 +126,8 @@ export default class Camera extends Element {
     if (this._up.isEqual(vec)) {
       return;
     }
-    this._dirtyView = true;
     this._up = vec;
+    this._needUpdateView();
   }
 
   get up() {
@@ -128,8 +138,8 @@ export default class Camera extends Element {
     if (this._fovy === value) {
       return;
     }
-    this._dirtyProjection = true;
     this._fovy = value;
+    this._needUpdateProjection();
   }
 
   get fovy() {
@@ -140,8 +150,8 @@ export default class Camera extends Element {
     if (this._aspect === value) {
       return;
     }
-    this._dirtyProjection = true;
     this._aspect = value;
+    this._needUpdateProjection();
   }
 
   get aspect() {
@@ -152,8 +162,8 @@ export default class Camera extends Element {
     if (this._zNear === value) {
       return;
     }
-    this._dirtyProjection = true;
     this._zNear = value;
+    this._needUpdateProjection();
   }
 
   get zNear() {
@@ -164,26 +174,14 @@ export default class Camera extends Element {
     if (this._zFar === value) {
       return;
     }
-    this._dirtyProjection = true;
     this._zFar = value;
+    this._needUpdateProjection();
   }
 
   get zFar() {
     return this._zFar;
   }
-  /*
-  get dirty() {
-    return this._dirtyView || this._dirtyProjection;
-  }
 
-  get dirtyView() {
-    return this._dirtyView;
-  }
-
-  get dirtyProjection() {
-    return this._dirtyProjection;
-  }
-  */
 }
 Camera._mainCamera = null;
 
