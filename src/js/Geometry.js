@@ -162,7 +162,7 @@ export default class Geometry {
 
   }
 
-  draw(lights, camera) {
+  draw(lights, camera, mesh) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
@@ -182,12 +182,12 @@ export default class Geometry {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._parent.transformMatrix);
+          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
 
           if (typeof glslProgram.modelViewMatrix !== "undefined") {
-            var mv_m = viewMatrix.clone().multiply(this._parent.transformMatrix);
+            var mv_m = viewMatrix.clone().multiply(mesh.transformMatrix);
             gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
           }
 
@@ -251,7 +251,7 @@ export default class Geometry {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._parent.transformMatrix);
+        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
       }
 
