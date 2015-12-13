@@ -2,12 +2,12 @@ import GLBoost from './../globals'
 import Element from './../Element'
 import GLContext from './../GLContext'
 import GLExtentionsManager from './../GLExtentionsManager'
-import Mesh from './../Geometry'
+import Geometry from './../Geometry'
 import Vector4 from './../math/Vector4'
 import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'
 
-export default class Cube extends Mesh {
+export default class Cube extends Geometry {
   constructor(widthVector, vertexColor, canvas) {
     super(canvas);
 

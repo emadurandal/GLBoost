@@ -1,5 +1,4 @@
 import GLBoost from './globals'
-import Element from './Element'
 import Matrix44 from './math/Matrix44'
 import Vector4 from './math/Vector4'
 import GLContext from './GLContext'
@@ -9,9 +8,8 @@ import SimpleShader from './shaders/SimpleShader'
 import PointLight from './lights/PointLight'
 import DirectionalLight from './lights/DirectionalLight'
 
-export default class Geometry extends Element {
+export default class Geometry {
   constructor(canvas) {
-    super();
     this._gl = GLContext.getInstance(canvas).gl;
     this._canvas = canvas;
     this._materials = [];
@@ -19,6 +17,7 @@ export default class Geometry extends Element {
     this._glslProgram = null;
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
+    this._parent = null; // this can be any Mesh
     this._shader_for_non_material = new SimpleShader(this._canvas);
 
     if (this.name === 'Geometry') {
@@ -183,12 +182,12 @@ export default class Geometry extends Element {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
+          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._parent.transformMatrix);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
 
           if (typeof glslProgram.modelViewMatrix !== "undefined") {
-            var mv_m = viewMatrix.clone().multiply(this.transformMatrix);
+            var mv_m = viewMatrix.clone().multiply(this._parent.transformMatrix);
             gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
           }
 
@@ -252,7 +251,7 @@ export default class Geometry extends Element {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this.transformMatrix);
+        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(this._parent.transformMatrix);
         gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
       }
 

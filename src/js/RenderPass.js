@@ -1,6 +1,6 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
-import Mesh from './Geometry'
+import Mesh from './Mesh'
 
 
 export default class RenderPass {

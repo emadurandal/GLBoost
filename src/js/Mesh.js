@@ -1,7 +1,9 @@
 import GLBoost from './globals'
+import Element from './Element'
 
-export default class Mesh {
+export default class Mesh extends Element {
   constructor(geometry, material) {
+    super();
     this.geometry = geometry;
     this.material = material;
   }
@@ -16,6 +18,7 @@ export default class Mesh {
 
   set geometry(geometry) {
     this._geometry = geometry;
+    geometry._parent = this;
     Mesh._geometries[geometry.toString()] = geometry;
   }
 
