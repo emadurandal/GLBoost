@@ -2024,6 +2024,10 @@
       _this._vertices = null;
       _this._vertexAttribComponentNDic = {};
       _this._shader_for_non_material = new SimpleShader(_this._canvas);
+
+      if (_this.name === 'Geometry') {
+        Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
+      }
       return _this;
     }
 
@@ -2279,6 +2283,11 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
       }
     }, {
+      key: 'toString',
+      value: function toString() {
+        return 'Geometry_' + Geometry._instanceCount;
+      }
+    }, {
       key: 'materials',
       set: function set(materials) {
         this._materials = materials;
@@ -2441,6 +2450,57 @@
   })(AbstractTexture);
 
   GLBoost$1["MutableTexture"] = MutableTexture;
+
+  var Mesh = (function () {
+    function Mesh(geometry, material) {
+      babelHelpers.classCallCheck(this, Mesh);
+
+      this.geometry = geometry;
+      this.material = material;
+    }
+
+    babelHelpers.createClass(Mesh, [{
+      key: "prepareForRender",
+      value: function prepareForRender(existCamera_f, lights) {
+        this._geometry.prepareForRender(existCamera_f, lights);
+      }
+    }, {
+      key: "draw",
+      value: function draw(lights, camera) {
+        this._geometry.draw(lights, camera);
+      }
+    }, {
+      key: "geometry",
+      set: function set(geometry) {
+        this._geometry = geometry;
+        Mesh._geometries[geometry.toString()] = geometry;
+      },
+      get: function get() {
+        return this._geometry;
+      }
+    }, {
+      key: "material",
+      set: function set(material) {
+        if (typeof this._geometry === "undefined") {
+          console.assert(false, "set a geometry before a material.");
+        }
+        if (this._geometry._materials.length === 0) {
+          this._geometry.materials = [material];
+          this._material = material;
+        } else {
+          this._material = null;
+        }
+      },
+      get: function get() {
+        return this._material;
+      }
+    }]);
+    return Mesh;
+  })();
+
+  Mesh._geometries = {};
+
+  GLBoost$1["Mesh"] = Mesh;
 
   var Camera = (function (_Element) {
     babelHelpers.inherits(Camera, _Element);
@@ -2699,7 +2759,7 @@
           glem.drawBuffers(gl, [gl.BACK]);
 
           scene.elements.forEach(function (elm) {
-            if (elm instanceof Geometry) {
+            if (elm instanceof Mesh) {
               elm.draw(lights, camera);
             }
           });
@@ -2838,7 +2898,7 @@
         // レンダリングの準備をさせる。
         this._elements.forEach(function (elm) {
           if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
-          if (elm instanceof Geometry) {
+          if (elm instanceof Mesh) {
             elm.prepareForRender(existCamera_f, lights);
           }
         });

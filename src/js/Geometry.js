@@ -20,6 +20,10 @@ export default class Geometry extends Element {
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
     this._shader_for_non_material = new SimpleShader(this._canvas);
+
+    if (this.name === 'Geometry') {
+      Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
+    }
   }
 
   /**
@@ -267,6 +271,10 @@ export default class Geometry extends Element {
 
   set materials(materials) {
     this._materials = materials;
+  }
+
+  toString() {
+    return 'Geometry_' + Geometry._instanceCount;
   }
 }
 

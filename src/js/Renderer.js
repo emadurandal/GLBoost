@@ -1,5 +1,5 @@
 import GLBoost from './globals'
-import Mesh from './Geometry'
+import Mesh from './Mesh'
 import Camera from './Camera'
 import Matrix44 from './math/Matrix44'
 import GLContext from './GLContext'
