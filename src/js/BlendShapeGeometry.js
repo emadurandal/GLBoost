@@ -5,7 +5,7 @@ import GLExtentionsManager from './GLExtentionsManager'
 import BlendShapeShaderSource from './shaders/BlendShapeShader'
 import Geometry from './Geometry'
 
-export default class BlendShapeMesh extends Geometry {
+export default class BlendShapeGeometry extends Geometry {
   constructor(canvas) {
     super(canvas);
 
@@ -119,4 +119,4 @@ export default class BlendShapeMesh extends Geometry {
 
 }
 
-GLBoost["BlendShapeMesh"] = BlendShapeMesh;
+GLBoost["BlendShapeGeometry"] = BlendShapeGeometry;

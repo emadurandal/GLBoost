@@ -19126,8 +19126,8 @@ tm.webgl = tm.webgl || {};
      * @class tm.webgl.BlendShapeMeshElement
      * @TODO ?
      */
-    tm.webgl.BlendShapeMeshElement = tm.createClass({
-        superClass: GLBoost.BlendShapeMesh,
+    tm.webgl.BlendShapeGeometryElement = tm.createClass({
+        superClass: GLBoost.BlendShapeGeometry,
 
         /**
          * @constructor
@@ -19135,12 +19135,12 @@ tm.webgl = tm.webgl || {};
         init: function(canvas) {
             tm.webgl.GeometryElement.prototype.init.call(this, canvas);
 
-            GLBoost.BlendShapeMesh.prototype.constructor.call(this, canvas);
+            GLBoost.BlendShapeGeometry.prototype.constructor.call(this, canvas);
         }
     });
 
     // tm.webgl.MeshElement を継承
-    tm.webgl.BlendShapeMeshElement.prototype.$safe(tm.webgl.GeometryElement.prototype);
+    tm.webgl.BlendShapeGeometryElement.prototype.$safe(tm.webgl.GeometryElement.prototype);
 
 })();
 
