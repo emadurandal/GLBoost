@@ -50,12 +50,12 @@
           new GLBoost.Vector2(1.0, 1.0)
         ];
 
-        var mesh = new GLBoost.Mesh(layer.canvas);
+        var geometry = new GLBoost.Geometry(layer.canvas);
         var texture = new GLBoost.Texture('resouces/texture.png', layer.canvas);
         var material = new GLBoost.ClassicMaterial(layer.canvas);
         material.diffuseTexture = texture;
-        mesh.materials = [material];
-        mesh.setVerticesData({
+        var mesh = new GLBoost.Mesh(geometry, material);
+        geometry.setVerticesData({
           position: positions,
           color: colors,
           texcoord: texcoords

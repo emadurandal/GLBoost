@@ -85,12 +85,12 @@
               new tm.geom.Vector2(1.0, 1.0)
             ];
 
-          var mesh = tm.webgl.BlendShapeGeometryElement(CANVAS_ID);
+          var geometry = new GLBoost.BlendShapeGeometry(CANVAS_ID);
           var texture = new GLBoost.Texture('resouces/texture.png', CANVAS_ID);
           var material = new GLBoost.ClassicMaterial(CANVAS_ID);
           material.diffuseTexture = texture;
-          mesh.materials = [material];
-          mesh.setVerticesData({
+          var mesh = new tm.webgl.MeshElement(geometry, material, CANVAS_ID);
+          geometry.setVerticesData({
             position: positions,
             texcoord: texcoords,
             shapetarget_1: shapetarget_1,
@@ -103,11 +103,11 @@
           renderPasses[0].specifyRenderTargetTextures(CANVAS_ID, renderTextures);
 
 
-          var mesh2 = tm.webgl.GeometryElement(CANVAS_ID);
+          var geometry2 = new GLBoost.Geometry(CANVAS_ID);
           var material2 = new GLBoost.ClassicMaterial(CANVAS_ID);
           material2.diffuseTexture = renderTextures[0];
-          mesh2.materials = [material2];
-          mesh2.setVerticesData({
+          var mesh2 = tm.webgl.MeshElement(geometry2, material2, CANVAS_ID);
+          geometry2.setVerticesData({
             position: positions,
             texcoord: texcoords
           });
@@ -119,10 +119,10 @@
 
           this.prepareForRender();
 
-          var tw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
-          var ctw1 = new tm.anim.Tween().fromTo(mesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
-          var tw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
-          var ctw2 = new tm.anim.Tween().fromTo(mesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+          var tw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+          var ctw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+          var tw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+          var ctw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
 
           tw1.on("finish", function (e) {
             tw2.start();
