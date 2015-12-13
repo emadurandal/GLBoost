@@ -97,19 +97,18 @@
         new GLBoost.Vector2(1.0, 1.0)
       ];
 
-      var blendMesh = tm.webgl.BlendShapeMeshElement('#world_' + index);
-      var blendMeshMaterial = new GLBoost.ClassicMaterial('#world_' + index);
+      var geometry = new GLBoost.BlendShapeGeometry('#world_' + index);
+      var material = new GLBoost.ClassicMaterial('#world_' + index);
       var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
-
-      blendMeshMaterial.diffuseTexture = texture;
-      blendMesh.materials = [blendMeshMaterial];
-      blendMesh.setVerticesData({
+      material.diffuseTexture = texture;
+      var mesh = tm.webgl.MeshElement(geometry, material, '#world');
+      geometry.setVerticesData({
         position: base_positions,
         texcoord: texcoords,
         shapetarget_1: shapetarget_1,
         shapetarget_2: shapetarget_2
       });
-      this.add(blendMesh);
+      this.add(mesh);
       var camera = tm.webgl.CameraElement(
               {
                 eye: new GLBoost.Vector3(0.0, 0.0, 10.0),
@@ -127,10 +126,10 @@
 
       this.prepareForRender();
 
-      var tw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
-      var ctw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
-      var tw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
-      var ctw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+      var tw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+      var ctw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+      var tw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+      var ctw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
 
       tw1.on("finish", function (e) {
         tw2.start();
@@ -203,19 +202,18 @@
         new GLBoost.Vector2(1.0, 1.0)
       ];
 
-      var blendMesh = tm.webgl.BlendShapeMeshElement('#world_' + index);
-      var blendMeshMaterial = new GLBoost.ClassicMaterial('#world_' + index);
+      var geometry = new GLBoost.BlendShapeGeometry('#world_' + index);
+      var material = new GLBoost.ClassicMaterial('#world_' + index);
       var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
-
-      blendMeshMaterial.diffuseTexture = texture;
-      blendMesh.materials = [blendMeshMaterial];
-      blendMesh.setVerticesData({
+      material.diffuseTexture = texture;
+      var mesh = tm.webgl.MeshElement(geometry, material, '#world');
+      geometry.setVerticesData({
         position: base_positions,
         texcoord: texcoords,
         shapetarget_1: shapetarget_1,
         shapetarget_2: shapetarget_2
       });
-      this.add(blendMesh);
+      this.add(mesh);
       var camera = tm.webgl.CameraElement(
               {
                 eye: new GLBoost.Vector3(0.0, 0.0, 10.0),
@@ -233,10 +231,10 @@
 
       this.prepareForRender();
 
-      var tw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
-      var ctw1 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
-      var tw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
-      var ctw2 = new tm.anim.Tween().fromTo(blendMesh, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
+      var tw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
+      var ctw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);
+      var tw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 0.0}, {blendWeight_2: 1.0}, 500, null);
+      var ctw2 = new tm.anim.Tween().fromTo(geometry, {blendWeight_2: 1.0}, {blendWeight_2: 0.0}, 500, null);
 
       tw1.on("finish", function (e) {
         tw2.start();

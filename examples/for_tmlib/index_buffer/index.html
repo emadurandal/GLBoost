@@ -60,8 +60,9 @@
             new tm.geom.Vector3(0.0, 0.0, 1.0)
             ];
 
-          var mesh_1 = tm.webgl.MeshElement('#world');
-          mesh_1.setVerticesData({
+          var geometry_1 = new GLBoost.Geometry('#world');
+          var mesh_1 = tm.webgl.MeshElement(geometry_1, null, '#world');
+          geometry_1.setVerticesData({
             position: positions,
             color: colors,
             indices: [indices]
@@ -81,12 +82,12 @@
             new tm.geom.Vector2(0.0, 1.0)
             ];
 
-          var mesh_2 = tm.webgl.MeshElement('#world');
+          var geometry_2 = new GLBoost.Geometry('#world');
           var texture = new GLBoost.Texture('resouces/texture.png', '#world');
           var material = new GLBoost.ClassicMaterial('#world');
           material.diffuseTexture = texture;
-          mesh_2.materials = [material];
-          mesh_2.setVerticesData({
+          var mesh_2 = new tm.webgl.MeshElement(geometry_2, material, '#world');
+          geometry_2.setVerticesData({
             position: positions,
             texcoord: texcoords,
             indices: [indices]

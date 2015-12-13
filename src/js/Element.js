@@ -9,7 +9,17 @@ export default class Element {
     this._rotate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
     this._matrix = Matrix44.identity();
-    this._dirty = false;
+    this._dirtyAsElement = false;
+    this._updateCountAsElement = 0;
+  }
+
+  _needUpdate() {
+    this._dirtyAsElement = true;
+    this._updateCountAsElement++;
+  }
+
+  get updateCountAsElement() {
+    return this._updateCountAsElement;
   }
 
   set translate(vec) {
@@ -17,7 +27,7 @@ export default class Element {
       return;
     }
     this._translate = vec;
-    this._dirty = true;
+    this._needUpdate();
   }
 
   get translate() {
@@ -29,7 +39,7 @@ export default class Element {
       return;
     }
     this._rotate = vec;
-    this._dirty = true;
+    this._needUpdate();
   }
 
   get rotate() {
@@ -41,7 +51,7 @@ export default class Element {
       return;
     }
     this._scale = vec;
-    this._dirty = true;
+    this._needUpdate();
   }
 
   get scale() {
@@ -49,14 +59,14 @@ export default class Element {
   }
 
   get transformMatrix() {
-    if (this._dirty) {
+    if (this._dirtyAsElement) {
       var matrix = Matrix44.identity();
       this._matrix = matrix.multiply(Matrix44.scale(this._scale)).
         multiply(Matrix44.rotateX(this._rotate.x)).
         multiply(Matrix44.rotateY(this._rotate.y)).
         multiply(Matrix44.rotateZ(this._rotate.z)).
         multiply(Matrix44.translate(this._translate));
-      this._dirty = false;
+      this._dirtyAsElement = false;
       return this._matrix.clone();
     } else {
       return this._matrix.clone();
@@ -64,7 +74,10 @@ export default class Element {
   }
 
   set dirty(flg) {
-    this._dirty = flg;
+    this._dirtyAsElement = flg;
+    if (flg) {
+      this._needUpdate();
+    }
   }
 }
 

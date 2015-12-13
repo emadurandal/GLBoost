@@ -64,8 +64,9 @@
 
             ];
 
-          var mesh = tm.webgl.MeshElement('#world');
-          mesh.setVerticesData({
+          var geometry = new GLBoost.Geometry('#world');
+          var mesh = tm.webgl.MeshElement(geometry, null, '#world');
+          geometry.setVerticesData({
             position: positions,
             color: colors
           });
