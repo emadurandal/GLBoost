@@ -2934,7 +2934,7 @@
       this._ambientColor = new Vector3(0.0, 0.0, 0.0);
       this._name = "";
       this._shader = new SimpleShader(canvas);
-      this._vertexNofMeshes = {};
+      this._vertexNofGeometries = {};
     }
 
     babelHelpers.createClass(ClassicMaterial, [{
@@ -2950,12 +2950,12 @@
       */
 
       value: function setVertexN(mesh, num) {
-        this._vertexNofMeshes[mesh] = num;
+        this._vertexNofGeometries[mesh] = num;
       }
     }, {
       key: 'getVertexN',
       value: function getVertexN(mesh) {
-        return typeof this._vertexNofMeshes[mesh] === "undefined" ? 0 : this._vertexNofMeshes[mesh];
+        return typeof this._vertexNofGeometries[mesh] === "undefined" ? 0 : this._vertexNofGeometries[mesh];
       }
     }, {
       key: 'setUp',
@@ -3916,7 +3916,7 @@
         fCount = 0;
         var partFCount = 0;
 
-        var mesh = new Geometry(canvas);
+        var geometry = new Geometry(canvas);
 
         for (var i = 0; i < this._materials.length; i++) {
           partFCount = 0;
@@ -4040,13 +4040,14 @@
               continue;
             }
 
-          this._materials[i].setVertexN(mesh, partFCount * 3);
+          this._materials[i].setVertexN(geometry, partFCount * 3);
 
           indices[i] = iFaceBufferArray.concat();
         }
 
-        mesh.materials = this._materials;
-        mesh.setVerticesData({
+        var mesh = new Mesh(geometry);
+        geometry.materials = this._materials;
+        geometry.setVerticesData({
           position: positions,
           texcoord: texcoords,
           normal: normals,

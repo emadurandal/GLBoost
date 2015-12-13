@@ -3,7 +3,8 @@ import Vector3 from './math/Vector3'
 import Vector2 from './math/Vector2'
 import ClassicMaterial from './ClassicMaterial'
 import Texture from './textures/Texture'
-import Mesh from './Geometry'
+import Geometry from './Geometry'
+import Mesh from './Mesh'
 import LambertShader from './shaders/LambertShader'
 import HalfLambertShader from './shaders/HalfLambertShader'
 import PhongShader from './shaders/PhongShader'
@@ -236,7 +237,7 @@ export default class ObjLoader {
     fCount = 0;
     var partFCount = 0;
 
-    var mesh = new Mesh(canvas);
+    var geometry = new Geometry(canvas);
 
     for(let i=0; i<this._materials.length; i++) {
       partFCount = 0;
@@ -355,15 +356,15 @@ export default class ObjLoader {
           continue;
       }
 
-      this._materials[i].setVertexN(mesh, partFCount*3);
+      this._materials[i].setVertexN(geometry, partFCount*3);
 
       indices[i] = iFaceBufferArray.concat();
 
     }
 
-
-    mesh.materials = this._materials;
-    mesh.setVerticesData({
+    var mesh = new Mesh(geometry);
+    geometry.materials = this._materials;
+    geometry.setVerticesData({
       position: positions,
       texcoord: texcoords,
       normal: normals,

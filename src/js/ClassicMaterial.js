@@ -12,7 +12,7 @@ export default class ClassicMaterial {
     this._ambientColor = new Vector3(0.0, 0.0, 0.0);
     this._name = "";
     this._shader = new SimpleShader(canvas);
-    this._vertexNofMeshes = {};
+    this._vertexNofGeometries = {};
   }
 
   set shader(shader) {
@@ -73,11 +73,11 @@ export default class ClassicMaterial {
   */
 
   setVertexN(mesh, num) {
-    this._vertexNofMeshes[mesh] = num;
+    this._vertexNofGeometries[mesh] = num;
   }
 
   getVertexN(mesh) {
-    return (typeof this._vertexNofMeshes[mesh] === "undefined") ? 0 : this._vertexNofMeshes[mesh];
+    return (typeof this._vertexNofGeometries[mesh] === "undefined") ? 0 : this._vertexNofGeometries[mesh];
   }
 
   setUp() {
