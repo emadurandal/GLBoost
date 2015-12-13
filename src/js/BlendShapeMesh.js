@@ -3,9 +3,9 @@ import Element from './Element'
 import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import BlendShapeShaderSource from './shaders/BlendShapeShader'
-import Mesh from './Geometry'
+import Geometry from './Geometry'
 
-export default class BlendShapeMesh extends Mesh {
+export default class BlendShapeMesh extends Geometry {
   constructor(canvas) {
     super(canvas);
 
