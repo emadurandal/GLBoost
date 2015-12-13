@@ -1305,7 +1305,7 @@
         if (typeof this._geometry === "undefined") {
           console.assert(false, "set a geometry before a material.");
         }
-        if (this._geometry._materials.length === 0) {
+        if (this._geometry._materials.length === 0 && material) {
           this._geometry.materials = [material];
           this._material = material;
         } else {
