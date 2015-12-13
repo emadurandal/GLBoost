@@ -3102,13 +3102,13 @@
     return BlendShapeShaderSource;
   })();
 
-  var BlendShapeMesh = (function (_Geometry) {
-    babelHelpers.inherits(BlendShapeMesh, _Geometry);
+  var BlendShapeGeometry = (function (_Geometry) {
+    babelHelpers.inherits(BlendShapeGeometry, _Geometry);
 
-    function BlendShapeMesh(canvas) {
-      babelHelpers.classCallCheck(this, BlendShapeMesh);
+    function BlendShapeGeometry(canvas) {
+      babelHelpers.classCallCheck(this, BlendShapeGeometry);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeMesh).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeGeometry).call(this, canvas));
 
       var BlendShapeShader = (function (_this$_shader_for_non) {
         babelHelpers.inherits(BlendShapeShader, _this$_shader_for_non);
@@ -3130,7 +3130,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(BlendShapeMesh, [{
+    babelHelpers.createClass(BlendShapeGeometry, [{
       key: 'prepareForRender',
       value: function prepareForRender(existCamera_f, pointLight) {
 
@@ -3142,7 +3142,7 @@
           }
         }
 
-        babelHelpers.get(Object.getPrototypeOf(BlendShapeMesh.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight);
+        babelHelpers.get(Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight);
       }
     }, {
       key: '_setBlendWeightToGlslProgram',
@@ -3249,10 +3249,10 @@
         gl.useProgram(currentProgram);
       }
     }]);
-    return BlendShapeMesh;
+    return BlendShapeGeometry;
   })(Geometry);
 
-  GLBoost$1["BlendShapeMesh"] = BlendShapeMesh;
+  GLBoost$1["BlendShapeGeometry"] = BlendShapeGeometry;
 
   var HalfLambertShaderSource = (function () {
     function HalfLambertShaderSource() {
