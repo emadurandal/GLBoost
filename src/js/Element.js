@@ -9,12 +9,15 @@ export default class Element {
     this._rotate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
     this._matrix = Matrix44.identity();
+    this._invMatrix = Matrix44.identity();
     this._dirtyAsElement = false;
+    this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
   }
 
   _needUpdate() {
     this._dirtyAsElement = true;
+    this._calculatedInverseMatrix = false;
     this._updateCountAsElement++;
   }
 
@@ -67,10 +70,17 @@ export default class Element {
         multiply(Matrix44.rotateZ(this._rotate.z)).
         multiply(Matrix44.translate(this._translate));
       this._dirtyAsElement = false;
-      return this._matrix.clone();
-    } else {
-      return this._matrix.clone();
     }
+
+    return this._matrix.clone();
+  }
+
+  get inverseTransformMatrix() {
+    if (!this._calculatedInverseMatrix) {
+      this._invMatrix = this.transformMatrix.invert(this._matrix);
+      this._calculatedInverseMatrix = true;
+    }
+    return this._invMatrix.clone();
   }
 
   set dirty(flg) {

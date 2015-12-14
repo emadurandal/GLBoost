@@ -20,8 +20,9 @@ export default class Geometry {
     this._shader_for_non_material = new SimpleShader(this._canvas);
     this._dirty = true;
 
-    if (this.name === 'Geometry') {
+    if (this.constructor === Geometry) {
       Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
+      this._instanceName = Geometry.name + '_' + Geometry._instanceCount;
     }
   }
 
@@ -92,12 +93,20 @@ export default class Geometry {
     });
 
     // create VAO
+    if (Geometry._vaoDic[this.toString()]) {
+      return;
+    }
     var vao = glem.createVertexArray(gl);
     glem.bindVertexArray(gl, vao);
+    Geometry._vaoDic[this.toString()] = vao;
 
     // create VBO
-    this._vbo = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+    if (Geometry._vboDic[this.toString()]) {
+      return;
+    }
+    var vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    Geometry._vboDic[this.toString()] = vbo;
 
     let materials = this._materials;
     if (materials.length > 0) {
@@ -138,21 +147,25 @@ export default class Geometry {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    this._indicesBuffers = [];
-    this._indicesNArray = [];
+    //this._ibo = [];
+    //this._indicesNArray = [];
+    Geometry._iboArrayDic[this.toString()] = [];
+    Geometry._idxNArrayDic[this.toString()] = [];
     if (vertices.indices) {
       // create Index Buffer
       for (let i=0; i<vertices.indices.length; i++) {
-        this._indicesBuffers[i] = gl.createBuffer();
-        this._indicesNArray[i] = vertices.indices[i].length;
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
+        //this._ibo[i] = gl.createBuffer();
+        //this._indicesNArray[i] = vertices.indices[i].length;
+        var ibo = gl.createBuffer();
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        Geometry._iboArrayDic[this.toString()][i] = ibo;
+        Geometry._idxNArrayDic[this.toString()][i] = vertices.indices[i].length;
       }
     }
     glem.bindVertexArray(gl, null);
-
-    this._vao = vao;
 
     // if this mesh has only one material...
     if (this._materials && this._materials.length === 1 && this._materials[0].getVertexN(this) === 0) {
@@ -173,18 +186,27 @@ export default class Geometry {
     var glem = GLExtentionsManager.getInstance(gl);
     var materials = this._materials;
 
-    var isVAOBound = glem.bindVertexArray(gl, this._vao);
+    var isVAOBound = false;
+    if (Geometry._lastGeometry !== this.toString()) {
+      isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+    }
+
 
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
-        let glslProgram = materials[i].glslProgram;
-        gl.useProgram(glslProgram);
+        if (materials[i].toString() !== Geometry._lastMaterial) {
+          let glslProgram = materials[i].glslProgram;
+          gl.useProgram(glslProgram);
 
-        if (!isVAOBound) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
-          this.setUpVertexAttribs(gl, glslProgram);
+          if (!isVAOBound) {
+            if (Geometry._lastGeometry !== this.toString()) {
+              gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+              this.setUpVertexAttribs(gl, glslProgram);
+            }
+          }
         }
 
+        let glslProgram = materials[i].glslProgram;
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
@@ -196,9 +218,9 @@ export default class Geometry {
         if (lights.length !== 0) {
           if (glslProgram['viewPosition']) {
             if (camera) {
-              var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(camera.eye);
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
             } else {
-              var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(new Vector3(0, 0, 1));
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
             }
             gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
           }
@@ -215,7 +237,7 @@ export default class Geometry {
                 isPointLight = 0.0;
               }
 
-              let lightVecInLocalCoord = mesh.transformMatrix.invert().multiplyVector(lightVec);
+              let lightVecInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(lightVec);
               gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
               gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
@@ -223,32 +245,47 @@ export default class Geometry {
           }
         }
 
-        if (typeof materials[i].shader.setUniforms !== "undefined") {
-          materials[i].shader.setUniforms(gl, glslProgram);
+        let isMaterialSetupDone = true;
+
+        if (materials[i].toString() !== Geometry._lastMaterial) {
+          if (typeof materials[i].shader.setUniforms !== "undefined") {
+            materials[i].shader.setUniforms(gl, glslProgram);
+          }
+
+          if (materials[i]) {
+            isMaterialSetupDone = materials[i].setUp();
+          }
         }
 
-        if (materials[i]) {
-          materials[i].setUp();
-        }
-
-        if (this._indicesBuffers.length > 0) {
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i] );
+        //if (this._ibo.length > 0) {
+        if (Geometry._iboArrayDic[this.toString()].length > 0) {
+          //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][i] );
           gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_SHORT, 0);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         } else {
           gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
         }
 
-        if (materials[i]) {
-          materials[i].tearDown();
+        /*
+        if (materials[i].toString() !== Geometry._lastMaterial) {
+          if (materials[i]) {
+            materials[i].tearDown();
+          }
         }
+        */
+
+        //Geometry._lastMaterial = null;
+        Geometry._lastMaterial = isMaterialSetupDone ? materials[i].toString() : null;
       }
     } else {
       gl.useProgram(this._glslProgram);
 
       if (!isVAOBound) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
-        this.setUpVertexAttribs(gl, this._glslProgram);
+        if (Geometry._lastGeometry !== this.toString()) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+          this.setUpVertexAttribs(gl, this._glslProgram);
+        }
       }
 
       if (camera) {
@@ -259,17 +296,22 @@ export default class Geometry {
 
       }
 
-      if (this._indicesBuffers.length > 0) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[0] );
-        gl.drawElements(gl[this._primitiveType], this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
+      //if (this._ibo.length > 0) {
+      if (Geometry._iboArrayDic[this.toString()].length > 0) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][0] );
+        gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[this.toString()][0], gl.UNSIGNED_SHORT, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
       }
+
+      Geometry._lastMaterial = null;
     }
 
-    glem.bindVertexArray(gl, null);
+    //glem.bindVertexArray(gl, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    Geometry._lastGeometry = this.toString();
 
   }
 
@@ -279,8 +321,18 @@ export default class Geometry {
   }
 
   toString() {
-    return 'Geometry_' + Geometry._instanceCount;
+    return this._instanceName;
+  }
+
+  static clearMaterialCache() {
+    Geometry._lastMaterial = null;
   }
 }
+Geometry._vaoDic = {};
+Geometry._vboDic = {};
+Geometry._iboArrayDic = {};
+Geometry._idxNArrayDic = {};
+Geometry._lastGeometry = null;
+Geometry._lastMaterial = null;
 
 GLBoost["Geometry"] = Geometry;

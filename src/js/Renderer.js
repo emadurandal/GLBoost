@@ -7,6 +7,8 @@ import GLExtentionsManager from './GLExtentionsManager'
 import MutableTexture from './textures/MutableTexture'
 import RenderPass from './RenderPass'
 import AbstractLight from './lights/AbstractLight'
+import Geometry from './Geometry'
+
 
 export default class Renderer {
   constructor(parameters) {
@@ -75,7 +77,11 @@ export default class Renderer {
     } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
       this._renderPasses.forEach((renderPass)=>{
 
+        var meshes = renderPass.getMeshes();
+
         if (renderPass.buffersToDraw[0] !== gl.BACK) {
+          gl.bindTexture(gl.TEXTURE_2D, null);
+          Geometry.clearMaterialCache();
           gl.bindFramebuffer(gl.FRAMEBUFFER, this._fbo);
         }
         glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
@@ -86,7 +92,6 @@ export default class Renderer {
           gl.clear( gl.COLOR_BUFFER_BIT );
         }
 
-        var meshes = renderPass.getMeshes();
         meshes.forEach((mesh)=> {
           mesh.draw(lights, camera);
         });
