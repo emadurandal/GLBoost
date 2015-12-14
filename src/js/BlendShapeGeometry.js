@@ -18,6 +18,11 @@ export default class BlendShapeGeometry extends Geometry {
 
     this._shader_for_non_material = new BlendShapeShader(canvas);
     this._shaderClass = BlendShapeShader;
+
+    if (this.constructor === BlendShapeGeometry) {
+      BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === "undefined") ? 0 : (BlendShapeGeometry._instanceCount + 1);
+      this._instanceCount = BlendShapeGeometry._instanceCount;
+    }
   }
 
   prepareForRender(existCamera_f, pointLight) {
@@ -117,6 +122,9 @@ export default class BlendShapeGeometry extends Geometry {
     gl.useProgram(currentProgram);
   }
 
+  toString() {
+    return 'BlendShapeGeometry_' + this._instanceCount;
+  }
 }
 
 GLBoost["BlendShapeGeometry"] = BlendShapeGeometry;

@@ -1370,8 +1370,9 @@
       _this.geometry = geometry;
       _this.material = material;
 
-      if (_this.name === 'Mesh') {
+      if (_this.constructor === Mesh || _this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
         Mesh._instanceCount = typeof Mesh._instanceCount === "undefined" ? 0 : Mesh._instanceCount + 1;
+        _this._instanceCount = Mesh._instanceCount;
       }
       return _this;
     }
@@ -1389,7 +1390,7 @@
     }, {
       key: 'toString',
       value: function toString() {
-        return 'Mesh_' + Mesh._instanceCount;
+        return 'Mesh_' + this._instanceCount;
       }
     }, {
       key: 'geometry',
@@ -2996,8 +2997,9 @@
       this._shader_for_non_material = new SimpleShader(this._canvas);
       this._dirty = true;
 
-      if (this.name === 'Geometry') {
+      if (this.constructor === Geometry) {
         Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
+        this._instanceCount = Geometry._instanceCount;
       }
     }
 
@@ -3079,12 +3081,20 @@
         });
 
         // create VAO
+        if (Geometry._vaoDic[this.toString()]) {
+          return;
+        }
         var vao = glem.createVertexArray(gl);
         glem.bindVertexArray(gl, vao);
+        Geometry._vaoDic[this.toString()] = vao;
 
         // create VBO
-        this._vbo = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+        if (Geometry._vboDic[this.toString()]) {
+          return;
+        }
+        var vbo = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+        Geometry._vboDic[this.toString()] = vbo;
 
         var materials = this._materials;
         if (materials.length > 0) {
@@ -3124,21 +3134,25 @@
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        this._indicesBuffers = [];
-        this._indicesNArray = [];
+        //this._ibo = [];
+        //this._indicesNArray = [];
+        Geometry._iboArrayDic[this.toString()] = [];
+        Geometry._idxNArrayDic[this.toString()] = [];
         if (vertices.indices) {
           // create Index Buffer
           for (var i = 0; i < vertices.indices.length; i++) {
-            this._indicesBuffers[i] = gl.createBuffer();
-            this._indicesNArray[i] = vertices.indices[i].length;
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
+            //this._ibo[i] = gl.createBuffer();
+            //this._indicesNArray[i] = vertices.indices[i].length;
+            var ibo = gl.createBuffer();
+            //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            Geometry._iboArrayDic[this.toString()][i] = ibo;
+            Geometry._idxNArrayDic[this.toString()][i] = vertices.indices[i].length;
           }
         }
         glem.bindVertexArray(gl, null);
-
-        this._vao = vao;
 
         // if this mesh has only one material...
         if (this._materials && this._materials.length === 1 && this._materials[0].getVertexN(this) === 0) {
@@ -3160,7 +3174,8 @@
         var glem = GLExtentionsManager.getInstance(gl);
         var materials = this._materials;
 
-        var isVAOBound = glem.bindVertexArray(gl, this._vao);
+        //var isVAOBound = glem.bindVertexArray(gl, this._vao);
+        var isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
@@ -3168,7 +3183,8 @@
             gl.useProgram(glslProgram);
 
             if (!isVAOBound) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+              //gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+              gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
               this.setUpVertexAttribs(gl, glslProgram);
             }
 
@@ -3218,8 +3234,10 @@
               materials[i].setUp();
             }
 
-            if (this._indicesBuffers.length > 0) {
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[i]);
+            //if (this._ibo.length > 0) {
+            if (Geometry._iboArrayDic[this.toString()].length > 0) {
+              //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][i]);
               gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_SHORT, 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
@@ -3234,7 +3252,8 @@
           gl.useProgram(this._glslProgram);
 
           if (!isVAOBound) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+            //gl.bindBuffer(gl.ARRAY_BUFFER, this._vbo);
+            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
             this.setUpVertexAttribs(gl, this._glslProgram);
           }
 
@@ -3245,9 +3264,10 @@
             gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
           }
 
-          if (this._indicesBuffers.length > 0) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._indicesBuffers[0]);
-            gl.drawElements(gl[this._primitiveType], this._indicesNArray[0], gl.UNSIGNED_SHORT, 0);
+          //if (this._ibo.length > 0) {
+          if (Geometry._iboArrayDic[this.toString()].length > 0) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][0]);
+            gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[this.toString()][0], gl.UNSIGNED_SHORT, 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -3260,7 +3280,7 @@
     }, {
       key: 'toString',
       value: function toString() {
-        return 'Geometry_' + Geometry._instanceCount;
+        return 'Geometry_' + this._instanceCount;
       }
     }, {
       key: 'materials',
@@ -3271,6 +3291,11 @@
     }]);
     return Geometry;
   })();
+
+  Geometry._vaoDic = {};
+  Geometry._vboDic = {};
+  Geometry._iboArrayDic = {};
+  Geometry._idxNArrayDic = {};
 
   GLBoost$1["Geometry"] = Geometry;
 
@@ -3299,6 +3324,11 @@
 
       _this._shader_for_non_material = new BlendShapeShader(canvas);
       _this._shaderClass = BlendShapeShader;
+
+      if (_this.constructor === BlendShapeGeometry) {
+        BlendShapeGeometry._instanceCount = typeof BlendShapeGeometry._instanceCount === "undefined" ? 0 : BlendShapeGeometry._instanceCount + 1;
+        _this._instanceCount = BlendShapeGeometry._instanceCount;
+      }
       return _this;
     }
 
@@ -3329,6 +3359,11 @@
           this._gl.useProgram(this._glslProgram);
           this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + blendTarget], weight);
         }
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return 'BlendShapeGeometry_' + this._instanceCount;
       }
     }, {
       key: 'blendWeight_1',
@@ -3582,8 +3617,6 @@
         shaderText += '  vec4 surfaceColor = rt1;\n';
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
-        //shaderText += '  float diffuse = 0.0;\n';
-
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
@@ -3591,7 +3624,7 @@
         shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.rgb, 1);\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
 
         return shaderText;
       }
