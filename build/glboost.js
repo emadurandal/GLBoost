@@ -265,7 +265,7 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector3 = (function () {
+  var Vector3$1 = (function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
 
@@ -453,7 +453,7 @@
     return Vector3;
   })();
 
-  GLBoost$1["Vector3"] = Vector3;
+  GLBoost$1["Vector3"] = Vector3$1;
 
   var Matrix33 = (function () {
     function Matrix33() {
@@ -584,7 +584,7 @@
         var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z;
         var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z;
 
-        return new Vector3(x, y, z);
+        return new Vector3$1(x, y, z);
       }
 
       /**
@@ -1005,6 +1005,34 @@
         return new Matrix33(this.m00, this.m01, this.m02, this.m10, this.m11, this.m12, this.m20, this.m21, this.m22);
       }
     }, {
+      key: 'determinant',
+      value: function determinant() {
+        return this.m00 * this.m11 * this.m22 * this.m33 + this.m00 * this.m12 * this.m23 * this.m31 + this.m00 * this.m13 * this.m21 * this.m32 + this.m01 * this.m10 * this.m23 * this.m32 + this.m01 * this.m12 * this.m20 * this.m33 + this.m01 * this.m13 * this.m22 * this.m30 + this.m02 * this.m10 * this.m21 * this.m33 + this.m02 * this.m11 * this.m23 * this.m30 + this.m02 * this.m13 * this.m20 * this.m31 + this.m03 * this.m10 * this.m22 * this.m31 + this.m03 * this.m11 * this.m20 * this.m32 + this.m03 * this.m12 * this.m21 * this.m30 - this.m00 * this.m11 * this.m23 * this.m32 - this.m00 * this.m12 * this.m21 * this.m33 - this.m00 * this.m13 * this.m22 * this.m31 - this.m01 * this.m10 * this.m22 * this.m33 - this.m01 * this.m12 * this.m23 * this.m30 - this.m01 * this.m13 * this.m20 * this.m32 - this.m02 * this.m10 * this.m23 * this.m31 - this.m02 * this.m11 * this.m20 * this.m33 - this.m02 * this.m13 * this.m21 * this.m30 - this.m03 * this.m10 * this.m21 * this.m32 - this.m03 * this.m11 * this.m22 * this.m30 - this.m03 * this.m12 * this.m20 * this.m31;
+      }
+    }, {
+      key: 'invert',
+      value: function invert() {
+        var det = this.determinant();
+        var m00 = (this.m11 * this.m22 * this.m33 + this.m12 * this.m23 * this.m31 + this.m13 * this.m21 * this.m32 - this.m11 * this.m23 * this.m32 - this.m12 * this.m21 * this.m33 - this.m13 * this.m22 * this.m31) / det;
+        var m01 = (this.m01 * this.m23 * this.m32 + this.m02 * this.m21 * this.m33 + this.m03 * this.m22 * this.m31 - this.m01 * this.m22 * this.m33 - this.m02 * this.m23 * this.m31 - this.m03 * this.m21 * this.m32) / det;
+        var m02 = (this.m01 * this.m12 * this.m33 + this.m02 * this.m13 * this.m31 + this.m03 * this.m11 * this.m32 - this.m01 * this.m13 * this.m32 - this.m02 * this.m11 * this.m33 - this.m03 * this.m12 * this.m31) / det;
+        var m03 = (this.m01 * this.m13 * this.m22 + this.m02 * this.m11 * this.m23 + this.m03 * this.m12 * this.m21 - this.m01 * this.m12 * this.m23 - this.m02 * this.m13 * this.m21 - this.m03 * this.m11 * this.m22) / det;
+        var m10 = (this.m10 * this.m23 * this.m32 + this.m12 * this.m20 * this.m33 + this.m13 * this.m22 * this.m30 - this.m10 * this.m22 * this.m33 - this.m12 * this.m23 * this.m30 - this.m13 * this.m20 * this.m32) / det;
+        var m11 = (this.m00 * this.m22 * this.m33 + this.m02 * this.m23 * this.m30 + this.m03 * this.m20 * this.m32 - this.m00 * this.m23 * this.m32 - this.m02 * this.m20 * this.m33 - this.m03 * this.m22 * this.m30) / det;
+        var m12 = (this.m00 * this.m13 * this.m32 + this.m02 * this.m10 * this.m33 + this.m03 * this.m12 * this.m30 - this.m00 * this.m12 * this.m33 - this.m02 * this.m13 * this.m30 - this.m03 * this.m10 * this.m32) / det;
+        var m13 = (this.m00 * this.m12 * this.m23 + this.m02 * this.m13 * this.m20 + this.m03 * this.m10 * this.m22 - this.m00 * this.m13 * this.m22 - this.m02 * this.m10 * this.m23 - this.m03 * this.m12 * this.m20) / det;
+        var m20 = (this.m10 * this.m21 * this.m33 + this.m11 * this.m23 * this.m30 + this.m13 * this.m20 * this.m31 - this.m10 * this.m23 * this.m31 - this.m11 * this.m20 * this.m33 - this.m13 * this.m21 * this.m30) / det;
+        var m21 = (this.m00 * this.m23 * this.m31 + this.m01 * this.m20 * this.m33 + this.m03 * this.m21 * this.m30 - this.m00 * this.m21 * this.m33 - this.m01 * this.m23 * this.m30 - this.m03 * this.m20 * this.m31) / det;
+        var m22 = (this.m00 * this.m11 * this.m33 + this.m01 * this.m13 * this.m30 + this.m03 * this.m10 * this.m31 - this.m00 * this.m13 * this.m31 - this.m01 * this.m10 * this.m33 - this.m03 * this.m11 * this.m30) / det;
+        var m23 = (this.m00 * this.m13 * this.m21 + this.m01 * this.m10 * this.m23 + this.m03 * this.m11 * this.m20 - this.m00 * this.m11 * this.m23 - this.m01 * this.m13 * this.m20 - this.m03 * this.m10 * this.m21) / det;
+        var m30 = (this.m10 * this.m22 * this.m31 + this.m11 * this.m20 * this.m32 + this.m12 * this.m21 * this.m30 - this.m10 * this.m21 * this.m32 - this.m11 * this.m22 * this.m30 - this.m12 * this.m20 * this.m31) / det;
+        var m31 = (this.m00 * this.m21 * this.m32 + this.m01 * this.m22 * this.m30 + this.m02 * this.m20 * this.m31 - this.m00 * this.m22 * this.m31 - this.m01 * this.m20 * this.m32 - this.m02 * this.m21 * this.m30) / det;
+        var m32 = (this.m00 * this.m12 * this.m31 + this.m01 * this.m10 * this.m32 + this.m02 * this.m11 * this.m30 - this.m00 * this.m11 * this.m32 - this.m01 * this.m12 * this.m30 - this.m02 * this.m10 * this.m31) / det;
+        var m33 = (this.m00 * this.m11 * this.m22 + this.m01 * this.m12 * this.m20 + this.m02 * this.m10 * this.m21 - this.m00 * this.m12 * this.m21 - this.m01 * this.m10 * this.m22 - this.m02 * this.m11 * this.m20) / det;
+
+        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
+    }, {
       key: 'm00',
       set: function set(val) {
         this.m[0] = val;
@@ -1211,6 +1239,34 @@
       value: function toMatrix33(mat) {
         return new Matrix33(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22);
       }
+    }, {
+      key: 'determinant',
+      value: function determinant(mat) {
+        return mat.m00 * mat.m11 * mat.m22 * mat.m33 + mat.m00 * mat.m12 * mat.m23 * mat.m31 + mat.m00 * mat.m13 * mat.m21 * mat.m32 + mat.m01 * mat.m10 * mat.m23 * mat.m32 + mat.m01 * mat.m12 * mat.m20 * mat.m33 + mat.m01 * mat.m13 * mat.m22 * mat.m30 + mat.m02 * mat.m10 * mat.m21 * mat.m33 + mat.m02 * mat.m11 * mat.m23 * mat.m30 + mat.m02 * mat.m13 * mat.m20 * mat.m31 + mat.m03 * mat.m10 * mat.m22 * mat.m31 + mat.m03 * mat.m11 * mat.m20 * mat.m32 + mat.m03 * mat.m12 * mat.m21 * mat.m30 - mat.m00 * mat.m11 * mat.m23 * mat.m32 - mat.m00 * mat.m12 * mat.m21 * mat.m33 - mat.m00 * mat.m13 * mat.m22 * mat.m31 - mat.m01 * mat.m10 * mat.m22 * mat.m33 - mat.m01 * mat.m12 * mat.m23 * mat.m30 - mat.m01 * mat.m13 * mat.m20 * mat.m32 - mat.m02 * mat.m10 * mat.m23 * mat.m31 - mat.m02 * mat.m11 * mat.m20 * mat.m33 - mat.m02 * mat.m13 * mat.m21 * mat.m30 - mat.m03 * mat.m10 * mat.m21 * mat.m32 - mat.m03 * mat.m11 * mat.m22 * mat.m30 - mat.m03 * mat.m12 * mat.m20 * mat.m31;
+      }
+    }, {
+      key: 'invert',
+      value: function invert(mat) {
+        var det = mat.determinant();
+        var m00 = (mat.m11 * mat.m22 * mat.m33 + mat.m12 * mat.m23 * mat.m31 + mat.m13 * mat.m21 * mat.m32 - mat.m11 * mat.m23 * mat.m32 - mat.m12 * mat.m21 * mat.m33 - mat.m13 * mat.m22 * mat.m31) / det;
+        var m01 = (mat.m01 * mat.m23 * mat.m32 + mat.m02 * mat.m21 * mat.m33 + mat.m03 * mat.m22 * mat.m31 - mat.m01 * mat.m22 * mat.m33 - mat.m02 * mat.m23 * mat.m31 - mat.m03 * mat.m21 * mat.m32) / det;
+        var m02 = (mat.m01 * mat.m12 * mat.m33 + mat.m02 * mat.m13 * mat.m31 + mat.m03 * mat.m11 * mat.m32 - mat.m01 * mat.m13 * mat.m32 - mat.m02 * mat.m11 * mat.m33 - mat.m03 * mat.m12 * mat.m31) / det;
+        var m03 = (mat.m01 * mat.m13 * mat.m22 + mat.m02 * mat.m11 * mat.m23 + mat.m03 * mat.m12 * mat.m21 - mat.m01 * mat.m12 * mat.m23 - mat.m02 * mat.m13 * mat.m21 - mat.m03 * mat.m11 * mat.m22) / det;
+        var m10 = (mat.m10 * mat.m23 * mat.m32 + mat.m12 * mat.m20 * mat.m33 + mat.m13 * mat.m22 * mat.m30 - mat.m10 * mat.m22 * mat.m33 - mat.m12 * mat.m23 * mat.m30 - mat.m13 * mat.m20 * mat.m32) / det;
+        var m11 = (mat.m00 * mat.m22 * mat.m33 + mat.m02 * mat.m23 * mat.m30 + mat.m03 * mat.m20 * mat.m32 - mat.m00 * mat.m23 * mat.m32 - mat.m02 * mat.m20 * mat.m33 - mat.m03 * mat.m22 * mat.m30) / det;
+        var m12 = (mat.m00 * mat.m13 * mat.m32 + mat.m02 * mat.m10 * mat.m33 + mat.m03 * mat.m12 * mat.m30 - mat.m00 * mat.m12 * mat.m33 - mat.m02 * mat.m13 * mat.m30 - mat.m03 * mat.m10 * mat.m32) / det;
+        var m13 = (mat.m00 * mat.m12 * mat.m23 + mat.m02 * mat.m13 * mat.m20 + mat.m03 * mat.m10 * mat.m22 - mat.m00 * mat.m13 * mat.m22 - mat.m02 * mat.m10 * mat.m23 - mat.m03 * mat.m12 * mat.m20) / det;
+        var m20 = (mat.m10 * mat.m21 * mat.m33 + mat.m11 * mat.m23 * mat.m30 + mat.m13 * mat.m20 * mat.m31 - mat.m10 * mat.m23 * mat.m31 - mat.m11 * mat.m20 * mat.m33 - mat.m13 * mat.m21 * mat.m30) / det;
+        var m21 = (mat.m00 * mat.m23 * mat.m31 + mat.m01 * mat.m20 * mat.m33 + mat.m03 * mat.m21 * mat.m30 - mat.m00 * mat.m21 * mat.m33 - mat.m01 * mat.m23 * mat.m30 - mat.m03 * mat.m20 * mat.m31) / det;
+        var m22 = (mat.m00 * mat.m11 * mat.m33 + mat.m01 * mat.m13 * mat.m30 + mat.m03 * mat.m10 * mat.m31 - mat.m00 * mat.m13 * mat.m31 - mat.m01 * mat.m10 * mat.m33 - mat.m03 * mat.m11 * mat.m30) / det;
+        var m23 = (mat.m00 * mat.m13 * mat.m21 + mat.m01 * mat.m10 * mat.m23 + mat.m03 * mat.m11 * mat.m20 - mat.m00 * mat.m11 * mat.m23 - mat.m01 * mat.m13 * mat.m20 - mat.m03 * mat.m10 * mat.m21) / det;
+        var m30 = (mat.m10 * mat.m22 * mat.m31 + mat.m11 * mat.m20 * mat.m32 + mat.m12 * mat.m21 * mat.m30 - mat.m10 * mat.m21 * mat.m32 - mat.m11 * mat.m22 * mat.m30 - mat.m12 * mat.m20 * mat.m31) / det;
+        var m31 = (mat.m00 * mat.m21 * mat.m32 + mat.m01 * mat.m22 * mat.m30 + mat.m02 * mat.m20 * mat.m31 - mat.m00 * mat.m22 * mat.m31 - mat.m01 * mat.m20 * mat.m32 - mat.m02 * mat.m21 * mat.m30) / det;
+        var m32 = (mat.m00 * mat.m12 * mat.m31 + mat.m01 * mat.m10 * mat.m32 + mat.m02 * mat.m11 * mat.m30 - mat.m00 * mat.m11 * mat.m32 - mat.m01 * mat.m12 * mat.m30 - mat.m02 * mat.m10 * mat.m31) / det;
+        var m33 = (mat.m00 * mat.m11 * mat.m22 + mat.m01 * mat.m12 * mat.m20 + mat.m02 * mat.m10 * mat.m21 - mat.m00 * mat.m12 * mat.m21 - mat.m01 * mat.m10 * mat.m22 - mat.m02 * mat.m11 * mat.m20) / det;
+
+        return new Matrix44(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
     }]);
     return Matrix44;
   })();
@@ -1222,9 +1278,9 @@
       babelHelpers.classCallCheck(this, Element);
 
       this.children = [];
-      this._translate = Vector3.zero();
-      this._rotate = Vector3.zero();
-      this._scale = new Vector3(1, 1, 1);
+      this._translate = Vector3$1.zero();
+      this._rotate = Vector3$1.zero();
+      this._scale = new Vector3$1(1, 1, 1);
       this._matrix = Matrix44.identity();
       this._dirtyAsElement = false;
       this._updateCountAsElement = 0;
@@ -1313,6 +1369,10 @@
 
       _this.geometry = geometry;
       _this.material = material;
+
+      if (_this.name === 'Mesh') {
+        Mesh._instanceCount = typeof Mesh._instanceCount === "undefined" ? 0 : Mesh._instanceCount + 1;
+      }
       return _this;
     }
 
@@ -1325,6 +1385,11 @@
       key: 'draw',
       value: function draw(lights, camera) {
         this._geometry.draw(lights, camera, this);
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return 'Mesh_' + Mesh._instanceCount;
       }
     }, {
       key: 'geometry',
@@ -1779,11 +1844,11 @@
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix(eye, center, up) {
 
-        var f = Vector3.normalize(Vector3.subtract(center, eye));
-        var s = Vector3.normalize(Vector3.cross(f, up));
-        var u = Vector3.cross(s, f);
+        var f = Vector3$1.normalize(Vector3$1.subtract(center, eye));
+        var s = Vector3$1.normalize(Vector3$1.cross(f, up));
+        var u = Vector3$1.cross(s, f);
 
-        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
+        return new Matrix44(s.x, s.y, s.z, -Vector3$1.dotProduct(s, eye), u.x, u.y, u.z, -Vector3$1.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3$1.dotProduct(f, eye), 0, 0, 0, 1);
       }
     }, {
       key: 'perspectiveRHMatrix',
@@ -2647,9 +2712,9 @@
 
       this._diffuseTexture = null;
       this._gl = GLContext.getInstance(canvas).gl;
-      this._diffuseColor = new Vector3(1.0, 1.0, 1.0);
-      this._specularColor = new Vector3(1.0, 1.0, 1.0);
-      this._ambientColor = new Vector3(0.0, 0.0, 0.0);
+      this._diffuseColor = new Vector3$1(1.0, 1.0, 1.0);
+      this._specularColor = new Vector3$1(1.0, 1.0, 1.0);
+      this._ambientColor = new Vector3$1(0.0, 0.0, 0.0);
       this._name = "";
       this._shader = new SimpleShader(canvas);
       this._vertexNofGeometries = {};
@@ -2928,16 +2993,8 @@
       this._glslProgram = null;
       this._vertices = null;
       this._vertexAttribComponentNDic = {};
-      this._parent = null; // this can be any Mesh
       this._shader_for_non_material = new SimpleShader(this._canvas);
       this._dirty = true;
-
-      this._existCamera_f = false;
-      var noMatchNumber = -9999;
-      this._updateCountOfCameraView = noMatchNumber;
-      this._updateCountOfCameraProjectin = noMatchNumber;
-      this._updateCountOfMeshTransform = noMatchNumber;
-      this._lights = [];
 
       if (this.name === 'Geometry') {
         Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
@@ -3096,26 +3153,6 @@
 
         return true;
       }
-
-      /**
-       * Check updateCount of Camera View, Camera Projection, and Mesh's Transform, and Save them.
-       * @param camera
-       * @param mesh
-       * @returns {boolean} true: something is changed   false: No changed
-       * @private
-       */
-
-    }, {
-      key: '_checkAndSaveUpdateCountOfCameraAndMeshTransform',
-      value: function _checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh) {
-        var result = this._updateCountOfCameraView !== camera.updateCountAsCameraView || this._updateCountOfCameraProjectin !== camera.updateCountAsCameraProjection || this._updateCountOfMeshTransform !== camera.updateCountAsElement;
-
-        this._updateCountOfCameraView = camera.updateCountAsCameraView;
-        this._updateCountOfCameraProjectin = camera.updateCountAsCameraProjection;
-        this._updateCountOfMeshTransform = mesh.updateCountAsElement;
-
-        return result;
-      }
     }, {
       key: 'draw',
       value: function draw(lights, camera, mesh) {
@@ -3135,43 +3172,39 @@
               this.setUpVertexAttribs(gl, glslProgram);
             }
 
-            var resultWhetherUpdated = this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh);
-
-            if (camera && resultWhetherUpdated) {
+            if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
               var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
               gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
-
-              if (typeof glslProgram.modelViewMatrix !== "undefined") {
-                var mv_m = viewMatrix.clone().multiply(mesh.transformMatrix);
-                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
-              }
-
-              if (typeof glslProgram.invNormalMatrix !== "undefined") {
-                var in_m = mv_m.toMatrix33().invert();
-                gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
-              }
             }
 
             lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
             if (lights.length !== 0) {
+              if (glslProgram['viewPosition']) {
+                if (camera) {
+                  var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(camera.eye);
+                } else {
+                  var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(new Vector3(0, 0, 1));
+                }
+                gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+              }
+
               for (var j = 0; j < lights.length; j++) {
                 if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
                   var lightVec = null;
+                  var isPointLight = -9999;
                   if (lights[j] instanceof PointLight) {
-                    lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1.0);
+                    lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1);
+                    isPointLight = 1.0;
                   } else if (lights[j] instanceof DirectionalLight) {
-                    lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
+                    lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                    isPointLight = 0.0;
                   }
 
-                  if (camera && resultWhetherUpdated) {
-                    var lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
-                    gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
-                  } else {
-                    gl.uniform4f(glslProgram['lightPosition_' + j], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
-                  }
+                  var lightVecInLocalCoord = mesh.transformMatrix.invert().multiplyVector(lightVec);
+                  gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+
                   gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
                 }
               }
@@ -3205,7 +3238,7 @@
             this.setUpVertexAttribs(gl, this._glslProgram);
           }
 
-          if (camera && this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh)) {
+          if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
@@ -3407,8 +3440,6 @@
           shaderText += out_ + ' vec3 normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
 
         return shaderText;
       }
@@ -3416,14 +3447,9 @@
       key: 'VSTransform_HalfLambertShaderSource',
       value: function VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
         var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
+
+        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+        shaderText += '  normal = aVertex_normal;\n';
 
         return shaderText;
       }
@@ -3449,7 +3475,7 @@
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
         shaderText += '    float diffuse = halfLambert*halfLambert;\n';
@@ -3472,11 +3498,12 @@
             vertexAttribsAsResult.push(attribName);
           }
         });
-
+        /*
         if (existCamera_f) {
           shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
           shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
         }
+        */
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -3506,6 +3533,8 @@
     return HalfLambertShader;
   })(SimpleShader);
 
+  GLBoost["HalfLambertShader"] = HalfLambertShader;
+
   var LambertShaderSource = (function () {
     function LambertShaderSource() {
       babelHelpers.classCallCheck(this, LambertShaderSource);
@@ -3520,8 +3549,6 @@
           shaderText += out_ + ' vec3 normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
 
         return shaderText;
       }
@@ -3529,14 +3556,8 @@
       key: 'VSTransform_LambertShaderSource',
       value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
         var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
+        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+        shaderText += '  normal = aVertex_normal;\n';
 
         return shaderText;
       }
@@ -3561,14 +3582,16 @@
         shaderText += '  vec4 surfaceColor = rt1;\n';
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
+        //shaderText += '  float diffuse = 0.0;\n';
+
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
         shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+        //shaderText += '  rt1 = vec4(position.rgb, 1);\n';
 
         return shaderText;
       }
@@ -3584,11 +3607,6 @@
             vertexAttribsAsResult.push(attribName);
           }
         });
-
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -3618,6 +3636,8 @@
     return LambertShader;
   })(SimpleShader);
 
+  GLBoost["LambertShader"] = LambertShader;
+
   var PhongShaderSource = (function () {
     function PhongShaderSource() {
       babelHelpers.classCallCheck(this, PhongShaderSource);
@@ -3632,23 +3652,14 @@
           shaderText += out_ + ' vec3 normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewMatrix;\n';
-        shaderText += 'uniform mat3 invNormalMatrix;\n';
-
         return shaderText;
       }
     }, {
       key: 'VSTransform_PhongShaderSource',
       value: function VSTransform_PhongShaderSource(existCamera_f, f, lights) {
         var shaderText = '';
-        shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          if (existCamera_f) {
-            shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-          } else {
-            shaderText += '  normal = aVertex_normal;\n';
-          }
-        }
+        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+        shaderText += '  normal = aVertex_normal;\n';
 
         return shaderText;
       }
@@ -3660,6 +3671,7 @@
           shaderText += in_ + ' vec3 normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
+        shaderText += 'uniform vec3 viewPosition;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
         shaderText += 'uniform float Kd;\n';
@@ -3677,11 +3689,10 @@
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
         shaderText += '    rt1.rgb += Kd * lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
-        shaderText += '    vec3 viewPosition = vec3(0.0, 0.0, 0.0);\n';
         shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
         shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
         shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
@@ -3705,16 +3716,13 @@
           }
         });
 
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-
         shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
         shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
         shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+
+        shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
 
         for (var i = 0; i < lights.length; i++) {
           shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
@@ -3951,7 +3959,7 @@
           if (matchArray[1] === "v") {
             matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
             //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-            pvCoord[vCount] = new Vector3();
+            pvCoord[vCount] = new Vector3$1();
             pvCoord[vCount].x = parseFloat(matchArray[2]);
             pvCoord[vCount].y = parseFloat(matchArray[3]);
             pvCoord[vCount].z = parseFloat(matchArray[4]);
@@ -3962,7 +3970,7 @@
           if (matchArray[1] === "vn") {
             matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
             //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-            pvNormal[vnCount] = new Vector3();
+            pvNormal[vnCount] = new Vector3$1();
             pvNormal[vnCount].x = parseFloat(matchArray[2]);
             pvNormal[vnCount].y = parseFloat(matchArray[3]);
             pvNormal[vnCount].z = parseFloat(matchArray[4]);
@@ -4150,7 +4158,7 @@
   GLBoost$1["ObjLoader"] = ObjLoader;
 
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
-  GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
+  GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3$1(1, 1, 1);
 
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
@@ -4171,7 +4179,7 @@
       value: function _setupVertexData(halfWidth, halfHeight, vertexColor) {
         var indices = [3, 1, 0, 2, 1, 3];
 
-        var positions = [new Vector3(-halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, halfHeight), new Vector3(-halfWidth, 0, halfHeight)];
+        var positions = [new Vector3$1(-halfWidth, 0, -halfHeight), new Vector3$1(halfWidth, 0, -halfHeight), new Vector3$1(halfWidth, 0, halfHeight), new Vector3$1(-halfWidth, 0, halfHeight)];
         var colors = [new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
         var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
 
@@ -4214,33 +4222,33 @@
 
         var positions = [
         // upper
-        new Vector3(-widthVector.x, widthVector.y, -widthVector.z), new Vector3(widthVector.x, widthVector.y, -widthVector.z), new Vector3(widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z),
+        new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, widthVector.y, widthVector.z), new Vector3$1(-widthVector.x, widthVector.y, widthVector.z),
         // lower
-        new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, widthVector.z), new Vector3(-widthVector.x, -widthVector.y, widthVector.z),
+        new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, -widthVector.y, widthVector.z), new Vector3$1(-widthVector.x, -widthVector.y, widthVector.z),
         // front
-        new Vector3(-widthVector.x, -widthVector.y, widthVector.z), new Vector3(widthVector.x, -widthVector.y, widthVector.z), new Vector3(widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z),
+        new Vector3$1(-widthVector.x, -widthVector.y, widthVector.z), new Vector3$1(widthVector.x, -widthVector.y, widthVector.z), new Vector3$1(widthVector.x, widthVector.y, widthVector.z), new Vector3$1(-widthVector.x, widthVector.y, widthVector.z),
         // back
-        new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, widthVector.y, -widthVector.z), new Vector3(-widthVector.x, widthVector.y, -widthVector.z),
+        new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, widthVector.y, -widthVector.z), new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z),
         // right
-        new Vector3(widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, widthVector.z), new Vector3(widthVector.x, widthVector.y, widthVector.z), new Vector3(widthVector.x, widthVector.y, -widthVector.z),
+        new Vector3$1(widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(widthVector.x, -widthVector.y, widthVector.z), new Vector3$1(widthVector.x, widthVector.y, widthVector.z), new Vector3$1(widthVector.x, widthVector.y, -widthVector.z),
         // left
-        new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(-widthVector.x, -widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, -widthVector.z)];
+        new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3$1(-widthVector.x, -widthVector.y, widthVector.z), new Vector3$1(-widthVector.x, widthVector.y, widthVector.z), new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z)];
         var colors = [new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
         var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
 
         var normals = [
         // upper
-        new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0), new Vector3(0, 1, 0),
+        new Vector3$1(0, 1, 0), new Vector3$1(0, 1, 0), new Vector3$1(0, 1, 0), new Vector3$1(0, 1, 0),
         // lower
-        new Vector3(0, -1, 0), new Vector3(0, -1, 0), new Vector3(0, -1, 0), new Vector3(0, -1, 0),
+        new Vector3$1(0, -1, 0), new Vector3$1(0, -1, 0), new Vector3$1(0, -1, 0), new Vector3$1(0, -1, 0),
         // front
-        new Vector3(0, 0, 1), new Vector3(0, 0, 1), new Vector3(0, 0, 1), new Vector3(0, 0, 1),
+        new Vector3$1(0, 0, 1), new Vector3$1(0, 0, 1), new Vector3$1(0, 0, 1), new Vector3$1(0, 0, 1),
         // back
-        new Vector3(0, 0, -1), new Vector3(0, 0, -1), new Vector3(0, 0, -1), new Vector3(0, 0, -1),
+        new Vector3$1(0, 0, -1), new Vector3$1(0, 0, -1), new Vector3$1(0, 0, -1), new Vector3$1(0, 0, -1),
         // right
-        new Vector3(1, 0, 0), new Vector3(1, 0, 0), new Vector3(1, 0, 0), new Vector3(1, 0, 0),
+        new Vector3$1(1, 0, 0), new Vector3$1(1, 0, 0), new Vector3$1(1, 0, 0), new Vector3$1(1, 0, 0),
         // left
-        new Vector3(-1, 0, 0), new Vector3(-1, 0, 0), new Vector3(-1, 0, 0), new Vector3(-1, 0, 0)];
+        new Vector3$1(-1, 0, 0), new Vector3$1(-1, 0, 0), new Vector3$1(-1, 0, 0), new Vector3$1(-1, 0, 0)];
 
         this.setVerticesData({
           position: positions,

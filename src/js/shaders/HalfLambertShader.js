@@ -9,22 +9,15 @@ export class HalfLambertShaderSource {
       shaderText += `${out_} vec3 normal;\n`;
     }
     shaderText += `${out_} vec4 position;\n`;
-    shaderText += 'uniform mat4 modelViewMatrix;\n';
-    shaderText += 'uniform mat3 invNormalMatrix;\n';
 
     return shaderText;
   }
 
   VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
     var shaderText = '';
-    shaderText += '  position = modelViewMatrix * vec4(aVertex_position, 1.0);\n';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      if (existCamera_f) {
-        shaderText += '  normal = normalize(invNormalMatrix * aVertex_normal);\n';
-      } else {
-        shaderText += '  normal = aVertex_normal;\n';
-      }
-    }
+
+    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+    shaderText += '  normal = aVertex_normal;\n';
 
     return shaderText;
   }
@@ -48,7 +41,7 @@ export class HalfLambertShaderSource {
     shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-    // if PointLight: lightPosition[i].w === 1.0      if DirecitonalLight: lightPosition[i].w === 0.0
+    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
     shaderText += '    float diffuse = halfLambert*halfLambert;\n';
@@ -71,11 +64,12 @@ export class HalfLambertShaderSource {
         vertexAttribsAsResult.push(attribName);
       }
     });
-
+    /*
     if (existCamera_f) {
       shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
       shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
     }
+    */
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -98,3 +92,5 @@ export default class HalfLambertShader extends SimpleShader {
   }
 
 }
+
+GLBoost["HalfLambertShader"] = HalfLambertShader;

@@ -17,16 +17,8 @@ export default class Geometry {
     this._glslProgram = null;
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
-    this._parent = null; // this can be any Mesh
     this._shader_for_non_material = new SimpleShader(this._canvas);
     this._dirty = true;
-
-    this._existCamera_f = false;
-    var noMatchNumber = -9999;
-    this._updateCountOfCameraView = noMatchNumber;
-    this._updateCountOfCameraProjectin = noMatchNumber;
-    this._updateCountOfMeshTransform = noMatchNumber;
-    this._lights = [];
 
     if (this.name === 'Geometry') {
       Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
@@ -176,26 +168,6 @@ export default class Geometry {
     return true;
   }
 
-  /**
-   * Check updateCount of Camera View, Camera Projection, and Mesh's Transform, and Save them.
-   * @param camera
-   * @param mesh
-   * @returns {boolean} true: something is changed   false: No changed
-   * @private
-   */
-  _checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh) {
-    var result =
-      this._updateCountOfCameraView !== camera.updateCountAsCameraView ||
-      this._updateCountOfCameraProjectin !== camera.updateCountAsCameraProjection ||
-      this._updateCountOfMeshTransform !== camera.updateCountAsElement;
-
-    this._updateCountOfCameraView = camera.updateCountAsCameraView;
-    this._updateCountOfCameraProjectin = camera.updateCountAsCameraProjection;
-    this._updateCountOfMeshTransform = mesh.updateCountAsElement;
-
-    return result;
-  }
-
   draw(lights, camera, mesh) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
@@ -213,45 +185,39 @@ export default class Geometry {
           this.setUpVertexAttribs(gl, glslProgram);
         }
 
-        var resultWhetherUpdated = this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh);
-
-        if (camera && resultWhetherUpdated) {
+        if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
           var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
-
-
-          if (typeof glslProgram.modelViewMatrix !== "undefined") {
-            var mv_m = viewMatrix.clone().multiply(mesh.transformMatrix);
-            gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(mv_m.clone().transpose().flatten()));
-          }
-
-          if (typeof glslProgram.invNormalMatrix !== "undefined") {
-            var in_m = mv_m.toMatrix33().invert();
-            gl.uniformMatrix3fv(glslProgram.invNormalMatrix, false, new Float32Array(in_m.flatten()));
-          }
-
         }
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-
         if (lights.length !== 0) {
+          if (glslProgram['viewPosition']) {
+            if (camera) {
+              var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(camera.eye);
+            } else {
+              var cameraPosInLocalCoord = mesh.transformMatrix.toMatrix33().invert().multiplyVector(new Vector3(0, 0, 1));
+            }
+            gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+          }
+
           for(let j=0; j<lights.length; j++) {
             if (glslProgram[`lightPosition_${j}`] && glslProgram[`lightDiffuse_${j}`]) {
               let lightVec = null;
+              let isPointLight = -9999;
               if (lights[j] instanceof PointLight) {
-                lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1.0);
+                lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1);
+                isPointLight = 1.0;
               } else if (lights[j] instanceof DirectionalLight) {
-                lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 0.0);
+                lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                isPointLight = 0.0;
               }
 
-              if (camera && resultWhetherUpdated) {
-                let lightVecInCameraCoord = viewMatrix.multiplyVector(lightVec);
-                gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInCameraCoord.x, lightVecInCameraCoord.y, lightVecInCameraCoord.z, lightVec.w);
-              } else {
-                gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVec.x, lightVec.y, lightVec.z, lightVec.w);
-              }
+              let lightVecInLocalCoord = mesh.transformMatrix.invert().multiplyVector(lightVec);
+              gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+
               gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
             }
           }
@@ -285,7 +251,7 @@ export default class Geometry {
         this.setUpVertexAttribs(gl, this._glslProgram);
       }
 
-      if (camera && this._checkAndSaveUpdateCountOfCameraAndMeshTransform(camera, mesh)) {
+      if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
         var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
