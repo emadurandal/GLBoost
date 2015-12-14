@@ -13,6 +13,11 @@ export default class ClassicMaterial {
     this._name = "";
     this._shader = new SimpleShader(canvas);
     this._vertexNofGeometries = {};
+
+    if (this.constructor === ClassicMaterial) {
+      ClassicMaterial._instanceCount = (typeof ClassicMaterial._instanceCount === "undefined") ? 0 : (ClassicMaterial._instanceCount + 1);
+      this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
+    }
   }
 
   set shader(shader) {
@@ -82,17 +87,27 @@ export default class ClassicMaterial {
 
   setUp() {
     var gl = this._gl;
+    var result = false;
     if (this._diffuseTexture) {
       // テクスチャユニット０にテクスチャオブジェクトをバインドする
       gl.activeTexture(gl.TEXTURE0);
-      this._diffuseTexture.setUp();
+      result = this._diffuseTexture.setUp();
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+      result = true;
     }
+
+    return result;
   }
 
   tearDown() {
     if (this._diffuseTexture) {
       this._diffuseTexture.tearDown();
     }
+  }
+
+  toString() {
+    return this._instanceName;
   }
 }
 

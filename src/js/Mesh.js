@@ -9,7 +9,7 @@ export default class Mesh extends Element {
 
     if (this.constructor === Mesh || (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) ) {
       Mesh._instanceCount = (typeof Mesh._instanceCount === "undefined") ? 0 : (Mesh._instanceCount + 1);
-      this._instanceCount = Mesh._instanceCount;
+      this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
     }
   }
 
@@ -48,7 +48,7 @@ export default class Mesh extends Element {
   }
 
   toString() {
-    return 'Mesh_' + this._instanceCount;
+    return this._instanceName;
   }
 }
 Mesh._geometries = {};

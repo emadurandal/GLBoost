@@ -16,7 +16,12 @@ export default class AbstractTexture {
   }
 
   setUp() {
+    if (this._texture === null) {
+      return false;
+    }
     this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
+
+    return true;
   }
 
   tearDown() {

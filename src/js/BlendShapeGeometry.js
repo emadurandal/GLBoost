@@ -21,7 +21,7 @@ export default class BlendShapeGeometry extends Geometry {
 
     if (this.constructor === BlendShapeGeometry) {
       BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === "undefined") ? 0 : (BlendShapeGeometry._instanceCount + 1);
-      this._instanceCount = BlendShapeGeometry._instanceCount;
+      this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
     }
   }
 
@@ -123,7 +123,7 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
   toString() {
-    return 'BlendShapeGeometry_' + this._instanceCount;
+    return this._instanceName;
   }
 }
 
