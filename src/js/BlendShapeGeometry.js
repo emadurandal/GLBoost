@@ -9,37 +9,49 @@ export default class BlendShapeGeometry extends Geometry {
   constructor(canvas) {
     super(canvas);
 
-    class BlendShapeShader extends this._defaultMaterial.shader.constructor {
-      constructor(canvas) {
-        super(canvas);
-        BlendShapeShader.mixin(BlendShapeShaderSource);
-      }
-    }
-
-    this._defaultMaterial.shader = new BlendShapeShader(canvas);
-    this._shaderClass = BlendShapeShader;
-
     if (this.constructor === BlendShapeGeometry) {
       BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === "undefined") ? 0 : (BlendShapeGeometry._instanceCount + 1);
       this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
     }
   }
 
-  prepareForRender(existCamera_f, pointLight) {
-
+  prepareForRender(existCamera_f, pointLight, meshMaterial) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-    let materials = this._materials;
-    if (materials) {
-      for (let i=0; i<materials.length;i++) {
-        materials[i].shader = new this._shaderClass(this._canvas);
+    var canvas = this._canvas;
+
+    if (meshMaterial) {
+      this._materialForBlend = meshMaterial;
+    } else {
+      this._materialForBlend = this._defaultMaterial;
+    }
+
+    class BlendShapeShader extends this._materialForBlend.shader.constructor {
+      constructor(canvas) {
+        super(canvas);
+        BlendShapeShader.mixin(BlendShapeShaderSource);
       }
     }
 
-    super.prepareForRender(existCamera_f, pointLight);
+    if (meshMaterial) {
+      meshMaterial.shader = new BlendShapeShader(canvas);
+      } else {
+      this._defaultMaterial.shader = new BlendShapeShader(canvas);
+    }
+
+    /*
+    let materials = this._materials;
+    if (materials) {
+      for (let i=0; i<materials.length;i++) {
+        materials[i].shader = new BlendShapeShader(this._canvas);
+      }
+    }
+    */
+
+    super.prepareForRender(existCamera_f, pointLight, meshMaterial);
   }
 
   _setBlendWeightToGlslProgram(blendTarget, weight) {
-    var materials = this._materials;
+    var materials = [this._materialForBlend];
     if (materials) {
       for (let i=0; i<materials.length;i++) {
         this._gl.useProgram(materials[i].glslProgram);

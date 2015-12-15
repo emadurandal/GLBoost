@@ -86,12 +86,12 @@ export default class ClassicMaterial {
   }
   */
 
-  setVertexN(mesh, num) {
-    this._vertexNofGeometries[mesh] = num;
+  setVertexN(geom, num) {
+    this._vertexNofGeometries[geom] = num;
   }
 
-  getVertexN(mesh) {
-    return (typeof this._vertexNofGeometries[mesh] === "undefined") ? 0 : this._vertexNofGeometries[mesh];
+  getVertexN(geom) {
+    return (typeof this._vertexNofGeometries[geom] === "undefined") ? 0 : this._vertexNofGeometries[geom];
   }
 
   setUp() {

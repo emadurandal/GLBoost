@@ -56,6 +56,21 @@ export default class Geometry {
 
     return attribNameArray;
   }
+
+  /**
+   * インデックス以外の全ての頂点属性のリストを返す
+   */
+  _allVertexAttribs(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      if (attribName !== 'indices') {// && attribName !== 'normal') {
+        attribNameArray.push(attribName);
+      }
+    }
+
+    return attribNameArray;
+  }
+
   /*
   _getSheder(result, existCamera_f, lights) {
     return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
@@ -67,20 +82,22 @@ export default class Geometry {
     this._primitiveType = (primitiveType) ? primitiveType : GLBoost.TRIANGLES;
   }
 
-  setUpVertexAttribs(gl, glslProgram) {
+  setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
     var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
     var stride = 0;
-    optimizedVertexAttribs.forEach((attribName)=> {
+    _allVertexAttribs.forEach((attribName)=> {
       stride += this._vertexAttribComponentNDic[attribName] * 4;
     });
 
     // 頂点レイアウト設定
     var offset = 0;
-    optimizedVertexAttribs.forEach((attribName)=> {
-      gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-      gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-        this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+    _allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+        gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
+          this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+      }
       offset += this._vertexAttribComponentNDic[attribName] * 4;
     });
   }
@@ -94,17 +111,18 @@ export default class Geometry {
     glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
     gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
 
-    _optimizedVertexAttribs.forEach((attribName)=> {
+    var allVertexAttribs = this._allVertexAttribs(vertices);
+    allVertexAttribs.forEach((attribName)=> {
       this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
     });
 
     var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights);
-    this.setUpVertexAttribs(gl, glslProgram);
+    this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
 
     glem.bindVertexArray(gl, null);
 
     var materials = [material];
-    this._setVertexNtoSingleMaterial(materials);
+    materials = this._setVertexNtoSingleMaterial(materials);
     materials[0].glslProgram = glslProgram;
 
     return materials[0];
@@ -120,30 +138,26 @@ export default class Geometry {
         materials[0].setVertexN(this, this._vertexN);
       }
     }
+
+    return materials;
   }
 
-  prepareForRender(existCamera_f, lights) {
+  prepareForRender(existCamera_f, lights, meshMaterial) {
 
     var vertices = this._vertices;
     var gl = this._gl;
 
     var glem = GLExtentionsManager.getInstance(gl);
 
-    //var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
-
     var optimizedVertexAttribs = null;
 
     this._vertexN = vertices.position.length;
-/*
-    optimizedVertexAttribs.forEach((attribName)=> {
-      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
-    });
-*/
+
     // create VAO
     if (Geometry._vaoDic[this.toString()]) {
       return;
     }
-            var vao = glem.createVertexArray(gl);
+    var vao = glem.createVertexArray(gl);
     glem.bindVertexArray(gl, vao);
     Geometry._vaoDic[this.toString()] = vao;
 
@@ -160,24 +174,12 @@ export default class Geometry {
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
-/*
-        var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
-        this.setUpVertexAttribs(gl, glslProgram);
-        optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-        materials[i].glslProgram = glslProgram;
-*/
         var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], existCamera_f, lights);
         materials[i].glslProgram = material.glslProgram;
         optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
 
       }
-    } else {
-      /*
-      var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
-      this.setUpVertexAttribs(gl, glslProgram);
-      optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-      this._glslProgram = glslProgram;*/
-
+    } else if (!meshMaterial) {
       var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, existCamera_f, lights);
       this._glslProgram = material.glslProgram;
       optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
@@ -186,9 +188,9 @@ export default class Geometry {
 
 
     var vertexData = [];
-
+    var allVertexAttribs = this._allVertexAttribs(vertices);
     vertices.position.forEach((elem, index, array) => {
-      optimizedVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach((attribName)=> {
         var element = vertices[attribName][index];
         vertexData.push(element.x);
         vertexData.push(element.y);
@@ -226,18 +228,6 @@ export default class Geometry {
     }
     glem.bindVertexArray(gl, null);
 
-    /*
-    // if this mesh has only one material...
-    if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
-      if (vertices.indices && vertices.indices.length > 0) {
-        materials[0].setVertexN(this, vertices.indices[0].length);
-      } else {
-        materials[0].setVertexN(this, this._vertexN);
-      }
-    }
-
-    this._setVertexNtoSingleMaterial(materials);
-     */
 
     return true;
   }

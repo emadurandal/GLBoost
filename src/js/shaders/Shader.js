@@ -349,35 +349,41 @@ export default class Shader {
     if (!Shader._shaderHashTable[gl._canvas.id]) {
       Shader._shaderHashTable[gl._canvas.id] = {};
     }
+    let programToReturn = null;
     var hashTable = Shader._shaderHashTable[gl._canvas.id];
     if (hash in hashTable) {
       if (hashTable[hash].code === baseText) {
-        return hashTable[hash].program;
+        programToReturn = hashTable[hash].program;
       } else {
         for (let i=0; i<hashTable[hash].collisionN; i++) {
           if (hashTable[hash + '_' + i].code === baseText) {
-            return hashTable[hash + '_' + i].program;
+            programToReturn = hashTable[hash + '_' + i].program;
+            break;
           }
         }
         hashTable[hash].collisionN++;
       }
     }
 
+    if (programToReturn === null) {
     // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-    var shaderProgram = this._initShaders(gl, vertexShaderText, fragmentShaderText);
-    shaderProgram.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
+      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
-    // register it to shaderHashTable.
-    var indexStr = null;
-    if (typeof hashTable[hash] !== "undefined" && hashTable[hash].collisionN > 0) {
-      indexStr = hash + '_' + hashTable[hash].collisionN;
+      // register it to shaderHashTable.
+      var indexStr = null;
+      if (typeof hashTable[hash] !== "undefined" && hashTable[hash].collisionN > 0) {
+        indexStr = hash + '_' + hashTable[hash].collisionN;
+      } else {
+        indexStr = hash;
+      }
+      hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
+      Shader._shaderHashTable[gl._canvas.id] = hashTable;
     } else {
-      indexStr = hash;
+      //gl.useProgram(programToReturn);
     }
-    hashTable[indexStr] = {code:baseText, program:shaderProgram, collisionN:0};
-    Shader._shaderHashTable[gl._canvas.id] = hashTable;
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights);
 
-    return shaderProgram;
+    return programToReturn;
   }
 
   static getDefaultPointLightIfNotExsist(gl, lights) {
