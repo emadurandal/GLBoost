@@ -2752,8 +2752,11 @@
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
-            var glslProgram = materials[i].glslProgram;
-            gl.useProgram(glslProgram);
+            if (materials[i].toString() !== Geometry._lastMaterial) {
+              this._glslProgram = materials[i].glslProgram;
+              gl.useProgram(this._glslProgram);
+            }
+            var glslProgram = this._glslProgram;
 
             if (!isVAOBound) {
               if (Geometry._lastGeometry !== this.toString()) {

@@ -251,8 +251,11 @@ export default class Geometry {
 
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
-        let glslProgram = materials[i].glslProgram;
-        gl.useProgram(glslProgram);
+        if (materials[i].toString() !== Geometry._lastMaterial) {
+          this._glslProgram = materials[i].glslProgram;
+          gl.useProgram(this._glslProgram);
+        }
+        let glslProgram = this._glslProgram;
 
         if (!isVAOBound) {
           if (Geometry._lastGeometry !== this.toString()) {
