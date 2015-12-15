@@ -2745,22 +2745,25 @@
           var materials = [];
         }
 
+        var thisName = this.toString();
+
         var isVAOBound = false;
-        if (Geometry._lastGeometry !== this.toString()) {
-          isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+        if (Geometry._lastGeometry !== thisName) {
+          isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[thisName]);
         }
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
-            if (materials[i].toString() !== Geometry._lastMaterial) {
+            var materialName = materials[i].toString();
+            if (materialName !== Geometry._lastMaterial) {
               this._glslProgram = materials[i].glslProgram;
               gl.useProgram(this._glslProgram);
             }
             var glslProgram = this._glslProgram;
 
             if (!isVAOBound) {
-              if (Geometry._lastGeometry !== this.toString()) {
-                gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+              if (Geometry._lastGeometry !== thisName) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
                 this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
               }
             }
@@ -2805,7 +2808,7 @@
 
             var isMaterialSetupDone = true;
 
-            if (materials[i].toString() !== Geometry._lastMaterial) {
+            if (materialName !== Geometry._lastMaterial) {
               if (typeof materials[i].shader.setUniforms !== "undefined") {
                 materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
               }
@@ -2816,9 +2819,9 @@
             }
 
             //if (this._ibo.length > 0) {
-            if (Geometry._iboArrayDic[this.toString()].length > 0) {
+            if (Geometry._iboArrayDic[thisName].length > 0) {
               //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][i]);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][i]);
               gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_SHORT, 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
@@ -2833,15 +2836,15 @@
             }
             */
 
-            Geometry._lastMaterial = isMaterialSetupDone ? materials[i].toString() : null;
+            Geometry._lastMaterial = isMaterialSetupDone ? materialName : null;
           }
         } else {
           var glslProgram = this._glslProgram;
           gl.useProgram(glslProgram);
 
           if (!isVAOBound) {
-            if (Geometry._lastGeometry !== this.toString()) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+            if (Geometry._lastGeometry !== thisName) {
+              gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
               this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
             }
           }
@@ -2858,9 +2861,9 @@
           }
 
           //if (this._ibo.length > 0) {
-          if (Geometry._iboArrayDic[this.toString()].length > 0) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()][0]);
-            gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[this.toString()][0], gl.UNSIGNED_SHORT, 0);
+          if (Geometry._iboArrayDic[thisName].length > 0) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][0]);
+            gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], gl.UNSIGNED_SHORT, 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -2872,7 +2875,7 @@
         //glem.bindVertexArray(gl, null);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        Geometry._lastGeometry = this.toString();
+        Geometry._lastGeometry = thisName;
       }
     }, {
       key: 'toString',
