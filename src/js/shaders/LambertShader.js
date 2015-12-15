@@ -29,6 +29,7 @@ export class LambertShaderSource {
     shaderText += `${in_} vec4 position;\n`;
     shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
     shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
+    shaderText += `uniform vec4 Kd;\n`;
 
     return shaderText;
   }
@@ -37,13 +38,13 @@ export class LambertShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt1;\n';
-    shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-    shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';
     //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
@@ -62,6 +63,8 @@ export class LambertShaderSource {
         vertexAttribsAsResult.push(attribName);
       }
     });
+
+    shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -83,6 +86,12 @@ export default class LambertShader extends SimpleShader {
     LambertShader.mixin(LambertShaderSource);
   }
 
+  setUniforms(gl, glslProgram, material) {
+    super.setUniforms(gl, glslProgram, material);
+
+    var Kd = material.diffuseColor;
+    gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+  }
 }
 
 GLBoost["LambertShader"] = LambertShader;

@@ -14,7 +14,11 @@ export default class Mesh extends Element {
   }
 
   prepareForRender(existCamera_f, lights) {
-    this._geometry.prepareForRender(existCamera_f, lights);
+    this._geometry.prepareForRender(existCamera_f, lights, this._material);
+    if (this._geometry._materials.length === 0 && this._material) {
+    //if (this._material) {
+      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, existCamera_f, lights);
+    }
   }
 
   draw(lights, camera) {
@@ -32,6 +36,7 @@ export default class Mesh extends Element {
   }
 
   set material(material) {
+    /*
     if (typeof this._geometry === "undefined") {
       console.assert(false, "set a geometry before a material.");
     }
@@ -41,6 +46,9 @@ export default class Mesh extends Element {
     } else {
       this._material = null;
     }
+    */
+
+    this._material = material;
   }
 
   get material() {

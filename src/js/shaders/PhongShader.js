@@ -29,8 +29,8 @@ export class PhongShaderSource {
     shaderText += `uniform vec3 viewPosition;\n`;
     shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
     shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
-    shaderText += `uniform float Kd;\n`;
-    shaderText += `uniform float Ks;\n`;
+    shaderText += `uniform vec4 Kd;\n`;
+    shaderText += `uniform vec4 Ks;\n`;
     shaderText += `uniform float power;\n`;
 
     return shaderText;
@@ -40,17 +40,17 @@ export class PhongShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt1;\n';
-    shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-    shaderText += '    rt1.rgb += Kd * lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
     shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
     shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
-    shaderText += '    rt1.rgb += Ks * lightDiffuse[i].rgb * specular;\n';
+    shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 1.0);\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';
     //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
@@ -95,15 +95,17 @@ export default class PhongShader extends SimpleShader {
     super(canvas);
     PhongShader.mixin(PhongShaderSource);
 
-    this._Kd = 0.8;
-    this._Ks = 0.5;
     this._power = 5.0;
 
   }
 
-  setUniforms(gl, glslProgram) {
-    gl.uniform1f(glslProgram.Kd, this._Kd);
-    gl.uniform1f(glslProgram.Ks, this._Ks);
+  setUniforms(gl, glslProgram, material) {
+    super.setUniforms(gl, glslProgram, material);
+
+    var Kd = material.diffuseColor;
+    var Ks = material.specularColor;
+    gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform4f(glslProgram.Ks, Ks.x, Ks.y, Ks.z, Ks.w);
     gl.uniform1f(glslProgram.power, this._power);
   }
 
