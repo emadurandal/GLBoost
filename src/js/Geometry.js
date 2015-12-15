@@ -271,8 +271,8 @@ export default class Geometry {
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
-        if (lights.length !== 0) {
+        if (glslProgram['lightPosition_0']) {
+          lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
           if (glslProgram['viewPosition']) {
             if (camera) {
               var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
@@ -332,7 +332,6 @@ export default class Geometry {
         }
         */
 
-        //Geometry._lastMaterial = null;
         Geometry._lastMaterial = isMaterialSetupDone ? materials[i].toString() : null;
       }
     } else {
