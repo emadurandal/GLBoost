@@ -249,22 +249,18 @@ export default class Geometry {
       isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
     }
 
-
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
-        if (materials[i].toString() !== Geometry._lastMaterial) {
-          let glslProgram = materials[i].glslProgram;
-          gl.useProgram(glslProgram);
+        let glslProgram = materials[i].glslProgram;
+        gl.useProgram(glslProgram);
 
-          if (!isVAOBound) {
-            if (Geometry._lastGeometry !== this.toString()) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-              this.setUpVertexAttribs(gl, glslProgram);
-            }
+        if (!isVAOBound) {
+          if (Geometry._lastGeometry !== this.toString()) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+            this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
           }
         }
 
-        let glslProgram = materials[i].glslProgram;
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
@@ -343,7 +339,7 @@ export default class Geometry {
       if (!isVAOBound) {
         if (Geometry._lastGeometry !== this.toString()) {
           gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-          this.setUpVertexAttribs(gl, glslProgram);
+          this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
         }
       }
 

@@ -2752,19 +2752,16 @@
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
-            if (materials[i].toString() !== Geometry._lastMaterial) {
-              var _glslProgram = materials[i].glslProgram;
-              gl.useProgram(_glslProgram);
+            var glslProgram = materials[i].glslProgram;
+            gl.useProgram(glslProgram);
 
-              if (!isVAOBound) {
-                if (Geometry._lastGeometry !== this.toString()) {
-                  gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-                  this.setUpVertexAttribs(gl, _glslProgram);
-                }
+            if (!isVAOBound) {
+              if (Geometry._lastGeometry !== this.toString()) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+                this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
               }
             }
 
-            var glslProgram = materials[i].glslProgram;
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
@@ -2843,7 +2840,7 @@
           if (!isVAOBound) {
             if (Geometry._lastGeometry !== this.toString()) {
               gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-              this.setUpVertexAttribs(gl, glslProgram);
+              this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
             }
           }
 
