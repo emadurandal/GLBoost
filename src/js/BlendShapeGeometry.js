@@ -9,14 +9,14 @@ export default class BlendShapeGeometry extends Geometry {
   constructor(canvas) {
     super(canvas);
 
-    class BlendShapeShader extends this._shader_for_non_material.constructor {
+    class BlendShapeShader extends this._defaultMaterial.shader.constructor {
       constructor(canvas) {
         super(canvas);
         BlendShapeShader.mixin(BlendShapeShaderSource);
       }
     }
 
-    this._shader_for_non_material = new BlendShapeShader(canvas);
+    this._defaultMaterial.shader = new BlendShapeShader(canvas);
     this._shaderClass = BlendShapeShader;
 
     if (this.constructor === BlendShapeGeometry) {

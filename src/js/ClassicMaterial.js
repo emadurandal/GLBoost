@@ -1,15 +1,16 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
-import Vector3 from './math/Vector3'
+import Vector4 from './math/Vector4'
 import SimpleShader from './shaders/SimpleShader'
 
 export default class ClassicMaterial {
   constructor(canvas) {
     this._diffuseTexture = null;
     this._gl = GLContext.getInstance(canvas).gl;
-    this._diffuseColor = new Vector3(1.0, 1.0, 1.0);
-    this._specularColor = new Vector3(1.0, 1.0, 1.0);
-    this._ambientColor = new Vector3(0.0, 0.0, 0.0);
+    this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
     this._name = "";
     this._shader = new SimpleShader(canvas);
     this._vertexNofGeometries = {};
@@ -34,6 +35,14 @@ export default class ClassicMaterial {
 
   get diffuseTexture() {
     return this._diffuseTexture;
+  }
+
+  set baseColor(vec) {
+    this._baseColor = vec;
+  }
+
+  get baseColor() {
+    return this._baseColor;
   }
 
   set diffuseColor(vec) {

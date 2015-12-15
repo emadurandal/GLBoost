@@ -34,6 +34,8 @@ export class SimpleShaderSource {
       shaderText += `${in_} vec2 texcoord;\n\n`;
       shaderText += 'uniform sampler2D uTexture;\n';
     }
+    shaderText += 'uniform vec4 materialBaseColor;\n';
+
     return shaderText;
   }
 
@@ -43,9 +45,11 @@ export class SimpleShaderSource {
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt1 = color;\n';
     }
+    shaderText += '    rt1 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `  rt1 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
+    //shaderText += '    rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     return shaderText;
   }
 
@@ -59,6 +63,8 @@ export class SimpleShaderSource {
         vertexAttribsAsResult.push(attribName);
       }
     });
+
+    shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
@@ -75,5 +81,11 @@ export default class SimpleShader extends Shader {
 
     super(canvas);
     SimpleShader.mixin(SimpleShaderSource);
+  }
+
+  setUniforms(gl, glslProgram, material) {
+
+    var baseColor = material.baseColor;
+    gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
   }
 }

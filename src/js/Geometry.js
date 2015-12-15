@@ -5,6 +5,7 @@ import GLContext from './GLContext'
 import GLExtentionsManager from './GLExtentionsManager'
 import Shader from './shaders/Shader'
 import SimpleShader from './shaders/SimpleShader'
+import ClassicMaterial from './ClassicMaterial'
 import PointLight from './lights/PointLight'
 import DirectionalLight from './lights/DirectionalLight'
 
@@ -17,8 +18,8 @@ export default class Geometry {
     this._glslProgram = null;
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
-    this._shader_for_non_material = new SimpleShader(this._canvas);
-    this._dirty = true;
+    //this._shader_for_non_material = new SimpleShader(this._canvas);
+    this._defaultMaterial = new ClassicMaterial(this._canvas);
 
     if (this.constructor === Geometry) {
       Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
@@ -30,12 +31,18 @@ export default class Geometry {
    * データとして利用する頂点属性を判断し、そのリストを返す
    * 不必要な頂点属性のデータは無視する。
    */
-  _decideNeededVertexAttribs(vertices) {
+  _decideNeededVertexAttribs(vertices, material) {
+    if (material) {
+      var _material = material;
+    } else {
+      var _material = this._materials[0];
+    }
+
     var attribNameArray = [];
     for (var attribName in vertices) {
       if (attribName === GLBoost.TEXCOORD) {
         // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-        if ((this._materials[0] !== void 0) && this._materials[0].diffuseTexture !== null) {
+        if ((_material !== void 0) && _material.diffuseTexture !== null) {
           attribNameArray.push(attribName);
         } else {
           //delete vertices[GLBoost.TEXCOORD];
@@ -49,15 +56,15 @@ export default class Geometry {
 
     return attribNameArray;
   }
-
+  /*
   _getSheder(result, existCamera_f, lights) {
     return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
   }
+  */
 
   setVerticesData(vertices, primitiveType) {
     this._vertices = vertices;
     this._primitiveType = (primitiveType) ? primitiveType : GLBoost.TRIANGLES;
-    this._dirty = true;
   }
 
   setUpVertexAttribs(gl, glslProgram) {
@@ -78,25 +85,65 @@ export default class Geometry {
     });
   }
 
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, existCamera_f, lights) {
+    var gl = this._gl;
+    var vertices = this._vertices;
+
+    var glem = GLExtentionsManager.getInstance(gl);
+    var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+    glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+    _optimizedVertexAttribs.forEach((attribName)=> {
+      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
+    });
+
+    var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights);
+    this.setUpVertexAttribs(gl, glslProgram);
+
+    glem.bindVertexArray(gl, null);
+
+    var materials = [material];
+    this._setVertexNtoSingleMaterial(materials);
+    materials[0].glslProgram = glslProgram;
+
+    return materials[0];
+  }
+
+  _setVertexNtoSingleMaterial(materials) {
+    // if this mesh has only one material...
+    var vertices = this._vertices;
+    if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
+      if (vertices.indices && vertices.indices.length > 0) {
+        materials[0].setVertexN(this, vertices.indices[0].length);
+      } else {
+        materials[0].setVertexN(this, this._vertexN);
+      }
+    }
+  }
+
   prepareForRender(existCamera_f, lights) {
-    // TODO: Add prepare skipping using dirty flag
 
     var vertices = this._vertices;
     var gl = this._gl;
 
     var glem = GLExtentionsManager.getInstance(gl);
 
-    var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
+    //var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
 
+    var optimizedVertexAttribs = null;
+
+    this._vertexN = vertices.position.length;
+/*
     optimizedVertexAttribs.forEach((attribName)=> {
       this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
     });
-
+*/
     // create VAO
     if (Geometry._vaoDic[this.toString()]) {
       return;
     }
-    var vao = glem.createVertexArray(gl);
+            var vao = glem.createVertexArray(gl);
     glem.bindVertexArray(gl, vao);
     Geometry._vaoDic[this.toString()] = vao;
 
@@ -108,23 +155,35 @@ export default class Geometry {
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     Geometry._vboDic[this.toString()] = vbo;
 
-    let materials = this._materials;
+    var materials = this._materials;
+
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
+/*
         var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
         this.setUpVertexAttribs(gl, glslProgram);
         optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
         materials[i].glslProgram = glslProgram;
+*/
+        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], existCamera_f, lights);
+        materials[i].glslProgram = material.glslProgram;
+        optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
+
       }
     } else {
+      /*
       var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
       this.setUpVertexAttribs(gl, glslProgram);
       optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-      this._glslProgram = glslProgram;
+      this._glslProgram = glslProgram;*/
+
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, existCamera_f, lights);
+      this._glslProgram = material.glslProgram;
+      optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
     }
 
-    this._vertexN = vertices.position.length;
+
 
     var vertexData = [];
 
@@ -167,16 +226,18 @@ export default class Geometry {
     }
     glem.bindVertexArray(gl, null);
 
+    /*
     // if this mesh has only one material...
-    if (this._materials && this._materials.length === 1 && this._materials[0].getVertexN(this) === 0) {
+    if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
       if (vertices.indices && vertices.indices.length > 0) {
-        this._materials[0].setVertexN(this, vertices.indices[0].length);
+        materials[0].setVertexN(this, vertices.indices[0].length);
       } else {
-        this._materials[0].setVertexN(this, this._vertexN);
+        materials[0].setVertexN(this, this._vertexN);
       }
     }
 
-    this._dirty = false;
+    this._setVertexNtoSingleMaterial(materials);
+     */
 
     return true;
   }
@@ -184,7 +245,14 @@ export default class Geometry {
   draw(lights, camera, mesh) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
-    var materials = this._materials;
+
+    if (this._materials.length > 0) {
+      var materials = this._materials;
+    } else if (mesh.material){
+      var materials = [mesh.material];
+    } else {
+      var materials = [];
+    }
 
     var isVAOBound = false;
     if (Geometry._lastGeometry !== this.toString()) {
@@ -249,7 +317,7 @@ export default class Geometry {
 
         if (materials[i].toString() !== Geometry._lastMaterial) {
           if (typeof materials[i].shader.setUniforms !== "undefined") {
-            materials[i].shader.setUniforms(gl, glslProgram);
+            materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
           }
 
           if (materials[i]) {
@@ -279,12 +347,13 @@ export default class Geometry {
         Geometry._lastMaterial = isMaterialSetupDone ? materials[i].toString() : null;
       }
     } else {
-      gl.useProgram(this._glslProgram);
+      let glslProgram = this._glslProgram;
+      gl.useProgram(glslProgram);
 
       if (!isVAOBound) {
         if (Geometry._lastGeometry !== this.toString()) {
           gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-          this.setUpVertexAttribs(gl, this._glslProgram);
+          this.setUpVertexAttribs(gl, glslProgram);
         }
       }
 
@@ -292,8 +361,12 @@ export default class Geometry {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
         var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
-        gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
+      }
+
+      if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
+        this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial);
       }
 
       //if (this._ibo.length > 0) {
@@ -317,7 +390,6 @@ export default class Geometry {
 
   set materials(materials) {
     this._materials = materials;
-    this._dirty = true;
   }
 
   toString() {

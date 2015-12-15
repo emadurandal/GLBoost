@@ -1392,6 +1392,10 @@
       key: 'prepareForRender',
       value: function prepareForRender(existCamera_f, lights) {
         this._geometry.prepareForRender(existCamera_f, lights);
+        if (this._geometry._materials.length === 0 && this._material) {
+          //if (this._material) {
+          //this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, existCamera_f, lights);
+        }
       }
     }, {
       key: 'draw',
@@ -1416,6 +1420,7 @@
     }, {
       key: 'material',
       set: function set(material) {
+
         if (typeof this._geometry === "undefined") {
           console.assert(false, "set a geometry before a material.");
         }
@@ -1425,6 +1430,8 @@
         } else {
           this._material = null;
         }
+
+        //this._material = material;
       },
       get: function get() {
         return this._material;
@@ -2282,6 +2289,8 @@
           shaderText += in_ + ' vec2 texcoord;\n\n';
           shaderText += 'uniform sampler2D uTexture;\n';
         }
+        shaderText += 'uniform vec4 materialBaseColor;\n';
+
         return shaderText;
       }
     }, {
@@ -2292,9 +2301,11 @@
         if (Shader._exist(f, GLBoost.COLOR)) {
           shaderText += '  rt1 = color;\n';
         }
+        shaderText += '    rt1 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  rt1 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
+        //shaderText += '    rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
       }
     }, {
@@ -2309,6 +2320,8 @@
             vertexAttribsAsResult.push(attribName);
           }
         });
+
+        shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
         if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
           shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
@@ -2334,8 +2347,146 @@
       return _this;
     }
 
+    babelHelpers.createClass(SimpleShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+      }
+    }]);
     return SimpleShader;
   })(Shader);
+
+  var ClassicMaterial = (function () {
+    function ClassicMaterial(canvas) {
+      babelHelpers.classCallCheck(this, ClassicMaterial);
+
+      this._diffuseTexture = null;
+      this._gl = GLContext.getInstance(canvas).gl;
+      this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
+      this._name = "";
+      this._shader = new SimpleShader(canvas);
+      this._vertexNofGeometries = {};
+
+      if (this.constructor === ClassicMaterial) {
+        ClassicMaterial._instanceCount = typeof ClassicMaterial._instanceCount === "undefined" ? 0 : ClassicMaterial._instanceCount + 1;
+        this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
+      }
+    }
+
+    babelHelpers.createClass(ClassicMaterial, [{
+      key: 'setVertexN',
+
+      /*
+      set faceN(num) {
+        this._faceN = num;
+      }
+       get faceN() {
+        return this._faceN;
+      }
+      */
+
+      value: function setVertexN(mesh, num) {
+        this._vertexNofGeometries[mesh] = num;
+      }
+    }, {
+      key: 'getVertexN',
+      value: function getVertexN(mesh) {
+        return typeof this._vertexNofGeometries[mesh] === "undefined" ? 0 : this._vertexNofGeometries[mesh];
+      }
+    }, {
+      key: 'setUp',
+      value: function setUp() {
+        var gl = this._gl;
+        var result = false;
+        if (this._diffuseTexture) {
+          // テクスチャユニット０にテクスチャオブジェクトをバインドする
+          gl.activeTexture(gl.TEXTURE0);
+          result = this._diffuseTexture.setUp();
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, null);
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
+      key: 'tearDown',
+      value: function tearDown() {
+        if (this._diffuseTexture) {
+          this._diffuseTexture.tearDown();
+        }
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
+      }
+    }, {
+      key: 'shader',
+      set: function set(shader) {
+        this._shader = shader;
+      },
+      get: function get() {
+        return this._shader;
+      }
+    }, {
+      key: 'diffuseTexture',
+      set: function set(tex) {
+        this._diffuseTexture = tex;
+      },
+      get: function get() {
+        return this._diffuseTexture;
+      }
+    }, {
+      key: 'baseColor',
+      set: function set(vec) {
+        this._baseColor = vec;
+      },
+      get: function get() {
+        return this._baseColor;
+      }
+    }, {
+      key: 'diffuseColor',
+      set: function set(vec) {
+        this._diffuseColor = vec;
+      },
+      get: function get() {
+        return this._diffuseColor;
+      }
+    }, {
+      key: 'specularColor',
+      set: function set(vec) {
+        this._specularColor = vec;
+      },
+      get: function get() {
+        return this._specularColor;
+      }
+    }, {
+      key: 'ambientColor',
+      set: function set(vec) {
+        this._ambientColor = vec;
+      },
+      get: function get() {
+        return this._ambientColor;
+      }
+    }, {
+      key: 'name',
+      set: function set(name) {
+        this._name = name;
+      },
+      get: function get() {
+        return this._name;
+      }
+    }]);
+    return ClassicMaterial;
+  })();
+
+  GLBoost$1["ClassicMaterial"] = ClassicMaterial;
 
   var Geometry = (function () {
     function Geometry(canvas) {
@@ -2348,8 +2499,8 @@
       this._glslProgram = null;
       this._vertices = null;
       this._vertexAttribComponentNDic = {};
-      this._shader_for_non_material = new SimpleShader(this._canvas);
-      this._dirty = true;
+      //this._shader_for_non_material = new SimpleShader(this._canvas);
+      this._defaultMaterial = new ClassicMaterial(this._canvas);
 
       if (this.constructor === Geometry) {
         Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
@@ -2364,12 +2515,18 @@
 
     babelHelpers.createClass(Geometry, [{
       key: '_decideNeededVertexAttribs',
-      value: function _decideNeededVertexAttribs(vertices) {
+      value: function _decideNeededVertexAttribs(vertices, material) {
+        if (material) {
+          var _material = material;
+        } else {
+          var _material = this._materials[0];
+        }
+
         var attribNameArray = [];
         for (var attribName in vertices) {
           if (attribName === GLBoost$1.TEXCOORD) {
             // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-            if (this._materials[0] !== void 0 && this._materials[0].diffuseTexture !== null) {
+            if (_material !== void 0 && _material.diffuseTexture !== null) {
               attribNameArray.push(attribName);
             } else {
               //delete vertices[GLBoost.TEXCOORD];
@@ -2384,17 +2541,17 @@
 
         return attribNameArray;
       }
-    }, {
-      key: '_getSheder',
-      value: function _getSheder(result, existCamera_f, lights) {
+      /*
+      _getSheder(result, existCamera_f, lights) {
         return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
       }
+      */
+
     }, {
       key: 'setVerticesData',
       value: function setVerticesData(vertices, primitiveType) {
         this._vertices = vertices;
         this._primitiveType = primitiveType ? primitiveType : GLBoost$1.TRIANGLES;
-        this._dirty = true;
       }
     }, {
       key: 'setUpVertexAttribs',
@@ -2417,23 +2574,65 @@
         });
       }
     }, {
-      key: 'prepareForRender',
-      value: function prepareForRender(existCamera_f, lights) {
+      key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
+      value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, existCamera_f, lights) {
         var _this2 = this;
 
-        // TODO: Add prepare skipping using dirty flag
+        var gl = this._gl;
+        var vertices = this._vertices;
+
+        var glem = GLExtentionsManager.getInstance(gl);
+        var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+        glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+        _optimizedVertexAttribs.forEach(function (attribName) {
+          _this2._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
+        });
+
+        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights);
+        this.setUpVertexAttribs(gl, glslProgram);
+
+        glem.bindVertexArray(gl, null);
+
+        var materials = [material];
+        this._setVertexNtoSingleMaterial(materials);
+        materials[0].glslProgram = glslProgram;
+
+        return materials[0];
+      }
+    }, {
+      key: '_setVertexNtoSingleMaterial',
+      value: function _setVertexNtoSingleMaterial(materials) {
+        // if this mesh has only one material...
+        var vertices = this._vertices;
+        if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
+          if (vertices.indices && vertices.indices.length > 0) {
+            materials[0].setVertexN(this, vertices.indices[0].length);
+          } else {
+            materials[0].setVertexN(this, this._vertexN);
+          }
+        }
+      }
+    }, {
+      key: 'prepareForRender',
+      value: function prepareForRender(existCamera_f, lights) {
 
         var vertices = this._vertices;
         var gl = this._gl;
 
         var glem = GLExtentionsManager.getInstance(gl);
 
-        var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
+        //var optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices);
 
-        optimizedVertexAttribs.forEach(function (attribName) {
-          _this2._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
-        });
+        var optimizedVertexAttribs = null;
 
+        this._vertexN = vertices.position.length;
+        /*
+            optimizedVertexAttribs.forEach((attribName)=> {
+              this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
+            });
+        */
         // create VAO
         if (Geometry._vaoDic[this.toString()]) {
           return;
@@ -2451,22 +2650,31 @@
         Geometry._vboDic[this.toString()] = vbo;
 
         var materials = this._materials;
+
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             // GLSLプログラム作成。
-            var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
-            this.setUpVertexAttribs(gl, glslProgram);
-            optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-            materials[i].glslProgram = glslProgram;
+            /*
+                    var glslProgram = materials[i].shader.getShaderProgram(optimizedVertexAttribs, existCamera_f, lights);
+                    this.setUpVertexAttribs(gl, glslProgram);
+                    optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+                    materials[i].glslProgram = glslProgram;
+            */
+            var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], existCamera_f, lights);
+            materials[i].glslProgram = material.glslProgram;
+            optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
           }
         } else {
+          /*
           var glslProgram = this._getSheder(optimizedVertexAttribs, existCamera_f, lights);
           this.setUpVertexAttribs(gl, glslProgram);
           optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-          this._glslProgram = glslProgram;
-        }
+          this._glslProgram = glslProgram;*/
 
-        this._vertexN = vertices.position.length;
+          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, existCamera_f, lights);
+          this._glslProgram = material.glslProgram;
+          optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
+        }
 
         var vertexData = [];
 
@@ -2508,16 +2716,17 @@
         }
         glem.bindVertexArray(gl, null);
 
+        /*
         // if this mesh has only one material...
-        if (this._materials && this._materials.length === 1 && this._materials[0].getVertexN(this) === 0) {
+        if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
           if (vertices.indices && vertices.indices.length > 0) {
-            this._materials[0].setVertexN(this, vertices.indices[0].length);
+            materials[0].setVertexN(this, vertices.indices[0].length);
           } else {
-            this._materials[0].setVertexN(this, this._vertexN);
+            materials[0].setVertexN(this, this._vertexN);
           }
         }
-
-        this._dirty = false;
+         this._setVertexNtoSingleMaterial(materials);
+         */
 
         return true;
       }
@@ -2526,7 +2735,14 @@
       value: function draw(lights, camera, mesh) {
         var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
-        var materials = this._materials;
+
+        if (this._materials.length > 0) {
+          var materials = this._materials;
+        } else if (mesh.material) {
+          var materials = [mesh.material];
+        } else {
+          var materials = [];
+        }
 
         var isVAOBound = false;
         if (Geometry._lastGeometry !== this.toString()) {
@@ -2590,7 +2806,7 @@
 
             if (materials[i].toString() !== Geometry._lastMaterial) {
               if (typeof materials[i].shader.setUniforms !== "undefined") {
-                materials[i].shader.setUniforms(gl, glslProgram);
+                materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
               }
 
               if (materials[i]) {
@@ -2620,12 +2836,13 @@
             Geometry._lastMaterial = isMaterialSetupDone ? materials[i].toString() : null;
           }
         } else {
-          gl.useProgram(this._glslProgram);
+          var glslProgram = this._glslProgram;
+          gl.useProgram(glslProgram);
 
           if (!isVAOBound) {
             if (Geometry._lastGeometry !== this.toString()) {
               gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-              this.setUpVertexAttribs(gl, this._glslProgram);
+              this.setUpVertexAttribs(gl, glslProgram);
             }
           }
 
@@ -2633,7 +2850,11 @@
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
-            gl.uniformMatrix4fv(this._glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+          }
+
+          if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
+            this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial);
           }
 
           //if (this._ibo.length > 0) {
@@ -2662,7 +2883,6 @@
       key: 'materials',
       set: function set(materials) {
         this._materials = materials;
-        this._dirty = true;
       }
     }], [{
       key: 'clearMaterialCache',
@@ -3108,127 +3328,6 @@
 
   GLBoost$1["Vector2"] = Vector2;
 
-  var ClassicMaterial = (function () {
-    function ClassicMaterial(canvas) {
-      babelHelpers.classCallCheck(this, ClassicMaterial);
-
-      this._diffuseTexture = null;
-      this._gl = GLContext.getInstance(canvas).gl;
-      this._diffuseColor = new Vector3(1.0, 1.0, 1.0);
-      this._specularColor = new Vector3(1.0, 1.0, 1.0);
-      this._ambientColor = new Vector3(0.0, 0.0, 0.0);
-      this._name = "";
-      this._shader = new SimpleShader(canvas);
-      this._vertexNofGeometries = {};
-
-      if (this.constructor === ClassicMaterial) {
-        ClassicMaterial._instanceCount = typeof ClassicMaterial._instanceCount === "undefined" ? 0 : ClassicMaterial._instanceCount + 1;
-        this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
-      }
-    }
-
-    babelHelpers.createClass(ClassicMaterial, [{
-      key: 'setVertexN',
-
-      /*
-      set faceN(num) {
-        this._faceN = num;
-      }
-       get faceN() {
-        return this._faceN;
-      }
-      */
-
-      value: function setVertexN(mesh, num) {
-        this._vertexNofGeometries[mesh] = num;
-      }
-    }, {
-      key: 'getVertexN',
-      value: function getVertexN(mesh) {
-        return typeof this._vertexNofGeometries[mesh] === "undefined" ? 0 : this._vertexNofGeometries[mesh];
-      }
-    }, {
-      key: 'setUp',
-      value: function setUp() {
-        var gl = this._gl;
-        var result = false;
-        if (this._diffuseTexture) {
-          // テクスチャユニット０にテクスチャオブジェクトをバインドする
-          gl.activeTexture(gl.TEXTURE0);
-          result = this._diffuseTexture.setUp();
-        } else {
-          gl.bindTexture(gl.TEXTURE_2D, null);
-          result = true;
-        }
-
-        return result;
-      }
-    }, {
-      key: 'tearDown',
-      value: function tearDown() {
-        if (this._diffuseTexture) {
-          this._diffuseTexture.tearDown();
-        }
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this._instanceName;
-      }
-    }, {
-      key: 'shader',
-      set: function set(shader) {
-        this._shader = shader;
-      },
-      get: function get() {
-        return this._shader;
-      }
-    }, {
-      key: 'diffuseTexture',
-      set: function set(tex) {
-        this._diffuseTexture = tex;
-      },
-      get: function get() {
-        return this._diffuseTexture;
-      }
-    }, {
-      key: 'diffuseColor',
-      set: function set(vec) {
-        this._diffuseColor = vec;
-      },
-      get: function get() {
-        return this._diffuseColor;
-      }
-    }, {
-      key: 'specularColor',
-      set: function set(vec) {
-        this._specularColor = vec;
-      },
-      get: function get() {
-        return this._specularColor;
-      }
-    }, {
-      key: 'ambientColor',
-      set: function set(vec) {
-        this._ambientColor = vec;
-      },
-      get: function get() {
-        return this._ambientColor;
-      }
-    }, {
-      key: 'name',
-      set: function set(name) {
-        this._name = name;
-      },
-      get: function get() {
-        return this._name;
-      }
-    }]);
-    return ClassicMaterial;
-  })();
-
-  GLBoost$1["ClassicMaterial"] = ClassicMaterial;
-
   var Texture = (function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
@@ -3371,8 +3470,8 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeGeometry).call(this, canvas));
 
-      var BlendShapeShader = (function (_this$_shader_for_non) {
-        babelHelpers.inherits(BlendShapeShader, _this$_shader_for_non);
+      var BlendShapeShader = (function (_this$_defaultMateria) {
+        babelHelpers.inherits(BlendShapeShader, _this$_defaultMateria);
 
         function BlendShapeShader(canvas) {
           babelHelpers.classCallCheck(this, BlendShapeShader);
@@ -3384,9 +3483,9 @@
         }
 
         return BlendShapeShader;
-      })(_this._shader_for_non_material.constructor);
+      })(_this._defaultMaterial.shader.constructor);
 
-      _this._shader_for_non_material = new BlendShapeShader(canvas);
+      _this._defaultMaterial.shader = new BlendShapeShader(canvas);
       _this._shaderClass = BlendShapeShader;
 
       if (_this.constructor === BlendShapeGeometry) {
@@ -3561,8 +3660,8 @@
         shaderText += 'uniform vec3 viewPosition;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        shaderText += 'uniform float Kd;\n';
-        shaderText += 'uniform float Ks;\n';
+        shaderText += 'uniform vec4 Kd;\n';
+        shaderText += 'uniform vec4 Ks;\n';
         shaderText += 'uniform float power;\n';
 
         return shaderText;
@@ -3573,17 +3672,17 @@
         var shaderText = '';
 
         shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt1.rgb += Kd * lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
         shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
         shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
         shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
-        shaderText += '    rt1.rgb += Ks * lightDiffuse[i].rgb * specular;\n';
+        shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 1.0);\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
         //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
@@ -3632,8 +3731,6 @@
 
       PhongShader.mixin(PhongShaderSource);
 
-      _this._Kd = 0.8;
-      _this._Ks = 0.5;
       _this._power = 5.0;
 
       return _this;
@@ -3641,9 +3738,13 @@
 
     babelHelpers.createClass(PhongShader, [{
       key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram) {
-        gl.uniform1f(glslProgram.Kd, this._Kd);
-        gl.uniform1f(glslProgram.Ks, this._Ks);
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(Object.getPrototypeOf(PhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        var Ks = material.specularColor;
+        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(glslProgram.Ks, Ks.x, Ks.y, Ks.z, Ks.w);
         gl.uniform1f(glslProgram.power, this._power);
       }
     }, {
@@ -3712,6 +3813,7 @@
         shaderText += in_ + ' vec4 position;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 Kd;\n';
 
         return shaderText;
       }
@@ -3721,13 +3823,13 @@
         var shaderText = '';
 
         shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
         //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
@@ -3746,6 +3848,8 @@
             vertexAttribsAsResult.push(attribName);
           }
         });
+
+        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -3772,6 +3876,15 @@
       return _this;
     }
 
+    babelHelpers.createClass(LambertShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+      }
+    }]);
     return LambertShader;
   })(SimpleShader);
 
@@ -3814,6 +3927,7 @@
         shaderText += in_ + ' vec4 position;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
         shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        shaderText += 'uniform vec4 Kd;\n';
 
         return shaderText;
       }
@@ -3823,14 +3937,14 @@
         var shaderText = '';
 
         shaderText += '  vec4 surfaceColor = rt1;\n';
-        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+        shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
         shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
         shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
         shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-        shaderText += '    rt1.rgb += lightDiffuse[i].rgb * diffuse * surfaceColor.rgb;\n';
+        shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
         //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
@@ -3849,12 +3963,8 @@
             vertexAttribsAsResult.push(attribName);
           }
         });
-        /*
-        if (existCamera_f) {
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-          shaderProgram.invNormalMatrix = gl.getUniformLocation(shaderProgram, 'invNormalMatrix');
-        }
-        */
+
+        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
@@ -3881,6 +3991,15 @@
       return _this;
     }
 
+    babelHelpers.createClass(HalfLambertShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+      }
+    }]);
     return HalfLambertShader;
   })(SimpleShader);
 

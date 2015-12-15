@@ -85,7 +85,7 @@ export default class ObjLoader {
       {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
-        materials[iMCount].shader = new HalfLambertShader(canvas);
+        materials[iMCount].shader = new PhongShader(canvas);
         materials[iMCount].name = matchArray[2];
       }
 
