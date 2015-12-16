@@ -53,6 +53,6 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Both Forward Rendering and Deferred Rendering Support
 * High-level API for beginners
 
-## LICENSE
+## License
 
 This library is released under the MIT License, see `LICENSE` file.
