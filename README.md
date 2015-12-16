@@ -1,5 +1,7 @@
 # GLBoost
 
+[![Join the chat at https://gitter.im/emadurandal/GLBoost](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/emadurandal/GLBoost?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A New WebGL Rendering Library for 3D Graphics Geeks
 
 ## Attention
