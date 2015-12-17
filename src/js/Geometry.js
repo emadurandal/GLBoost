@@ -307,11 +307,12 @@ export default class Geometry {
 
         let isMaterialSetupDone = true;
 
-        if (materialName !== Geometry._lastMaterial) {
-          if (typeof materials[i].shader.setUniforms !== "undefined") {
-            materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
-          }
+        if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
+          materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
+          materials[i].shader.dirty = false;
+        }
 
+        if (materialName !== Geometry._lastMaterial) {
           if (materials[i]) {
             isMaterialSetupDone = materials[i].setUp();
           }

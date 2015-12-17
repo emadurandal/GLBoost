@@ -1800,6 +1800,8 @@
       }
 
       this._gl = GLContext.getInstance(canvas).gl;
+
+      this._dirty = true;
     }
 
     babelHelpers.createClass(Shader, [{
@@ -1978,6 +1980,9 @@
         return 'position';
       }
     }, {
+      key: 'setUniforms',
+      value: function setUniforms() {}
+    }, {
       key: '_getShader',
       value: function _getShader(gl, theSource, type) {
         var shader;
@@ -2081,6 +2086,14 @@
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights);
 
         return programToReturn;
+      }
+    }, {
+      key: 'dirty',
+      get: function get() {
+        return this._dirty;
+      },
+      set: function set(flg) {
+        this._dirty = flg;
       }
     }], [{
       key: 'initMixinMethodArray',
@@ -2808,11 +2821,12 @@
 
             var isMaterialSetupDone = true;
 
-            if (materialName !== Geometry._lastMaterial) {
-              if (typeof materials[i].shader.setUniforms !== "undefined") {
-                materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
-              }
+            if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
+              materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
+              materials[i].shader.dirty = false;
+            }
 
+            if (materialName !== Geometry._lastMaterial) {
               if (materials[i]) {
                 isMaterialSetupDone = materials[i].setUp();
               }
