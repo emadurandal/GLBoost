@@ -30,6 +30,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 
 * ECMAScript 2015 based library (using Babel)
 * Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
+* WebGL2.0 Ready (Currently, Firefox nightly and Chrome Canary)
 
 ## Supported Browsers
 
