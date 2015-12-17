@@ -27,7 +27,7 @@ export default class ObjLoader {
       return this[singleton];
   }
 
-  loadObj(url, canvas) {
+  loadObj(url, canvas, defaultShader = null) {
     this._numMaterial = 0;
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
@@ -39,7 +39,7 @@ export default class ObjLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          var mesh = this.constructMesh(gotText, basePath, canvas);
+          var mesh = this.constructMesh(gotText, basePath, canvas, defaultShader);
           resolve(mesh);
         }
       };
@@ -49,7 +49,7 @@ export default class ObjLoader {
     });
   }
 
-  loadMaterialFromFile(basePath, fileName, canvas) {
+  loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
 
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("GET", basePath + fileName, false);
@@ -85,7 +85,11 @@ export default class ObjLoader {
       {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
-        materials[iMCount].shader = new PhongShader(canvas);
+        if (defaultShader) {
+          materials[iMCount].shader = new defaultShader(canvas);
+        } else {
+          materials[iMCount].shader = new PhongShader(canvas);
+        }
         materials[iMCount].name = matchArray[2];
       }
 
@@ -124,7 +128,7 @@ export default class ObjLoader {
     this._materials = materials;
   }
 
-  constructMesh(objText, basePath, canvas) {
+  constructMesh(objText, basePath, canvas, defaultShader) {
 
     console.log(basePath);
 
@@ -145,7 +149,7 @@ export default class ObjLoader {
       // material file
       if (matchArray[1] === "mtllib")
       {
-        this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas);
+        this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
       }
       // Vertex
       if (matchArray[1] === "v")

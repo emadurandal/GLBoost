@@ -4042,6 +4042,8 @@
       value: function loadObj(url, canvas) {
         var _this = this;
 
+        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+
         this._numMaterial = 0;
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -4053,7 +4055,7 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              var mesh = _this.constructMesh(gotText, basePath, canvas);
+              var mesh = _this.constructMesh(gotText, basePath, canvas, defaultShader);
               resolve(mesh);
             }
           };
@@ -4064,7 +4066,7 @@
       }
     }, {
       key: 'loadMaterialFromFile',
-      value: function loadMaterialFromFile(basePath, fileName, canvas) {
+      value: function loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
 
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", basePath + fileName, false);
@@ -4098,7 +4100,11 @@
           if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
-            materials[iMCount].shader = new PhongShader(canvas);
+            if (defaultShader) {
+              materials[iMCount].shader = new defaultShader(canvas);
+            } else {
+              materials[iMCount].shader = new PhongShader(canvas);
+            }
             materials[iMCount].name = matchArray[2];
           }
 
@@ -4134,7 +4140,7 @@
       }
     }, {
       key: 'constructMesh',
-      value: function constructMesh(objText, basePath, canvas) {
+      value: function constructMesh(objText, basePath, canvas, defaultShader) {
 
         console.log(basePath);
 
@@ -4154,7 +4160,7 @@
 
           // material file
           if (matchArray[1] === "mtllib") {
-            this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas);
+            this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
           }
           // Vertex
           if (matchArray[1] === "v") {
