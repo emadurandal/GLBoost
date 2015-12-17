@@ -1800,6 +1800,8 @@
       }
 
       this._gl = GLContext.getInstance(canvas).gl;
+
+      this._dirty = true;
     }
 
     babelHelpers.createClass(Shader, [{
@@ -1978,6 +1980,9 @@
         return 'position';
       }
     }, {
+      key: 'setUniforms',
+      value: function setUniforms() {}
+    }, {
       key: '_getShader',
       value: function _getShader(gl, theSource, type) {
         var shader;
@@ -2081,6 +2086,14 @@
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights);
 
         return programToReturn;
+      }
+    }, {
+      key: 'dirty',
+      get: function get() {
+        return this._dirty;
+      },
+      set: function set(flg) {
+        this._dirty = flg;
       }
     }], [{
       key: 'initMixinMethodArray',
@@ -2808,11 +2821,12 @@
 
             var isMaterialSetupDone = true;
 
-            if (materialName !== Geometry._lastMaterial) {
-              if (typeof materials[i].shader.setUniforms !== "undefined") {
-                materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
-              }
+            if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
+              materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
+              materials[i].shader.dirty = false;
+            }
 
+            if (materialName !== Geometry._lastMaterial) {
               if (materials[i]) {
                 isMaterialSetupDone = materials[i].setUp();
               }
@@ -4042,6 +4056,8 @@
       value: function loadObj(url, canvas) {
         var _this = this;
 
+        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+
         this._numMaterial = 0;
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -4053,7 +4069,7 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              var mesh = _this.constructMesh(gotText, basePath, canvas);
+              var mesh = _this.constructMesh(gotText, basePath, canvas, defaultShader);
               resolve(mesh);
             }
           };
@@ -4064,7 +4080,7 @@
       }
     }, {
       key: 'loadMaterialFromFile',
-      value: function loadMaterialFromFile(basePath, fileName, canvas) {
+      value: function loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
 
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", basePath + fileName, false);
@@ -4098,7 +4114,11 @@
           if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
-            materials[iMCount].shader = new PhongShader(canvas);
+            if (defaultShader) {
+              materials[iMCount].shader = new defaultShader(canvas);
+            } else {
+              materials[iMCount].shader = new PhongShader(canvas);
+            }
             materials[iMCount].name = matchArray[2];
           }
 
@@ -4134,7 +4154,7 @@
       }
     }, {
       key: 'constructMesh',
-      value: function constructMesh(objText, basePath, canvas) {
+      value: function constructMesh(objText, basePath, canvas, defaultShader) {
 
         console.log(basePath);
 
@@ -4154,7 +4174,7 @@
 
           // material file
           if (matchArray[1] === "mtllib") {
-            this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas);
+            this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
           }
           // Vertex
           if (matchArray[1] === "v") {

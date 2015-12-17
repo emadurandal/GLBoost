@@ -11,6 +11,7 @@ export default class Shader {
 
     this._gl = GLContext.getInstance(canvas).gl;
 
+    this._dirty = true;
   }
 
   static initMixinMethodArray() {
@@ -282,6 +283,18 @@ export default class Shader {
     }
 
     return 'position';
+  }
+
+  get dirty() {
+    return this._dirty;
+  }
+
+  set dirty(flg) {
+    this._dirty = flg;
+  }
+
+  setUniforms() {
+
   }
 
   _getShader(gl, theSource, type) {
