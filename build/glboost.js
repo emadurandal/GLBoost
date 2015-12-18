@@ -6,6 +6,10 @@
 
   var babelHelpers = {};
 
+  babelHelpers.typeof = function (obj) {
+    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
   babelHelpers.classCallCheck = function (instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -2378,6 +2382,8 @@
     return SimpleShader;
   })(Shader);
 
+  GLBoost["SimpleShader"] = SimpleShader;
+
   var ClassicMaterial = (function () {
     function ClassicMaterial(canvas) {
       babelHelpers.classCallCheck(this, ClassicMaterial);
@@ -4416,23 +4422,53 @@
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
   GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
 
+  var ArrayUtil = (function () {
+    function ArrayUtil() {
+      babelHelpers.classCallCheck(this, ArrayUtil);
+    }
+
+    babelHelpers.createClass(ArrayUtil, null, [{
+      key: 'merge',
+      value: function merge() {
+        var key,
+            result = false;
+        if (arguments && arguments.length > 0) {
+          result = [];
+          for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
+              for (key in arguments[i]) {
+                if (isFinite(key)) {
+                  result.push(arguments[i][key]);
+                } else {
+                  result[key] = arguments[i][key];
+                }
+              }
+            }
+          }
+        }
+        return result;
+      }
+    }]);
+    return ArrayUtil;
+  })();
+
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
 
-    function Plane(width, height, uSpan, vSpan, vertexColor, canvas) {
+    function Plane(width, height, uSpan, vSpan, customVertexAttributes, canvas) {
       babelHelpers.classCallCheck(this, Plane);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
 
       Plane._instanceCount = typeof Plane._instanceCount === "undefined" ? 0 : Plane._instanceCount + 1;
 
-      _this._setupVertexData(width, height, uSpan, vSpan, vertexColor);
+      _this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
       return _this;
     }
 
     babelHelpers.createClass(Plane, [{
       key: '_setupVertexData',
-      value: function _setupVertexData(width, height, uSpan, vSpan, vertexColor) {
+      value: function _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes) {
 
         var positions = [];
 
@@ -4458,7 +4494,9 @@
           indices.push(degenerate_right_index);
           indices.push(degenerate_left_index);
         }
+
         var colors = [];
+        var vertexColor = new Vector4(1, 1, 1, 1);
         for (var i = 0; i <= vSpan; i++) {
           for (var j = 0; j <= uSpan; j++) {
             colors.push(vertexColor);
@@ -4480,13 +4518,16 @@
           }
         }
 
-        this.setVerticesData({
+        var object = {
           position: positions,
           color: colors,
           texcoord: texcoords,
           normal: normals,
           indices: [indices]
-        }, GLBoost$1.TRIANGLE_STRIP);
+        };
+
+        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+        this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
       }
     }, {
       key: 'toString',
