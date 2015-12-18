@@ -4419,32 +4419,74 @@
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
 
-    function Plane(width, height, vertexColor, canvas) {
+    function Plane(width, height, uSpan, vSpan, vertexColor, canvas) {
       babelHelpers.classCallCheck(this, Plane);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
 
       Plane._instanceCount = typeof Plane._instanceCount === "undefined" ? 0 : Plane._instanceCount + 1;
 
-      _this._setupVertexData(width / 2.0, height / 2.0, vertexColor);
+      _this._setupVertexData(width, height, uSpan, vSpan, vertexColor);
       return _this;
     }
 
     babelHelpers.createClass(Plane, [{
       key: '_setupVertexData',
-      value: function _setupVertexData(halfWidth, halfHeight, vertexColor) {
-        var indices = [3, 1, 0, 2, 1, 3];
+      value: function _setupVertexData(width, height, uSpan, vSpan, vertexColor) {
 
-        var positions = [new Vector3(-halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, -halfHeight), new Vector3(halfWidth, 0, halfHeight), new Vector3(-halfWidth, 0, halfHeight)];
-        var colors = [new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
-        var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
+        var positions = [];
+
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            positions.push(new Vector3((j / uSpan - 1 / 2) * width, 0, (i / vSpan - 1 / 2) * height));
+          }
+        }
+
+        var indices = [];
+        for (var i = 0; i < vSpan; i++) {
+          var degenerate_left_index = 0;
+          var degenerate_right_index = 0;
+          for (var j = 0; j <= uSpan; j++) {
+            indices.push(i * (uSpan + 1) + j);
+            indices.push((i + 1) * (uSpan + 1) + j);
+            if (j === 0) {
+              degenerate_left_index = (i + 1) * (uSpan + 1) + j;
+            } else if (j === uSpan) {
+              degenerate_right_index = (i + 1) * (uSpan + 1) + j;
+            }
+          }
+          indices.push(degenerate_right_index);
+          indices.push(degenerate_left_index);
+        }
+        var colors = [];
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            colors.push(vertexColor);
+          }
+        }
+
+        var texcoords = [];
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            texcoords.push(new Vector2(j / uSpan, i / vSpan));
+          }
+        }
+
+        var normal = new Vector3(0, 1, 0);
+        var normals = [];
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            normals.push(normal);
+          }
+        }
 
         this.setVerticesData({
           position: positions,
           color: colors,
           texcoord: texcoords,
+          normal: normals,
           indices: [indices]
-        });
+        }, GLBoost$1.TRIANGLE_STRIP);
       }
     }, {
       key: 'toString',
