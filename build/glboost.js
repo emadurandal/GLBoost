@@ -4063,6 +4063,7 @@
         var _this = this;
 
         var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
         this._numMaterial = 0;
         return new Promise(function (resolve, reject) {
@@ -4075,7 +4076,7 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              var mesh = _this.constructMesh(gotText, basePath, canvas, defaultShader);
+              var mesh = _this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString);
               resolve(mesh);
             }
           };
@@ -4085,14 +4086,11 @@
         });
       }
     }, {
-      key: 'loadMaterialFromFile',
-      value: function loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
+      key: '_loadMaterialFromString',
+      value: function _loadMaterialFromString(mtlString, canvas, defaultShader) {
+        var basePath = arguments.length <= 3 || arguments[3] === undefined ? '' : arguments[3];
 
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", basePath + fileName, false);
-        xmlHttp.send(null);
-
-        var mtlTextRows = xmlHttp.responseText.split('\n');
+        var mtlTextRows = mtlString.split('\n');
 
         // checking the number of material
         for (var i = 0; i < mtlTextRows.length; i++) {
@@ -4150,7 +4148,7 @@
           }
 
           if (matchArray[1] === "map_Kd") {
-            matchArray = mtlTextRows[i].match(/^(\w+) (\w+.\w+)/);
+            matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
             var texture = new Texture(basePath + matchArray[2], canvas);
             texture.name = matchArray[2];
             materials[iMCount].diffuseTexture = texture;
@@ -4159,8 +4157,18 @@
         this._materials = materials;
       }
     }, {
-      key: 'constructMesh',
-      value: function constructMesh(objText, basePath, canvas, defaultShader) {
+      key: '_loadMaterialFromFile',
+      value: function _loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", basePath + fileName, false);
+        xmlHttp.send(null);
+
+        this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath);
+      }
+    }, {
+      key: '_constructMesh',
+      value: function _constructMesh(objText, basePath, canvas, defaultShader, mtlString) {
 
         console.log(basePath);
 
@@ -4171,6 +4179,10 @@
         var vnCount = 0;
         var vtCount = 0;
 
+        if (mtlString) {
+          this._loadMaterialFromString(mtlString, canvas, defaultShader);
+        }
+
         var outputRows = [];
         for (var i = 0; i < objTextRows.length; i++) {
           var matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
@@ -4179,8 +4191,8 @@
           }
 
           // material file
-          if (matchArray[1] === "mtllib") {
-            this.loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+          if (matchArray[1] === "mtllib" && mtlString === null) {
+            this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
           }
           // Vertex
           if (matchArray[1] === "v") {
