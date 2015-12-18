@@ -6,17 +6,18 @@ import Geometry from './../Geometry'
 import Vector4 from './../math/Vector4'
 import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'
+import ArrayUtil from '.././misc/ArrayUtil'
 
 export default class Plane extends Geometry {
-  constructor(width, height, uSpan, vSpan, vertexColor, canvas) {
+  constructor(width, height, uSpan, vSpan, customVertexAttributes, canvas) {
     super(canvas);
 
     Plane._instanceCount = (typeof Plane._instanceCount === "undefined") ? 0 : (Plane._instanceCount + 1);
 
-    this._setupVertexData(width, height, uSpan, vSpan, vertexColor);
+    this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
   }
 
-  _setupVertexData(width, height, uSpan, vSpan, vertexColor) {
+  _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes) {
 
     var positions = [];
 
@@ -42,7 +43,9 @@ export default class Plane extends Geometry {
       indices.push(degenerate_right_index);
       indices.push(degenerate_left_index);
     }
+
     var colors = [];
+    var vertexColor = new Vector4(1, 1, 1, 1);
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         colors.push(vertexColor);
@@ -64,13 +67,17 @@ export default class Plane extends Geometry {
       }
     }
 
-    this.setVerticesData({
+
+    var object = {
       position: positions,
       color: colors,
       texcoord: texcoords,
       normal: normals,
       indices: [indices]
-    }, GLBoost.TRIANGLE_STRIP);
+    };
+
+    var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+    this.setVerticesData(completeAttributes, GLBoost.TRIANGLE_STRIP);
   }
 
   toString() {

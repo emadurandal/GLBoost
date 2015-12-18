@@ -89,3 +89,5 @@ export default class SimpleShader extends Shader {
     gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
   }
 }
+
+GLBoost["SimpleShader"] = SimpleShader;
