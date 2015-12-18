@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "esdoc": "esdoc -c esdoc.json"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,7 @@
   "homepage": "https://github.com/emadurandal/GLBoost#readme",
   "devDependencies": {
     "babel-preset-es2015-rollup": "^1.0.0",
+    "esdoc": "^0.4.3",
     "rollup": "^0.21.2",
     "rollup-plugin-babel": "^2.2.0"
   }
