@@ -89,7 +89,7 @@ export default class ObjLoader {
         materials[iMCount].name = matchArray[2];
       }
 
-      if (matchArray[1] === "Ka")
+      if (matchArray[1].toLowerCase() === "ka")
       {
         matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
@@ -97,7 +97,7 @@ export default class ObjLoader {
         materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
       }
 
-      if (matchArray[1] === "Kd")
+      if (matchArray[1].toLowerCase() === "kd")
       {
         matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
@@ -105,7 +105,7 @@ export default class ObjLoader {
         materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
       }
 
-      if (matchArray[1] === "Ks")
+      if (matchArray[1].toLowerCase() === "ks")
       {
         matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
@@ -113,7 +113,7 @@ export default class ObjLoader {
         materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
       }
 
-      if (matchArray[1] === "map_Kd")
+      if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
         var texture = new Texture(basePath + matchArray[2], canvas);
