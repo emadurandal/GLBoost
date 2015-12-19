@@ -205,7 +205,7 @@ export default class ObjLoader {
       //頂点 読み込み
       if (matchArray[1] === "v")
       {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
+        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
 //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
         pvCoord[vCount] = new Vector3();
         pvCoord[vCount].x = parseFloat(matchArray[2]);
@@ -217,7 +217,7 @@ export default class ObjLoader {
       //法線 読み込み
       if (matchArray[1] === "vn")
       {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
+        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
 //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
         pvNormal[vnCount] = new Vector3();
         pvNormal[vnCount].x = parseFloat(matchArray[2]);
@@ -229,7 +229,7 @@ export default class ObjLoader {
       //テクスチャー座標 読み込み
       if (matchArray[1] === "vt")
       {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9]+\.[0-9]+) (-?[0-9]+\.[0-9]+)/);
+        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
         pvTexture[vtCount] = new Vector2();
         pvTexture[vtCount].x = parseFloat(matchArray[2]);
         pvTexture[vtCount].y = parseFloat(matchArray[3]);
