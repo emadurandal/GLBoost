@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Obj Mesh example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+  <script src="../../../build/glboost.js"></script>
+  <script src="../../../libs/tmlib.js"></script>
+  <script>
+  /*
+   * constant
+   */
+  var SCREEN_WIDTH    = 800;              // 画面幅
+  var SCREEN_HEIGHT   = 800;              // 画面高さ
+  var SCREEN_CENTER_X = SCREEN_WIDTH/2;   // 画面中央X座標値
+  var SCREEN_CENTER_Y = SCREEN_HEIGHT/2;  // 画面中央Y座標値
+
+  GLBoost.TARGET_WEBGL_VERSION = 1;
+
+  /*
+   * main
+   */
+  tm.main(function() {
+      // アプリケーション
+      var app = tm.webgl.WebGLApp("#world");
+      app.replaceScene(MainScene());
+
+      // 実行
+      app.run();
+  });
+
+
+  /*
+   * scene
+   */
+  var MainScene = tm.createClass({
+      // three.js 用シーンを継承
+      superClass: tm.webgl.Scene,
+
+      init: function() {
+          this.superInit();
+
+
+          var camera = tm.webgl.CameraElement(
+              {
+                eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
+                center: new GLBoost.Vector3(0.0, 1.5, 0.0),
+                up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+              },
+              {
+                fovy: 45.0,
+                aspect: 1.0,
+                zNear: 0.1,
+                zFar: 300.0
+              }
+            );
+          this.add( camera );
+
+          var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(1, 1, 1), '#world');
+          pointLight_1.translate = new GLBoost.Vector3(0, 0, -10);
+          var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10), '#world');
+          this.add( pointLight_1 );
+          this.add( directionalLight_2 );
+
+          var objLoader = GLBoost.ObjLoader.getInstance();
+          var mtlString = 'newmtl initialShadingGroup\n' +
+                          'Kd 1.00 1.00 1.00\n' +
+                          'Ka 0.00 0.00 0.00\n' +
+                          'map_Kd resouces/teapot/wood.jpg\n';
+          var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world', null, mtlString);
+          var self = this;
+          promise.then(function(mesh) {
+//            console.log(mesh);
+
+            self.add( mesh );
+
+            self.prepareForRender();
+
+          });
+
+          setInterval(function(){
+            var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
+            var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+            camera.eye = rotatedVector;
+          }, 34);
+      }
+  });
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost basic example</p>
+</header>
+<main>
+  <canvas id="world" width="800" height="800"></canvas>
+</main>
+</body>
+</html>
