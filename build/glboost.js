@@ -4109,7 +4109,7 @@
 
         // main loading
         for (var i = 0; i < mtlTextRows.length; i++) {
-          var matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
+          var matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
 
           if (matchArray === null) {
             continue;

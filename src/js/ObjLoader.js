@@ -71,7 +71,7 @@ export default class ObjLoader {
 
     // main loading
     for (let i=0; i<mtlTextRows.length; i++) {
-      let matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
+      let matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
 
       if (matchArray === null) {
         continue;
