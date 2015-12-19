@@ -1,5 +1,7 @@
 # GLBoost
 
+![GLBoost](https://github.com/emadurandal/GLBoost/raw/master/logo.png "GLBoost")
+
 [![Join the chat at https://gitter.im/emadurandal/GLBoost](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/emadurandal/GLBoost?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 <a href="https://zenhub.io"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
 
