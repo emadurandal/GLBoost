@@ -343,17 +343,17 @@ export default class ObjLoader {
     var vn1=0,vn2=0,vn3=0;
     var vt1=0,vt2=0,vt3=0;
     let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-    v1 = matchArray[2];
-    vt1 = matchArray[3];
-    vn1 = matchArray[4];
-    v2 = matchArray[5];
-    vt2 = matchArray[6];
-    vn2 = matchArray[7];
-    v3 = matchArray[8];
-    vt3 = matchArray[9];
-    vn3 = matchArray[10];
 
-    if(vn1) {
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
       positions[fCount*3] = pvCoord[v1-1];
       positions[fCount*3+1] = pvCoord[v2-1];
       positions[fCount*3+2] = pvCoord[v3-1];
@@ -386,14 +386,15 @@ export default class ObjLoader {
     var vn1=0,vn2=0,vn3=0;
     var vt1=0,vt2=0,vt3=0;
     let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-    v1 = matchArray[2];
-    vn1 = matchArray[3];
-    v2 = matchArray[4];
-    vn2 = matchArray[5];
-    v3 = matchArray[6];
-    vn3 = matchArray[7];
 
-    if(vn1) {
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+
       positions[fCount*3] = pvCoord[v1-1];
       positions[fCount*3+1] = pvCoord[v2-1];
       positions[fCount*3+2] = pvCoord[v3-1];
@@ -430,20 +431,21 @@ export default class ObjLoader {
     var vn1=0,vn2=0,vn3=0,vn4=0;
     var vt1=0,vt2=0,vt3=0,vt4=0;
     let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-    v1 = matchArray[2];
-    vt1 = matchArray[3];
-    vn1 = matchArray[4];
-    v2 = matchArray[5];
-    vt2 = matchArray[6];
-    vn2 = matchArray[7];
-    v3 = matchArray[8];
-    vt3 = matchArray[9];
-    vn3 = matchArray[10];
-    v4 = matchArray[11];
-    vt4 = matchArray[12];
-    vn4 = matchArray[13];
 
-    if(vn1) {
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
+      v4 = matchArray[11];
+      vt4 = matchArray[12];
+      vn4 = matchArray[13];
+
       positions[fCount*3] = pvCoord[v1-1];
       normals[fCount*3] = pvNormal[vn1-1];
       texcoords[fCount*3] = pvTexture[vt1-1];
@@ -497,15 +499,15 @@ export default class ObjLoader {
     var vn1=0,vn2=0,vn3=0,vn4=0;
     var vt1=0,vt2=0,vt3=0,vt4=0;
     let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-    v1 = matchArray[2];
-    vn1 = matchArray[3];
-    v2 = matchArray[4];
-    vn2 = matchArray[5];
-    v3 = matchArray[6];
-    vn3 = matchArray[7];
-    v4 = matchArray[8];
-    vn4 = matchArray[9];
-    if(vn1) {
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+      v4 = matchArray[8];
+      vn4 = matchArray[9];
       positions[fCount*3] = pvCoord[v1-1];
       normals[fCount*3] = pvNormal[vn1-1];
       positions[fCount*3+1] = pvCoord[v2-1];
