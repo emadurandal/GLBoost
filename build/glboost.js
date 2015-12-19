@@ -4183,7 +4183,6 @@
           this._loadMaterialFromString(mtlString, canvas, defaultShader);
         }
 
-        var outputRows = [];
         for (var i = 0; i < objTextRows.length; i++) {
           var matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
           if (matchArray === null) {
@@ -4208,9 +4207,14 @@
           }
           // Face
           if (matchArray[1] === "f") {
-            fCount++;
+            matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+            if (matchArray !== null) {
+              // if this is a Quad Polygon
+              fCount += 2;
+            } else {
+              fCount++;
+            }
           }
-          outputRows.push(matchArray[1] + ' ' + matchArray[2]);
         }
 
         var pvCoord = new Array(vCount);
@@ -4309,81 +4313,9 @@
                   vt3 = 0;
 
               if (this._materials[i].diffuseTexture) {
-
-                var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-                v1 = _matchArray[2];
-                vt1 = _matchArray[3];
-                vn1 = _matchArray[4];
-                v2 = _matchArray[5];
-                vt2 = _matchArray[6];
-                vn2 = _matchArray[7];
-                v3 = _matchArray[8];
-                vt3 = _matchArray[9];
-                vn3 = _matchArray[10];
-
-                if (vn1) {
-                  positions[fCount * 3] = pvCoord[v1 - 1];
-                  positions[fCount * 3 + 1] = pvCoord[v2 - 1];
-                  positions[fCount * 3 + 2] = pvCoord[v3 - 1];
-                  normals[fCount * 3] = pvNormal[vn1 - 1];
-                  normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
-                  normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
-                  texcoords[fCount * 3] = pvTexture[vt1 - 1];
-                  texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
-                  texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
-                } else {
-                  var _matchArray2 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-                  v1 = _matchArray2[2];
-                  vn1 = _matchArray2[3];
-                  v2 = _matchArray2[4];
-                  vn2 = _matchArray2[5];
-                  v3 = _matchArray2[6];
-                  vn3 = _matchArray2[7];
-                  positions[fCount * 3] = pvCoord[v1 - 1];
-                  positions[fCount * 3 + 1] = pvCoord[v2 - 1];
-                  positions[fCount * 3 + 2] = pvCoord[v3 - 1];
-                  normals[fCount * 3] = pvNormal[vn1 - 1];
-                  normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
-                  normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
-                }
+                this._addVertexDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               } else {
-                var _matchArray3 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-                v1 = _matchArray3[2];
-                vn1 = _matchArray3[3];
-                v2 = _matchArray3[4];
-                vn2 = _matchArray3[5];
-                v3 = _matchArray3[6];
-                vn3 = _matchArray3[7];
-
-                if (vn1) {
-                  positions[fCount * 3] = pvCoord[v1 - 1];
-                  positions[fCount * 3 + 1] = pvCoord[v2 - 1];
-                  positions[fCount * 3 + 2] = pvCoord[v3 - 1];
-                  normals[fCount * 3] = pvNormal[vn1 - 1];
-                  normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
-                  normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
-                } else {
-                  var _matchArray4 = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-                  v1 = _matchArray4[2];
-                  vt1 = _matchArray4[3];
-                  vn1 = _matchArray4[4];
-                  v2 = _matchArray4[5];
-                  vt2 = _matchArray4[6];
-                  vn2 = _matchArray4[7];
-                  v3 = _matchArray4[8];
-                  vt3 = _matchArray4[9];
-                  vn3 = _matchArray4[10];
-
-                  positions[fCount * 3] = pvCoord[v1 - 1];
-                  positions[fCount * 3 + 1] = pvCoord[v2 - 1];
-                  positions[fCount * 3 + 2] = pvCoord[v3 - 1];
-                  normals[fCount * 3] = pvNormal[vn1 - 1];
-                  normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
-                  normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
-                  texcoords[fCount * 3] = pvTexture[vt1 - 1];
-                  texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
-                  texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
-                }
+                this._addVertexDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               }
 
               iFaceBufferArray[partFCount * 3] = fCount * 3;
@@ -4416,6 +4348,105 @@
         });
 
         return mesh;
+      }
+    }, {
+      key: '_addVertexDataToArraysWithTexture',
+      value: function _addVertexDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount) {
+        var v1 = 0,
+            v2 = 0,
+            v3 = 0;
+        var vn1 = 0,
+            vn2 = 0,
+            vn3 = 0;
+        var vt1 = 0,
+            vt2 = 0,
+            vt3 = 0;
+        var matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+        v1 = matchArray[2];
+        vt1 = matchArray[3];
+        vn1 = matchArray[4];
+        v2 = matchArray[5];
+        vt2 = matchArray[6];
+        vn2 = matchArray[7];
+        v3 = matchArray[8];
+        vt3 = matchArray[9];
+        vn3 = matchArray[10];
+
+        if (vn1) {
+          positions[fCount * 3] = pvCoord[v1 - 1];
+          positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+          positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+          normals[fCount * 3] = pvNormal[vn1 - 1];
+          normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+          normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+          texcoords[fCount * 3] = pvTexture[vt1 - 1];
+          texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
+          texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
+        } else {
+          var _matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+          v1 = _matchArray[2];
+          vn1 = _matchArray[3];
+          v2 = _matchArray[4];
+          vn2 = _matchArray[5];
+          v3 = _matchArray[6];
+          vn3 = _matchArray[7];
+          positions[fCount * 3] = pvCoord[v1 - 1];
+          positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+          positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+          normals[fCount * 3] = pvNormal[vn1 - 1];
+          normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+          normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+        }
+      }
+    }, {
+      key: '_addVertexDataToArraysWithoutTexture',
+      value: function _addVertexDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount) {
+        var v1 = 0,
+            v2 = 0,
+            v3 = 0;
+        var vn1 = 0,
+            vn2 = 0,
+            vn3 = 0;
+        var vt1 = 0,
+            vt2 = 0,
+            vt3 = 0;
+        var matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+        v1 = matchArray[2];
+        vn1 = matchArray[3];
+        v2 = matchArray[4];
+        vn2 = matchArray[5];
+        v3 = matchArray[6];
+        vn3 = matchArray[7];
+
+        if (vn1) {
+          positions[fCount * 3] = pvCoord[v1 - 1];
+          positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+          positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+          normals[fCount * 3] = pvNormal[vn1 - 1];
+          normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+          normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+        } else {
+          var _matchArray2 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          v1 = _matchArray2[2];
+          vt1 = _matchArray2[3];
+          vn1 = _matchArray2[4];
+          v2 = _matchArray2[5];
+          vt2 = _matchArray2[6];
+          vn2 = _matchArray2[7];
+          v3 = _matchArray2[8];
+          vt3 = _matchArray2[9];
+          vn3 = _matchArray2[10];
+
+          positions[fCount * 3] = pvCoord[v1 - 1];
+          positions[fCount * 3 + 1] = pvCoord[v2 - 1];
+          positions[fCount * 3 + 2] = pvCoord[v3 - 1];
+          normals[fCount * 3] = pvNormal[vn1 - 1];
+          normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
+          normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
+          texcoords[fCount * 3] = pvTexture[vt1 - 1];
+          texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
+          texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
+        }
       }
     }], [{
       key: 'getInstance',
