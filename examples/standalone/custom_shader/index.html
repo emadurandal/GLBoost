@@ -36,7 +36,7 @@
         fovy: 45.0,
         aspect: 1.0,
         zNear: 0.1,
-        zFar: 300.0
+        zFar: 500.0
       }
   );
   scene.add( camera );
@@ -123,9 +123,12 @@
       var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
       camera.eye = rotatedVector;
 
-      var myCustomShader = mesh.geometry._materials[0].shader;
-      myCustomShader.increaseTime(0.16);
-      myCustomShader.dirty = true;
+      mesh.geometry._materials.forEach(function(material){
+        var myCustomShader = material.shader;
+        myCustomShader.increaseTime(0.16);
+        myCustomShader.dirty = true;
+
+      });
 
       requestAnimationFrame(render);
     };
