@@ -46,9 +46,9 @@ export default class Camera extends Element {
     if (this._dirtyView) {
       this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
       this._dirtyView = false;
-      return this._viewMatrix;
+      return this._viewMatrix.clone();
     } else {
-      return this._viewMatrix;
+      return this._viewMatrix.clone();
     }
   }
 
@@ -68,9 +68,9 @@ export default class Camera extends Element {
     if (this._dirtyProjection) {
       this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
       this._dirtyProjection = false;
-      return this._projectionMatrix;
+      return this._projectionMatrix.clone();
     } else {
-      return this._projectionMatrix;
+      return this._projectionMatrix.clone();
     }
   }
 

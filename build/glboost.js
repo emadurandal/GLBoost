@@ -2790,7 +2790,7 @@
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
-              var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
+              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
               gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
             }
 
@@ -2872,7 +2872,7 @@
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
-            var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
+            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
           }
 
@@ -2969,9 +2969,9 @@
         if (this._dirtyView) {
           this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
           this._dirtyView = false;
-          return this._viewMatrix;
+          return this._viewMatrix.clone();
         } else {
-          return this._viewMatrix;
+          return this._viewMatrix.clone();
         }
       }
     }, {
@@ -2980,9 +2980,9 @@
         if (this._dirtyProjection) {
           this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
           this._dirtyProjection = false;
-          return this._projectionMatrix;
+          return this._projectionMatrix.clone();
         } else {
-          return this._projectionMatrix;
+          return this._projectionMatrix.clone();
         }
       }
     }, {
@@ -4815,5 +4815,108 @@
   })(Geometry);
 
   GLBoost$1["Cube"] = Cube;
+
+  /**
+   * This Particle class handles particles expressions.
+   * You can define particles behaviors in a custom vertex shader.
+   * These particles are processed in GPU, so this is a very fast solution of particles expressions.
+   */
+
+  var Particle = (function (_Geometry) {
+    babelHelpers.inherits(Particle, _Geometry);
+
+    /**
+     * This is Particle class's constructor
+     *
+     * @param {Array} positionArray position array
+     * @param {Number} particleWidth Width of each particle
+     * @param {Number} particleHeight Height of each particle
+     * @param {Object} JSON which has other vertex attribute arrays you want
+     * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
+     */
+
+    function Particle(positionArray, particleWidth, particleHeight, customVertexAttributes, canvas) {
+      babelHelpers.classCallCheck(this, Particle);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, canvas));
+
+      Particle._instanceCount = typeof Particle._instanceCount === "undefined" ? 0 : Particle._instanceCount + 1;
+
+      _this._setupVertexData(positionArray, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
+      return _this;
+    }
+
+    babelHelpers.createClass(Particle, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(positionArray, pHalfWidth, pHalfHeight, customVertexAttributes) {
+        var indices = [];
+
+        for (var i = 0; i < positionArray.length; i++) {
+          var offset = i * 4;
+          indices.push(offset); // start Quad
+          indices.push(offset + 1); //
+          indices.push(offset + 2); // end Quad
+          indices.push(offset + 3); //
+          if (i === positionArray.length - 1) {
+            break;
+          }
+          indices.push(offset + 3); // degenerated
+          indices.push(offset + 4); // move another Particle
+        }
+
+        var positions = [];
+        for (var i = 0; i < positionArray.length; i++) {
+          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+        }
+
+        var colors = [];
+        var vertexColor = new Vector4(1, 1, 1, 1);
+        for (var i = 0; i < positionArray.length; i++) {
+          for (var j = 0; j < 4; j++) {
+            colors.push(vertexColor);
+          }
+        }
+
+        var texcoords = [];
+        for (var i = 0; i < positionArray.length; i++) {
+          texcoords.push(new Vector2(0, 0));
+          texcoords.push(new Vector2(0, 1));
+          texcoords.push(new Vector2(1, 0));
+          texcoords.push(new Vector2(1, 1));
+        }
+
+        var normals = [];
+        var normal = new Vector3(0, 0, 1);
+        for (var i = 0; i < positionArray.length; i++) {
+          for (var j = 0; j < 4; j++) {
+            normals.push(normal);
+          }
+        }
+
+        var object = {
+          position: positions,
+          color: colors,
+          texcoord: texcoords,
+          normal: normals,
+          indices: [indices]
+        };
+
+        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+
+        this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return Particle.name + '_' + Particle._instanceCount;
+      }
+    }]);
+    return Particle;
+  })(Geometry);
+
+  GLBoost$1["Particle"] = Particle;
 
 }));

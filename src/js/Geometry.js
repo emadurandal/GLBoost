@@ -270,7 +270,7 @@ export default class Geometry {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
+          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
@@ -352,7 +352,7 @@ export default class Geometry {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.clone().multiply(viewMatrix).multiply(mesh.transformMatrix);
+        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
         gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
       }
