@@ -308,8 +308,8 @@ export default class Geometry {
         let isMaterialSetupDone = true;
 
         if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
-          materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
-          materials[i].shader.dirty = false;
+          var needTobeStillDirty = materials[i].shader.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+          materials[i].shader.dirty = needTobeStillDirty ? true : false;
         }
 
         if (materialName !== Geometry._lastMaterial) {
@@ -358,7 +358,7 @@ export default class Geometry {
       }
 
       if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
-        this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial);
+        this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
       }
 
       //if (this._ibo.length > 0) {

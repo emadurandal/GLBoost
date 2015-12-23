@@ -9,7 +9,8 @@
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "esdoc": "esdoc -c esdoc.json"
+    "esdoc": "esdoc -c esdoc.json",
+    "build-examples": "rollup -c examples/standalone/particles/rollup.config.js"
   },
   "repository": {
     "type": "git",

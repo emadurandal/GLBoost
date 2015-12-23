@@ -168,6 +168,10 @@ export default class Renderer {
     return this._renderPasses;
   }
 
+  get glContext() {
+    return this._gl;
+  }
+
 }
 
 GLBoost["Renderer"] = Renderer;
