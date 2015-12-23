@@ -56,6 +56,35 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Both Forward Rendering and Deferred Rendering Support
 * High-level API for beginners
 
+## Hot to Install npm packages to build library, examples and API document
+
+```
+$ npm install
+```
+
+### Build of GLBoost Library
+
+```
+$ npm run build
+```
+
+### Build of examples
+
+Some examples needs to be built by Babel because they are written ECMAScript 2015.
+The following command builds them all.
+
+```
+$ npm run build-examples
+```
+
+### Build of API Document
+
+```
+$ npm run esdoc
+```
+
+(Note: The documentation coverage is still very low. We address the resolution of this problem.)
+
 ## License
 
 This library is released under the MIT License, see `LICENSE` file.
