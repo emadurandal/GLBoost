@@ -56,7 +56,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Both Forward Rendering and Deferred Rendering Support
 * High-level API for beginners
 
-## Hot to Install npm packages to build library, examples and API document
+## How to Install npm packages to build library, examples and API document
 
 ```
 $ npm install
