@@ -2828,8 +2828,8 @@
             var isMaterialSetupDone = true;
 
             if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
-              materials[i].shader.setUniforms(gl, glslProgram, materials[i]);
-              materials[i].shader.dirty = false;
+              var needTobeStillDirty = materials[i].shader.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+              materials[i].shader.dirty = needTobeStillDirty ? true : false;
             }
 
             if (materialName !== Geometry._lastMaterial) {
@@ -2877,7 +2877,7 @@
           }
 
           if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
-            this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial);
+            this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
           }
 
           //if (this._ibo.length > 0) {
@@ -3141,7 +3141,7 @@
         gl.enable(gl.BLEND);
         gl.blendEquation(gl.FUNC_ADD);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
+        //gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
         gl.clearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
         gl.clearDepth(1);
         gl.clearStencil(0);
@@ -3281,6 +3281,11 @@
         }
 
         return this._renderPasses;
+      }
+    }, {
+      key: 'glContext',
+      get: function get() {
+        return this._gl;
       }
     }]);
     return Renderer;
@@ -4816,6 +4821,50 @@
 
   GLBoost$1["Cube"] = Cube;
 
+  var ParticleShaderSource = (function () {
+    function ParticleShaderSource() {
+      babelHelpers.classCallCheck(this, ParticleShaderSource);
+    }
+
+    babelHelpers.createClass(ParticleShaderSource, [{
+      key: 'VSDefine_ParticleShaderSource',
+      value: function VSDefine_ParticleShaderSource(in_, out_, f) {
+        var shaderText = '';
+        shaderText += in_ + ' vec3 aVertex_particleCenterPos;\n';
+        shaderText += 'uniform mat4 projectionMatrix;\n';
+        shaderText += 'uniform mat4 modelViewMatrix;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_ParticleShaderSource',
+      value: function VSTransform_ParticleShaderSource(existCamera_f, f) {
+        var shaderText = '';
+
+        shaderText += '  vec4 cameraCenterPos = modelViewMatrix * vec4(aVertex_particleCenterPos, 1.0);\n';
+        shaderText += '  vec4 cameraEachPointPos = cameraCenterPos + vec4(aVertex_position - aVertex_particleCenterPos, 1.0);\n';
+        shaderText += '  gl_Position = projectionMatrix * cameraEachPointPos;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_ParticleShaderSource',
+      value: function prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+        var vertexAttribsAsResult = [];
+
+        shaderProgram['vertexAttribute_' + 'particleCenterPos'] = gl.getAttribLocation(shaderProgram, 'aVertex_' + 'particleCenterPos');
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + 'particleCenterPos']);
+        vertexAttribsAsResult.push('particleCenterPos');
+
+        shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+        shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return ParticleShaderSource;
+  })();
+
   /**
    * This Particle class handles particles expressions.
    * You can define particles behaviors in a custom vertex shader.
@@ -4828,28 +4877,29 @@
     /**
      * This is Particle class's constructor
      *
-     * @param {Array} positionArray position array
+     * @param {Array} centerPointData position array and the other data
      * @param {Number} particleWidth Width of each particle
      * @param {Number} particleHeight Height of each particle
      * @param {Object} JSON which has other vertex attribute arrays you want
      * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
 
-    function Particle(positionArray, particleWidth, particleHeight, customVertexAttributes, canvas) {
+    function Particle(centerPointData, particleWidth, particleHeight, customVertexAttributes, canvas) {
       babelHelpers.classCallCheck(this, Particle);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, canvas));
 
       Particle._instanceCount = typeof Particle._instanceCount === "undefined" ? 0 : Particle._instanceCount + 1;
 
-      _this._setupVertexData(positionArray, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
+      _this._setupVertexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
       return _this;
     }
 
     babelHelpers.createClass(Particle, [{
       key: '_setupVertexData',
-      value: function _setupVertexData(positionArray, pHalfWidth, pHalfHeight, customVertexAttributes) {
+      value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
         var indices = [];
+        var positionArray = centerPointData.position;
 
         for (var i = 0; i < positionArray.length; i++) {
           var offset = i * 4;
@@ -4870,6 +4920,14 @@
           positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
           positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
           positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+        }
+
+        var centerPositions = [];
+        for (var i = 0; i < positionArray.length; i++) {
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
         }
 
         var colors = [];
@@ -4896,17 +4954,99 @@
           }
         }
 
+        var pointData = {};
+        for (var type in centerPointData) {
+          if (type !== 'position') {
+            pointData[type] = [];
+            for (var i = 0; i < positionArray.length; i++) {
+              for (var j = 0; j < 4; j++) {
+                pointData[type].push(centerPointData[type][i]);
+              }
+            }
+          }
+        }
+
         var object = {
           position: positions,
           color: colors,
           texcoord: texcoords,
           normal: normals,
+          particleCenterPos: centerPositions,
           indices: [indices]
         };
 
-        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+        var tempAttributes = ArrayUtil.merge(object, pointData);
+        var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
         this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
+      }
+    }, {
+      key: 'prepareForRender',
+      value: function prepareForRender(existCamera_f, pointLight, meshMaterial) {
+        // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
+        var canvas = this._canvas;
+
+        if (meshMaterial) {
+          this._materialForBillboard = meshMaterial;
+        } else {
+          this._materialForBillboard = this._defaultMaterial;
+        }
+
+        var ParticleShader = (function (_materialForBillboard) {
+          babelHelpers.inherits(ParticleShader, _materialForBillboard);
+
+          function ParticleShader(canvas) {
+            babelHelpers.classCallCheck(this, ParticleShader);
+
+            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(ParticleShader).call(this, canvas, ParticleShaderSource));
+
+            ParticleShader.mixin(ParticleShaderSource);
+
+            _this2._meshTransformUpdateCount = -9999;
+            _this2._cameraViewUpdateCount = -9999;
+            _this2._cameraProjectionUpdateCount = -9999;
+            return _this2;
+          }
+
+          babelHelpers.createClass(ParticleShader, [{
+            key: 'setUniforms',
+            value: function setUniforms(gl, glslProgram, material, camera, mesh) {
+              babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
+
+              if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
+                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().transpose().flatten()));
+              }
+
+              if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
+                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).transpose().flatten()));
+              }
+
+              this._meshTransformUpdateCount = mesh.updateCountAsElement;
+              this._cameraViewUpdateCount = camera.updateCountAsCameraView;
+              this._cameraProjectionUpdateCount = camera.updateCountAsCameraProjection;
+
+              return true; // still dirty
+            }
+          }]);
+          return ParticleShader;
+        })(this._materialForBillboard.shader.constructor);
+
+        if (meshMaterial) {
+          meshMaterial.shader = new ParticleShader(canvas);
+        } else {
+          this._defaultMaterial.shader = new ParticleShader(canvas);
+        }
+
+        /*
+         let materials = this._materials;
+         if (materials) {
+         for (let i=0; i<materials.length;i++) {
+         materials[i].shader = new BlendShapeShader(this._canvas);
+         }
+         }
+         */
+
+        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial);
       }
     }, {
       key: 'toString',
