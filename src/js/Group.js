@@ -16,12 +16,16 @@ export default class Group extends Element {
   }
 
   removeChild(element) {
-    this._children = this._children.filter(function(elm) {
+    this._children = this._children.filter(function(elem) {
       if (elem === element) {
         element._parent = null;
       }
       return elem !== element
     });
+  }
+
+  getChildren() {
+    return this._children;
   }
 }
 

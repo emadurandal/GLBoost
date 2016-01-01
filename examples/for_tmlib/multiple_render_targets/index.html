@@ -99,7 +99,7 @@
           });
 
           this.add( mesh );
-          renderPasses[0].addMeshes([mesh]);
+          renderPasses[0].addElements([mesh]);
           renderPasses[0].setClearColor([0, 0, 0, 1]);
           renderPasses[0].specifyRenderTargetTextures(CANVAS_ID, renderTextures);
 
@@ -114,11 +114,12 @@
           });
           this.add( mesh2 );
 
-          renderPasses[1].addMeshes([mesh2]);
+          renderPasses[1].addElements([mesh2]);
           renderPasses[1].setClearColor([1, 0, 0, 1]);
 
 
           this.prepareForRender();
+          window.renderer.prepareRenderPassesForRender();
 
           var tw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 0.0}, {blendWeight_1: 1.0}, 500, null);
           var ctw1 = new tm.anim.Tween().fromTo(geometry, {blendWeight_1: 1.0}, {blendWeight_1: 0.0}, 500, null);

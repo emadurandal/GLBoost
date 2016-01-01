@@ -106,135 +106,6 @@
   };
 
   babelHelpers;
-  var GLContextImpl = (function () {
-    function GLContextImpl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextImpl);
-
-      //    if (new.target === GLContextImpl) {
-      if (this.constructor === GLContextImpl) {
-        throw new TypeError("Cannot construct GLContextImpl instances directly");
-      }
-
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
-
-      if (canvas === void 0) {
-        throw new Error("Failed to create WebGL Context due to no canvas object.");
-      }
-
-      this._canvas = canvas;
-      this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
-
-      if (this.gl === undefined) {
-        throw new TypeError("Must override gl getter.");
-      }
-    }
-
-    babelHelpers.createClass(GLContextImpl, [{
-      key: "init",
-      value: function init(glVersionString, ContextType) {
-
-        var gl = this._canvas.getContext(glVersionString);
-
-        if (!gl) {
-          gl = this._canvas.getContext('experimental-' + glVersionString);
-          if (!gl) {
-            throw new Error("This platform doesn't support WebGL.");
-          }
-        }
-
-        if (!gl instanceof ContextType) {
-          throw new Error("Unexpected rendering context.");
-        }
-
-        gl._canvas = this._canvas;
-        this._canvas._gl = gl;
-      }
-    }]);
-    return GLContextImpl;
-  })();
-
-  var GLContextWebGL2Impl = (function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
-
-    function GLContextWebGL2Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
-
-      return _this;
-    }
-
-    babelHelpers.createClass(GLContextWebGL2Impl, [{
-      key: 'gl',
-      get: function get() {
-        return this._canvas._gl;
-      }
-    }]);
-    return GLContextWebGL2Impl;
-  })(GLContextImpl);
-
-  var GLContextWebGL1Impl = (function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
-
-    function GLContextWebGL1Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
-
-      return _this;
-    }
-
-    babelHelpers.createClass(GLContextWebGL1Impl, [{
-      key: 'gl',
-      get: function get() {
-        return this._canvas._gl;
-      }
-    }]);
-    return GLContextWebGL1Impl;
-  })(GLContextImpl);
-
-  var GLContext = (function () {
-    function GLContext(canvas) {
-      babelHelpers.classCallCheck(this, GLContext);
-
-      if (GLContext._instances[canvas.id] instanceof GLContext) {
-        return GLContext._instances[canvas.id];
-      }
-
-      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
-      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
-      }
-
-      GLContext._instances[canvas.id] = this;
-    }
-
-    babelHelpers.createClass(GLContext, [{
-      key: 'gl',
-      get: function get() {
-        return this.impl.gl;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(canvas) {
-        if (typeof canvas === 'string') {
-          var canvas = window.document.querySelector(canvas);
-        }
-        return new GLContext(canvas);
-      }
-    }]);
-    return GLContext;
-  })();
-
-  GLContext._instances = new Object();
-
   window.GLBoost = window.GLBoost || { REVISION: '1' };
 
   var global = window;
@@ -1301,12 +1172,13 @@
         this._updateCountAsElement++;
       }
     }, {
-      key: 'multiplyMyAndParentTransformMatrices',
-      value: function multiplyMyAndParentTransformMatrices(currentElem) {
+      key: '_multiplyMyAndParentTransformMatrices',
+      value: function _multiplyMyAndParentTransformMatrices(currentElem) {
         if (currentElem._parent === null) {
           return currentElem.transformMatrix;
         } else {
-          return this.multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+          return this._multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+          //  return currentElem.transformMatrix.multiply(this._multiplyMyAndParentTransformMatrices(currentElem._parent));
         }
       }
     }, {
@@ -1373,12 +1245,12 @@
     }, {
       key: 'transformMatrixAccumulatedAncestry',
       get: function get() {
-        return this.multiplyMyAndParentTransformMatrices(this);
+        return this._multiplyMyAndParentTransformMatrices(this);
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestry',
       get: function get() {
-        return this.multiplyMyAndParentTransformMatrices(this).invert();
+        return this._multiplyMyAndParentTransformMatrices(this).invert();
       }
     }, {
       key: 'dirty',
@@ -1474,31 +1346,196 @@
 
   GLBoost$1["Mesh"] = Mesh;
 
+  var Group = (function (_Element) {
+    babelHelpers.inherits(Group, _Element);
+
+    function Group() {
+      babelHelpers.classCallCheck(this, Group);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this));
+
+      _this._children = [];
+      return _this;
+    }
+
+    babelHelpers.createClass(Group, [{
+      key: 'addChild',
+      value: function addChild(element) {
+        this.removeChild(element);
+        this._children.push(element);
+        element._parent = this;
+      }
+    }, {
+      key: 'removeChild',
+      value: function removeChild(element) {
+        this._children = this._children.filter(function (elem) {
+          if (elem === element) {
+            element._parent = null;
+          }
+          return elem !== element;
+        });
+      }
+    }, {
+      key: 'getChildren',
+      value: function getChildren() {
+        return this._children;
+      }
+    }]);
+    return Group;
+  })(Element);
+
+  GLBoost$1["Group"] = Group;
+
+  var GLContextImpl = (function () {
+    function GLContextImpl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextImpl);
+
+      //    if (new.target === GLContextImpl) {
+      if (this.constructor === GLContextImpl) {
+        throw new TypeError("Cannot construct GLContextImpl instances directly");
+      }
+
+      if (!(parent instanceof GLContext)) {
+        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+      }
+
+      if (canvas === void 0) {
+        throw new Error("Failed to create WebGL Context due to no canvas object.");
+      }
+
+      this._canvas = canvas;
+      this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
+
+      if (this.gl === undefined) {
+        throw new TypeError("Must override gl getter.");
+      }
+    }
+
+    babelHelpers.createClass(GLContextImpl, [{
+      key: "init",
+      value: function init(glVersionString, ContextType) {
+
+        var gl = this._canvas.getContext(glVersionString);
+
+        if (!gl) {
+          gl = this._canvas.getContext('experimental-' + glVersionString);
+          if (!gl) {
+            throw new Error("This platform doesn't support WebGL.");
+          }
+        }
+
+        if (!gl instanceof ContextType) {
+          throw new Error("Unexpected rendering context.");
+        }
+
+        gl._canvas = this._canvas;
+        this._canvas._gl = gl;
+      }
+    }]);
+    return GLContextImpl;
+  })();
+
+  var GLContextWebGL2Impl = (function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+    function GLContextWebGL2Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
+
+      return _this;
+    }
+
+    babelHelpers.createClass(GLContextWebGL2Impl, [{
+      key: 'gl',
+      get: function get() {
+        return this._canvas._gl;
+      }
+    }]);
+    return GLContextWebGL2Impl;
+  })(GLContextImpl);
+
+  var GLContextWebGL1Impl = (function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+
+    function GLContextWebGL1Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
+
+      return _this;
+    }
+
+    babelHelpers.createClass(GLContextWebGL1Impl, [{
+      key: 'gl',
+      get: function get() {
+        return this._canvas._gl;
+      }
+    }]);
+    return GLContextWebGL1Impl;
+  })(GLContextImpl);
+
+  var GLContext = (function () {
+    function GLContext(canvas) {
+      babelHelpers.classCallCheck(this, GLContext);
+
+      if (GLContext._instances[canvas.id] instanceof GLContext) {
+        return GLContext._instances[canvas.id];
+      }
+
+      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+        this.impl = new GLContextWebGL1Impl(canvas, this);
+      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+        this.impl = new GLContextWebGL2Impl(canvas, this);
+      }
+
+      GLContext._instances[canvas.id] = this;
+    }
+
+    babelHelpers.createClass(GLContext, [{
+      key: 'gl',
+      get: function get() {
+        return this.impl.gl;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(canvas) {
+        if (typeof canvas === 'string') {
+          var canvas = window.document.querySelector(canvas);
+        }
+        return new GLContext(canvas);
+      }
+    }]);
+    return GLContext;
+  })();
+
+  GLContext._instances = new Object();
+
   var RenderPass = (function () {
     function RenderPass(gl) {
       babelHelpers.classCallCheck(this, RenderPass);
 
+      this._elements = [];
       this._meshes = [];
       this._drawBuffers = [gl.BACK];
       this._clearColor = null;
     }
 
     babelHelpers.createClass(RenderPass, [{
-      key: 'addMeshes',
-      value: function addMeshes(meshes) {
+      key: 'addElements',
+      value: function addElements(elements) {
         var _this = this;
 
-        meshes.forEach(function (mesh) {
-          if (!(mesh instanceof Mesh)) {
-            throw new TypeError("RenderPass accepts Geometry objects only.");
+        elements.forEach(function (elem) {
+          if (!(elem instanceof Mesh || elem instanceof Group)) {
+            throw new TypeError("RenderPass accepts Mesh or Group element only.");
           }
-          _this._meshes.push(mesh);
+          _this._elements.push(elem);
         });
-      }
-    }, {
-      key: 'getMeshes',
-      value: function getMeshes() {
-        return this._meshes;
       }
     }, {
       key: 'specifyRenderTargetTextures',
@@ -1520,6 +1557,42 @@
       key: 'setClearColor',
       value: function setClearColor(color) {
         this._clearColor = color;
+      }
+    }, {
+      key: 'prepareForRender',
+      value: function prepareForRender() {
+        var _this3 = this;
+
+        var collectMeshes = function collectMeshes(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            var meshes = [];
+            children.forEach(function (child) {
+              var childMeshes = collectMeshes(child);
+              meshes = meshes.concat(childMeshes);
+            });
+            return meshes;
+          } else if (elem instanceof Mesh) {
+            return [elem];
+          } else {
+            return [];
+          }
+        };
+
+        this._meshes = [];
+        this._elements.forEach(function (elm) {
+          _this3._meshes = _this3._meshes.concat(collectMeshes(elm));
+        });
+      }
+    }, {
+      key: 'elements',
+      get: function get() {
+        return this._elements;
+      }
+    }, {
+      key: 'meshes',
+      get: function get() {
+        return this._meshes;
       }
     }, {
       key: 'buffersToDraw',
@@ -2815,7 +2888,7 @@
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
-              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
+              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
               gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
             }
 
@@ -2823,9 +2896,9 @@
               lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
               if (glslProgram['viewPosition']) {
                 if (camera) {
-                  var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
+                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
                 } else {
-                  var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
+                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
                 }
                 gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
               }
@@ -2842,7 +2915,7 @@
                     isPointLight = 0.0;
                   }
 
-                  var lightVecInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(lightVec);
+                  var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
                   gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
@@ -2897,7 +2970,7 @@
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
-            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
+            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
           }
 
@@ -3208,16 +3281,14 @@
         if (this._renderPasses === null) {
           glem.drawBuffers(gl, [gl.BACK]);
 
-          scene.elements.forEach(function (elm) {
-            if (elm instanceof Mesh) {
-              elm.draw(lights, camera);
-            }
+          scene.meshes.forEach(function (mesh) {
+            mesh.draw(lights, camera);
           });
         } else {
           // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
           this._renderPasses.forEach(function (renderPass) {
 
-            var meshes = renderPass.getMeshes();
+            var meshes = renderPass.meshes;
 
             if (renderPass.buffersToDraw[0] !== gl.BACK) {
               gl.bindTexture(gl.TEXTURE_2D, null);
@@ -3308,6 +3379,13 @@
         return this._renderPasses;
       }
     }, {
+      key: 'prepareRenderPassesForRender',
+      value: function prepareRenderPassesForRender() {
+        this._renderPasses.forEach(function (renderPass) {
+          renderPass.prepareForRender();
+        });
+      }
+    }, {
       key: 'glContext',
       get: function get() {
         return this._gl;
@@ -3327,6 +3405,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Scene).call(this));
 
       _this._elements = [];
+      _this._meshes = [];
       return _this;
     }
 
@@ -3338,6 +3417,8 @@
     }, {
       key: 'prepareForRender',
       value: function prepareForRender() {
+        var _this2 = this;
+
         // カメラが最低１つでも存在しているか確認
         var existCamera_f = false;
         this._elements.forEach(function (elm) {
@@ -3353,18 +3434,41 @@
           }
         });
 
-        // レンダリングの準備をさせる。
-        this._elements.forEach(function (elm) {
-          if (elm.prepareForRender === void 0) return; // prepareForRenderメソッドを持っていないエレメントは処理しない
-          if (elm instanceof Mesh) {
-            elm.prepareForRender(existCamera_f, lights);
+        var collectMeshes = function collectMeshes(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            var meshes = [];
+            children.forEach(function (child) {
+              var childMeshes = collectMeshes(child);
+              meshes = meshes.concat(childMeshes);
+            });
+            return meshes;
+          } else if (elem instanceof Mesh) {
+            return [elem];
+          } else {
+            return [];
           }
+        };
+
+        this._meshes = [];
+        this._elements.forEach(function (elm) {
+          _this2._meshes = _this2._meshes.concat(collectMeshes(elm));
+        });
+
+        // レンダリングの準備をさせる。
+        this._meshes.forEach(function (elm) {
+          elm.prepareForRender(existCamera_f, lights);
         });
       }
     }, {
       key: 'elements',
       get: function get() {
         return this._elements;
+      }
+    }, {
+      key: 'meshes',
+      get: function get() {
+        return this._meshes;
       }
     }]);
     return Scene;
@@ -5083,40 +5187,5 @@
   })(Geometry);
 
   GLBoost$1["Particle"] = Particle;
-
-  var Group = (function (_Element) {
-    babelHelpers.inherits(Group, _Element);
-
-    function Group() {
-      babelHelpers.classCallCheck(this, Group);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this));
-
-      _this._children = [];
-      return _this;
-    }
-
-    babelHelpers.createClass(Group, [{
-      key: 'addChild',
-      value: function addChild(element) {
-        this.removeChild(element);
-        this._children.push(element);
-        element._parent = this;
-      }
-    }, {
-      key: 'removeChild',
-      value: function removeChild(element) {
-        this._children = this._children.filter(function (elm) {
-          if (elem === element) {
-            element._parent = null;
-          }
-          return elem !== element;
-        });
-      }
-    }]);
-    return Group;
-  })(Element);
-
-  GLBoost$1["Group"] = Group;
 
 }));

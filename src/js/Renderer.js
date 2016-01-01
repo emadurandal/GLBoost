@@ -8,7 +8,7 @@ import MutableTexture from './textures/MutableTexture'
 import RenderPass from './RenderPass'
 import AbstractLight from './lights/AbstractLight'
 import Geometry from './Geometry'
-
+import Group from './Group'
 
 export default class Renderer {
   constructor(parameters) {
@@ -68,16 +68,14 @@ export default class Renderer {
     if (this._renderPasses === null) {
       glem.drawBuffers(gl, [gl.BACK]);
 
-      scene.elements.forEach((elm)=> {
-        if(elm instanceof Mesh) {
-          elm.draw(lights, camera);
-        }
+      scene.meshes.forEach((mesh)=> {
+        mesh.draw(lights, camera);
       });
 
     } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
       this._renderPasses.forEach((renderPass)=>{
 
-        var meshes = renderPass.getMeshes();
+        var meshes = renderPass.meshes;
 
         if (renderPass.buffersToDraw[0] !== gl.BACK) {
           gl.bindTexture(gl.TEXTURE_2D, null);
@@ -166,6 +164,12 @@ export default class Renderer {
     }
 
     return this._renderPasses;
+  }
+
+  prepareRenderPassesForRender() {
+    this._renderPasses.forEach((renderPass)=> {
+      renderPass.prepareForRender();
+    });
   }
 
   get glContext() {
