@@ -32,7 +32,7 @@
         var texture = new GLBoost.Texture('resouces/texture.png', layer.canvas);
         material.diffuseTexture = texture;
 
-        var planeGeometry = new GLBoost.Plane(10, 10, 10, 10, new GLBoost.Vector4(1,1,1,1), layer.canvas);
+        var planeGeometry = new GLBoost.Plane(10, 10, 10, 10, null, layer.canvas);
         var plane = new GLBoost.Mesh(planeGeometry, material);
         layer.scene.add( plane );
 
