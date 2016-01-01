@@ -1278,6 +1278,9 @@
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
       get: function get() {
+        if (this._parent === null) {
+          return Matrix44.identity();
+        }
         return this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
       }
     }, {
