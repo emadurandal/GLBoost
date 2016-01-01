@@ -270,7 +270,7 @@ export default class Geometry {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
+          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
@@ -278,9 +278,9 @@ export default class Geometry {
           lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
           if (glslProgram['viewPosition']) {
             if (camera) {
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
             } else {
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
             }
             gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
           }
@@ -297,7 +297,7 @@ export default class Geometry {
                 isPointLight = 0.0;
               }
 
-              let lightVecInLocalCoord = mesh.inverseTransformMatrix.multiplyVector(lightVec);
+              let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
               gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
               gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
@@ -352,7 +352,7 @@ export default class Geometry {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrix);
+        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
         gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
       }

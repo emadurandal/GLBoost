@@ -4,7 +4,8 @@ import Matrix44 from './math/Matrix44'
 
 export default class Element {
   constructor() {
-    this.children = [];
+    this.children = []; // this is compatibility for tmlib. Actually this is NOT used.
+    this._parent = null;
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
@@ -77,10 +78,26 @@ export default class Element {
 
   get inverseTransformMatrix() {
     if (!this._calculatedInverseMatrix) {
-      this._invMatrix = this.transformMatrix.invert(this._matrix);
+      this._invMatrix = this.transformMatrix.invert();
       this._calculatedInverseMatrix = true;
     }
     return this._invMatrix.clone();
+  }
+
+  _multiplyMyAndParentTransformMatrices(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.transformMatrix;
+    } else {
+      return this._multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+    }
+  }
+
+  get transformMatrixAccumulatedAncestry() {
+    return this._multiplyMyAndParentTransformMatrices(this);
+  }
+
+  get inverseTransformMatrixAccumulatedAncestry() {
+    return this._multiplyMyAndParentTransformMatrices(this).invert();
   }
 
   set dirty(flg) {
@@ -88,6 +105,10 @@ export default class Element {
     if (flg) {
       this._needUpdate();
     }
+  }
+
+  get parent() {
+    return this._parent;
   }
 }
 

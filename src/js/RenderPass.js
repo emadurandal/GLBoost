@@ -1,26 +1,32 @@
 import GLBoost from './globals'
 import GLContext from './GLContext'
 import Mesh from './Mesh'
+import Group from './Group'
 
 
 export default class RenderPass {
 
   constructor(gl) {
+    this._elements = [];
     this._meshes = [];
     this._drawBuffers = [gl.BACK];
     this._clearColor = null;
   }
 
-  addMeshes(meshes) {
-    meshes.forEach((mesh)=>{
-      if(!(mesh instanceof Mesh)) {
-        throw new TypeError("RenderPass accepts Geometry objects only.");
+  addElements(elements) {
+    elements.forEach((elem)=>{
+      if(!(elem instanceof Mesh || elem instanceof Group)) {
+        throw new TypeError("RenderPass accepts Mesh or Group element only.");
       }
-      this._meshes.push(mesh);
+      this._elements.push(elem);
     });
   }
 
-  getMeshes() {
+  get elements() {
+    return this._elements;
+  }
+
+  get meshes() {
     return this._meshes;
   }
 
@@ -47,6 +53,29 @@ export default class RenderPass {
 
   get clearColor() {
     return this._clearColor;
+  }
+
+  prepareForRender() {
+    let collectMeshes = function(elem) {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        var meshes = [];
+        children.forEach(function(child) {
+          var childMeshes = collectMeshes(child);
+          meshes = meshes.concat(childMeshes)
+        });
+        return meshes;
+      } else if (elem instanceof Mesh) {
+        return [elem];
+      } else {
+        return [];
+      }
+    };
+
+    this._meshes = [];
+    this._elements.forEach((elm)=> {
+      this._meshes = this._meshes.concat(collectMeshes(elm));
+    });
   }
 }
 
