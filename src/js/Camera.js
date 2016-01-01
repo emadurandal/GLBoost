@@ -19,6 +19,7 @@ export default class Camera extends Element {
     this.setAsMainCamera();
 
     this._dirtyView = true;
+    this._dirtyAsElement = true;
     this._updateCountAsCameraView = 0;
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection = 0;

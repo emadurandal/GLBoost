@@ -11,6 +11,7 @@ export default class Scene extends Element {
     this._elements = [];
     this._meshes = [];
     this._lights = [];
+    this._cameras = [];
   }
 
   add(mesh) {
@@ -68,6 +69,30 @@ export default class Scene extends Element {
       this._lights = this._lights.concat(collectLights(elm));
     });
 
+    var existCamera_f = false;
+    let collectCameras = function(elem) {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        var cameras = [];
+        children.forEach(function(child) {
+          var childCameras = collectCameras(child);
+          cameras = cameras.concat(childCameras)
+        });
+        return cameras;
+      } else if (elem instanceof Camera) {
+        existCamera_f = true;
+        return [elem];
+      } else {
+        return [];
+      }
+    };
+
+    this._cameras = [];
+    this._elements.forEach((elm)=> {
+      this._cameras = this._cameras.concat(collectCameras(elm));
+    });
+
+
     // レンダリングの準備をさせる。
     this._meshes.forEach((elm)=> {
       elm.prepareForRender(existCamera_f, this._lights);
@@ -85,6 +110,10 @@ export default class Scene extends Element {
 
   get lights() {
     return this._lights;
+  }
+
+  get cameras() {
+    return this._cameras;
   }
 }
 

@@ -46,11 +46,9 @@ export default class Renderer {
     var camera = false;
     var viewMatrix = null;
     var projectionMatrix = null;
-    scene.elements.forEach((elm)=> {
-      if(elm instanceof Camera) {
-        if (elm.isMainCamera) {
-          camera = elm;
-        }
+    scene.cameras.forEach((elm)=> {
+      if (elm.isMainCamera) {
+        camera = elm;
       }
     });
 

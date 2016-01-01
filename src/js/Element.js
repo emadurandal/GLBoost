@@ -87,16 +87,44 @@ export default class Element {
     return this._invMatrix.clone();
   }
 
-  _multiplyMyAndParentTransformMatrices(currentElem) {
+  _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
     if (currentElem._parent === null) {
-      return currentElem.transformMatrix;
+      if (withMySelf) {
+        return currentElem.transformMatrix;
+      } else {
+        return Matrix44.identity();
+      }
     } else {
-      return this._multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrix;
+      }
+      return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+    }
+  }
+
+  _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
+    if (currentElem._parent === null) {
+      if (withMySelf) {
+        return currentElem.transformMatrix;
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrix;
+      }
+      return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
     }
   }
 
   get transformMatrixAccumulatedAncestry() {
-    return this._multiplyMyAndParentTransformMatrices(this);
+    return this._multiplyMyAndParentTransformMatrices(this, true);
+  }
+
+  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+    return this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
   }
 
   get rotateMatrixAccumulatedAncestry() {
@@ -114,7 +142,7 @@ export default class Element {
   }
 
   get inverseTransformMatrixAccumulatedAncestry() {
-    return this._multiplyMyAndParentTransformMatrices(this).invert();
+    return this._multiplyMyAndParentTransformMatrices(this, true).invert();
   }
 
   set dirty(flg) {

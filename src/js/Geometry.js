@@ -270,7 +270,7 @@ export default class Geometry {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
+          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
         }
 
@@ -278,7 +278,9 @@ export default class Geometry {
           lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
           if (glslProgram['viewPosition']) {
             if (camera) {
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
+              let cameraPos = new Vector4(0, 0, 0, 1);
+              cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
             } else {
               var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
             }
@@ -355,7 +357,7 @@ export default class Geometry {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
+        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
         gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
 
       }

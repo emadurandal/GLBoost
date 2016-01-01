@@ -1173,11 +1173,36 @@
       }
     }, {
       key: '_multiplyMyAndParentTransformMatrices',
-      value: function _multiplyMyAndParentTransformMatrices(currentElem) {
+      value: function _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
         if (currentElem._parent === null) {
-          return currentElem.transformMatrix;
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44.identity();
+          }
         } else {
-          return this._multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentTransformMatricesInInverseOrder',
+      value: function _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
         }
       }
     }, {
@@ -1248,7 +1273,12 @@
     }, {
       key: 'transformMatrixAccumulatedAncestry',
       get: function get() {
-        return this._multiplyMyAndParentTransformMatrices(this);
+        return this._multiplyMyAndParentTransformMatrices(this, true);
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
+      get: function get() {
+        return this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
       }
     }, {
       key: 'rotateMatrixAccumulatedAncestry',
@@ -1263,7 +1293,7 @@
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestry',
       get: function get() {
-        return this._multiplyMyAndParentTransformMatrices(this).invert();
+        return this._multiplyMyAndParentTransformMatrices(this, true).invert();
       }
     }, {
       key: 'dirty',
@@ -2901,7 +2931,7 @@
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
-              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
+              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
               gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
             }
 
@@ -2909,7 +2939,9 @@
               lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
               if (glslProgram['viewPosition']) {
                 if (camera) {
-                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(camera.eye.x, camera.eye.y, camera.eye.z, 1));
+                  var cameraPos = new Vector4(0, 0, 0, 1);
+                  cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
                 } else {
                   var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
                 }
@@ -2986,7 +3018,7 @@
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
-            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(mesh.transformMatrixAccumulatedAncestry);
+            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
           }
 
@@ -3059,6 +3091,7 @@
       _this.setAsMainCamera();
 
       _this._dirtyView = true;
+      _this._dirtyAsElement = true;
       _this._updateCountAsCameraView = 0;
       _this._dirtyProjection = true;
       _this._updateCountAsCameraProjection = 0;
@@ -3275,11 +3308,9 @@
         var camera = false;
         var viewMatrix = null;
         var projectionMatrix = null;
-        scene.elements.forEach(function (elm) {
-          if (elm instanceof Camera) {
-            if (elm.isMainCamera) {
-              camera = elm;
-            }
+        scene.cameras.forEach(function (elm) {
+          if (elm.isMainCamera) {
+            camera = elm;
           }
         });
 
@@ -3418,6 +3449,7 @@
       _this._elements = [];
       _this._meshes = [];
       _this._lights = [];
+      _this._cameras = [];
       return _this;
     }
 
@@ -3481,6 +3513,29 @@
           _this2._lights = _this2._lights.concat(collectLights(elm));
         });
 
+        var existCamera_f = false;
+        var collectCameras = function collectCameras(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            var cameras = [];
+            children.forEach(function (child) {
+              var childCameras = collectCameras(child);
+              cameras = cameras.concat(childCameras);
+            });
+            return cameras;
+          } else if (elem instanceof Camera) {
+            existCamera_f = true;
+            return [elem];
+          } else {
+            return [];
+          }
+        };
+
+        this._cameras = [];
+        this._elements.forEach(function (elm) {
+          _this2._cameras = _this2._cameras.concat(collectCameras(elm));
+        });
+
         // レンダリングの準備をさせる。
         this._meshes.forEach(function (elm) {
           elm.prepareForRender(existCamera_f, _this2._lights);
@@ -3500,6 +3555,11 @@
       key: 'lights',
       get: function get() {
         return this._lights;
+      }
+    }, {
+      key: 'cameras',
+      get: function get() {
+        return this._cameras;
       }
     }]);
     return Scene;
