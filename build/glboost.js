@@ -1281,7 +1281,8 @@
     function Element() {
       babelHelpers.classCallCheck(this, Element);
 
-      this.children = [];
+      this.children = []; // this is compatibility for tmlib. Actually this is NOT used.
+      this._parent = null;
       this._translate = Vector3.zero();
       this._rotate = Vector3.zero();
       this._scale = new Vector3(1, 1, 1);
@@ -1298,6 +1299,15 @@
         this._dirtyAsElement = true;
         this._calculatedInverseMatrix = false;
         this._updateCountAsElement++;
+      }
+    }, {
+      key: 'multiplyMyAndParentTransformMatrices',
+      value: function multiplyMyAndParentTransformMatrices(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.transformMatrix;
+        } else {
+          return this.multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
+        }
       }
     }, {
       key: 'updateCountAsElement',
@@ -1355,10 +1365,20 @@
       key: 'inverseTransformMatrix',
       get: function get() {
         if (!this._calculatedInverseMatrix) {
-          this._invMatrix = this.transformMatrix.invert(this._matrix);
+          this._invMatrix = this.transformMatrix.invert();
           this._calculatedInverseMatrix = true;
         }
         return this._invMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixAccumulatedAncestry',
+      get: function get() {
+        return this.multiplyMyAndParentTransformMatrices(this);
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestry',
+      get: function get() {
+        return this.multiplyMyAndParentTransformMatrices(this).invert();
       }
     }, {
       key: 'dirty',
@@ -1367,6 +1387,11 @@
         if (flg) {
           this._needUpdate();
         }
+      }
+    }, {
+      key: 'parent',
+      get: function get() {
+        return this._parent;
       }
     }]);
     return Element;
@@ -3141,7 +3166,7 @@
         gl.enable(gl.BLEND);
         gl.blendEquation(gl.FUNC_ADD);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        //gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+
         gl.clearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
         gl.clearDepth(1);
         gl.clearStencil(0);
@@ -5058,5 +5083,40 @@
   })(Geometry);
 
   GLBoost$1["Particle"] = Particle;
+
+  var Group = (function (_Element) {
+    babelHelpers.inherits(Group, _Element);
+
+    function Group() {
+      babelHelpers.classCallCheck(this, Group);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this));
+
+      _this._children = [];
+      return _this;
+    }
+
+    babelHelpers.createClass(Group, [{
+      key: 'addChild',
+      value: function addChild(element) {
+        this.removeChild(element);
+        this._children.push(element);
+        element._parent = this;
+      }
+    }, {
+      key: 'removeChild',
+      value: function removeChild(element) {
+        this._children = this._children.filter(function (elm) {
+          if (elem === element) {
+            element._parent = null;
+          }
+          return elem !== element;
+        });
+      }
+    }]);
+    return Group;
+  })(Element);
+
+  GLBoost$1["Group"] = Group;
 
 }));
