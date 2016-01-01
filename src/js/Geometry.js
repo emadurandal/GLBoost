@@ -290,10 +290,13 @@ export default class Geometry {
               let lightVec = null;
               let isPointLight = -9999;
               if (lights[j] instanceof PointLight) {
-                lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1);
+                lightVec = new Vector4(0, 0, 0, 1);
+                lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                 isPointLight = 1.0;
               } else if (lights[j] instanceof DirectionalLight) {
                 lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                lightVec.w = 0.0;
                 isPointLight = 0.0;
               }
 

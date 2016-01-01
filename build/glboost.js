@@ -1178,7 +1178,6 @@
           return currentElem.transformMatrix;
         } else {
           return this._multiplyMyAndParentTransformMatrices(currentElem._parent).multiply(currentElem.transformMatrix);
-          //  return currentElem.transformMatrix.multiply(this._multiplyMyAndParentTransformMatrices(currentElem._parent));
         }
       }
     }, {
@@ -1227,7 +1226,11 @@
       get: function get() {
         if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
-          this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(Matrix44.rotateX(this._rotate.x)).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z)).multiply(Matrix44.translate(this._translate));
+          this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(Matrix44.rotateX(this._rotate.x)).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z));
+          this._matrix.m03 = this._translate.x;
+          this._matrix.m13 = this._translate.y;
+          this._matrix.m23 = this._translate.z;
+
           this._dirtyAsElement = false;
         }
 
@@ -1246,6 +1249,16 @@
       key: 'transformMatrixAccumulatedAncestry',
       get: function get() {
         return this._multiplyMyAndParentTransformMatrices(this);
+      }
+    }, {
+      key: 'rotateMatrixAccumulatedAncestry',
+      get: function get() {
+        var mat = this._multiplyMyAndParentTransformMatrices(this);
+        var scaleX = Math.sqrt(mat.m00 * mat.m00 + mat.m10 * mat.m10 + mat.m20 * mat.m20);
+        var scaleY = Math.sqrt(mat.m01 * mat.m01 + mat.m11 * mat.m11 + mat.m21 * mat.m21);
+        var scaleZ = Math.sqrt(mat.m02 * mat.m02 + mat.m12 * mat.m12 + mat.m22 * mat.m22);
+
+        return new Matrix44(mat.m00 / scaleX, mat.m01 / scaleY, mat.m02 / scaleZ, 0, mat.m10 / scaleX, mat.m11 / scaleY, mat.m12 / scaleZ, 0, mat.m20 / scaleX, mat.m21 / scaleY, mat.m22 / scaleZ, 0, 0, 0, 0, 1);
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestry',
@@ -2908,10 +2921,13 @@
                   var lightVec = null;
                   var isPointLight = -9999;
                   if (lights[j] instanceof PointLight) {
-                    lightVec = new Vector4(lights[j].translate.x, lights[j].translate.y, lights[j].translate.z, 1);
+                    lightVec = new Vector4(0, 0, 0, 1);
+                    lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                     isPointLight = 1.0;
                   } else if (lights[j] instanceof DirectionalLight) {
                     lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                    lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                    lightVec.w = 0.0;
                     isPointLight = 0.0;
                   }
 
@@ -3270,12 +3286,7 @@
         var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
 
-        var lights = [];
-        scene.elements.forEach(function (elm) {
-          if (elm instanceof AbstractLight) {
-            lights.push(elm);
-          }
-        });
+        var lights = scene.lights;
 
         // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
         if (this._renderPasses === null) {
@@ -3406,6 +3417,7 @@
 
       _this._elements = [];
       _this._meshes = [];
+      _this._lights = [];
       return _this;
     }
 
@@ -3424,13 +3436,6 @@
         this._elements.forEach(function (elm) {
           if (elm instanceof Camera) {
             existCamera_f = true;
-          }
-        });
-
-        var lights = [];
-        this._elements.forEach(function (elm) {
-          if (elm instanceof AbstractLight) {
-            lights.push(elm);
           }
         });
 
@@ -3455,9 +3460,30 @@
           _this2._meshes = _this2._meshes.concat(collectMeshes(elm));
         });
 
+        var collectLights = function collectLights(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            var lights = [];
+            children.forEach(function (child) {
+              var childLights = collectLights(child);
+              lights = lights.concat(childLights);
+            });
+            return lights;
+          } else if (elem instanceof AbstractLight) {
+            return [elem];
+          } else {
+            return [];
+          }
+        };
+
+        this._lights = [];
+        this._elements.forEach(function (elm) {
+          _this2._lights = _this2._lights.concat(collectLights(elm));
+        });
+
         // レンダリングの準備をさせる。
         this._meshes.forEach(function (elm) {
-          elm.prepareForRender(existCamera_f, lights);
+          elm.prepareForRender(existCamera_f, _this2._lights);
         });
       }
     }, {
@@ -3469,6 +3495,11 @@
       key: 'meshes',
       get: function get() {
         return this._meshes;
+      }
+    }, {
+      key: 'lights',
+      get: function get() {
+        return this._lights;
       }
     }]);
     return Scene;

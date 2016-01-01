@@ -57,12 +57,7 @@ export default class Renderer {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
 
-    let lights = [];
-    scene.elements.forEach((elm)=> {
-      if(elm instanceof AbstractLight) {
-        lights.push(elm);
-      }
-    });
+    let lights = scene.lights;
 
     // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
     if (this._renderPasses === null) {
