@@ -7666,20 +7666,18 @@ tm.asset = tm.asset || {};
         },
     });
 
-    tm.asset.Font.checkLoaded = function(font, callback) {
-        var element = tm.dom.Element("body").create("span");
-        element.style
-            .set("color", "rgba(0, 0, 0, 0)")
-            .set("fontSize", "40px");
-        element.text = "QW@HhsXJ=/()あいうえお＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝";
+    tm.asset.Font.checkLoaded = function (font, callback) {
+        var canvas = tm.graphics.Canvas();
+        var DEFAULT_FONT = canvas.context.font.split(' ')[1];
+        canvas.context.font = '40px ' + DEFAULT_FONT;
 
-        var before = element.element.offsetWidth;
-        element.style
-            .set("fontFamily", "'{0}', 'monospace'".format(font));
+        var checkText = "1234567890-^\\qwertyuiop@[asdfghjkl;:]zxcvbnm,./\!\"#$%&'()=~|QWERTYUIOP`{ASDFGHJKL+*}ZXCVBNM<>?_１２３４５６７８９０－＾￥ｑｗｅｒｔｙｕｉｏｐａｓｄｆｇｈｊｋｌｚｘｃｖｂｎｍ，．あいうかさたなをん時は金なり";
 
-        var checkLoadFont = function() {
-            if (element.element.offsetWidth !== before) {
-                element.remove();
+        var before = canvas.context.measureText(checkText).width;
+        canvas.context.font = '40px ' + font + ', ' + DEFAULT_FONT;
+
+        var checkLoadFont = function () {
+            if (canvas.context.measureText(checkText).width !== before) {
                 callback && callback();
             } else {
                 setTimeout(checkLoadFont, 100);
@@ -12458,10 +12456,12 @@ tm.app = tm.app || {};
                 
                 console.assert(Object.keys(_class).length !== 0, _class + " is not defined.");
                 
-                var elm = _class.apply(null, args).addChildTo(this);
+                var elm = _class.apply(null, args);
                 elm.fromJSON(data);
                 
                 this[name] = elm;
+                
+                elm.addChildTo(this);
             }.bind(this);
             
             for (var key in data) {
@@ -14390,7 +14390,7 @@ tm.display = tm.display || {};
      * 高さ
      */
     tm.display.CanvasApp.prototype.accessor("background", {
-        "get": function()   { return this.canvas._background; },
+        "get": function()   { return this._background; },
         "set": function(v)  {
             this._background = v;
             this.element.style.background = v;
@@ -15398,8 +15398,8 @@ tm.display = tm.display || {};
 
 (function() {
     
-    var dummyCanvas  = null;
-    var dummyContext = null;
+    var dummyCanvas = document.createElement("canvas");
+    var dummyContext = dummyCanvas.getContext('2d');
 
     /**
      * @class tm.display.Label
@@ -15416,11 +15416,15 @@ tm.display = tm.display || {};
         stroke: false,
         /** デバッグボックス */
         debugBox: false,
+        /** キャッシュ */
+        _cache: null,
+
 
         /** @property _fontSize @private */
         /** @property _fontFamily @private */
         /** @property _fontWeight @private */
         /** @property _lineHeight @private */
+        /** @property _rowWidth @private */
         /** @property align */
         /** @property baseline */
         /** @property maxWidth */
@@ -15431,7 +15435,7 @@ tm.display = tm.display || {};
         init: function(text, size) {
             this.superInit();
             
-            this.text       = text || "";
+            this.text       = text;
             
             this._fontSize   = size || 24;
             this._fontFamily = tm.display.Label.default.fontFamily;
@@ -15490,19 +15494,85 @@ tm.display = tm.display || {};
          */
         _updateFont: function() {
             this.fontStyle = "{fontWeight} {fontSize}px {fontFamily}".format(this);
-            if (!dummyCanvas) {
-                dummyCanvas = document.createElement("canvas");
-                dummyContext = dummyCanvas.getContext('2d');
-            }
-            dummyContext.font = this.fontStyle;
-            this.textSize = dummyContext.measureText('あ').width * this.lineHeight;
+
+            this._cache = tm.display.Label._cache[this.fontStyle];
+
+            this.textSize = this.measure('あ') * this.lineHeight;
         },
 
         /**
          * @private
          */
         _updateLines: function() {
-            this._lines = (this._text+'').split('\n');
+            var lines = this._lines = (this._text + '').split('\n');
+
+            if (this._rowWidth) {
+                var rowWidth = this._rowWidth;
+                //どのへんで改行されるか目星つけとく
+                var defaultIndex = rowWidth / this.measure('あ') | 0;
+                var cache = this._cache || (this._cache = tm.display.Label._cache[this.fontStyle] = {});
+                for (var i = lines.length; i--;) {
+                    var text = lines[i], index, len, j = 0, width, char;
+                    while (true) {
+                        if (rowWidth > (cache[text] || (cache[text] = dummyContext.measureText(text).width))) break;
+
+                        index = index || defaultIndex;
+                        len = text.length;
+                        if (len <= index) index = len - 1;
+
+                        if (rowWidth < (width = cache[char = text.substring(0, index)] || (cache[char] = dummyContext.measureText(char).width))) {
+                            while (rowWidth < (width -= cache[char = text[--index]] || (cache[char] = dummyContext.measureText(char).width)));
+                        } else {
+                            while (rowWidth >= (width += cache[char = text[index++]] || (cache[char] = dummyContext.measureText(char).width)));
+                            --index;
+                        }
+
+                        //index が 0 のときは無限ループになるので、1にしとく
+                        if (index === 0) index = 1;
+                        lines.splice(i + j++, 1, text.substring(0, index), text = text.substring(index, len));
+                    }
+
+                }
+            }
+        },
+
+        /**
+         * このLabelインスタンスの設定で文字を描画したときの幅
+         * newLine true 指定で\nによる改行も考慮する
+         */
+        measure: function (text, newLine) {
+            dummyContext.font = this.fontStyle;
+            text = text == null ? '' : text + '';
+
+            if (newLine) {
+                text = text.split('\n');
+                var max = 0;
+
+                text.forEach(function (text) {
+                    var width = dummyContext.measureText(text).width;
+                    if (width > max) max = width;
+                });
+
+                return max;
+            }
+
+            return dummyContext.measureText(text).width;
+        },
+
+        /**
+         * 列の幅をセット
+         */
+        setRowWidth: function (rowWidth) {
+            this.rowWidth = rowWidth;
+            return this;
+        },
+
+        /**
+         * 文字列をセット
+         */
+        setText: function (text) {
+            this.text = text;
+            return this;
         },
         
     });
@@ -15513,13 +15583,9 @@ tm.display = tm.display || {};
      */
     tm.display.Label.prototype.accessor("text", {
         "get": function() { return this._text; },
-        "set": function(v){
-            if (v == null || v == undefined) {
-                this._text = "";
-            }
-            else {
-                this._text = v;
-            }
+        "set": function (v) {
+            if (this._text === v) return;
+            this._text = (v != null) ? v : '';
             this._updateLines();
         }
     });
@@ -15561,6 +15627,17 @@ tm.display = tm.display || {};
             this._lineHeight = v; this._updateFont();
         },
     });
+
+
+    /**
+     * @property rowWidth
+     */
+    tm.display.Label.prototype.accessor("rowWidth", {
+        "get": function () { return this._rowWidth; },
+        "set": function (v) {
+            this._rowWidth = v; this._updateLines();
+        },
+    });
     
     tm.display.Label.default = {
         align: "center",
@@ -15569,6 +15646,8 @@ tm.display = tm.display || {};
         // align: "start",
         // baseline: "alphabetic",
     };
+
+    tm.display.Label._cache = {};
 
     
 })();
@@ -16413,7 +16492,7 @@ tm.ui = tm.ui || {};
          * @constructor
          */
         init: function() {
-            this.superInit.call(this, arguments);
+            this.superInit.apply(this, arguments);
             
             this.setInteractive(true);
             this.boundingType = "rect";
@@ -16630,8 +16709,8 @@ tm.ui = tm.ui || {};
             this.menu = [].concat(params.menu);
             this._selected = ~~params.defaultSelected;
             this.showExit = !!params.showExit;
-            if (params.menuDesctiptions) {
-                this.descriptions = params.menuDesctiptions;
+            if (params.menuDescriptions) {
+                this.descriptions = params.menuDescriptions;
             } else {
                 this.descriptions = [].concat(params.menu);
             }
@@ -16642,7 +16721,9 @@ tm.ui = tm.ui || {};
             }
 
             var height = Math.max((1+this.menu.length)*50, 50) + 40;
-            this.box = tm.display.RectangleShape(this._screenWidth * 0.8, height, {
+            this.box = tm.display.RectangleShape({
+                width: this._screenWidth * 0.8,
+                height: height,
                 strokeStyle: "rgba(0,0,0,0)",
                 fillStyle: "rgba(43,156,255, 0.8)",
             }).setPosition(this._screenWidth*0.5, this._screenHeight*0.5);
@@ -16719,7 +16800,9 @@ tm.ui = tm.ui || {};
          * @private
          */
         _createCursor: function() {
-            var cursor = tm.display.RectangleShape(this._screenWidth*0.7, 30, {
+            var cursor = tm.display.RectangleShape({
+                width: this._screenWidth*0.7,
+                height: 30,
                 strokeStyle: "rgba(0,0,0,0)",
                 fillStyle: "rgba(12,79,138,1)"
             }).addChildTo(this);
@@ -16775,12 +16858,7 @@ tm.ui = tm.ui || {};
                             this.dispatchEvent(e);
                         }.bind(this));
                 }.bind(this));
-            this.cursor.tweener
-                .clear()
-                .call(function() {
-                    this.visible = !this.visible;
-                }.bind(this.cursor))
-                .setLoop(true);
+            this.cursor.on("enterframe", function () { this.visible = !this.visible; });
         },
 
         /**
@@ -16993,7 +17071,7 @@ tm.ui = tm.ui || {};
          * 空っぽかをチェック
          */
         isEmpty: function() {
-            return this._value == 0;
+            return this._value === 0;
         },
 
         /**
@@ -17001,8 +17079,7 @@ tm.ui = tm.ui || {};
          */
         _reset: function(direction) {
             this.originX = 0;
-            this._value = 100;
-            this._value = this._maxValue = 100;
+            this._realValue = this._value = this._maxValue = 100;
         },
 
         /**
@@ -17058,6 +17135,14 @@ tm.ui = tm.ui || {};
             return this.value;
         },
 
+
+        /**
+         * 値をゲット
+         */
+        getRealValue: function () {
+            return this._realValue;
+        },
+
         /**
          * 値を％でセット
          */
@@ -17068,8 +17153,15 @@ tm.ui = tm.ui || {};
         /**
          * 値を％でゲット
          */
-        getPercent: function() {
-            return (this._value/this._maxValue)*100;
+        getPercent: function () {
+            return (this._value / this._maxValue) * 100;
+        },
+
+        /**
+         * 値を％でゲット
+         */
+        getRealPercent: function () {
+            return (this._realValue / this._maxValue) * 100;
         },
 
         /**
@@ -17082,10 +17174,17 @@ tm.ui = tm.ui || {};
         /**
          * 値を比率でゲット
          */
-        getRatio: function() {
-            return this._value/this._maxValue;
+        getRatio: function () {
+            return this._value / this._maxValue;
         },
-        
+
+        /**
+         * 値を比率でゲット
+         */
+        getRealRatio: function () {
+            return this._realValue / this._maxValue;
+        },
+
         isAnimation: function() {
             return this.animationFlag;
         },
@@ -17123,6 +17222,20 @@ tm.ui = tm.ui || {};
         },
     });
 
+
+    /**
+     * @property    realValue
+     * 値
+     */
+    tm.ui.Gauge.prototype.accessor("realValue", {
+        get: function () {
+            return this._realValue;
+        },
+        set: function (v) {
+            this.setValue(v);
+        },
+    });
+
     /**
      * @property    percent
      * パーセント
@@ -17133,6 +17246,19 @@ tm.ui = tm.ui || {};
         },
         set: function(v) {
             this.setPercent(v);
+        },
+    });
+
+    /**
+     * @property    percent
+     * パーセント
+     */
+    tm.ui.Gauge.prototype.accessor("realPercent", {
+        get: function () {
+            return this.getRealPercent();
+        },
+        set: function (v) {
+            this.setRealPercent(v);
         },
     });
     
@@ -17146,6 +17272,19 @@ tm.ui = tm.ui || {};
             return this.getRatio();
         },
         set: function(v) {
+            this.setRatio(v);
+        },
+    });
+
+    /**
+     * @property    ratio
+     * 比率
+     */
+    tm.ui.Gauge.prototype.accessor("realRatio", {
+        get: function () {
+            return this.getRealRatio();
+        },
+        set: function (v) {
             this.setRatio(v);
         },
     });
@@ -18893,262 +19032,6 @@ tm.three = tm.three || {};
 
 
 
-
-/*
- * webgl.js
- */
-
-tm.webgl = tm.webgl || {};
-
-(function() {
-
-    if (!tm.global.GLBoost) return ;
-
-
-    /**
-     * @class tm.webgl.WebGLApp
-     * 3Dライブラリ - tmlib.jsによるWebGLサポート
-     * @extends tm.app.BaseApp
-     */
-    tm.webgl.WebGLApp = tm.createClass({
-        superClass: tm.app.BaseApp,
-
-        /** canvas */
-        canvas      : null,
-        _scenes      : null,
-
-        /**
-         * @constructor
-         */
-        init: function(canvas) {
-            if (canvas instanceof HTMLCanvasElement) {
-                this.element = canvas;
-            }
-            else if (typeof canvas == "string") {
-                this.element = document.querySelector(canvas);
-            }
-            else {
-                this.element = document.createElement("canvas");
-                document.body.appendChild(this.element);
-            }
-
-            // 親の初期化
-            this.superInit(this.element);
-
-            // レンダラーを生成
-            this.renderer = new GLBoost.Renderer({ canvas: this.element, clearColor: {red:0, green:1, blue:0, alpha:1}});
-
-            // シーン周り
-            this._scenes = [ tm.webgl.Scene() ];
-
-        },
-
-        _draw: function() {
-            this.renderer.clearCanvas();
-
-            for (var i=0, len=this._scenes.length; i<len; ++i) {
-                this.renderer.draw(this.currentScene);
-            }
-
-        },
-
-        /**
-         * @TODO ?
-         */
-        resize: function(width, height) {
-            this.width = width;
-            this.height= height;
-
-            return this;
-        },
-
-        /**
-         * @TODO ?
-         */
-        resizeWindow: function() {
-            this.width = innerWidth;
-            this.height= innerHeight;
-
-            return this;
-        },
-
-        /**
-         * 画面にフィットさせる
-         */
-        fitWindow: function(everFlag) {
-            // 画面にフィット
-            var _fitFunc = function() {
-                everFlag = everFlag === undefined ? true : everFlag;
-                var e = this.element;
-                var s = e.style;
-
-                s.position = "absolute";
-                s.left = "0px";
-                s.top  = "0px";
-
-                var rateWidth = e.width/window.innerWidth;
-                var rateHeight= e.height/window.innerHeight;
-                var rate = e.height/e.width;
-
-                if (rateWidth > rateHeight) {
-                    s.width  = innerWidth+"px";
-                    s.height = innerWidth*rate+"px";
-                }
-                else {
-                    s.width  = innerHeight/rate+"px";
-                    s.height = innerHeight+"px";
-                }
-            }.bind(this);
-
-            // 一度実行しておく
-            _fitFunc();
-            // リサイズ時のリスナとして登録しておく
-            if (everFlag) {
-                window.addEventListener("resize", _fitFunc, false);
-            }
-
-            // マウスとタッチの座標更新関数をパワーアップ
-            this.mouse._mousemove = this.mouse._mousemoveScale;
-            this.touch._touchmove = this.touch._touchmoveScale;
-        },
-
-        getRenderer: function() {
-          return this.renderer;
-        }
-
-    });
-})();
-
-(function() {
-
-    if (!tm.global.GLBoost) return ;
-
-    /**
-     * @class tm.webgl.Element
-     * @TODO ?
-     */
-    tm.webgl.Element = tm.createClass({
-      superClass: GLBoost.Element,
-        /**
-         * @constructor
-         */
-        init: function() {
-            GLBoost.Element.prototype.constructor.call(this);
-
-            tm.event.EventDispatcher.prototype.init.call(this);
-        },
-
-        /**
-         * 更新処理
-         */
-        update: function() {},
-
-        /**
-         * @TODO ?
-         * @private
-         */
-        _update: function(app) {
-            // 更新有効チェック
-            if (this.awake == false) return ;
-
-            this.update(app);
-
-            var e = tm.event.Event("enterframe");
-            e.app = app;
-            this.dispatchEvent(e);
-
-        },
-    });
-
-    // tm.event.EventDispatcher を継承
-    tm.webgl.Element.prototype.$safe(tm.event.EventDispatcher.prototype);
-
-})();
-
-(function() {
-
-    if (!tm.global.GLBoost) return ;
-
-    /**
-     * @class tm.webgl.CameraElement
-     * @TODO ?
-     */
-    tm.webgl.CameraElement = tm.createClass({
-        superClass: GLBoost.Camera,
-
-        /**
-         * @constructor
-         */
-        init: function(lookAt, perspective) {
-            tm.webgl.Element.prototype.init.call(this);
-
-            GLBoost.Camera.prototype.constructor.call(this, lookAt, perspective);
-        }
-    });
-
-    // tm.webgl.Element を継承
-    tm.webgl.CameraElement.prototype.$safe(tm.webgl.Element.prototype);
-
-})();
-
-
-(function() {
-
-    if (!tm.global.GLBoost) return ;
-
-    /**
-     * @class tm.webgl.MeshElement
-     * @TODO ?
-     */
-    tm.webgl.MeshElement = tm.createClass({
-        superClass: GLBoost.Mesh,
-
-        /**
-         * @constructor
-         */
-        init: function(geometry, material, canvas) {
-            tm.webgl.Element.prototype.init.call(this, canvas);
-
-            GLBoost.Mesh.prototype.constructor.call(this, geometry, material);
-        }
-    });
-
-    // tm.webgl.MeshElement を継承
-    tm.webgl.MeshElement.prototype.$safe(tm.webgl.Element.prototype);
-
-})();
-
-(function() {
-
-    if (!tm.global.GLBoost) return ;
-
-    /**
-     * @class tm.webgl.Scene
-     * シーン
-     */
-    tm.webgl.Scene = tm.createClass({
-        superClass: GLBoost.Scene,
-
-        /** @property camera    カメラ */
-        /** @property Projector プロジェクター */
-
-        /**
-         * @constructor
-         */
-        init: function(fov, aspect) {
-            // tm.webgl.Element を継承
-            tm.webgl.Element.prototype.init.call(this);
-
-            // GLBoost.Scene の初期化
-            GLBoost.Scene.prototype.constructor.call(this);
-
-        }
-
-    });
-
-    // tm.webgl.Element を継承
-    tm.webgl.Scene.prototype.$safe(tm.webgl.Element.prototype);
-})();
 
 /*
  * sound.js
