@@ -28,7 +28,6 @@ export default class ObjLoader {
   }
 
   loadObj(url, canvas, defaultShader = null, mtlString = null) {
-    this._numMaterial = 0;
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -53,6 +52,7 @@ export default class ObjLoader {
 
     var mtlTextRows = mtlString.split('\n');
 
+    var numMaterial = 0;
     // checking the number of material
     for (let i=0; i<mtlTextRows.length; i++) {
       let matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
@@ -62,11 +62,11 @@ export default class ObjLoader {
 
       if (matchArray[1] === "newmtl")
       {
-        this._numMaterial++;
+        numMaterial++;
       }
     }
 
-    var materials = new Array(this._numMaterial);
+    var materials = new Array(numMaterial);
     var iMCount = -1;
 
     // main loading
@@ -121,7 +121,7 @@ export default class ObjLoader {
         materials[iMCount].diffuseTexture = texture;
       }
     }
-    this._materials = materials;
+    return materials;
   }
 
   _loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
@@ -130,7 +130,7 @@ export default class ObjLoader {
     xmlHttp.open("GET", basePath + fileName, false);
     xmlHttp.send(null);
 
-    this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath)
+    return this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath)
   }
 
   _constructMesh(objText, basePath, canvas, defaultShader, mtlString) {
@@ -138,14 +138,14 @@ export default class ObjLoader {
     console.log(basePath);
 
     var objTextRows = objText.split('\n');
-
+    var materials = null;
     let vCount = 0;
     let fCount = 0;
     let vnCount = 0;
     let vtCount = 0;
 
     if (mtlString) {
-      this._loadMaterialFromString(mtlString, canvas, defaultShader);
+      materials = this._loadMaterialFromString(mtlString, canvas, defaultShader);
     }
 
     for (let i=0; i<objTextRows.length; i++) {
@@ -157,7 +157,7 @@ export default class ObjLoader {
       // material file
       if (matchArray[1] === "mtllib" && mtlString === null)
       {
-        this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+        materials = this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
       }
       // Vertex
       if (matchArray[1] === "v")
@@ -244,21 +244,19 @@ export default class ObjLoader {
     var normals = new Array( fCount );
     var indices = [];
 
-    this._indexBuffers = new Array(this._materials); //GLuint[g_dwNumMaterial];
-
     var boFlag = false;
 
-    this._FaceN = fCount;
-    var iFaceBufferArray = new Array(this._FaceN*3);
+    var FaceN = fCount;
+    var iFaceBufferArray = new Array(FaceN*3);
     fCount = 0;
     var partFCount = 0;
 
     var geometry = new Geometry(canvas);
 
-    for(let i=0; i<this._materials.length; i++) {
+    for(let i=0; i<materials.length; i++) {
       partFCount = 0;
 
-      for (let j=0; (j<objTextRows.length) && (fCount < this._FaceN); j++) {
+      for (let j=0; (j<objTextRows.length) && (fCount < FaceN); j++) {
         let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
         if (matchArray === null) {
@@ -266,7 +264,7 @@ export default class ObjLoader {
         }
 
         if (matchArray[1] === "usemtl") {
-          if (matchArray[2] === this._materials[i].name) {
+          if (matchArray[2] === materials[i].name) {
             boFlag = true;
           } else {
             boFlag = false;
@@ -282,7 +280,7 @@ export default class ObjLoader {
             isQuad = false;
           }
 
-          if(this._materials[i].diffuseTexture) {
+          if(materials[i].diffuseTexture) {
 
             if (isQuad) {
                 this._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
@@ -315,18 +313,17 @@ export default class ObjLoader {
 
       if (fCount === 0)//使用されていないマテリアル対策
       {
-          this._indexBuffers[i] = null;
           continue;
       }
 
-      this._materials[i].setVertexN(geometry, partFCount*3);
+      materials[i].setVertexN(geometry, partFCount*3);
 
       indices[i] = iFaceBufferArray.concat();
 
     }
 
     var mesh = new Mesh(geometry);
-    geometry.materials = this._materials;
+    geometry.materials = materials;
     geometry.setVerticesData({
       position: positions,
       texcoord: texcoords,

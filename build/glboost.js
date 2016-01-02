@@ -4294,7 +4294,6 @@
         var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
         var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
-        this._numMaterial = 0;
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = function () {
@@ -4321,6 +4320,7 @@
 
         var mtlTextRows = mtlString.split('\n');
 
+        var numMaterial = 0;
         // checking the number of material
         for (var i = 0; i < mtlTextRows.length; i++) {
           var matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
@@ -4329,11 +4329,11 @@
           }
 
           if (matchArray[1] === "newmtl") {
-            this._numMaterial++;
+            numMaterial++;
           }
         }
 
-        var materials = new Array(this._numMaterial);
+        var materials = new Array(numMaterial);
         var iMCount = -1;
 
         // main loading
@@ -4383,7 +4383,7 @@
             materials[iMCount].diffuseTexture = texture;
           }
         }
-        this._materials = materials;
+        return materials;
       }
     }, {
       key: '_loadMaterialFromFile',
@@ -4393,7 +4393,7 @@
         xmlHttp.open("GET", basePath + fileName, false);
         xmlHttp.send(null);
 
-        this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath);
+        return this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath);
       }
     }, {
       key: '_constructMesh',
@@ -4402,14 +4402,14 @@
         console.log(basePath);
 
         var objTextRows = objText.split('\n');
-
+        var materials = null;
         var vCount = 0;
         var fCount = 0;
         var vnCount = 0;
         var vtCount = 0;
 
         if (mtlString) {
-          this._loadMaterialFromString(mtlString, canvas, defaultShader);
+          materials = this._loadMaterialFromString(mtlString, canvas, defaultShader);
         }
 
         for (var i = 0; i < objTextRows.length; i++) {
@@ -4420,7 +4420,7 @@
 
           // material file
           if (matchArray[1] === "mtllib" && mtlString === null) {
-            this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+            materials = this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
           }
           // Vertex
           if (matchArray[1] === "v") {
@@ -4501,21 +4501,19 @@
         var normals = new Array(fCount);
         var indices = [];
 
-        this._indexBuffers = new Array(this._materials); //GLuint[g_dwNumMaterial];
-
         var boFlag = false;
 
-        this._FaceN = fCount;
-        var iFaceBufferArray = new Array(this._FaceN * 3);
+        var FaceN = fCount;
+        var iFaceBufferArray = new Array(FaceN * 3);
         fCount = 0;
         var partFCount = 0;
 
         var geometry = new Geometry(canvas);
 
-        for (var i = 0; i < this._materials.length; i++) {
+        for (var i = 0; i < materials.length; i++) {
           partFCount = 0;
 
-          for (var j = 0; j < objTextRows.length && fCount < this._FaceN; j++) {
+          for (var j = 0; j < objTextRows.length && fCount < FaceN; j++) {
             var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
             if (matchArray === null) {
@@ -4523,7 +4521,7 @@
             }
 
             if (matchArray[1] === "usemtl") {
-              if (matchArray[2] === this._materials[i].name) {
+              if (matchArray[2] === materials[i].name) {
                 boFlag = true;
               } else {
                 boFlag = false;
@@ -4539,7 +4537,7 @@
                 isQuad = false;
               }
 
-              if (this._materials[i].diffuseTexture) {
+              if (materials[i].diffuseTexture) {
 
                 if (isQuad) {
                   this._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
@@ -4572,17 +4570,16 @@
 
           if (fCount === 0) //使用されていないマテリアル対策
             {
-              this._indexBuffers[i] = null;
               continue;
             }
 
-          this._materials[i].setVertexN(geometry, partFCount * 3);
+          materials[i].setVertexN(geometry, partFCount * 3);
 
           indices[i] = iFaceBufferArray.concat();
         }
 
         var mesh = new Mesh(geometry);
-        geometry.materials = this._materials;
+        geometry.materials = materials;
         geometry.setVerticesData({
           position: positions,
           texcoord: texcoords,
