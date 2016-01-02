@@ -3591,6 +3591,7 @@
       _this._texture = null;
 
       _this._img = new Image();
+      _this._img.crossOrigin = "Anonymous";
       _this._img.onload = function () {
         var gl = _this._gl;
         var texture = gl.createTexture();

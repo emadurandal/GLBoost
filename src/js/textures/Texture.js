@@ -10,6 +10,7 @@ export default class Texture extends AbstractTexture {
     this._texture = null;
 
     this._img = new Image();
+    this._img.crossOrigin = "Anonymous";
     this._img.onload = ()=> {
       var gl = this._gl;
       var texture = gl.createTexture();
