@@ -111,6 +111,24 @@ export default class Vector3 {
   }
 
   /**
+   * 加算
+   */
+  add(v) {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+
+    return this;
+  }
+
+  /**
+   * 加算（static版）
+   */
+  static add(lv, rv) {
+    return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
+  }
+
+  /**
    * 減算
    */
   subtract(v) {

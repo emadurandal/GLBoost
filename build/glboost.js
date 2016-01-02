@@ -250,6 +250,24 @@
        */
 
     }, {
+      key: "add",
+
+      /**
+       * 加算
+       */
+      value: function add(v) {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+
+        return this;
+      }
+
+      /**
+       * 加算（static版）
+       */
+
+    }, {
       key: "subtract",
 
       /**
@@ -312,6 +330,11 @@
         vec3.divide(length);
 
         return vec3;
+      }
+    }, {
+      key: "add",
+      value: function add(lv, rv) {
+        return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
       }
     }, {
       key: "subtract",
