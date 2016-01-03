@@ -15,6 +15,7 @@ export default class Element {
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
+    this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
 
     this._setName();
   }
@@ -140,7 +141,7 @@ export default class Element {
     //console.log(tempString);
     if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === "undefined") {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString
+      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     }
 
     return this._matrixAccumulatedAncestry;
@@ -153,9 +154,9 @@ export default class Element {
 
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
+    if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
       this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString
+      this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
     }
 
     return this._invMatrixAccumulatedAncestry
@@ -195,8 +196,8 @@ export default class Element {
   }
 
   toStringWithUpdateInfo() {
-  //  return '&' + this._instanceName + '#' + this._updateCountAsElement  // human readable
-    return this._instanceName + this._updateCountAsElement                // faster
+  //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
+    return this._instanceName + this._updateCountAsElement;                // faster
   }
 
 }

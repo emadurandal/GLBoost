@@ -1186,6 +1186,7 @@
       this._calculatedInverseMatrix = false;
       this._updateCountAsElement = 0;
       this._accumulatedAncestryNameWithUpdateInfoString = '';
+      this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
 
       this._setName();
     }
@@ -1254,7 +1255,7 @@
     }, {
       key: 'toStringWithUpdateInfo',
       value: function toStringWithUpdateInfo() {
-        //  return '&' + this._instanceName + '#' + this._updateCountAsElement  // human readable
+        //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
         return this._instanceName + this._updateCountAsElement; // faster
       }
     }, {
@@ -1343,9 +1344,9 @@
 
         var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
         //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
+        if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
           this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+          this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
         }
 
         return this._invMatrixAccumulatedAncestry;
