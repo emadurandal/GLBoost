@@ -14,6 +14,10 @@ export default class GLExtentionsManager {
 //    if (!this._extDBs)
 //      throw("WEBGL_draw_buffersをサポートしていません");
 
+    this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") ||
+      gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") ||
+      gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+
     GLExtentionsManager._instance = this;
   }
   static getInstance(gl) {
@@ -26,6 +30,10 @@ export default class GLExtentionsManager {
 
   get extDBs() {
     return this._extDBs;
+  }
+
+  get extTFA() {
+    return this._extTFA;
   }
 
   createVertexArray(gl) {

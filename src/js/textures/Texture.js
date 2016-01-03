@@ -1,6 +1,7 @@
 import GLBoost from './../globals'
 import GLContext from './../GLContext'
 import AbstractTexture from './AbstractTexture'
+import GLExtentionsManager from '../GLExtentionsManager'
 
 export default class Texture extends AbstractTexture {
   constructor(imageUrl, canvas) {
@@ -13,9 +14,14 @@ export default class Texture extends AbstractTexture {
     this._img.crossOrigin = "Anonymous";
     this._img.onload = ()=> {
       var gl = this._gl;
+      var glem = GLExtentionsManager.getInstance(gl);
+
       var texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      if (glem.getTFA) {
+        gl.texParameteri(gl.TEXTURE_2D, glem.getTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      }
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._img);
       gl.generateMipmap(gl.TEXTURE_2D);
       gl.bindTexture(gl.TEXTURE_2D, null);

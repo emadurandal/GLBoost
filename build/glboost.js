@@ -1791,6 +1791,8 @@
       //    if (!this._extDBs)
       //      throw("WEBGL_draw_buffersをサポートしていません");
 
+      this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+
       GLExtentionsManager._instance = this;
     }
 
@@ -1837,6 +1839,11 @@
       key: "extDBs",
       get: function get() {
         return this._extDBs;
+      }
+    }, {
+      key: "extTFA",
+      get: function get() {
+        return this._extTFA;
       }
     }], [{
       key: "getInstance",
@@ -3625,9 +3632,14 @@
       _this._img.crossOrigin = "Anonymous";
       _this._img.onload = function () {
         var gl = _this._gl;
+        var glem = GLExtentionsManager.getInstance(gl);
+
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        if (glem.getTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.getTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        }
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this._img);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
