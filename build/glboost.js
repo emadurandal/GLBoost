@@ -1208,9 +1208,9 @@
       key: '_accumulateMyAndParentNameWithUpdateInfo',
       value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
         if (currentElem._parent === null) {
-          return this.toStringWithUpdateInfo();
+          return currentElem.toStringWithUpdateInfo();
         } else {
-          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + this.toStringWithUpdateInfo();
+          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
         }
       }
     }, {
