@@ -3637,8 +3637,8 @@
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-        if (glem.getTFA) {
-          gl.texParameteri(gl.TEXTURE_2D, glem.getTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        if (glem.extTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this._img);
         gl.generateMipmap(gl.TEXTURE_2D);
