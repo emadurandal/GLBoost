@@ -169,6 +169,13 @@ export default class Renderer {
     return this._gl;
   }
 
+  resize(width, height) {
+    this._gl._canvas.width = width;
+    this._gl._canvas.height = height;
+
+    this._gl.viewport(0, 0, width, height);
+  }
+
 }
 
 GLBoost["Renderer"] = Renderer;

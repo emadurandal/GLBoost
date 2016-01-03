@@ -3454,6 +3454,14 @@
         });
       }
     }, {
+      key: 'resize',
+      value: function resize(width, height) {
+        this._gl._canvas.width = width;
+        this._gl._canvas.height = height;
+
+        this._gl.viewport(0, 0, width, height);
+      }
+    }, {
       key: 'glContext',
       get: function get() {
         return this._gl;
