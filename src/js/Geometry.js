@@ -21,10 +21,12 @@ export default class Geometry {
     //this._shader_for_non_material = new SimpleShader(this._canvas);
     this._defaultMaterial = new ClassicMaterial(this._canvas);
 
-    if (this.constructor === Geometry) {
-      Geometry._instanceCount = (typeof Geometry._instanceCount === "undefined") ? 0 : (Geometry._instanceCount + 1);
-      this._instanceName = Geometry.name + '_' + Geometry._instanceCount;
-    }
+    this._setName();
+  }
+
+  _setName() {
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === "undefined") ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   /**
@@ -395,6 +397,10 @@ export default class Geometry {
 
   static clearMaterialCache() {
     Geometry._lastMaterial = null;
+  }
+
+  toString() {
+    return this._instanceName;
   }
 }
 Geometry._vaoDic = {};

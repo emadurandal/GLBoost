@@ -12,6 +12,13 @@ export default class Scene extends Element {
     this._meshes = [];
     this._lights = [];
     this._cameras = [];
+
+    // this code for tmlib
+    if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Scene ||
+      this.__proto__.__proto__ && this.__proto__.__proto__.__proto__ && this.__proto__.__proto__.__proto__.constructor == Scene) {
+      Scene._instanceCount = (typeof Scene._instanceCount === "undefined") ? 0 : (Scene._instanceCount + 1);
+      this._instanceName = Scene.name + '_' + Scene._instanceCount;
+    }
   }
 
   add(mesh) {

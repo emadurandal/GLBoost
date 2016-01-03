@@ -29,8 +29,6 @@ export default class Particle extends Geometry {
   constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, canvas) {
     super(canvas);
 
-    Particle._instanceCount = (typeof Particle._instanceCount === "undefined") ? 0 : (Particle._instanceCount + 1);
-
     this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes);
   }
 
@@ -173,11 +171,6 @@ export default class Particle extends Geometry {
      */
 
     super.prepareForRender(existCamera_f, pointLight, meshMaterial);
-  }
-
-
-  toString() {
-    return Particle.name + '_' + Particle._instanceCount;
   }
 
 }

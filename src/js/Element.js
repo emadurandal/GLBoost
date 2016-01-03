@@ -12,8 +12,16 @@ export default class Element {
     this._matrix = Matrix44.identity();
     this._invMatrix = Matrix44.identity();
     this._dirtyAsElement = false;
+    this._dirtyAsAncestry = true;
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
+
+    this._setName();
+  }
+
+  _setName() {
+      this.constructor._instanceCount = (typeof this.constructor._instanceCount === "undefined") ? 0 : (this.constructor._instanceCount + 1);
+      this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   _needUpdate() {
@@ -158,6 +166,11 @@ export default class Element {
   get parent() {
     return this._parent;
   }
+
+  toString() {
+    return this._instanceName;
+  }
+
 }
 
 GLBoost["Element"] = Element;

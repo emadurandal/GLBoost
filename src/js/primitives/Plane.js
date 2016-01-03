@@ -12,8 +12,6 @@ export default class Plane extends Geometry {
   constructor(width, height, uSpan, vSpan, customVertexAttributes, canvas) {
     super(canvas);
 
-    Plane._instanceCount = (typeof Plane._instanceCount === "undefined") ? 0 : (Plane._instanceCount + 1);
-
     this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
   }
 
@@ -78,10 +76,6 @@ export default class Plane extends Geometry {
 
     var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
     this.setVerticesData(completeAttributes, GLBoost.TRIANGLE_STRIP);
-  }
-
-  toString() {
-    return 'Plane_' + Plane._instanceCount;
   }
 
 }

@@ -9,6 +9,7 @@ export default class PointLight extends AbstractLight {
     this._gl = GLContext.getInstance(canvas).gl;
     this._name = "";
     this._intensity = intensity;
+
   }
 
   set intensity(vec) {
@@ -18,6 +19,7 @@ export default class PointLight extends AbstractLight {
   get intensity() {
     return this._intensity;
   }
+
 }
 
 GLBoost["PointLight"] = PointLight;

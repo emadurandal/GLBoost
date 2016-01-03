@@ -7,7 +7,7 @@ export default class Mesh extends Element {
     this.geometry = geometry;
     this.material = material;
 
-    if (this.constructor === Mesh || (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) ) {
+    if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) {  // this code for tmlib
       Mesh._instanceCount = (typeof Mesh._instanceCount === "undefined") ? 0 : (Mesh._instanceCount + 1);
       this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
     }
@@ -55,9 +55,6 @@ export default class Mesh extends Element {
     return this._material;
   }
 
-  toString() {
-    return this._instanceName;
-  }
 }
 Mesh._geometries = {};
 

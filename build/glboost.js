@@ -1183,11 +1183,20 @@
       this._matrix = Matrix44.identity();
       this._invMatrix = Matrix44.identity();
       this._dirtyAsElement = false;
+      this._dirtyAsAncestry = true;
       this._calculatedInverseMatrix = false;
       this._updateCountAsElement = 0;
+
+      this._setName();
     }
 
     babelHelpers.createClass(Element, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === "undefined" ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+    }, {
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
@@ -1227,6 +1236,11 @@
           }
           return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
         }
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
       }
     }, {
       key: 'updateCountAsElement',
@@ -1351,7 +1365,8 @@
       _this.geometry = geometry;
       _this.material = material;
 
-      if (_this.constructor === Mesh || _this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
+      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
+        // this code for tmlib
         Mesh._instanceCount = typeof Mesh._instanceCount === "undefined" ? 0 : Mesh._instanceCount + 1;
         _this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
       }
@@ -1371,11 +1386,6 @@
       key: 'draw',
       value: function draw(lights, camera) {
         this._geometry.draw(lights, camera, this);
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this._instanceName;
       }
     }, {
       key: 'geometry',
@@ -1433,6 +1443,7 @@
         this.removeChild(element);
         this._children.push(element);
         element._parent = this;
+        element._dirtyAsAncestry = true;
       }
     }, {
       key: 'removeChild',
@@ -1440,6 +1451,7 @@
         this._children = this._children.filter(function (elem) {
           if (elem === element) {
             element._parent = null;
+            element._dirtyAsAncestry = true;
           }
           return elem !== element;
         });
@@ -1924,6 +1936,7 @@
       _this._gl = GLContext.getInstance(canvas).gl;
       _this._name = "";
       _this._intensity = intensity;
+
       return _this;
     }
 
@@ -2702,18 +2715,22 @@
       //this._shader_for_non_material = new SimpleShader(this._canvas);
       this._defaultMaterial = new ClassicMaterial(this._canvas);
 
-      if (this.constructor === Geometry) {
-        Geometry._instanceCount = typeof Geometry._instanceCount === "undefined" ? 0 : Geometry._instanceCount + 1;
-        this._instanceName = Geometry.name + '_' + Geometry._instanceCount;
-      }
+      this._setName();
     }
 
-    /**
-     * データとして利用する頂点属性を判断し、そのリストを返す
-     * 不必要な頂点属性のデータは無視する。
-     */
-
     babelHelpers.createClass(Geometry, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === "undefined" ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+
+      /**
+       * データとして利用する頂点属性を判断し、そのリストを返す
+       * 不必要な頂点属性のデータは無視する。
+       */
+
+    }, {
       key: '_decideNeededVertexAttribs',
       value: function _decideNeededVertexAttribs(vertices, material) {
         if (material) {
@@ -3075,6 +3092,11 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         Geometry._lastGeometry = thisName;
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
       }
     }, {
       key: 'toString',
@@ -3491,6 +3513,12 @@
       _this._meshes = [];
       _this._lights = [];
       _this._cameras = [];
+
+      // this code for tmlib
+      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Scene || _this.__proto__.__proto__ && _this.__proto__.__proto__.__proto__ && _this.__proto__.__proto__.__proto__.constructor == Scene) {
+        Scene._instanceCount = typeof Scene._instanceCount === "undefined" ? 0 : Scene._instanceCount + 1;
+        _this._instanceName = Scene.name + '_' + Scene._instanceCount;
+      }
       return _this;
     }
 
@@ -4937,8 +4965,6 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
 
-      Plane._instanceCount = typeof Plane._instanceCount === "undefined" ? 0 : Plane._instanceCount + 1;
-
       _this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
       return _this;
     }
@@ -5006,11 +5032,6 @@
         var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
         this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
       }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return 'Plane_' + Plane._instanceCount;
-      }
     }]);
     return Plane;
   })(Geometry);
@@ -5024,8 +5045,6 @@
       babelHelpers.classCallCheck(this, Cube);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Cube).call(this, canvas));
-
-      Cube._instanceCount = typeof Cube._instanceCount === "undefined" ? 0 : Cube._instanceCount + 1;
 
       _this._setupVertexData(widthVector.divide(2.0), vertexColor);
       return _this;
@@ -5073,11 +5092,6 @@
           texcoord: texcoords,
           indices: [indices]
         });
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return 'Cube_' + Cube._instanceCount;
       }
     }]);
     return Cube;
@@ -5152,8 +5166,6 @@
       babelHelpers.classCallCheck(this, Particle);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, canvas));
-
-      Particle._instanceCount = typeof Particle._instanceCount === "undefined" ? 0 : Particle._instanceCount + 1;
 
       _this._setupVertexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
       return _this;
@@ -5311,11 +5323,6 @@
          */
 
         babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial);
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return Particle.name + '_' + Particle._instanceCount;
       }
     }]);
     return Particle;

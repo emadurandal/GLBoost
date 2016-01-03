@@ -27,6 +27,7 @@ export default class DirectionalLight extends AbstractLight {
   get direction() {
     return this._direction;
   }
+
 }
 
 GLBoost["DirectionalLight"] = DirectionalLight;

@@ -11,8 +11,6 @@ export default class Cube extends Geometry {
   constructor(widthVector, vertexColor, canvas) {
     super(canvas);
 
-    Cube._instanceCount = (typeof Cube._instanceCount === "undefined") ? 0 : (Cube._instanceCount + 1);
-
     this._setupVertexData(widthVector.divide(2.0), vertexColor);
   }
 
@@ -162,10 +160,6 @@ export default class Cube extends Geometry {
       texcoord: texcoords,
       indices: [indices]
     });
-  }
-
-  toString() {
-    return 'Cube_' + Cube._instanceCount;
   }
 
 }
