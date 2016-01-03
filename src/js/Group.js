@@ -13,14 +13,12 @@ export default class Group extends Element {
     this.removeChild(element);
     this._children.push(element);
     element._parent = this;
-    element._dirtyAsAncestry = true;
   }
 
   removeChild(element) {
     this._children = this._children.filter(function(elem) {
       if (elem === element) {
         element._parent = null;
-        element._dirtyAsAncestry = true;
       }
       return elem !== element
     });

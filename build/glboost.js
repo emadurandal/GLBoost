@@ -1183,9 +1183,9 @@
       this._matrix = Matrix44.identity();
       this._invMatrix = Matrix44.identity();
       this._dirtyAsElement = false;
-      this._dirtyAsAncestry = true;
       this._calculatedInverseMatrix = false;
       this._updateCountAsElement = 0;
+      this._accumulatedAncestryNameWithUpdateInfoString = '';
 
       this._setName();
     }
@@ -1202,6 +1202,15 @@
         this._dirtyAsElement = true;
         this._calculatedInverseMatrix = false;
         this._updateCountAsElement++;
+      }
+    }, {
+      key: '_accumulateMyAndParentNameWithUpdateInfo',
+      value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+        if (currentElem._parent === null) {
+          return this.toStringWithUpdateInfo();
+        } else {
+          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + this.toStringWithUpdateInfo();
+        }
       }
     }, {
       key: '_multiplyMyAndParentTransformMatrices',
@@ -1241,6 +1250,12 @@
       key: 'toString',
       value: function toString() {
         return this._instanceName;
+      }
+    }, {
+      key: 'toStringWithUpdateInfo',
+      value: function toStringWithUpdateInfo() {
+        //  return '&' + this._instanceName + '#' + this._updateCountAsElement  // human readable
+        return this._instanceName + this._updateCountAsElement; // faster
       }
     }, {
       key: 'updateCountAsElement',
@@ -1310,7 +1325,14 @@
     }, {
       key: 'transformMatrixAccumulatedAncestry',
       get: function get() {
-        return this._multiplyMyAndParentTransformMatrices(this, true);
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === "undefined") {
+          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._matrixAccumulatedAncestry;
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
@@ -1318,7 +1340,15 @@
         if (this._parent === null) {
           return Matrix44.identity();
         }
-        return this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
+
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
+          this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._invMatrixAccumulatedAncestry;
       }
     }, {
       key: 'rotateMatrixAccumulatedAncestry',
@@ -1443,7 +1473,6 @@
         this.removeChild(element);
         this._children.push(element);
         element._parent = this;
-        element._dirtyAsAncestry = true;
       }
     }, {
       key: 'removeChild',
@@ -1451,7 +1480,6 @@
         this._children = this._children.filter(function (elem) {
           if (elem === element) {
             element._parent = null;
-            element._dirtyAsAncestry = true;
           }
           return elem !== element;
         });
