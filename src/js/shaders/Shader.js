@@ -143,11 +143,6 @@ export default class Shader {
     });
 
 
-    // Uniform modelViewProjectionMatrix
-    if (existCamera_f) {
-      shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
-    }
-
     // begin of main function
     shaderText +=   'void main(void) {\n';
 
@@ -232,6 +227,7 @@ export default class Shader {
 
   VSDefine(in_, out_, f) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
+    shaderText +=      'uniform mat4 modelViewProjectionMatrix;';
     return shaderText;
   }
   VSTransform(existCamera_f, f) {
@@ -249,11 +245,12 @@ export default class Shader {
 
   FSDefine(in_, f) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
+    shaderText +=      'uniform float opacity;';
     return shaderText;
   }
 
   FSShading(f, gl) {
-    var shaderText =   `rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n`;
+    var shaderText =   `rt1 = vec4(1.0, 1.0, 1.0, opacity);\n`;
     return shaderText;
   }
 
@@ -281,6 +278,7 @@ export default class Shader {
     if (existCamera_f) {
       shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
     }
+    shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
 
     return 'position';
   }

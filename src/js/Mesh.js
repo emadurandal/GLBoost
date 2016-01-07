@@ -21,8 +21,8 @@ export default class Mesh extends Element {
     }
   }
 
-  draw(lights, camera) {
-    this._geometry.draw(lights, camera, this);
+  draw(lights, camera, scene) {
+    this._geometry.draw(lights, camera, this, scene);
   }
 
   set geometry(geometry) {

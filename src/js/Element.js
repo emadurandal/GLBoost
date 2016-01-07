@@ -16,6 +16,7 @@ export default class Element {
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+    this.opacity = 1.0;
 
     this._setName();
   }
@@ -178,6 +179,26 @@ export default class Element {
 
   get inverseTransformMatrixAccumulatedAncestry() {
     return this._multiplyMyAndParentTransformMatrices(this, true).invert();
+  }
+
+  _accumulateMyAndParentOpacity(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.opacity;
+    } else {
+      return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
+    }
+  }
+
+  get opacityAccumulatedAncestry() {
+    return this._accumulateMyAndParentOpacity(this);
+  }
+
+  set opacity(opacity) {
+    this._opacity = opacity;
+  }
+
+  get opacity() {
+    return this._opacity;
   }
 
   set dirty(flg) {

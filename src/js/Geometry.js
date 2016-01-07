@@ -18,7 +18,6 @@ export default class Geometry {
     this._glslProgram = null;
     this._vertices = null;
     this._vertexAttribComponentNDic = {};
-    //this._shader_for_non_material = new SimpleShader(this._canvas);
     this._defaultMaterial = new ClassicMaterial(this._canvas);
 
     this._setName();
@@ -234,7 +233,7 @@ export default class Geometry {
     return true;
   }
 
-  draw(lights, camera, mesh) {
+  draw(lights, camera, mesh, scene) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
 
@@ -268,6 +267,9 @@ export default class Geometry {
             this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
           }
         }
+
+        let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+        gl.uniform1f(glslProgram.opacity, opacity);
 
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
@@ -355,6 +357,9 @@ export default class Geometry {
           this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
         }
       }
+
+      let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+      gl.uniform1f(glslProgram.opacity, opacity);
 
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();

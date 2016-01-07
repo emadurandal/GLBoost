@@ -1187,6 +1187,7 @@
       this._updateCountAsElement = 0;
       this._accumulatedAncestryNameWithUpdateInfoString = '';
       this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+      this.opacity = 1.0;
 
       this._setName();
     }
@@ -1245,6 +1246,15 @@
             currentMatrix = currentElem.transformMatrix;
           }
           return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
+        }
+      }
+    }, {
+      key: '_accumulateMyAndParentOpacity',
+      value: function _accumulateMyAndParentOpacity(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.opacity;
+        } else {
+          return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
         }
       }
     }, {
@@ -1367,6 +1377,19 @@
         return this._multiplyMyAndParentTransformMatrices(this, true).invert();
       }
     }, {
+      key: 'opacityAccumulatedAncestry',
+      get: function get() {
+        return this._accumulateMyAndParentOpacity(this);
+      }
+    }, {
+      key: 'opacity',
+      set: function set(opacity) {
+        this._opacity = opacity;
+      },
+      get: function get() {
+        return this._opacity;
+      }
+    }, {
       key: 'dirty',
       set: function set(flg) {
         this._dirtyAsElement = flg;
@@ -1415,8 +1438,8 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera) {
-        this._geometry.draw(lights, camera, this);
+      value: function draw(lights, camera, scene) {
+        this._geometry.draw(lights, camera, this, scene);
       }
     }, {
       key: 'geometry',
@@ -2051,11 +2074,6 @@
           }
         });
 
-        // Uniform modelViewProjectionMatrix
-        if (existCamera_f) {
-          shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
-        }
-
         // begin of main function
         shaderText += 'void main(void) {\n';
 
@@ -2138,6 +2156,7 @@
       key: 'VSDefine',
       value: function VSDefine(in_, out_, f) {
         var shaderText = in_ + ' vec3 aVertex_position;\n';
+        shaderText += 'uniform mat4 modelViewProjectionMatrix;';
         return shaderText;
       }
     }, {
@@ -2160,12 +2179,13 @@
       key: 'FSDefine',
       value: function FSDefine(in_, f) {
         var shaderText = in_ + ' vec3 aVertex_position;\n';
+        shaderText += 'uniform float opacity;';
         return shaderText;
       }
     }, {
       key: 'FSShading',
       value: function FSShading(f, gl) {
-        var shaderText = 'rt1 = vec4(1.0, 1.0, 1.0, 1.0);\n';
+        var shaderText = 'rt1 = vec4(1.0, 1.0, 1.0, opacity);\n';
         return shaderText;
       }
     }, {
@@ -2196,6 +2216,7 @@
         if (existCamera_f) {
           shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
         }
+        shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
 
         return 'position';
       }
@@ -2539,7 +2560,7 @@
         var shaderText = '';
         var textureFunc = Shader._texture_func(gl);
         if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  rt1 = color;\n';
+          shaderText += '  rt1 *= color;\n';
         }
         shaderText += '    rt1 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -2741,7 +2762,6 @@
       this._glslProgram = null;
       this._vertices = null;
       this._vertexAttribComponentNDic = {};
-      //this._shader_for_non_material = new SimpleShader(this._canvas);
       this._defaultMaterial = new ClassicMaterial(this._canvas);
 
       this._setName();
@@ -2972,7 +2992,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, mesh) {
+      value: function draw(lights, camera, mesh, scene) {
         var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
 
@@ -3006,6 +3026,9 @@
                 this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
               }
             }
+
+            var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+            gl.uniform1f(glslProgram.opacity, opacity);
 
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
@@ -3093,6 +3116,9 @@
               this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
             }
           }
+
+          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+          gl.uniform1f(glslProgram.opacity, opacity);
 
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
@@ -3408,7 +3434,7 @@
           glem.drawBuffers(gl, [gl.BACK]);
 
           scene.meshes.forEach(function (mesh) {
-            mesh.draw(lights, camera);
+            mesh.draw(lights, camera, scene);
           });
         } else {
           // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
@@ -3430,7 +3456,7 @@
             }
 
             meshes.forEach(function (mesh) {
-              mesh.draw(lights, camera);
+              mesh.draw(lights, camera, scene);
             });
 
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);

@@ -29,43 +29,40 @@ var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, gree
 var scene = new GLBoost.Scene();
 
 var material = new GLBoost.ClassicMaterial('#world');
-material.shader = new GLBoost.PhongShader('#world');
 var texture = new GLBoost.Texture('resouces/texture.png', '#world');
 material.diffuseTexture = texture;
 
-
-var group = new GLBoost.Group();
+var group1 = new GLBoost.Group();
 var group2 = new GLBoost.Group();
-var group3 = new GLBoost.Group();
-group2.rotate = new GLBoost.Vector3(0, 0.5, 0);
-group.translate = new GLBoost.Vector3(20, 0, 0);
-group3.scale = new GLBoost.Vector3(2, 2, 2);
 
-var planeGeometry = new GLBoost.Plane(10, 10, 10, 10, null, '#world');
-var plane = new GLBoost.Mesh(planeGeometry, material);
-group3.addChild( plane );
+var planeGeometry = new GLBoost.Plane(1, 1, 1, 1, null, '#world');
+var cube0 = new GLBoost.Mesh(planeGeometry, material);
+cube0.translate = new GLBoost.Vector3(-3, 0, 0);
+cube0.opacity = 0.5;
+group2.addChild( cube0 );
 
-var cubeGeometry = new GLBoost.Cube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1), '#world');
-var cube = new GLBoost.Mesh(cubeGeometry, material);
+var cube1 = new GLBoost.Mesh(planeGeometry, material);
+cube1.translate = new GLBoost.Vector3(-1, 0, 0);
+group2.addChild( cube1 );
+group2.opacity = 0.5;
 
-cube.translate = new GLBoost.Vector3(10, 0, 0);
+var cube2 = new GLBoost.Mesh(planeGeometry, material);
+cube2.translate = new GLBoost.Vector3(1, 0, 0);
 
-group3.addChild( cube );
-group2.addChild(group3);
-group.addChild(group2);
+group1.addChild(cube2);
+group1.addChild(group2);
+group1.opacity = 0.5;
 
-scene.add(group);
+var cube3 = new GLBoost.Mesh(planeGeometry, material);
+cube3.translate = new GLBoost.Vector3(3, 0, 0);
 
-var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(0.5, 0.5, 0.5), '#world');
-pointLight.translate = new GLBoost.Vector3(5, 1, 0);
-group3.addChild( pointLight );
-
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(0, 0, 10), new GLBoost.Vector3(1, 0, 0), '#world');
-group3.addChild( directionalLight );
+scene.add(cube3);
+scene.add(group1);
+scene.opacity = 0.5;
 
 var camera = new GLBoost.Camera(
     {
-      eye: new GLBoost.Vector4(0.0, 100, 0, 1),
+      eye: new GLBoost.Vector4(0.0, 10, 0, 1),
       center: new GLBoost.Vector3(0.0, 0.0, 0.0),
       up: new GLBoost.Vector3(0.0, 0.0, -1.0)
     },
@@ -76,17 +73,7 @@ var camera = new GLBoost.Camera(
       zFar: 300.0
     }
 );
-//scene.add( camera );
-
-
-var group4 = new GLBoost.Group();
-var group5 = new GLBoost.Group();
-group4.translate = new GLBoost.Vector3(20, 0, 0);
-group5.rotate = new GLBoost.Vector3(0, 0.5, 0);
-group4.addChild( camera );
-group5.addChild( group4 );
-
-scene.add( group5 );
+scene.add( camera );
 
 scene.prepareForRender();
 
@@ -95,9 +82,6 @@ var render = function(){
   renderer.clearCanvas();
   renderer.draw(scene);
 
-//  var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
-//  var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-//  camera.eye = rotatedVector;
 
   requestAnimationFrame(render);
 };

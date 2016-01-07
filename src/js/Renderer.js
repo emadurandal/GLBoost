@@ -62,7 +62,7 @@ export default class Renderer {
       glem.drawBuffers(gl, [gl.BACK]);
 
       scene.meshes.forEach((mesh)=> {
-        mesh.draw(lights, camera);
+        mesh.draw(lights, camera, scene);
       });
 
     } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
@@ -84,7 +84,7 @@ export default class Renderer {
         }
 
         meshes.forEach((mesh)=> {
-          mesh.draw(lights, camera);
+          mesh.draw(lights, camera, scene);
         });
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

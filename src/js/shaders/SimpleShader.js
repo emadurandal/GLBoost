@@ -43,7 +43,7 @@ export class SimpleShaderSource {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
-      shaderText += '  rt1 = color;\n';
+      shaderText += '  rt1 *= color;\n';
     }
     shaderText += '    rt1 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
