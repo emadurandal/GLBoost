@@ -44,7 +44,7 @@ export class LambertShaderSource {
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 0.0) * surfaceColor;\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';
     //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';

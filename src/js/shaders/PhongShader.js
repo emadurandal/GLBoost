@@ -50,7 +50,7 @@ export class PhongShaderSource {
     shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
     shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
     shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
-    shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 1.0);\n';
+    shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';
     //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
