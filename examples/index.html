@@ -239,9 +239,14 @@
 		button.textContent = 'View source';
 		button.addEventListener( 'click', function ( event ) {
 
+			// "http://localhost:8086/examples/index.html#standalone/custom_shader_2"
+			// -> "http://localhost:8086/examples"
 			var array = location.href.split( '/' );
 			array.pop();
+			array.pop();
 
+			// "http://localhost:8086/examples" + "/" + "standalone/custom_shader_2" + "index.html"
+			// -> http://localhost:8086/examples/standalone/custom_shader_2/index.html
 			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '/index.html' );
 
 		}, false );
