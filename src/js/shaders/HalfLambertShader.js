@@ -46,7 +46,7 @@ export class HalfLambertShaderSource {
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
     shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 0.0) * surfaceColor;\n';
+    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '  }\n';
     //shaderText += '  rt1.a = 1.0;\n';
     //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
