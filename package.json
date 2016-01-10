@@ -10,7 +10,11 @@
     "build": "rollup -c rollup.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "esdoc": "esdoc -c esdoc.json",
-    "build-examples": "rollup -c examples/standalone/custom_shader/rollup.config.js; rollup -c examples/standalone/custom_shader_2/rollup.config.js; rollup -c examples/standalone/particles/rollup.config.js"
+    "build-examples": "npm run standalone",
+    "standalone": "npm run standalone:custom_shader && npm run standalone:custom_shader_2 && npm run standalone:particles",
+    "standalone:custom_shader": "rollup -c examples/standalone/custom_shader/rollup.config.js",
+    "standalone:custom_shader_2": "rollup -c examples/standalone/custom_shader_2/rollup.config.js",
+    "standalone:particles": "rollup -c examples/standalone/particles/rollup.config.js"
   },
   "repository": {
     "type": "git",
