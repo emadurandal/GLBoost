@@ -18,6 +18,7 @@ export default class Geometry {
     this._glslProgram = null;
     this._vertices = null;
     this._indicesArray = null;
+    this._performanceHint = null;
     this._vertexAttribComponentNDic = {};
     this._defaultMaterial = new ClassicMaterial(this._canvas);
 
@@ -69,10 +70,25 @@ export default class Geometry {
     return attribNameArray;
   }
 
-  setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES) {
+  setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
     this._indicesArray = indicesArray;
     this._primitiveType = primitiveType;
+
+    var gl = this._gl;
+    var hint = null;
+    switch (performanceHint) {
+      case GLBoost.STATIC_DRAW:
+        hint = gl.STATIC_DRAW;
+        break;
+      case GLBoost.STREAM_DRAW:
+        hint = gl.STREAM_DRAW;
+        break;
+      case GLBoost.DYNAMIC_DRAW:
+        hint = gl.DYNAMIC_DRAW;
+        break;
+    }
+    this._performanceHint = hint;
   }
 
   updateVerticesData(vertices, isAlreadyInterleaved = false) {
@@ -221,7 +237,7 @@ export default class Geometry {
       });
     });
 
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);

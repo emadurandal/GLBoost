@@ -120,6 +120,9 @@
   global.GLBoost["LINE_LOOP"] = 'LINE_LOOP';
   global.GLBoost["TRIANGLES"] = 'TRIANGLES';
   global.GLBoost["TRIANGLE_STRIP"] = 'TRIANGLE_STRIP';
+  global.GLBoost["STATIC_DRAW"] = 'STATIC_DRAW';
+  global.GLBoost["STREAM_DRAW"] = 'STREAM_DRAW';
+  global.GLBoost["DYNAMIC_DRAW"] = 'DYNAMIC_DRAW';
   global.GLBoost["BLENDTARGET1"] = 'shapetarget_1';
   global.GLBoost["BLENDTARGET2"] = 'shapetarget_2';
   global.GLBoost["BLENDTARGET3"] = 'shapetarget_3';
@@ -2762,6 +2765,7 @@
       this._glslProgram = null;
       this._vertices = null;
       this._indicesArray = null;
+      this._performanceHint = null;
       this._vertexAttribComponentNDic = {};
       this._defaultMaterial = new ClassicMaterial(this._canvas);
 
@@ -2824,10 +2828,26 @@
       key: 'setVerticesData',
       value: function setVerticesData(vertices, indicesArray) {
         var primitiveType = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.TRIANGLES : arguments[2];
+        var performanceHint = arguments.length <= 3 || arguments[3] === undefined ? GLBoost$1.STATIC_DRAW : arguments[3];
 
         this._vertices = vertices;
         this._indicesArray = indicesArray;
         this._primitiveType = primitiveType;
+
+        var gl = this._gl;
+        var hint = null;
+        switch (performanceHint) {
+          case GLBoost$1.STATIC_DRAW:
+            hint = gl.STATIC_DRAW;
+            break;
+          case GLBoost$1.STREAM_DRAW:
+            hint = gl.STREAM_DRAW;
+            break;
+          case GLBoost$1.DYNAMIC_DRAW:
+            hint = gl.DYNAMIC_DRAW;
+            break;
+        }
+        this._performanceHint = hint;
       }
     }, {
       key: 'updateVerticesData',
@@ -2983,7 +3003,7 @@
           });
         });
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
@@ -5228,12 +5248,12 @@
      * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
 
-    function Particle(centerPointData, particleWidth, particleHeight, customVertexAttributes, canvas) {
+    function Particle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas) {
       babelHelpers.classCallCheck(this, Particle);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, canvas));
 
-      _this._setupVertexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
+      _this._setupVertexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes, performanceHint);
       return _this;
     }
 
@@ -5326,10 +5346,10 @@
       }
     }, {
       key: '_setupVertexData',
-      value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+      value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
         var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
 
-        this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost$1.TRIANGLE_STRIP);
+        this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost$1.TRIANGLE_STRIP, performanceHint);
       }
     }, {
       key: 'updateVerticesData',

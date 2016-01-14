@@ -39,7 +39,7 @@ for (let i=0; i<100; i++) {
 var particleGeometry = new GLBoost.Particle(
   {
     position: particlesPosition
-  }, 0.5, 0.5, null, '#world');
+  }, 0.5, 0.5, null, GLBoost.DYNAMIC_DRAW, '#world');
 
 var material = new GLBoost.ClassicMaterial('#world');
 var texture = new GLBoost.Texture('resouces/iceball.png', '#world');

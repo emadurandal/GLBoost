@@ -26,10 +26,10 @@ export default class Particle extends Geometry {
    * @param {Object} JSON which has other vertex attribute arrays you want
    * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
    */
-  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, canvas) {
+  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas) {
     super(canvas);
 
-    this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes);
+    this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, performanceHint);
   }
 
   _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
@@ -118,10 +118,10 @@ export default class Particle extends Geometry {
     }
   }
 
-  _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+  _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
     var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
 
-    this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost.TRIANGLE_STRIP);
+    this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost.TRIANGLE_STRIP, performanceHint);
   }
 
   updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
