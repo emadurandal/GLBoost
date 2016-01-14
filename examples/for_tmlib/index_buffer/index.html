@@ -65,9 +65,8 @@
           var mesh_1 = tm.webgl.MeshElement(geometry_1, null, '#world');
           geometry_1.setVerticesData({
             position: positions,
-            color: colors,
-            indices: [indices]
-          });
+            color: colors
+          }, [indices]);
           this.add( mesh_1 );
 
           var positions = [
@@ -90,9 +89,8 @@
           var mesh_2 = new tm.webgl.MeshElement(geometry_2, material, '#world');
           geometry_2.setVerticesData({
             position: positions,
-            texcoord: texcoords,
-            indices: [indices]
-          });
+            texcoord: texcoords
+          }, [indices]);
           this.add( mesh_2 );
 
           var camera = tm.webgl.CameraElement(

@@ -17,6 +17,8 @@ export default class Geometry {
     this._vertexN = 0;
     this._glslProgram = null;
     this._vertices = null;
+    this._indicesArray = null;
+    this._performanceHint = null;
     this._vertexAttribComponentNDic = {};
     this._defaultMaterial = new ClassicMaterial(this._canvas);
 
@@ -49,22 +51,6 @@ export default class Geometry {
           //delete vertices[GLBoost.TEXCOORD];
         }
       } else {
-        if (attribName !== 'indices') {// && attribName !== 'normal') {
-          attribNameArray.push(attribName);
-        }
-      }
-    }
-
-    return attribNameArray;
-  }
-
-  /**
-   * インデックス以外の全ての頂点属性のリストを返す
-   */
-  _allVertexAttribs(vertices) {
-    var attribNameArray = [];
-    for (var attribName in vertices) {
-      if (attribName !== 'indices') {// && attribName !== 'normal') {
         attribNameArray.push(attribName);
       }
     }
@@ -72,15 +58,64 @@ export default class Geometry {
     return attribNameArray;
   }
 
-  /*
-  _getSheder(result, existCamera_f, lights) {
-    return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
-  }
-  */
+  /**
+   * 全ての頂点属性のリストを返す
+   */
+  _allVertexAttribs(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      attribNameArray.push(attribName);
+    }
 
-  setVerticesData(vertices, primitiveType) {
+    return attribNameArray;
+  }
+
+  setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
-    this._primitiveType = (primitiveType) ? primitiveType : GLBoost.TRIANGLES;
+    this._indicesArray = indicesArray;
+    this._primitiveType = primitiveType;
+
+    var gl = this._gl;
+    var hint = null;
+    switch (performanceHint) {
+      case GLBoost.STATIC_DRAW:
+        hint = gl.STATIC_DRAW;
+        break;
+      case GLBoost.STREAM_DRAW:
+        hint = gl.STREAM_DRAW;
+        break;
+      case GLBoost.DYNAMIC_DRAW:
+        hint = gl.DYNAMIC_DRAW;
+        break;
+    }
+    this._performanceHint = hint;
+  }
+
+  updateVerticesData(vertices, isAlreadyInterleaved = false) {
+    var gl = this._gl;
+    var vertexData = [];
+    if (isAlreadyInterleaved) {
+      vertexData = vertices;
+    } else {
+      var allVertexAttribs = this._allVertexAttribs(vertices);
+      vertices.position.forEach((elem, index, array) => {
+        allVertexAttribs.forEach((attribName)=> {
+          var element = vertices[attribName][index];
+          vertexData.push(element.x);
+          vertexData.push(element.y);
+          if (element.z !== void 0) {
+            vertexData.push(element.z);
+          }
+          if (element.w !== void 0) {
+            vertexData.push(element.w);
+          }
+        });
+      });
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertexData));
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 
   setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
@@ -131,10 +166,9 @@ export default class Geometry {
 
   _setVertexNtoSingleMaterial(materials) {
     // if this mesh has only one material...
-    var vertices = this._vertices;
     if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
-      if (vertices.indices && vertices.indices.length > 0) {
-        materials[0].setVertexN(this, vertices.indices[0].length);
+      if (this._indicesArray && this._indicesArray.length > 0) {
+        materials[0].setVertexN(this, this._indicesArray[0].length);
       } else {
         materials[0].setVertexN(this, this._vertexN);
       }
@@ -149,8 +183,6 @@ export default class Geometry {
     var gl = this._gl;
 
     var glem = GLExtentionsManager.getInstance(gl);
-
-    var optimizedVertexAttribs = null;
 
     this._vertexN = vertices.position.length;
 
@@ -171,6 +203,7 @@ export default class Geometry {
     Geometry._vboDic[this.toString()] = vbo;
 
     var materials = this._materials;
+    var optimizedVertexAttribs = null;
 
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
@@ -204,27 +237,22 @@ export default class Geometry {
       });
     });
 
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    //this._ibo = [];
-    //this._indicesNArray = [];
     Geometry._iboArrayDic[this.toString()] = [];
     Geometry._idxNArrayDic[this.toString()] = [];
-    if (vertices.indices) {
+    if (this._indicesArray) {
       // create Index Buffer
-      for (let i=0; i<vertices.indices.length; i++) {
-        //this._ibo[i] = gl.createBuffer();
-        //this._indicesNArray[i] = vertices.indices[i].length;
+      for (let i=0; i<this._indicesArray.length; i++) {
         var ibo = gl.createBuffer();
-        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._indicesArray[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         Geometry._iboArrayDic[this.toString()][i] = ibo;
-        Geometry._idxNArrayDic[this.toString()][i] = vertices.indices[i].length;
+        Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
       }
     }
     glem.bindVertexArray(gl, null);

@@ -210,7 +210,7 @@
   var particleGeometry = new GLBoost.Particle({
     position: particlesPosition,
     particlesVelocity: particlesVelocity
-  }, 0.5, 0.5, null, '#world');
+  }, 0.5, 0.5, null, GLBoost.STATIC_DRAW, '#world');
 
   var material = new GLBoost.ClassicMaterial('#world');
   material.shader = new MyCustomShader('#world');
