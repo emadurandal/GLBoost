@@ -157,9 +157,8 @@ export default class Cube extends Geometry {
       position: positions,
       color: colors,
       normal: normals,
-      texcoord: texcoords,
-      indices: [indices]
-    });
+      texcoord: texcoords
+    }, [indices]);
   }
 
 }

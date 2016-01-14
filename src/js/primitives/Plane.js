@@ -70,12 +70,11 @@ export default class Plane extends Geometry {
       position: positions,
       color: colors,
       texcoord: texcoords,
-      normal: normals,
-      indices: [indices]
+      normal: normals
     };
 
     var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-    this.setVerticesData(completeAttributes, GLBoost.TRIANGLE_STRIP);
+    this.setVerticesData(completeAttributes, [indices], GLBoost.TRIANGLE_STRIP);
   }
 
 }

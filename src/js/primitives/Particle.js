@@ -32,7 +32,7 @@ export default class Particle extends Geometry {
     this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes);
   }
 
-  _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+  _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
     var indices = [];
     var positionArray = centerPointData.position;
 
@@ -106,14 +106,28 @@ export default class Particle extends Geometry {
       color: colors,
       texcoord: texcoords,
       normal: normals,
-      particleCenterPos: centerPositions,
-      indices: [indices]
+      particleCenterPos: centerPositions
     };
 
     var tempAttributes = ArrayUtil.merge(object, pointData);
     var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
-    this.setVerticesData(completeAttributes, GLBoost.TRIANGLE_STRIP);
+    return {
+      vertexAttributes: completeAttributes,
+      indexArray: [indices]
+    }
+  }
+
+  _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+    var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
+
+    this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost.TRIANGLE_STRIP);
+  }
+
+  updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
+    var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes);
+
+    super.updateVerticesData(result.vertexAttributes);
   }
 
   prepareForRender(existCamera_f, pointLight, meshMaterial) {

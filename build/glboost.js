@@ -2761,6 +2761,7 @@
       this._vertexN = 0;
       this._glslProgram = null;
       this._vertices = null;
+      this._indicesArray = null;
       this._vertexAttribComponentNDic = {};
       this._defaultMaterial = new ClassicMaterial(this._canvas);
 
@@ -2798,10 +2799,7 @@
               //delete vertices[GLBoost.TEXCOORD];
             }
           } else {
-              if (attribName !== 'indices') {
-                // && attribName !== 'normal') {
-                attribNameArray.push(attribName);
-              }
+              attribNameArray.push(attribName);
             }
         }
 
@@ -2809,7 +2807,7 @@
       }
 
       /**
-       * インデックス以外の全ての頂点属性のリストを返す
+       * 全ての頂点属性のリストを返す
        */
 
     }, {
@@ -2817,26 +2815,49 @@
       value: function _allVertexAttribs(vertices) {
         var attribNameArray = [];
         for (var attribName in vertices) {
-          if (attribName !== 'indices') {
-            // && attribName !== 'normal') {
-            attribNameArray.push(attribName);
-          }
+          attribNameArray.push(attribName);
         }
 
         return attribNameArray;
       }
-
-      /*
-      _getSheder(result, existCamera_f, lights) {
-        return this._shader_for_non_material.getShaderProgram(result, existCamera_f, lights);
-      }
-      */
-
     }, {
       key: 'setVerticesData',
-      value: function setVerticesData(vertices, primitiveType) {
+      value: function setVerticesData(vertices, indicesArray) {
+        var primitiveType = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.TRIANGLES : arguments[2];
+
         this._vertices = vertices;
-        this._primitiveType = primitiveType ? primitiveType : GLBoost$1.TRIANGLES;
+        this._indicesArray = indicesArray;
+        this._primitiveType = primitiveType;
+      }
+    }, {
+      key: 'updateVerticesData',
+      value: function updateVerticesData(vertices) {
+        var isAlreadyInterleaved = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+        var gl = this._gl;
+        var vertexData = [];
+        if (isAlreadyInterleaved) {
+          vertexData = vertices;
+        } else {
+          var allVertexAttribs = this._allVertexAttribs(vertices);
+          vertices.position.forEach(function (elem, index, array) {
+            allVertexAttribs.forEach(function (attribName) {
+              var element = vertices[attribName][index];
+              vertexData.push(element.x);
+              vertexData.push(element.y);
+              if (element.z !== void 0) {
+                vertexData.push(element.z);
+              }
+              if (element.w !== void 0) {
+                vertexData.push(element.w);
+              }
+            });
+          });
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertexData));
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
       }
     }, {
       key: 'setUpVertexAttribs',
@@ -2893,10 +2914,9 @@
       key: '_setVertexNtoSingleMaterial',
       value: function _setVertexNtoSingleMaterial(materials) {
         // if this mesh has only one material...
-        var vertices = this._vertices;
         if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
-          if (vertices.indices && vertices.indices.length > 0) {
-            materials[0].setVertexN(this, vertices.indices[0].length);
+          if (this._indicesArray && this._indicesArray.length > 0) {
+            materials[0].setVertexN(this, this._indicesArray[0].length);
           } else {
             materials[0].setVertexN(this, this._vertexN);
           }
@@ -2912,8 +2932,6 @@
         var gl = this._gl;
 
         var glem = GLExtentionsManager.getInstance(gl);
-
-        var optimizedVertexAttribs = null;
 
         this._vertexN = vertices.position.length;
 
@@ -2934,6 +2952,7 @@
         Geometry._vboDic[this.toString()] = vbo;
 
         var materials = this._materials;
+        var optimizedVertexAttribs = null;
 
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
@@ -2968,22 +2987,17 @@
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        //this._ibo = [];
-        //this._indicesNArray = [];
         Geometry._iboArrayDic[this.toString()] = [];
         Geometry._idxNArrayDic[this.toString()] = [];
-        if (vertices.indices) {
+        if (this._indicesArray) {
           // create Index Buffer
-          for (var i = 0; i < vertices.indices.length; i++) {
-            //this._ibo[i] = gl.createBuffer();
-            //this._indicesNArray[i] = vertices.indices[i].length;
+          for (var i = 0; i < this._indicesArray.length; i++) {
             var ibo = gl.createBuffer();
-            //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertices.indices[i]), gl.STATIC_DRAW);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this._indicesArray[i]), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             Geometry._iboArrayDic[this.toString()][i] = ibo;
-            Geometry._idxNArrayDic[this.toString()][i] = vertices.indices[i].length;
+            Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
           }
         }
         glem.bindVertexArray(gl, null);
@@ -4709,9 +4723,8 @@
         geometry.setVerticesData({
           position: positions,
           texcoord: texcoords,
-          normal: normals,
-          indices: indices
-        });
+          normal: normals
+        }, indices);
 
         return mesh;
       }
@@ -5080,12 +5093,11 @@
           position: positions,
           color: colors,
           texcoord: texcoords,
-          normal: normals,
-          indices: [indices]
+          normal: normals
         };
 
         var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-        this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
+        this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
       }
     }]);
     return Plane;
@@ -5144,9 +5156,8 @@
           position: positions,
           color: colors,
           normal: normals,
-          texcoord: texcoords,
-          indices: [indices]
-        });
+          texcoord: texcoords
+        }, [indices]);
       }
     }]);
     return Cube;
@@ -5227,8 +5238,8 @@
     }
 
     babelHelpers.createClass(Particle, [{
-      key: '_setupVertexData',
-      value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+      key: '_setupVertexAndIndexData',
+      value: function _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
         var indices = [];
         var positionArray = centerPointData.position;
 
@@ -5302,14 +5313,30 @@
           color: colors,
           texcoord: texcoords,
           normal: normals,
-          particleCenterPos: centerPositions,
-          indices: [indices]
+          particleCenterPos: centerPositions
         };
 
         var tempAttributes = ArrayUtil.merge(object, pointData);
         var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
-        this.setVerticesData(completeAttributes, GLBoost$1.TRIANGLE_STRIP);
+        return {
+          vertexAttributes: completeAttributes,
+          indexArray: [indices]
+        };
+      }
+    }, {
+      key: '_setupVertexData',
+      value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+        var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
+
+        this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost$1.TRIANGLE_STRIP);
+      }
+    }, {
+      key: 'updateVerticesData',
+      value: function updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
+        var result = this._setupVertexAndIndexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
+
+        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'updateVerticesData', this).call(this, result.vertexAttributes);
       }
     }, {
       key: 'prepareForRender',

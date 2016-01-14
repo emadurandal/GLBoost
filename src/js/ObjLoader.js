@@ -327,9 +327,8 @@ export default class ObjLoader {
     geometry.setVerticesData({
       position: positions,
       texcoord: texcoords,
-      normal: normals,
-      indices: indices
-    });
+      normal: normals
+    }, indices);
 
     return mesh;
   }
