@@ -2882,6 +2882,8 @@
     }, {
       key: 'updateVerticesData',
       value: function updateVerticesData(vertices) {
+        var _this = this;
+
         var isAlreadyInterleaved = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
 
         var gl = this._gl;
@@ -2891,9 +2893,9 @@
         } else {
           this._vertices = ArrayUtil.merge(this._vertices, vertices);
           var allVertexAttribs = this._allVertexAttribs(this._vertices);
-          vertices.position.forEach(function (elem, index, array) {
+          this._vertices.position.forEach(function (elem, index, array) {
             allVertexAttribs.forEach(function (attribName) {
-              var element = vertices[attribName][index];
+              var element = _this._vertices[attribName][index];
               vertexData.push(element.x);
               vertexData.push(element.y);
               if (element.z !== void 0) {
@@ -2913,13 +2915,13 @@
     }, {
       key: 'setUpVertexAttribs',
       value: function setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
-        var _this = this;
+        var _this2 = this;
 
         var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
         var stride = 0;
         _allVertexAttribs.forEach(function (attribName) {
-          stride += _this._vertexAttribComponentNDic[attribName] * 4;
+          stride += _this2._vertexAttribComponentNDic[attribName] * 4;
         });
 
         // 頂点レイアウト設定
@@ -2927,15 +2929,15 @@
         _allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
             gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this2._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
           }
-          offset += _this._vertexAttribComponentNDic[attribName] * 4;
+          offset += _this2._vertexAttribComponentNDic[attribName] * 4;
         });
       }
     }, {
       key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
       value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, existCamera_f, lights) {
-        var _this2 = this;
+        var _this3 = this;
 
         var gl = this._gl;
         var vertices = this._vertices;
@@ -2947,7 +2949,7 @@
 
         var allVertexAttribs = this._allVertexAttribs(vertices);
         allVertexAttribs.forEach(function (attribName) {
-          _this2._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
+          _this3._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
         });
 
         var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights);

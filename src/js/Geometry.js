@@ -100,9 +100,9 @@ export default class Geometry {
     } else {
       this._vertices = ArrayUtil.merge(this._vertices, vertices);
       var allVertexAttribs = this._allVertexAttribs(this._vertices);
-      vertices.position.forEach((elem, index, array) => {
+      this._vertices.position.forEach((elem, index, array) => {
         allVertexAttribs.forEach((attribName)=> {
-          var element = vertices[attribName][index];
+          var element = this._vertices[attribName][index];
           vertexData.push(element.x);
           vertexData.push(element.y);
           if (element.z !== void 0) {
