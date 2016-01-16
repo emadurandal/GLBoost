@@ -8,6 +8,7 @@ import SimpleShader from './shaders/SimpleShader'
 import ClassicMaterial from './ClassicMaterial'
 import PointLight from './lights/PointLight'
 import DirectionalLight from './lights/DirectionalLight'
+import ArrayUtil from './misc/ArrayUtil'
 
 export default class Geometry {
   constructor(canvas) {
@@ -97,7 +98,8 @@ export default class Geometry {
     if (isAlreadyInterleaved) {
       vertexData = vertices;
     } else {
-      var allVertexAttribs = this._allVertexAttribs(vertices);
+      this._vertices = ArrayUtil.merge(this._vertices, vertices);
+      var allVertexAttribs = this._allVertexAttribs(this._vertices);
       vertices.position.forEach((elem, index, array) => {
         allVertexAttribs.forEach((attribName)=> {
           var element = vertices[attribName][index];

@@ -2511,6 +2511,36 @@
   Shader._instances = new Object();
   Shader._shaderHashTable = {};
 
+  var ArrayUtil = (function () {
+    function ArrayUtil() {
+      babelHelpers.classCallCheck(this, ArrayUtil);
+    }
+
+    babelHelpers.createClass(ArrayUtil, null, [{
+      key: 'merge',
+      value: function merge() {
+        var key,
+            result = false;
+        if (arguments && arguments.length > 0) {
+          result = [];
+          for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
+              for (key in arguments[i]) {
+                if (isFinite(key)) {
+                  result.push(arguments[i][key]);
+                } else {
+                  result[key] = arguments[i][key];
+                }
+              }
+            }
+          }
+        }
+        return result;
+      }
+    }]);
+    return ArrayUtil;
+  })();
+
   var SimpleShaderSource = (function () {
     function SimpleShaderSource() {
       babelHelpers.classCallCheck(this, SimpleShaderSource);
@@ -2859,7 +2889,8 @@
         if (isAlreadyInterleaved) {
           vertexData = vertices;
         } else {
-          var allVertexAttribs = this._allVertexAttribs(vertices);
+          this._vertices = ArrayUtil.merge(this._vertices, vertices);
+          var allVertexAttribs = this._allVertexAttribs(this._vertices);
           vertices.position.forEach(function (elem, index, array) {
             allVertexAttribs.forEach(function (attribName) {
               var element = vertices[attribName][index];
@@ -5015,36 +5046,6 @@
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
   GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
 
-  var ArrayUtil = (function () {
-    function ArrayUtil() {
-      babelHelpers.classCallCheck(this, ArrayUtil);
-    }
-
-    babelHelpers.createClass(ArrayUtil, null, [{
-      key: 'merge',
-      value: function merge() {
-        var key,
-            result = false;
-        if (arguments && arguments.length > 0) {
-          result = [];
-          for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
-              for (key in arguments[i]) {
-                if (isFinite(key)) {
-                  result.push(arguments[i][key]);
-                } else {
-                  result[key] = arguments[i][key];
-                }
-              }
-            }
-          }
-        }
-        return result;
-      }
-    }]);
-    return ArrayUtil;
-  })();
-
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
 
@@ -5259,7 +5260,7 @@
 
     babelHelpers.createClass(Particle, [{
       key: '_setupVertexAndIndexData',
-      value: function _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+      value: function _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
         var indices = [];
         var positionArray = centerPointData.position;
 
@@ -5292,14 +5293,6 @@
           centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
         }
 
-        var colors = [];
-        var vertexColor = new Vector4(1, 1, 1, 1);
-        for (var i = 0; i < positionArray.length; i++) {
-          for (var j = 0; j < 4; j++) {
-            colors.push(vertexColor);
-          }
-        }
-
         var texcoords = [];
         for (var i = 0; i < positionArray.length; i++) {
           texcoords.push(new Vector2(0, 0));
@@ -5330,11 +5323,21 @@
 
         var object = {
           position: positions,
-          color: colors,
           texcoord: texcoords,
           normal: normals,
           particleCenterPos: centerPositions
         };
+
+        if (needDefaultWhiteColor) {
+          var colors = [];
+          var vertexColor = new Vector4(1, 1, 1, 1);
+          for (var i = 0; i < positionArray.length; i++) {
+            for (var j = 0; j < 4; j++) {
+              colors.push(vertexColor);
+            }
+          }
+          object.color = colors;
+        }
 
         var tempAttributes = ArrayUtil.merge(object, pointData);
         var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
@@ -5347,14 +5350,14 @@
     }, {
       key: '_setupVertexData',
       value: function _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
-        var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
+        var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, true);
 
         this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost$1.TRIANGLE_STRIP, performanceHint);
       }
     }, {
       key: 'updateVerticesData',
       value: function updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
-        var result = this._setupVertexAndIndexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes);
+        var result = this._setupVertexAndIndexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes, false);
 
         babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'updateVerticesData', this).call(this, result.vertexAttributes);
       }

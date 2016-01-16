@@ -32,7 +32,7 @@ export default class Particle extends Geometry {
     this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, performanceHint);
   }
 
-  _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes) {
+  _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
     var indices = [];
     var positionArray = centerPointData.position;
 
@@ -65,14 +65,6 @@ export default class Particle extends Geometry {
       centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
     }
 
-    var colors = [];
-    var vertexColor = new Vector4(1, 1, 1, 1);
-    for (let i=0; i<positionArray.length; i++) {
-      for (let j=0; j<4; j++) {
-        colors.push(vertexColor);
-      }
-    }
-
     var texcoords = [];
     for (let i=0; i<positionArray.length; i++) {
       texcoords.push(new Vector2(0, 0));
@@ -103,11 +95,21 @@ export default class Particle extends Geometry {
 
     var object = {
       position: positions,
-      color: colors,
       texcoord: texcoords,
       normal: normals,
       particleCenterPos: centerPositions
     };
+
+    if (needDefaultWhiteColor) {
+      var colors = [];
+      var vertexColor = new Vector4(1, 1, 1, 1);
+      for (let i=0; i<positionArray.length; i++) {
+        for (let j=0; j<4; j++) {
+          colors.push(vertexColor);
+        }
+      }
+      object.color = colors;
+    }
 
     var tempAttributes = ArrayUtil.merge(object, pointData);
     var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
@@ -119,13 +121,13 @@ export default class Particle extends Geometry {
   }
 
   _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
-    var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes);
+    var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, true);
 
     this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost.TRIANGLE_STRIP, performanceHint);
   }
 
   updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
-    var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes);
+    var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
 
     super.updateVerticesData(result.vertexAttributes);
   }
