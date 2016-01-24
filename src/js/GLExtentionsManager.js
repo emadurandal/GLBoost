@@ -18,6 +18,8 @@ export default class GLExtentionsManager {
       gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") ||
       gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
 
+    this._extEIUI = gl.getExtension("OES_element_index_uint");
+
     GLExtentionsManager._instance = this;
   }
   static getInstance(gl) {
