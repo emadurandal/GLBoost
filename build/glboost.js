@@ -330,9 +330,10 @@
       key: "normalize",
       value: function normalize(vec3) {
         var length = vec3.length();
-        vec3.divide(length);
+        var newVec = new Vector3(vec3.x, vec3.y, vec3.z);
+        newVec.divide(length);
 
-        return vec3;
+        return newVec;
       }
     }, {
       key: "add",
@@ -5189,6 +5190,95 @@
   })(Geometry);
 
   GLBoost$1["Cube"] = Cube;
+
+  var Sphere = (function (_Geometry) {
+    babelHelpers.inherits(Sphere, _Geometry);
+
+    function Sphere(radius, widthSegments, heightSegments, customVertexAttributes, canvas) {
+      babelHelpers.classCallCheck(this, Sphere);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sphere).call(this, canvas));
+
+      _this._setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes);
+      return _this;
+    }
+
+    babelHelpers.createClass(Sphere, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes) {
+
+        // See below:
+        // WebGL Lesson 11 - spheres, rotation matrices, and mouse events
+        // http://learningwebgl.com/blog/?p=1253
+        //
+        var positions = [];
+        var texcoords = [];
+        var colors = [];
+        var normals = [];
+        var vertexColor = new Vector4(1, 1, 1, 1);
+
+        for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
+          var theta = latNumber * Math.PI / heightSegments;
+          var sinTheta = Math.sin(theta);
+          var cosTheta = Math.cos(theta);
+
+          for (var longNumber = 0; longNumber <= widthSegments; longNumber++) {
+            var phi = longNumber * 2 * Math.PI / widthSegments;
+            var sinPhi = Math.sin(phi);
+            var cosPhi = Math.cos(phi);
+
+            var x = radius * cosPhi * sinTheta;
+            var y = radius * cosTheta;
+            var z = radius * sinPhi * sinTheta;
+            var position = new Vector3(x, y, z);
+            positions.push(position);
+            var u = 1 - longNumber / widthSegments;
+            var v = 1 - latNumber / heightSegments;
+            texcoords.push(new Vector2(u, v));
+            colors.push(vertexColor);
+            normals.push(Vector3.normalize(position));
+          }
+        }
+
+        // first    first+1
+        //    +-------+
+        //    |     / |
+        //    |   /   |
+        //    | /     |
+        //    +-------+
+        // second   second+1
+        //
+        var indices = [];
+        for (var latNumber = 0; latNumber < heightSegments; latNumber++) {
+          for (var longNumber = 0; longNumber < widthSegments; longNumber++) {
+            var first = latNumber * (widthSegments + 1) + longNumber;
+            var second = first + widthSegments + 1;
+
+            indices.push(first + 1);
+            indices.push(second);
+            indices.push(first);
+
+            indices.push(first + 1);
+            indices.push(second + 1);
+            indices.push(second);
+          }
+        }
+
+        var object = {
+          position: positions,
+          color: colors,
+          texcoord: texcoords,
+          normal: normals
+        };
+
+        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+        this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLES);
+      }
+    }]);
+    return Sphere;
+  })(Geometry);
+
+  GLBoost$1["Sphere"] = Sphere;
 
   var ParticleShaderSource = (function () {
     function ParticleShaderSource() {

@@ -105,9 +105,10 @@ export default class Vector3 {
    */
   static normalize(vec3) {
     var length = vec3.length();
-    vec3.divide(length);
+    var newVec = new Vector3(vec3.x, vec3.y, vec3.z);
+    newVec.divide(length);
 
-    return vec3;
+    return newVec;
   }
 
   /**
