@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Primitive Sphere example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+<!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>-->
+  <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
+  <script src="../../../build/glboost.js"></script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Primitive Sphere example</p>
+</header>
+<main>
+  <canvas id="world" width="600" height="600"></canvas>
+</main>
+<script>
+
+GLBoost.TARGET_WEBGL_VERSION = 1;
+
+var stats;
+var canvas = document.getElementById("world");
+
+var renderer = new GLBoost.Renderer({
+  canvas: canvas,
+  clearColor: {
+    red: 0.0,
+    green: 0.0,
+    blue: 0.0,
+    alpha: 1
+  }
+});
+
+// 初期設定値を更新（暫定対応）
+renderer._gl.disable(renderer._gl.CULL_FACE);
+
+var scene = new GLBoost.Scene();
+
+var material = new GLBoost.ClassicMaterial('#world');
+var texture = new GLBoost.Texture('resouces/texture.png', '#world'); // earth.jpg
+material.diffuseTexture = texture;
+
+var shader = new GLBoost.PhongShader('#world');
+material.shader = shader;
+var geometry = new GLBoost.Sphere(20, 24, 24, null, "#world");
+
+var earth = new GLBoost.Mesh(geometry, material);
+scene.add(earth);
+
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), '#world');
+scene.add( directionalLight );
+
+
+var camera = new GLBoost.Camera({
+  eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
+  center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+  up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+}, {
+  fovy: 45.0,
+  aspect: 1.0,
+  zNear: 0.1,
+  zFar: 1000.0
+});
+
+scene.add(camera);
+scene.prepareForRender();
+
+var render = function() {
+  renderer.clearCanvas();
+  renderer.draw(scene);
+
+  var rotateMatrixY = GLBoost.Matrix33.rotateY(-0.02);
+  rotatedVector = rotateMatrixY.multiplyVector(camera.eye);
+  camera.eye = rotatedVector;
+
+  requestAnimationFrame(render);
+};
+
+render();
+</script>
+</body>
+</html>
