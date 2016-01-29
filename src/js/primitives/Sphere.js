@@ -26,7 +26,6 @@ export default class Sphere extends Geometry {
     var colors = [];
     var normals = [];
     var vertexColor = new Vector4(1, 1, 1, 1);
-    var normal = new Vector3(0, 1, 0);
 
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
       var theta = latNumber * Math.PI / heightSegments;
@@ -41,12 +40,13 @@ export default class Sphere extends Geometry {
         var x = radius * cosPhi * sinTheta;
         var y = radius * cosTheta;
         var z = radius * sinPhi * sinTheta;
-        positions.push(new Vector3(x, y, z));
+        var position = new Vector3(x, y, z);
+        positions.push(position);
         var u = 1 - (longNumber / widthSegments);
         var v = 1 - (latNumber / heightSegments);
         texcoords.push(new Vector2(u, v));
         colors.push(vertexColor);
-        normals.push(normal);
+        normals.push(Vector3.normalize(position));
       }
     }
     
