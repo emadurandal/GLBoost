@@ -5,6 +5,13 @@
 		<title>GLBoost.js / examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+			.clearfix:after {
+				content: ".";
+				display: block;
+				height: 0;
+				clear: both;
+				visibility: hidden;
+			}
 
 			html {
 				height: 100%;
@@ -37,6 +44,14 @@
 				color: #2194CE;
 				text-decoration: none;
 			}
+			#webgl-version-selector a, #webgl-version-selector span {
+				display: block;
+				float: left;
+				padding: 2px;
+				border-color: rgba(0,0,0,0);
+				border-style: solid;
+				border-width: 2px;
+			}
 
 			#panel {
 				position: fixed;
@@ -47,7 +62,7 @@
 				background: #fafafa;
 			}
 
-				#panel #content {
+				#panel #content, #panel #webgl-version-selector {
 					padding: 0px 20px;
 				}
 
@@ -61,9 +76,9 @@
 					color: #ff0000;
 				}
 
-					#panel #content .link:hover {
-						text-decoration: underline;
-					}
+				#panel #content .link:hover {
+					text-decoration: underline;
+				}
 
 			#viewer {
 				position: absolute;
@@ -122,7 +137,7 @@
 					margin-top: 20px;
 					margin-bottom: 20px;
 				}
-				#panel{
+				#panel {
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -133,7 +148,7 @@
 					overflow: hidden;
 					border-bottom: 1px solid #dedede;
 				}
-				#content{
+				#content {
 					position: absolute;
 					left: 0;
 					top: 60px;
@@ -169,11 +184,53 @@
 				<span></span>
 				<span></span>
 			</a>
+			<div id="webgl-version-selector" class="clearfix">
+				<a href="javascript:void(0)" id="button-webgl-1">WebGL 1</a><span>&nbsp;/&nbsp;</span><a id="button-webgl-2" href="javascript:void(0)">WebGL 2</a>
+			</div>
 			<div id="content"></div>
 		</div>
 		<iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
 
 		<script>
+		var webgl2Str = '?webglver=2';
+
+		var button_webgl_1 = document.getElementById('button-webgl-1');
+		var button_webgl_2 = document.getElementById('button-webgl-2');
+
+		var borderWebgl_1 = function() {
+			button_webgl_1.style.borderColor = "rgba(0,0,0,0.5)";
+			button_webgl_2.style.borderColor = "rgba(0,0,0,0)";
+		};
+		var borderWebgl_2 = function() {
+			button_webgl_1.style.borderColor = "rgba(0,0,0,0)";
+			button_webgl_2.style.borderColor = "rgba(0,0,0,0.5)";
+		};
+
+		button_webgl_1.addEventListener('click', function(){
+			window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + window.location.hash;
+			borderWebgl_1();
+		});
+		button_webgl_2.addEventListener('click', function(){
+			window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + webgl2Str + window.location.hash;
+			borderWebgl_2();
+		});
+
+		var arg = new Object;
+		var argStr = location.href.split('?')[1];
+		if (argStr) {
+			argStr = argStr.split('#')[0];
+			var pair = argStr.split('&');
+			for(var i=0; pair[i]; i++) {
+				var kv = pair[i].split('=');
+				arg[kv[0]] = kv[1];
+			}
+		}
+
+		if (arg.webglver === '2') {
+			borderWebgl_2();
+		} else {
+			borderWebgl_1();
+		}
 
 		var files = {
 			"for_phina": [
@@ -208,8 +265,6 @@
 				"update_particles"
 			]
 		};
-
-		//
 
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
@@ -298,8 +353,10 @@
 
 			divs[ file ].className = 'link selected';
 
+			var verArg = (arg.webglver === '2') ? webgl2Str : '';
+			window.location.href = window.location.href + verArg;
 			window.location.hash = file;
-			viewer.src = file + '/index.html';
+			viewer.src = file + '/index.html' + verArg;
 			viewer.focus();
 
 			button.style.display = '';
@@ -310,7 +367,7 @@
 
 		if ( window.location.hash !== '' ) {
 
-			load( window.location.hash.substring( 1 ) );
+			load( window.location.hash.substring(1).split('?')[0]);
 
 		}
 

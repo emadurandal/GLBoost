@@ -80,6 +80,15 @@
   };
 
   babelHelpers;
+  var arg = new Object();
+  var pair = location.search.substring(1).split('&');
+  for (var i = 0; pair[i]; i++) {
+    var kv = pair[i].split('=');
+    arg[kv[0]] = kv[1];
+  }
+
+  GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+
   var canvas = document.getElementById("world");
 
   var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
@@ -109,30 +118,30 @@
     }
 
     babelHelpers.createClass(MyCustomShaderSource, [{
-      key: "VSDefine_MyCustomShaderSource",
+      key: 'VSDefine_MyCustomShaderSource',
       value: function VSDefine_MyCustomShaderSource(in_, out_, f, lights) {
         var shaderText = '';
 
-        shaderText += in_ + " vec3 aVertex_" + attributeName + ";\n";
-        shaderText += "uniform float time;\n";
+        shaderText += in_ + ' vec3 aVertex_' + attributeName + ';\n';
+        shaderText += 'uniform float time;\n';
 
         return shaderText;
       }
     }, {
-      key: "VSTransform_MyCustomShaderSource",
+      key: 'VSTransform_MyCustomShaderSource',
       value: function VSTransform_MyCustomShaderSource(existCamera_f, f, lights) {
         var shaderText = '';
-        shaderText += "  gl_Position.y = gl_Position.y + sin(time + aVertex_" + attributeName + ".y) * aVertex_" + attributeName + ".y * 0.8;\n";
-        shaderText += "  gl_Position.x = gl_Position.x + sin(time + aVertex_" + attributeName + ".x) * aVertex_" + attributeName + ".x * 0.03 * aVertex_" + attributeName + ".y;\n";
-        shaderText += "  gl_Position.z = gl_Position.z + sin(time + aVertex_" + attributeName + ".z) * aVertex_" + attributeName + ".z * 0.03 * aVertex_" + attributeName + ".y;\n";
-        shaderText += "  color.r = aVertex_" + attributeName + ".y*0.1+0.1;\n";
-        shaderText += "  color.g = aVertex_" + attributeName + ".y*0.1+0.1;\n";
-        shaderText += "  color.b = ((sin(aVertex_" + attributeName + ".b) + 1.0) * 0.5) * aVertex_" + attributeName + ".y + 0.2;\n";
+        shaderText += '  gl_Position.y = gl_Position.y + sin(time + aVertex_' + attributeName + '.y) * aVertex_' + attributeName + '.y * 0.8;\n';
+        shaderText += '  gl_Position.x = gl_Position.x + sin(time + aVertex_' + attributeName + '.x) * aVertex_' + attributeName + '.x * 0.03 * aVertex_' + attributeName + '.y;\n';
+        shaderText += '  gl_Position.z = gl_Position.z + sin(time + aVertex_' + attributeName + '.z) * aVertex_' + attributeName + '.z * 0.03 * aVertex_' + attributeName + '.y;\n';
+        shaderText += '  color.r = aVertex_' + attributeName + '.y*0.1+0.1;\n';
+        shaderText += '  color.g = aVertex_' + attributeName + '.y*0.1+0.1;\n';
+        shaderText += '  color.b = ((sin(aVertex_' + attributeName + '.b) + 1.0) * 0.5) * aVertex_' + attributeName + '.y + 0.2;\n';
 
         return shaderText;
       }
     }, {
-      key: "prepare_MyCustomShaderSource",
+      key: 'prepare_MyCustomShaderSource',
       value: function prepare_MyCustomShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
 
         var vertexAttribsAsResult = [];
@@ -164,14 +173,14 @@
     }
 
     babelHelpers.createClass(MyCustomShader, [{
-      key: "setUniforms",
+      key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(MyCustomShader.prototype), "setUniforms", this).call(this, gl, glslProgram, material);
+        babelHelpers.get(Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         gl.uniform1f(glslProgram.time, this._time);
       }
     }, {
-      key: "increaseTime",
+      key: 'increaseTime',
       value: function increaseTime(delta) {
         this._time += delta;
       }
@@ -184,7 +193,7 @@
 
   var additionalAttributes = {};
   additionalAttributes[attributeName] = [];
-  for (var i = 0; i <= vSpan; i++) {
+  for (var _i = 0; _i <= vSpan; _i++) {
     for (var j = 0; j <= uSpan; j++) {
       additionalAttributes.heightpoints.push(new GLBoost.Vector3(Math.random(), Math.random(), Math.random()));
     }
