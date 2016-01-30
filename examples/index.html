@@ -353,9 +353,18 @@
 
 			divs[ file ].className = 'link selected';
 
+			// href     : origin + pathname + verArg + '#' + file
+			//         -> "http://localhost:24198/examples/index.html?webglver=2#for_phina/blendshape"
+			//
+			// origin   : http://localhost:24198
+			// pathname : /examples/index.html
+			// verArg   : ?webglver=2
+			// file     : for_phina/blendshape
+			var origin = window.location.origin;
+			var pathname = window.location.pathname;
 			var verArg = (arg.webglver === '2') ? webgl2Str : '';
-			window.location.href = window.location.href + verArg;
-			window.location.hash = file;
+			window.location.href = origin + pathname + verArg + '#' + file;
+			
 			viewer.src = file + '/index.html' + verArg;
 			viewer.focus();
 
