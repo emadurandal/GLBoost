@@ -20,9 +20,6 @@ export default class Renderer {
     var gl = this._gl;
 
     var setDefaultGLStates = function setDefaultGLStates() {
-      gl.frontFace( gl.CCW );
-      gl.cullFace( gl.BACK );
-      gl.enable( gl.CULL_FACE );
 
       gl.enable( gl.DEPTH_TEST );
       gl.depthFunc( gl.LEQUAL );
