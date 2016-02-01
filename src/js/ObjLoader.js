@@ -38,8 +38,7 @@ export default class ObjLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          var mesh = this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString);
-          resolve(mesh);
+          this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString, resolve);
         }
       };
 
@@ -48,7 +47,7 @@ export default class ObjLoader {
     });
   }
 
-  _loadMaterialFromString(mtlString, canvas, defaultShader, basePath = '') {
+  _loadMaterialsFromString(mtlString, canvas, defaultShader, basePath = '') {
 
     var mtlTextRows = mtlString.split('\n');
 
@@ -124,28 +123,37 @@ export default class ObjLoader {
     return materials;
   }
 
-  _loadMaterialFromFile(basePath, fileName, canvas, defaultShader) {
+  _loadMaterialsFromFile(basePath, fileName, canvas, defaultShader) {
+    return new Promise((resolve, reject)=> {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = ()=> {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+          resolve(this._loadMaterialsFromString(xmlHttp.responseText, canvas, defaultShader, basePath));
+        }
+      };
 
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", basePath + fileName, false);
-    xmlHttp.send(null);
-
-    return this._loadMaterialFromString(xmlHttp.responseText, canvas, defaultShader, basePath)
+      xmlHttp.open("GET", basePath + fileName, true);
+      xmlHttp.send(null);
+    });
   }
 
-  _constructMesh(objText, basePath, canvas, defaultShader, mtlString) {
+  _constructMesh(objText, basePath, canvas, defaultShader, mtlString, resolve) {
 
     console.log(basePath);
 
     var objTextRows = objText.split('\n');
-    var materials = null;
+    var promise = null;
     let vCount = 0;
     let fCount = 0;
     let vnCount = 0;
     let vtCount = 0;
 
     if (mtlString) {
-      materials = this._loadMaterialFromString(mtlString, canvas, defaultShader);
+      promise = (()=>{
+        return new Promise((resolve, reject)=> {
+          resolve(this._loadMaterialsFromString(mtlString, canvas, defaultShader));
+        });
+      })();
     }
 
     for (let i=0; i<objTextRows.length; i++) {
@@ -155,182 +163,194 @@ export default class ObjLoader {
       }
 
       // material file
-      if (matchArray[1] === "mtllib" && mtlString === null)
-      {
-        materials = this._loadMaterialFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
-      }
-      // Vertex
-      if (matchArray[1] === "v")
-      {
-          vCount++;
-      }
-      // Vertex Normal
-      if (matchArray[1] === "vn")
-      {
-          vnCount++;
-      }
-      // Texcoord
-      if (matchArray[1] === "vt")
-      {
-          vtCount++;
-      }
-      // Face
-      if (matchArray[1] === "f")
-      {
-        matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-        if (matchArray !== null) { // if this is a Quad Polygon
-          fCount += 2;
-        } else {
-          fCount++;
-        }
+      if (matchArray[1] === "mtllib" && mtlString === null) {
+        promise = this._loadMaterialsFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
       }
     }
 
-    var pvCoord=new Array(vCount);
-    var pvNormal=new Array(vnCount);
-    var pvTexture=new Array(vtCount);
-
-    vCount = 0;
-    vnCount = 0;
-    vtCount = 0;
-
-    for (let i=0; i<objTextRows.length; i++) {
-      //キーワード 読み込み
-      let matchArray = objTextRows[i].match(/^(\w+) /);
-
-      if (matchArray === null) {
-        continue;
-      }
-
-      //頂点 読み込み
-      if (matchArray[1] === "v")
-      {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
-//          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-        pvCoord[vCount] = new Vector3();
-        pvCoord[vCount].x = parseFloat(matchArray[2]);
-        pvCoord[vCount].y = parseFloat(matchArray[3]);
-        pvCoord[vCount].z = parseFloat(matchArray[4]);
-        vCount++;
-      }
-
-      //法線 読み込み
-      if (matchArray[1] === "vn")
-      {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
-//          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-        pvNormal[vnCount] = new Vector3();
-        pvNormal[vnCount].x = parseFloat(matchArray[2]);
-        pvNormal[vnCount].y = parseFloat(matchArray[3]);
-        pvNormal[vnCount].z = parseFloat(matchArray[4]);
-        vnCount++;
-      }
-
-      //テクスチャー座標 読み込み
-      if (matchArray[1] === "vt")
-      {
-        matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
-        pvTexture[vtCount] = new Vector2();
-        pvTexture[vtCount].x = parseFloat(matchArray[2]);
-        pvTexture[vtCount].y = parseFloat(matchArray[3]);
-        pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
-
-        vtCount++;
-      }
-    }
-
-    var positions = new Array( fCount );
-    var texcoords = new Array( fCount );
-    var normals = new Array( fCount );
-    var indices = [];
-
-    var boFlag = false;
-
-    var FaceN = fCount;
-    var iFaceBufferArray = new Array(FaceN*3);
-    fCount = 0;
-    var partFCount = 0;
-
-    var geometry = new Geometry(canvas);
-
-    for(let i=0; i<materials.length; i++) {
-      partFCount = 0;
-
-      for (let j=0; (j<objTextRows.length) && (fCount < FaceN); j++) {
-        let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
-
+    promise.then((materials)=>{
+      for (let i=0; i<objTextRows.length; i++) {
+        let matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
         if (matchArray === null) {
           continue;
         }
 
-        if (matchArray[1] === "usemtl") {
-          if (matchArray[2] === materials[i].name) {
-            boFlag = true;
-          } else {
-            boFlag = false;
-          }
+        // Vertex
+        if (matchArray[1] === "v")
+        {
+          vCount++;
         }
-
-        if (matchArray[1] === "f" && boFlag) {
-          let isQuad = true;
-          let matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);   if (matchArray === null) {
-            matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-          }
-          if (matchArray === null) {
-            isQuad = false;
-          }
-
-          if(materials[i].diffuseTexture) {
-
-            if (isQuad) {
-                this._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
-            } else {
-              this._addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
-            }
-          } else {
-            if (isQuad) {
-              this._addQuadDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
-            } else {
-              this._addTriangleDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
-            }
-          }
-
-          iFaceBufferArray[partFCount*3]=fCount*3;
-          iFaceBufferArray[partFCount*3+1]=fCount*3+1;
-          iFaceBufferArray[partFCount*3+2]=fCount*3+2;
-          if (isQuad) {
-            iFaceBufferArray[partFCount*3+3]=fCount*3+3;
-            iFaceBufferArray[partFCount*3+4]=fCount*3+4;
-            iFaceBufferArray[partFCount*3+5]=fCount*3+5;
-            partFCount += 2;
+        // Vertex Normal
+        if (matchArray[1] === "vn")
+        {
+          vnCount++;
+        }
+        // Texcoord
+        if (matchArray[1] === "vt")
+        {
+          vtCount++;
+        }
+        // Face
+        if (matchArray[1] === "f")
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          if (matchArray !== null) { // if this is a Quad Polygon
             fCount += 2;
           } else {
-            partFCount++;
             fCount++;
           }
         }
       }
 
-      if (fCount === 0)//使用されていないマテリアル対策
-      {
+      var pvCoord=new Array(vCount);
+      var pvNormal=new Array(vnCount);
+      var pvTexture=new Array(vtCount);
+
+      vCount = 0;
+      vnCount = 0;
+      vtCount = 0;
+
+      for (let i=0; i<objTextRows.length; i++) {
+        //キーワード 読み込み
+        let matchArray = objTextRows[i].match(/^(\w+) /);
+
+        if (matchArray === null) {
           continue;
+        }
+
+        //頂点 読み込み
+        if (matchArray[1] === "v")
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+//          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
+          pvCoord[vCount] = new Vector3();
+          pvCoord[vCount].x = parseFloat(matchArray[2]);
+          pvCoord[vCount].y = parseFloat(matchArray[3]);
+          pvCoord[vCount].z = parseFloat(matchArray[4]);
+          vCount++;
+        }
+
+        //法線 読み込み
+        if (matchArray[1] === "vn")
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+//          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
+          pvNormal[vnCount] = new Vector3();
+          pvNormal[vnCount].x = parseFloat(matchArray[2]);
+          pvNormal[vnCount].y = parseFloat(matchArray[3]);
+          pvNormal[vnCount].z = parseFloat(matchArray[4]);
+          vnCount++;
+        }
+
+        //テクスチャー座標 読み込み
+        if (matchArray[1] === "vt")
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+          pvTexture[vtCount] = new Vector2();
+          pvTexture[vtCount].x = parseFloat(matchArray[2]);
+          pvTexture[vtCount].y = parseFloat(matchArray[3]);
+          pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
+
+          vtCount++;
+        }
       }
 
-      materials[i].setVertexN(geometry, partFCount*3);
+      var positions = new Array( fCount );
+      var texcoords = new Array( fCount );
+      var normals = new Array( fCount );
+      var indices = [];
 
-      indices[i] = iFaceBufferArray.concat();
+      var boFlag = false;
 
-    }
+      var FaceN = fCount;
+      var iFaceBufferArray = new Array(FaceN*3);
+      fCount = 0;
+      var partFCount = 0;
 
-    var mesh = new Mesh(geometry);
-    geometry.materials = materials;
-    geometry.setVerticesData({
-      position: positions,
-      texcoord: texcoords,
-      normal: normals
-    }, indices);
+      var geometry = new Geometry(canvas);
 
-    return mesh;
+      for(let i=0; i<materials.length; i++) {
+        partFCount = 0;
+
+        for (let j=0; (j<objTextRows.length) && (fCount < FaceN); j++) {
+          let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
+
+          if (matchArray === null) {
+            continue;
+          }
+
+          if (matchArray[1] === "usemtl") {
+            if (matchArray[2] === materials[i].name) {
+              boFlag = true;
+            } else {
+              boFlag = false;
+            }
+          }
+
+          if (matchArray[1] === "f" && boFlag) {
+            let isQuad = true;
+            let matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);   if (matchArray === null) {
+              matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+            }
+            if (matchArray === null) {
+              isQuad = false;
+            }
+
+            if(materials[i].diffuseTexture) {
+
+              if (isQuad) {
+                this._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              } else {
+                this._addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              }
+            } else {
+              if (isQuad) {
+                this._addQuadDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              } else {
+                this._addTriangleDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              }
+            }
+
+            iFaceBufferArray[partFCount*3]=fCount*3;
+            iFaceBufferArray[partFCount*3+1]=fCount*3+1;
+            iFaceBufferArray[partFCount*3+2]=fCount*3+2;
+            if (isQuad) {
+              iFaceBufferArray[partFCount*3+3]=fCount*3+3;
+              iFaceBufferArray[partFCount*3+4]=fCount*3+4;
+              iFaceBufferArray[partFCount*3+5]=fCount*3+5;
+              partFCount += 2;
+              fCount += 2;
+            } else {
+              partFCount++;
+              fCount++;
+            }
+          }
+        }
+
+        if (fCount === 0)//使用されていないマテリアル対策
+        {
+          continue;
+        }
+
+        materials[i].setVertexN(geometry, partFCount*3);
+
+        indices[i] = iFaceBufferArray.concat();
+
+      }
+
+      var mesh = new Mesh(geometry);
+      geometry.materials = materials;
+      geometry.setVerticesData({
+        position: positions,
+        texcoord: texcoords,
+        normal: normals
+      }, indices);
+
+      resolve(mesh);
+    }).catch(function onRejected(error){
+      console.error(error);
+    });
+
   }
 
   _addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
