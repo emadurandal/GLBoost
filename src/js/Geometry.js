@@ -140,7 +140,7 @@ export default class Geometry {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(material, existCamera_f, lights) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
     var gl = this._gl;
     var vertices = this._vertices;
 
@@ -159,24 +159,21 @@ export default class Geometry {
 
     glem.bindVertexArray(gl, null);
 
-    var materials = [material];
-    materials = this._setVertexNtoSingleMaterial(materials);
-    materials[0].glslProgram = glslProgram;
+    this._setVertexNtoSingleMaterial(material, index);
+    material.glslProgram = glslProgram;
 
-    return materials[0];
+    return material;
   }
 
-  _setVertexNtoSingleMaterial(materials) {
+  _setVertexNtoSingleMaterial(material, index) {
     // if this mesh has only one material...
-    if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
+    if (index >= 0 && material.getVertexN(this) === 0) {
       if (this._indicesArray && this._indicesArray.length > 0) {
-        materials[0].setVertexN(this, this._indicesArray[0].length);
+        material.setVertexN(this, this._indicesArray[index].length);
       } else {
-        materials[0].setVertexN(this, this._vertexN);
+        material.setVertexN(this, this._vertexN);
       }
     }
-
-    return materials;
   }
 
   prepareForRender(existCamera_f, lights, meshMaterial) {
@@ -210,13 +207,13 @@ export default class Geometry {
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
         // GLSLプログラム作成。
-        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], existCamera_f, lights);
+        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights);
         materials[i].glslProgram = material.glslProgram;
         optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
 
       }
     } else if (!meshMaterial) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, existCamera_f, lights);
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, -1, existCamera_f, lights);
       this._glslProgram = material.glslProgram;
       optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
     }

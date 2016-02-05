@@ -255,15 +255,15 @@ export default class ObjLoader {
         }
       }
 
-      var positions = new Array( fCount );
-      var texcoords = new Array( fCount );
-      var normals = new Array( fCount );
+      var positions = new Array();//new Array( fCount );
+      var texcoords = new Array();//new Array( fCount );
+      var normals = new Array();//new Array( fCount );
       var indices = [];
 
       var boFlag = false;
 
       var FaceN = fCount;
-      var iFaceBufferArray = new Array(FaceN*3);
+      var iFaceBufferArray = new Array();//new Array(FaceN*3);
       fCount = 0;
       var partFCount = 0;
 
@@ -271,6 +271,7 @@ export default class ObjLoader {
 
       for(let i=0; i<materials.length; i++) {
         partFCount = 0;
+        iFaceBufferArray.length = 0;
 
         for (let j=0; (j<objTextRows.length) && (fCount < FaceN); j++) {
           let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);

@@ -2939,7 +2939,7 @@
       }
     }, {
       key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
-      value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, existCamera_f, lights) {
+      value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
         var _this3 = this;
 
         var gl = this._gl;
@@ -2960,25 +2960,22 @@
 
         glem.bindVertexArray(gl, null);
 
-        var materials = [material];
-        materials = this._setVertexNtoSingleMaterial(materials);
-        materials[0].glslProgram = glslProgram;
+        this._setVertexNtoSingleMaterial(material, index);
+        material.glslProgram = glslProgram;
 
-        return materials[0];
+        return material;
       }
     }, {
       key: '_setVertexNtoSingleMaterial',
-      value: function _setVertexNtoSingleMaterial(materials) {
+      value: function _setVertexNtoSingleMaterial(material, index) {
         // if this mesh has only one material...
-        if (materials && materials.length === 1 && materials[0].getVertexN(this) === 0) {
+        if (index >= 0 && material.getVertexN(this) === 0) {
           if (this._indicesArray && this._indicesArray.length > 0) {
-            materials[0].setVertexN(this, this._indicesArray[0].length);
+            material.setVertexN(this, this._indicesArray[index].length);
           } else {
-            materials[0].setVertexN(this, this._vertexN);
+            material.setVertexN(this, this._vertexN);
           }
         }
-
-        return materials;
       }
     }, {
       key: 'prepareForRender',
@@ -3013,12 +3010,12 @@
         if (materials.length > 0) {
           for (var i = 0; i < materials.length; i++) {
             // GLSLプログラム作成。
-            var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], existCamera_f, lights);
+            var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights);
             materials[i].glslProgram = material.glslProgram;
             optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
           }
         } else if (!meshMaterial) {
-          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, existCamera_f, lights);
+          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, -1, existCamera_f, lights);
           this._glslProgram = material.glslProgram;
           optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
         }
@@ -4147,7 +4144,7 @@
         shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+        //shaderText += '  rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
         return shaderText;
       }
@@ -4709,15 +4706,15 @@
             }
           }
 
-          var positions = new Array(fCount);
-          var texcoords = new Array(fCount);
-          var normals = new Array(fCount);
+          var positions = new Array(); //new Array( fCount );
+          var texcoords = new Array(); //new Array( fCount );
+          var normals = new Array(); //new Array( fCount );
           var indices = [];
 
           var boFlag = false;
 
           var FaceN = fCount;
-          var iFaceBufferArray = new Array(FaceN * 3);
+          var iFaceBufferArray = new Array(); //new Array(FaceN*3);
           fCount = 0;
           var partFCount = 0;
 
@@ -4725,6 +4722,7 @@
 
           for (var i = 0; i < materials.length; i++) {
             partFCount = 0;
+            iFaceBufferArray.length = 0;
 
             for (var j = 0; j < objTextRows.length && fCount < FaceN; j++) {
               var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
