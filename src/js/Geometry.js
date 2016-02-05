@@ -167,7 +167,7 @@ export default class Geometry {
 
   _setVertexNtoSingleMaterial(material, index) {
     // if this mesh has only one material...
-    if (index >= 0 && material.getVertexN(this) === 0) {
+    if (material.getVertexN(this) === 0) {
       if (this._indicesArray && this._indicesArray.length > 0) {
         material.setVertexN(this, this._indicesArray[index].length);
       } else {
@@ -213,7 +213,7 @@ export default class Geometry {
 
       }
     } else if (!meshMaterial) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, -1, existCamera_f, lights);
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights);
       this._glslProgram = material.glslProgram;
       optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
     }

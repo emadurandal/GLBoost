@@ -17,7 +17,7 @@ export default class Mesh extends Element {
     this._geometry.prepareForRender(existCamera_f, lights, this._material);
     if (this._geometry._materials.length === 0 && this._material) {
     //if (this._material) {
-      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, -1, existCamera_f, lights);
+      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights);
     }
   }
 

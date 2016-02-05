@@ -249,7 +249,7 @@ export default class ObjLoader {
           pvTexture[vtCount] = new Vector2();
           pvTexture[vtCount].x = parseFloat(matchArray[2]);
           pvTexture[vtCount].y = parseFloat(matchArray[3]);
-          pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
+          //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
 
           vtCount++;
         }

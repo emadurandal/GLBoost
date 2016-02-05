@@ -1437,7 +1437,7 @@
         this._geometry.prepareForRender(existCamera_f, lights, this._material);
         if (this._geometry._materials.length === 0 && this._material) {
           //if (this._material) {
-          this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, existCamera_f, lights);
+          this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights);
         }
       }
     }, {
@@ -2969,7 +2969,7 @@
       key: '_setVertexNtoSingleMaterial',
       value: function _setVertexNtoSingleMaterial(material, index) {
         // if this mesh has only one material...
-        if (index >= 0 && material.getVertexN(this) === 0) {
+        if (material.getVertexN(this) === 0) {
           if (this._indicesArray && this._indicesArray.length > 0) {
             material.setVertexN(this, this._indicesArray[index].length);
           } else {
@@ -3015,7 +3015,7 @@
             optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
           }
         } else if (!meshMaterial) {
-          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, -1, existCamera_f, lights);
+          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights);
           this._glslProgram = material.glslProgram;
           optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
         }
@@ -3787,6 +3787,8 @@
         if (glem.extTFA) {
           gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this._img);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -4700,7 +4702,7 @@
               pvTexture[vtCount] = new Vector2();
               pvTexture[vtCount].x = parseFloat(matchArray[2]);
               pvTexture[vtCount].y = parseFloat(matchArray[3]);
-              pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
+              //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
 
               vtCount++;
             }
