@@ -4146,7 +4146,7 @@
         shaderText += '    rt1 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
         shaderText += '  }\n';
         //shaderText += '  rt1.a = 1.0;\n';
-        //shaderText += '  rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
 
         return shaderText;
       }
@@ -5548,5 +5548,56 @@
   })(Geometry);
 
   GLBoost$1["Particle"] = Particle;
+
+  var singleton$1 = Symbol();
+  var singletonEnforcer$1 = Symbol();
+
+  var GLTFLoader = (function () {
+    function GLTFLoader(enforcer) {
+      babelHelpers.classCallCheck(this, GLTFLoader);
+
+      if (enforcer !== singletonEnforcer$1) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+    }
+
+    babelHelpers.createClass(GLTFLoader, [{
+      key: 'loadGLTF',
+      value: function loadGLTF(url, canvas) {
+        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+
+        return new Promise(function (resolve, reject) {
+          var xmlHttp = new XMLHttpRequest();
+          xmlHttp.onreadystatechange = function () {
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+              var gotText = xmlHttp.responseText;
+              var partsOfPath = url.split('/');
+              var basePath = '';
+              for (var i = 0; i < partsOfPath.length - 1; i++) {
+                basePath += partsOfPath[i] + '/';
+              }
+              console.log(basePath);
+              //this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString, resolve);
+            }
+          };
+
+          xmlHttp.open("GET", url, true);
+          xmlHttp.send(null);
+        });
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton$1]) {
+          this[singleton$1] = new GLTFLoader(singletonEnforcer$1);
+        }
+        return this[singleton$1];
+      }
+    }]);
+    return GLTFLoader;
+  })();
+
+  GLBoost$1["GLTFLoader"] = GLTFLoader;
 
 }));

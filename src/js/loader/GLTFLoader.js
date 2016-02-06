@@ -29,6 +29,7 @@ export default class GLTFLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
+          console.log(basePath);
           //this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString, resolve);
         }
       };

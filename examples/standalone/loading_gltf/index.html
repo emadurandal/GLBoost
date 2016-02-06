@@ -55,8 +55,8 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
-var objLoader = GLBoost.ObjLoader.getInstance();
-var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world');
+var glTFLoader = GLBoost.GLTFLoader.getInstance();
+var promise = glTFLoader.loadGLTF('resouces/simple_box/simple_box.gltf', '#world');
 promise.then(function(mesh) {
 //            console.log(mesh);
 
