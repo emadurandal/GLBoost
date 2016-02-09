@@ -42,8 +42,8 @@ scene.add( pointLight );
 
 var camera = new GLBoost.Camera(
     {
-      eye: new GLBoost.Vector3(0.0, 0, 10),
-      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+      eye: new GLBoost.Vector3(0.0, 1.0, 10),
+      center: new GLBoost.Vector3(0.0, 1.0, 0.0),
       up: new GLBoost.Vector3(0.0, 1.0, 0.0)
     },
     {
@@ -57,7 +57,8 @@ scene.add( camera );
 
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/simple_box/simple_box.gltf', '#world');
+//var promise = glTFLoader.loadGLTF('resouces/simple_box/simple_box.gltf', '#world');
+var promise = glTFLoader.loadGLTF('resouces/teapot/teapot.gltf', '#world');
 promise.then(function(mesh) {
   console.log(mesh);
 
