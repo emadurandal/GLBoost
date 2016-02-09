@@ -3755,14 +3755,14 @@
 
   GLBoost$1["Scene"] = Scene;
 
-  var Vector2$1 = function Vector2(x, y) {
+  var Vector2 = function Vector2(x, y) {
     babelHelpers.classCallCheck(this, Vector2);
 
     this.x = x;
     this.y = y;
   };
 
-  GLBoost$1["Vector2"] = Vector2$1;
+  GLBoost$1["Vector2"] = Vector2;
 
   var Texture = (function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
@@ -4699,7 +4699,7 @@
             //テクスチャー座標 読み込み
             if (matchArray[1] === "vt") {
               matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
-              pvTexture[vtCount] = new Vector2$1();
+              pvTexture[vtCount] = new Vector2();
               pvTexture[vtCount].x = parseFloat(matchArray[2]);
               pvTexture[vtCount].y = parseFloat(matchArray[3]);
               //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
@@ -5123,7 +5123,7 @@
         var texcoords = [];
         for (var i = 0; i <= vSpan; i++) {
           for (var j = 0; j <= uSpan; j++) {
-            texcoords.push(new Vector2$1(j / uSpan, i / vSpan));
+            texcoords.push(new Vector2(j / uSpan, i / vSpan));
           }
         }
 
@@ -5182,7 +5182,7 @@
         // left
         new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(-widthVector.x, -widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, -widthVector.z)];
         var colors = [new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
-        var texcoords = [new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0), new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0), new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0), new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0), new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0), new Vector2$1(0.0, 0.0), new Vector2$1(1.0, 0.0), new Vector2$1(1.0, 1.0), new Vector2$1(0.0, 1.0)];
+        var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
 
         var normals = [
         // upper
@@ -5254,7 +5254,7 @@
             positions.push(position);
             var u = 1 - longNumber / widthSegments;
             var v = 1 - latNumber / heightSegments;
-            texcoords.push(new Vector2$1(u, v));
+            texcoords.push(new Vector2(u, v));
             colors.push(vertexColor);
             normals.push(Vector3.normalize(position));
           }
@@ -5409,10 +5409,10 @@
 
         var texcoords = [];
         for (var i = 0; i < positionArray.length; i++) {
-          texcoords.push(new Vector2$1(0, 0));
-          texcoords.push(new Vector2$1(0, 1));
-          texcoords.push(new Vector2$1(1, 0));
-          texcoords.push(new Vector2$1(1, 1));
+          texcoords.push(new Vector2(0, 0));
+          texcoords.push(new Vector2(0, 1));
+          texcoords.push(new Vector2(1, 0));
+          texcoords.push(new Vector2(1, 1));
         }
 
         var normals = [];
@@ -5596,17 +5596,19 @@
         for (var bufferName in json.buffers) {
           //console.log("name: " + bufferName + " data:" + );
           var bufferInfo = json.buffers[bufferName];
-          this._loadBinaryFile(basePath + bufferInfo.uri, json, canvas, resolve);
+          this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
         }
       }
     }, {
       key: '_loadBinaryFile',
-      value: function _loadBinaryFile(path, json, canvas, resolve) {
+      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, resolve) {
         var _this2 = this;
 
         var oReq = new XMLHttpRequest();
-        oReq.open("GET", path, true);
+        oReq.open("GET", binaryFilePath, true);
         oReq.responseType = "arraybuffer";
+
+        var material = new ClassicMaterial(canvas);
 
         oReq.onload = function (oEvent) {
           var arrayBuffer = oReq.response; // Note: not oReq.responseText
@@ -5617,9 +5619,8 @@
               meshJson = json.meshes[_mesh];
             }
             var primitiveJson = meshJson.primitives[0];
-
-            //
             var gl = GLContext.getInstance(canvas).gl;
+
             var indicesAccessorStr = primitiveJson.indices;
             var indices = _this2._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
 
@@ -5629,48 +5630,38 @@
             var normalsAccessorStr = primitiveJson.attributes.NORMAL;
             var normals = _this2._accessBinary(normalsAccessorStr, json, arrayBuffer, gl);
 
-            /*
-            // Index
-            let indices = [];
-            let indicesDataView = new DataView(arrayBuffer, 0, 72);
-            for (let pos = 0; pos < 72; pos += 2) {
-            //  console.log(indicesDataView.getUint16(pos, littleEndian));
-              indices.push(indicesDataView.getUint16(pos, littleEndian));
-            }
-             // Position
-            let positions = [];
-            let positionDataView = new DataView(arrayBuffer, 72, 432);
-            for (let pos = 0; pos < 432; pos += 12) {
-            //  console.log(positionDataView.getFloat32(pos, littleEndian));
-               positions.push(new Vector3(
-                  positionDataView.getFloat32(pos, littleEndian),
-                  positionDataView.getFloat32(pos+4, littleEndian),
-                  positionDataView.getFloat32(pos+8, littleEndian)
-                )
-              );
-             }
-             // Normal
-            let normals = [];
-            let normalDataView = new DataView(arrayBuffer, 72+432, 432);
-            for (let pos = 0; pos < 432; pos += 12) {
-            //  console.log(normalDataView.getFloat32(pos, littleEndian));
-              normals.push(new Vector3(
-                normalDataView.getFloat32(pos, littleEndian),
-                normalDataView.getFloat32(pos+4, littleEndian),
-                normalDataView.getFloat32(pos+8, littleEndian)
-                )
-              );
-            }
-            */
+            // Texture
+            var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+            var texcoords = null;
+            var additional = {};
+            if (texcoords0AccessorStr) {
+              texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
+              additional['texcoord'] = texcoords;
 
-            var geometry = new Geometry(canvas);
-            geometry.setVerticesData({
+              var materialStr = primitiveJson.material;
+              var materialJson = json.materials[materialStr];
+              var diffuseValue = materialJson.values.diffuse;
+              if (typeof diffuseValue === 'string') {
+                var textureStr = diffuseValue;
+                var textureJson = json.textures[textureStr];
+                var imageFileStr = textureJson.source;
+
+                var texture = new Texture(basePath + imageFileStr, canvas);
+                texture.name = textureStr;
+                material.diffuseTexture = texture;
+              }
+            }
+
+            var vertexData = {
               position: positions,
               normal: normals
-            }, [indices]);
+            };
+
+            var geometry = new Geometry(canvas);
+            geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
           }
           var mesh = new Mesh(geometry);
-          mesh.material = new ClassicMaterial(canvas);
+          mesh.material = material;
           mesh.material.shader = new PhongShader(canvas);
 
           resolve(mesh);

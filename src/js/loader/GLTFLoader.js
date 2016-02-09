@@ -4,7 +4,10 @@ import Geometry from '../Geometry'
 import ClassicMaterial from '../ClassicMaterial'
 import Mesh from '../Mesh'
 import PhongShader from '../shaders/PhongShader'
+import Texture from '../textures/Texture'
 import Vector3 from '../math/Vector3'
+import Vector2 from '../math/Vector2'
+import ArrayUtil from '../misc/ArrayUtil'
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -51,14 +54,16 @@ export default class GLTFLoader {
     for (let bufferName in json.buffers) {
       //console.log("name: " + bufferName + " data:" + );
       let bufferInfo = json.buffers[bufferName];
-      this._loadBinaryFile(basePath + bufferInfo.uri, json, canvas, resolve);
+      this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
     }
   }
 
-  _loadBinaryFile(path, json, canvas, resolve) {
+  _loadBinaryFile(binaryFilePath, basePath, json, canvas, resolve) {
     var oReq = new XMLHttpRequest();
-    oReq.open("GET", path, true);
+    oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
+
+    var material = new ClassicMaterial(canvas);
 
     oReq.onload = (oEvent)=> {
       var arrayBuffer = oReq.response; // Note: not oReq.responseText
@@ -80,14 +85,38 @@ export default class GLTFLoader {
         let normalsAccessorStr = primitiveJson.attributes.NORMAL;
         let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, gl);
 
-        var geometry = new Geometry(canvas);
-        geometry.setVerticesData({
+        // Texture
+        let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+        var texcoords = null;
+        var additional = {};
+        if (texcoords0AccessorStr) {
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
+          additional['texcoord'] = texcoords;
+
+          let materialStr = primitiveJson.material;
+          let materialJson = json.materials[materialStr];
+          let diffuseValue = materialJson.values.diffuse;
+          if (typeof diffuseValue === 'string') {
+            let textureStr = diffuseValue;
+            let textureJson = json.textures[textureStr];
+            var imageFileStr = textureJson.source;
+
+            var texture = new Texture(basePath + imageFileStr, canvas);
+            texture.name = textureStr;
+            material.diffuseTexture = texture;
+          }
+        }
+
+        var vertexData = {
           position: positions,
           normal: normals
-        }, [indices]);
+        };
+
+        var geometry = new Geometry(canvas);
+        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
       }
       var mesh = new Mesh(geometry);
-      mesh.material = new ClassicMaterial(canvas);
+      mesh.material = material;
       mesh.material.shader = new PhongShader(canvas);
 
       resolve(mesh);
