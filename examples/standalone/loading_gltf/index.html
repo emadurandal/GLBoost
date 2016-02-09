@@ -30,7 +30,7 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:1.0, green:0.5, blue:0.5, alpha:1}});
 
 var scene = new GLBoost.Scene();
 
@@ -42,8 +42,8 @@ scene.add( pointLight );
 
 var camera = new GLBoost.Camera(
     {
-      eye: new GLBoost.Vector3(0.0, 5, 10),
-      center: new GLBoost.Vector3(0.0, 2.0, 0.0),
+      eye: new GLBoost.Vector3(0.0, 0, 10),
+      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
       up: new GLBoost.Vector3(0.0, 1.0, 0.0)
     },
     {
@@ -55,29 +55,29 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
+
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF('resouces/simple_box/simple_box.gltf', '#world');
 promise.then(function(mesh) {
-//            console.log(mesh);
+  console.log(mesh);
 
   scene.add( mesh );
 
   scene.prepareForRender();
 
+  var render = function(){
+    renderer.clearCanvas();
+    renderer.draw(scene);
+
+    var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
+    var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+    camera.eye = rotatedVector;
+
+    requestAnimationFrame(render);
+  };
+  render();
 });
 
-
-var render = function(){
-  renderer.clearCanvas();
-  renderer.draw(scene);
-
-  var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
-  var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-  camera.eye = rotatedVector;
-
-  requestAnimationFrame(render);
-};
-render();
 </script>
 </body>
 </html>
