@@ -53,7 +53,7 @@ export default class Plane extends Geometry {
     var texcoords = [];
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
-        texcoords.push(new Vector2(j/uSpan, i/vSpan));
+        texcoords.push(new Vector2(j/uSpan, 1.0-i/vSpan));
       }
     }
 

@@ -3783,7 +3783,7 @@
 
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         if (glem.extTFA) {
           gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
@@ -5123,7 +5123,7 @@
         var texcoords = [];
         for (var i = 0; i <= vSpan; i++) {
           for (var j = 0; j <= uSpan; j++) {
-            texcoords.push(new Vector2(j / uSpan, i / vSpan));
+            texcoords.push(new Vector2(j / uSpan, 1.0 - i / vSpan));
           }
         }
 
