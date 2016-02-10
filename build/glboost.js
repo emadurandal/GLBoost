@@ -5596,7 +5596,12 @@
         for (var bufferName in json.buffers) {
           //console.log("name: " + bufferName + " data:" + );
           var bufferInfo = json.buffers[bufferName];
-          this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
+
+          if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+            this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, resolve);
+          } else {
+            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
+          }
         }
       }
     }, {
@@ -5644,7 +5649,9 @@
               if (typeof diffuseValue === 'string') {
                 var textureStr = diffuseValue;
                 var textureJson = json.textures[textureStr];
-                var imageFileStr = textureJson.source;
+                var imageStr = textureJson.source;
+                var imageJson = json.images[imageStr];
+                var imageFileStr = imageJson.uri;
 
                 var texture = new Texture(basePath + imageFileStr, canvas);
                 texture.name = textureStr;

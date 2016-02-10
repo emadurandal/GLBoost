@@ -54,7 +54,12 @@ export default class GLTFLoader {
     for (let bufferName in json.buffers) {
       //console.log("name: " + bufferName + " data:" + );
       let bufferInfo = json.buffers[bufferName];
-      this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
+
+      if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
+        this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, resolve);
+      } else {
+        this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
+      }
     }
   }
 
@@ -99,7 +104,9 @@ export default class GLTFLoader {
           if (typeof diffuseValue === 'string') {
             let textureStr = diffuseValue;
             let textureJson = json.textures[textureStr];
-            var imageFileStr = textureJson.source;
+            let imageStr = textureJson.source;
+            let imageJson = json.images[imageStr];
+            let imageFileStr = imageJson.uri;
 
             var texture = new Texture(basePath + imageFileStr, canvas);
             texture.name = textureStr;
