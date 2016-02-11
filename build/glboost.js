@@ -5625,6 +5625,7 @@
             var primitiveJson = meshJson.primitives[0];
             var gl = GLContext.getInstance(canvas).gl;
 
+            // Geometry
             var indicesAccessorStr = primitiveJson.indices;
             var indices = _this2._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
 
@@ -5642,6 +5643,7 @@
             var materialStr = primitiveJson.material;
             var materialJson = json.materials[materialStr];
             var diffuseValue = materialJson.values.diffuse;
+            // Diffuse Texture
             if (texcoords0AccessorStr) {
               texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
               additional['texcoord'] = texcoords;
@@ -5658,13 +5660,16 @@
                 material.diffuseTexture = texture;
               }
             }
+            // Diffuse
             if (typeof diffuseValue !== 'string') {
               material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
             }
+            // Ambient
             var ambientValue = materialJson.values.ambient;
             if (typeof ambientValue !== 'string') {
               material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
             }
+            // Specular
             var specularValue = materialJson.values.specular;
             if (typeof specularValue !== 'string') {
               material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
@@ -5679,6 +5684,8 @@
 
             var geometry = new Geometry(canvas);
             geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+
+            //
           }
           var mesh = new Mesh(geometry);
           material.setVertexN(geometry, indices.length);
