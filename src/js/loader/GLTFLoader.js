@@ -7,6 +7,7 @@ import PhongShader from '../shaders/PhongShader'
 import Texture from '../textures/Texture'
 import Vector3 from '../math/Vector3'
 import Vector2 from '../math/Vector2'
+import Vector4 from '../math/Vector4'
 import ArrayUtil from '../misc/ArrayUtil'
 
 let singleton = Symbol();
@@ -94,13 +95,14 @@ export default class GLTFLoader {
         let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
         var texcoords = null;
         var additional = {};
+
+        let materialStr = primitiveJson.material;
+        let materialJson = json.materials[materialStr];
+        let diffuseValue = materialJson.values.diffuse;
         if (texcoords0AccessorStr) {
           texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
           additional['texcoord'] = texcoords;
 
-          let materialStr = primitiveJson.material;
-          let materialJson = json.materials[materialStr];
-          let diffuseValue = materialJson.values.diffuse;
           if (typeof diffuseValue === 'string') {
             let textureStr = diffuseValue;
             let textureJson = json.textures[textureStr];
@@ -112,7 +114,21 @@ export default class GLTFLoader {
             texture.name = textureStr;
             material.diffuseTexture = texture;
           }
+
         }
+        if (typeof diffuseValue !== 'string') {
+          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+        }
+        let ambientValue = materialJson.values.ambient;
+        if (typeof ambientValue !== 'string') {
+          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+        }
+        let specularValue = materialJson.values.specular;
+        if (typeof specularValue !== 'string') {
+          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+        }
+
+        let opacityValue = 1.0 - materialJson.values.transparency;
 
         var vertexData = {
           position: positions,

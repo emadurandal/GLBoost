@@ -691,7 +691,7 @@
 
   GLBoost$1["Matrix33"] = Matrix33;
 
-  var Vector4$1 = (function () {
+  var Vector4 = (function () {
     function Vector4(x, y, z, w) {
       babelHelpers.classCallCheck(this, Vector4);
 
@@ -714,7 +714,7 @@
     return Vector4;
   })();
 
-  GLBoost$1["Vector4"] = Vector4$1;
+  GLBoost$1["Vector4"] = Vector4;
 
   var Matrix44 = (function () {
     function Matrix44() {
@@ -864,7 +864,7 @@
         var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
         var w = this.m30 * vec.x + this.m31 * vec.y + this.m32 * vec.z + this.m33 * vec.w;
 
-        return new Vector4$1(x, y, z, w);
+        return new Vector4(x, y, z, w);
       }
 
       /**
@@ -2663,10 +2663,10 @@
 
       this._diffuseTexture = null;
       this._gl = GLContext.getInstance(canvas).gl;
-      this._baseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
-      this._diffuseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
-      this._specularColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
-      this._ambientColor = new Vector4$1(0.0, 0.0, 0.0, 1.0);
+      this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
       this._name = "";
       this._shader = new SimpleShader(canvas);
       this._vertexNofGeometries = {};
@@ -3108,11 +3108,11 @@
               lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
               if (glslProgram['viewPosition']) {
                 if (camera) {
-                  var cameraPos = new Vector4$1(0, 0, 0, 1);
+                  var cameraPos = new Vector4(0, 0, 0, 1);
                   cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
-                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4$1(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
                 } else {
-                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4$1(0, 0, 1, 1));
+                  var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
                 }
                 gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
               }
@@ -3122,11 +3122,11 @@
                   var lightVec = null;
                   var isPointLight = -9999;
                   if (lights[j] instanceof PointLight) {
-                    lightVec = new Vector4$1(0, 0, 0, 1);
+                    lightVec = new Vector4(0, 0, 0, 1);
                     lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                     isPointLight = 1.0;
                   } else if (lights[j] instanceof DirectionalLight) {
-                    lightVec = new Vector4$1(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                    lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
                     lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
                     lightVec.w = 0.0;
                     isPointLight = 0.0;
@@ -5113,7 +5113,7 @@
         }
 
         var colors = [];
-        var vertexColor = new Vector4$1(1, 1, 1, 1);
+        var vertexColor = new Vector4(1, 1, 1, 1);
         for (var i = 0; i <= vSpan; i++) {
           for (var j = 0; j <= uSpan; j++) {
             colors.push(vertexColor);
@@ -5181,7 +5181,7 @@
         new Vector3(widthVector.x, -widthVector.y, -widthVector.z), new Vector3(widthVector.x, -widthVector.y, widthVector.z), new Vector3(widthVector.x, widthVector.y, widthVector.z), new Vector3(widthVector.x, widthVector.y, -widthVector.z),
         // left
         new Vector3(-widthVector.x, -widthVector.y, -widthVector.z), new Vector3(-widthVector.x, -widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, widthVector.z), new Vector3(-widthVector.x, widthVector.y, -widthVector.z)];
-        var colors = [new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
+        var colors = [new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w), new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)];
         var texcoords = [new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0), new Vector2(0.0, 0.0), new Vector2(1.0, 0.0), new Vector2(1.0, 1.0), new Vector2(0.0, 1.0)];
 
         var normals = [
@@ -5235,7 +5235,7 @@
         var texcoords = [];
         var colors = [];
         var normals = [];
-        var vertexColor = new Vector4$1(1, 1, 1, 1);
+        var vertexColor = new Vector4(1, 1, 1, 1);
 
         for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
           var theta = latNumber * Math.PI / heightSegments;
@@ -5444,7 +5444,7 @@
 
         if (needDefaultWhiteColor) {
           var colors = [];
-          var vertexColor = new Vector4$1(1, 1, 1, 1);
+          var vertexColor = new Vector4(1, 1, 1, 1);
           for (var i = 0; i < positionArray.length; i++) {
             for (var j = 0; j < 4; j++) {
               colors.push(vertexColor);
@@ -5638,13 +5638,14 @@
             var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
             var texcoords = null;
             var additional = {};
+
+            var materialStr = primitiveJson.material;
+            var materialJson = json.materials[materialStr];
+            var diffuseValue = materialJson.values.diffuse;
             if (texcoords0AccessorStr) {
               texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
               additional['texcoord'] = texcoords;
 
-              var materialStr = primitiveJson.material;
-              var materialJson = json.materials[materialStr];
-              var diffuseValue = materialJson.values.diffuse;
               if (typeof diffuseValue === 'string') {
                 var textureStr = diffuseValue;
                 var textureJson = json.textures[textureStr];
@@ -5657,6 +5658,19 @@
                 material.diffuseTexture = texture;
               }
             }
+            if (typeof diffuseValue !== 'string') {
+              material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+            }
+            var ambientValue = materialJson.values.ambient;
+            if (typeof ambientValue !== 'string') {
+              material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+            }
+            var specularValue = materialJson.values.specular;
+            if (typeof specularValue !== 'string') {
+              material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+            }
+
+            var opacityValue = 1.0 - materialJson.values.transparency;
 
             var vertexData = {
               position: positions,
