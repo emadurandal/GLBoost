@@ -82,7 +82,7 @@ export default class GLTFLoader {
         let gl = GLContext.getInstance(canvas).gl;
 
         let indicesAccessorStr = primitiveJson.indices;
-        let indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
+        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
 
         let positionsAccessorStr = primitiveJson.attributes.POSITION;
         let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, gl);
@@ -123,8 +123,9 @@ export default class GLTFLoader {
         geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
       }
       var mesh = new Mesh(geometry);
-      mesh.material = material;
-      mesh.material.shader = new PhongShader(canvas);
+      material.setVertexN(geometry, indices.length);
+      material.shader = new PhongShader(canvas);
+      geometry.materials = [material];
 
       resolve(mesh);
     };

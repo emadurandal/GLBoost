@@ -5668,8 +5668,9 @@
             geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
           }
           var mesh = new Mesh(geometry);
-          mesh.material = material;
-          mesh.material.shader = new PhongShader(canvas);
+          material.setVertexN(geometry, indices.length);
+          material.shader = new PhongShader(canvas);
+          geometry.materials = [material];
 
           resolve(mesh);
         };
