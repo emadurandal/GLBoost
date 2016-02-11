@@ -5567,7 +5567,6 @@
         var _this = this;
 
         var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-        var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -5580,7 +5579,7 @@
                 basePath += partsOfPath[i] + '/';
               }
               console.log(basePath);
-              _this._constructMesh(gotText, basePath, canvas, resolve);
+              _this._constructMesh(gotText, basePath, canvas, defaultShader, resolve);
             }
           };
 
@@ -5590,7 +5589,7 @@
       }
     }, {
       key: '_constructMesh',
-      value: function _constructMesh(gotText, basePath, canvas, resolve) {
+      value: function _constructMesh(gotText, basePath, canvas, defaultShader, resolve) {
         var json = JSON.parse(gotText);
 
         for (var bufferName in json.buffers) {
@@ -5598,15 +5597,15 @@
           var bufferInfo = json.buffers[bufferName];
 
           if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
-            this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, resolve);
+            this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
           } else {
-            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, resolve);
+            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
           }
         }
       }
     }, {
       key: '_loadBinaryFile',
-      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, resolve) {
+      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, defaultShader, resolve) {
         var _this2 = this;
 
         var oReq = new XMLHttpRequest();
@@ -5669,7 +5668,11 @@
           }
           var mesh = new Mesh(geometry);
           material.setVertexN(geometry, indices.length);
-          material.shader = new PhongShader(canvas);
+          if (defaultShader) {
+            material.shader = defaultShader;
+          } else {
+            material.shader = new PhongShader(canvas);
+          }
           geometry.materials = [material];
 
           resolve(mesh);
