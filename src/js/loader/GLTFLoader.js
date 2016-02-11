@@ -82,6 +82,7 @@ export default class GLTFLoader {
         let primitiveJson = meshJson.primitives[0];
         let gl = GLContext.getInstance(canvas).gl;
 
+        // Geometry
         let indicesAccessorStr = primitiveJson.indices;
         var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
 
@@ -99,6 +100,7 @@ export default class GLTFLoader {
         let materialStr = primitiveJson.material;
         let materialJson = json.materials[materialStr];
         let diffuseValue = materialJson.values.diffuse;
+        // Diffuse Texture
         if (texcoords0AccessorStr) {
           texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
           additional['texcoord'] = texcoords;
@@ -114,15 +116,17 @@ export default class GLTFLoader {
             texture.name = textureStr;
             material.diffuseTexture = texture;
           }
-
         }
+        // Diffuse
         if (typeof diffuseValue !== 'string') {
           material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
         }
+        // Ambient
         let ambientValue = materialJson.values.ambient;
         if (typeof ambientValue !== 'string') {
           material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
         }
+        // Specular
         let specularValue = materialJson.values.specular;
         if (typeof specularValue !== 'string') {
           material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
@@ -137,6 +141,8 @@ export default class GLTFLoader {
 
         var geometry = new Geometry(canvas);
         geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+
+        //
       }
       var mesh = new Mesh(geometry);
       material.setVertexN(geometry, indices.length);
