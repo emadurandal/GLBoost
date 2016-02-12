@@ -42,7 +42,7 @@ scene.add( pointLight );
 
 var camera = new GLBoost.Camera(
     {
-      eye: new GLBoost.Vector3(0.0, 1.0, 10),
+      eye: new GLBoost.Vector3(0.0, 1.0, 20),
       center: new GLBoost.Vector3(0.0, 1.0, 0.0),
       up: new GLBoost.Vector3(0.0, 1.0, 0.0)
     },
@@ -55,11 +55,14 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
+var gtime = 0;
+
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/teapot/teapot.gltf', '#world', 1);//, new GLBoost.HalfLambertShader('#world'));
+var promise = glTFLoader.loadGLTF('resouces/pyramid_anim/pyramid_anim2.gltf', '#world', 100);
 promise.then(function(mesh) {
   console.log(mesh);
 
+  //mesh.scale = new GLBoost.Vector3(50,50,50);
   scene.add( mesh );
   window.mesh = mesh;
   scene.prepareForRender();
@@ -68,9 +71,20 @@ promise.then(function(mesh) {
     renderer.clearCanvas();
     renderer.draw(scene);
 
+    window.mesh.translate = window.mesh.getTranslateAt(0, gtime);
+    window.mesh.quaternion = window.mesh.getQuaternionAt(0, gtime);
+    window.mesh.scale = window.mesh.getScaleAt(0, gtime);
+    //console.log(gtime);
+    //console.log(window.mesh.getTranslateAt(gtime));
+    gtime += 0.01;
+
+    if (gtime > 1.5) {
+      gtime = 0.0;
+    }
+
     var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+//    camera.eye = rotatedVector;
 
     requestAnimationFrame(render);
   };
