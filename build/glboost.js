@@ -1416,33 +1416,33 @@
       }
     }, {
       key: '_getAnimatedTransformValue',
-      value: function _getAnimatedTransformValue(value, animation) {
-        if (animation) {
-          return AnimationUtil.interpolate(animation.input, animation.output, value, animation.outputComponentN);
+      value: function _getAnimatedTransformValue(value, animation, type) {
+        if (animation[type]) {
+          return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
         } else {
-          console.warn(this._instanceName + "doesn't have " + animation.outputAttribute + " animation data. GLBoost returned default " + animation.outputAttribute + " value.");
-          return this[animation.outputAttribute];
+          console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
+          return this[type];
         }
       }
     }, {
       key: 'getTranslateAt',
       value: function getTranslateAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['translate']);
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'translate');
       }
     }, {
       key: 'getRotateAt',
       value: function getRotateAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['rotate']);
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'rotate');
       }
     }, {
       key: 'getQuaternionAt',
       value: function getQuaternionAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['quaternion']);
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'quaternion');
       }
     }, {
       key: 'getScaleAt',
       value: function getScaleAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['scale']);
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'scale');
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -5898,7 +5898,14 @@
           var mesh = new Mesh(geometry);
 
           if (arrayBuffer) {
-
+            /*
+                    let sceneJson = json.scenes.defaultScene;
+            
+                    let nodeJson = null;
+                    for (let node in sceneJson.nodes) {
+                      nodeJson = sceneJson.nodes[node];
+                    }
+            */
             var meshJson = null;
             for (var _mesh in json.meshes) {
               meshJson = json.meshes[_mesh];

@@ -44,12 +44,12 @@ export default class Element {
     return this._updateCountAsElement;
   }
 
-  _getAnimatedTransformValue(value, animation) {
-    if (animation) {
-      return AnimationUtil.interpolate(animation.input, animation.output, value, animation.outputComponentN);
+  _getAnimatedTransformValue(value, animation, type) {
+    if (animation[type]) {
+      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
-      console.warn(this._instanceName + "doesn't have " + animation.outputAttribute + " animation data. GLBoost returned default " + animation.outputAttribute + " value.");
-      return this[animation.outputAttribute];
+      console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
+      return this[type];
     }
   }
 
@@ -66,7 +66,7 @@ export default class Element {
   }
 
   getTranslateAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['translate']);
+    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'translate');
   }
 
   set rotate(vec) {
@@ -86,7 +86,7 @@ export default class Element {
   }
 
   getRotateAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['rotate']);
+    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'rotate');
   }
 
   set quaternion(quat) {
@@ -106,7 +106,7 @@ export default class Element {
   }
 
   getQuaternionAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['quaternion']);
+    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'quaternion');
   }
 
   set scale(vec) {
@@ -122,7 +122,7 @@ export default class Element {
   }
 
   getScaleAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['scale']);
+    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'scale');
   }
 
   get transformMatrix() {
