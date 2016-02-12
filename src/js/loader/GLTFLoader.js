@@ -8,6 +8,7 @@ import Texture from '../textures/Texture'
 import Vector3 from '../math/Vector3'
 import Vector2 from '../math/Vector2'
 import Vector4 from '../math/Vector4'
+import Quaternion from '../math/Quaternion'
 import ArrayUtil from '../misc/ArrayUtil'
 
 let singleton = Symbol();
@@ -28,7 +29,7 @@ export default class GLTFLoader {
     return this[singleton];
   }
 
-  loadGLTF(url, canvas, defaultShader = null) {
+  loadGLTF(url, canvas, scale = 1.0, defaultShader = null) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -40,7 +41,7 @@ export default class GLTFLoader {
             basePath += partsOfPath[i] + '/';
           }
           console.log(basePath);
-          this._constructMesh(gotText, basePath, canvas, defaultShader, resolve);
+          this._constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve);
         }
       };
 
@@ -49,7 +50,7 @@ export default class GLTFLoader {
     });
   }
 
-  _constructMesh(gotText, basePath, canvas, defaultShader, resolve) {
+  _constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve) {
     var json = JSON.parse(gotText);
 
     for (let bufferName in json.buffers) {
@@ -57,14 +58,14 @@ export default class GLTFLoader {
       let bufferInfo = json.buffers[bufferName];
 
       if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
-        this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
+        this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       } else {
-        this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
+        this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       }
     }
   }
 
-  _loadBinaryFile(binaryFilePath, basePath, json, canvas, defaultShader, resolve) {
+  _loadBinaryFile(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
@@ -73,6 +74,9 @@ export default class GLTFLoader {
 
     oReq.onload = (oEvent)=> {
       var arrayBuffer = oReq.response; // Note: not oReq.responseText
+      var geometry = new Geometry(canvas);
+      var mesh = new Mesh(geometry);
+
       if (arrayBuffer) {
 
         let meshJson = null;
@@ -84,13 +88,13 @@ export default class GLTFLoader {
 
         // Geometry
         let indicesAccessorStr = primitiveJson.indices;
-        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
+        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
 
         let positionsAccessorStr = primitiveJson.attributes.POSITION;
-        let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, gl);
+        let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
 
         let normalsAccessorStr = primitiveJson.attributes.NORMAL;
-        let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, gl);
+        let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
 
         // Texture
         let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
@@ -102,7 +106,7 @@ export default class GLTFLoader {
         let diffuseValue = materialJson.values.diffuse;
         // Diffuse Texture
         if (texcoords0AccessorStr) {
-          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
           additional['texcoord'] = texcoords;
 
           if (typeof diffuseValue === 'string') {
@@ -118,17 +122,17 @@ export default class GLTFLoader {
           }
         }
         // Diffuse
-        if (typeof diffuseValue !== 'string') {
+        if (diffuseValue && typeof diffuseValue !== 'string') {
           material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
         }
         // Ambient
         let ambientValue = materialJson.values.ambient;
-        if (typeof ambientValue !== 'string') {
+        if (ambientValue && typeof ambientValue !== 'string') {
           material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
         }
         // Specular
         let specularValue = materialJson.values.specular;
-        if (typeof specularValue !== 'string') {
+        if (specularValue && typeof specularValue !== 'string') {
           material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
         }
 
@@ -139,12 +143,44 @@ export default class GLTFLoader {
           normal: normals
         };
 
-        var geometry = new Geometry(canvas);
         geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
 
-        //
+        // Animation
+        let animationJson = null;
+        for (let anim in json.animations) {
+          animationJson = json.animations[anim];
+          if (animationJson) {
+            let channelJson = animationJson.channels[0];
+            let targetMeshStr = channelJson.target.id;
+            let targetPathStr = channelJson.target.path;
+            let samplerStr = channelJson.sampler;
+            let samplerJson = animationJson.samplers[samplerStr];
+            let animInputStr = samplerJson.input;
+            var animOutputStr = samplerJson.output;
+            let animInputAccessorStr = animationJson.parameters[animInputStr];
+            let animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+            var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+            if (animOutputStr === 'translation') {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+            } else if (animOutputStr === 'rotation') {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+            } else {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+            }
+
+            let animationAttributeName = '';
+            if (animOutputStr === 'translation') {
+              animationAttributeName = 'translate';
+            } else if (animOutputStr === 'rotation') {
+              animationAttributeName = 'quaternion';
+            } else {
+              animationAttributeName = animOutputStr;
+            }
+            mesh.setAnimationAtLine(0, animationAttributeName, animInputArray, animOutputArray);
+          }
+        }
       }
-      var mesh = new Mesh(geometry);
       material.setVertexN(geometry, indices.length);
       if (defaultShader) {
         material.shader = defaultShader;
@@ -159,7 +195,7 @@ export default class GLTFLoader {
     oReq.send(null);
   }
 
-  _accessBinary(accessorStr, json, arrayBuffer, gl) {
+  _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false) {
     var accessorJson = json.accessors[accessorStr];
     var bufferViewStr = accessorJson.bufferView;
     var bufferViewJson = json.bufferViews[bufferViewStr];
@@ -208,24 +244,33 @@ export default class GLTFLoader {
           break;
         case 'VEC2':
           vertexAttributeArray.push(new Vector2(
-            dataView[dataViewMethod](pos, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)
+            dataView[dataViewMethod](pos, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale
           ));
           break;
         case 'VEC3':
           vertexAttributeArray.push(new Vector3(
-            dataView[dataViewMethod](pos, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)
+            dataView[dataViewMethod](pos, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale
           ));
           break;
         case 'VEC4':
-          vertexAttributeArray.push(new Vector4(
-            dataView[dataViewMethod](pos, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
-            dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
-          ));
+          if (quaternionIfVec4) {
+            vertexAttributeArray.push(Quaternion.invert(new Quaternion(
+              dataView[dataViewMethod](pos, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
+            )));
+          } else {
+            vertexAttributeArray.push(new Vector4(
+              dataView[dataViewMethod](pos, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
+            ));
+          }
           break;
       }
 

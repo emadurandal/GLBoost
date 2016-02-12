@@ -28,6 +28,9 @@ export default class Vector3 {
     return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
   }
 
+  clone() {
+    return new Vector3(this.x, this.y, this.z);
+  }
 
   /*
    * disabled for now because Safari's Function.prototype.length is not configurable yet.
@@ -165,6 +168,21 @@ export default class Vector3 {
   static divide(vec3, val) {
     console.assert(val != 0, "0 division!");
     return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+  }
+
+  multiply(val) {
+    this.x *= val;
+    this.y *= val;
+    this.z *= val;
+
+    return this;
+  }
+
+  /**
+   * 除算（static版）
+   */
+  static multiply(vec3, val) {
+    return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }
 }
 

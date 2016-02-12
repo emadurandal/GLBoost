@@ -171,6 +171,11 @@
       value: function length() {
         return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
       }
+    }, {
+      key: "clone",
+      value: function clone() {
+        return new Vector3(this.x, this.y, this.z);
+      }
 
       /*
        * disabled for now because Safari's Function.prototype.length is not configurable yet.
@@ -307,6 +312,20 @@
        * 除算（static版）
        */
 
+    }, {
+      key: "multiply",
+      value: function multiply(val) {
+        this.x *= val;
+        this.y *= val;
+        this.z *= val;
+
+        return this;
+      }
+
+      /**
+       * 除算（static版）
+       */
+
     }], [{
       key: "zero",
       value: function zero() {
@@ -350,6 +369,11 @@
       value: function divide(vec3, val) {
         console.assert(val != 0, "0 division!");
         return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+      }
+    }, {
+      key: "multiply",
+      value: function multiply(vec3, val) {
+        return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
       }
     }]);
     return Vector3;
@@ -1175,6 +1199,184 @@
 
   GLBoost$1["Matrix44"] = Matrix44;
 
+  var MathUtil = (function () {
+    function MathUtil() {
+      babelHelpers.classCallCheck(this, MathUtil);
+    }
+
+    babelHelpers.createClass(MathUtil, null, [{
+      key: "radianToDegree",
+      value: function radianToDegree(rad) {
+        return rad * 180 / Math.PI;
+      }
+    }, {
+      key: "degreeToRadian",
+      value: function degreeToRadian(deg) {
+        return deg * Math.PI / 180;
+      }
+    }]);
+    return MathUtil;
+  })();
+
+  var Quaternion = (function () {
+    function Quaternion(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Quaternion);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Quaternion, [{
+      key: 'isEqual',
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Quaternion(this.x, this.y, this.z, this.w);
+      }
+    }, {
+      key: 'add',
+      value: function add(q) {
+        this.x += q.x;
+        this.y += q.y;
+        this.z += q.z;
+        this.w += q.w;
+
+        return this;
+      }
+    }, {
+      key: 'multiply',
+      value: function multiply(val) {
+        this.x *= val;
+        this.y *= val;
+        this.z *= val;
+        this.w *= val;
+
+        return this;
+      }
+    }, {
+      key: 'rotationMatrix',
+      get: function get() {
+        var sx = this.x * this.x;
+        var sy = this.y * this.y;
+        var sz = this.z * this.z;
+        var cx = this.y * this.z;
+        var cy = this.x * this.z;
+        var cz = this.x * this.y;
+        var wx = this.w * this.x;
+        var wy = this.w * this.y;
+        var wz = this.w * this.z;
+
+        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0, 2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0, 2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
+      }
+    }], [{
+      key: 'invert',
+      value: function invert(quat) {
+        return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0 / (quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w));
+      }
+    }, {
+      key: 'qlerp',
+      value: function qlerp(lhq, rhq, ratio) {
+
+        var q = new Quaternion(0, 0, 0, 1);
+        var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+        var ss = 1.0 - qr * qr;
+
+        if (ss === 0.0) {
+          q.w = lhq.w;
+          q.x = lhq.x;
+          q.y = lhq.y;
+          q.z = lhq.z;
+
+          return q;
+        } else {
+
+          var ph = Math.acos(qr);
+          var s2 = undefined;
+          if (qr < 0.0 && ph > Math.PI / 2.0) {
+            qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+            ph = Math.acos(qr);
+            s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+          } else {
+            s2 = Math.sin(ph * ratio) / Math.sin(ph);
+          }
+          var s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+          q.x = lhq.x * s1 + rhq.x * s2;
+          q.y = lhq.y * s1 + rhq.y * s2;
+          q.z = lhq.z * s1 + rhq.z * s2;
+          q.w = lhq.w * s1 + rhq.w * s2;
+
+          return q;
+        }
+      }
+    }]);
+    return Quaternion;
+  })();
+
+  GLBoost$1["Quaternion"] = Quaternion;
+
+  var Vector2 = function Vector2(x, y) {
+    babelHelpers.classCallCheck(this, Vector2);
+
+    this.x = x;
+    this.y = y;
+  };
+
+  GLBoost$1["Vector2"] = Vector2;
+
+  var AnimationUtil = (function () {
+    function AnimationUtil() {
+      babelHelpers.classCallCheck(this, AnimationUtil);
+    }
+
+    babelHelpers.createClass(AnimationUtil, null, [{
+      key: "lerp",
+      value: function lerp(start, end, ratio, componentN) {
+        if (componentN === 1) {
+          return start * (1 - ratio) + end * ratio;
+        } else {
+          if (start instanceof Quaternion) {
+            return Quaternion.qlerp(start, end, ratio);
+          } else {
+            return start.multiply(1 - ratio).add(end.multiply(ratio));
+          }
+        }
+      }
+    }, {
+      key: "interpolate",
+      value: function interpolate(inputArray, outputArray, input, componentN) {
+        if (input < inputArray[0]) {
+          return outputArray[0].clone(); // out of range!
+        }
+        if (inputArray[inputArray.length - 1] <= input) {
+          return outputArray[outputArray.length - 1].clone(); // out of range!
+        }
+
+        for (var i = 0; i < inputArray.length; i++) {
+          if (typeof inputArray[i + 1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i + 1]) {
+            var ratio = (input - inputArray[i]) / (inputArray[i + 1] - inputArray[i]);
+            var resultValue = this.lerp(outputArray[i].clone(), outputArray[i + 1].clone(), ratio, componentN);
+            return resultValue;
+          }
+        }
+        return outputArray[0].clone(); // out of range!
+      }
+    }]);
+    return AnimationUtil;
+  })();
+
   var Element = (function () {
     function Element() {
       babelHelpers.classCallCheck(this, Element);
@@ -1183,14 +1385,17 @@
       this._parent = null;
       this._translate = Vector3.zero();
       this._rotate = Vector3.zero();
+      this._quaternion = new Quaternion(0, 0, 0, 1);
       this._scale = new Vector3(1, 1, 1);
       this._matrix = Matrix44.identity();
       this._invMatrix = Matrix44.identity();
       this._dirtyAsElement = false;
+      this._isQuaternionActive = false; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
       this._calculatedInverseMatrix = false;
       this._updateCountAsElement = 0;
       this._accumulatedAncestryNameWithUpdateInfoString = '';
       this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+      this._animationLine = [];
       this.opacity = 1.0;
 
       this._setName();
@@ -1208,6 +1413,36 @@
         this._dirtyAsElement = true;
         this._calculatedInverseMatrix = false;
         this._updateCountAsElement++;
+      }
+    }, {
+      key: '_getAnimatedTransformValue',
+      value: function _getAnimatedTransformValue(value, animation) {
+        if (animation) {
+          return AnimationUtil.interpolate(animation.input, animation.output, value, animation.outputComponentN);
+        } else {
+          console.warn(this._instanceName + "doesn't have " + animation.outputAttribute + " animation data. GLBoost returned default " + animation.outputAttribute + " value.");
+          return this[animation.outputAttribute];
+        }
+      }
+    }, {
+      key: 'getTranslateAt',
+      value: function getTranslateAt(lineIndex, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['translate']);
+      }
+    }, {
+      key: 'getRotateAt',
+      value: function getRotateAt(lineIndex, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['rotate']);
+      }
+    }, {
+      key: 'getQuaternionAt',
+      value: function getQuaternionAt(lineIndex, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['quaternion']);
+      }
+    }, {
+      key: 'getScaleAt',
+      value: function getScaleAt(lineIndex, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex]['scale']);
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -1273,6 +1508,31 @@
         return this._instanceName + this._updateCountAsElement; // faster
       }
     }, {
+      key: 'setAnimationAtLine',
+      value: function setAnimationAtLine(lineIndex, attributeName, inputArray, outputArray) {
+        var outputComponentN = 0;
+        if (outputArray[0] instanceof Vector2) {
+          outputComponentN = 2;
+        } else if (outputArray[0] instanceof Vector3) {
+          outputComponentN = 3;
+        } else if (outputArray[0] instanceof Vector4) {
+          outputComponentN = 4;
+        } else if (outputArray[0] instanceof Quaternion) {
+          outputComponentN = 4;
+        } else {
+          outputComponentN = 1;
+        }
+        if (!this._animationLine[lineIndex]) {
+          this._animationLine[lineIndex] = {};
+        }
+        this._animationLine[lineIndex][attributeName] = {
+          input: inputArray,
+          output: outputArray,
+          outputAttribute: attributeName,
+          outputComponentN: outputComponentN
+        };
+      }
+    }, {
       key: 'updateCountAsElement',
       get: function get() {
         return this._updateCountAsElement;
@@ -1292,6 +1552,10 @@
     }, {
       key: 'rotate',
       set: function set(vec) {
+        if (this._isQuaternionActive === true) {
+          this._isQuaternionActive = false;
+          this._needUpdate();
+        }
         if (this._rotate.isEqual(vec)) {
           return;
         }
@@ -1300,6 +1564,22 @@
       },
       get: function get() {
         return this._rotate;
+      }
+    }, {
+      key: 'quaternion',
+      set: function set(quat) {
+        if (this._isQuaternionActive === false) {
+          this._isQuaternionActive = true;
+          this._needUpdate();
+        }
+        if (this._quaternion.isEqual(quat)) {
+          return;
+        }
+        this._quaternion = quat;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._quaternion;
       }
     }, {
       key: 'scale',
@@ -1318,7 +1598,13 @@
       get: function get() {
         if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
-          this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(Matrix44.rotateX(this._rotate.x)).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z));
+          if (this._isQuaternionActive) {
+            var rotationMatrix = this._quaternion.rotationMatrix;
+          } else {
+            var rotationMatrix = Matrix44.rotateX(this._rotate.x).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z));
+          }
+
+          this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(rotationMatrix);
           this._matrix.m03 = this._translate.x;
           this._matrix.m13 = this._translate.y;
           this._matrix.m23 = this._translate.z;
@@ -3755,15 +4041,6 @@
 
   GLBoost$1["Scene"] = Scene;
 
-  var Vector2 = function Vector2(x, y) {
-    babelHelpers.classCallCheck(this, Vector2);
-
-    this.x = x;
-    this.y = y;
-  };
-
-  GLBoost$1["Vector2"] = Vector2;
-
   var Texture = (function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
@@ -5566,7 +5843,8 @@
       value: function loadGLTF(url, canvas) {
         var _this = this;
 
-        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var scale = arguments.length <= 2 || arguments[2] === undefined ? 1.0 : arguments[2];
+        var defaultShader = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -5579,7 +5857,7 @@
                 basePath += partsOfPath[i] + '/';
               }
               console.log(basePath);
-              _this._constructMesh(gotText, basePath, canvas, defaultShader, resolve);
+              _this._constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve);
             }
           };
 
@@ -5589,7 +5867,7 @@
       }
     }, {
       key: '_constructMesh',
-      value: function _constructMesh(gotText, basePath, canvas, defaultShader, resolve) {
+      value: function _constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve) {
         var json = JSON.parse(gotText);
 
         for (var bufferName in json.buffers) {
@@ -5597,15 +5875,15 @@
           var bufferInfo = json.buffers[bufferName];
 
           if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
-            this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
+            this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           } else {
-            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, defaultShader, resolve);
+            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           }
         }
       }
     }, {
       key: '_loadBinaryFile',
-      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, defaultShader, resolve) {
+      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
         var _this2 = this;
 
         var oReq = new XMLHttpRequest();
@@ -5616,6 +5894,9 @@
 
         oReq.onload = function (oEvent) {
           var arrayBuffer = oReq.response; // Note: not oReq.responseText
+          var geometry = new Geometry(canvas);
+          var mesh = new Mesh(geometry);
+
           if (arrayBuffer) {
 
             var meshJson = null;
@@ -5627,13 +5908,13 @@
 
             // Geometry
             var indicesAccessorStr = primitiveJson.indices;
-            var indices = _this2._accessBinary(indicesAccessorStr, json, arrayBuffer, gl);
+            var indices = _this2._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
 
             var positionsAccessorStr = primitiveJson.attributes.POSITION;
-            var positions = _this2._accessBinary(positionsAccessorStr, json, arrayBuffer, gl);
+            var positions = _this2._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
 
             var normalsAccessorStr = primitiveJson.attributes.NORMAL;
-            var normals = _this2._accessBinary(normalsAccessorStr, json, arrayBuffer, gl);
+            var normals = _this2._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
 
             // Texture
             var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
@@ -5645,7 +5926,7 @@
             var diffuseValue = materialJson.values.diffuse;
             // Diffuse Texture
             if (texcoords0AccessorStr) {
-              texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, gl);
+              texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
               additional['texcoord'] = texcoords;
 
               if (typeof diffuseValue === 'string') {
@@ -5661,17 +5942,17 @@
               }
             }
             // Diffuse
-            if (typeof diffuseValue !== 'string') {
+            if (diffuseValue && typeof diffuseValue !== 'string') {
               material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
             }
             // Ambient
             var ambientValue = materialJson.values.ambient;
-            if (typeof ambientValue !== 'string') {
+            if (ambientValue && typeof ambientValue !== 'string') {
               material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
             }
             // Specular
             var specularValue = materialJson.values.specular;
-            if (typeof specularValue !== 'string') {
+            if (specularValue && typeof specularValue !== 'string') {
               material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
             }
 
@@ -5682,12 +5963,44 @@
               normal: normals
             };
 
-            var geometry = new Geometry(canvas);
             geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
 
-            //
+            // Animation
+            var animationJson = null;
+            for (var anim in json.animations) {
+              animationJson = json.animations[anim];
+              if (animationJson) {
+                var channelJson = animationJson.channels[0];
+                var targetMeshStr = channelJson.target.id;
+                var targetPathStr = channelJson.target.path;
+                var samplerStr = channelJson.sampler;
+                var samplerJson = animationJson.samplers[samplerStr];
+                var animInputStr = samplerJson.input;
+                var animOutputStr = samplerJson.output;
+                var animInputAccessorStr = animationJson.parameters[animInputStr];
+                var animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+                var animInputArray = _this2._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+                if (animOutputStr === 'translation') {
+                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+                } else if (animOutputStr === 'rotation') {
+                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+                } else {
+                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+                }
+
+                var animationAttributeName = '';
+                if (animOutputStr === 'translation') {
+                  animationAttributeName = 'translate';
+                } else if (animOutputStr === 'rotation') {
+                  animationAttributeName = 'quaternion';
+                } else {
+                  animationAttributeName = animOutputStr;
+                }
+                mesh.setAnimationAtLine(0, animationAttributeName, animInputArray, animOutputArray);
+              }
+            }
           }
-          var mesh = new Mesh(geometry);
           material.setVertexN(geometry, indices.length);
           if (defaultShader) {
             material.shader = defaultShader;
@@ -5703,7 +6016,9 @@
       }
     }, {
       key: '_accessBinary',
-      value: function _accessBinary(accessorStr, json, arrayBuffer, gl) {
+      value: function _accessBinary(accessorStr, json, arrayBuffer, scale, gl) {
+        var quaternionIfVec4 = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
+
         var accessorJson = json.accessors[accessorStr];
         var bufferViewStr = accessorJson.bufferView;
         var bufferViewJson = json.bufferViews[bufferViewStr];
@@ -5751,13 +6066,17 @@
               vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
               break;
             case 'VEC2':
-              vertexAttributeArray.push(new Vector2(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian)));
+              vertexAttributeArray.push(new Vector2(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale));
               break;
             case 'VEC3':
-              vertexAttributeArray.push(new Vector3(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian)));
+              vertexAttributeArray.push(new Vector3(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale));
               break;
             case 'VEC4':
-              vertexAttributeArray.push(new Vector4(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
+              if (quaternionIfVec4) {
+                vertexAttributeArray.push(Quaternion.invert(new Quaternion(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian))));
+              } else {
+                vertexAttributeArray.push(new Vector4(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
+              }
               break;
           }
         }
