@@ -42,15 +42,15 @@ scene.add( pointLight );
 
 var camera = new GLBoost.Camera(
     {
-      eye: new GLBoost.Vector3(0.0, 1.0, 20),
-      center: new GLBoost.Vector3(0.0, 1.0, 0.0),
-      up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+      eye: new GLBoost.Vector3(0.0, 30.0, 0.0),
+      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+      up: new GLBoost.Vector3(0.0, 0.0, -1.0)
     },
     {
       fovy: 45.0,
       aspect: 1.0,
       zNear: 0.1,
-      zFar: 300.0
+      zFar: 30000.0
     }
 );
 scene.add( camera );
@@ -58,13 +58,13 @@ scene.add( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/pyramid_anim/pyramid_anim2.gltf', '#world', 100);
-promise.then(function(group) {
-  console.log(group);
+var promise = glTFLoader.loadGLTF('resouces/hierarchical_anim/hierarchical_anim2.gltf', '#world', 1);
+promise.then(function(mesh) {
+  console.log(mesh);
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
-  scene.add( group );
-
+  scene.add( mesh );
+  window.mesh = mesh;
   scene.prepareForRender();
 
   var render = function(){
@@ -73,9 +73,11 @@ promise.then(function(group) {
     renderer.draw(scene);
 
 
-    gtime += 0.01;
+    //console.log(gtime);
+    //console.log(window.mesh.getTranslateAt(gtime));
+    gtime += 0.001;
 
-    if (gtime > 1.5) {
+    if (gtime > 1) {
       gtime = 0.0;
     }
 

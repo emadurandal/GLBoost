@@ -1298,7 +1298,6 @@
 
           return q;
         } else {
-
           var ph = Math.acos(qr);
           var s2 = undefined;
           if (qr < 0.0 && ph > Math.PI / 2.0) {
@@ -1388,9 +1387,10 @@
       this._quaternion = new Quaternion(0, 0, 0, 1);
       this._scale = new Vector3(1, 1, 1);
       this._matrix = Matrix44.identity();
+      this._matrixToMultiply = Matrix44.identity();
       this._invMatrix = Matrix44.identity();
       this._dirtyAsElement = false;
-      this._isQuaternionActive = false; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
+      this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
       this._calculatedInverseMatrix = false;
       this._updateCountAsElement = 0;
       this._accumulatedAncestryNameWithUpdateInfoString = '';
@@ -1451,6 +1451,13 @@
       key: 'getScaleAt',
       value: function getScaleAt(lineName, value) {
         return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
+      }
+    }, {
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(mat) {
+        this._matrixToMultiply = mat;
+        this._currentCalcMode = 'matrix';
+        this._needUpdate();
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -1571,7 +1578,6 @@
         this._needUpdate();
       },
       get: function get() {
-        console.log(this._instanceName + '_' + this._userFlavorName);
         if (this._activeAnimationLineName) {
           return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
         } else {
@@ -1581,8 +1587,8 @@
     }, {
       key: 'rotate',
       set: function set(vec) {
-        if (this._isQuaternionActive === true) {
-          this._isQuaternionActive = false;
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
           this._needUpdate();
         }
         if (this._rotate.isEqual(vec)) {
@@ -1601,8 +1607,8 @@
     }, {
       key: 'quaternion',
       set: function set(quat) {
-        if (this._isQuaternionActive === false) {
-          this._isQuaternionActive = true;
+        if (this._currentCalcMode !== 'quaternion') {
+          this._currentCalcMode = 'quaternion';
           this._needUpdate();
         }
         if (this._quaternion.isEqual(quat)) {
@@ -1639,7 +1645,13 @@
       get: function get() {
         if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
-          if (this._isQuaternionActive) {
+          if (this._currentCalcMode === 'matrix') {
+            this._matrix = matrix.multiply(this._matrixToMultiply);
+            this._dirtyAsElement = false;
+            return this._matrix.clone();
+          }
+
+          if (this._currentCalcMode === 'quaternion') {
             var rotationMatrix = this.quaternion.rotationMatrix;
           } else {
             var rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
@@ -1747,12 +1759,12 @@
         this._instanceName + '_' + this._userFlavorName;
       }
     }, {
-      key: 'isQuaternionActive',
-      set: function set(flag) {
-        this._isQuaternionActive = flag;
+      key: 'currentCalcMode',
+      set: function set(mode) {
+        this._currentCalcMode = mode;
       },
       get: function get() {
-        return this._isQuaternionActive;
+        return this._currentCalcMode;
       }
     }]);
     return Element;
@@ -3468,7 +3480,8 @@
             if (camera) {
               var viewMatrix = camera.lookAtRHMatrix();
               var projectionMatrix = camera.perspectiveRHMatrix();
-              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
+              var m_m = mesh.transformMatrixAccumulatedAncestry;
+              var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
               gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
             }
 
@@ -6048,6 +6061,21 @@
         var group = new Group();
         group.userFlavorName = nodeStr;
 
+        if (nodeJson.translation) {
+          group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+        }
+        if (nodeJson.scale) {
+          group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+        }
+        if (nodeJson.rotation) {
+          group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+        }
+        if (nodeJson.matrix) {
+          var m = nodeJson.matrix;
+          var matrix = new Matrix44(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
+          group.multiplyMatrix(matrix.transpose());
+        }
+
         if (nodeJson.meshes) {
           // this node has mashes...
           var meshStr = nodeJson.meshes[0];
@@ -6153,6 +6181,10 @@
           animationJson = json.animations[anim];
           if (animationJson) {
             var channelJson = animationJson.channels[0];
+            if (!channelJson) {
+              continue;
+            }
+
             var targetMeshStr = channelJson.target.id;
             var targetPathStr = channelJson.target.path;
             var samplerStr = channelJson.sampler;
@@ -6185,7 +6217,7 @@
             if (hitElement) {
               hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
               hitElement.setActiveAnimationLine('time');
-              hitElement.isQuaternionActive = true;
+              hitElement.currentCalcMode = 'quaternion';
             }
           }
         }

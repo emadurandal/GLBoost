@@ -16,9 +16,10 @@ export default class Element {
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._scale = new Vector3(1, 1, 1);
     this._matrix = Matrix44.identity();
+    this._matrixToMultiply = Matrix44.identity();
     this._invMatrix = Matrix44.identity();
     this._dirtyAsElement = false;
-    this._isQuaternionActive = false; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
+    this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
@@ -69,7 +70,6 @@ export default class Element {
   }
 
   get translate() {
-    console.log(this._instanceName + '_' + this._userFlavorName);
     if (this._activeAnimationLineName) {
       return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     } else {
@@ -82,8 +82,8 @@ export default class Element {
   }
 
   set rotate(vec) {
-    if (this._isQuaternionActive === true) {
-      this._isQuaternionActive = false;
+    if (this._currentCalcMode !== 'euler') {
+      this._currentCalcMode = 'euler';
       this._needUpdate();
     }
     if (this._rotate.isEqual(vec)) {
@@ -106,8 +106,8 @@ export default class Element {
   }
 
   set quaternion(quat) {
-    if (this._isQuaternionActive === false) {
-      this._isQuaternionActive = true;
+    if (this._currentCalcMode !== 'quaternion') {
+      this._currentCalcMode = 'quaternion';
       this._needUpdate();
     }
     if (this._quaternion.isEqual(quat)) {
@@ -149,10 +149,22 @@ export default class Element {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
   }
 
+  multiplyMatrix(mat) {
+    this._matrixToMultiply = mat;
+    this._currentCalcMode = 'matrix';
+    this._needUpdate();
+  }
+
   get transformMatrix() {
     if (this._dirtyAsElement) {
       var matrix = Matrix44.identity();
-      if (this._isQuaternionActive) {
+      if (this._currentCalcMode === 'matrix') {
+        this._matrix = matrix.multiply(this._matrixToMultiply);
+        this._dirtyAsElement = false;
+        return this._matrix.clone();
+      }
+
+      if (this._currentCalcMode === 'quaternion') {
         var rotationMatrix = this.quaternion.rotationMatrix;
       } else {
         var rotationMatrix = Matrix44.rotateX(this.rotate.x).
@@ -352,12 +364,12 @@ export default class Element {
     }
   }
 
-  set isQuaternionActive(flag) {
-    this._isQuaternionActive = flag;
+  set currentCalcMode(mode) {
+    this._currentCalcMode = mode;
   }
 
-  get isQuaternionActive() {
-    return this._isQuaternionActive;
+  get currentCalcMode() {
+    return this._currentCalcMode;
   }
 }
 

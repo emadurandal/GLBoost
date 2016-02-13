@@ -8,6 +8,7 @@ import Texture from '../textures/Texture'
 import Vector3 from '../math/Vector3'
 import Vector2 from '../math/Vector2'
 import Vector4 from '../math/Vector4'
+import Matrix44 from '../math/Matrix44'
 import Quaternion from '../math/Quaternion'
 import ArrayUtil from '../misc/ArrayUtil'
 import Group from '../Group'
@@ -103,6 +104,24 @@ export default class GLTFLoader {
     var nodeJson = json.nodes[nodeStr];
     var group = new Group();
     group.userFlavorName = nodeStr;
+
+    if (nodeJson.translation) {
+      group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+    }
+    if (nodeJson.scale) {
+      group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+    }
+    if (nodeJson.rotation) {
+      group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+    }
+    if (nodeJson.matrix) {
+      let m = nodeJson.matrix;
+      let matrix = new Matrix44(m[0], m[1], m[2], m[3],
+        m[4], m[5], m[6], m[7],
+        m[8], m[9], m[10], m[11],
+        m[12], m[13], m[14], m[15]);
+      group.multiplyMatrix(matrix.transpose());
+    }
 
     if (nodeJson.meshes) {
       // this node has mashes...
@@ -207,6 +226,10 @@ export default class GLTFLoader {
       animationJson = json.animations[anim];
       if (animationJson) {
         let channelJson = animationJson.channels[0];
+        if (!channelJson) {
+          continue;
+        }
+
         let targetMeshStr = channelJson.target.id;
         let targetPathStr = channelJson.target.path;
         let samplerStr = channelJson.sampler;
@@ -239,7 +262,7 @@ export default class GLTFLoader {
         if (hitElement) {
           hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
           hitElement.setActiveAnimationLine('time');
-          hitElement.isQuaternionActive = true;
+          hitElement.currentCalcMode = 'quaternion';
         }
       }
     }
