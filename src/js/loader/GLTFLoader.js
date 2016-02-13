@@ -10,6 +10,7 @@ import Vector2 from '../math/Vector2'
 import Vector4 from '../math/Vector4'
 import Quaternion from '../math/Quaternion'
 import ArrayUtil from '../misc/ArrayUtil'
+import Group from '../Group'
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -70,129 +71,176 @@ export default class GLTFLoader {
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
 
-    var material = new ClassicMaterial(canvas);
 
     oReq.onload = (oEvent)=> {
       var arrayBuffer = oReq.response; // Note: not oReq.responseText
-      var geometry = new Geometry(canvas);
-      var mesh = new Mesh(geometry);
 
       if (arrayBuffer) {
+        let sceneJson = json.scenes.defaultScene;
 
-        let meshJson = null;
-        for (let mesh in json.meshes) {
-          meshJson = json.meshes[mesh];
+        let group = new Group();
+        group.userFlavorName = "TopGroup";
+        let nodeStr = null;
+        for (let i=0; i<sceneJson.nodes.length; i++) {
+          nodeStr = sceneJson.nodes[i];
+
+          // iterate nodes and load meshes
+          let element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
+          group.addChild(element);
         }
-        let primitiveJson = meshJson.primitives[0];
-        let gl = GLContext.getInstance(canvas).gl;
-
-        // Geometry
-        let indicesAccessorStr = primitiveJson.indices;
-        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-
-        let positionsAccessorStr = primitiveJson.attributes.POSITION;
-        let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
-
-        let normalsAccessorStr = primitiveJson.attributes.NORMAL;
-        let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
-
-        // Texture
-        let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-        var texcoords = null;
-        var additional = {};
-
-        let materialStr = primitiveJson.material;
-        let materialJson = json.materials[materialStr];
-        let diffuseValue = materialJson.values.diffuse;
-        // Diffuse Texture
-        if (texcoords0AccessorStr) {
-          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
-          additional['texcoord'] = texcoords;
-
-          if (typeof diffuseValue === 'string') {
-            let textureStr = diffuseValue;
-            let textureJson = json.textures[textureStr];
-            let imageStr = textureJson.source;
-            let imageJson = json.images[imageStr];
-            let imageFileStr = imageJson.uri;
-
-            var texture = new Texture(basePath + imageFileStr, canvas);
-            texture.name = textureStr;
-            material.diffuseTexture = texture;
-          }
-        }
-        // Diffuse
-        if (diffuseValue && typeof diffuseValue !== 'string') {
-          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-        }
-        // Ambient
-        let ambientValue = materialJson.values.ambient;
-        if (ambientValue && typeof ambientValue !== 'string') {
-          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-        }
-        // Specular
-        let specularValue = materialJson.values.specular;
-        if (specularValue && typeof specularValue !== 'string') {
-          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
-        }
-
-        let opacityValue = 1.0 - materialJson.values.transparency;
-
-        var vertexData = {
-          position: positions,
-          normal: normals
-        };
-
-        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
 
         // Animation
-        let animationJson = null;
-        for (let anim in json.animations) {
-          animationJson = json.animations[anim];
-          if (animationJson) {
-            let channelJson = animationJson.channels[0];
-            let targetMeshStr = channelJson.target.id;
-            let targetPathStr = channelJson.target.path;
-            let samplerStr = channelJson.sampler;
-            let samplerJson = animationJson.samplers[samplerStr];
-            let animInputStr = samplerJson.input;
-            var animOutputStr = samplerJson.output;
-            let animInputAccessorStr = animationJson.parameters[animInputStr];
-            let animOutputAccessorStr = animationJson.parameters[animOutputStr];
+        this._loadAnimation(group, arrayBuffer, json, canvas, scale);
 
-            var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
-            if (animOutputStr === 'translation') {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
-            } else if (animOutputStr === 'rotation') {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
-            } else {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
-            }
-
-            let animationAttributeName = '';
-            if (animOutputStr === 'translation') {
-              animationAttributeName = 'translate';
-            } else if (animOutputStr === 'rotation') {
-              animationAttributeName = 'quaternion';
-            } else {
-              animationAttributeName = animOutputStr;
-            }
-            mesh.setAnimationAtLine(0, animationAttributeName, animInputArray, animOutputArray);
-          }
-        }
+        resolve(group);
       }
-      material.setVertexN(geometry, indices.length);
-      if (defaultShader) {
-        material.shader = defaultShader;
-      } else {
-        material.shader = new PhongShader(canvas);
-      }
-      geometry.materials = [material];
-
-      resolve(mesh);
     };
 
     oReq.send(null);
+  }
+
+  _recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+    var nodeJson = json.nodes[nodeStr];
+    var group = new Group();
+    group.userFlavorName = nodeStr;
+
+    if (nodeJson.meshes) {
+      // this node has mashes...
+      let meshStr = nodeJson.meshes[0];
+      let meshJson = json.meshes[meshStr];
+
+      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      mesh.userFlavorName = meshStr;
+      group.addChild(mesh);
+    }
+
+    for (let i=0; i<nodeJson.children.length; i++) {
+      let nodeStr = nodeJson.children[i];
+      let childElement = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      group.addChild(childElement);
+    }
+
+    return group;
+  }
+
+  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+    var geometry = new Geometry(canvas);
+    var mesh = new Mesh(geometry);
+    var material = new ClassicMaterial(canvas);
+
+    let primitiveJson = meshJson.primitives[0];
+    let gl = GLContext.getInstance(canvas).gl;
+
+    // Geometry
+    let indicesAccessorStr = primitiveJson.indices;
+    var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+
+    let positionsAccessorStr = primitiveJson.attributes.POSITION;
+    let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
+
+    let normalsAccessorStr = primitiveJson.attributes.NORMAL;
+    let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
+
+    // Texture
+    let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+    var texcoords = null;
+    var additional = {};
+
+    let materialStr = primitiveJson.material;
+    let materialJson = json.materials[materialStr];
+    let diffuseValue = materialJson.values.diffuse;
+    // Diffuse Texture
+    if (texcoords0AccessorStr) {
+      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
+      additional['texcoord'] = texcoords;
+
+      if (typeof diffuseValue === 'string') {
+        let textureStr = diffuseValue;
+        let textureJson = json.textures[textureStr];
+        let imageStr = textureJson.source;
+        let imageJson = json.images[imageStr];
+        let imageFileStr = imageJson.uri;
+
+        var texture = new Texture(basePath + imageFileStr, canvas);
+        texture.name = textureStr;
+        material.diffuseTexture = texture;
+      }
+    }
+    // Diffuse
+    if (diffuseValue && typeof diffuseValue !== 'string') {
+      material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+    }
+    // Ambient
+    let ambientValue = materialJson.values.ambient;
+    if (ambientValue && typeof ambientValue !== 'string') {
+      material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+    }
+    // Specular
+    let specularValue = materialJson.values.specular;
+    if (specularValue && typeof specularValue !== 'string') {
+      material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+    }
+
+    let opacityValue = 1.0 - materialJson.values.transparency;
+
+    var vertexData = {
+      position: positions,
+      normal: normals
+    };
+
+    geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+
+    material.setVertexN(geometry, indices.length);
+    if (defaultShader) {
+      material.shader = defaultShader;
+    } else {
+      material.shader = new PhongShader(canvas);
+    }
+    geometry.materials = [material];
+
+    return mesh;
+  }
+
+  _loadAnimation(element, arrayBuffer, json, canvas, scale) {
+    let animationJson = null;
+    for (let anim in json.animations) {
+      animationJson = json.animations[anim];
+      if (animationJson) {
+        let channelJson = animationJson.channels[0];
+        let targetMeshStr = channelJson.target.id;
+        let targetPathStr = channelJson.target.path;
+        let samplerStr = channelJson.sampler;
+        let samplerJson = animationJson.samplers[samplerStr];
+        let animInputStr = samplerJson.input;
+        var animOutputStr = samplerJson.output;
+        let animInputAccessorStr = animationJson.parameters[animInputStr];
+        let animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+        let gl = GLContext.getInstance(canvas).gl;
+        var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+        if (animOutputStr === 'translation') {
+          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+        } else if (animOutputStr === 'rotation') {
+          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+        } else {
+          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+        }
+
+        let animationAttributeName = '';
+        if (animOutputStr === 'translation') {
+          animationAttributeName = 'translate';
+        } else if (animOutputStr === 'rotation') {
+          animationAttributeName = 'quaternion';
+        } else {
+          animationAttributeName = animOutputStr;
+        }
+
+        let hitElement = element.searchElement(targetMeshStr);
+        if (hitElement) {
+          hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+        }
+      }
+    }
   }
 
   _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false) {

@@ -27,6 +27,23 @@ export default class Group extends Element {
   getChildren() {
     return this._children;
   }
+
+  searchElement(userflavorName, element = this) {
+    if (element.userFlavorName === userflavorName) {
+      return element;
+    }
+
+    if (element instanceof Group) {
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChild = this.searchElement(userflavorName, children[i]);
+        if (hitChild) {
+          return hitChild;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 GLBoost["Group"] = Group;

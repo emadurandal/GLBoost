@@ -1396,7 +1396,10 @@
       this._accumulatedAncestryNameWithUpdateInfoString = '';
       this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
       this._animationLine = [];
+      this._userFlavorName = '';
       this.opacity = 1.0;
+
+      this._activeAnimationLineName = 'time';
 
       this._setName();
     }
@@ -1426,23 +1429,23 @@
       }
     }, {
       key: 'getTranslateAt',
-      value: function getTranslateAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'translate');
+      value: function getTranslateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
       }
     }, {
       key: 'getRotateAt',
-      value: function getRotateAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'rotate');
+      value: function getRotateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
       }
     }, {
       key: 'getQuaternionAt',
-      value: function getQuaternionAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'quaternion');
+      value: function getQuaternionAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
       }
     }, {
       key: 'getScaleAt',
-      value: function getScaleAt(lineIndex, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'scale');
+      value: function getScaleAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -1503,13 +1506,15 @@
       }
     }, {
       key: 'toStringWithUpdateInfo',
+
+      // used by library (not Application)
       value: function toStringWithUpdateInfo() {
         //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
         return this._instanceName + this._updateCountAsElement; // faster
       }
     }, {
       key: 'setAnimationAtLine',
-      value: function setAnimationAtLine(lineIndex, attributeName, inputArray, outputArray) {
+      value: function setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
         var outputComponentN = 0;
         if (outputArray[0] instanceof Vector2) {
           outputComponentN = 2;
@@ -1522,10 +1527,10 @@
         } else {
           outputComponentN = 1;
         }
-        if (!this._animationLine[lineIndex]) {
-          this._animationLine[lineIndex] = {};
+        if (!this._animationLine[lineName]) {
+          this._animationLine[lineName] = {};
         }
-        this._animationLine[lineIndex][attributeName] = {
+        this._animationLine[lineName][attributeName] = {
           input: inputArray,
           output: outputArray,
           outputAttribute: attributeName,
@@ -1692,6 +1697,19 @@
       get: function get() {
         return this._parent;
       }
+    }, {
+      key: 'userFlavorName',
+      set: function set(name) {
+        this._userFlavorName = name;
+      },
+      get: function get() {
+        return this._userFlavorName;
+      }
+    }, {
+      key: 'instanceNameWithUserFlavor',
+      get: function get() {
+        this._instanceName + '_' + this._userFlavorName;
+      }
     }]);
     return Element;
   })();
@@ -1802,6 +1820,26 @@
       key: 'getChildren',
       value: function getChildren() {
         return this._children;
+      }
+    }, {
+      key: 'searchElement',
+      value: function searchElement(userflavorName) {
+        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+
+        if (element.userFlavorName === userflavorName) {
+          return element;
+        }
+
+        if (element instanceof Group) {
+          var children = element.getChildren();
+          for (var i = 0; i < children.length; i++) {
+            var hitChild = this.searchElement(userflavorName, children[i]);
+            if (hitChild) {
+              return hitChild;
+            }
+          }
+        }
+        return null;
       }
     }]);
     return Group;
@@ -5890,136 +5928,178 @@
         oReq.open("GET", binaryFilePath, true);
         oReq.responseType = "arraybuffer";
 
-        var material = new ClassicMaterial(canvas);
-
         oReq.onload = function (oEvent) {
           var arrayBuffer = oReq.response; // Note: not oReq.responseText
-          var geometry = new Geometry(canvas);
-          var mesh = new Mesh(geometry);
 
           if (arrayBuffer) {
-            /*
-                    let sceneJson = json.scenes.defaultScene;
-            
-                    let nodeJson = null;
-                    for (let node in sceneJson.nodes) {
-                      nodeJson = sceneJson.nodes[node];
-                    }
-            */
-            var meshJson = null;
-            for (var _mesh in json.meshes) {
-              meshJson = json.meshes[_mesh];
+            var sceneJson = json.scenes.defaultScene;
+
+            var group = new Group();
+            group.userFlavorName = "TopGroup";
+            var nodeStr = null;
+            for (var i = 0; i < sceneJson.nodes.length; i++) {
+              nodeStr = sceneJson.nodes[i];
+
+              // iterate nodes and load meshes
+              var element = _this2._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+              group.addChild(element);
             }
-            var primitiveJson = meshJson.primitives[0];
-            var gl = GLContext.getInstance(canvas).gl;
-
-            // Geometry
-            var indicesAccessorStr = primitiveJson.indices;
-            var indices = _this2._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-
-            var positionsAccessorStr = primitiveJson.attributes.POSITION;
-            var positions = _this2._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
-
-            var normalsAccessorStr = primitiveJson.attributes.NORMAL;
-            var normals = _this2._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
-
-            // Texture
-            var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-            var texcoords = null;
-            var additional = {};
-
-            var materialStr = primitiveJson.material;
-            var materialJson = json.materials[materialStr];
-            var diffuseValue = materialJson.values.diffuse;
-            // Diffuse Texture
-            if (texcoords0AccessorStr) {
-              texcoords = _this2._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
-              additional['texcoord'] = texcoords;
-
-              if (typeof diffuseValue === 'string') {
-                var textureStr = diffuseValue;
-                var textureJson = json.textures[textureStr];
-                var imageStr = textureJson.source;
-                var imageJson = json.images[imageStr];
-                var imageFileStr = imageJson.uri;
-
-                var texture = new Texture(basePath + imageFileStr, canvas);
-                texture.name = textureStr;
-                material.diffuseTexture = texture;
-              }
-            }
-            // Diffuse
-            if (diffuseValue && typeof diffuseValue !== 'string') {
-              material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-            }
-            // Ambient
-            var ambientValue = materialJson.values.ambient;
-            if (ambientValue && typeof ambientValue !== 'string') {
-              material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-            }
-            // Specular
-            var specularValue = materialJson.values.specular;
-            if (specularValue && typeof specularValue !== 'string') {
-              material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
-            }
-
-            var opacityValue = 1.0 - materialJson.values.transparency;
-
-            var vertexData = {
-              position: positions,
-              normal: normals
-            };
-
-            geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
 
             // Animation
-            var animationJson = null;
-            for (var anim in json.animations) {
-              animationJson = json.animations[anim];
-              if (animationJson) {
-                var channelJson = animationJson.channels[0];
-                var targetMeshStr = channelJson.target.id;
-                var targetPathStr = channelJson.target.path;
-                var samplerStr = channelJson.sampler;
-                var samplerJson = animationJson.samplers[samplerStr];
-                var animInputStr = samplerJson.input;
-                var animOutputStr = samplerJson.output;
-                var animInputAccessorStr = animationJson.parameters[animInputStr];
-                var animOutputAccessorStr = animationJson.parameters[animOutputStr];
+            _this2._loadAnimation(group, arrayBuffer, json, canvas, scale);
 
-                var animInputArray = _this2._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
-                if (animOutputStr === 'translation') {
-                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
-                } else if (animOutputStr === 'rotation') {
-                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
-                } else {
-                  var animOutputArray = _this2._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
-                }
-
-                var animationAttributeName = '';
-                if (animOutputStr === 'translation') {
-                  animationAttributeName = 'translate';
-                } else if (animOutputStr === 'rotation') {
-                  animationAttributeName = 'quaternion';
-                } else {
-                  animationAttributeName = animOutputStr;
-                }
-                mesh.setAnimationAtLine(0, animationAttributeName, animInputArray, animOutputArray);
-              }
-            }
+            resolve(group);
           }
-          material.setVertexN(geometry, indices.length);
-          if (defaultShader) {
-            material.shader = defaultShader;
-          } else {
-            material.shader = new PhongShader(canvas);
-          }
-          geometry.materials = [material];
-
-          resolve(mesh);
         };
 
         oReq.send(null);
+      }
+    }, {
+      key: '_recursiveIterateNode',
+      value: function _recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+        var nodeJson = json.nodes[nodeStr];
+        var group = new Group();
+        group.userFlavorName = nodeStr;
+
+        if (nodeJson.meshes) {
+          // this node has mashes...
+          var meshStr = nodeJson.meshes[0];
+          var meshJson = json.meshes[meshStr];
+
+          var mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          mesh.userFlavorName = meshStr;
+          group.addChild(mesh);
+        }
+
+        for (var i = 0; i < nodeJson.children.length; i++) {
+          var _nodeStr = nodeJson.children[i];
+          var childElement = this._recursiveIterateNode(_nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          group.addChild(childElement);
+        }
+
+        return group;
+      }
+    }, {
+      key: '_loadMesh',
+      value: function _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+        var geometry = new Geometry(canvas);
+        var mesh = new Mesh(geometry);
+        var material = new ClassicMaterial(canvas);
+
+        var primitiveJson = meshJson.primitives[0];
+        var gl = GLContext.getInstance(canvas).gl;
+
+        // Geometry
+        var indicesAccessorStr = primitiveJson.indices;
+        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+
+        var positionsAccessorStr = primitiveJson.attributes.POSITION;
+        var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
+
+        var normalsAccessorStr = primitiveJson.attributes.NORMAL;
+        var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
+
+        // Texture
+        var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+        var texcoords = null;
+        var additional = {};
+
+        var materialStr = primitiveJson.material;
+        var materialJson = json.materials[materialStr];
+        var diffuseValue = materialJson.values.diffuse;
+        // Diffuse Texture
+        if (texcoords0AccessorStr) {
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
+          additional['texcoord'] = texcoords;
+
+          if (typeof diffuseValue === 'string') {
+            var textureStr = diffuseValue;
+            var textureJson = json.textures[textureStr];
+            var imageStr = textureJson.source;
+            var imageJson = json.images[imageStr];
+            var imageFileStr = imageJson.uri;
+
+            var texture = new Texture(basePath + imageFileStr, canvas);
+            texture.name = textureStr;
+            material.diffuseTexture = texture;
+          }
+        }
+        // Diffuse
+        if (diffuseValue && typeof diffuseValue !== 'string') {
+          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+        }
+        // Ambient
+        var ambientValue = materialJson.values.ambient;
+        if (ambientValue && typeof ambientValue !== 'string') {
+          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+        }
+        // Specular
+        var specularValue = materialJson.values.specular;
+        if (specularValue && typeof specularValue !== 'string') {
+          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+        }
+
+        var opacityValue = 1.0 - materialJson.values.transparency;
+
+        var vertexData = {
+          position: positions,
+          normal: normals
+        };
+
+        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+
+        material.setVertexN(geometry, indices.length);
+        if (defaultShader) {
+          material.shader = defaultShader;
+        } else {
+          material.shader = new PhongShader(canvas);
+        }
+        geometry.materials = [material];
+
+        return mesh;
+      }
+    }, {
+      key: '_loadAnimation',
+      value: function _loadAnimation(element, arrayBuffer, json, canvas, scale) {
+        var animationJson = null;
+        for (var anim in json.animations) {
+          animationJson = json.animations[anim];
+          if (animationJson) {
+            var channelJson = animationJson.channels[0];
+            var targetMeshStr = channelJson.target.id;
+            var targetPathStr = channelJson.target.path;
+            var samplerStr = channelJson.sampler;
+            var samplerJson = animationJson.samplers[samplerStr];
+            var animInputStr = samplerJson.input;
+            var animOutputStr = samplerJson.output;
+            var animInputAccessorStr = animationJson.parameters[animInputStr];
+            var animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+            var gl = GLContext.getInstance(canvas).gl;
+            var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+            if (animOutputStr === 'translation') {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+            } else if (animOutputStr === 'rotation') {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+            } else {
+              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+            }
+
+            var animationAttributeName = '';
+            if (animOutputStr === 'translation') {
+              animationAttributeName = 'translate';
+            } else if (animOutputStr === 'rotation') {
+              animationAttributeName = 'quaternion';
+            } else {
+              animationAttributeName = animOutputStr;
+            }
+
+            var hitElement = element.searchElement(targetMeshStr);
+            if (hitElement) {
+              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+            }
+          }
+        }
       }
     }, {
       key: '_accessBinary',

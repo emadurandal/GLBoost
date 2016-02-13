@@ -59,21 +59,21 @@ var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF('resouces/pyramid_anim/pyramid_anim2.gltf', '#world', 100);
-promise.then(function(mesh) {
-  console.log(mesh);
+promise.then(function(group) {
+  console.log(group);
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
-  scene.add( mesh );
-  window.mesh = mesh;
+  scene.add( group );
+  window.element = group.searchElement('_pPyramid1');
   scene.prepareForRender();
 
   var render = function(){
     renderer.clearCanvas();
     renderer.draw(scene);
 
-    window.mesh.translate = window.mesh.getTranslateAt(0, gtime);
-    window.mesh.quaternion = window.mesh.getQuaternionAt(0, gtime);
-    window.mesh.scale = window.mesh.getScaleAt(0, gtime);
+    window.element.translate = window.element.getTranslateAt('time', gtime);
+    window.element.quaternion = window.element.getQuaternionAt('time', gtime);
+    window.element.scale = window.element.getScaleAt('time', gtime);
     //console.log(gtime);
     //console.log(window.mesh.getTranslateAt(gtime));
     gtime += 0.01;

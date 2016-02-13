@@ -24,7 +24,10 @@ export default class Element {
     this._accumulatedAncestryNameWithUpdateInfoString = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
     this._animationLine = [];
+    this._userFlavorName = '';
     this.opacity = 1.0;
+
+    this._activeAnimationLineName = 'time';
 
     this._setName();
   }
@@ -65,8 +68,8 @@ export default class Element {
     return this._translate;
   }
 
-  getTranslateAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'translate');
+  getTranslateAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
   }
 
   set rotate(vec) {
@@ -85,8 +88,8 @@ export default class Element {
     return this._rotate;
   }
 
-  getRotateAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'rotate');
+  getRotateAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
   }
 
   set quaternion(quat) {
@@ -105,8 +108,8 @@ export default class Element {
     return this._quaternion;
   }
 
-  getQuaternionAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'quaternion');
+  getQuaternionAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
   }
 
   set scale(vec) {
@@ -121,8 +124,8 @@ export default class Element {
     return this._scale;
   }
 
-  getScaleAt(lineIndex, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineIndex], 'scale');
+  getScaleAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
   }
 
   get transformMatrix() {
@@ -274,12 +277,25 @@ export default class Element {
     return this._instanceName;
   }
 
+  set userFlavorName(name) {
+    this._userFlavorName = name;
+  }
+
+  get userFlavorName() {
+    return this._userFlavorName;
+  }
+
+  get instanceNameWithUserFlavor() {
+    this._instanceName + '_' + this._userFlavorName;
+  }
+
+  // used by library (not Application)
   toStringWithUpdateInfo() {
   //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
     return this._instanceName + this._updateCountAsElement;                // faster
   }
 
-  setAnimationAtLine(lineIndex, attributeName, inputArray, outputArray) {
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
     var outputComponentN = 0;
     if (outputArray[0] instanceof Vector2) {
       outputComponentN = 2;
@@ -292,16 +308,17 @@ export default class Element {
     } else {
       outputComponentN = 1;
     }
-    if (!this._animationLine[lineIndex]) {
-      this._animationLine[lineIndex] = {};
+    if (!this._animationLine[lineName]) {
+      this._animationLine[lineName] = {};
     }
-    this._animationLine[lineIndex][attributeName] = {
+    this._animationLine[lineName][attributeName] = {
       input: inputArray,
       output: outputArray,
       outputAttribute: attributeName,
       outputComponentN: outputComponentN
     };
   }
+
 }
 
 GLBoost["Element"] = Element;
