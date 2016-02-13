@@ -23,11 +23,11 @@ export default class Element {
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
-    this._animationLine = [];
+    this._animationLine = {};
     this._userFlavorName = '';
     this.opacity = 1.0;
 
-    this._activeAnimationLineName = 'time';
+    this._activeAnimationLineName = null;
 
     this._setName();
   }
@@ -51,8 +51,8 @@ export default class Element {
     if (animation[type]) {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
-      console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
-      return this[type];
+    //  console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
+      return this['_' + type];
     }
   }
 
@@ -64,8 +64,17 @@ export default class Element {
     this._needUpdate();
   }
 
+  _getCurrentAnimationInputValue(inputName) {
+    return this._parent._getCurrentAnimationInputValue(inputName);
+  }
+
   get translate() {
-    return this._translate;
+    console.log(this._instanceName + '_' + this._userFlavorName);
+    if (this._activeAnimationLineName) {
+      return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._translate;
+    }
   }
 
   getTranslateAt(lineName, value) {
@@ -85,7 +94,11 @@ export default class Element {
   }
 
   get rotate() {
-    return this._rotate;
+    if (this._activeAnimationLineName) {
+      return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._rotate;
+    }
   }
 
   getRotateAt(lineName, value) {
@@ -105,7 +118,11 @@ export default class Element {
   }
 
   get quaternion() {
-    return this._quaternion;
+    if (this._activeAnimationLineName) {
+      return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._quaternion;
+    }
   }
 
   getQuaternionAt(lineName, value) {
@@ -121,7 +138,11 @@ export default class Element {
   }
 
   get scale() {
-    return this._scale;
+    if (this._activeAnimationLineName) {
+      return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._scale;
+    }
   }
 
   getScaleAt(lineName, value) {
@@ -132,17 +153,17 @@ export default class Element {
     if (this._dirtyAsElement) {
       var matrix = Matrix44.identity();
       if (this._isQuaternionActive) {
-        var rotationMatrix = this._quaternion.rotationMatrix;
+        var rotationMatrix = this.quaternion.rotationMatrix;
       } else {
-        var rotationMatrix = Matrix44.rotateX(this._rotate.x).
-        multiply(Matrix44.rotateY(this._rotate.y)).
-        multiply(Matrix44.rotateZ(this._rotate.z));
+        var rotationMatrix = Matrix44.rotateX(this.rotate.x).
+        multiply(Matrix44.rotateY(this.rotate.y)).
+        multiply(Matrix44.rotateZ(this.rotate.z));
       }
 
-      this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(rotationMatrix);
-      this._matrix.m03 = this._translate.x;
-      this._matrix.m13 = this._translate.y;
-      this._matrix.m23 = this._translate.z;
+      this._matrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+      this._matrix.m03 = this.translate.x;
+      this._matrix.m13 = this.translate.y;
+      this._matrix.m23 = this.translate.z;
 
       this._dirtyAsElement = false;
     }
@@ -319,6 +340,25 @@ export default class Element {
     };
   }
 
+  setActiveAnimationLine(lineName) {
+    this._activeAnimationLineName = lineName;
+  }
+
+  hasAnimation(lineName) {
+    if (this._animationLine[lineName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  set isQuaternionActive(flag) {
+    this._isQuaternionActive = flag;
+  }
+
+  get isQuaternionActive() {
+    return this._isQuaternionActive;
+  }
 }
 
 GLBoost["Element"] = Element;

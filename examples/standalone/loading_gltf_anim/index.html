@@ -64,18 +64,15 @@ promise.then(function(group) {
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
   scene.add( group );
-  window.element = group.searchElement('_pPyramid1');
+
   scene.prepareForRender();
 
   var render = function(){
     renderer.clearCanvas();
     renderer.draw(scene);
 
-    window.element.translate = window.element.getTranslateAt('time', gtime);
-    window.element.quaternion = window.element.getQuaternionAt('time', gtime);
-    window.element.scale = window.element.getScaleAt('time', gtime);
-    //console.log(gtime);
-    //console.log(window.mesh.getTranslateAt(gtime));
+    scene.setCurrentAnimationValue('time', gtime);
+
     gtime += 0.01;
 
     if (gtime > 1.5) {

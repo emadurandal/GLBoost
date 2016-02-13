@@ -12,6 +12,7 @@ export default class Scene extends Element {
     this._meshes = [];
     this._lights = [];
     this._cameras = [];
+    this._currentAnimationInputValues = {};
 
     // this code for tmlib
     if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Scene ||
@@ -21,9 +22,43 @@ export default class Scene extends Element {
     }
   }
 
-  add(mesh) {
-    this._elements.push(mesh);
+  add(element) {
+    this._elements.push(element);
+    element._parent = this;
   }
+
+  addChild(element) {
+    this._elements.push(element);
+    element._parent = this;
+  }
+
+  getChildren() {
+    return this._elements;
+  }
+
+
+  _setDirtyToAnimatedElement(inputName, element = this) {
+    if (element.hasAnimation(inputName)) {
+      element._needUpdate();
+    }
+
+    if (element instanceof Group || element instanceof Scene) {
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        this._setDirtyToAnimatedElement(inputName, children[i]);
+      }
+    }
+  }
+
+  _getCurrentAnimationInputValue(inputName) {
+    return this._currentAnimationInputValues[inputName];
+  }
+
+  setCurrentAnimationValue(inputName, inputValue) {
+    this._setDirtyToAnimatedElement(inputName);
+    this._currentAnimationInputValues[inputName] = inputValue;
+  }
+
 
   prepareForRender() {
     // カメラが最低１つでも存在しているか確認

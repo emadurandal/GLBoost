@@ -238,6 +238,8 @@ export default class GLTFLoader {
         let hitElement = element.searchElement(targetMeshStr);
         if (hitElement) {
           hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+          hitElement.setActiveAnimationLine('time');
+          hitElement.isQuaternionActive = true;
         }
       }
     }

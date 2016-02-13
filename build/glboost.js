@@ -1395,11 +1395,11 @@
       this._updateCountAsElement = 0;
       this._accumulatedAncestryNameWithUpdateInfoString = '';
       this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
-      this._animationLine = [];
+      this._animationLine = {};
       this._userFlavorName = '';
       this.opacity = 1.0;
 
-      this._activeAnimationLineName = 'time';
+      this._activeAnimationLineName = null;
 
       this._setName();
     }
@@ -1423,9 +1423,14 @@
         if (animation[type]) {
           return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
         } else {
-          console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
-          return this[type];
+          //  console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
+          return this['_' + type];
         }
+      }
+    }, {
+      key: '_getCurrentAnimationInputValue',
+      value: function _getCurrentAnimationInputValue(inputName) {
+        return this._parent._getCurrentAnimationInputValue(inputName);
       }
     }, {
       key: 'getTranslateAt',
@@ -1538,6 +1543,20 @@
         };
       }
     }, {
+      key: 'setActiveAnimationLine',
+      value: function setActiveAnimationLine(lineName) {
+        this._activeAnimationLineName = lineName;
+      }
+    }, {
+      key: 'hasAnimation',
+      value: function hasAnimation(lineName) {
+        if (this._animationLine[lineName]) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
       key: 'updateCountAsElement',
       get: function get() {
         return this._updateCountAsElement;
@@ -1552,7 +1571,12 @@
         this._needUpdate();
       },
       get: function get() {
-        return this._translate;
+        console.log(this._instanceName + '_' + this._userFlavorName);
+        if (this._activeAnimationLineName) {
+          return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._translate;
+        }
       }
     }, {
       key: 'rotate',
@@ -1568,7 +1592,11 @@
         this._needUpdate();
       },
       get: function get() {
-        return this._rotate;
+        if (this._activeAnimationLineName) {
+          return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._rotate;
+        }
       }
     }, {
       key: 'quaternion',
@@ -1584,7 +1612,11 @@
         this._needUpdate();
       },
       get: function get() {
-        return this._quaternion;
+        if (this._activeAnimationLineName) {
+          return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._quaternion;
+        }
       }
     }, {
       key: 'scale',
@@ -1596,7 +1628,11 @@
         this._needUpdate();
       },
       get: function get() {
-        return this._scale;
+        if (this._activeAnimationLineName) {
+          return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._scale;
+        }
       }
     }, {
       key: 'transformMatrix',
@@ -1604,15 +1640,15 @@
         if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
           if (this._isQuaternionActive) {
-            var rotationMatrix = this._quaternion.rotationMatrix;
+            var rotationMatrix = this.quaternion.rotationMatrix;
           } else {
-            var rotationMatrix = Matrix44.rotateX(this._rotate.x).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z));
+            var rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
           }
 
-          this._matrix = matrix.multiply(Matrix44.scale(this._scale)).multiply(rotationMatrix);
-          this._matrix.m03 = this._translate.x;
-          this._matrix.m13 = this._translate.y;
-          this._matrix.m23 = this._translate.z;
+          this._matrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+          this._matrix.m03 = this.translate.x;
+          this._matrix.m13 = this.translate.y;
+          this._matrix.m23 = this.translate.z;
 
           this._dirtyAsElement = false;
         }
@@ -1709,6 +1745,14 @@
       key: 'instanceNameWithUserFlavor',
       get: function get() {
         this._instanceName + '_' + this._userFlavorName;
+      }
+    }, {
+      key: 'isQuaternionActive',
+      set: function set(flag) {
+        this._isQuaternionActive = flag;
+      },
+      get: function get() {
+        return this._isQuaternionActive;
       }
     }]);
     return Element;
@@ -3658,6 +3702,9 @@
       set: function set(vec) {
         babelHelpers.set(Object.getPrototypeOf(Camera.prototype), 'translate', vec, this);
         this._needUpdateView();
+      },
+      get: function get() {
+        return babelHelpers.get(Object.getPrototypeOf(Camera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
@@ -3956,6 +4003,7 @@
       _this._meshes = [];
       _this._lights = [];
       _this._cameras = [];
+      _this._currentAnimationInputValues = {};
 
       // this code for tmlib
       if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Scene || _this.__proto__.__proto__ && _this.__proto__.__proto__.__proto__ && _this.__proto__.__proto__.__proto__.constructor == Scene) {
@@ -3967,8 +4015,47 @@
 
     babelHelpers.createClass(Scene, [{
       key: 'add',
-      value: function add(mesh) {
-        this._elements.push(mesh);
+      value: function add(element) {
+        this._elements.push(element);
+        element._parent = this;
+      }
+    }, {
+      key: 'addChild',
+      value: function addChild(element) {
+        this._elements.push(element);
+        element._parent = this;
+      }
+    }, {
+      key: 'getChildren',
+      value: function getChildren() {
+        return this._elements;
+      }
+    }, {
+      key: '_setDirtyToAnimatedElement',
+      value: function _setDirtyToAnimatedElement(inputName) {
+        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+
+        if (element.hasAnimation(inputName)) {
+          element._needUpdate();
+        }
+
+        if (element instanceof Group || element instanceof Scene) {
+          var children = element.getChildren();
+          for (var i = 0; i < children.length; i++) {
+            this._setDirtyToAnimatedElement(inputName, children[i]);
+          }
+        }
+      }
+    }, {
+      key: '_getCurrentAnimationInputValue',
+      value: function _getCurrentAnimationInputValue(inputName) {
+        return this._currentAnimationInputValues[inputName];
+      }
+    }, {
+      key: 'setCurrentAnimationValue',
+      value: function setCurrentAnimationValue(inputName, inputValue) {
+        this._setDirtyToAnimatedElement(inputName);
+        this._currentAnimationInputValues[inputName] = inputValue;
       }
     }, {
       key: 'prepareForRender',
@@ -6097,6 +6184,8 @@
             var hitElement = element.searchElement(targetMeshStr);
             if (hitElement) {
               hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+              hitElement.setActiveAnimationLine('time');
+              hitElement.isQuaternionActive = true;
             }
           }
         }

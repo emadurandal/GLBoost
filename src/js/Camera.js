@@ -102,6 +102,10 @@ export default class Camera extends Element {
     this._needUpdateView();
   }
 
+  get translate() {
+    return super.translate;
+  }
+
   set eye(vec) {
     super.translate = vec;
     this._needUpdateView();
