@@ -1,5 +1,6 @@
 import GLBoost from './../globals'
 import Vector3 from './Vector3'
+import MathUtil from './MathUtil'
 
 export default class Matrix33 {
 
@@ -47,7 +48,14 @@ export default class Matrix33 {
   /**
    * Create X oriented Rotation Matrix
    */
-  rotateX(radian) {
+  rotateX(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     return this.setComponents(
@@ -59,7 +67,14 @@ export default class Matrix33 {
   /**
    * Create X oriented Rotation Matrix
    */
-  static rotateX(radian) {
+  static rotateX(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     return new Matrix33(
@@ -72,7 +87,14 @@ export default class Matrix33 {
   /**
    * Create Y oriented Rotation Matrix
    */
-  rotateY(radian) {
+  rotateY(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     this.setComponents(
@@ -85,7 +107,14 @@ export default class Matrix33 {
   /**
    * Create Y oriented Rotation Matrix
    */
-  static rotateY(radian) {
+  static rotateY(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     return new Matrix33(
@@ -98,7 +127,14 @@ export default class Matrix33 {
   /**
    * Create Z oriented Rotation Matrix
    */
-  rotateZ(radian) {
+  rotateZ(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     return this.setComponents(
@@ -110,7 +146,14 @@ export default class Matrix33 {
   /**
    * Create Z oriented Rotation Matrix
    */
-  static rotateZ(radian) {
+  static rotateZ(angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+
     var cos = Math.cos(radian);
     var sin = Math.sin(radian);
     return new Matrix33(

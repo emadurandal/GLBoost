@@ -67,7 +67,7 @@
 
 
         layer.update = function() {
-          var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
+          var rotateMatrix = GLBoost.Matrix44.rotateY(-1.0);
           var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           camera.eye = rotatedVector;
         };

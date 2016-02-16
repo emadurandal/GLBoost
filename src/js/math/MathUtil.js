@@ -1,3 +1,5 @@
+import GLBoost from './../globals'
+
 export default class MathUtil {
 
   constructor() {

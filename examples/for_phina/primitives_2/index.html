@@ -82,13 +82,11 @@
         var theta = 0;
         var radius = 100;
         layer.update = function() {
-          //var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
-          //var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           theta += 0.5;
           camera.eye = new GLBoost.Vector3(
-              radius * Math.sin( theta * Math.PI / 180 ),
-              radius * Math.sin( theta * Math.PI / 180 ),
-              radius * Math.cos( theta * Math.PI / 180 ));
+              radius * Math.sin( GLBoost.MathUtil.degreeToRadian(theta) ),
+              radius * Math.sin( GLBoost.MathUtil.degreeToRadian(theta) ),
+              radius * Math.cos( GLBoost.MathUtil.degreeToRadian(theta) ));
         };
 
 

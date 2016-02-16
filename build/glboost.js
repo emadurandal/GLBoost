@@ -145,6 +145,27 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
+  var MathUtil = (function () {
+    function MathUtil() {
+      babelHelpers.classCallCheck(this, MathUtil);
+    }
+
+    babelHelpers.createClass(MathUtil, null, [{
+      key: "radianToDegree",
+      value: function radianToDegree(rad) {
+        return rad * 180 / Math.PI;
+      }
+    }, {
+      key: "degreeToRadian",
+      value: function degreeToRadian(deg) {
+        return deg * Math.PI / 180;
+      }
+    }]);
+    return MathUtil;
+  })();
+
+  GLBoost$1["MathUtil"] = MathUtil;
+
   var Vector3 = (function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -426,7 +447,14 @@
       /**
        * Create X oriented Rotation Matrix
        */
-      value: function rotateX(radian) {
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return this.setComponents(1, 0, 0, 0, cos, -sin, 0, sin, cos);
@@ -441,7 +469,14 @@
       /**
        * Create Y oriented Rotation Matrix
        */
-      value: function rotateY(radian) {
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         this.setComponents(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
@@ -457,7 +492,14 @@
       /**
        * Create Z oriented Rotation Matrix
        */
-      value: function rotateZ(radian) {
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return this.setComponents(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
@@ -641,21 +683,42 @@
       }
     }, {
       key: 'rotateX',
-      value: function rotateX(radian) {
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix33(1, 0, 0, 0, cos, -sin, 0, sin, cos);
       }
     }, {
       key: 'rotateY',
-      value: function rotateY(radian) {
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix33(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
       }
     }, {
       key: 'rotateZ',
-      value: function rotateZ(radian) {
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix33(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
@@ -801,7 +864,14 @@
       /**
        * Create X oriented Rotation Matrix
        */
-      value: function rotateX(radian) {
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return this.setComponents(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
@@ -816,7 +886,14 @@
       /**
        * Create Y oriented Rotation Matrix
        */
-      value: function rotateY(radian) {
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return this.setComponents(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
@@ -831,7 +908,14 @@
       /**
        * Create Z oriented Rotation Matrix
        */
-      value: function rotateZ(radian) {
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return this.setComponents(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -1105,21 +1189,42 @@
       }
     }, {
       key: 'rotateX',
-      value: function rotateX(radian) {
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix44(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
       }
     }, {
       key: 'rotateY',
-      value: function rotateY(radian) {
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix44(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
       }
     }, {
       key: 'rotateZ',
-      value: function rotateZ(radian) {
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
         var cos = Math.cos(radian);
         var sin = Math.sin(radian);
         return new Matrix44(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -1200,27 +1305,6 @@
   })();
 
   GLBoost$1["Matrix44"] = Matrix44;
-
-  var MathUtil = (function () {
-    function MathUtil() {
-      babelHelpers.classCallCheck(this, MathUtil);
-    }
-
-    babelHelpers.createClass(MathUtil, null, [{
-      key: "radianToDegree",
-      value: function radianToDegree(rad) {
-        return rad * 180 / Math.PI;
-      }
-    }, {
-      key: "degreeToRadian",
-      value: function degreeToRadian(deg) {
-        return deg * Math.PI / 180;
-      }
-    }]);
-    return MathUtil;
-  })();
-
-  GLBoost["MathUtil"] = MathUtil;
 
   var Quaternion = (function () {
     function Quaternion(x, y, z, w) {

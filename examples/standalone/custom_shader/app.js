@@ -198,7 +198,7 @@
       renderer.clearCanvas();
       renderer.draw(scene);
 
-      var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
+      var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
       var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
       camera.eye = rotatedVector;
 
