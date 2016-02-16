@@ -1,5 +1,6 @@
 import GLBoost from './../globals'
 import Matrix44 from './Matrix44'
+import Vector3 from './Vector3'
 import MathUtil from './MathUtil'
 
 export default class Quaternion {
@@ -74,11 +75,48 @@ export default class Quaternion {
     var wz = this.w * this.z;
 
     return new Matrix44(
-      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
-      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
-      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
       0.0, 0.0, 0.0, 1.0
     );
+  }
+
+  axisAngle(axisVec3, angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+    var halfAngle = 0.5 * radian;
+    var sin = Math.sin(halfAngle);
+
+    var axis = Vector3.normalize(axisVec3);
+    this.w = Math.cos(halfAngle);
+    this.x = sin * axis.x;
+    this.y = sin * axis.y;
+    this.z = sin * axis.z;
+
+    return this;
+  }
+
+  static axisAngle(axisVec3, angle) {
+    var radian = 0;
+    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+    var halfAngle = 0.5 * radian;
+    var sin = Math.sin(halfAngle);
+
+    var axis = Vector3.normalize(axisVec3);
+    return new Quaternion(
+      sin * axis.x,
+      sin * axis.y,
+      sin * axis.z,
+      Math.cos(halfAngle));
   }
 
   add(q) {

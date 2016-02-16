@@ -330,12 +330,12 @@ export default class GLTFLoader {
           break;
         case 'VEC4':
           if (quaternionIfVec4) {
-            vertexAttributeArray.push(Quaternion.invert(new Quaternion(
+            vertexAttributeArray.push(new Quaternion(
               dataView[dataViewMethod](pos, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
-            )));
+            ));
           } else {
             vertexAttributeArray.push(new Vector4(
               dataView[dataViewMethod](pos, littleEndian)*scale,

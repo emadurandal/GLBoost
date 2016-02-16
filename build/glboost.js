@@ -133,6 +133,8 @@
   global.GLBoost["BLENDTARGET8"] = 'shapetarget_8';
   global.GLBoost["BLENDTARGET9"] = 'shapetarget_9';
   global.GLBoost["BLENDTARGET10"] = 'shapetarget_10';
+  global.GLBoost["RADIAN"] = 'radian';
+  global.GLBoost["DEGREE"] = 'degree';
 
   var GLBoost$1 = global.GLBoost;
 
@@ -1218,6 +1220,8 @@
     return MathUtil;
   })();
 
+  GLBoost["MathUtil"] = MathUtil;
+
   var Quaternion = (function () {
     function Quaternion(x, y, z, w) {
       babelHelpers.classCallCheck(this, Quaternion);
@@ -1241,6 +1245,26 @@
       key: 'clone',
       value: function clone() {
         return new Quaternion(this.x, this.y, this.z, this.w);
+      }
+    }, {
+      key: 'axisAngle',
+      value: function axisAngle(axisVec3, angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+        var halfAngle = 0.5 * radian;
+        var sin = Math.sin(halfAngle);
+
+        var axis = Vector3.normalize(axisVec3);
+        this.w = Math.cos(halfAngle);
+        this.x = sin * axis.x;
+        this.y = sin * axis.y;
+        this.z = sin * axis.z;
+
+        return this;
       }
     }, {
       key: 'add',
@@ -1275,7 +1299,7 @@
         var wy = this.w * this.y;
         var wz = this.w * this.z;
 
-        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0, 2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0, 2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
+        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0, 2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0, 2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
       }
     }], [{
       key: 'invert',
@@ -1298,6 +1322,7 @@
 
           return q;
         } else {
+
           var ph = Math.acos(qr);
           var s2 = undefined;
           if (qr < 0.0 && ph > Math.PI / 2.0) {
@@ -1316,6 +1341,21 @@
 
           return q;
         }
+      }
+    }, {
+      key: 'axisAngle',
+      value: function axisAngle(axisVec3, angle) {
+        var radian = 0;
+        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+        var halfAngle = 0.5 * radian;
+        var sin = Math.sin(halfAngle);
+
+        var axis = Vector3.normalize(axisVec3);
+        return new Quaternion(sin * axis.x, sin * axis.y, sin * axis.z, Math.cos(halfAngle));
       }
     }]);
     return Quaternion;
@@ -5485,6 +5525,7 @@
 
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
   GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
+  GLBoost$1["ANGLE_UNIT"] = GLBoost$1.DEGREE;
 
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
@@ -6281,7 +6322,7 @@
               break;
             case 'VEC4':
               if (quaternionIfVec4) {
-                vertexAttributeArray.push(Quaternion.invert(new Quaternion(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian))));
+                vertexAttributeArray.push(new Quaternion(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
               } else {
                 vertexAttributeArray.push(new Vector4(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
               }

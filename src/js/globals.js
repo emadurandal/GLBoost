@@ -25,6 +25,9 @@ global.GLBoost["BLENDTARGET7"] = 'shapetarget_7';
 global.GLBoost["BLENDTARGET8"] = 'shapetarget_8';
 global.GLBoost["BLENDTARGET9"] = 'shapetarget_9';
 global.GLBoost["BLENDTARGET10"] = 'shapetarget_10';
+global.GLBoost["RADIAN"] = 'radian';
+global.GLBoost["DEGREE"] = 'degree';
+
 
 export default global.GLBoost;
 

@@ -12,3 +12,5 @@ export default class MathUtil {
     return deg * Math.PI / 180;
   }
 }
+
+GLBoost["MathUtil"] = MathUtil;
