@@ -4306,7 +4306,7 @@
   var Texture = (function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
-    function Texture(imageUrl, canvas) {
+    function Texture(src, canvas) {
       babelHelpers.classCallCheck(this, Texture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, canvas));
@@ -4314,10 +4314,49 @@
       _this._isTextureReady = false;
       _this._texture = null;
 
-      _this._img = new Image();
-      _this._img.crossOrigin = "Anonymous";
-      _this._img.onload = function () {
-        var gl = _this._gl;
+      if (typeof src === "string") {
+        _this.generateTextureFromUri(src);
+      } else {
+        _this.generateTextureFromImageData(src);
+      }
+      return _this;
+    }
+
+    babelHelpers.createClass(Texture, [{
+      key: 'generateTextureFromUri',
+      value: function generateTextureFromUri(imageUri) {
+        var _this2 = this;
+
+        this._img = new Image();
+        this._img.crossOrigin = "Anonymous";
+        this._img.onload = function () {
+          var gl = _this2._gl;
+          var glem = GLExtentionsManager.getInstance(gl);
+
+          var texture = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+          if (glem.extTFA) {
+            gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+          }
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.bindTexture(gl.TEXTURE_2D, null);
+
+          _this2._texture = texture;
+          _this2._isTextureReady = true;
+          _this2._width = _this2._img.width;
+          _this2._height = _this2._img.height;
+        };
+
+        this._img.src = imageUri;
+      }
+    }, {
+      key: 'generateTextureFromImageData',
+      value: function generateTextureFromImageData(imageData) {
+        var gl = this._gl;
         var glem = GLExtentionsManager.getInstance(gl);
 
         var texture = gl.createTexture();
@@ -4326,23 +4365,19 @@
         if (glem.extTFA) {
           gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this._img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData);
         gl.generateMipmap(gl.TEXTURE_2D);
         gl.bindTexture(gl.TEXTURE_2D, null);
 
-        _this._texture = texture;
-        _this._isTextureReady = true;
-        _this._width = _this._img.width;
-        _this._height = _this._img.width;
-      };
-
-      _this._img.src = imageUrl;
-      return _this;
-    }
-
-    babelHelpers.createClass(Texture, [{
+        this._texture = texture;
+        this._isTextureReady = true;
+        this._width = imageData.width;
+        this._height = imageData.height;
+        this._img = imageData;
+      }
+    }, {
       key: 'isTextureReady',
       get: function get() {
         return this._isTextureReady;
@@ -4350,7 +4385,7 @@
     }, {
       key: 'isImageAssignedForTexture',
       get: function get() {
-        return typeof this._img.src !== "undefined";
+        return typeof this._img == "undefined";
       }
     }]);
     return Texture;
