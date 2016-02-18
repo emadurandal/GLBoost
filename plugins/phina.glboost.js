@@ -4,7 +4,7 @@ phina.namespace(function() {
    * @class
    */
   phina.define('phina.display.GLBoostLayer', {
-    superClass: 'phina.display.CanvasElement',
+    superClass: 'phina.display.Layer',
 
     scene: null,
     camera: null,
@@ -16,7 +16,9 @@ phina.namespace(function() {
     renderChildBySelf: false,
 
     init: function(params) {
-      this.superInit();
+      this.superInit(params);
+      this.originX = 0;
+      this.originY = 0;
 
       this.canvas = document.createElement("canvas");
       this.canvas.id = 'glboost_world';
@@ -30,11 +32,58 @@ phina.namespace(function() {
         this.renderer.clearCanvas();
         this.renderer.draw(this.scene);
       });
-    },
-
-    draw: function(canvas) {
-      var domElement = this.canvas;
-      canvas.context.drawImage(domElement, 0, 0, domElement.width, domElement.height);
+      this.domElement = this.canvas;
     }
   });
+
+  phina.define("phina.display.OffScreenLayer", {
+    superClass: 'phina.display.Layer',
+
+    /**
+     * 子孫要素の描画の面倒を自分で見る
+     */
+    renderChildBySelf: true,
+
+    /** 子孫要素を普通に描画するためのキャンバス */
+    canvas2d: null,
+    /** canvas2dに描画するレンダラー */
+    renderer2d: null,
+
+    width: 0,
+    height: 0,
+
+    init: function (params) {
+      this.superInit();
+
+      this.width = params.width;
+      this.height = params.height;
+
+      this.canvas2d = phina.graphics.Canvas();
+      this.canvas2d.setSize(this.width, this.height);
+
+      this.renderer2d = phina.display.CanvasRenderer(this.canvas2d);
+
+    },
+
+    reset: function() {
+      this.canvas2d.clearColor('red', 0, 0, this.width, this.height);
+      // this.canvas2d.clear(0, 0, this.width, this.height);
+      /*
+       this.canvas2d.init();
+       this.canvas2d.setSize(this.width, this.height);
+       this.renderer2d = phina.display.CanvasRenderer(this.canvas2d);
+       */
+    },
+
+    renderObject: function(obj) {
+      var layer = CanvasElement();
+      obj.addChildTo(layer);
+      this.renderer2d.renderObject(layer);
+    },
+
+    getImageDataURL: function() {
+      return this.canvas2d.domElement.toDataURL('image/png');
+    }
+  });
+
 });

@@ -44,6 +44,10 @@ export default class AbstractTexture {
     return this._height;
   }
 
+  isPowerOfTwo(x) {
+    return (x & (x - 1)) == 0;
+  }
+
 }
 
 GLBoost["AbstractTexture"] = AbstractTexture;
