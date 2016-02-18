@@ -1,3 +1,9 @@
+import GLBoost from '../globals'
+
+if (typeof phina !== "undefined") {
+
+
+
 phina.namespace(function() {
 
   /**
@@ -87,3 +93,6 @@ phina.namespace(function() {
   });
 
 });
+}
+
+export default GLBoost;
