@@ -411,6 +411,8 @@
       this.m = [];
       if (arguments.length >= 9) {
         this.setComponents.apply(this, arguments);
+      } else if (Array.isArray(arguments[0])) {
+        this.m = arguments[0].concat();
       } else {
         this.identity();
       }
@@ -613,7 +615,7 @@
         return this.m[0];
       }
     }, {
-      key: 'm01',
+      key: 'm10',
       set: function set(val) {
         this.m[1] = val;
       },
@@ -621,7 +623,7 @@
         return this.m[1];
       }
     }, {
-      key: 'm02',
+      key: 'm20',
       set: function set(val) {
         this.m[2] = val;
       },
@@ -629,7 +631,7 @@
         return this.m[2];
       }
     }, {
-      key: 'm10',
+      key: 'm01',
       set: function set(val) {
         this.m[3] = val;
       },
@@ -645,7 +647,7 @@
         return this.m[4];
       }
     }, {
-      key: 'm12',
+      key: 'm21',
       set: function set(val) {
         this.m[5] = val;
       },
@@ -653,7 +655,7 @@
         return this.m[5];
       }
     }, {
-      key: 'm20',
+      key: 'm02',
       set: function set(val) {
         this.m[6] = val;
       },
@@ -661,7 +663,7 @@
         return this.m[6];
       }
     }, {
-      key: 'm21',
+      key: 'm12',
       set: function set(val) {
         this.m[7] = val;
       },
@@ -812,6 +814,8 @@
       this.m = [];
       if (arguments.length >= 16) {
         this.setComponents.apply(this, arguments);
+      } else if (Array.isArray(arguments[0])) {
+        this.m = arguments[0].concat();
       } else {
         this.identity();
       }
@@ -830,7 +834,7 @@
     }, {
       key: 'clone',
       value: function clone() {
-        return new Matrix44(this.m00, this.m01, this.m02, this.m03, this.m10, this.m11, this.m12, this.m13, this.m20, this.m21, this.m22, this.m23, this.m30, this.m31, this.m32, this.m33);
+        return new Matrix44(this.m);
       }
 
       /**
@@ -1053,7 +1057,7 @@
         return this.m[0];
       }
     }, {
-      key: 'm01',
+      key: 'm10',
       set: function set(val) {
         this.m[1] = val;
       },
@@ -1061,7 +1065,7 @@
         return this.m[1];
       }
     }, {
-      key: 'm02',
+      key: 'm20',
       set: function set(val) {
         this.m[2] = val;
       },
@@ -1069,7 +1073,7 @@
         return this.m[2];
       }
     }, {
-      key: 'm03',
+      key: 'm30',
       set: function set(val) {
         this.m[3] = val;
       },
@@ -1077,7 +1081,7 @@
         return this.m[3];
       }
     }, {
-      key: 'm10',
+      key: 'm01',
       set: function set(val) {
         this.m[4] = val;
       },
@@ -1093,7 +1097,7 @@
         return this.m[5];
       }
     }, {
-      key: 'm12',
+      key: 'm21',
       set: function set(val) {
         this.m[6] = val;
       },
@@ -1101,7 +1105,7 @@
         return this.m[6];
       }
     }, {
-      key: 'm13',
+      key: 'm31',
       set: function set(val) {
         this.m[7] = val;
       },
@@ -1109,7 +1113,7 @@
         return this.m[7];
       }
     }, {
-      key: 'm20',
+      key: 'm02',
       set: function set(val) {
         this.m[8] = val;
       },
@@ -1117,7 +1121,7 @@
         return this.m[8];
       }
     }, {
-      key: 'm21',
+      key: 'm12',
       set: function set(val) {
         this.m[9] = val;
       },
@@ -1133,7 +1137,7 @@
         return this.m[10];
       }
     }, {
-      key: 'm23',
+      key: 'm32',
       set: function set(val) {
         this.m[11] = val;
       },
@@ -1141,7 +1145,7 @@
         return this.m[11];
       }
     }, {
-      key: 'm30',
+      key: 'm03',
       set: function set(val) {
         this.m[12] = val;
       },
@@ -1149,7 +1153,7 @@
         return this.m[12];
       }
     }, {
-      key: 'm31',
+      key: 'm13',
       set: function set(val) {
         this.m[13] = val;
       },
@@ -1157,7 +1161,7 @@
         return this.m[13];
       }
     }, {
-      key: 'm32',
+      key: 'm23',
       set: function set(val) {
         this.m[14] = val;
       },
@@ -3611,7 +3615,7 @@
               var projectionMatrix = camera.perspectiveRHMatrix();
               var m_m = mesh.transformMatrixAccumulatedAncestry;
               var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-              gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+              gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
             }
 
             if (glslProgram['lightPosition_0']) {
@@ -3701,7 +3705,7 @@
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.transpose().flatten()));
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
           }
 
           if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
@@ -6107,11 +6111,11 @@
               babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().transpose().flatten()));
+                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().flatten()));
               }
 
               if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).transpose().flatten()));
+                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten()));
               }
 
               this._meshTransformUpdateCount = mesh.updateCountAsElement;

@@ -9,9 +9,10 @@ export default class Matrix44 {
   constructor() {
     this.m = [];
     if (arguments.length >= 16) {
-      this.setComponents.apply(this, arguments);
-    }
-    else {
+      this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values
+    } else if (Array.isArray(arguments[0])) {
+      this.m = arguments[0].concat();             // arguments[0] must be column major array
+    } else {
       this.identity();
     }
   }
@@ -26,12 +27,7 @@ export default class Matrix44 {
   }
 
   clone() {
-    return new Matrix44(
-      this.m00, this.m01, this.m02, this.m03,
-      this.m10, this.m11, this.m12, this.m13,
-      this.m20, this.m21, this.m22, this.m23,
-      this.m30, this.m31, this.m32, this.m33
-    );
+    return new Matrix44(this.m);
   }
 
   /**
@@ -442,35 +438,35 @@ export default class Matrix44 {
     return this.m[0];
   }
 
-  set m01(val) {
+  set m10(val) {
     this.m[1] = val;
   }
 
-  get m01() {
+  get m10() {
     return this.m[1];
   }
 
-  set m02(val) {
+  set m20(val) {
     this.m[2] = val;
   }
 
-  get m02() {
+  get m20() {
     return this.m[2];
   }
 
-  set m03(val) {
+  set m30(val) {
     this.m[3] = val;
   }
 
-  get m03() {
+  get m30() {
     return this.m[3];
   }
 
-  set m10(val) {
+  set m01(val) {
     this.m[4] = val;
   }
 
-  get m10() {
+  get m01() {
     return this.m[4];
   }
 
@@ -482,35 +478,35 @@ export default class Matrix44 {
     return this.m[5];
   }
 
-  set m12(val) {
+  set m21(val) {
     this.m[6] = val;
   }
 
-  get m12() {
+  get m21() {
     return this.m[6];
   }
 
-  set m13(val) {
+  set m31(val) {
     this.m[7] = val;
   }
 
-  get m13() {
+  get m31() {
     return this.m[7];
   }
 
-  set m20(val) {
+  set m02(val) {
     this.m[8] = val;
   }
 
-  get m20() {
+  get m02() {
     return this.m[8];
   }
 
-  set m21(val) {
+  set m12(val) {
     this.m[9] = val;
   }
 
-  get m21() {
+  get m12() {
     return this.m[9];
   }
 
@@ -522,35 +518,35 @@ export default class Matrix44 {
     return this.m[10];
   }
 
-  set m23(val) {
+  set m32(val) {
     this.m[11] = val;
   }
 
-  get m23() {
+  get m32() {
     return this.m[11];
   }
 
-  set m30(val) {
+  set m03(val) {
     this.m[12] = val;
   }
 
-  get m30() {
+  get m03() {
     return this.m[12];
   }
 
-  set m31(val) {
+  set m13(val) {
     this.m[13] = val;
   }
 
-  get m31() {
+  get m13() {
     return this.m[13];
   }
 
-  set m32(val) {
+  set m23(val) {
     this.m[14] = val;
   }
 
-  get m32() {
+  get m23() {
     return this.m[14];
   }
 

@@ -156,11 +156,11 @@ export default class Particle extends Geometry {
         super.setUniforms(gl, glslProgram, material, camera, mesh);
 
         if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-          gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().transpose().flatten()));
+          gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().flatten()));
         }
 
         if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).transpose().flatten()));
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten()));
         }
 
         this._meshTransformUpdateCount = mesh.updateCountAsElement;

@@ -7,9 +7,10 @@ export default class Matrix33 {
   constructor() {
     this.m = [];
     if (arguments.length >= 9) {
-      this.setComponents.apply(this, arguments);
-    }
-    else {
+      this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values
+    } else if (Array.isArray(arguments[0])) {
+      this.m = arguments[0].concat();            // arguments[0] must be column major array
+    } else {
       this.identity();
     }
   }
@@ -319,28 +320,28 @@ export default class Matrix33 {
     return this.m[0];
   }
 
-  set m01(val) {
+  set m10(val) {
     this.m[1] = val;
   }
 
-  get m01() {
+  get m10() {
     return this.m[1];
   }
 
-  set m02(val) {
+  set m20(val) {
     this.m[2] = val;
   }
 
-  get m02() {
+  get m20() {
     return this.m[2];
   }
 
 
-  set m10(val) {
+  set m01(val) {
     this.m[3] = val;
   }
 
-  get m10() {
+  get m01() {
     return this.m[3];
   }
 
@@ -352,27 +353,27 @@ export default class Matrix33 {
     return this.m[4];
   }
 
-  set m12(val) {
+  set m21(val) {
     this.m[5] = val;
   }
 
-  get m12() {
+  get m21() {
     return this.m[5];
   }
 
-  set m20(val) {
+  set m02(val) {
     this.m[6  ] = val;
   }
 
-  get m20() {
+  get m02() {
     return this.m[6];
   }
 
-  set m21(val) {
+  set m12(val) {
     this.m[7] = val;
   }
 
-  get m21() {
+  get m12() {
     return this.m[7];
   }
 
