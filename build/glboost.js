@@ -5126,7 +5126,7 @@
 
         // main loading
         for (var i = 0; i < mtlTextRows.length; i++) {
-          var matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+          var matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
 
           if (matchArray === null) {
             continue;
@@ -5144,28 +5144,28 @@
           }
 
           if (matchArray[1].toLowerCase() === "ka") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
             materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
             materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "kd") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
             materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
             materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "ks") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
             materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
             materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "map_kd") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
             var texture = new Texture(basePath + matchArray[2], canvas);
             texture.name = matchArray[2];
             materials[iMCount].diffuseTexture = texture;
@@ -5226,7 +5226,7 @@
 
         promise.then(function (materials) {
           for (var i = 0; i < objTextRows.length; i++) {
-            var matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
+            var matchArray = objTextRows[i].match(/^(\w+) .(\w+)/);
             if (matchArray === null) {
               continue;
             }
@@ -5245,7 +5245,7 @@
             }
             // Face
             if (matchArray[1] === "f") {
-              matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+              matchArray = objTextRows[i].match(/^(\w+) .(\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
               if (matchArray !== null) {
                 // if this is a Quad Polygon
                 fCount += 2;
@@ -5265,7 +5265,7 @@
 
           for (var i = 0; i < objTextRows.length; i++) {
             //キーワード 読み込み
-            var matchArray = objTextRows[i].match(/^(\w+) /);
+            var matchArray = objTextRows[i].match(/^(\w+) ./);
 
             if (matchArray === null) {
               continue;
@@ -5273,7 +5273,7 @@
 
             //頂点 読み込み
             if (matchArray[1] === "v") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+              matchArray = objTextRows[i].match(/^(\w+) .(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvCoord[vCount] = new Vector3();
               pvCoord[vCount].x = parseFloat(matchArray[2]);
@@ -5284,7 +5284,7 @@
 
             //法線 読み込み
             if (matchArray[1] === "vn") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+              matchArray = objTextRows[i].match(/^(\w+) .(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvNormal[vnCount] = new Vector3();
               pvNormal[vnCount].x = parseFloat(matchArray[2]);
@@ -5295,7 +5295,7 @@
 
             //テクスチャー座標 読み込み
             if (matchArray[1] === "vt") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+              matchArray = objTextRows[i].match(/^(\w+) .(-?[0-9\.]+) (-?[0-9\.]+)/);
               pvTexture[vtCount] = new Vector2();
               pvTexture[vtCount].x = parseFloat(matchArray[2]);
               pvTexture[vtCount].y = parseFloat(matchArray[3]);
@@ -5340,7 +5340,8 @@
 
               if (matchArray[1] === "f" && boFlag) {
                 var isQuad = true;
-                var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);if (_matchArray === null) {
+                var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+                if (_matchArray === null) {
                   _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
                 }
                 if (_matchArray === null) {
