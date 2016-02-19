@@ -43,7 +43,7 @@ export default class Sphere extends Geometry {
         var position = new Vector3(x, y, z);
         positions.push(position);
         var u = 1 - (longNumber / widthSegments);
-        var v = 1 - (latNumber / heightSegments);
+        var v = latNumber / heightSegments;
         texcoords.push(new Vector2(u, v));
         colors.push(vertexColor);
         normals.push(Vector3.normalize(position));
