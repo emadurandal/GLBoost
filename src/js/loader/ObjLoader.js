@@ -70,7 +70,7 @@ export default class ObjLoader {
 
     // main loading
     for (let i=0; i<mtlTextRows.length; i++) {
-      let matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+      let matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
 
       if (matchArray === null) {
         continue;
@@ -90,7 +90,7 @@ export default class ObjLoader {
 
       if (matchArray[1].toLowerCase() === "ka")
       {
-        matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
         materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
         materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
@@ -98,7 +98,7 @@ export default class ObjLoader {
 
       if (matchArray[1].toLowerCase() === "kd")
       {
-        matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
         materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
         materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
@@ -106,7 +106,7 @@ export default class ObjLoader {
 
       if (matchArray[1].toLowerCase() === "ks")
       {
-        matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
         materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
         materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
         materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
@@ -114,7 +114,7 @@ export default class ObjLoader {
 
       if (matchArray[1].toLowerCase() === "map_kd")
       {
-        matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+        matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
         var texture = new Texture(basePath + matchArray[2], canvas);
         texture.name = matchArray[2];
         materials[iMCount].diffuseTexture = texture;
@@ -170,7 +170,7 @@ export default class ObjLoader {
 
     promise.then((materials)=>{
       for (let i=0; i<objTextRows.length; i++) {
-        let matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
+        let matchArray = objTextRows[i].match(/^(\w+) +(\w+)/);
         if (matchArray === null) {
           continue;
         }
@@ -221,7 +221,7 @@ export default class ObjLoader {
         //頂点 読み込み
         if (matchArray[1] === "v")
         {
-          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+          matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
 //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
           pvCoord[vCount] = new Vector3();
           pvCoord[vCount].x = parseFloat(matchArray[2]);

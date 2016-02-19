@@ -5126,7 +5126,7 @@
 
         // main loading
         for (var i = 0; i < mtlTextRows.length; i++) {
-          var matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+          var matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
 
           if (matchArray === null) {
             continue;
@@ -5144,28 +5144,28 @@
           }
 
           if (matchArray[1].toLowerCase() === "ka") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
             materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
             materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "kd") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
             materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
             materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "ks") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
             materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
             materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
             materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
           }
 
           if (matchArray[1].toLowerCase() === "map_kd") {
-            matchArray = mtlTextRows[i].match(/^(\w+) ([\w:\/\-\.]+)/);
+            matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
             var texture = new Texture(basePath + matchArray[2], canvas);
             texture.name = matchArray[2];
             materials[iMCount].diffuseTexture = texture;
@@ -5226,7 +5226,7 @@
 
         promise.then(function (materials) {
           for (var i = 0; i < objTextRows.length; i++) {
-            var matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
+            var matchArray = objTextRows[i].match(/^(\w+) +(\w+)/);
             if (matchArray === null) {
               continue;
             }
@@ -5273,7 +5273,7 @@
 
             //頂点 読み込み
             if (matchArray[1] === "v") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+              matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvCoord[vCount] = new Vector3();
               pvCoord[vCount].x = parseFloat(matchArray[2]);
