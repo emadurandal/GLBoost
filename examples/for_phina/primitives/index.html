@@ -66,7 +66,7 @@
 
 
         layer.update = function() {
-          var rotateMatrix = GLBoost.Matrix44.rotateY(-1.0);
+          var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
           var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           camera.eye = rotatedVector;
         };
@@ -89,6 +89,8 @@
         height: SCREEN_HEIGHT
       });
 
+      app.fps = 120;
+      app.enableStats();
       app.run();
     });
 
