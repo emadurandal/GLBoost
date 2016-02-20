@@ -3755,7 +3755,23 @@
       }
     }, {
       key: 'merge',
-      value: function merge(geometry) {}
+      value: function merge(geometry) {
+        var baseLen = this._vertices.position.length;
+        var len = geometry._vertices.position.length;
+
+        for (var attribName in this._vertices) {
+          Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+        }
+        var geometryIndicesN = geometry._indicesArray.length;
+        for (var i = 0; i < geometryIndicesN; i++) {
+          for (var j = 0; j < geometry._indicesArray[i].length; j++) {
+            geometry._indicesArray[i][j] += baseLen;
+          }
+          this._indicesArray.push(geometry._indicesArray[i]);
+          this._materials.push(geometry._materials[i]);
+        }
+        this._vertexN += geometry._vertexN;
+      }
     }, {
       key: 'toString',
       value: function toString() {
