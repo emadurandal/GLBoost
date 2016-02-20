@@ -44,6 +44,27 @@ export default class Group extends Element {
     }
     return null;
   }
+
+  searchElementsByType(type, element = this) {
+    if (element instanceof type) {
+      return element;
+    }
+
+    if (element instanceof Group) {
+      let children = element.getChildren();
+      let results = [];
+      for (let i = 0; i < children.length; i++) {
+        let hitChildOrChildren = this.searchElementsByType(type, children[i]);
+        if (Array.isArray(hitChildOrChildren)) {
+          Array.prototype.push.apply(results, hitChildOrChildren); // concat
+        } else {
+          results.push(hitChildOrChildren);
+        }
+      }
+      return results;
+    }
+    return null;
+  }
 }
 
 GLBoost["Group"] = Group;

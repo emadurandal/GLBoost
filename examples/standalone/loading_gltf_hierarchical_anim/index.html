@@ -59,22 +59,20 @@ var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF('resouces/hierarchical_anim/hierarchical_anim2.gltf', '#world', 1);
-promise.then(function(mesh) {
-  console.log(mesh);
+promise.then(function(group) {
+  console.log(group);
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
-  scene.add( mesh );
-  window.mesh = mesh;
+  scene.add( group );
   scene.prepareForRender();
+
+  let meshes = group.searchElementsByType(GLBoost.Mesh);
 
   var render = function(){
     scene.setCurrentAnimationValue('time', gtime);
     renderer.clearCanvas();
     renderer.draw(scene);
 
-
-    //console.log(gtime);
-    //console.log(window.mesh.getTranslateAt(gtime));
     gtime += 0.001;
 
     if (gtime > 1) {

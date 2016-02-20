@@ -2025,6 +2025,30 @@
         }
         return null;
       }
+    }, {
+      key: 'searchElementsByType',
+      value: function searchElementsByType(type) {
+        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+
+        if (element instanceof type) {
+          return element;
+        }
+
+        if (element instanceof Group) {
+          var children = element.getChildren();
+          var results = [];
+          for (var i = 0; i < children.length; i++) {
+            var hitChildOrChildren = this.searchElementsByType(type, children[i]);
+            if (Array.isArray(hitChildOrChildren)) {
+              Array.prototype.push.apply(results, hitChildOrChildren); // concat
+            } else {
+                results.push(hitChildOrChildren);
+              }
+          }
+          return results;
+        }
+        return null;
+      }
     }]);
     return Group;
   })(Element);
