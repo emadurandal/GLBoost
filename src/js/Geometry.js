@@ -420,10 +420,16 @@ export default class Geometry {
 
   }
 
+  /**
+   *
+   * @param geometry
+   */
   merge(geometry) {
     var baseLen = this._vertices.position.length;
-    var len = geometry._vertices.position.length;
 
+    if (this === geometry) {
+      console.assert("don't merge same geometry!");
+    }
     for (var attribName in this._vertices) {
       Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
     }
@@ -433,10 +439,39 @@ export default class Geometry {
         geometry._indicesArray[i][j] += baseLen;
       }
       this._indicesArray.push(geometry._indicesArray[i]);
-      this._materials.push(geometry._materials[i]);
+      if (geometry._materials[i]) {
+        this._materials.push(geometry._materials[i]);
+      }
     }
     this._vertexN += geometry._vertexN;
   }
+
+  /**
+   * take no thought geometry's materials
+   *
+   * @param geometry
+   */
+  mergeHarder(geometry) {
+    var baseLen = this._vertices.position.length;
+    if (this === geometry) {
+      console.assert("don't merge same geometry!");
+    }
+    for (var attribName in this._vertices) {
+      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+    }
+    for (let i = 0; i < this._indicesArray.length; i++) {
+      let len = geometry._indicesArray[i].length;
+      for (let j = 0; j < len; j++) {
+        var idx = geometry._indicesArray[i][j];
+        this._indicesArray[i].push(baseLen + idx);
+      }
+      if (this._materials[i]) {
+        this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+      }
+    }
+    this._vertexN += geometry._vertexN;
+  }
+
 
   set materials(materials) {
     this._materials = materials;

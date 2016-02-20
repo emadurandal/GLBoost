@@ -7,6 +7,7 @@ export default class ClassicMaterial {
   constructor(canvas) {
     this._diffuseTexture = null;
     this._gl = GLContext.getInstance(canvas).gl;
+    this._canvas = canvas;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -19,6 +20,21 @@ export default class ClassicMaterial {
       ClassicMaterial._instanceCount = (typeof ClassicMaterial._instanceCount === "undefined") ? 0 : (ClassicMaterial._instanceCount + 1);
       this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
     }
+  }
+
+  clone() {
+    var material = new ClassicMaterial(this._canvas);
+    material._baseColor = this._baseColor;
+    material._diffuseColor = this._diffuseColor;
+    material._specularColor = this._specularColor;
+    material._ambientColor = this._ambientColor;
+    material._shader = this._shader;
+
+    for (let geom in this._vertexNofGeometries) {
+      material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
+    }
+
+    return material;
   }
 
   set shader(shader) {

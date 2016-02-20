@@ -145,27 +145,6 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var MathUtil = (function () {
-    function MathUtil() {
-      babelHelpers.classCallCheck(this, MathUtil);
-    }
-
-    babelHelpers.createClass(MathUtil, null, [{
-      key: "radianToDegree",
-      value: function radianToDegree(rad) {
-        return rad * 180 / Math.PI;
-      }
-    }, {
-      key: "degreeToRadian",
-      value: function degreeToRadian(deg) {
-        return deg * Math.PI / 180;
-      }
-    }]);
-    return MathUtil;
-  })();
-
-  GLBoost$1["MathUtil"] = MathUtil;
-
   var Vector3 = (function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -403,6 +382,52 @@
   })();
 
   GLBoost$1["Vector3"] = Vector3;
+
+  var Vector4 = (function () {
+    function Vector4(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Vector4);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Vector4, [{
+      key: "isEqual",
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }]);
+    return Vector4;
+  })();
+
+  GLBoost$1["Vector4"] = Vector4;
+
+  var MathUtil = (function () {
+    function MathUtil() {
+      babelHelpers.classCallCheck(this, MathUtil);
+    }
+
+    babelHelpers.createClass(MathUtil, null, [{
+      key: "radianToDegree",
+      value: function radianToDegree(rad) {
+        return rad * 180 / Math.PI;
+      }
+    }, {
+      key: "degreeToRadian",
+      value: function degreeToRadian(deg) {
+        return deg * Math.PI / 180;
+      }
+    }]);
+    return MathUtil;
+  })();
+
+  GLBoost$1["MathUtil"] = MathUtil;
 
   var Matrix33 = (function () {
     function Matrix33() {
@@ -781,31 +806,6 @@
   })();
 
   GLBoost$1["Matrix33"] = Matrix33;
-
-  var Vector4 = (function () {
-    function Vector4(x, y, z, w) {
-      babelHelpers.classCallCheck(this, Vector4);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    babelHelpers.createClass(Vector4, [{
-      key: "isEqual",
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }]);
-    return Vector4;
-  })();
-
-  GLBoost$1["Vector4"] = Vector4;
 
   var Matrix44 = (function () {
     function Matrix44() {
@@ -1932,6 +1932,120 @@
       key: 'draw',
       value: function draw(lights, camera, scene) {
         this._geometry.draw(lights, camera, this, scene);
+      }
+    }, {
+      key: 'bakeTransformToGeometry',
+      value: function bakeTransformToGeometry() {
+        var positions = this._geometry._vertices.position;
+        for (var i = 0; i < positions.length; i++) {
+          var mat = this.transformMatrixAccumulatedAncestry;
+          var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
+          var transformedPosVec = mat.multiplyVector(posVector4);
+          positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
+        }
+        this._geometry._vertices.position = positions;
+
+        /*
+        if (this._geometry._vertices.normal) {
+          var normals = this._geometry._vertices.normal;
+          for (let i=0; i<normals.length; i++) {
+            let mat = this.transformMatrixAccumulatedAncestry;
+            let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
+            let transformedNormalVec = mat.multiplyVector(normalVector4);
+            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+          }
+          this._geometry._vertices.normal = normals;
+        }
+        */
+      }
+    }, {
+      key: 'bakeInverseTransformToGeometry',
+      value: function bakeInverseTransformToGeometry() {
+        var positions = this._geometry._vertices.position;
+        for (var i = 0; i < positions.length; i++) {
+          var mat = this.inverseTransformMatrixAccumulatedAncestry;
+          var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
+          var transformedPosVec = mat.multiplyVector(posVector4);
+          positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
+        }
+        this._geometry._vertices.position = positions;
+
+        /*
+        if (this._geometry._vertices.normal) {
+          var normals = this._geometry._vertices.normal;
+          for (let i=0; i<normals.length; i++) {
+            let mat = this.inverseTransformMatrixAccumulatedAncestry;
+            let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
+            let transformedNormalVec = mat.multiplyVector(normalVector4);
+            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+          }
+          this._geometry._vertices.normal = normals;
+        }
+        */
+      }
+    }, {
+      key: '_copyMaterials',
+      value: function _copyMaterials() {
+        if (this.geometry._indicesArray.length !== this.geometry._materials.length) {
+          for (var i = 0; i < this.geometry._indicesArray.length; i++) {
+            this.geometry._materials[i] = this._material; //.clone();
+            this.geometry._materials[i].setVertexN(this.geometry, this.geometry._indicesArray[i].length);
+          }
+        }
+      }
+    }, {
+      key: 'merge',
+      value: function merge(meshOrMeshes) {
+        if (Array.isArray(meshOrMeshes)) {
+          this.bakeTransformToGeometry();
+
+          var meshes = meshOrMeshes;
+          for (var i = 0; i < meshes.length; i++) {
+            meshes[i].bakeTransformToGeometry();
+            this.geometry.merge(meshes[i].geometry);
+            delete meshes[i];
+          }
+
+          this._copyMaterials();
+
+          this.bakeInverseTransformToGeometry();
+        } else {
+          //
+          var mesh = meshOrMeshes;
+          mesh.bakeTransformToGeometry();
+          this.bakeTransformToGeometry();
+          this.geometry.merge(mesh.geometry);
+
+          this._copyMaterials();
+
+          this.bakeInverseTransformToGeometry();
+        }
+      }
+    }, {
+      key: 'mergeHarder',
+      value: function mergeHarder(meshOrMeshes) {
+
+        if (Array.isArray(meshOrMeshes)) {
+
+          this.bakeTransformToGeometry();
+
+          var meshes = meshOrMeshes;
+          for (var i = 0; i < meshes.length; i++) {
+            meshes[i].bakeTransformToGeometry();
+            this.geometry.mergeHarder(meshes[i].geometry);
+            delete meshes[i];
+          }
+
+          this.bakeInverseTransformToGeometry();
+        } else {
+          //
+          var mesh = meshOrMeshes;
+          mesh.bakeTransformToGeometry();
+          this.bakeTransformToGeometry();
+          this.geometry.mergeHarder(mesh.geometry);
+
+          this.bakeInverseTransformToGeometry();
+        }
       }
     }, {
       key: 'geometry',
@@ -3200,6 +3314,7 @@
 
       this._diffuseTexture = null;
       this._gl = GLContext.getInstance(canvas).gl;
+      this._canvas = canvas;
       this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
       this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
       this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -3215,6 +3330,22 @@
     }
 
     babelHelpers.createClass(ClassicMaterial, [{
+      key: 'clone',
+      value: function clone() {
+        var material = new ClassicMaterial(this._canvas);
+        material._baseColor = this._baseColor;
+        material._diffuseColor = this._diffuseColor;
+        material._specularColor = this._specularColor;
+        material._ambientColor = this._ambientColor;
+        material._shader = this._shader;
+
+        for (var geom in this._vertexNofGeometries) {
+          material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
+        }
+
+        return material;
+      }
+    }, {
       key: 'setVertexN',
 
       /*
@@ -3753,12 +3884,20 @@
 
         Geometry._lastGeometry = thisName;
       }
+
+      /**
+       *
+       * @param geometry
+       */
+
     }, {
       key: 'merge',
       value: function merge(geometry) {
         var baseLen = this._vertices.position.length;
-        var len = geometry._vertices.position.length;
 
+        if (this === geometry) {
+          console.assert("don't merge same geometry!");
+        }
         for (var attribName in this._vertices) {
           Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
         }
@@ -3768,7 +3907,38 @@
             geometry._indicesArray[i][j] += baseLen;
           }
           this._indicesArray.push(geometry._indicesArray[i]);
-          this._materials.push(geometry._materials[i]);
+          if (geometry._materials[i]) {
+            this._materials.push(geometry._materials[i]);
+          }
+        }
+        this._vertexN += geometry._vertexN;
+      }
+
+      /**
+       * take no thought geometry's materials
+       *
+       * @param geometry
+       */
+
+    }, {
+      key: 'mergeHarder',
+      value: function mergeHarder(geometry) {
+        var baseLen = this._vertices.position.length;
+        if (this === geometry) {
+          console.assert("don't merge same geometry!");
+        }
+        for (var attribName in this._vertices) {
+          Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+        }
+        for (var i = 0; i < this._indicesArray.length; i++) {
+          var len = geometry._indicesArray[i].length;
+          for (var j = 0; j < len; j++) {
+            var idx = geometry._indicesArray[i][j];
+            this._indicesArray[i].push(baseLen + idx);
+          }
+          if (this._materials[i]) {
+            this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+          }
         }
         this._vertexN += geometry._vertexN;
       }
