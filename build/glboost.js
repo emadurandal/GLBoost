@@ -410,12 +410,12 @@
 
       this.m = [];
       if (arguments.length >= 9) {
-        this.setComponents.apply(this, arguments);
+        this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values
       } else if (Array.isArray(arguments[0])) {
-        this.m = arguments[0].concat();
-      } else {
-        this.identity();
-      }
+          this.m = arguments[0].concat(); // arguments[0] must be column major array
+        } else {
+            this.identity();
+          }
     }
 
     babelHelpers.createClass(Matrix33, [{
@@ -813,12 +813,12 @@
 
       this.m = [];
       if (arguments.length >= 16) {
-        this.setComponents.apply(this, arguments);
+        this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values
       } else if (Array.isArray(arguments[0])) {
-        this.m = arguments[0].concat();
-      } else {
-        this.identity();
-      }
+          this.m = arguments[0].concat(); // arguments[0] must be column major array
+        } else {
+            this.identity();
+          }
     }
 
     babelHelpers.createClass(Matrix44, [{
@@ -3730,6 +3730,9 @@
         Geometry._lastGeometry = thisName;
       }
     }, {
+      key: 'merge',
+      value: function merge(geometry) {}
+    }, {
       key: 'toString',
       value: function toString() {
         return this._instanceName;
@@ -6202,13 +6205,30 @@
           if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
             this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           } else {
-            this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+            this._loadBinaryFileUsingXHR(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           }
         }
       }
     }, {
       key: '_loadBinaryFile',
-      value: function _loadBinaryFile(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+      value: function _loadBinaryFile(dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
+        dataUrI = dataUrI.split(',');
+        var type = dataUrI[0].split(':')[1].split(';')[0];
+        var byteString = atob(dataUrI[1]);
+        var byteStringLength = byteString.length;
+        var arrayBuffer = new ArrayBuffer(byteStringLength);
+        var intArray = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < byteStringLength; i++) {
+          intArray[i] = byteString.charCodeAt(i);
+        }
+
+        if (arrayBuffer) {
+          this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+        }
+      }
+    }, {
+      key: '_loadBinaryFileUsingXHR',
+      value: function _loadBinaryFileUsingXHR(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
         var _this2 = this;
 
         var oReq = new XMLHttpRequest();
@@ -6219,27 +6239,32 @@
           var arrayBuffer = oReq.response; // Note: not oReq.responseText
 
           if (arrayBuffer) {
-            var sceneJson = json.scenes.defaultScene;
-
-            var group = new Group();
-            group.userFlavorName = "TopGroup";
-            var nodeStr = null;
-            for (var i = 0; i < sceneJson.nodes.length; i++) {
-              nodeStr = sceneJson.nodes[i];
-
-              // iterate nodes and load meshes
-              var element = _this2._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
-              group.addChild(element);
-            }
-
-            // Animation
-            _this2._loadAnimation(group, arrayBuffer, json, canvas, scale);
-
-            resolve(group);
+            _this2._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
           }
         };
 
         oReq.send(null);
+      }
+    }, {
+      key: '_IterateNodeOfScene',
+      value: function _IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+        var sceneJson = json.scenes.defaultScene;
+
+        var group = new Group();
+        group.userFlavorName = "TopGroup";
+        var nodeStr = null;
+        for (var i = 0; i < sceneJson.nodes.length; i++) {
+          nodeStr = sceneJson.nodes[i];
+
+          // iterate nodes and load meshes
+          var element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          group.addChild(element);
+        }
+
+        // Animation
+        this._loadAnimation(group, arrayBuffer, json, canvas, scale);
+
+        resolve(group);
       }
     }, {
       key: '_recursiveIterateNode',

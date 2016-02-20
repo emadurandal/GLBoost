@@ -62,12 +62,28 @@ export default class GLTFLoader {
       if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
         this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       } else {
-        this._loadBinaryFile(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadBinaryFileUsingXHR(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       }
     }
   }
 
-  _loadBinaryFile(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadBinaryFile(dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
+    dataUrI = dataUrI.split(',');
+    var type = dataUrI[0].split(':')[1].split(';')[0];
+    var byteString = atob(dataUrI[1]);
+    var byteStringLength = byteString.length;
+    var arrayBuffer = new ArrayBuffer(byteStringLength);
+    var intArray = new Uint8Array(arrayBuffer);
+    for (var i = 0; i < byteStringLength; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+
+    if (arrayBuffer) {
+      this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+    }
+  }
+
+  _loadBinaryFileUsingXHR(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
@@ -77,27 +93,31 @@ export default class GLTFLoader {
       var arrayBuffer = oReq.response; // Note: not oReq.responseText
 
       if (arrayBuffer) {
-        let sceneJson = json.scenes.defaultScene;
-
-        let group = new Group();
-        group.userFlavorName = "TopGroup";
-        let nodeStr = null;
-        for (let i=0; i<sceneJson.nodes.length; i++) {
-          nodeStr = sceneJson.nodes[i];
-
-          // iterate nodes and load meshes
-          let element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
-          group.addChild(element);
-        }
-
-        // Animation
-        this._loadAnimation(group, arrayBuffer, json, canvas, scale);
-
-        resolve(group);
+        this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
       }
     };
 
     oReq.send(null);
+  }
+
+  _IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+    let sceneJson = json.scenes.defaultScene;
+
+    let group = new Group();
+    group.userFlavorName = "TopGroup";
+    let nodeStr = null;
+    for (let i=0; i<sceneJson.nodes.length; i++) {
+      nodeStr = sceneJson.nodes[i];
+
+      // iterate nodes and load meshes
+      let element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
+      group.addChild(element);
+    }
+
+    // Animation
+    this._loadAnimation(group, arrayBuffer, json, canvas, scale);
+
+    resolve(group);
   }
 
   _recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
