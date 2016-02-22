@@ -6029,18 +6029,18 @@
   var Sphere = (function (_Geometry) {
     babelHelpers.inherits(Sphere, _Geometry);
 
-    function Sphere(radius, widthSegments, heightSegments, customVertexAttributes, canvas) {
+    function Sphere(radius, widthSegments, heightSegments, vertexColor, canvas) {
       babelHelpers.classCallCheck(this, Sphere);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sphere).call(this, canvas));
 
-      _this._setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes);
+      _this._setupVertexData(radius, widthSegments, heightSegments, vertexColor);
       return _this;
     }
 
     babelHelpers.createClass(Sphere, [{
       key: '_setupVertexData',
-      value: function _setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes) {
+      value: function _setupVertexData(radius, widthSegments, heightSegments, vertexColor) {
 
         // See below:
         // WebGL Lesson 11 - spheres, rotation matrices, and mouse events
@@ -6050,7 +6050,10 @@
         var texcoords = [];
         var colors = [];
         var normals = [];
-        var vertexColor = new Vector4(1, 1, 1, 1);
+
+        if (!vertexColor) {
+          vertexColor = new Vector4(1, 1, 1, 1);
+        }
 
         for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
           var theta = latNumber * Math.PI / heightSegments;
@@ -6106,8 +6109,7 @@
           normal: normals
         };
 
-        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-        this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLES);
+        this.setVerticesData(object, [indices], GLBoost$1.TRIANGLES);
       }
     }]);
     return Sphere;

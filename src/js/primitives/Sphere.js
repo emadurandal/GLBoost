@@ -26,6 +26,10 @@ export default class Sphere extends Geometry {
     var colors = [];
     var normals = [];
 
+    if (!vertexColor) {
+      vertexColor = new Vector4(1, 1, 1, 1);
+    }
+
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
       var theta = latNumber * Math.PI / heightSegments;
       var sinTheta = Math.sin(theta);
