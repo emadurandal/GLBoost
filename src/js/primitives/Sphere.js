@@ -9,13 +9,13 @@ import Vector2 from './../math/Vector2'
 import ArrayUtil from '.././misc/ArrayUtil'
 
 export default class Sphere extends Geometry {
-  constructor(radius, widthSegments, heightSegments, customVertexAttributes, canvas) {
+  constructor(radius, widthSegments, heightSegments, vertexColor, canvas) {
     super(canvas);
 
-    this._setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes);
+    this._setupVertexData(radius, widthSegments, heightSegments, vertexColor);
   }
 
-  _setupVertexData(radius, widthSegments, heightSegments, customVertexAttributes) {
+  _setupVertexData(radius, widthSegments, heightSegments, vertexColor) {
 
     // See below:
     // WebGL Lesson 11 - spheres, rotation matrices, and mouse events
@@ -25,7 +25,6 @@ export default class Sphere extends Geometry {
     var texcoords = [];
     var colors = [];
     var normals = [];
-    var vertexColor = new Vector4(1, 1, 1, 1);
 
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
       var theta = latNumber * Math.PI / heightSegments;
@@ -81,8 +80,7 @@ export default class Sphere extends Geometry {
       normal: normals
     };
 
-    var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-    this.setVerticesData(completeAttributes, [indices], GLBoost.TRIANGLES);
+    this.setVerticesData(object, [indices], GLBoost.TRIANGLES);
   }
 
 }
