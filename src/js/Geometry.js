@@ -248,7 +248,7 @@ export default class Geometry {
       for (let i=0; i<this._indicesArray.length; i++) {
         var ibo = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this._indicesArray[i]), gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(this._indicesArray[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         Geometry._iboArrayDic[this.toString()][i] = ibo;
         Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
@@ -359,7 +359,7 @@ export default class Geometry {
         if (Geometry._iboArrayDic[thisName].length > 0) {
           //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][i] );
-          gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_INT, 0);
+          gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), glem.elementIndexBitSize(gl), 0);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         } else {
           gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -404,7 +404,7 @@ export default class Geometry {
       //if (this._ibo.length > 0) {
       if (Geometry._iboArrayDic[thisName].length > 0) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][0] );
-        gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], gl.UNSIGNED_INT, 0);
+        gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], glem.elementIndexBitSize(gl), 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);

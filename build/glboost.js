@@ -2501,18 +2501,15 @@
         return GLExtentionsManager._instance;
       }
 
-      this._extVAO = gl.getExtension("OES_vertex_array_object");
-      /*    if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
-              throw new Error("OES_vertex_array_objectをサポートしていません");
-          }
-      */
-      this._extDBs = gl.getExtension("WEBGL_draw_buffers");
-      //    if (!this._extDBs)
-      //      throw("WEBGL_draw_buffersをサポートしていません");
+      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
+        this._extVAO = gl.getExtension("OES_vertex_array_object");
 
-      this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+        this._extDBs = gl.getExtension("WEBGL_draw_buffers");
 
-      this._extEIUI = gl.getExtension("OES_element_index_uint");
+        this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+
+        this._extEIUI = gl.getExtension("OES_element_index_uint");
+      }
 
       GLExtentionsManager._instance = this;
     }
@@ -2520,7 +2517,7 @@
     babelHelpers.createClass(GLExtentionsManager, [{
       key: "createVertexArray",
       value: function createVertexArray(gl) {
-        if (GLBoost.isThisGLVersion_2(gl)) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
           return gl.createVertexArray();
         } else if (this._extVAO) {
           return this._extVAO.createVertexArrayOES();
@@ -2531,7 +2528,7 @@
     }, {
       key: "bindVertexArray",
       value: function bindVertexArray(gl, vao) {
-        if (GLBoost.isThisGLVersion_2(gl)) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
           gl.bindVertexArray(vao);
           return true;
         } else if (this._extVAO) {
@@ -2550,6 +2547,16 @@
       key: "colorAttachiment",
       value: function colorAttachiment(gl, index) {
         return this._extDBs ? this._extDBs["COLOR_ATTACHMENT" + index + "_WEBGL"] : gl["COLOR_ATTACHMENT" + index];
+      }
+    }, {
+      key: "elementIndexBitSize",
+      value: function elementIndexBitSize(gl) {
+        return this._extEIUI ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
+      }
+    }, {
+      key: "createUintArrayForElementIndex",
+      value: function createUintArrayForElementIndex(array) {
+        return this._extEIUI ? new Uint32Array(array) : new Uint16Array(array);
       }
     }, {
       key: "extVAO",
@@ -3715,7 +3722,7 @@
           for (var i = 0; i < this._indicesArray.length; i++) {
             var ibo = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this._indicesArray[i]), gl.STATIC_DRAW);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(this._indicesArray[i]), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             Geometry._iboArrayDic[this.toString()][i] = ibo;
             Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
@@ -3826,7 +3833,7 @@
             if (Geometry._iboArrayDic[thisName].length > 0) {
               //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][i]);
-              gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), gl.UNSIGNED_INT, 0);
+              gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), glem.elementIndexBitSize(gl), 0);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             } else {
               gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -3870,7 +3877,7 @@
           //if (this._ibo.length > 0) {
           if (Geometry._iboArrayDic[thisName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][0]);
-            gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], gl.UNSIGNED_INT, 0);
+            gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
@@ -5885,6 +5892,7 @@
   GLBoost$1["TARGET_WEBGL_VERSION"] = 1;
   GLBoost$1["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
   GLBoost$1["ANGLE_UNIT"] = GLBoost$1.DEGREE;
+  GLBoost$1["WEBGL_ONE_USE_EXTENSIONS"] = true;
 
   var Plane = (function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);

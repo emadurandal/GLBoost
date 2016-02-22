@@ -1,3 +1,5 @@
+import GLBoost from './globals'
+
 export default class GLExtentionsManager {
 
   constructor(gl) {
@@ -5,20 +7,17 @@ export default class GLExtentionsManager {
         return GLExtentionsManager._instance;
     }
 
-    this._extVAO = gl.getExtension("OES_vertex_array_object");
-/*    if (!GLBoost.isThisGLVersion_2(gl) && !this._extVAO) {
-        throw new Error("OES_vertex_array_objectをサポートしていません");
+    if (GLBoost.WEBGL_ONE_USE_EXTENSIONS) {
+      this._extVAO = gl.getExtension("OES_vertex_array_object");
+
+      this._extDBs = gl.getExtension("WEBGL_draw_buffers");
+
+      this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") ||
+        gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") ||
+        gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+
+      this._extEIUI = gl.getExtension("OES_element_index_uint");
     }
-*/
-    this._extDBs = gl.getExtension("WEBGL_draw_buffers");
-//    if (!this._extDBs)
-//      throw("WEBGL_draw_buffersをサポートしていません");
-
-    this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") ||
-      gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") ||
-      gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
-
-    this._extEIUI = gl.getExtension("OES_element_index_uint");
 
     GLExtentionsManager._instance = this;
   }
@@ -70,6 +69,18 @@ export default class GLExtentionsManager {
     return this._extDBs ?
       this._extDBs[`COLOR_ATTACHMENT${index}_WEBGL`] :
       gl[`COLOR_ATTACHMENT${index}`];
+  }
+
+  elementIndexBitSize(gl) {
+    return this._extEIUI ?
+      gl.UNSIGNED_INT :
+      gl.UNSIGNED_SHORT;
+  }
+
+  createUintArrayForElementIndex(array) {
+    return this._extEIUI ?
+    new Uint32Array(array) :
+    new Uint16Array(array);
   }
 
 }

@@ -10,4 +10,5 @@ export default class InitialSettings {
 GLBoost["TARGET_WEBGL_VERSION"] = 1;
 GLBoost["DEFAULT_POINTLIGHT_INTENSITY"] = new Vector3(1, 1, 1);
 GLBoost["ANGLE_UNIT"] = GLBoost.DEGREE;
+GLBoost["WEBGL_ONE_USE_EXTENSIONS"] = true;
 
