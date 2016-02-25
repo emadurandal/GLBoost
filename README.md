@@ -48,17 +48,96 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 * Microsoft Edge (Xbox One included)
 * Internet Explorer 11 (note that [browser-polyfill.min.js](https://cdnjs.com/libraries/babel-core/5.8.34) is required)
 
-## Roadmap
+## How to use
 
-### Coming Soon
+1. Include `build/glboost.js` in your html file.
 
-* Allow access to WebGL Context and Resources
+```html
+<script src="./glboost.js"></script>
+```
 
-### Near Future
+2. Put canvas tag in body element.
 
-* Physically Based Rendering
-* Both Forward Rendering and Deferred Rendering Support
-* High-level API for beginners
+```html
+<body>
+  <canvas id="world" width="600" height="600"></canvas>
+</body>
+```
+
+3. Write your codes.
+
+```javascript
+// setup GLBoost renderer
+var canvas = document.getElementById("world");
+var renderer = new GLBoost.Renderer({
+  canvas: canvas,
+  clearColor: {
+    red: 0.0,
+    green: 0.0,
+    blue: 0.0,
+    alpha: 1
+  }
+});
+
+// make a scene
+var scene = new GLBoost.Scene();
+
+// setup material
+var material = new GLBoost.ClassicMaterial('#world');
+var texture = new GLBoost.Texture('resouces/texture.png', '#world'); // earth.jpg
+material.diffuseTexture = texture;
+var shader = new GLBoost.PhongShader('#world');
+material.shader = shader;
+
+// make a Sphere geometry
+var geometry = new GLBoost.Sphere(20, 24, 24, null, "#world");
+
+// set Sphere geometry and material to make a Mesh.
+var earth = new GLBoost.Mesh(geometry, material);
+// add the earth mesh to the scene
+scene.add(earth);
+
+// make a directonal light
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), '#world');
+// add the light to the scene
+scene.add( directionalLight );
+
+// setup camera
+var camera = new GLBoost.Camera({
+  eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
+  center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+  up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+}, {
+  fovy: 45.0,
+  aspect: 1.0,
+  zNear: 0.1,
+  zFar: 1000.0
+});
+// add the camera to the scene
+scene.add(camera);
+
+// call this method before rendering
+scene.prepareForRender();
+
+// rendering loop
+var render = function() {
+  // render the scene
+  renderer.clearCanvas();
+  renderer.draw(scene);
+
+  // rotate camera
+  var rotateMatrixY = GLBoost.Matrix33.rotateY(-1.0);
+  rotatedVector = rotateMatrixY.multiplyVector(camera.eye);
+  camera.eye = rotatedVector;
+
+  requestAnimationFrame(render);
+};
+
+render();
+
+```
+
+for other usage, check [examples](https://rawgit.com/emadurandal/GLBoost/master/examples/index.html)!
 
 ## How to Install npm packages to build library, examples and API document
 
@@ -88,6 +167,18 @@ $ npm run esdoc
 ```
 
 (Note: The documentation coverage is still very low. We address the resolution of this problem.)
+
+## Roadmap
+
+### Coming Soon
+
+* Allow access to WebGL Context and Resources
+
+### Near Future
+
+* Physically Based Rendering
+* Both Forward Rendering and Deferred Rendering Support
+* High-level API for beginners
 
 ## License
 
