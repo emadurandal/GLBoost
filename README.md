@@ -50,13 +50,13 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 
 ## How to use
 
-1. Include `build/glboost.js` in your html file.
+`1.` Include `build/glboost.js` in your html file.
 
 ```html
 <script src="./glboost.js"></script>
 ```
 
-2. Put canvas tag in body element.
+`2.` Put canvas tag in body element.
 
 ```html
 <body>
@@ -64,7 +64,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 </body>
 ```
 
-3. Write your codes.
+`3.` Write your codes.
 
 ```javascript
 // setup GLBoost renderer
