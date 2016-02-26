@@ -82,7 +82,7 @@ export class HalfLambertShaderSource {
 
 
 export default class HalfLambertShader extends SimpleShader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
     HalfLambertShader.mixin(HalfLambertShaderSource);

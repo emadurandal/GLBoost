@@ -66,7 +66,7 @@
           new GLBoost.Vector2(1.0, 0.0)
         ];
 
-        var geometry = new GLBoost.Geometry(layer.canvas);
+        var geometry = new GLBoost.Geometry();
         geometry.setVerticesData({
           position: positions,
           //color: colors,
@@ -101,10 +101,10 @@
         offscreen.renderObject(heart);
         var imageData = offscreen.getImageDataURL();
 
-        var texture = new GLBoost.Texture(imageData, layer.canvas);
+        var texture = new GLBoost.Texture(imageData);
 
 //        var texture = new GLBoost.Texture('resouces/texture.png', layer.canvas);
-        var material = new GLBoost.ClassicMaterial(layer.canvas);
+        var material = new GLBoost.ClassicMaterial();
         material.diffuseTexture = texture;
         var mesh = new GLBoost.Mesh(geometry, material);
         layer.scene.add( mesh );

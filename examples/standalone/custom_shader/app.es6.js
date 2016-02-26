@@ -30,7 +30,7 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.add( directionalLight );
 
 
@@ -94,7 +94,7 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
 
 
 var objLoader = GLBoost.ObjLoader.getInstance();
-var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world', MyCustomShader);
+var promise = objLoader.loadObj('resouces/teapot/teapot.obj', MyCustomShader, null);
 promise.then(function(mesh) {
 //            console.log(mesh);
 

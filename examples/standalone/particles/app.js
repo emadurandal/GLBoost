@@ -12,7 +12,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -28,7 +28,7 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers.get = function get(object, property, receiver) {
     if (object === null) object = Function.prototype;
@@ -80,6 +80,7 @@
   };
 
   babelHelpers;
+
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -110,12 +111,12 @@
   });
   scene.add(camera);
 
-  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
   scene.add(directionalLight);
 
   var attributeName = 'particlesVelocity';
 
-  var MyCustomShaderSource = (function () {
+  var MyCustomShaderSource = function () {
     function MyCustomShaderSource() {
       babelHelpers.classCallCheck(this, MyCustomShaderSource);
     }
@@ -170,9 +171,9 @@
       }
     }]);
     return MyCustomShaderSource;
-  })();
+  }();
 
-  var MyCustomShader = (function (_GLBoost$HalfLambertS) {
+  var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
     function MyCustomShader(canvas, ParticleShaderSource) {
@@ -206,7 +207,7 @@
       }
     }]);
     return MyCustomShader;
-  })(GLBoost.HalfLambertShader);
+  }(GLBoost.HalfLambertShader);
 
   var particlesPosition = [];
   var particlesVelocity = [];
@@ -219,11 +220,11 @@
   var particleGeometry = new GLBoost.Particle({
     position: particlesPosition,
     particlesVelocity: particlesVelocity
-  }, 0.5, 0.5, null, GLBoost.STATIC_DRAW, '#world');
+  }, 0.5, 0.5, null, GLBoost.STATIC_DRAW);
 
-  var material = new GLBoost.ClassicMaterial('#world');
-  material.shader = new MyCustomShader('#world');
-  var texture = new GLBoost.Texture('resouces/iceball.png', '#world');
+  var material = new GLBoost.ClassicMaterial();
+  material.shader = new MyCustomShader(GLBoost.CURRENT_CANVAS_ID);
+  var texture = new GLBoost.Texture('resouces/iceball.png');
   material.diffuseTexture = texture;
   var particle = new GLBoost.Mesh(particleGeometry, material);
 

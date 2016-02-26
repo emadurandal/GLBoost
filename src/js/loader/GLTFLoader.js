@@ -31,7 +31,7 @@ export default class GLTFLoader {
     return this[singleton];
   }
 
-  loadGLTF(url, canvas, scale = 1.0, defaultShader = null) {
+  loadGLTF(url, scale = 1.0, defaultShader = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {

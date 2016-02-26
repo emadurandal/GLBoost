@@ -5,9 +5,10 @@
 }(this, function () { 'use strict';
 
   var babelHelpers = {};
-
-  babelHelpers.typeof = function (obj) {
-    return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
   babelHelpers.classCallCheck = function (instance, Constructor) {
@@ -16,7 +17,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -32,7 +33,7 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers.get = function get(object, property, receiver) {
     if (object === null) object = Function.prototype;
@@ -106,6 +107,7 @@
   };
 
   babelHelpers;
+
   window.GLBoost = window.GLBoost || { REVISION: '1' };
 
   var global = window;
@@ -145,7 +147,7 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector3 = (function () {
+  var Vector3 = function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
 
@@ -225,6 +227,7 @@
     }, {
       key: "cross",
 
+
       /**
        * 外積
        */
@@ -245,6 +248,7 @@
     }, {
       key: "normalize",
 
+
       /**
        * 正規化
        */
@@ -261,6 +265,7 @@
 
     }, {
       key: "add",
+
 
       /**
        * 加算
@@ -280,6 +285,7 @@
     }, {
       key: "subtract",
 
+
       /**
        * 減算
        */
@@ -297,6 +303,7 @@
 
     }, {
       key: "divide",
+
 
       /**
        * 除算
@@ -379,11 +386,11 @@
       }
     }]);
     return Vector3;
-  })();
+  }();
 
   GLBoost$1["Vector3"] = Vector3;
 
-  var Vector4 = (function () {
+  var Vector4 = function () {
     function Vector4(x, y, z, w) {
       babelHelpers.classCallCheck(this, Vector4);
 
@@ -404,11 +411,11 @@
       }
     }]);
     return Vector4;
-  })();
+  }();
 
   GLBoost$1["Vector4"] = Vector4;
 
-  var MathUtil = (function () {
+  var MathUtil = function () {
     function MathUtil() {
       babelHelpers.classCallCheck(this, MathUtil);
     }
@@ -425,11 +432,11 @@
       }
     }]);
     return MathUtil;
-  })();
+  }();
 
   GLBoost$1["MathUtil"] = MathUtil;
 
-  var Matrix33 = (function () {
+  var Matrix33 = function () {
     function Matrix33() {
       babelHelpers.classCallCheck(this, Matrix33);
 
@@ -471,6 +478,7 @@
     }, {
       key: 'rotateX',
 
+
       /**
        * Create X oriented Rotation Matrix
        */
@@ -492,6 +500,7 @@
 
     }, {
       key: 'rotateY',
+
 
       /**
        * Create Y oriented Rotation Matrix
@@ -516,6 +525,7 @@
     }, {
       key: 'rotateZ',
 
+
       /**
        * Create Z oriented Rotation Matrix
        */
@@ -537,6 +547,7 @@
 
     }, {
       key: 'zero',
+
 
       /**
        * ゼロ行列
@@ -803,11 +814,11 @@
       }
     }]);
     return Matrix33;
-  })();
+  }();
 
   GLBoost$1["Matrix33"] = Matrix33;
 
-  var Matrix44 = (function () {
+  var Matrix44 = function () {
     function Matrix44() {
       babelHelpers.classCallCheck(this, Matrix44);
 
@@ -865,6 +876,7 @@
     }, {
       key: 'rotateX',
 
+
       /**
        * Create X oriented Rotation Matrix
        */
@@ -886,6 +898,7 @@
 
     }, {
       key: 'rotateY',
+
 
       /**
        * Create Y oriented Rotation Matrix
@@ -909,6 +922,7 @@
     }, {
       key: 'rotateZ',
 
+
       /**
        * Create Z oriented Rotation Matrix
        */
@@ -930,6 +944,7 @@
 
     }, {
       key: 'zero',
+
 
       /**
        * ゼロ行列
@@ -1306,11 +1321,11 @@
       }
     }]);
     return Matrix44;
-  })();
+  }();
 
   GLBoost$1["Matrix44"] = Matrix44;
 
-  var Quaternion = (function () {
+  var Quaternion = function () {
     function Quaternion(x, y, z, w) {
       babelHelpers.classCallCheck(this, Quaternion);
 
@@ -1447,7 +1462,7 @@
       }
     }]);
     return Quaternion;
-  })();
+  }();
 
   GLBoost$1["Quaternion"] = Quaternion;
 
@@ -1460,7 +1475,7 @@
 
   GLBoost$1["Vector2"] = Vector2;
 
-  var AnimationUtil = (function () {
+  var AnimationUtil = function () {
     function AnimationUtil() {
       babelHelpers.classCallCheck(this, AnimationUtil);
     }
@@ -1502,9 +1517,9 @@
       }
     }]);
     return AnimationUtil;
-  })();
+  }();
 
-  var Element = (function () {
+  var Element = function () {
     function Element() {
       babelHelpers.classCallCheck(this, Element);
 
@@ -1646,6 +1661,7 @@
       }
     }, {
       key: 'toStringWithUpdateInfo',
+
 
       // used by library (not Application)
       value: function toStringWithUpdateInfo() {
@@ -1896,11 +1912,11 @@
       }
     }]);
     return Element;
-  })();
+  }();
 
   GLBoost$1["Element"] = Element;
 
-  var Mesh = (function (_Element) {
+  var Mesh = function (_Element) {
     babelHelpers.inherits(Mesh, _Element);
 
     function Mesh(geometry, material) {
@@ -2079,13 +2095,13 @@
       }
     }]);
     return Mesh;
-  })(Element);
+  }(Element);
 
   Mesh._geometries = {};
 
   GLBoost$1["Mesh"] = Mesh;
 
-  var Group = (function (_Element) {
+  var Group = function (_Element) {
     babelHelpers.inherits(Group, _Element);
 
     function Group() {
@@ -2165,11 +2181,11 @@
       }
     }]);
     return Group;
-  })(Element);
+  }(Element);
 
   GLBoost$1["Group"] = Group;
 
-  var GLContextImpl = (function () {
+  var GLContextImpl = function () {
     function GLContextImpl(canvas, parent) {
       babelHelpers.classCallCheck(this, GLContextImpl);
 
@@ -2216,9 +2232,9 @@
       }
     }]);
     return GLContextImpl;
-  })();
+  }();
 
-  var GLContextWebGL2Impl = (function (_GLContextImpl) {
+  var GLContextWebGL2Impl = function (_GLContextImpl) {
     babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
 
     function GLContextWebGL2Impl(canvas, parent) {
@@ -2238,9 +2254,9 @@
       }
     }]);
     return GLContextWebGL2Impl;
-  })(GLContextImpl);
+  }(GLContextImpl);
 
-  var GLContextWebGL1Impl = (function (_GLContextImpl) {
+  var GLContextWebGL1Impl = function (_GLContextImpl) {
     babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
 
     function GLContextWebGL1Impl(canvas, parent) {
@@ -2260,9 +2276,9 @@
       }
     }]);
     return GLContextWebGL1Impl;
-  })(GLContextImpl);
+  }(GLContextImpl);
 
-  var GLContext = (function () {
+  var GLContext = function () {
     function GLContext(canvas) {
       babelHelpers.classCallCheck(this, GLContext);
 
@@ -2294,11 +2310,11 @@
       }
     }]);
     return GLContext;
-  })();
+  }();
 
   GLContext._instances = new Object();
 
-  var RenderPass = (function () {
+  var RenderPass = function () {
     function RenderPass(gl) {
       babelHelpers.classCallCheck(this, RenderPass);
 
@@ -2322,8 +2338,10 @@
       }
     }, {
       key: 'specifyRenderTargetTextures',
-      value: function specifyRenderTargetTextures(canvas, renderTargetTextures) {
+      value: function specifyRenderTargetTextures(renderTargetTextures) {
         var _this2 = this;
+
+        var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
 
         var gl = GLContext.getInstance(canvas).gl;
 
@@ -2389,12 +2407,13 @@
       }
     }]);
     return RenderPass;
-  })();
+  }();
 
   GLBoost$1["RenderPass"] = RenderPass;
 
-  var AbstractTexture = (function () {
-    function AbstractTexture(canvas) {
+  var AbstractTexture = function () {
+    function AbstractTexture() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, AbstractTexture);
 
       if (this.constructor === AbstractTexture) {
@@ -2450,14 +2469,15 @@
       }
     }]);
     return AbstractTexture;
-  })();
+  }();
 
   GLBoost$1["AbstractTexture"] = AbstractTexture;
 
-  var MutableTexture = (function (_AbstractTexture) {
+  var MutableTexture = function (_AbstractTexture) {
     babelHelpers.inherits(MutableTexture, _AbstractTexture);
 
-    function MutableTexture(canvas, width, height) {
+    function MutableTexture(width, height) {
+      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
       babelHelpers.classCallCheck(this, MutableTexture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MutableTexture).call(this, canvas));
@@ -2489,11 +2509,11 @@
       }
     }]);
     return MutableTexture;
-  })(AbstractTexture);
+  }(AbstractTexture);
 
   GLBoost$1["MutableTexture"] = MutableTexture;
 
-  var GLExtentionsManager = (function () {
+  var GLExtentionsManager = function () {
     function GLExtentionsManager(gl) {
       babelHelpers.classCallCheck(this, GLExtentionsManager);
 
@@ -2580,14 +2600,15 @@
       }
     }]);
     return GLExtentionsManager;
-  })();
+  }();
 
   GLExtentionsManager._instance = null;
 
-  var AbstractLight = (function (_Element) {
+  var AbstractLight = function (_Element) {
     babelHelpers.inherits(AbstractLight, _Element);
 
-    function AbstractLight(canvas) {
+    function AbstractLight() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, AbstractLight);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, canvas));
@@ -2602,12 +2623,13 @@
     }
 
     return AbstractLight;
-  })(Element);
+  }(Element);
 
-  var DirectionalLight = (function (_AbstractLight) {
+  var DirectionalLight = function (_AbstractLight) {
     babelHelpers.inherits(DirectionalLight, _AbstractLight);
 
-    function DirectionalLight(intensity, direction, canvas) {
+    function DirectionalLight(intensity, direction) {
+      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
       babelHelpers.classCallCheck(this, DirectionalLight);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, canvas));
@@ -2637,14 +2659,15 @@
       }
     }]);
     return DirectionalLight;
-  })(AbstractLight);
+  }(AbstractLight);
 
   GLBoost$1["DirectionalLight"] = DirectionalLight;
 
-  var PointLight = (function (_AbstractLight) {
+  var PointLight = function (_AbstractLight) {
     babelHelpers.inherits(PointLight, _AbstractLight);
 
-    function PointLight(intensity, canvas) {
+    function PointLight(intensity) {
+      var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
       babelHelpers.classCallCheck(this, PointLight);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PointLight).call(this, canvas));
@@ -2666,11 +2689,11 @@
       }
     }]);
     return PointLight;
-  })(AbstractLight);
+  }(AbstractLight);
 
   GLBoost$1["PointLight"] = PointLight;
 
-  var Hash = (function () {
+  var Hash = function () {
     function Hash() {
       babelHelpers.classCallCheck(this, Hash);
     }
@@ -2694,11 +2717,11 @@
       }
     }]);
     return Hash;
-  })();
+  }();
 
   Hash._crc32table = "00000000 77073096 EE0E612C 990951BA 076DC419 706AF48F E963A535 9E6495A3 0EDB8832 79DCB8A4 E0D5E91E 97D2D988 09B64C2B 7EB17CBD E7B82D07 90BF1D91 1DB71064 6AB020F2 F3B97148 84BE41DE 1ADAD47D 6DDDE4EB F4D4B551 83D385C7 136C9856 646BA8C0 FD62F97A 8A65C9EC 14015C4F 63066CD9 FA0F3D63 8D080DF5 3B6E20C8 4C69105E D56041E4 A2677172 3C03E4D1 4B04D447 D20D85FD A50AB56B 35B5A8FA 42B2986C DBBBC9D6 ACBCF940 32D86CE3 45DF5C75 DCD60DCF ABD13D59 26D930AC 51DE003A C8D75180 BFD06116 21B4F4B5 56B3C423 CFBA9599 B8BDA50F 2802B89E 5F058808 C60CD9B2 B10BE924 2F6F7C87 58684C11 C1611DAB B6662D3D 76DC4190 01DB7106 98D220BC EFD5102A 71B18589 06B6B51F 9FBFE4A5 E8B8D433 7807C9A2 0F00F934 9609A88E E10E9818 7F6A0DBB 086D3D2D 91646C97 E6635C01 6B6B51F4 1C6C6162 856530D8 F262004E 6C0695ED 1B01A57B 8208F4C1 F50FC457 65B0D9C6 12B7E950 8BBEB8EA FCB9887C 62DD1DDF 15DA2D49 8CD37CF3 FBD44C65 4DB26158 3AB551CE A3BC0074 D4BB30E2 4ADFA541 3DD895D7 A4D1C46D D3D6F4FB 4369E96A 346ED9FC AD678846 DA60B8D0 44042D73 33031DE5 AA0A4C5F DD0D7CC9 5005713C 270241AA BE0B1010 C90C2086 5768B525 206F85B3 B966D409 CE61E49F 5EDEF90E 29D9C998 B0D09822 C7D7A8B4 59B33D17 2EB40D81 B7BD5C3B C0BA6CAD EDB88320 9ABFB3B6 03B6E20C 74B1D29A EAD54739 9DD277AF 04DB2615 73DC1683 E3630B12 94643B84 0D6D6A3E 7A6A5AA8 E40ECF0B 9309FF9D 0A00AE27 7D079EB1 F00F9344 8708A3D2 1E01F268 6906C2FE F762575D 806567CB 196C3671 6E6B06E7 FED41B76 89D32BE0 10DA7A5A 67DD4ACC F9B9DF6F 8EBEEFF9 17B7BE43 60B08ED5 D6D6A3E8 A1D1937E 38D8C2C4 4FDFF252 D1BB67F1 A6BC5767 3FB506DD 48B2364B D80D2BDA AF0A1B4C 36034AF6 41047A60 DF60EFC3 A867DF55 316E8EEF 4669BE79 CB61B38C BC66831A 256FD2A0 5268E236 CC0C7795 BB0B4703 220216B9 5505262F C5BA3BBE B2BD0B28 2BB45A92 5CB36A04 C2D7FFA7 B5D0CF31 2CD99E8B 5BDEAE1D 9B64C2B0 EC63F226 756AA39C 026D930A 9C0906A9 EB0E363F 72076785 05005713 95BF4A82 E2B87A14 7BB12BAE 0CB61B38 92D28E9B E5D5BE0D 7CDCEFB7 0BDBDF21 86D3D2D4 F1D4E242 68DDB3F8 1FDA836E 81BE16CD F6B9265B 6FB077E1 18B74777 88085AE6 FF0F6A70 66063BCA 11010B5C 8F659EFF F862AE69 616BFFD3 166CCF45 A00AE278 D70DD2EE 4E048354 3903B3C2 A7672661 D06016F7 4969474D 3E6E77DB AED16A4A D9D65ADC 40DF0B66 37D83BF0 A9BCAE53 DEBB9EC5 47B2CF7F 30B5FFE9 BDBDF21C CABAC28A 53B39330 24B4A3A6 BAD03605 CDD70693 54DE5729 23D967BF B3667A2E C4614AB8 5D681B02 2A6F2B94 B40BBE37 C30C8EA1 5A05DF1B 2D02EF8D".split(' ');
 
-  var Shader = (function () {
+  var Shader = function () {
     function Shader(canvas) {
       babelHelpers.classCallCheck(this, Shader);
 
@@ -3167,12 +3190,12 @@
       }
     }]);
     return Shader;
-  })();
+  }();
 
   Shader._instances = new Object();
   Shader._shaderHashTable = {};
 
-  var ArrayUtil = (function () {
+  var ArrayUtil = function () {
     function ArrayUtil() {
       babelHelpers.classCallCheck(this, ArrayUtil);
     }
@@ -3200,9 +3223,9 @@
       }
     }]);
     return ArrayUtil;
-  })();
+  }();
 
-  var SimpleShaderSource = (function () {
+  var SimpleShaderSource = function () {
     function SimpleShaderSource() {
       babelHelpers.classCallCheck(this, SimpleShaderSource);
     }
@@ -3288,12 +3311,13 @@
       }
     }]);
     return SimpleShaderSource;
-  })();
+  }();
 
-  var SimpleShader = (function (_Shader) {
+  var SimpleShader = function (_Shader) {
     babelHelpers.inherits(SimpleShader, _Shader);
 
-    function SimpleShader(canvas) {
+    function SimpleShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, SimpleShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SimpleShader).call(this, canvas));
@@ -3311,12 +3335,13 @@
       }
     }]);
     return SimpleShader;
-  })(Shader);
+  }(Shader);
 
   GLBoost["SimpleShader"] = SimpleShader;
 
-  var ClassicMaterial = (function () {
-    function ClassicMaterial(canvas) {
+  var ClassicMaterial = function () {
+    function ClassicMaterial() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, ClassicMaterial);
 
       this._diffuseTexture = null;
@@ -3458,12 +3483,13 @@
       }
     }]);
     return ClassicMaterial;
-  })();
+  }();
 
   GLBoost$1["ClassicMaterial"] = ClassicMaterial;
 
-  var Geometry = (function () {
-    function Geometry(canvas) {
+  var Geometry = function () {
+    function Geometry() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, Geometry);
 
       this._gl = GLContext.getInstance(canvas).gl;
@@ -3971,7 +3997,7 @@
       }
     }]);
     return Geometry;
-  })();
+  }();
 
   Geometry._vaoDic = {};
   Geometry._vboDic = {};
@@ -3982,7 +4008,7 @@
 
   GLBoost$1["Geometry"] = Geometry;
 
-  var Camera = (function (_Element) {
+  var Camera = function (_Element) {
     babelHelpers.inherits(Camera, _Element);
 
     function Camera(lookat, perspective) {
@@ -4174,18 +4200,20 @@
       }
     }]);
     return Camera;
-  })(Element);
+  }(Element);
 
   Camera._mainCamera = null;
 
   GLBoost$1["Camera"] = Camera;
 
-  var Renderer = (function () {
+  var Renderer = function () {
     function Renderer(parameters) {
       babelHelpers.classCallCheck(this, Renderer);
 
       var _canvas = parameters.canvas;
       var _clearColor = parameters.clearColor;
+
+      GLBoost$1.CURRENT_CANVAS_ID = '#' + parameters.canvas.id;
 
       this._gl = GLContext.getInstance(_canvas).gl;
 
@@ -4297,7 +4325,7 @@
         this._fbo.height = height ? height : gl._canvas.height;
 
         for (var i = 0; i < textureNum; i++) {
-          var texture = new MutableTexture(gl._canvas, this._fbo.width, this._fbo.height);
+          var texture = new MutableTexture(this._fbo.width, this._fbo.height, gl._canvas);
           this._currentRenderTargetTextures.push(texture);
         }
 
@@ -4353,11 +4381,11 @@
       }
     }]);
     return Renderer;
-  })();
+  }();
 
   GLBoost$1["Renderer"] = Renderer;
 
-  var Scene = (function (_Element) {
+  var Scene = function (_Element) {
     babelHelpers.inherits(Scene, _Element);
 
     function Scene() {
@@ -4528,14 +4556,15 @@
       }
     }]);
     return Scene;
-  })(Element);
+  }(Element);
 
   GLBoost$1["Scene"] = Scene;
 
-  var Texture = (function (_AbstractTexture) {
+  var Texture = function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
-    function Texture(src, canvas) {
+    function Texture(src) {
+      var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
       babelHelpers.classCallCheck(this, Texture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, canvas));
@@ -4636,11 +4665,11 @@
       }
     }]);
     return Texture;
-  })(AbstractTexture);
+  }(AbstractTexture);
 
   GLBoost$1["Texture"] = Texture;
 
-  var BlendShapeShaderSource = (function () {
+  var BlendShapeShaderSource = function () {
     function BlendShapeShaderSource() {
       babelHelpers.classCallCheck(this, BlendShapeShaderSource);
     }
@@ -4730,12 +4759,13 @@
       }
     }]);
     return BlendShapeShaderSource;
-  })();
+  }();
 
-  var BlendShapeGeometry = (function (_Geometry) {
+  var BlendShapeGeometry = function (_Geometry) {
     babelHelpers.inherits(BlendShapeGeometry, _Geometry);
 
-    function BlendShapeGeometry(canvas) {
+    function BlendShapeGeometry() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, BlendShapeGeometry);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeGeometry).call(this, canvas));
@@ -4759,7 +4789,7 @@
           this._materialForBlend = this._defaultMaterial;
         }
 
-        var BlendShapeShader = (function (_materialForBlend$sha) {
+        var BlendShapeShader = function (_materialForBlend$sha) {
           babelHelpers.inherits(BlendShapeShader, _materialForBlend$sha);
 
           function BlendShapeShader(canvas) {
@@ -4772,7 +4802,7 @@
           }
 
           return BlendShapeShader;
-        })(this._materialForBlend.shader.constructor);
+        }(this._materialForBlend.shader.constructor);
 
         if (meshMaterial) {
           meshMaterial.shader = new BlendShapeShader(canvas);
@@ -4902,11 +4932,11 @@
       }
     }]);
     return BlendShapeGeometry;
-  })(Geometry);
+  }(Geometry);
 
   GLBoost$1["BlendShapeGeometry"] = BlendShapeGeometry;
 
-  var PhongShaderSource = (function () {
+  var PhongShaderSource = function () {
     function PhongShaderSource() {
       babelHelpers.classCallCheck(this, PhongShaderSource);
     }
@@ -5001,12 +5031,13 @@
       }
     }]);
     return PhongShaderSource;
-  })();
+  }();
 
-  var PhongShader = (function (_SimpleShader) {
+  var PhongShader = function (_SimpleShader) {
     babelHelpers.inherits(PhongShader, _SimpleShader);
 
-    function PhongShader(canvas) {
+    function PhongShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, PhongShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PhongShader).call(this, canvas));
@@ -5055,11 +5086,11 @@
       }
     }]);
     return PhongShader;
-  })(SimpleShader);
+  }(SimpleShader);
 
   GLBoost["PhongShader"] = PhongShader;
 
-  var LambertShaderSource = (function () {
+  var LambertShaderSource = function () {
     function LambertShaderSource() {
       babelHelpers.classCallCheck(this, LambertShaderSource);
     }
@@ -5144,12 +5175,13 @@
       }
     }]);
     return LambertShaderSource;
-  })();
+  }();
 
-  var LambertShader = (function (_SimpleShader) {
+  var LambertShader = function (_SimpleShader) {
     babelHelpers.inherits(LambertShader, _SimpleShader);
 
-    function LambertShader(canvas) {
+    function LambertShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, LambertShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
@@ -5168,11 +5200,11 @@
       }
     }]);
     return LambertShader;
-  })(SimpleShader);
+  }(SimpleShader);
 
   GLBoost["LambertShader"] = LambertShader;
 
-  var HalfLambertShaderSource = (function () {
+  var HalfLambertShaderSource = function () {
     function HalfLambertShaderSource() {
       babelHelpers.classCallCheck(this, HalfLambertShaderSource);
     }
@@ -5259,12 +5291,13 @@
       }
     }]);
     return HalfLambertShaderSource;
-  })();
+  }();
 
-  var HalfLambertShader = (function (_SimpleShader) {
+  var HalfLambertShader = function (_SimpleShader) {
     babelHelpers.inherits(HalfLambertShader, _SimpleShader);
 
-    function HalfLambertShader(canvas) {
+    function HalfLambertShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, HalfLambertShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
@@ -5283,14 +5316,14 @@
       }
     }]);
     return HalfLambertShader;
-  })(SimpleShader);
+  }(SimpleShader);
 
   GLBoost["HalfLambertShader"] = HalfLambertShader;
 
   var singleton = Symbol();
   var singletonEnforcer = Symbol();
 
-  var ObjLoader = (function () {
+  var ObjLoader = function () {
     function ObjLoader(enforcer) {
       babelHelpers.classCallCheck(this, ObjLoader);
 
@@ -5301,11 +5334,13 @@
 
     babelHelpers.createClass(ObjLoader, [{
       key: 'loadObj',
-      value: function loadObj(url, canvas) {
+      value: function loadObj(url) {
+        var defaultShader = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
         var _this = this;
 
-        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-        var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+        var mtlString = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var canvas = arguments.length <= 3 || arguments[3] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[3];
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -5329,6 +5364,7 @@
       key: '_loadMaterialsFromString',
       value: function _loadMaterialsFromString(mtlString, canvas, defaultShader) {
         var basePath = arguments.length <= 3 || arguments[3] === undefined ? '' : arguments[3];
+
 
         var mtlTextRows = mtlString.split('\n');
 
@@ -5429,11 +5465,11 @@
         var vtCount = 0;
 
         if (mtlString) {
-          promise = (function () {
+          promise = function () {
             return new Promise(function (resolve, reject) {
               resolve(_this3._loadMaterialsFromString(mtlString, canvas, defaultShader));
             });
-          })();
+          }();
         }
 
         for (var i = 0; i < objTextRows.length; i++) {
@@ -5885,7 +5921,7 @@
       }
     }]);
     return ObjLoader;
-  })();
+  }();
 
   GLBoost$1["ObjLoader"] = ObjLoader;
 
@@ -5894,10 +5930,11 @@
   GLBoost$1["ANGLE_UNIT"] = GLBoost$1.DEGREE;
   GLBoost$1["WEBGL_ONE_USE_EXTENSIONS"] = true;
 
-  var Plane = (function (_Geometry) {
+  var Plane = function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
 
-    function Plane(width, height, uSpan, vSpan, customVertexAttributes, canvas) {
+    function Plane(width, height, uSpan, vSpan, customVertexAttributes) {
+      var canvas = arguments.length <= 5 || arguments[5] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[5];
       babelHelpers.classCallCheck(this, Plane);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, canvas));
@@ -5970,14 +6007,15 @@
       }
     }]);
     return Plane;
-  })(Geometry);
+  }(Geometry);
 
   GLBoost$1["Plane"] = Plane;
 
-  var Cube = (function (_Geometry) {
+  var Cube = function (_Geometry) {
     babelHelpers.inherits(Cube, _Geometry);
 
-    function Cube(widthVector, vertexColor, canvas) {
+    function Cube(widthVector, vertexColor) {
+      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
       babelHelpers.classCallCheck(this, Cube);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Cube).call(this, canvas));
@@ -6030,14 +6068,15 @@
       }
     }]);
     return Cube;
-  })(Geometry);
+  }(Geometry);
 
   GLBoost$1["Cube"] = Cube;
 
-  var Sphere = (function (_Geometry) {
+  var Sphere = function (_Geometry) {
     babelHelpers.inherits(Sphere, _Geometry);
 
-    function Sphere(radius, widthSegments, heightSegments, vertexColor, canvas) {
+    function Sphere(radius, widthSegments, heightSegments, vertexColor) {
+      var canvas = arguments.length <= 4 || arguments[4] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[4];
       babelHelpers.classCallCheck(this, Sphere);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sphere).call(this, canvas));
@@ -6121,11 +6160,11 @@
       }
     }]);
     return Sphere;
-  })(Geometry);
+  }(Geometry);
 
   GLBoost$1["Sphere"] = Sphere;
 
-  var ParticleShaderSource = (function () {
+  var ParticleShaderSource = function () {
     function ParticleShaderSource() {
       babelHelpers.classCallCheck(this, ParticleShaderSource);
     }
@@ -6167,7 +6206,7 @@
       }
     }]);
     return ParticleShaderSource;
-  })();
+  }();
 
   /**
    * This Particle class handles particles expressions.
@@ -6175,8 +6214,9 @@
    * These particles are processed in GPU, so this is a very fast solution of particles expressions.
    */
 
-  var Particle = (function (_Geometry) {
+  var Particle = function (_Geometry) {
     babelHelpers.inherits(Particle, _Geometry);
+
 
     /**
      * This is Particle class's constructor
@@ -6188,7 +6228,8 @@
      * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
 
-    function Particle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas) {
+    function Particle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+      var canvas = arguments.length <= 5 || arguments[5] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[5];
       babelHelpers.classCallCheck(this, Particle);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, canvas));
@@ -6312,7 +6353,7 @@
           this._materialForBillboard = this._defaultMaterial;
         }
 
-        var ParticleShader = (function (_materialForBillboard) {
+        var ParticleShader = function (_materialForBillboard) {
           babelHelpers.inherits(ParticleShader, _materialForBillboard);
 
           function ParticleShader(canvas) {
@@ -6349,7 +6390,7 @@
             }
           }]);
           return ParticleShader;
-        })(this._materialForBillboard.shader.constructor);
+        }(this._materialForBillboard.shader.constructor);
 
         if (meshMaterial) {
           meshMaterial.shader = new ParticleShader(canvas);
@@ -6370,14 +6411,14 @@
       }
     }]);
     return Particle;
-  })(Geometry);
+  }(Geometry);
 
   GLBoost$1["Particle"] = Particle;
 
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
-  var GLTFLoader = (function () {
+  var GLTFLoader = function () {
     function GLTFLoader(enforcer) {
       babelHelpers.classCallCheck(this, GLTFLoader);
 
@@ -6388,11 +6429,13 @@
 
     babelHelpers.createClass(GLTFLoader, [{
       key: 'loadGLTF',
-      value: function loadGLTF(url, canvas) {
+      value: function loadGLTF(url) {
+        var scale = arguments.length <= 1 || arguments[1] === undefined ? 1.0 : arguments[1];
+
         var _this = this;
 
-        var scale = arguments.length <= 2 || arguments[2] === undefined ? 1.0 : arguments[2];
-        var defaultShader = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+        var canvas = arguments.length <= 3 || arguments[3] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[3];
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -6733,7 +6776,7 @@
       }
     }]);
     return GLTFLoader;
-  })();
+  }();
 
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
@@ -6774,6 +6817,10 @@
             this.renderer.draw(this.scene);
           });
           this.domElement = this.canvas;
+
+          var bodyElm = document.getElementsByTagName("body").item(0);
+          bodyElm.appendChild(this.canvas);
+          this.canvas.style.display = "none";
         }
       });
 

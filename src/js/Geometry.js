@@ -11,7 +11,7 @@ import DirectionalLight from './lights/DirectionalLight'
 import ArrayUtil from './misc/ArrayUtil'
 
 export default class Geometry {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     this._gl = GLContext.getInstance(canvas).gl;
     this._canvas = canvas;
     this._materials = [];

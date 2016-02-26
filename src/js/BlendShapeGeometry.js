@@ -6,7 +6,7 @@ import BlendShapeShaderSource from './shaders/BlendShapeShader'
 import Geometry from './Geometry'
 
 export default class BlendShapeGeometry extends Geometry {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     if (this.constructor === BlendShapeGeometry) {

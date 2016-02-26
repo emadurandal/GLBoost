@@ -12,7 +12,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -28,7 +28,7 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers.get = function get(object, property, receiver) {
     if (object === null) object = Function.prototype;
@@ -80,6 +80,7 @@
   };
 
   babelHelpers;
+
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -107,10 +108,10 @@
   });
   scene.add(camera);
 
-  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
   scene.add(directionalLight);
 
-  var MyCustomShaderSource = (function () {
+  var MyCustomShaderSource = function () {
     function MyCustomShaderSource() {
       babelHelpers.classCallCheck(this, MyCustomShaderSource);
     }
@@ -153,9 +154,9 @@
       }
     }]);
     return MyCustomShaderSource;
-  })();
+  }();
 
-  var MyCustomShader = (function (_GLBoost$HalfLambertS) {
+  var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
     function MyCustomShader(canvas) {
@@ -183,10 +184,10 @@
       }
     }]);
     return MyCustomShader;
-  })(GLBoost.HalfLambertShader);
+  }(GLBoost.HalfLambertShader);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
-  var promise = objLoader.loadObj('resouces/teapot/teapot.obj', '#world', MyCustomShader);
+  var promise = objLoader.loadObj('resouces/teapot/teapot.obj', MyCustomShader, null);
   promise.then(function (mesh) {
     //            console.log(mesh);
 

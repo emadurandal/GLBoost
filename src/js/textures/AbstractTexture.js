@@ -2,7 +2,7 @@ import GLBoost from './../globals'
 import GLContext from './../GLContext'
 
 export default class AbstractTexture {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     if (this.constructor === AbstractTexture) {
       throw new TypeError("Cannot construct AbstractTexture instances directly.");
     }

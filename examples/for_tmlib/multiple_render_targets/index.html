@@ -93,9 +93,9 @@
               new tm.geom.Vector2(1.0, 0.0)
             ];
 
-          var geometry = new GLBoost.BlendShapeGeometry(CANVAS_ID);
-          var texture = new GLBoost.Texture('resouces/texture.png', CANVAS_ID);
-          var material = new GLBoost.ClassicMaterial(CANVAS_ID);
+          var geometry = new GLBoost.BlendShapeGeometry();
+          var texture = new GLBoost.Texture('resouces/texture.png');
+          var material = new GLBoost.ClassicMaterial();
           material.diffuseTexture = texture;
           var mesh = new tm.webgl.MeshElement(geometry, material, CANVAS_ID);
           geometry.setVerticesData({
@@ -108,11 +108,11 @@
           this.add( mesh );
           renderPasses[0].addElements([mesh]);
           renderPasses[0].setClearColor([0, 0, 0, 1]);
-          renderPasses[0].specifyRenderTargetTextures(CANVAS_ID, renderTextures);
+          renderPasses[0].specifyRenderTargetTextures(renderTextures);
 
 
-          var geometry2 = new GLBoost.Geometry(CANVAS_ID);
-          var material2 = new GLBoost.ClassicMaterial(CANVAS_ID);
+          var geometry2 = new GLBoost.Geometry();
+          var material2 = new GLBoost.ClassicMaterial();
           material2.diffuseTexture = renderTextures[0];
           var mesh2 = tm.webgl.MeshElement(geometry2, material2, CANVAS_ID);
           geometry2.setVerticesData({

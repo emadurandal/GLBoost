@@ -9,7 +9,7 @@ import Vector2 from './../math/Vector2'
 import ArrayUtil from '.././misc/ArrayUtil'
 
 export default class Sphere extends Geometry {
-  constructor(radius, widthSegments, heightSegments, vertexColor, canvas) {
+  constructor(radius, widthSegments, heightSegments, vertexColor, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._setupVertexData(radius, widthSegments, heightSegments, vertexColor);

@@ -4,7 +4,7 @@ import AbstractTexture from './AbstractTexture'
 import GLExtentionsManager from '../GLExtentionsManager'
 
 export default class Texture extends AbstractTexture {
-  constructor(src, canvas) {
+  constructor(src, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._isTextureReady = false;

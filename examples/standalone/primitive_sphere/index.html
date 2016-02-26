@@ -44,18 +44,18 @@ renderer._gl.disable(renderer._gl.CULL_FACE);
 
 var scene = new GLBoost.Scene();
 
-var material = new GLBoost.ClassicMaterial('#world');
-var texture = new GLBoost.Texture('resouces/texture.png', '#world'); // earth.jpg
+var material = new GLBoost.ClassicMaterial();
+var texture = new GLBoost.Texture('resouces/texture.png'); // earth.jpg
 material.diffuseTexture = texture;
 
-var shader = new GLBoost.PhongShader('#world');
+var shader = new GLBoost.PhongShader();
 material.shader = shader;
-var geometry = new GLBoost.Sphere(20, 24, 24, null, "#world");
+var geometry = new GLBoost.Sphere(20, 24, 24, null);
 
 var earth = new GLBoost.Mesh(geometry, material);
 scene.add(earth);
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), '#world');
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 scene.add( directionalLight );
 
 

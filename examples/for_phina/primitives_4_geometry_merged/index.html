@@ -34,11 +34,11 @@
           width: SCREEN_WIDTH,
           height: SCREEN_HEIGHT
         }).addChildTo(this);
-        var material = new GLBoost.ClassicMaterial(layer.canvas);
-        material.shader = new GLBoost.PhongShader(layer.canvas);
+        var material = new GLBoost.ClassicMaterial();
+        material.shader = new GLBoost.PhongShader();
 
 
-        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1), layer.canvas);
+        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
         var mesh = new GLBoost.Mesh(geometry, material);
 
         var scale = 0.2;
@@ -46,7 +46,7 @@
 
         var cubes = [];
         for ( var i = 0; i < 20000-1; i ++ ) {
-          var cube = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1), layer.canvas);
+          var cube = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
           var cubeMesh = new GLBoost.Mesh(cube, material);
 
           cubeMesh.translate = new GLBoost.Vector3(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);

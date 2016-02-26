@@ -26,7 +26,7 @@ export default class Particle extends Geometry {
    * @param {Object} JSON which has other vertex attribute arrays you want
    * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
    */
-  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas) {
+  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, performanceHint);

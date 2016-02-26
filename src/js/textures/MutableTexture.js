@@ -3,7 +3,7 @@ import GLContext from './../GLContext'
 import AbstractTexture from './AbstractTexture'
 
 export default class MutableTexture extends AbstractTexture {
-  constructor(canvas, width, height) {
+  constructor(width, height, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._isTextureReady = false;

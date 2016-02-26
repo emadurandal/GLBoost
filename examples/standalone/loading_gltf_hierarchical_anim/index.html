@@ -36,7 +36,7 @@ var scene = new GLBoost.Scene();
 
 
 
-var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0), '#world');
+var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0));
 pointLight.translate = new GLBoost.Vector3(10, 10, 10);
 scene.add( pointLight );
 
@@ -58,7 +58,7 @@ scene.add( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/hierarchical_anim/hierarchical_anim2.gltf', '#world', 1);
+var promise = glTFLoader.loadGLTF('resouces/hierarchical_anim/hierarchical_anim2.gltf', 1, null);
 promise.then(function(group) {
   console.log(group);
 

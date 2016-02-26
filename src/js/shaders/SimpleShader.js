@@ -77,7 +77,7 @@ export class SimpleShaderSource {
 }
 
 export default class SimpleShader extends Shader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
     SimpleShader.mixin(SimpleShaderSource);

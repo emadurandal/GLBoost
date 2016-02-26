@@ -33,7 +33,7 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.add( directionalLight );
 
 
@@ -46,10 +46,10 @@ for (let i=0; i<100; i++) {
 var particleGeometry = new GLBoost.Particle(
   {
     position: particlesPosition
-  }, 0.5, 0.5, null, GLBoost.DYNAMIC_DRAW, '#world');
+  }, 0.5, 0.5, null, GLBoost.DYNAMIC_DRAW);
 
-var material = new GLBoost.ClassicMaterial('#world');
-var texture = new GLBoost.Texture('resouces/iceball.png', '#world');
+var material = new GLBoost.ClassicMaterial();
+var texture = new GLBoost.Texture('resouces/iceball.png');
 material.diffuseTexture = texture;
 var particle = new GLBoost.Mesh(particleGeometry, material);
 

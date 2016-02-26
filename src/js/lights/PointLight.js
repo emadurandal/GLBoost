@@ -3,7 +3,7 @@ import GLContext from './../GLContext'
 import AbstractLight from './AbstractLight'
 
 export default class PointLight extends AbstractLight {
-  constructor(intensity, canvas) {
+  constructor(intensity, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._gl = GLContext.getInstance(canvas).gl;

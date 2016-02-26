@@ -12,7 +12,7 @@
     }
   };
 
-  babelHelpers.createClass = (function () {
+  babelHelpers.createClass = function () {
     function defineProperties(target, props) {
       for (var i = 0; i < props.length; i++) {
         var descriptor = props[i];
@@ -28,7 +28,7 @@
       if (staticProps) defineProperties(Constructor, staticProps);
       return Constructor;
     };
-  })();
+  }();
 
   babelHelpers.get = function get(object, property, receiver) {
     if (object === null) object = Function.prototype;
@@ -80,6 +80,7 @@
   };
 
   babelHelpers;
+
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -107,12 +108,12 @@
   });
   scene.add(camera);
 
-  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
   scene.add(directionalLight);
 
   var attributeName = 'heightpoints';
 
-  var MyCustomShaderSource = (function () {
+  var MyCustomShaderSource = function () {
     function MyCustomShaderSource() {
       babelHelpers.classCallCheck(this, MyCustomShaderSource);
     }
@@ -156,12 +157,13 @@
       }
     }]);
     return MyCustomShaderSource;
-  })();
+  }();
 
-  var MyCustomShader = (function (_GLBoost$SimpleShader) {
+  var MyCustomShader = function (_GLBoost$SimpleShader) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$SimpleShader);
 
-    function MyCustomShader(canvas) {
+    function MyCustomShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, MyCustomShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
@@ -186,7 +188,7 @@
       }
     }]);
     return MyCustomShader;
-  })(GLBoost.SimpleShader);
+  }(GLBoost.SimpleShader);
 
   var uSpan = 40;
   var vSpan = 40;
@@ -199,9 +201,9 @@
     }
   }
 
-  var material = new GLBoost.ClassicMaterial('#world');
-  material.shader = new MyCustomShader('#world');
-  var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes, '#world');
+  var material = new GLBoost.ClassicMaterial();
+  material.shader = new MyCustomShader();
+  var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
   var plane = new GLBoost.Mesh(planeGeometry, material);
   scene.add(plane);
 

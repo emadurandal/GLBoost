@@ -15,6 +15,8 @@ export default class Renderer {
     var _canvas = parameters.canvas;
     var _clearColor = parameters.clearColor;
 
+    GLBoost.CURRENT_CANVAS_ID = '#' + parameters.canvas.id;
+
     this._gl = GLContext.getInstance(_canvas).gl;
 
     var gl = this._gl;
@@ -122,7 +124,7 @@ export default class Renderer {
     this._fbo.height = height ? height : gl._canvas.height;
 
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(gl._canvas, this._fbo.width, this._fbo.height);
+      let texture = new MutableTexture(this._fbo.width, this._fbo.height, gl._canvas);
       this._currentRenderTargetTextures.push(texture);
     }
 

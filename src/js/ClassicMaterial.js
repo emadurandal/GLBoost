@@ -4,7 +4,7 @@ import Vector4 from './math/Vector4'
 import SimpleShader from './shaders/SimpleShader'
 
 export default class ClassicMaterial {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     this._diffuseTexture = null;
     this._gl = GLContext.getInstance(canvas).gl;
     this._canvas = canvas;

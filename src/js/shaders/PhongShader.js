@@ -90,7 +90,7 @@ export class PhongShaderSource {
 
 
 export default class PhongShader extends SimpleShader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
     PhongShader.mixin(PhongShaderSource);

@@ -81,9 +81,9 @@
             new tm.geom.Vector2(1.0, 0.0)
             ];
 
-          var geometry = new GLBoost.Geometry('#world');
-          var texture = new GLBoost.Texture('resouces/texture.png', '#world');
-          var material = new GLBoost.ClassicMaterial('#world');
+          var geometry = new GLBoost.Geometry();
+          var texture = new GLBoost.Texture('resouces/texture.png');
+          var material = new GLBoost.ClassicMaterial();
           material.diffuseTexture = texture;
           var mesh = new tm.webgl.MeshElement(geometry, material, '#world');
           geometry.setVerticesData({

@@ -51,7 +51,7 @@
         layer.scene.add( camera );
 
         var objLoader = GLBoost.ObjLoader.getInstance();
-        var promise = objLoader.loadObj('resouces/teapot/teapot.obj', layer.canvas);
+        var promise = objLoader.loadObj('resouces/teapot/teapot.obj');
         promise.then(function(mesh) {
 //            console.log(mesh);
 
@@ -61,10 +61,8 @@
 
         });
 
-        layer.scene.prepareForRender();
-
         layer.update = function() {
-          var rotateMatrix = GLBoost.Matrix44.rotateY(-1.0);
+          var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
           var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
           camera.eye = rotatedVector;
         };

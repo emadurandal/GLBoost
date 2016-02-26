@@ -36,7 +36,7 @@ var scene = new GLBoost.Scene();
 
 
 
-var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0), '#world');
+var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0));
 pointLight.translate = new GLBoost.Vector3(10, 10, 10);
 scene.add( pointLight );
 
@@ -56,7 +56,7 @@ var camera = new GLBoost.Camera(
 scene.add( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/teapot/teapot.gltf', '#world', 1);//, new GLBoost.HalfLambertShader('#world'));
+var promise = glTFLoader.loadGLTF('resouces/teapot/teapot.gltf', 1, null);//, new GLBoost.HalfLambertShader('#world'));
 promise.then(function(mesh) {
   console.log(mesh);
 

@@ -39,6 +39,10 @@ phina.namespace(function() {
         this.renderer.draw(this.scene);
       });
       this.domElement = this.canvas;
+
+      var bodyElm = document.getElementsByTagName("body").item(0);
+      bodyElm.appendChild(this.canvas);
+      this.canvas.style.display = "none";
     }
   });
 

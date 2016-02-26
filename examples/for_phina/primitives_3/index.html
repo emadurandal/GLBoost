@@ -35,11 +35,11 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
 
-        var shader = new GLBoost.PhongShader(layer.canvas);
-        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1,1), layer.canvas);
+        var shader = new GLBoost.PhongShader();
+        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1,1));
 
         for ( var i = 0; i < 2000; i ++ ) {
-          var material = new GLBoost.ClassicMaterial(layer.canvas);
+          var material = new GLBoost.ClassicMaterial();
           var object = new GLBoost.Mesh(geometry, material);
           material.shader = shader;
           material.baseColor = new GLBoost.Vector4(Math.random(), Math.random(), Math.random(), Math.random()*0.5+0.5);

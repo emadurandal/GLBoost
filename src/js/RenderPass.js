@@ -30,7 +30,7 @@ export default class RenderPass {
     return this._meshes;
   }
 
-  specifyRenderTargetTextures(canvas, renderTargetTextures) {
+  specifyRenderTargetTextures(renderTargetTextures, canvas = GLBoost.CURRENT_CANVAS_ID) {
     var gl = GLContext.getInstance(canvas).gl;
 
     if (renderTargetTextures) {

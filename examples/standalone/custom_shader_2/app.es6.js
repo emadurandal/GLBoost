@@ -30,7 +30,7 @@ var camera = new GLBoost.Camera(
 );
 scene.add( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10), '#world');
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.add( directionalLight );
 
 var attributeName = 'heightpoints';
@@ -74,7 +74,7 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.SimpleShader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
     MyCustomShader.mixin(MyCustomShaderSource);
 
@@ -103,9 +103,9 @@ for(let i=0; i<=vSpan; i++) {
   }
 }
 
-var material = new GLBoost.ClassicMaterial('#world');
-material.shader = new MyCustomShader('#world');
-var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes, '#world');
+var material = new GLBoost.ClassicMaterial();
+material.shader = new MyCustomShader();
+var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
 var plane = new GLBoost.Mesh(planeGeometry, material);
 scene.add( plane );
 

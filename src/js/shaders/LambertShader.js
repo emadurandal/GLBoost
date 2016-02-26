@@ -80,7 +80,7 @@ export class LambertShaderSource {
 
 
 export default class LambertShader extends SimpleShader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
     LambertShader.mixin(LambertShaderSource);

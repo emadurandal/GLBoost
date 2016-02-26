@@ -34,14 +34,14 @@ var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, gree
 
 var scene = new GLBoost.Scene();
 
-var material = new GLBoost.ClassicMaterial('#world');
-var texture = new GLBoost.Texture('resouces/texture.png', '#world');
+var material = new GLBoost.ClassicMaterial();
+var texture = new GLBoost.Texture('resouces/texture.png');
 material.diffuseTexture = texture;
 
 var group1 = new GLBoost.Group();
 var group2 = new GLBoost.Group();
 
-var planeGeometry = new GLBoost.Plane(1, 1, 1, 1, null, '#world');
+var planeGeometry = new GLBoost.Plane(1, 1, 1, 1, null);
 var cube0 = new GLBoost.Mesh(planeGeometry, material);
 cube0.translate = new GLBoost.Vector3(-3, 0, 0);
 cube0.opacity = 0.5;

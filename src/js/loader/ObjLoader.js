@@ -27,7 +27,7 @@ export default class ObjLoader {
       return this[singleton];
   }
 
-  loadObj(url, canvas, defaultShader = null, mtlString = null) {
+  loadObj(url, defaultShader = null, mtlString = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {

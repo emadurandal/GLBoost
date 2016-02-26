@@ -8,7 +8,7 @@ import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'
 
 export default class Cube extends Geometry {
-  constructor(widthVector, vertexColor, canvas) {
+  constructor(widthVector, vertexColor, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._setupVertexData(widthVector.divide(2.0), vertexColor);

@@ -3,7 +3,7 @@ import GLContext from './../GLContext'
 import AbstractLight from './AbstractLight'
 
 export default class DirectionalLight extends AbstractLight {
-  constructor(intensity, direction, canvas) {
+  constructor(intensity, direction, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._gl = GLContext.getInstance(canvas).gl;
