@@ -107,7 +107,7 @@
 
       var geometry = new GLBoost.BlendShapeGeometry('#world_' + index);
       var material = new GLBoost.ClassicMaterial('#world_' + index);
-      var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
+      var texture = new GLBoost.Texture('resources/texture.png', '#world_' + index);
       material.diffuseTexture = texture;
       var mesh = tm.webgl.MeshElement(geometry, material, '#world');
       geometry.setVerticesData({
@@ -212,7 +212,7 @@
 
       var geometry = new GLBoost.BlendShapeGeometry('#world_' + index);
       var material = new GLBoost.ClassicMaterial('#world_' + index);
-      var texture = new GLBoost.Texture('resouces/texture.png', '#world_' + index);
+      var texture = new GLBoost.Texture('resources/texture.png', '#world_' + index);
       material.diffuseTexture = texture;
       var mesh = tm.webgl.MeshElement(geometry, material, '#world');
       geometry.setVerticesData({

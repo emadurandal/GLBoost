@@ -77,8 +77,8 @@
           var mtlString = 'newmtl initialShadingGroup\n' +
                           'Kd 1.00 1.00 1.00\n' +
                           'Ka 0.00 0.00 0.00\n' +
-                          'map_Kd resouces/teapot/wood.jpg\n';
-          var promise = objLoader.loadObj('resouces/teapot/teapot.obj', null, mtlString);
+                          'map_Kd resources/teapot/wood.jpg\n';
+          var promise = objLoader.loadObj('resources/teapot/teapot.obj', null, mtlString);
           var self = this;
           promise.then(function(mesh) {
 //            console.log(mesh);

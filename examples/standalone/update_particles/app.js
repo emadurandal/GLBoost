@@ -49,7 +49,7 @@ var particleGeometry = new GLBoost.Particle(
   }, 0.5, 0.5, null, GLBoost.DYNAMIC_DRAW);
 
 var material = new GLBoost.ClassicMaterial();
-var texture = new GLBoost.Texture('resouces/iceball.png');
+var texture = new GLBoost.Texture('resources/iceball.png');
 material.diffuseTexture = texture;
 var particle = new GLBoost.Mesh(particleGeometry, material);
 

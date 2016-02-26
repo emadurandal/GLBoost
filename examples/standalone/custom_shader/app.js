@@ -187,7 +187,7 @@
   }(GLBoost.HalfLambertShader);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
-  var promise = objLoader.loadObj('resouces/teapot/teapot.obj', MyCustomShader, null);
+  var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
   promise.then(function (mesh) {
     //            console.log(mesh);
 

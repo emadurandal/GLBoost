@@ -131,7 +131,7 @@ var particleGeometry = new GLBoost.Particle(
 
 var material = new GLBoost.ClassicMaterial();
 material.shader = new MyCustomShader(GLBoost.CURRENT_CANVAS_ID);
-var texture = new GLBoost.Texture('resouces/iceball.png');
+var texture = new GLBoost.Texture('resources/iceball.png');
 material.diffuseTexture = texture;
 var particle = new GLBoost.Mesh(particleGeometry, material);
 

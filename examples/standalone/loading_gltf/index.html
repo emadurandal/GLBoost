@@ -56,7 +56,7 @@ var camera = new GLBoost.Camera(
 scene.add( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resouces/teapot/teapot.gltf', 1, null);//, new GLBoost.HalfLambertShader('#world'));
+var promise = glTFLoader.loadGLTF('resources/teapot/teapot.gltf', 1, null);//, new GLBoost.HalfLambertShader('#world'));
 promise.then(function(mesh) {
   console.log(mesh);
 
