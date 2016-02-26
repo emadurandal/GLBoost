@@ -83,14 +83,14 @@ var renderer = new GLBoost.Renderer({
 var scene = new GLBoost.Scene();
 
 // setup material
-var material = new GLBoost.ClassicMaterial('#world');
-var texture = new GLBoost.Texture('resouces/texture.png', '#world'); // earth.jpg
+var material = new GLBoost.ClassicMaterial();
+var texture = new GLBoost.Texture('resources/texture.png'); // earth.jpg
 material.diffuseTexture = texture;
-var shader = new GLBoost.PhongShader('#world');
+var shader = new GLBoost.PhongShader();
 material.shader = shader;
 
 // make a Sphere geometry
-var geometry = new GLBoost.Sphere(20, 24, 24, null, "#world");
+var geometry = new GLBoost.Sphere(20, 24, 24, null);
 
 // set Sphere geometry and material to make a Mesh.
 var earth = new GLBoost.Mesh(geometry, material);
@@ -98,7 +98,7 @@ var earth = new GLBoost.Mesh(geometry, material);
 scene.add(earth);
 
 // make a directonal light
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), '#world');
+var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 // add the light to the scene
 scene.add( directionalLight );
 
