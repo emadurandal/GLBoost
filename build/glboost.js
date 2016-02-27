@@ -4206,6 +4206,11 @@
 
   GLBoost$1["Camera"] = Camera;
 
+  /**
+   * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
+   * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+   */
+
   var Renderer = function () {
     function Renderer(parameters) {
       babelHelpers.classCallCheck(this, Renderer);
@@ -4238,6 +4243,13 @@
       this._currentRenderTargetTextures = [];
       this._renderPasses = null;
     }
+
+    /**
+     * en: draw elements of the scene.<br>
+     * ja: sceneが持つオブジェクトを描画します
+     * @param {Scene} scene a instance of Scene class
+     */
+
 
     babelHelpers.createClass(Renderer, [{
       key: 'draw',
@@ -4293,6 +4305,15 @@
           });
         }
       }
+
+      /**
+       * en: clear color/depth/stencil of canvas.<br>
+       * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
+       * @param {boolean} color_flg true: clear color, false: don't clear color
+       * @param {boolean} depth_flg true: clear depth, false: don't clear depth
+       * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+       */
+
     }, {
       key: 'clearCanvas',
       value: function clearCanvas(color_flg, depth_flg, stencil_flg) {
@@ -4309,6 +4330,16 @@
       }
     }, {
       key: 'createTexturesForRenderTarget',
+
+
+      /**
+       * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
+       * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
+       * @param {number} width en: width of texture. ja: テクスチャの幅
+       * @param {number} height en: height of texture. ja: テクスチャの高さ
+       * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
+       * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+       */
       value: function createTexturesForRenderTarget(width, height, textureNum) {
 
         var gl = this._gl;
@@ -4366,8 +4397,23 @@
           renderPass.prepareForRender();
         });
       }
+
+      /**
+       * en: Get WebGL context.<br>
+       * ja: WebGLコンテキストを取得します。
+       * @returns {webglcontext} a context of WebGL
+       */
+
     }, {
       key: 'resize',
+
+
+      /**
+       * en: resize canvas and viewport.<br>
+       * ja: canvasとビューポートをリサイズします。
+       * @param {number} width en: width to resize, ja: リサイズする幅
+       * @param {number} height en: height to resize, ja:リサイズする高さ
+       */
       value: function resize(width, height) {
         this._gl._canvas.width = width;
         this._gl._canvas.height = height;
@@ -4384,6 +4430,13 @@
   }();
 
   GLBoost$1["Renderer"] = Renderer;
+
+  /**
+   * en: This Scene class is the top level element of scene graph hierarchy.
+   *       To render scene, pass this scene element to Renderer.draw method.<br>
+   * ja: このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
+   *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
+   */
 
   var Scene = function (_Element) {
     babelHelpers.inherits(Scene, _Element);
@@ -4407,18 +4460,39 @@
       return _this;
     }
 
+    /**
+     * en: Add the element to this scene as a child.<br>
+     * ja: このシーンにelementを子供として追加します。
+     * @param element a instance of Element class
+     */
+
+
     babelHelpers.createClass(Scene, [{
       key: 'add',
       value: function add(element) {
         this._elements.push(element);
         element._parent = this;
       }
+
+      /**
+       * en: Add the element to this scene as a child.<br>
+       * ja: このシーンにelementを子供として追加します。
+       * @param element a instance of Element class
+       */
+
     }, {
       key: 'addChild',
       value: function addChild(element) {
         this._elements.push(element);
         element._parent = this;
       }
+
+      /**
+       * en: Get child elements which belong to this scene.<br>
+       * ja: このシーンに属していた子供の要素の配列を返します。
+       * @return {Array} en: child elements of this scene. ja: このシーンの子供の要素
+       */
+
     }, {
       key: 'getChildren',
       value: function getChildren() {
@@ -4445,12 +4519,26 @@
       value: function _getCurrentAnimationInputValue(inputName) {
         return this._currentAnimationInputValues[inputName];
       }
+
+      /**
+       * en: Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+       * ja: アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+       * @param {string} inputName en: inputName name of input value. ja: 入力値の名前
+       * @param {any} inputValue en: input value of animation. ja: アニメーションの入力値
+       */
+
     }, {
       key: 'setCurrentAnimationValue',
       value: function setCurrentAnimationValue(inputName, inputValue) {
         this._setDirtyToAnimatedElement(inputName);
         this._currentAnimationInputValues[inputName] = inputValue;
       }
+
+      /**
+       * en: Prepare for Rendering. You have to call this method before Renderer.draw method.
+       * ja: レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
+       */
+
     }, {
       key: 'prepareForRender',
       value: function prepareForRender() {
@@ -4534,21 +4622,49 @@
           elm.prepareForRender(existCamera_f, _this2._lights);
         });
       }
+
+      /**
+       * en: Get child elements which belong to this scene.<br>
+       * ja: このシーンに属していた子供の要素の配列を返します。
+       * @return {Array} en: child elements of this scene. ja: このシーンの子供の要素
+       */
+
     }, {
       key: 'elements',
       get: function get() {
         return this._elements;
       }
+
+      /**
+       * en: Get child meshes which belong to this scene.<br>
+       * ja: このシーンに属していた子供のMesh要素の配列を返します。
+       * @return {Array} en: child meshes of this scene. ja: このシーンの子供のMesh要素
+       */
+
     }, {
       key: 'meshes',
       get: function get() {
         return this._meshes;
       }
+
+      /**
+       * en: Get child lights which belong to this scene.<br>
+       * ja: このシーンに属していた子供のLight要素の配列を返します。
+       * @return {Array} en: child lights of this scene. ja: このシーンの子供のLight要素
+       */
+
     }, {
       key: 'lights',
       get: function get() {
         return this._lights;
       }
+
+      /**
+       * en: Get child cameras which belong to this scene.<br>
+       * ja: このシーンに属していた子供のCamera要素の配列を返します。
+       * @return {Array} en: child cameras of this scene. ja: このシーンの子供のCamera要素
+       */
+
     }, {
       key: 'cameras',
       get: function get() {
@@ -6599,7 +6715,7 @@
         var diffuseValue = materialJson.values.diffuse;
         // Diffuse Texture
         if (texcoords0AccessorStr) {
-          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
           additional['texcoord'] = texcoords;
 
           if (typeof diffuseValue === 'string') {

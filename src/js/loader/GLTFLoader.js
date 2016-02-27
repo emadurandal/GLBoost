@@ -190,7 +190,7 @@ export default class GLTFLoader {
     let diffuseValue = materialJson.values.diffuse;
     // Diffuse Texture
     if (texcoords0AccessorStr) {
-      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, scale, gl);
+      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
       additional['texcoord'] = texcoords;
 
       if (typeof diffuseValue === 'string') {
