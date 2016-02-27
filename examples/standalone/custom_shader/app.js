@@ -159,7 +159,8 @@
   var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
-    function MyCustomShader(canvas) {
+    function MyCustomShader() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, MyCustomShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
@@ -187,7 +188,7 @@
   }(GLBoost.HalfLambertShader);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
-  var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
+  var promise = objLoader.loadObj('resources/teapot/teapot.obj', new MyCustomShader(), null);
   promise.then(function (mesh) {
     //            console.log(mesh);
 

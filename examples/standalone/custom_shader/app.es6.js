@@ -73,7 +73,7 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.HalfLambertShader {
-  constructor(canvas) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
     MyCustomShader.mixin(MyCustomShaderSource);
 
@@ -94,7 +94,7 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
 
 
 var objLoader = GLBoost.ObjLoader.getInstance();
-var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
+var promise = objLoader.loadObj('resources/teapot/teapot.obj', new MyCustomShader(), null);
 promise.then(function(mesh) {
 //            console.log(mesh);
 

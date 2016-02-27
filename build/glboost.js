@@ -5512,7 +5512,7 @@
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
             if (defaultShader) {
-              materials[iMCount].shader = new defaultShader(canvas);
+              materials[iMCount].shader = defaultShader;
             } else {
               materials[iMCount].shader = new PhongShader(canvas);
             }
