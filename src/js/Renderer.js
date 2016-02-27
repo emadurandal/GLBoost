@@ -10,6 +10,10 @@ import AbstractLight from './lights/AbstractLight'
 import Geometry from './Geometry'
 import Group from './Group'
 
+/**
+ * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
+ * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+ */
 export default class Renderer {
   constructor(parameters) {
     var _canvas = parameters.canvas;
@@ -41,6 +45,11 @@ export default class Renderer {
     this._renderPasses = null;
   }
 
+  /**
+   * en: draw elements of the scene.<br>
+   * ja: sceneが持つオブジェクトを描画します
+   * @param {Scene} scene a instance of Scene class
+   */
   draw(scene) {
     var camera = false;
     var viewMatrix = null;
@@ -93,6 +102,13 @@ export default class Renderer {
     }
   }
 
+  /**
+   * en: clear color/depth/stencil of canvas.<br>
+   * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
+   * @param {boolean} color_flg true: clear color, false: don't clear color
+   * @param {boolean} depth_flg true: clear depth, false: don't clear depth
+   * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+   */
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
 
     var gl = this._gl;
@@ -107,6 +123,14 @@ export default class Renderer {
 
   };
 
+  /**
+   * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
+   * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
+   * @param {number} width en: width of texture. ja: テクスチャの幅
+   * @param {number} height en: height of texture. ja: テクスチャの高さ
+   * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
+   * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+   */
   createTexturesForRenderTarget(width, height, textureNum) {
 
     var gl = this._gl;
@@ -164,10 +188,22 @@ export default class Renderer {
     });
   }
 
+  /**
+   * en: Get WebGL context.<br>
+   * ja: WebGLコンテキストを取得します。
+   * @returns {webglcontext} a context of WebGL
+   */
   get glContext() {
     return this._gl;
   }
 
+
+  /**
+   * en: resize canvas and viewport.<br>
+   * ja: canvasとビューポートをリサイズします。
+   * @param {number} width en: width to resize, ja: リサイズする幅
+   * @param {number} height en: height to resize, ja:リサイズする高さ
+   */
   resize(width, height) {
     this._gl._canvas.width = width;
     this._gl._canvas.height = height;
