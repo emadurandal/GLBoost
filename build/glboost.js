@@ -390,31 +390,6 @@
 
   GLBoost$1["Vector3"] = Vector3;
 
-  var Vector4 = function () {
-    function Vector4(x, y, z, w) {
-      babelHelpers.classCallCheck(this, Vector4);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    babelHelpers.createClass(Vector4, [{
-      key: "isEqual",
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }]);
-    return Vector4;
-  }();
-
-  GLBoost$1["Vector4"] = Vector4;
-
   var MathUtil = function () {
     function MathUtil() {
       babelHelpers.classCallCheck(this, MathUtil);
@@ -817,6 +792,31 @@
   }();
 
   GLBoost$1["Matrix33"] = Matrix33;
+
+  var Vector4 = function () {
+    function Vector4(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Vector4);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Vector4, [{
+      key: "isEqual",
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }]);
+    return Vector4;
+  }();
+
+  GLBoost$1["Vector4"] = Vector4;
 
   var Matrix44 = function () {
     function Matrix44() {
@@ -1953,51 +1953,46 @@
       key: 'bakeTransformToGeometry',
       value: function bakeTransformToGeometry() {
         var positions = this._geometry._vertices.position;
+        var mat = this.transformMatrixAccumulatedAncestry;
         for (var i = 0; i < positions.length; i++) {
-          var mat = this.transformMatrixAccumulatedAncestry;
           var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
           var transformedPosVec = mat.multiplyVector(posVector4);
           positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
         }
         this._geometry._vertices.position = positions;
 
-        /*
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (let i=0; i<normals.length; i++) {
-            let mat = this.transformMatrixAccumulatedAncestry;
-            let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
-            let transformedNormalVec = mat.multiplyVector(normalVector4);
+          for (var i = 0; i < normals.length; i++) {
+            var normalVector3 = normals[i];
+            var transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
             normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
-        */
       }
     }, {
       key: 'bakeInverseTransformToGeometry',
       value: function bakeInverseTransformToGeometry() {
         var positions = this._geometry._vertices.position;
+        var invMat = this.inverseTransformMatrixAccumulatedAncestry;
         for (var i = 0; i < positions.length; i++) {
-          var mat = this.inverseTransformMatrixAccumulatedAncestry;
           var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
-          var transformedPosVec = mat.multiplyVector(posVector4);
+          var transformedPosVec = invMat.multiplyVector(posVector4);
           positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
         }
         this._geometry._vertices.position = positions;
 
-        /*
+        var mat = this.transformMatrixAccumulatedAncestry;
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (let i=0; i<normals.length; i++) {
-            let mat = this.inverseTransformMatrixAccumulatedAncestry;
-            let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
-            let transformedNormalVec = mat.multiplyVector(normalVector4);
+          for (var i = 0; i < normals.length; i++) {
+            var normalVector3 = normals[i];
+            var transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
             normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
-        */
       }
     }, {
       key: '_copyMaterials',

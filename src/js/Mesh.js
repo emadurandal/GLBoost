@@ -2,7 +2,7 @@ import GLBoost from './globals'
 import Element from './Element'
 import Vector3 from './math/Vector3'
 import Vector4 from './math/Vector4'
-
+import Matrix44 from './math/Matrix44'
 
 export default class Mesh extends Element {
   constructor(geometry, material) {
@@ -60,50 +60,48 @@ export default class Mesh extends Element {
 
   bakeTransformToGeometry() {
     var positions = this._geometry._vertices.position;
+    var mat = this.transformMatrixAccumulatedAncestry;
     for (let i=0; i<positions.length; i++) {
-      let mat = this.transformMatrixAccumulatedAncestry;
       let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
       let transformedPosVec = mat.multiplyVector(posVector4);
       positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
     }
     this._geometry._vertices.position = positions;
 
-    /*
+
     if (this._geometry._vertices.normal) {
       var normals = this._geometry._vertices.normal;
       for (let i=0; i<normals.length; i++) {
-        let mat = this.transformMatrixAccumulatedAncestry;
-        let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
-        let transformedNormalVec = mat.multiplyVector(normalVector4);
+        let normalVector3 = normals[i];
+        let transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
         normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
       }
       this._geometry._vertices.normal = normals;
     }
-    */
+
   }
 
   bakeInverseTransformToGeometry() {
     var positions = this._geometry._vertices.position;
+    var invMat = this.inverseTransformMatrixAccumulatedAncestry;
     for (let i=0; i<positions.length; i++) {
-      let mat = this.inverseTransformMatrixAccumulatedAncestry;
       let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
-      let transformedPosVec = mat.multiplyVector(posVector4);
+      let transformedPosVec = invMat.multiplyVector(posVector4);
       positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
     }
     this._geometry._vertices.position = positions;
 
-    /*
+    let mat = this.transformMatrixAccumulatedAncestry;
     if (this._geometry._vertices.normal) {
       var normals = this._geometry._vertices.normal;
       for (let i=0; i<normals.length; i++) {
-        let mat = this.inverseTransformMatrixAccumulatedAncestry;
-        let normalVector4 = new Vector4(normals[i].x, normals[i].y, normals[i].z, 1);
-        let transformedNormalVec = mat.multiplyVector(normalVector4);
+        let normalVector3 = normals[i];
+        let transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
         normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
       }
       this._geometry._vertices.normal = normals;
     }
-    */
+
   }
 
   _copyMaterials() {
