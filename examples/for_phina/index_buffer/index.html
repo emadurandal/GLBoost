@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Index Buffer example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+  <script src="../../../libs/phina.js"></script>
+  <script src="../../../build/glboost.js"></script>
+  <script>
+
+    var arg = new Object;
+    var pair = location.search.substring(1).split('&');
+    for(var i = 0; pair[i] ; i++) {
+      var kv = pair[i].split('=');
+      arg[kv[0]] = kv[1];
+    }
+
+    GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+    
+    var SCREEN_WIDTH = 640;
+    var SCREEN_HEIGHT = 640;
+
+    phina.globalize();
+
+    phina.define('MainScene', {
+      superClass: 'DisplayScene',
+
+      init: function(options) {
+        this.superInit();
+
+        var layer = phina.display.GLBoostLayer({
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT
+        }).addChildTo(this);
+
+        var indices = [
+          0, 1, 3, 3, 1, 2
+        ];
+
+        var positions = [
+          new GLBoost.Vector3(-1.5, -0.5, 0.0),
+          new GLBoost.Vector3(-0.5, -0.5, 0.0),
+          new GLBoost.Vector3(-0.5,  0.5, 0.0),
+          new GLBoost.Vector3(-1.5, 0.5, 0.0)
+        ];
+        var colors = [
+          new GLBoost.Vector3(0.0, 1.0, 1.0),
+          new GLBoost.Vector3(1.0, 1.0, 0.0),
+          new GLBoost.Vector3(1.0, 0.0, 0.0),
+          new GLBoost.Vector3(0.0, 0.0, 1.0)
+        ];
+
+        var geometry1 = new GLBoost.Geometry();
+        geometry1.setVerticesData({
+          position: positions,
+          color: colors
+        }, [indices]);
+        var mesh1 = new GLBoost.Mesh(geometry1, null);
+        layer.scene.add( mesh1 );
+
+        var positions = [
+          new GLBoost.Vector3(0.5, -0.5, 0.0),
+          new GLBoost.Vector3(1.5, -0.5, 0.0),
+          new GLBoost.Vector3(1.5,  0.5, 0.0),
+          new GLBoost.Vector3(0.5, 0.5, 0.0)
+          ];
+        var texcoords = [
+          new GLBoost.Vector2(0.0, 1.0),
+          new GLBoost.Vector2(1.0, 1.0),
+          new GLBoost.Vector2(1.0, 0.0),
+          new GLBoost.Vector2(0.0, 0.0)
+          ];
+
+        var geometry2 = new GLBoost.Geometry();
+        var texture = new GLBoost.Texture('resources/texture.png');
+        var material = new GLBoost.ClassicMaterial();
+        material.diffuseTexture = texture;
+        geometry2.setVerticesData({
+          position: positions,
+          texcoord: texcoords
+        }, [indices]);
+        var mesh2 = new GLBoost.Mesh(geometry2, material);
+        layer.scene.add( mesh2 );
+
+        var camera = new GLBoost.Camera({
+          eye: new GLBoost.Vector3(0.0, 0, 5.0),
+          center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+          up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+        }, {
+          fovy: 45.0,
+          aspect: 1.0,
+          zNear: 0.1,
+          zFar: 1000.0
+        });
+        layer.scene.add( camera );
+
+        layer.scene.prepareForRender();
+
+        var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
+        label.fill = 'white';
+        label.stroke = 'black';
+        label.fontSize = 32;
+        label.strokeWidth = 4;
+        label.x = this.gridX.center();
+        label.y = this.gridY.center();
+      }
+    });
+
+    phina.main(function() {
+      var app = GameApp({
+        startLabel: 'main',
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT
+      });
+
+      app.run();
+    });
+
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Index Buffer example</p>
+</header>
+<main>
+</main>
+</body>
+</html>
