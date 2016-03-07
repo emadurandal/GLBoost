@@ -5213,7 +5213,7 @@
         var shaderText = '';
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
+          shaderText += out_ + ' vec3 v_normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
 
@@ -5224,7 +5224,7 @@
       value: function VSTransform_LambertShaderSource(existCamera_f, f, lights) {
         var shaderText = '';
         shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-        shaderText += '  normal = aVertex_normal;\n';
+        shaderText += '  v_normal = aVertex_normal;\n';
 
         return shaderText;
       }
@@ -5233,7 +5233,7 @@
       value: function FSDefine_LambertShaderSource(in_, f, lights) {
         var shaderText = '';
         if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
+          shaderText += in_ + ' vec3 v_normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
@@ -5249,6 +5249,7 @@
 
         shaderText += '  vec4 surfaceColor = rt1;\n';
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
@@ -5327,7 +5328,7 @@
         var shaderText = '';
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 normal;\n';
+          shaderText += out_ + ' vec3 v_normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
 
@@ -5339,7 +5340,7 @@
         var shaderText = '';
 
         shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-        shaderText += '  normal = aVertex_normal;\n';
+        shaderText += '  v_normal = aVertex_normal;\n';
 
         return shaderText;
       }
@@ -5348,7 +5349,7 @@
       value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
         var shaderText = '';
         if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 normal;\n';
+          shaderText += in_ + ' vec3 v_normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
         shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
@@ -5364,6 +5365,7 @@
 
         shaderText += '  vec4 surfaceColor = rt1;\n';
         shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
 
         shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
         // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
