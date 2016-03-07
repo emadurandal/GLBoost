@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Camera example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+  <script src="../../../libs/phina.js"></script>
+  <script src="../../../build/glboost.js"></script>
+  <script>
+
+    var arg = new Object;
+    var pair = location.search.substring(1).split('&');
+    for(var i = 0; pair[i] ; i++) {
+      var kv = pair[i].split('=');
+      arg[kv[0]] = kv[1];
+    }
+
+    GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+    
+    var SCREEN_WIDTH = 640;
+    var SCREEN_HEIGHT = 640;
+
+    phina.globalize();
+
+    phina.define('MainScene', {
+      superClass: 'DisplayScene',
+
+      init: function(options) {
+        this.superInit();
+
+        var layer = phina.display.GLBoostLayer({
+          width: SCREEN_WIDTH,
+          height: SCREEN_HEIGHT
+        }).addChildTo(this);
+
+        var positions = [
+          new GLBoost.Vector3(-0.5, -0.5, 0.0),
+          new GLBoost.Vector3(0.5, -0.5, 0.0),
+          new GLBoost.Vector3(-0.5,  0.5, 0.0),
+
+          new GLBoost.Vector3(-0.5, 0.5, 0.0),
+          new GLBoost.Vector3(0.5, -0.5, 0.0),
+          new GLBoost.Vector3(0.5,  0.5, 0.0)
+        ];
+
+        var colors = [
+          new GLBoost.Vector4(0.0, 1.0, 1.0, 1.0),
+          new GLBoost.Vector4(1.0, 1.0, 0.0, 1.0),
+          new GLBoost.Vector4(0.0, 0.0, 1.0, 1.0),
+
+          new GLBoost.Vector4(0.0, 0.0, 1.0, 1.0),
+          new GLBoost.Vector4(1.0, 1.0, 0.0, 1.0),
+          new GLBoost.Vector4(1.0, 0.0, 0.0, 1.0)
+        ];
+
+        var geometry = new GLBoost.Geometry();
+        geometry.setVerticesData({
+          position: positions,
+          color: colors
+        });
+        var mesh = new GLBoost.Mesh(geometry, null);
+        layer.scene.add( mesh );
+
+        var camera = new GLBoost.Camera({
+          eye: new GLBoost.Vector3(0.0, 0, 10.0),
+          center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+          up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+        }, {
+          fovy: 45.0,
+          aspect: 1.0,
+          zNear: 0.1,
+          zFar: 1000.0
+        });
+        layer.scene.add( camera );
+
+        layer.scene.prepareForRender();
+
+        var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
+        label.fill = 'white';
+        label.stroke = 'black';
+        label.fontSize = 32;
+        label.strokeWidth = 4;
+        label.x = this.gridX.center();
+        label.y = this.gridY.center();
+      }
+    });
+
+    phina.main(function() {
+      var app = GameApp({
+        startLabel: 'main',
+        width: SCREEN_WIDTH,
+        height: SCREEN_HEIGHT
+      });
+
+      app.run();
+    });
+
+  </script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Camera example</p>
+</header>
+<main>
+</main>
+</body>
+</html>

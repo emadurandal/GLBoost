@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>GLBoost Primitives 2 example</title>
+  <title>GLBoost Primitives 4 example</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -41,15 +41,15 @@
         var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
         var mesh = new GLBoost.Mesh(geometry, material);
 
-        var scale = 0.2;
+        var scale = 0.3;
         mesh.scale = new GLBoost.Vector3((Math.random() + 0.5)*scale, (Math.random() + 0.5)*scale, (Math.random() + 0.5)*scale);
 
         var cubes = [];
-        for ( var i = 0; i < 20000-1; i ++ ) {
+        for ( var i = 0; i < 10000-1; i ++ ) {
           var cube = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
           var cubeMesh = new GLBoost.Mesh(cube, material);
 
-          cubeMesh.translate = new GLBoost.Vector3(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
+          cubeMesh.translate = new GLBoost.Vector3(Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * 600 - 300);
 
           cubeMesh.rotate = new GLBoost.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
 
@@ -122,7 +122,7 @@
 </head>
 <body>
 <header>
-  <p class="header-title">GLBoost Primitives 4 example (20000 Cubes which share one merged big geometry)</p>
+  <p class="header-title">GLBoost Primitives 4 example (10000 Cubes which share one merged big geometry)</p>
 </header>
 <main>
 </main>
