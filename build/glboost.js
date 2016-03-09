@@ -4881,6 +4881,17 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeGeometry).call(this, canvas));
 
+      _this._blendWeight_1 = 0.0;
+      _this._blendWeight_2 = 0.0;
+      _this._blendWeight_3 = 0.0;
+      _this._blendWeight_4 = 0.0;
+      _this._blendWeight_5 = 0.0;
+      _this._blendWeight_6 = 0.0;
+      _this._blendWeight_7 = 0.0;
+      _this._blendWeight_8 = 0.0;
+      _this._blendWeight_9 = 0.0;
+      _this._blendWeight_10 = 0.0;
+
       if (_this.constructor === BlendShapeGeometry) {
         BlendShapeGeometry._instanceCount = typeof BlendShapeGeometry._instanceCount === "undefined" ? 0 : BlendShapeGeometry._instanceCount + 1;
         _this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
@@ -4959,6 +4970,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET1, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_1 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_1;
       }
     }, {
       key: 'blendWeight_2',
@@ -4968,6 +4983,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET2, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_2 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_2;
       }
     }, {
       key: 'blendWeight_3',
@@ -4977,6 +4996,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET3, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_3 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_3;
       }
     }, {
       key: 'blendWeight_4',
@@ -4986,6 +5009,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET4, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_4 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_4;
       }
     }, {
       key: 'blendWeight_5',
@@ -4995,6 +5022,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET5, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_5 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_5;
       }
     }, {
       key: 'blendWeight_6',
@@ -5004,6 +5035,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET6, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_6 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_6;
       }
     }, {
       key: 'blendWeight_7',
@@ -5013,6 +5048,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET7, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_7 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_7;
       }
     }, {
       key: 'blendWeight_8',
@@ -5022,6 +5061,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET8, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_8 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_8;
       }
     }, {
       key: 'blendWeight_9',
@@ -5031,6 +5074,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET9, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_9 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_9;
       }
     }, {
       key: 'blendWeight_10',
@@ -5040,6 +5087,10 @@
 
         this._setBlendWeightToGlslProgram(GLBoost$1.BLENDTARGET10, weight);
         gl.useProgram(currentProgram);
+        this._blendWeight_10 = weight;
+      },
+      get: function get() {
+        return this._blendWeight_10;
       }
     }]);
     return BlendShapeGeometry;
