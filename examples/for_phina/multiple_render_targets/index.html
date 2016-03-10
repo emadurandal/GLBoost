@@ -120,16 +120,14 @@
         var tweener = phina.accessory.Tweener();
         tweener.setTarget(geometry);
         tweener
-          .set({b1: 0.0}).to({b1: 1.0,}, 500, 'easeInCirc')
-          .set({b2: 0.0}).to({b2: 1.0,}, 500, 'easeOutElastic')
-          .to({b1: 0.0,}, 500, 'easeInOutBack')
-          .to({b2: 0.0,}, 500, 'easeOutCirc')
+          .set({blendWeight_1: 0.0}).to({blendWeight_1: 1.0,}, 500, 'easeInCirc')
+          .set({blendWeight_2: 0.0}).to({blendWeight_2: 1.0,}, 500, 'easeOutElastic')
+          .to({blendWeight_1: 0.0,}, 500, 'easeInOutBack')
+          .to({blendWeight_2: 0.0,}, 500, 'easeOutCirc')
           .setLoop(true);
-      
+        
         layer.update= function(app){
           tweener.update(app);
-          geometry.blendWeight_1 = geometry.b1;
-          geometry.blendWeight_2 = geometry.b2;
         };
       }
     });
