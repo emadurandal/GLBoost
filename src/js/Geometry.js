@@ -140,7 +140,7 @@ export default class Geometry {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh) {
     var gl = this._gl;
     var vertices = this._vertices;
 
@@ -154,13 +154,20 @@ export default class Geometry {
       this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
     });
 
-    var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights);
-    this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-
+    let glslProgramOfPasses = [];
+    for (let i=0; i<renderPasses.length; i++) {
+      if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
+        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i]);
+        this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+        glslProgramOfPasses.push(glslProgram);
+      } else {
+        glslProgramOfPasses.push(null);
+      }
+    }
     glem.bindVertexArray(gl, null);
 
     this._setVertexNtoSingleMaterial(material, index);
-    material.glslProgram = glslProgram;
+    material.glslProgramOfPasses = glslProgramOfPasses;
 
     return material;
   }
@@ -176,7 +183,7 @@ export default class Geometry {
     }
   }
 
-  prepareForRender(existCamera_f, lights, meshMaterial) {
+  prepareForRender(existCamera_f, lights, meshMaterial, renderPasses, mesh) {
 
     var vertices = this._vertices;
     var gl = this._gl;
@@ -206,16 +213,15 @@ export default class Geometry {
 
     if (materials.length > 0) {
       for (let i=0; i<materials.length;i++) {
-        // GLSLプログラム作成。
-        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights);
-        materials[i].glslProgram = material.glslProgram;
-        optimizedVertexAttribs = materials[i].glslProgram.optimizedVertexAttribs;
+        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+        materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
+        optimizedVertexAttribs = materials[i].glslProgramOfPasses[0].optimizedVertexAttribs;
 
       }
     } else if (!meshMaterial) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights);
-      this._glslProgram = material.glslProgram;
-      optimizedVertexAttribs = material.glslProgram.optimizedVertexAttribs;
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights, renderPasses, mesh);
+      this.glslProgramOfPasses = material.glslProgramOfPasses;
+      optimizedVertexAttribs = material.glslProgramOfPasses[0].optimizedVertexAttribs;
     }
 
 
@@ -260,7 +266,7 @@ export default class Geometry {
     return true;
   }
 
-  draw(lights, camera, mesh, scene) {
+  draw(lights, camera, mesh, scene, renderPass_index) {
     var gl = this._gl;
     var glem = GLExtentionsManager.getInstance(gl);
 
@@ -283,7 +289,7 @@ export default class Geometry {
       for (let i=0; i<materials.length;i++) {
         let materialName = materials[i].toString();
         if (materialName !== Geometry._lastMaterial) {
-          this._glslProgram = materials[i].glslProgram;
+          this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
           gl.useProgram(this._glslProgram);
         }
         let glslProgram = this._glslProgram;
@@ -376,7 +382,7 @@ export default class Geometry {
         Geometry._lastMaterial = isMaterialSetupDone ? materialName : null;
       }
     } else {
-      let glslProgram = this._glslProgram;
+      let glslProgram = this.glslProgramOfPasses[renderPass_index];
       gl.useProgram(glslProgram);
 
       if (!isVAOBound) {

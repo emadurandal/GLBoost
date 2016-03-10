@@ -30,6 +30,9 @@ phina.namespace(function() {
       this.canvas.id = 'glboost_world';
       this.canvas.width = params.width;
       this.canvas.height = params.height;
+      var bodyElm = document.getElementsByTagName("body").item(0);
+      bodyElm.appendChild(this.canvas);
+      this.canvas.style.display = "none";
 
       // レンダラーを生成
       this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:1, green:1, blue:1, alpha:1}});
@@ -40,9 +43,6 @@ phina.namespace(function() {
       });
       this.domElement = this.canvas;
 
-      var bodyElm = document.getElementsByTagName("body").item(0);
-      bodyElm.appendChild(this.canvas);
-      this.canvas.style.display = "none";
     }
   });
 

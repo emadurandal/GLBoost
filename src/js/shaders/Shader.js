@@ -178,15 +178,23 @@ export default class Shader {
   }
 
 
-  _getFragmentShaderString(gl, functions, lights) {
+  _getFragmentShaderString(gl, functions, lights, renderPass) {
     var f = functions;
     var shaderText = '';
 
     var in_ = Shader._in_onFrag(gl);
 
     shaderText +=   Shader._glslVer(gl);
+    shaderText +=   Shader._glsl1DrawBufferExt(gl);
     shaderText +=   'precision mediump float;\n';
-    shaderText +=   Shader._set_outColor_onFrag(gl);
+
+    if (renderPass.renderTargetTextures) {
+      renderPass.renderTargetTextures.forEach((texture, index)=>{
+        shaderText +=   Shader._set_outColor_onFrag(gl, index);
+      });
+    } else {
+      shaderText +=   Shader._set_outColor_onFrag(gl, 0);
+    }
 
 
     var foundExclusive = false;
@@ -219,7 +227,13 @@ export default class Shader {
     });
 
     // end of main function
-    shaderText +=   Shader._set_glFragColor_inGLVer1(gl);
+    if (renderPass.renderTargetTextures) {
+      renderPass.renderTargetTextures.forEach((texture, index)=> {
+        shaderText += Shader._set_glFragColor_inGLVer1(gl, index);
+      });
+    } else {
+      shaderText += Shader._set_glFragColor_inGLVer1(gl, 0);
+    }
     shaderText +=   '}\n';
 
     return shaderText;
@@ -250,7 +264,7 @@ export default class Shader {
   }
 
   FSShading(f, gl) {
-    var shaderText =   `rt1 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    var shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
     return shaderText;
   }
 
@@ -346,13 +360,13 @@ export default class Shader {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, lights) {
+  getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass) {
     var gl = this._gl;
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass);
 
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
@@ -420,6 +434,10 @@ export default class Shader {
     return GLBoost.isThisGLVersion_2(gl) ? '#version 300 es\n' : '';
   }
 
+  static _glsl1DrawBufferExt(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_draw_buffers : require\n' : '';
+  }
+
   static _in_onVert(gl) {
     return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
   }
@@ -434,12 +452,13 @@ export default class Shader {
     return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
   }
 
-  static _set_outColor_onFrag(gl) {
-    return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = 0) out vec4 rt1;' : 'vec4 rt1;';
+  static _set_outColor_onFrag(gl, i) {
+    return GLBoost.isThisGLVersion_2(gl) ? `layout(location = ${i}) out vec4 rt${i};\n` : `vec4 rt${i};\n`;
   }
 
-  static _set_glFragColor_inGLVer1(gl) {
-    return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt1;\n' : '';
+  static _set_glFragColor_inGLVer1(gl, i) {
+      //return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+    return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 }
 

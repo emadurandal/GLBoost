@@ -37,18 +37,18 @@ export class LambertShaderSource {
   FSShade_LambertShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    shaderText += '  vec4 surfaceColor = rt1;\n';
-    shaderText += '  rt1 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  vec4 surfaceColor = rt0;\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
     shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-    shaderText += '    rt1 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+    shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '  }\n';
-    //shaderText += '  rt1.a = 1.0;\n';
-    //shaderText += '  rt1 = vec4(position.xyz, 1.0);\n';
+    //shaderText += '  rt0.a = 1.0;\n';
+    //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 
 
     return shaderText;

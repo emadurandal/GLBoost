@@ -41,8 +41,6 @@ export default class Renderer {
 
     setDefaultGLStates();
 
-    this._currentRenderTargetTextures = [];
-    this._renderPasses = null;
   }
 
   /**
@@ -65,41 +63,31 @@ export default class Renderer {
 
     let lights = scene.lights;
 
-    // if you didn't setup RenderPasses, all meshes are drawn to the backbuffer of framebuffer (gl.BACK).
-    if (this._renderPasses === null) {
+    scene.renderPasses.forEach((renderPass, index)=>{
+
+      var meshes = renderPass.meshes;
+
+      if (renderPass.fboOfRenderTargetTextures) {
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        Geometry.clearMaterialCache();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fboOfRenderTargetTextures);
+      }
+      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+
+      if (renderPass.clearColor) {
+        var color = renderPass.clearColor;
+        gl.clearColor(color[0], color[1], color[2], color[3]);
+        gl.clear( gl.COLOR_BUFFER_BIT );
+      }
+
+      meshes.forEach((mesh)=> {
+        mesh.draw(lights, camera, scene, index);
+      });
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       glem.drawBuffers(gl, [gl.BACK]);
 
-      scene.meshes.forEach((mesh)=> {
-        mesh.draw(lights, camera, scene);
-      });
-
-    } else { // if you did setup RenderPasses, drawing meshes are executed for each RenderPass.
-      this._renderPasses.forEach((renderPass)=>{
-
-        var meshes = renderPass.meshes;
-
-        if (renderPass.buffersToDraw[0] !== gl.BACK) {
-          gl.bindTexture(gl.TEXTURE_2D, null);
-          Geometry.clearMaterialCache();
-          gl.bindFramebuffer(gl.FRAMEBUFFER, this._fbo);
-        }
-        glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
-
-        if (renderPass.clearColor) {
-          var color = renderPass.clearColor;
-          gl.clearColor(color[0], color[1], color[2], color[3]);
-          gl.clear( gl.COLOR_BUFFER_BIT );
-        }
-
-        meshes.forEach((mesh)=> {
-          mesh.draw(lights, camera, scene);
-        });
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        glem.drawBuffers(gl, [gl.BACK]);
-
-      });
-    }
+    });
   }
 
   /**
@@ -137,28 +125,26 @@ export default class Renderer {
 
     var glem = GLExtentionsManager.getInstance(gl);
 
-
-    if (this._fbo) {
-      gl.deleteFramebuffers(1, this._fbo);
-    }
     // Create FBO
-    this._fbo = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this._fbo);
-    this._fbo.width = width ? width : gl._canvas.width;
-    this._fbo.height = height ? height : gl._canvas.height;
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    fbo.width = width ? width : gl._canvas.width;
+    fbo.height = height ? height : gl._canvas.height;
 
+    var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(this._fbo.width, this._fbo.height, gl._canvas);
-      this._currentRenderTargetTextures.push(texture);
+      let texture = new MutableTexture(fbo.width, fbo.height, gl._canvas);
+      texture.fbo = fbo;
+      renderTargetTextures.push(texture);
     }
 
     // Create RenderBuffer
     var renderbuffer = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, this._fbo.width, this._fbo.height);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
     // Attach Buffers
-    this._currentRenderTargetTextures.forEach((texture, i)=>{
+    renderTargetTextures.forEach((texture, i)=>{
       var glTexture = texture.glTextureResource;
       var attachimentId = glem.colorAttachiment(gl, i);
       texture.colorAttachiment = attachimentId;
@@ -170,22 +156,16 @@ export default class Renderer {
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    return this._currentRenderTargetTextures;
+    return renderTargetTextures;
   }
 
   createRenderPasses(number) {
-    this._renderPasses = [];
+    var renderPasses = [];
     for (let i=0; i<number; i++) {
-      this._renderPasses.push(new RenderPass(this._gl));
+      renderPasses.push(new RenderPass(this._gl));
     }
 
-    return this._renderPasses;
-  }
-
-  prepareRenderPassesForRender() {
-    this._renderPasses.forEach((renderPass)=> {
-      renderPass.prepareForRender();
-    });
+    return renderPasses;
   }
 
   /**

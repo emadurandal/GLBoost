@@ -43,13 +43,13 @@ export class SimpleShaderSource {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
-      shaderText += '  rt1 *= color;\n';
+      shaderText += '  rt0 *= color;\n';
     }
-    shaderText += '    rt1 *= materialBaseColor;\n';
+    shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += `  rt1 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
-    //shaderText += '    rt1 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+    //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     return shaderText;
   }
 

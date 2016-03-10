@@ -1,9 +1,12 @@
 import GLBoost from './globals'
 import Element from './Element'
 import Camera from './Camera'
+import GLContext from './GLContext'
 import AbstractLight from './lights/AbstractLight'
 import Mesh from './Mesh'
 import Group from './Group'
+import RenderPass from './RenderPass'
+
 
 /**
  * en: This Scene class is the top level element of scene graph hierarchy.
@@ -12,12 +15,14 @@ import Group from './Group'
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
 export default class Scene extends Element {
-  constructor() {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super();
+    this._gl = GLContext.getInstance(canvas).gl;
     this._elements = [];
     this._meshes = [];
     this._lights = [];
     this._cameras = [];
+    this._renderPasses = [new RenderPass(this._gl)];
     this._currentAnimationInputValues = {};
 
     // this code for tmlib
@@ -164,12 +169,28 @@ export default class Scene extends Element {
       this._cameras = this._cameras.concat(collectCameras(elm));
     });
 
+    // If there is only one renderPass, register meshes to the renderPass automatically.
+    if (this._renderPasses.length === 1) {
+      this._renderPasses[0].addElements(this._meshes);
+    }
 
-    // レンダリングの準備をさせる。
-    this._meshes.forEach((elm)=> {
-      elm.prepareForRender(existCamera_f, this._lights);
+    this._renderPasses.forEach((renderPass)=> {
+      renderPass.prepareForRender();
     });
 
+    this._meshes.forEach((mesh)=> {
+      mesh.prepareForRender(existCamera_f, this._lights, this._renderPasses);
+    });
+
+
+  }
+
+  set renderPasses(renderPasses) {
+    this._renderPasses = renderPasses;
+  }
+
+  get renderPasses() {
+    return this._renderPasses;
   }
 
   /**

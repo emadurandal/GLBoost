@@ -55,7 +55,7 @@ class MyCustomShaderSource {
   FSShade_MyCustomShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    shaderText += '  rt1 = vec4(1.0 - rt1.x, 1.0 - rt1.y, 1.0 - rt1.z, 1.0);\n';
+    shaderText += '  rt0 = vec4(1.0 - rt0.x, 1.0 - rt0.y, 1.0 - rt0.z, 1.0);\n';
 
 
     return shaderText;

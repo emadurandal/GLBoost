@@ -11,6 +11,7 @@ export default class RenderPass {
     this._meshes = [];
     this._drawBuffers = [gl.BACK];
     this._clearColor = null;
+    this._renderTargetTextures = null;
   }
 
   addElements(elements) {
@@ -38,13 +39,27 @@ export default class RenderPass {
       renderTargetTextures.forEach((texture)=>{
         this._drawBuffers.push(texture.colorAttachiment);
       });
+      this._renderTargetTextures = renderTargetTextures;
     } else {
       this._drawBuffers = [gl.BACK];
     }
+
   }
 
   get buffersToDraw() {
     return this._drawBuffers;
+  }
+
+  get fboOfRenderTargetTextures() {
+    if (this._renderTargetTextures) {
+      return this._renderTargetTextures[0].fbo;
+    } else {
+      return null;
+    }
+  }
+
+  get renderTargetTextures() {
+    return this._renderTargetTextures;
   }
 
   setClearColor(color) {
@@ -76,6 +91,15 @@ export default class RenderPass {
     this._elements.forEach((elm)=> {
       this._meshes = this._meshes.concat(collectMeshes(elm));
     });
+  }
+
+  containsMeshAfterPrepareForRender(mesh) {
+    for(let i=0; i<this._meshes.length; i++) {
+      if (this._meshes[i] === mesh) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

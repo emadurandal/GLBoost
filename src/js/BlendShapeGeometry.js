@@ -20,13 +20,21 @@ export default class BlendShapeGeometry extends Geometry {
     this._blendWeight_9  = 0.0;
     this._blendWeight_10 = 0.0;
 
+    this._currentRenderPassIndex = 0;
+
     if (this.constructor === BlendShapeGeometry) {
       BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === "undefined") ? 0 : (BlendShapeGeometry._instanceCount + 1);
       this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
     }
   }
 
-  prepareForRender(existCamera_f, pointLight, meshMaterial) {
+
+  draw(lights, camera, mesh, scene, renderPass_index) {
+    this._currentRenderPassIndex = renderPass_index;
+    super.draw(lights, camera, mesh, scene, renderPass_index);
+  }
+
+  prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
     var canvas = this._canvas;
 
@@ -58,19 +66,19 @@ export default class BlendShapeGeometry extends Geometry {
     }
     */
 
-    super.prepareForRender(existCamera_f, pointLight, meshMaterial);
+    super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
   }
 
   _setBlendWeightToGlslProgram(blendTarget, weight) {
     var materials = [this._materialForBlend];
     if (materials) {
       for (let i=0; i<materials.length;i++) {
-        this._gl.useProgram(materials[i].glslProgram);
-        this._gl.uniform1f(materials[i].glslProgram['uniformFloatSampler_blendWeight_' + blendTarget], weight);
+        this._gl.useProgram(materials[i].glslProgramOfPasses[this._currentRenderPassIndex]);
+        this._gl.uniform1f(materials[i].glslProgramOfPasses[this._currentRenderPassIndex]['uniformFloatSampler_blendWeight_' + blendTarget], weight);
       }
     } else {
-      this._gl.useProgram(this._glslProgram);
-      this._gl.uniform1f(this._glslProgram['uniformFloatSampler_blendWeight_' + blendTarget], weight);
+      this._gl.useProgram(this.glslProgramOfPasses[this._currentRenderPassIndex]);
+      this._gl.uniform1f(this.glslProgramOfPasses[this._currentRenderPassIndex]['uniformFloatSampler_blendWeight_' + blendTarget], weight);
     }
   }
 

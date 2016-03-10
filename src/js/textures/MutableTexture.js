@@ -10,6 +10,7 @@ export default class MutableTexture extends AbstractTexture {
     this._texture = null;
     this._width = width;
     this._height = height;
+    this._fbo = null;
 
     var gl = this._gl;
 
@@ -28,6 +29,14 @@ export default class MutableTexture extends AbstractTexture {
 
   get colorAttachiment() {
     return this._attachmentId;
+  }
+
+  set frameBufferObject(fbo) {
+    this._fbo = fbo;
+  }
+
+  get frameBufferObject() {
+    return this._fbo;
   }
 }
 
