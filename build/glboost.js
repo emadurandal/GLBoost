@@ -2432,6 +2432,113 @@
 
   GLBoost$1["RenderPass"] = RenderPass;
 
+  var GLExtentionsManager = function () {
+    function GLExtentionsManager(gl) {
+      babelHelpers.classCallCheck(this, GLExtentionsManager);
+
+      if (GLExtentionsManager._instance) {
+        return GLExtentionsManager._instance;
+      }
+
+      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
+        this._extVAO = gl.getExtension("OES_vertex_array_object");
+
+        this._extDBs = gl.getExtension("WEBGL_draw_buffers");
+
+        this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+
+        this._extEIUI = gl.getExtension("OES_element_index_uint");
+      }
+
+      GLExtentionsManager._instance = this;
+    }
+
+    babelHelpers.createClass(GLExtentionsManager, [{
+      key: "createVertexArray",
+      value: function createVertexArray(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          return gl.createVertexArray();
+        } else if (this._extVAO) {
+          return this._extVAO.createVertexArrayOES();
+        } else {
+          return null;
+        }
+      }
+    }, {
+      key: "bindVertexArray",
+      value: function bindVertexArray(gl, vao) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.bindVertexArray(vao);
+          return true;
+        } else if (this._extVAO) {
+          this._extVAO.bindVertexArrayOES(vao);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: "drawBuffers",
+      value: function drawBuffers(gl, buffers) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.drawBuffers(buffers);
+          return true;
+        } else if (this._extDBs) {
+          this.extDBs.drawBuffersWEBGL(buffers);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: "colorAttachiment",
+      value: function colorAttachiment(gl, index) {
+        return this._extDBs ? this._extDBs["COLOR_ATTACHMENT" + index + "_WEBGL"] : gl["COLOR_ATTACHMENT" + index];
+      }
+    }, {
+      key: "elementIndexBitSize",
+      value: function elementIndexBitSize(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return gl.UNSIGNED_INT;
+        } else {
+          return gl.UNSIGNED_SHORT;
+        }
+      }
+    }, {
+      key: "createUintArrayForElementIndex",
+      value: function createUintArrayForElementIndex(gl, array) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return new Uint32Array(array);
+        } else {
+          return new Uint16Array(array);
+        }
+      }
+    }, {
+      key: "extVAO",
+      get: function get() {
+        return this._extVAO;
+      }
+    }, {
+      key: "extDBs",
+      get: function get() {
+        return this._extDBs;
+      }
+    }, {
+      key: "extTFA",
+      get: function get() {
+        return this._extTFA;
+      }
+    }], [{
+      key: "getInstance",
+      value: function getInstance(gl) {
+        return new GLExtentionsManager(gl);
+      }
+    }]);
+    return GLExtentionsManager;
+  }();
+
+  GLExtentionsManager._instance = null;
+
   var AbstractTexture = function () {
     function AbstractTexture() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
@@ -2511,10 +2618,14 @@
 
       var gl = _this._gl;
 
+      var glem = GLExtentionsManager.getInstance(gl);
+
       _this._texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, _this._texture);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -2542,97 +2653,6 @@
   }(AbstractTexture);
 
   GLBoost$1["MutableTexture"] = MutableTexture;
-
-  var GLExtentionsManager = function () {
-    function GLExtentionsManager(gl) {
-      babelHelpers.classCallCheck(this, GLExtentionsManager);
-
-      if (GLExtentionsManager._instance) {
-        return GLExtentionsManager._instance;
-      }
-
-      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
-        this._extVAO = gl.getExtension("OES_vertex_array_object");
-
-        this._extDBs = gl.getExtension("WEBGL_draw_buffers");
-
-        this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") || gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") || gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
-
-        this._extEIUI = gl.getExtension("OES_element_index_uint");
-      }
-
-      GLExtentionsManager._instance = this;
-    }
-
-    babelHelpers.createClass(GLExtentionsManager, [{
-      key: "createVertexArray",
-      value: function createVertexArray(gl) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          return gl.createVertexArray();
-        } else if (this._extVAO) {
-          return this._extVAO.createVertexArrayOES();
-        } else {
-          return null;
-        }
-      }
-    }, {
-      key: "bindVertexArray",
-      value: function bindVertexArray(gl, vao) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          gl.bindVertexArray(vao);
-          return true;
-        } else if (this._extVAO) {
-          this._extVAO.bindVertexArrayOES(vao);
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: "drawBuffers",
-      value: function drawBuffers(gl, buffers) {
-        return this._extDBs ? this.extDBs.drawBuffersWEBGL(buffers) : false;
-      }
-    }, {
-      key: "colorAttachiment",
-      value: function colorAttachiment(gl, index) {
-        return this._extDBs ? this._extDBs["COLOR_ATTACHMENT" + index + "_WEBGL"] : gl["COLOR_ATTACHMENT" + index];
-      }
-    }, {
-      key: "elementIndexBitSize",
-      value: function elementIndexBitSize(gl) {
-        return this._extEIUI ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-      }
-    }, {
-      key: "createUintArrayForElementIndex",
-      value: function createUintArrayForElementIndex(array) {
-        return this._extEIUI ? new Uint32Array(array) : new Uint16Array(array);
-      }
-    }, {
-      key: "extVAO",
-      get: function get() {
-        return this._extVAO;
-      }
-    }, {
-      key: "extDBs",
-      get: function get() {
-        return this._extDBs;
-      }
-    }, {
-      key: "extTFA",
-      get: function get() {
-        return this._extTFA;
-      }
-    }], [{
-      key: "getInstance",
-      value: function getInstance(gl) {
-        return new GLExtentionsManager(gl);
-      }
-    }]);
-    return GLExtentionsManager;
-  }();
-
-  GLExtentionsManager._instance = null;
 
   var AbstractLight = function (_Element) {
     babelHelpers.inherits(AbstractLight, _Element);
@@ -3333,7 +3353,7 @@
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        //shaderText += '    rt0 = vec4(1.0, 1.0, 0.0, 1.0);\n';
         return shaderText;
       }
     }, {
@@ -3804,7 +3824,7 @@
           for (var i = 0; i < this._indicesArray.length; i++) {
             var ibo = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(this._indicesArray[i]), gl.STATIC_DRAW);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
             Geometry._iboArrayDic[this.toString()][i] = ibo;
             Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
@@ -3909,6 +3929,9 @@
               if (materials[i]) {
                 isMaterialSetupDone = materials[i].setUp();
               }
+            }
+            if (!isMaterialSetupDone) {
+              return;
             }
 
             //if (this._ibo.length > 0) {

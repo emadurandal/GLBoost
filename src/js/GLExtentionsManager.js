@@ -60,9 +60,15 @@ export default class GLExtentionsManager {
   }
 
   drawBuffers(gl, buffers) {
-    return this._extDBs ?
-      this.extDBs.drawBuffersWEBGL(buffers) :
-      false;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      gl.drawBuffers(buffers);
+      return true;
+    } else if (this._extDBs) {
+      this.extDBs.drawBuffersWEBGL(buffers);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   colorAttachiment(gl, index) {
@@ -72,15 +78,19 @@ export default class GLExtentionsManager {
   }
 
   elementIndexBitSize(gl) {
-    return this._extEIUI ?
-      gl.UNSIGNED_INT :
-      gl.UNSIGNED_SHORT;
+    if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
+      return gl.UNSIGNED_INT;
+    } else {
+      return gl.UNSIGNED_SHORT;
+    }
   }
 
-  createUintArrayForElementIndex(array) {
-    return this._extEIUI ?
-    new Uint32Array(array) :
-    new Uint16Array(array);
+  createUintArrayForElementIndex(gl, array) {
+    if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
+      return new Uint32Array(array);
+    } else {
+      return new Uint16Array(array);
+    }
   }
 
 }

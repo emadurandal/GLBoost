@@ -254,7 +254,7 @@ export default class Geometry {
       for (let i=0; i<this._indicesArray.length; i++) {
         var ibo = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(this._indicesArray[i]), gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         Geometry._iboArrayDic[this.toString()][i] = ibo;
         Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
@@ -359,6 +359,9 @@ export default class Geometry {
           if (materials[i]) {
             isMaterialSetupDone = materials[i].setUp();
           }
+        }
+        if (!isMaterialSetupDone) {
+          return;
         }
 
         //if (this._ibo.length > 0) {
