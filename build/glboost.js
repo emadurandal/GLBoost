@@ -2853,7 +2853,9 @@
         var in_ = Shader._in_onFrag(gl);
 
         shaderText += Shader._glslVer(gl);
-        shaderText += Shader._glsl1DrawBufferExt(gl);
+        if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
+          shaderText += Shader._glsl1DrawBufferExt(gl);
+        }
         shaderText += 'precision mediump float;\n';
 
         if (renderPass.renderTargetTextures) {
@@ -2892,12 +2894,12 @@
         });
 
         // end of main function
-        if (renderPass.renderTargetTextures) {
+        if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
           renderPass.renderTargetTextures.forEach(function (texture, index) {
-            shaderText += Shader._set_glFragColor_inGLVer1(gl, index);
+            shaderText += Shader._set_glFragData_inGLVer1(gl, index);
           });
         } else {
-          shaderText += Shader._set_glFragColor_inGLVer1(gl, 0);
+          shaderText += Shader._set_glFragColor_inGLVer1(gl);
         }
         shaderText += '}\n';
 
@@ -3254,8 +3256,12 @@
       }
     }, {
       key: '_set_glFragColor_inGLVer1',
-      value: function _set_glFragColor_inGLVer1(gl, i) {
-        //return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+      value: function _set_glFragColor_inGLVer1(gl) {
+        return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+      }
+    }, {
+      key: '_set_glFragData_inGLVer1',
+      value: function _set_glFragData_inGLVer1(gl, i) {
         return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragData[' + i + '] = rt' + i + ';\n' : '';
       }
     }]);
@@ -3353,7 +3359,7 @@
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
-        //shaderText += '    rt0 = vec4(1.0, 1.0, 0.0, 1.0);\n';
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
       }
     }, {

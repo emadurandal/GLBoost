@@ -185,7 +185,9 @@ export default class Shader {
     var in_ = Shader._in_onFrag(gl);
 
     shaderText +=   Shader._glslVer(gl);
-    shaderText +=   Shader._glsl1DrawBufferExt(gl);
+    if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
+      shaderText += Shader._glsl1DrawBufferExt(gl);
+    }
     shaderText +=   'precision mediump float;\n';
 
     if (renderPass.renderTargetTextures) {
@@ -227,12 +229,12 @@ export default class Shader {
     });
 
     // end of main function
-    if (renderPass.renderTargetTextures) {
+    if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
       renderPass.renderTargetTextures.forEach((texture, index)=> {
-        shaderText += Shader._set_glFragColor_inGLVer1(gl, index);
+        shaderText += Shader._set_glFragData_inGLVer1(gl, index);
       });
     } else {
-      shaderText += Shader._set_glFragColor_inGLVer1(gl, 0);
+      shaderText += Shader._set_glFragColor_inGLVer1(gl);
     }
     shaderText +=   '}\n';
 
@@ -456,8 +458,10 @@ export default class Shader {
     return GLBoost.isThisGLVersion_2(gl) ? `layout(location = ${i}) out vec4 rt${i};\n` : `vec4 rt${i};\n`;
   }
 
-  static _set_glFragColor_inGLVer1(gl, i) {
-      //return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+  static _set_glFragColor_inGLVer1(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+  }
+  static _set_glFragData_inGLVer1(gl, i) {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 }
