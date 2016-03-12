@@ -48,8 +48,8 @@ material_1.shader = shader_1;
 
 var geometry_1 = new GLBoost.Cube(new GLBoost.Vector3(24,24,24), new GLBoost.Vector3(1,0,0));
 
-var sphere = new GLBoost.Mesh(geometry_1, material_1);
-scene_1.add(sphere);
+var cube = new GLBoost.Mesh(geometry_1, material_1);
+scene_1.add(cube);
 
 var directionalLight_1 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 scene_1.add( directionalLight_1 );
@@ -73,8 +73,8 @@ var shader_2 = new GLBoost.PhongShader(canvas_2);
 material_2.shader = shader_2;
 var geometry_2 = new GLBoost.Sphere(20, 24, 24, null);
 
-var cube = new GLBoost.Mesh(geometry_2, material_2);
-scene_2.add(cube);
+var sphere = new GLBoost.Mesh(geometry_2, material_2);
+scene_2.add(sphere);
 
 var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 scene_2.add( directionalLight_2 );
