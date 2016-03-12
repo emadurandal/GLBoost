@@ -9,7 +9,6 @@
 <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>-->
   <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
   <script src="../../../build/glboost.js"></script>
-  <!-- <script src="glboost.js"></script> -->
 </head>
 <body>
 <header>
@@ -51,7 +50,7 @@ var geometry_1 = new GLBoost.Cube(new GLBoost.Vector3(24,24,24), new GLBoost.Vec
 var cube = new GLBoost.Mesh(geometry_1, material_1);
 scene_1.add(cube);
 
-var directionalLight_1 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+var directionalLight_1 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), canvas_1);
 scene_1.add( directionalLight_1 );
 
 
@@ -76,7 +75,7 @@ var geometry_2 = new GLBoost.Sphere(20, 24, 24, null);
 var sphere = new GLBoost.Mesh(geometry_2, material_2);
 scene_2.add(sphere);
 
-var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1), canvas_2);
 scene_2.add( directionalLight_2 );
 
 
