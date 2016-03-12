@@ -3,8 +3,8 @@ import GLBoost from './globals'
 export default class GLExtentionsManager {
 
   constructor(gl) {
-    if (GLExtentionsManager._instance) {
-        return GLExtentionsManager._instance;
+    if (GLExtentionsManager._instances[gl._canvas.id]) {
+        return GLExtentionsManager._instances[gl._canvas.id];
     }
 
     if (GLBoost.WEBGL_ONE_USE_EXTENSIONS) {
@@ -19,7 +19,7 @@ export default class GLExtentionsManager {
       this._extEIUI = gl.getExtension("OES_element_index_uint");
     }
 
-    GLExtentionsManager._instance = this;
+    GLExtentionsManager._instances[gl._canvas.id] = this;
   }
   static getInstance(gl) {
     return new GLExtentionsManager(gl);
@@ -94,4 +94,4 @@ export default class GLExtentionsManager {
   }
 
 }
-GLExtentionsManager._instance = null;
+GLExtentionsManager._instances = new Object();;
