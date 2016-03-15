@@ -94,58 +94,56 @@ export default class Geometry {
 
   updateVerticesData(vertices, isAlreadyInterleaved = false) {
     var gl = this._gl;
+    let vertexData = this.vertexData;
     //var vertexData = [];
     if (isAlreadyInterleaved) {
-      this.vertexData = vertices;
+      vertexData = vertices;
     } else {
       this._vertices = ArrayUtil.merge(this._vertices, vertices);
       var allVertexAttribs = this._allVertexAttribs(this._vertices);
-      if(this.vertexData.length == 0) {
-      this._vertices.position.forEach((elem, index, array) => {
-        allVertexAttribs.forEach((attribName)=> {
-          var element = this._vertices[attribName][index];
-          this.vertexData.push(element.x);
-          this.vertexData.push(element.y);
-          if (element.z !== void 0) {
-            this.vertexData.push(element.z);
-          }
-          if (element.w !== void 0) {
-            this.vertexData.push(element.w);
-          }
+      if(vertexData.length == 0) {
+        this._vertices.position.forEach((elem, index, array) => {
+          allVertexAttribs.forEach((attribName)=> {
+            var element = this._vertices[attribName][index];
+            vertexData.push(element.x);
+            vertexData.push(element.y);
+            if (element.z !== void 0) {
+              vertexData.push(element.z);
+            }
+            if (element.w !== void 0) {
+              vertexData.push(element.w);
+            }
+          });
         });
-      });
-gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-this.Float32AryVertexData =  new Float32Array(this.vertexData);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        this.Float32AryVertexData =  new Float32Array(vertexData);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
       } else {
         let idx = 0;
         this._vertices.position.forEach((elem, index, array) => {
           allVertexAttribs.forEach((attribName)=> {
             var element = this._vertices[attribName][index];
-	    this.vertexData[idx++] = element.x;
-            this.vertexData[idx++] = element.y;
+	          vertexData[idx++] = element.x;
+            vertexData[idx++] = element.y;
             if (element.z !== void 0) {
-              this.vertexData[idx++] = element.z;
+              vertexData[idx++] = element.z;
             }
             if (element.w !== void 0) {
-              this.vertexData[idx++] = element.w;
+              vertexData[idx++] = element.w;
             }
           });
         });
       }
-      for(let i = 0; i < this.Float32AryVertexData.length; i++) {
-        this.Float32AryVertexData[i] = this.vertexData[i];
+      let float32AryVertexData = this.Float32AryVertexData;
+      for(let i = 0; i < float32AryVertexData.length; i++) {
+        float32AryVertexData[i] = vertexData[i];
       }
       gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
-
-    //gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-    //gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(this.vertexData));
-    //gl.bindBuffer(gl.ARRAY_BUFFER, null);
   }
 
   setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {

@@ -33,138 +33,147 @@ export default class Particle extends Geometry {
   }
 
   _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
-    this.indices = [];
-    let positionArray = centerPointData.position;
+    let indices = this.indices;
+    indices = [];
+    const positionArray = centerPointData.position;
 
     for (let i=0; i<positionArray.length; i++) {
       var offset = i*4;
-      this.indices.push(offset);   // start Quad
-      this.indices.push(offset+1); //
-      this.indices.push(offset+2); // end Quad
-      this.indices.push(offset+3); //
+      indices.push(offset);   // start Quad
+      indices.push(offset+1); //
+      indices.push(offset+2); // end Quad
+      indices.push(offset+3); //
       if (i === positionArray.length - 1) {
         break;
       }
-      this.indices.push(offset+3); // degenerated
-      this.indices.push(offset+4); // move another Particle
+      indices.push(offset+3); // degenerated
+      indices.push(offset+4); // move another Particle
     }
 
     this.positions = [];
-    for (let i=0; i<positionArray.length; i++) {
-      this.positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-      this.positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
-      this.positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-      this.positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
-    }
+    let positions = this.positions;
 
+    for (let i=0; i<positionArray.length; i++) {
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+    }
     this.centerPositions = [];
-    for (let i=0; i<positionArray.length; i++) {
-      this.centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      this.centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      this.centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      this.centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-    }
+    let centerPositions = this.centerPositions;
 
-    this.texcoords = [];
     for (let i=0; i<positionArray.length; i++) {
-      this.texcoords.push(new Vector2(0, 0));
-      this.texcoords.push(new Vector2(0, 1));
-      this.texcoords.push(new Vector2(1, 0));
-      this.texcoords.push(new Vector2(1, 1));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+    }
+    this.texcoords = [];
+    let texcoords = this.texcoords;
+    for (let i=0; i<positionArray.length; i++) {
+      texcoords.push(new Vector2(0, 0));
+      texcoords.push(new Vector2(0, 1));
+      texcoords.push(new Vector2(1, 0));
+      texcoords.push(new Vector2(1, 1));
     }
 
     this.normals = [];
+    let normals = this.normals;
     var normal = new Vector3(0, 0, 1);
     for (let i=0; i<positionArray.length; i++) {
       for (let j=0; j<4; j++) {
-        this.normals.push(normal);
+        normals.push(normal);
       }
     }
-
     this.pointData = {};
+    let pointData = this.pointData;
+
     for (let type in centerPointData) {
       if (type !== 'position') {
-        this.pointData[type] = [];
+        pointData[type] = [];
         for (let i=0; i<positionArray.length; i++) {
           for (let j=0; j<4; j++) {
-            this.pointData[type].push(centerPointData[type][i]);
+            pointData[type].push(centerPointData[type][i]);
           }
         }
       }
     }
 
     var object = {
-      position: this.positions,
-      texcoord: this.texcoords,
-      normal: this.normals,
-      particleCenterPos: this.centerPositions
+      position: positions,
+      texcoord: texcoords,
+      normal: normals,
+      particleCenterPos: centerPositions
     };
 
     if (needDefaultWhiteColor) {
       this.colors = [];
+      let colors = this.colors;
       var vertexColor = new Vector4(1, 1, 1, 1);
       for (let i=0; i<positionArray.length; i++) {
         for (let j=0; j<4; j++) {
-          this.colors.push(vertexColor);
+          colors.push(vertexColor);
         }
       }
-      object.color = this.colors;
+      object.color = colors;
     }
 
-    var tempAttributes = ArrayUtil.merge(object, this.pointData);
+    var tempAttributes = ArrayUtil.merge(object, pointData);
     var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
     return {
       vertexAttributes: completeAttributes,
-      indexArray: [this.indices]
+      indexArray: [indices]
     }
   }
 
   _updateVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
     let positionArray = centerPointData.position;
     let idx=0;
+    let positions = this.positions;
     for (let i=0; i<positionArray.length; i++) {
-      this.positions[idx+0].x = positionArray[i].x - pHalfWidth;
-      this.positions[idx+0].y = positionArray[i].y + pHalfHeight;
-      this.positions[idx+0].z = positionArray[i].z;
-      this.positions[idx+1].x = positionArray[i].x - pHalfWidth;
-      this.positions[idx+1].y = positionArray[i].y - pHalfHeight;
-      this.positions[idx+1].z = positionArray[i].z;
-      this.positions[idx+2].x = positionArray[i].x + pHalfWidth;
-      this.positions[idx+2].y = positionArray[i].y + pHalfHeight;
-      this.positions[idx+2].z = positionArray[i].z;
-      this.positions[idx+3].x = positionArray[i].x + pHalfWidth;
-      this.positions[idx+3].y = positionArray[i].y - pHalfHeight;
-      this.positions[idx+3].z = positionArray[i].z;
+      positions[idx+0].x = positionArray[i].x - pHalfWidth;
+      positions[idx+0].y = positionArray[i].y + pHalfHeight;
+      positions[idx+0].z = positionArray[i].z;
+      positions[idx+1].x = positionArray[i].x - pHalfWidth;
+      positions[idx+1].y = positionArray[i].y - pHalfHeight;
+      positions[idx+1].z = positionArray[i].z;
+      positions[idx+2].x = positionArray[i].x + pHalfWidth;
+      positions[idx+2].y = positionArray[i].y + pHalfHeight;
+      positions[idx+2].z = positionArray[i].z;
+      positions[idx+3].x = positionArray[i].x + pHalfWidth;
+      positions[idx+3].y = positionArray[i].y - pHalfHeight;
+      positions[idx+3].z = positionArray[i].z;
       idx+=4;
     }
 
-    var centerPositions = [];
+    let centerPositions = this.centerPositions;
     idx = 0;
     for (let i=0; i<positionArray.length; i++) {
-      this.centerPositions[idx].x = positionArray[i].x;
-      this.centerPositions[idx].y = positionArray[i].y;
-      this.centerPositions[idx].z = positionArray[i].z;
-      this.centerPositions[idx+1].x = positionArray[i].x;
-      this.centerPositions[idx+1].y = positionArray[i].y;
-      this.centerPositions[idx+1].z = positionArray[i].z;
-      this.centerPositions[idx+2].x = positionArray[i].x;
-      this.centerPositions[idx+2].y = positionArray[i].y;
-      this.centerPositions[idx+2].z = positionArray[i].z;
-      this.centerPositions[idx+3].x = positionArray[i].x; 
-      this.centerPositions[idx+3].y = positionArray[i].y;
-      this.centerPositions[idx+3].z = positionArray[i].z;
+      centerPositions[idx].x = positionArray[i].x;
+      centerPositions[idx].y = positionArray[i].y;
+      centerPositions[idx].z = positionArray[i].z;
+      centerPositions[idx+1].x = positionArray[i].x;
+      centerPositions[idx+1].y = positionArray[i].y;
+      centerPositions[idx+1].z = positionArray[i].z;
+      centerPositions[idx+2].x = positionArray[i].x;
+      centerPositions[idx+2].y = positionArray[i].y;
+      centerPositions[idx+2].z = positionArray[i].z;
+      centerPositions[idx+3].x = positionArray[i].x;
+      centerPositions[idx+3].y = positionArray[i].y;
+      centerPositions[idx+3].z = positionArray[i].z;
       idx+=4;
     }
     idx = 0;
+    let pointData = this.pointData;
     for (let type in centerPointData) {
       if (type !== 'position') {
-        this.pointData[type] = [];
+        pointData[type] = [];
         for (let i=0; i<positionArray.length; i++) {
           for (let j=0; j<4; j++) {
-            this.pointData[type][idx].x = centerPointData[type][i].x;
-            this.pointData[type][idx].y = centerPointData[type][i].y;
-            this.pointData[type][idx].z = centerPointData[type][i].z;
+            pointData[type][idx].x = centerPointData[type][i].x;
+            pointData[type][idx].y = centerPointData[type][i].y;
+            pointData[type][idx].z = centerPointData[type][i].z;
             idx++;
           }
         }
@@ -172,17 +181,17 @@ export default class Particle extends Geometry {
     }
 
     var object = {
-      position: this.positions,
+      position: positions,
       texcoord: this.texcoords,
       normal: this.normals,
-      particleCenterPos: this.centerPositions
+      particleCenterPos: centerPositions
     };
 
     if (needDefaultWhiteColor) {
       object.color = this.colors;
     }
 
-    var tempAttributes = ArrayUtil.merge(object, this.pointData);
+    var tempAttributes = ArrayUtil.merge(object, pointData);
     var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
     return {
