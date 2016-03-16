@@ -3672,51 +3672,61 @@
         if (isAlreadyInterleaved) {
           vertexData = vertices;
         } else {
-          this._vertices = ArrayUtil.merge(this._vertices, vertices);
-          var allVertexAttribs = this._allVertexAttribs(this._vertices);
-          if (vertexData.length == 0) {
-            this._vertices.position.forEach(function (elem, index, array) {
+          var allVertexAttribs;
+
+          (function () {
+            _this._vertices = ArrayUtil.merge(_this._vertices, vertices);
+            allVertexAttribs = _this._allVertexAttribs(_this._vertices);
+
+            var isCached = vertexData.length == 0 ? false : true;
+            /*
+                  if(vertexData.length == 0) {
+                    this._vertices.position.forEach((elem, index, array) => {
+                      allVertexAttribs.forEach((attribName)=> {
+                        var element = this._vertices[attribName][index];
+                        vertexData.push(element.x);
+                        vertexData.push(element.y);
+                        if (element.z !== void 0) {
+                          vertexData.push(element.z);
+                        }
+                        if (element.w !== void 0) {
+                          vertexData.push(element.w);
+                        }
+                      });
+                    });
+                    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+                    this.Float32AryVertexData =  new Float32Array(vertexData);
+                    gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            
+                  } else {
+            */
+            var idx = 0;
+            _this._vertices.position.forEach(function (elem, index, array) {
               allVertexAttribs.forEach(function (attribName) {
                 var element = _this._vertices[attribName][index];
-                vertexData.push(element.x);
-                vertexData.push(element.y);
+                vertexData[idx++] = element.x;
+                vertexData[idx++] = element.y;
                 if (element.z !== void 0) {
-                  vertexData.push(element.z);
+                  vertexData[idx++] = element.z;
                 }
                 if (element.w !== void 0) {
-                  vertexData.push(element.w);
+                  vertexData[idx++] = element.w;
                 }
               });
             });
-            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-            this.Float32AryVertexData = new Float32Array(vertexData);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+            //}
+            if (!isCached) {
+              _this.Float32AryVertexData = new Float32Array(vertexData);
+            }
+            var float32AryVertexData = _this.Float32AryVertexData;
+            for (var i = 0; i < float32AryVertexData.length; i++) {
+              float32AryVertexData[i] = vertexData[i];
+            }
+            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[_this.toString()]);
+            gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
-          } else {
-            (function () {
-              var idx = 0;
-              _this._vertices.position.forEach(function (elem, index, array) {
-                allVertexAttribs.forEach(function (attribName) {
-                  var element = _this._vertices[attribName][index];
-                  vertexData[idx++] = element.x;
-                  vertexData[idx++] = element.y;
-                  if (element.z !== void 0) {
-                    vertexData[idx++] = element.z;
-                  }
-                  if (element.w !== void 0) {
-                    vertexData[idx++] = element.w;
-                  }
-                });
-              });
-            })();
-          }
-          var float32AryVertexData = this.Float32AryVertexData;
-          for (var i = 0; i < float32AryVertexData.length; i++) {
-            float32AryVertexData[i] = vertexData[i];
-          }
-          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-          gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
-          gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          })();
         }
       }
     }, {

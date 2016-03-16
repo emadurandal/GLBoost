@@ -101,6 +101,8 @@ export default class Geometry {
     } else {
       this._vertices = ArrayUtil.merge(this._vertices, vertices);
       var allVertexAttribs = this._allVertexAttribs(this._vertices);
+      const isCached = vertexData.length == 0 ? false : true;
+/*
       if(vertexData.length == 0) {
         this._vertices.position.forEach((elem, index, array) => {
           allVertexAttribs.forEach((attribName)=> {
@@ -121,6 +123,7 @@ export default class Geometry {
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
       } else {
+*/
         let idx = 0;
         this._vertices.position.forEach((elem, index, array) => {
           allVertexAttribs.forEach((attribName)=> {
@@ -135,6 +138,9 @@ export default class Geometry {
             }
           });
         });
+      //}
+      if(!isCached) {
+        this.Float32AryVertexData = new Float32Array(vertexData);
       }
       let float32AryVertexData = this.Float32AryVertexData;
       for(let i = 0; i < float32AryVertexData.length; i++) {
