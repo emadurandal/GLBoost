@@ -22,7 +22,7 @@ export default class Geometry {
     this._performanceHint = null;
     this._vertexAttribComponentNDic = {};
     this._defaultMaterial = new ClassicMaterial(this._canvas);
-
+    this.vertexData = [];
     this._setName();
   }
 
@@ -94,30 +94,62 @@ export default class Geometry {
 
   updateVerticesData(vertices, isAlreadyInterleaved = false) {
     var gl = this._gl;
-    var vertexData = [];
+    let vertexData = this.vertexData;
+    //var vertexData = [];
     if (isAlreadyInterleaved) {
       vertexData = vertices;
     } else {
       this._vertices = ArrayUtil.merge(this._vertices, vertices);
       var allVertexAttribs = this._allVertexAttribs(this._vertices);
-      this._vertices.position.forEach((elem, index, array) => {
-        allVertexAttribs.forEach((attribName)=> {
-          var element = this._vertices[attribName][index];
-          vertexData.push(element.x);
-          vertexData.push(element.y);
-          if (element.z !== void 0) {
-            vertexData.push(element.z);
-          }
-          if (element.w !== void 0) {
-            vertexData.push(element.w);
-          }
+      const isCached = vertexData.length == 0 ? false : true;
+/*
+      if(vertexData.length == 0) {
+        this._vertices.position.forEach((elem, index, array) => {
+          allVertexAttribs.forEach((attribName)=> {
+            var element = this._vertices[attribName][index];
+            vertexData.push(element.x);
+            vertexData.push(element.y);
+            if (element.z !== void 0) {
+              vertexData.push(element.z);
+            }
+            if (element.w !== void 0) {
+              vertexData.push(element.w);
+            }
+          });
         });
-      });
-    }
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        this.Float32AryVertexData =  new Float32Array(vertexData);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(vertexData));
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      } else {
+*/
+        let idx = 0;
+        this._vertices.position.forEach((elem, index, array) => {
+          allVertexAttribs.forEach((attribName)=> {
+            var element = this._vertices[attribName][index];
+	          vertexData[idx++] = element.x;
+            vertexData[idx++] = element.y;
+            if (element.z !== void 0) {
+              vertexData[idx++] = element.z;
+            }
+            if (element.w !== void 0) {
+              vertexData[idx++] = element.w;
+            }
+          });
+        });
+      //}
+      if(!isCached) {
+        this.Float32AryVertexData = new Float32Array(vertexData);
+      }
+      let float32AryVertexData = this.Float32AryVertexData;
+      for(let i = 0; i < float32AryVertexData.length; i++) {
+        float32AryVertexData[i] = vertexData[i];
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
   }
 
   setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {

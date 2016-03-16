@@ -33,8 +33,9 @@ export default class Particle extends Geometry {
   }
 
   _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
-    var indices = [];
-    var positionArray = centerPointData.position;
+    let indices = this.indices;
+    indices = [];
+    const positionArray = centerPointData.position;
 
     for (let i=0; i<positionArray.length; i++) {
       var offset = i*4;
@@ -49,23 +50,26 @@ export default class Particle extends Geometry {
       indices.push(offset+4); // move another Particle
     }
 
-    var positions = [];
+    this.positions = [];
+    let positions = this.positions;
+
     for (let i=0; i<positionArray.length; i++) {
       positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
       positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
       positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
       positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
     }
+    this.centerPositions = [];
+    let centerPositions = this.centerPositions;
 
-    var centerPositions = [];
     for (let i=0; i<positionArray.length; i++) {
       centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
       centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
       centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
       centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
     }
-
-    var texcoords = [];
+    this.texcoords = [];
+    let texcoords = this.texcoords;
     for (let i=0; i<positionArray.length; i++) {
       texcoords.push(new Vector2(0, 0));
       texcoords.push(new Vector2(0, 1));
@@ -73,15 +77,17 @@ export default class Particle extends Geometry {
       texcoords.push(new Vector2(1, 1));
     }
 
-    var normals = [];
+    this.normals = [];
+    let normals = this.normals;
     var normal = new Vector3(0, 0, 1);
     for (let i=0; i<positionArray.length; i++) {
       for (let j=0; j<4; j++) {
         normals.push(normal);
       }
     }
+    this.pointData = {};
+    let pointData = this.pointData;
 
-    var pointData = {};
     for (let type in centerPointData) {
       if (type !== 'position') {
         pointData[type] = [];
@@ -101,7 +107,8 @@ export default class Particle extends Geometry {
     };
 
     if (needDefaultWhiteColor) {
-      var colors = [];
+      this.colors = [];
+      let colors = this.colors;
       var vertexColor = new Vector4(1, 1, 1, 1);
       for (let i=0; i<positionArray.length; i++) {
         for (let j=0; j<4; j++) {
@@ -120,6 +127,78 @@ export default class Particle extends Geometry {
     }
   }
 
+  _updateVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
+    let positionArray = centerPointData.position;
+    let idx=0;
+    let positions = this.positions;
+    for (let i=0; i<positionArray.length; i++) {
+      positions[idx+0].x = positionArray[i].x - pHalfWidth;
+      positions[idx+0].y = positionArray[i].y + pHalfHeight;
+      positions[idx+0].z = positionArray[i].z;
+      positions[idx+1].x = positionArray[i].x - pHalfWidth;
+      positions[idx+1].y = positionArray[i].y - pHalfHeight;
+      positions[idx+1].z = positionArray[i].z;
+      positions[idx+2].x = positionArray[i].x + pHalfWidth;
+      positions[idx+2].y = positionArray[i].y + pHalfHeight;
+      positions[idx+2].z = positionArray[i].z;
+      positions[idx+3].x = positionArray[i].x + pHalfWidth;
+      positions[idx+3].y = positionArray[i].y - pHalfHeight;
+      positions[idx+3].z = positionArray[i].z;
+      idx+=4;
+    }
+
+    let centerPositions = this.centerPositions;
+    idx = 0;
+    for (let i=0; i<positionArray.length; i++) {
+      centerPositions[idx].x = positionArray[i].x;
+      centerPositions[idx].y = positionArray[i].y;
+      centerPositions[idx].z = positionArray[i].z;
+      centerPositions[idx+1].x = positionArray[i].x;
+      centerPositions[idx+1].y = positionArray[i].y;
+      centerPositions[idx+1].z = positionArray[i].z;
+      centerPositions[idx+2].x = positionArray[i].x;
+      centerPositions[idx+2].y = positionArray[i].y;
+      centerPositions[idx+2].z = positionArray[i].z;
+      centerPositions[idx+3].x = positionArray[i].x;
+      centerPositions[idx+3].y = positionArray[i].y;
+      centerPositions[idx+3].z = positionArray[i].z;
+      idx+=4;
+    }
+    idx = 0;
+    let pointData = this.pointData;
+    for (let type in centerPointData) {
+      if (type !== 'position') {
+        pointData[type] = [];
+        for (let i=0; i<positionArray.length; i++) {
+          for (let j=0; j<4; j++) {
+            pointData[type][idx].x = centerPointData[type][i].x;
+            pointData[type][idx].y = centerPointData[type][i].y;
+            pointData[type][idx].z = centerPointData[type][i].z;
+            idx++;
+          }
+        }
+      }
+    }
+
+    var object = {
+      position: positions,
+      texcoord: this.texcoords,
+      normal: this.normals,
+      particleCenterPos: centerPositions
+    };
+
+    if (needDefaultWhiteColor) {
+      object.color = this.colors;
+    }
+
+    var tempAttributes = ArrayUtil.merge(object, pointData);
+    var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
+
+    return {
+      vertexAttributes: completeAttributes,
+      indexArray: [this.indices]
+    }
+  }
   _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
     var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, true);
 
@@ -127,8 +206,8 @@ export default class Particle extends Geometry {
   }
 
   updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
-    var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
-
+    //var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
+const result = this._updateVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
     super.updateVerticesData(result.vertexAttributes);
   }
 
