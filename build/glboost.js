@@ -1427,7 +1427,7 @@
         } else {
 
           var ph = Math.acos(qr);
-          var s2 = void 0;
+          var s2 = undefined;
           if (qr < 0.0 && ph > Math.PI / 2.0) {
             qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
             ph = Math.acos(qr);
@@ -1963,10 +1963,10 @@
 
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (var _i = 0; _i < normals.length; _i++) {
-            var normalVector3 = normals[_i];
+          for (var i = 0; i < normals.length; i++) {
+            var normalVector3 = normals[i];
             var transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[_i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
@@ -1986,10 +1986,10 @@
         var mat = this.transformMatrixAccumulatedAncestry;
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (var _i2 = 0; _i2 < normals.length; _i2++) {
-            var normalVector3 = normals[_i2];
+          for (var i = 0; i < normals.length; i++) {
+            var normalVector3 = normals[i];
             var transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[_i2] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
@@ -2331,6 +2331,11 @@
           }
           _this._elements.push(elem);
         });
+      }
+    }, {
+      key: 'clearElements',
+      value: function clearElements() {
+        this._elements.length = 0;
       }
     }, {
       key: 'specifyRenderTargetTextures',
@@ -3864,13 +3869,13 @@
         Geometry._idxNArrayDic[this.toString()] = [];
         if (this._indicesArray) {
           // create Index Buffer
-          for (var _i = 0; _i < this._indicesArray.length; _i++) {
+          for (var i = 0; i < this._indicesArray.length; i++) {
             var ibo = gl.createBuffer();
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i]), gl.STATIC_DRAW);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-            Geometry._iboArrayDic[this.toString()][_i] = ibo;
-            Geometry._idxNArrayDic[this.toString()][_i] = this._indicesArray[_i].length;
+            Geometry._iboArrayDic[this.toString()][i] = ibo;
+            Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
           }
         }
         glem.bindVertexArray(gl, null);
@@ -3998,28 +4003,28 @@
             Geometry._lastMaterial = isMaterialSetupDone ? materialName : null;
           }
         } else {
-          var _glslProgram = this.glslProgramOfPasses[renderPass_index];
-          gl.useProgram(_glslProgram);
+          var glslProgram = this.glslProgramOfPasses[renderPass_index];
+          gl.useProgram(glslProgram);
 
           if (!isVAOBound) {
             if (Geometry._lastGeometry !== thisName) {
               gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
-              this.setUpVertexAttribs(gl, _glslProgram, this._allVertexAttribs(this._vertices));
+              this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
             }
           }
 
-          var _opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-          gl.uniform1f(_glslProgram.opacity, _opacity);
+          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+          gl.uniform1f(glslProgram.opacity, opacity);
 
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
-            gl.uniformMatrix4fv(_glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
           }
 
           if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
-            this._defaultMaterial.shader.setUniforms(gl, _glslProgram, this._defaultMaterial, camera, mesh);
+            this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
           }
 
           //if (this._ibo.length > 0) {
@@ -4588,6 +4593,16 @@
         this._elements.push(element);
         element._parent = this;
       }
+    }, {
+      key: 'removeChild',
+      value: function removeChild(element) {
+        this._elements = this._elements.filter(function (elem) {
+          if (elem === element) {
+            element._parent = null;
+          }
+          return elem !== element;
+        });
+      }
 
       /**
        * en: Get child elements which belong to this scene.<br>
@@ -4721,6 +4736,7 @@
 
         // If there is only one renderPass, register meshes to the renderPass automatically.
         if (this._renderPasses.length === 1) {
+          this._renderPasses[0].clearElements();
           this._renderPasses[0].addElements(this._meshes);
         }
 
@@ -5681,14 +5697,14 @@
         var iMCount = -1;
 
         // main loading
-        for (var _i = 0; _i < mtlTextRows.length; _i++) {
-          var _matchArray = mtlTextRows[_i].match(/(\w+) ([\w:\/\-\.]+)/);
+        for (var i = 0; i < mtlTextRows.length; i++) {
+          var matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
 
-          if (_matchArray === null) {
+          if (matchArray === null) {
             continue;
           }
 
-          if (_matchArray[1] === "newmtl") {
+          if (matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = new ClassicMaterial(canvas);
             if (defaultShader) {
@@ -5696,34 +5712,34 @@
             } else {
               materials[iMCount].shader = new PhongShader(canvas);
             }
-            materials[iMCount].name = _matchArray[2];
+            materials[iMCount].name = matchArray[2];
           }
 
-          if (_matchArray[1].toLowerCase() === "ka") {
-            _matchArray = mtlTextRows[_i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].ambientColor.x = parseFloat(_matchArray[2]);
-            materials[iMCount].ambientColor.y = parseFloat(_matchArray[3]);
-            materials[iMCount].ambientColor.z = parseFloat(_matchArray[4]);
+          if (matchArray[1].toLowerCase() === "ka") {
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
+            materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
+            materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
           }
 
-          if (_matchArray[1].toLowerCase() === "kd") {
-            _matchArray = mtlTextRows[_i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].diffuseColor.x = parseFloat(_matchArray[2]);
-            materials[iMCount].diffuseColor.y = parseFloat(_matchArray[3]);
-            materials[iMCount].diffuseColor.z = parseFloat(_matchArray[4]);
+          if (matchArray[1].toLowerCase() === "kd") {
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
+            materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
+            materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
           }
 
-          if (_matchArray[1].toLowerCase() === "ks") {
-            _matchArray = mtlTextRows[_i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].specularColor.x = parseFloat(_matchArray[2]);
-            materials[iMCount].specularColor.y = parseFloat(_matchArray[3]);
-            materials[iMCount].specularColor.z = parseFloat(_matchArray[4]);
+          if (matchArray[1].toLowerCase() === "ks") {
+            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
+            materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
+            materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
           }
 
-          if (_matchArray[1].toLowerCase() === "map_kd") {
-            _matchArray = mtlTextRows[_i].match(/(\w+) ([\w:\/\-\.]+)/);
-            var texture = new Texture(basePath + _matchArray[2], canvas);
-            texture.name = _matchArray[2];
+          if (matchArray[1].toLowerCase() === "map_kd") {
+            matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
+            var texture = new Texture(basePath + matchArray[2], canvas);
+            texture.name = matchArray[2];
             materials[iMCount].diffuseTexture = texture;
           }
         }
@@ -5781,28 +5797,28 @@
         }
 
         promise.then(function (materials) {
-          for (var _i2 = 0; _i2 < objTextRows.length; _i2++) {
-            var _matchArray2 = objTextRows[_i2].match(/^(\w+) +(\w+)/);
-            if (_matchArray2 === null) {
+          for (var i = 0; i < objTextRows.length; i++) {
+            var matchArray = objTextRows[i].match(/^(\w+) +(\w+)/);
+            if (matchArray === null) {
               continue;
             }
 
             // Vertex
-            if (_matchArray2[1] === "v") {
+            if (matchArray[1] === "v") {
               vCount++;
             }
             // Vertex Normal
-            if (_matchArray2[1] === "vn") {
+            if (matchArray[1] === "vn") {
               vnCount++;
             }
             // Texcoord
-            if (_matchArray2[1] === "vt") {
+            if (matchArray[1] === "vt") {
               vtCount++;
             }
             // Face
-            if (_matchArray2[1] === "f") {
-              _matchArray2 = objTextRows[_i2].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-              if (_matchArray2 !== null) {
+            if (matchArray[1] === "f") {
+              matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+              if (matchArray !== null) {
                 // if this is a Quad Polygon
                 fCount += 2;
               } else {
@@ -5819,42 +5835,42 @@
           vnCount = 0;
           vtCount = 0;
 
-          for (var _i3 = 0; _i3 < objTextRows.length; _i3++) {
+          for (var i = 0; i < objTextRows.length; i++) {
             //キーワード 読み込み
-            var _matchArray3 = objTextRows[_i3].match(/^(\w+) /);
+            var matchArray = objTextRows[i].match(/^(\w+) /);
 
-            if (_matchArray3 === null) {
+            if (matchArray === null) {
               continue;
             }
 
             //頂点 読み込み
-            if (_matchArray3[1] === "v") {
-              _matchArray3 = objTextRows[_i3].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (matchArray[1] === "v") {
+              matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvCoord[vCount] = new Vector3();
-              pvCoord[vCount].x = parseFloat(_matchArray3[2]);
-              pvCoord[vCount].y = parseFloat(_matchArray3[3]);
-              pvCoord[vCount].z = parseFloat(_matchArray3[4]);
+              pvCoord[vCount].x = parseFloat(matchArray[2]);
+              pvCoord[vCount].y = parseFloat(matchArray[3]);
+              pvCoord[vCount].z = parseFloat(matchArray[4]);
               vCount++;
             }
 
             //法線 読み込み
-            if (_matchArray3[1] === "vn") {
-              _matchArray3 = objTextRows[_i3].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (matchArray[1] === "vn") {
+              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvNormal[vnCount] = new Vector3();
-              pvNormal[vnCount].x = parseFloat(_matchArray3[2]);
-              pvNormal[vnCount].y = parseFloat(_matchArray3[3]);
-              pvNormal[vnCount].z = parseFloat(_matchArray3[4]);
+              pvNormal[vnCount].x = parseFloat(matchArray[2]);
+              pvNormal[vnCount].y = parseFloat(matchArray[3]);
+              pvNormal[vnCount].z = parseFloat(matchArray[4]);
               vnCount++;
             }
 
             //テクスチャー座標 読み込み
-            if (_matchArray3[1] === "vt") {
-              _matchArray3 = objTextRows[_i3].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (matchArray[1] === "vt") {
+              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               pvTexture[vtCount] = new Vector2();
-              pvTexture[vtCount].x = parseFloat(_matchArray3[2]);
-              pvTexture[vtCount].y = parseFloat(_matchArray3[3]);
+              pvTexture[vtCount].x = parseFloat(matchArray[2]);
+              pvTexture[vtCount].y = parseFloat(matchArray[3]);
               //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
 
               vtCount++;
@@ -5875,35 +5891,35 @@
 
           var geometry = new Geometry(canvas);
 
-          for (var _i4 = 0; _i4 < materials.length; _i4++) {
+          for (var i = 0; i < materials.length; i++) {
             partFCount = 0;
             iFaceBufferArray.length = 0;
 
             for (var j = 0; j < objTextRows.length && fCount < FaceN; j++) {
-              var _matchArray4 = objTextRows[j].match(/^(\w+) (\w+)/);
+              var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
-              if (_matchArray4 === null) {
+              if (matchArray === null) {
                 continue;
               }
 
-              if (_matchArray4[1] === "usemtl") {
-                if (_matchArray4[2] === materials[_i4].name) {
+              if (matchArray[1] === "usemtl") {
+                if (matchArray[2] === materials[i].name) {
                   boFlag = true;
                 } else {
                   boFlag = false;
                 }
               }
 
-              if (_matchArray4[1] === "f" && boFlag) {
+              if (matchArray[1] === "f" && boFlag) {
                 var isQuad = true;
-                var _matchArray5 = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);if (_matchArray5 === null) {
-                  _matchArray5 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+                var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);if (_matchArray === null) {
+                  _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
                 }
-                if (_matchArray5 === null) {
+                if (_matchArray === null) {
                   isQuad = false;
                 }
 
-                if (materials[_i4].diffuseTexture) {
+                if (materials[i].diffuseTexture) {
 
                   if (isQuad) {
                     _this3._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
@@ -5939,9 +5955,9 @@
                 continue;
               }
 
-            materials[_i4].setVertexN(geometry, partFCount * 3);
+            materials[i].setVertexN(geometry, partFCount * 3);
 
-            indices[_i4] = iFaceBufferArray.concat();
+            indices[i] = iFaceBufferArray.concat();
           }
 
           var mesh = new Mesh(geometry);
@@ -5991,13 +6007,13 @@
           texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
           texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
         } else {
-          var _matchArray6 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-          v1 = _matchArray6[2];
-          vn1 = _matchArray6[3];
-          v2 = _matchArray6[4];
-          vn2 = _matchArray6[5];
-          v3 = _matchArray6[6];
-          vn3 = _matchArray6[7];
+          var _matchArray2 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+          v1 = _matchArray2[2];
+          vn1 = _matchArray2[3];
+          v2 = _matchArray2[4];
+          vn2 = _matchArray2[5];
+          v3 = _matchArray2[6];
+          vn3 = _matchArray2[7];
           positions[fCount * 3] = pvCoord[v1 - 1];
           positions[fCount * 3 + 1] = pvCoord[v2 - 1];
           positions[fCount * 3 + 2] = pvCoord[v3 - 1];
@@ -6035,16 +6051,16 @@
           normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
           normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
         } else {
-          var _matchArray7 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-          v1 = _matchArray7[2];
-          vt1 = _matchArray7[3];
-          vn1 = _matchArray7[4];
-          v2 = _matchArray7[5];
-          vt2 = _matchArray7[6];
-          vn2 = _matchArray7[7];
-          v3 = _matchArray7[8];
-          vt3 = _matchArray7[9];
-          vn3 = _matchArray7[10];
+          var _matchArray3 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          v1 = _matchArray3[2];
+          vt1 = _matchArray3[3];
+          vn1 = _matchArray3[4];
+          v2 = _matchArray3[5];
+          vt2 = _matchArray3[6];
+          vn2 = _matchArray3[7];
+          v3 = _matchArray3[8];
+          vt3 = _matchArray3[9];
+          vn3 = _matchArray3[10];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           positions[fCount * 3 + 1] = pvCoord[v2 - 1];
@@ -6108,15 +6124,15 @@
           normals[fCount * 3 + 5] = pvNormal[vn1 - 1];
           texcoords[fCount * 3 + 5] = pvTexture[vt1 - 1];
         } else {
-          var _matchArray8 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-          v1 = _matchArray8[2];
-          vn1 = _matchArray8[3];
-          v2 = _matchArray8[4];
-          vn2 = _matchArray8[5];
-          v3 = _matchArray8[6];
-          vn3 = _matchArray8[7];
-          v4 = _matchArray8[8];
-          vn4 = _matchArray8[9];
+          var _matchArray4 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+          v1 = _matchArray4[2];
+          vn1 = _matchArray4[3];
+          v2 = _matchArray4[4];
+          vn2 = _matchArray4[5];
+          v3 = _matchArray4[6];
+          vn3 = _matchArray4[7];
+          v4 = _matchArray4[8];
+          vn4 = _matchArray4[9];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           normals[fCount * 3] = pvNormal[vn1 - 1];
@@ -6172,19 +6188,19 @@
           positions[fCount * 3 + 5] = pvCoord[v1 - 1];
           normals[fCount * 3 + 5] = pvNormal[vn1 - 1];
         } else {
-          var _matchArray9 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-          v1 = _matchArray9[2];
-          vt1 = _matchArray9[3];
-          vn1 = _matchArray9[4];
-          v2 = _matchArray9[5];
-          vt2 = _matchArray9[6];
-          vn2 = _matchArray9[7];
-          v3 = _matchArray9[8];
-          vt3 = _matchArray9[9];
-          vn3 = _matchArray9[10];
-          v4 = _matchArray9[11];
-          vt4 = _matchArray9[12];
-          vn4 = _matchArray9[13];
+          var _matchArray5 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          v1 = _matchArray5[2];
+          vt1 = _matchArray5[3];
+          vn1 = _matchArray5[4];
+          v2 = _matchArray5[5];
+          vt2 = _matchArray5[6];
+          vn2 = _matchArray5[7];
+          v3 = _matchArray5[8];
+          vt3 = _matchArray5[9];
+          vn3 = _matchArray5[10];
+          v4 = _matchArray5[11];
+          vt4 = _matchArray5[12];
+          vn4 = _matchArray5[13];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           normals[fCount * 3] = pvNormal[vn1 - 1];
@@ -6252,16 +6268,16 @@
         }
 
         var indices = [];
-        for (var _i = 0; _i < vSpan; _i++) {
+        for (var i = 0; i < vSpan; i++) {
           var degenerate_left_index = 0;
           var degenerate_right_index = 0;
-          for (var _j = 0; _j <= uSpan; _j++) {
-            indices.push(_i * (uSpan + 1) + _j);
-            indices.push((_i + 1) * (uSpan + 1) + _j);
-            if (_j === 0) {
-              degenerate_left_index = (_i + 1) * (uSpan + 1) + _j;
-            } else if (_j === uSpan) {
-              degenerate_right_index = (_i + 1) * (uSpan + 1) + _j;
+          for (var j = 0; j <= uSpan; j++) {
+            indices.push(i * (uSpan + 1) + j);
+            indices.push((i + 1) * (uSpan + 1) + j);
+            if (j === 0) {
+              degenerate_left_index = (i + 1) * (uSpan + 1) + j;
+            } else if (j === uSpan) {
+              degenerate_right_index = (i + 1) * (uSpan + 1) + j;
             }
           }
           indices.push(degenerate_right_index);
@@ -6270,23 +6286,23 @@
 
         var colors = [];
         var vertexColor = new Vector4(1, 1, 1, 1);
-        for (var _i2 = 0; _i2 <= vSpan; _i2++) {
-          for (var _j2 = 0; _j2 <= uSpan; _j2++) {
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
             colors.push(vertexColor);
           }
         }
 
         var texcoords = [];
-        for (var _i3 = 0; _i3 <= vSpan; _i3++) {
-          for (var _j3 = 0; _j3 <= uSpan; _j3++) {
-            texcoords.push(new Vector2(_j3 / uSpan, 1.0 - _i3 / vSpan));
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            texcoords.push(new Vector2(j / uSpan, 1.0 - i / vSpan));
           }
         }
 
         var normal = new Vector3(0, 1, 0);
         var normals = [];
-        for (var _i4 = 0; _i4 <= vSpan; _i4++) {
-          for (var _j4 = 0; _j4 <= uSpan; _j4++) {
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
             normals.push(normal);
           }
         }
@@ -6557,24 +6573,24 @@
         this.positions = [];
         var positions = this.positions;
 
-        for (var _i = 0; _i < positionArray.length; _i++) {
-          positions.push(new Vector3(positionArray[_i].x - pHalfWidth, positionArray[_i].y + pHalfHeight, positionArray[_i].z));
-          positions.push(new Vector3(positionArray[_i].x - pHalfWidth, positionArray[_i].y - pHalfHeight, positionArray[_i].z));
-          positions.push(new Vector3(positionArray[_i].x + pHalfWidth, positionArray[_i].y + pHalfHeight, positionArray[_i].z));
-          positions.push(new Vector3(positionArray[_i].x + pHalfWidth, positionArray[_i].y - pHalfHeight, positionArray[_i].z));
+        for (var i = 0; i < positionArray.length; i++) {
+          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
         }
         this.centerPositions = [];
         var centerPositions = this.centerPositions;
 
-        for (var _i2 = 0; _i2 < positionArray.length; _i2++) {
-          centerPositions.push(new Vector3(positionArray[_i2].x, positionArray[_i2].y, positionArray[_i2].z));
-          centerPositions.push(new Vector3(positionArray[_i2].x, positionArray[_i2].y, positionArray[_i2].z));
-          centerPositions.push(new Vector3(positionArray[_i2].x, positionArray[_i2].y, positionArray[_i2].z));
-          centerPositions.push(new Vector3(positionArray[_i2].x, positionArray[_i2].y, positionArray[_i2].z));
+        for (var i = 0; i < positionArray.length; i++) {
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
         }
         this.texcoords = [];
         var texcoords = this.texcoords;
-        for (var _i3 = 0; _i3 < positionArray.length; _i3++) {
+        for (var i = 0; i < positionArray.length; i++) {
           texcoords.push(new Vector2(0, 0));
           texcoords.push(new Vector2(0, 1));
           texcoords.push(new Vector2(1, 0));
@@ -6584,7 +6600,7 @@
         this.normals = [];
         var normals = this.normals;
         var normal = new Vector3(0, 0, 1);
-        for (var _i4 = 0; _i4 < positionArray.length; _i4++) {
+        for (var i = 0; i < positionArray.length; i++) {
           for (var j = 0; j < 4; j++) {
             normals.push(normal);
           }
@@ -6595,9 +6611,9 @@
         for (var type in centerPointData) {
           if (type !== 'position') {
             pointData[type] = [];
-            for (var _i5 = 0; _i5 < positionArray.length; _i5++) {
-              for (var _j = 0; _j < 4; _j++) {
-                pointData[type].push(centerPointData[type][_i5]);
+            for (var i = 0; i < positionArray.length; i++) {
+              for (var j = 0; j < 4; j++) {
+                pointData[type].push(centerPointData[type][i]);
               }
             }
           }
@@ -6614,8 +6630,8 @@
           this.colors = [];
           var colors = this.colors;
           var vertexColor = new Vector4(1, 1, 1, 1);
-          for (var _i6 = 0; _i6 < positionArray.length; _i6++) {
-            for (var _j2 = 0; _j2 < 4; _j2++) {
+          for (var i = 0; i < positionArray.length; i++) {
+            for (var j = 0; j < 4; j++) {
               colors.push(vertexColor);
             }
           }
@@ -6654,19 +6670,19 @@
 
         var centerPositions = this.centerPositions;
         idx = 0;
-        for (var _i7 = 0; _i7 < positionArray.length; _i7++) {
-          centerPositions[idx].x = positionArray[_i7].x;
-          centerPositions[idx].y = positionArray[_i7].y;
-          centerPositions[idx].z = positionArray[_i7].z;
-          centerPositions[idx + 1].x = positionArray[_i7].x;
-          centerPositions[idx + 1].y = positionArray[_i7].y;
-          centerPositions[idx + 1].z = positionArray[_i7].z;
-          centerPositions[idx + 2].x = positionArray[_i7].x;
-          centerPositions[idx + 2].y = positionArray[_i7].y;
-          centerPositions[idx + 2].z = positionArray[_i7].z;
-          centerPositions[idx + 3].x = positionArray[_i7].x;
-          centerPositions[idx + 3].y = positionArray[_i7].y;
-          centerPositions[idx + 3].z = positionArray[_i7].z;
+        for (var i = 0; i < positionArray.length; i++) {
+          centerPositions[idx].x = positionArray[i].x;
+          centerPositions[idx].y = positionArray[i].y;
+          centerPositions[idx].z = positionArray[i].z;
+          centerPositions[idx + 1].x = positionArray[i].x;
+          centerPositions[idx + 1].y = positionArray[i].y;
+          centerPositions[idx + 1].z = positionArray[i].z;
+          centerPositions[idx + 2].x = positionArray[i].x;
+          centerPositions[idx + 2].y = positionArray[i].y;
+          centerPositions[idx + 2].z = positionArray[i].z;
+          centerPositions[idx + 3].x = positionArray[i].x;
+          centerPositions[idx + 3].y = positionArray[i].y;
+          centerPositions[idx + 3].z = positionArray[i].z;
           idx += 4;
         }
         idx = 0;
@@ -6674,11 +6690,11 @@
         for (var type in centerPointData) {
           if (type !== 'position') {
             pointData[type] = [];
-            for (var _i8 = 0; _i8 < positionArray.length; _i8++) {
+            for (var i = 0; i < positionArray.length; i++) {
               for (var j = 0; j < 4; j++) {
-                pointData[type][idx].x = centerPointData[type][_i8].x;
-                pointData[type][idx].y = centerPointData[type][_i8].y;
-                pointData[type][idx].z = centerPointData[type][_i8].z;
+                pointData[type][idx].x = centerPointData[type][i].x;
+                pointData[type][idx].y = centerPointData[type][i].y;
+                pointData[type][idx].z = centerPointData[type][i].z;
                 idx++;
               }
             }

@@ -23,6 +23,10 @@ export default class RenderPass {
     });
   }
 
+  clearElements() {
+    this._elements.length = 0;
+  }
+
   get elements() {
     return this._elements;
   }

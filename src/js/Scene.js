@@ -53,6 +53,15 @@ export default class Scene extends Element {
     element._parent = this;
   }
 
+  removeChild(element) {
+    this._elements = this._elements.filter(function(elem) {
+      if (elem === element) {
+        element._parent = null;
+      }
+      return elem !== element
+    });
+  }
+
   /**
    * en: Get child elements which belong to this scene.<br>
    * ja: このシーンに属していた子供の要素の配列を返します。
@@ -171,6 +180,7 @@ export default class Scene extends Element {
 
     // If there is only one renderPass, register meshes to the renderPass automatically.
     if (this._renderPasses.length === 1) {
+      this._renderPasses[0].clearElements();
       this._renderPasses[0].addElements(this._meshes);
     }
 
