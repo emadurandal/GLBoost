@@ -39,7 +39,7 @@ scene.add( directionalLight );
 
 var wide = 10;
 var particlesPosition = [];
-for (let i=0; i<100; i++) {
+for (var i=0; i<100; i++) {
   particlesPosition.push(new GLBoost.Vector3((Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide));
 }
 
@@ -66,7 +66,7 @@ var render = function(){
   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
   camera.eye = rotatedVector;
 
-  for (let i=0; i<100; i++) {
+  for (var i=0; i<100; i++) {
     particlesPosition[i].y -= 0.1;
     if (particlesPosition[i].y < -1.0) {
       particlesPosition[i].y = 5.0;
