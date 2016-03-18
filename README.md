@@ -30,7 +30,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 
 ## Demo
 
-[Check our examples page!](https://rawgit.com/emadurandal/GLBoost/master/examples/index.html)
+[Check our examples page!](https://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
 
 ## Key features
 
