@@ -1,7 +1,6 @@
-import GLBoost from './../globals'
-import GLContext from './../GLContext'
-import AbstractTexture from './AbstractTexture'
-import GLExtentionsManager from '../GLExtentionsManager'
+import GLBoost from './../globals';
+import AbstractTexture from './AbstractTexture';
+import GLExtentionsManager from '../GLExtentionsManager';
 
 export default class Texture extends AbstractTexture {
   constructor(src, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -10,7 +9,7 @@ export default class Texture extends AbstractTexture {
     this._isTextureReady = false;
     this._texture = null;
 
-    if (typeof src === "string") {
+    if (typeof src === 'string') {
       this.generateTextureFromUri(src);
     } else {
       this.generateTextureFromImageData(src);
@@ -21,7 +20,7 @@ export default class Texture extends AbstractTexture {
 
   generateTextureFromUri(imageUri) {
     this._img = new Image();
-    this._img.crossOrigin = "Anonymous";
+    this._img.crossOrigin = 'Anonymous';
     this._img.onload = ()=> {
       var gl = this._gl;
       var glem = GLExtentionsManager.getInstance(gl);
@@ -93,9 +92,9 @@ export default class Texture extends AbstractTexture {
   }
 
   get isImageAssignedForTexture() {
-    return typeof this._img == "undefined";
+    return typeof this._img == 'undefined';
   }
 
 }
 
-GLBoost["Texture"] = Texture;
+GLBoost['Texture'] = Texture;

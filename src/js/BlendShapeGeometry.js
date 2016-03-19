@@ -1,9 +1,6 @@
-import GLBoost from './globals'
-import Element from './Element'
-import GLContext from './GLContext'
-import GLExtentionsManager from './GLExtentionsManager'
-import BlendShapeShaderSource from './shaders/BlendShapeShader'
-import Geometry from './Geometry'
+import GLBoost from './globals';
+import BlendShapeShaderSource from './shaders/BlendShapeShader';
+import Geometry from './Geometry';
 
 export default class BlendShapeGeometry extends Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -23,7 +20,7 @@ export default class BlendShapeGeometry extends Geometry {
     this._currentRenderPassIndex = 0;
 
     if (this.constructor === BlendShapeGeometry) {
-      BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === "undefined") ? 0 : (BlendShapeGeometry._instanceCount + 1);
+      BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === 'undefined') ? 0 : (BlendShapeGeometry._instanceCount + 1);
       this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
     }
   }
@@ -53,7 +50,7 @@ export default class BlendShapeGeometry extends Geometry {
 
     if (meshMaterial) {
       meshMaterial.shader = new BlendShapeShader(canvas);
-      } else {
+    } else {
       this._defaultMaterial.shader = new BlendShapeShader(canvas);
     }
 
@@ -207,4 +204,4 @@ export default class BlendShapeGeometry extends Geometry {
   }
 }
 
-GLBoost["BlendShapeGeometry"] = BlendShapeGeometry;
+GLBoost['BlendShapeGeometry'] = BlendShapeGeometry;

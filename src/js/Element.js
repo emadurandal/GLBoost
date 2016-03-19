@@ -1,10 +1,10 @@
-import GLBoost from './globals'
-import Vector2 from './math/Vector2'
-import Vector3 from './math/Vector3'
-import Vector4 from './math/Vector4'
-import Quaternion from './math/Quaternion'
-import Matrix44 from './math/Matrix44'
-import AnimationUtil from './misc/AnimationUtil'
+import GLBoost from './globals';
+import Vector2 from './math/Vector2';
+import Vector3 from './math/Vector3';
+import Vector4 from './math/Vector4';
+import Quaternion from './math/Quaternion';
+import Matrix44 from './math/Matrix44';
+import AnimationUtil from './misc/AnimationUtil';
 
 
 export default class Element {
@@ -34,8 +34,8 @@ export default class Element {
   }
 
   _setName() {
-      this.constructor._instanceCount = (typeof this.constructor._instanceCount === "undefined") ? 0 : (this.constructor._instanceCount + 1);
-      this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   _needUpdate() {
@@ -52,7 +52,7 @@ export default class Element {
     if (animation[type]) {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
-    //  console.warn(this._instanceName + "doesn't have " + type + " animation data. GLBoost returned default " + type + " value.");
+    //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
       return this['_' + type];
     }
   }
@@ -164,10 +164,11 @@ export default class Element {
         return this._matrix.clone();
       }
 
+      var rotationMatrix = null
       if (this._currentCalcMode === 'quaternion') {
-        var rotationMatrix = this.quaternion.rotationMatrix;
+        rotationMatrix = this.quaternion.rotationMatrix;
       } else {
-        var rotationMatrix = Matrix44.rotateX(this.rotate.x).
+        rotationMatrix = Matrix44.rotateX(this.rotate.x).
         multiply(Matrix44.rotateY(this.rotate.y)).
         multiply(Matrix44.rotateZ(this.rotate.z));
       }
@@ -234,7 +235,7 @@ export default class Element {
   get transformMatrixAccumulatedAncestry() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === "undefined") {
+    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
       this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     }
@@ -249,12 +250,12 @@ export default class Element {
 
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === "undefined") {
+    if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
       this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
       this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
     }
 
-    return this._invMatrixAccumulatedAncestry
+    return this._invMatrixAccumulatedAncestry;
   }
 
   get rotateMatrixAccumulatedAncestry() {
@@ -373,4 +374,4 @@ export default class Element {
   }
 }
 
-GLBoost["Element"] = Element;
+GLBoost['Element'] = Element;

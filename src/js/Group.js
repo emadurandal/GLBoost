@@ -1,7 +1,5 @@
-import GLBoost from './globals'
-import Element from './Element'
-import Vector3 from './math/Vector3'
-import Matrix44 from './math/Matrix44'
+import GLBoost from './globals';
+import Element from './Element';
 
 export default class Group extends Element {
   constructor() {
@@ -20,7 +18,7 @@ export default class Group extends Element {
       if (elem === element) {
         element._parent = null;
       }
-      return elem !== element
+      return elem !== element;
     });
   }
 
@@ -67,4 +65,4 @@ export default class Group extends Element {
   }
 }
 
-GLBoost["Group"] = Group;
+GLBoost['Group'] = Group;

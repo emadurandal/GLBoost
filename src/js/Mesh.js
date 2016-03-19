@@ -1,8 +1,8 @@
-import GLBoost from './globals'
-import Element from './Element'
-import Vector3 from './math/Vector3'
-import Vector4 from './math/Vector4'
-import Matrix44 from './math/Matrix44'
+import GLBoost from './globals';
+import Element from './Element';
+import Vector3 from './math/Vector3';
+import Vector4 from './math/Vector4';
+import Matrix44 from './math/Matrix44';
 
 export default class Mesh extends Element {
   constructor(geometry, material) {
@@ -11,7 +11,7 @@ export default class Mesh extends Element {
     this.material = material;
 
     if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) {  // this code for tmlib
-      Mesh._instanceCount = (typeof Mesh._instanceCount === "undefined") ? 0 : (Mesh._instanceCount + 1);
+      Mesh._instanceCount = (typeof Mesh._instanceCount === 'undefined') ? 0 : (Mesh._instanceCount + 1);
       this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
     }
   }
@@ -170,4 +170,4 @@ export default class Mesh extends Element {
 }
 Mesh._geometries = {};
 
-GLBoost["Mesh"] = Mesh;
+GLBoost['Mesh'] = Mesh;

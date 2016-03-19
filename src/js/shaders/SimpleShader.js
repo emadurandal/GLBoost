@@ -1,4 +1,4 @@
-import Shader from './Shader'
+import Shader from './Shader';
 
 export class SimpleShaderSource {
   VSDefine_SimpleShaderSource(in_, out_, f) {
@@ -90,4 +90,4 @@ export default class SimpleShader extends Shader {
   }
 }
 
-GLBoost["SimpleShader"] = SimpleShader;
+GLBoost['SimpleShader'] = SimpleShader;

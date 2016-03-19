@@ -1,14 +1,12 @@
-import GLBoost from './globals'
-import Matrix44 from './math/Matrix44'
-import Vector4 from './math/Vector4'
-import GLContext from './GLContext'
-import GLExtentionsManager from './GLExtentionsManager'
-import Shader from './shaders/Shader'
-import SimpleShader from './shaders/SimpleShader'
-import ClassicMaterial from './ClassicMaterial'
-import PointLight from './lights/PointLight'
-import DirectionalLight from './lights/DirectionalLight'
-import ArrayUtil from './misc/ArrayUtil'
+import GLBoost from './globals';
+import Vector4 from './math/Vector4';
+import GLContext from './GLContext';
+import GLExtentionsManager from './GLExtentionsManager';
+import Shader from './shaders/Shader';
+import ClassicMaterial from './ClassicMaterial';
+import PointLight from './lights/PointLight';
+import DirectionalLight from './lights/DirectionalLight';
+import ArrayUtil from './misc/ArrayUtil';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -27,7 +25,7 @@ export default class Geometry {
   }
 
   _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === "undefined") ? 0 : (this.constructor._instanceCount + 1);
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
     this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
@@ -438,7 +436,7 @@ export default class Geometry {
 
       }
 
-      if (typeof this._defaultMaterial.shader.setUniforms !== "undefined") {
+      if (typeof this._defaultMaterial.shader.setUniforms !== 'undefined') {
         this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
       }
 
@@ -469,7 +467,7 @@ export default class Geometry {
     var baseLen = this._vertices.position.length;
 
     if (this === geometry) {
-      console.assert("don't merge same geometry!");
+      console.assert('don\'t merge same geometry!');
     }
     for (var attribName in this._vertices) {
       Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
@@ -495,7 +493,7 @@ export default class Geometry {
   mergeHarder(geometry) {
     var baseLen = this._vertices.position.length;
     if (this === geometry) {
-      console.assert("don't merge same geometry!");
+      console.assert('don\'t merge same geometry!');
     }
     for (var attribName in this._vertices) {
       Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
@@ -537,4 +535,4 @@ Geometry._idxNArrayDic = {};
 Geometry._lastGeometry = null;
 Geometry._lastMaterial = null;
 
-GLBoost["Geometry"] = Geometry;
+GLBoost['Geometry'] = Geometry;

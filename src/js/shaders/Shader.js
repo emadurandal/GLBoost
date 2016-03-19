@@ -1,12 +1,11 @@
-import GLContext from './../GLContext'
-import PointLight from './../lights/PointLight'
-import Vector3 from './../math/Vector3'
-import Hash from './../misc/Hash'
+import GLContext from './../GLContext';
+import PointLight from './../lights/PointLight';
+import Hash from './../misc/Hash';
 
 export default class Shader {
   constructor(canvas) {
     if (typeof canvas === 'string') {
-      var canvas = window.document.querySelector(canvas);
+      canvas = window.document.querySelector(canvas);
     }
 
     this._gl = GLContext.getInstance(canvas).gl;
@@ -53,7 +52,7 @@ export default class Shader {
     // mixin
     var target = this.prototype; source = source.prototype;
     Object.getOwnPropertyNames(source).forEach(function (name) {
-      if (name !== "constructor") Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(source, name));
+      if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(source, name));
     });
   }
 
@@ -87,7 +86,7 @@ export default class Shader {
     // mixin
     var target = this.prototype; newone = newone.prototype;
     Object.getOwnPropertyNames(newone).forEach(function (name) {
-      if (name !== "constructor") Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(newone, name));
+      if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(newone, name));
     });
   }
 
@@ -127,9 +126,6 @@ export default class Shader {
 
     shaderText +=   Shader._glslVer(gl);
     shaderText +=   'precision highp float;\n';
-
-
-    var foundExclusive = false;
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
@@ -197,9 +193,6 @@ export default class Shader {
     } else {
       shaderText +=   Shader._set_outColor_onFrag(gl, 0);
     }
-
-
-    var foundExclusive = false;
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
@@ -314,9 +307,9 @@ export default class Shader {
   _getShader(gl, theSource, type) {
     var shader;
 
-    if (type == "x-shader/x-fragment") {
+    if (type == 'x-shader/x-fragment') {
       shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (type == "x-shader/x-vertex") {
+    } else if (type == 'x-shader/x-vertex') {
       shader = gl.createShader(gl.VERTEX_SHADER);
     } else {
       // Unknown shader type
@@ -330,7 +323,7 @@ export default class Shader {
 
     // See if it compiled successfully
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      alert("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
+      alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
       return null;
     }
 
@@ -338,9 +331,9 @@ export default class Shader {
   }
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-    console.log("Vertex Shader:");
+    console.log('Vertex Shader:');
     console.log(vertexShaderStr);
-    console.log("Fragment Shader:");
+    console.log('Fragment Shader:');
     console.log(fragmentShaderStr);
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
@@ -354,7 +347,7 @@ export default class Shader {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      alert("Unable to initialize the shader program.");
+      alert('Unable to initialize the shader program.');
     }
 
     gl.useProgram(shaderProgram);
@@ -398,7 +391,7 @@ export default class Shader {
 
       // register it to shaderHashTable.
       var indexStr = null;
-      if (typeof hashTable[hash] !== "undefined" && hashTable[hash].collisionN > 0) {
+      if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
         indexStr = hash + '_' + hashTable[hash].collisionN;
       } else {
         indexStr = hash;
@@ -426,7 +419,7 @@ export default class Shader {
   }
 
   static isThisGLVersion_2(gl) {
-    if (typeof WebGL2RenderingContext === "undefined") {
+    if (typeof WebGL2RenderingContext === 'undefined') {
       return false;
     }
     return gl instanceof WebGL2RenderingContext;

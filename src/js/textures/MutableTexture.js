@@ -1,7 +1,6 @@
-import GLBoost from './../globals'
-import GLContext from './../GLContext'
-import AbstractTexture from './AbstractTexture'
-import GLExtentionsManager from '../GLExtentionsManager'
+import GLBoost from './../globals';
+import AbstractTexture from './AbstractTexture';
+import GLExtentionsManager from '../GLExtentionsManager';
 
 export default class MutableTexture extends AbstractTexture {
   constructor(width, height, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -15,7 +14,7 @@ export default class MutableTexture extends AbstractTexture {
 
     var gl = this._gl;
 
-    var glem = GLExtentionsManager.getInstance(gl);
+    //var glem = GLExtentionsManager.getInstance(gl);
 
     this._texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
@@ -45,4 +44,4 @@ export default class MutableTexture extends AbstractTexture {
   }
 }
 
-GLBoost["MutableTexture"] = MutableTexture;
+GLBoost['MutableTexture'] = MutableTexture;

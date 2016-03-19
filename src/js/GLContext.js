@@ -1,5 +1,5 @@
-import GLContextWebGL1Impl from './impl/GLContextWebGL1Impl'
-import GLContextWebGL2Impl from './impl/GLContextWebGL2Impl'
+import GLContextWebGL1Impl from './impl/GLContextWebGL1Impl';
+import GLContextWebGL2Impl from './impl/GLContextWebGL2Impl';
 
 export default class GLContext {
 
@@ -19,7 +19,7 @@ export default class GLContext {
 
   static getInstance(canvas) {
     if (typeof canvas === 'string') {
-      var canvas = window.document.querySelector(canvas);
+      canvas = window.document.querySelector(canvas);
     }
     return new GLContext(canvas);
   }

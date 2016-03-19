@@ -1,14 +1,14 @@
-import GLBoost from './../globals'
-import GLContext from './../GLContext'
+import GLBoost from './../globals';
+import GLContext from './../GLContext';
 
 export default class AbstractTexture {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     if (this.constructor === AbstractTexture) {
-      throw new TypeError("Cannot construct AbstractTexture instances directly.");
+      throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }
 
     this._gl = GLContext.getInstance(canvas).gl;
-    this._name = "";
+    this._name = '';
   }
 
   get glTextureResource() {
@@ -50,4 +50,4 @@ export default class AbstractTexture {
 
 }
 
-GLBoost["AbstractTexture"] = AbstractTexture;
+GLBoost['AbstractTexture'] = AbstractTexture;

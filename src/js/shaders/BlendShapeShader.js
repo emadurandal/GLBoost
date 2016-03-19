@@ -1,5 +1,4 @@
-import Shader from './Shader'
-import SimpleShader from './SimpleShader'
+import Shader from './Shader';
 
 export default class BlendShapeShaderSource {
 
@@ -37,7 +36,7 @@ export default class BlendShapeShaderSource {
     return shaderText;
   }
 
-  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs) {
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) { // if POSITION and ShapeTargets...

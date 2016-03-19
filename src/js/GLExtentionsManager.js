@@ -1,22 +1,22 @@
-import GLBoost from './globals'
+import GLBoost from './globals';
 
 export default class GLExtentionsManager {
 
   constructor(gl) {
     if (GLExtentionsManager._instances[gl._canvas.id]) {
-        return GLExtentionsManager._instances[gl._canvas.id];
+      return GLExtentionsManager._instances[gl._canvas.id];
     }
 
     if (GLBoost.WEBGL_ONE_USE_EXTENSIONS) {
-      this._extVAO = gl.getExtension("OES_vertex_array_object");
+      this._extVAO = gl.getExtension('OES_vertex_array_object');
 
-      this._extDBs = gl.getExtension("WEBGL_draw_buffers");
+      this._extDBs = gl.getExtension('WEBGL_draw_buffers');
 
-      this._extTFA = gl.getExtension("EXT_texture_filter_anisotropic") ||
-        gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic") ||
-        gl.getExtension("MOZ_EXT_texture_filter_anisotropic");
+      this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') ||
+        gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+        gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
 
-      this._extEIUI = gl.getExtension("OES_element_index_uint");
+      this._extEIUI = gl.getExtension('OES_element_index_uint');
     }
 
     GLExtentionsManager._instances[gl._canvas.id] = this;
@@ -94,4 +94,4 @@ export default class GLExtentionsManager {
   }
 
 }
-GLExtentionsManager._instances = new Object();;
+GLExtentionsManager._instances = new Object();

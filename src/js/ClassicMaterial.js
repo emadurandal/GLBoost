@@ -1,7 +1,7 @@
-import GLBoost from './globals'
-import GLContext from './GLContext'
-import Vector4 from './math/Vector4'
-import SimpleShader from './shaders/SimpleShader'
+import GLBoost from './globals';
+import GLContext from './GLContext';
+import Vector4 from './math/Vector4';
+import SimpleShader from './shaders/SimpleShader';
 
 export default class ClassicMaterial {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -12,12 +12,12 @@ export default class ClassicMaterial {
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
-    this._name = "";
+    this._name = '';
     this._shader = new SimpleShader(canvas);
     this._vertexNofGeometries = {};
 
     if (this.constructor === ClassicMaterial) {
-      ClassicMaterial._instanceCount = (typeof ClassicMaterial._instanceCount === "undefined") ? 0 : (ClassicMaterial._instanceCount + 1);
+      ClassicMaterial._instanceCount = (typeof ClassicMaterial._instanceCount === 'undefined') ? 0 : (ClassicMaterial._instanceCount + 1);
       this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
     }
   }
@@ -107,7 +107,7 @@ export default class ClassicMaterial {
   }
 
   getVertexN(geom) {
-    return (typeof this._vertexNofGeometries[geom] === "undefined") ? 0 : this._vertexNofGeometries[geom];
+    return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
   }
 
   setUp() {
@@ -136,4 +136,4 @@ export default class ClassicMaterial {
   }
 }
 
-GLBoost["ClassicMaterial"] = ClassicMaterial;
+GLBoost['ClassicMaterial'] = ClassicMaterial;

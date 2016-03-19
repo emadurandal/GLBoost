@@ -1,5 +1,5 @@
-import Shader from './Shader'
-import SimpleShader from './SimpleShader'
+import Shader from './Shader';
+import SimpleShader from './SimpleShader';
 
 export class HalfLambertShaderSource {
   VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
@@ -97,4 +97,4 @@ export default class HalfLambertShader extends SimpleShader {
   }
 }
 
-GLBoost["HalfLambertShader"] = HalfLambertShader;
+GLBoost['HalfLambertShader'] = HalfLambertShader;

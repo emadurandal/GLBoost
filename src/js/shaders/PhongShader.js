@@ -1,5 +1,5 @@
-import Shader from './Shader'
-import SimpleShader from './SimpleShader'
+import Shader from './Shader';
+import SimpleShader from './SimpleShader';
 
 export class PhongShaderSource {
   VSDefine_PhongShaderSource(in_, out_, f, lights) {
@@ -135,4 +135,4 @@ export default class PhongShader extends SimpleShader {
   }
 }
 
-GLBoost["PhongShader"] = PhongShader;
+GLBoost['PhongShader'] = PhongShader;
