@@ -1,6 +1,6 @@
-window.GLBoost = window.GLBoost || { REVISION: '1' };
+var global = ("global",eval)("this");
 
-var global = window;
+global.GLBoost = global.GLBoost || { REVISION: '1' };
 
 global.GLBoost["POSITION"] = 'position';
 global.GLBoost["COLOR"] = 'color';

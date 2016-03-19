@@ -168,6 +168,22 @@ $ npm run esdoc
 
 (Note: The documentation coverage is still very low. We address the resolution of this problem.)
 
+### Test
+
+`1.` launch local web server. for example...
+
+```bash
+$ ruby -run -e httpd -- --port 3000 ./
+```
+
+`2.` Run Test command.
+
+```bash
+$ npm run test
+```
+
+(Note: The test coverage is still very low. We address the resolution of this problem.)
+
 ## Roadmap
 
 ### Coming Soon

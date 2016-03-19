@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "rollup -c rollup.config.js",
-    "test": "NODE_ENV=test mocha --compilers js:babel-register --recursive $(find test -name '*.spec.js')",
+    "test": "NODE_ENV=test mocha --compilers js:babel-register --timeout 10000 --recursive $(find test -name '*.spec.js')",
     "esdoc": "esdoc -c esdoc.json",
     "build-examples": "npm run standalone",
     "standalone": "npm run standalone:custom_shader && npm run standalone:custom_shader_2 && npm run standalone:particles && npm run standalone:multiple_render_targets",
@@ -40,6 +40,7 @@
     "eslint-plugin-standard": "^1.3.2",
     "mocha": "^2.4.5",
     "rollup": "^0.21.2",
-    "rollup-plugin-babel": "^2.2.0"
+    "rollup-plugin-babel": "^2.2.0",
+    "selenium-webdriver": "^2.53.1"
   }
 }
