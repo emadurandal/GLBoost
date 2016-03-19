@@ -5,5 +5,13 @@ export default {
   dest: "build/glboost.js",
   format: "umd",
   moduleName: "GLBoost",
-  plugins: [babel()]
+
+  plugins: [
+    // refs: https://github.com/rollup/rollup/issues/357#issuecomment-180447881
+    babel({
+      babelrc: false,
+      presets: ['es2015-rollup'],
+      exclude: 'node_modules/**'
+    })
+  ]
 }

@@ -5,5 +5,11 @@ export default {
   dest: "examples/standalone/particles/app.js",
   format: "umd",
   moduleName: "GLBoostParticleExample",
-  plugins: [babel()]
+  plugins: [
+    babel({
+      babelrc: false,
+      presets: ['es2015-rollup'],
+      exclude: 'node_modules/**'
+    })
+  ]
 }

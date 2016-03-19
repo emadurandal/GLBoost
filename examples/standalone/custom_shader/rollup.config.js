@@ -5,5 +5,11 @@ export default {
   dest: "examples/standalone/custom_shader/app.js",
   format: "umd",
   moduleName: "GLBoostCustomShaderExample",
-  plugins: [babel()]
+  plugins: [
+    babel({
+      babelrc: false,
+      presets: ['es2015-rollup'],
+      exclude: 'node_modules/**'
+    })
+  ]
 }

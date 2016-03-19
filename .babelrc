@@ -1,3 +1,4 @@
 {
-  "presets": ["es2015-rollup"]
+  // refs: https://github.com/rollup/rollup/issues/357#issuecomment-180447881
+  "presets": ["es2015"]
 }

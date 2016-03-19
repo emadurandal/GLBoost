@@ -5,5 +5,11 @@ export default {
   dest: "examples/for_phina/multiple_render_targets/app.js",
   format: "umd",
   moduleName: "GLBoostMultipleRenderTargetsExample",
-  plugins: [babel()]
+  plugins: [
+    babel({
+      babelrc: false,
+      presets: ['es2015-rollup'],
+      exclude: 'node_modules/**'
+    })
+  ]
 }
