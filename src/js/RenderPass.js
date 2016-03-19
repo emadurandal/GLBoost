@@ -1,7 +1,7 @@
-import GLBoost from './globals'
-import GLContext from './GLContext'
-import Mesh from './Mesh'
-import Group from './Group'
+import GLBoost from './globals';
+import GLContext from './GLContext';
+import Mesh from './Mesh';
+import Group from './Group';
 
 
 export default class RenderPass {
@@ -17,7 +17,7 @@ export default class RenderPass {
   addElements(elements) {
     elements.forEach((elem)=>{
       if(!(elem instanceof Mesh || elem instanceof Group)) {
-        throw new TypeError("RenderPass accepts Mesh or Group element only.");
+        throw new TypeError('RenderPass accepts Mesh or Group element only.');
       }
       this._elements.push(elem);
     });
@@ -81,7 +81,7 @@ export default class RenderPass {
         var meshes = [];
         children.forEach(function(child) {
           var childMeshes = collectMeshes(child);
-          meshes = meshes.concat(childMeshes)
+          meshes = meshes.concat(childMeshes);
         });
         return meshes;
       } else if (elem instanceof Mesh) {
@@ -107,4 +107,4 @@ export default class RenderPass {
   }
 }
 
-GLBoost["RenderPass"] = RenderPass;
+GLBoost['RenderPass'] = RenderPass;

@@ -1,14 +1,9 @@
-import GLBoost from './globals'
-import Mesh from './Mesh'
-import Camera from './Camera'
-import Matrix44 from './math/Matrix44'
-import GLContext from './GLContext'
-import GLExtentionsManager from './GLExtentionsManager'
-import MutableTexture from './textures/MutableTexture'
-import RenderPass from './RenderPass'
-import AbstractLight from './lights/AbstractLight'
-import Geometry from './Geometry'
-import Group from './Group'
+import GLBoost from './globals';
+import GLContext from './GLContext';
+import GLExtentionsManager from './GLExtentionsManager';
+import MutableTexture from './textures/MutableTexture';
+import RenderPass from './RenderPass';
+import Geometry from './Geometry';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -50,8 +45,6 @@ export default class Renderer {
    */
   draw(scene) {
     var camera = false;
-    var viewMatrix = null;
-    var projectionMatrix = null;
     scene.cameras.forEach((elm)=> {
       if (elm.isMainCamera) {
         camera = elm;
@@ -109,7 +102,7 @@ export default class Renderer {
 
     gl.clear( bufferBits );
 
-  };
+  }
 
   /**
    * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
@@ -193,4 +186,4 @@ export default class Renderer {
 
 }
 
-GLBoost["Renderer"] = Renderer;
+GLBoost['Renderer'] = Renderer;
