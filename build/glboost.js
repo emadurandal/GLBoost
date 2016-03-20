@@ -4811,13 +4811,16 @@
     babelHelpers.inherits(Texture, _AbstractTexture);
 
     function Texture(src) {
-      var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
+      var parameters = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
       babelHelpers.classCallCheck(this, Texture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, canvas));
 
       _this._isTextureReady = false;
       _this._texture = null;
+
+      _this._parameters = parameters;
 
       if (typeof src === 'string') {
         _this.generateTextureFromUri(src);
@@ -4828,6 +4831,24 @@
     }
 
     babelHelpers.createClass(Texture, [{
+      key: '_getParameter',
+      value: function _getParameter(paramName) {
+        var isParametersExist = false;
+        if (this._parameters != null) {
+          isParametersExist = true;
+        }
+        var params = this._parameters;
+
+        switch (paramName) {
+          case 'flipY':
+            if (isParametersExist && params[paramName]) {
+              return params[paramName];
+            } else {
+              return false;
+            }
+        }
+      }
+    }, {
       key: 'generateTextureFromUri',
       value: function generateTextureFromUri(imageUri) {
         var _this2 = this;
@@ -4843,7 +4864,8 @@
 
           var texture = gl.createTexture();
           gl.bindTexture(gl.TEXTURE_2D, texture);
-          //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParameter('flipY'));
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
 
           if (_this2.isPowerOfTwo(_this2._width) && _this2.isPowerOfTwo(_this2._height)) {
@@ -5736,7 +5758,7 @@
 
           if (matchArray[1].toLowerCase() === "map_kd") {
             matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-            var texture = new Texture(basePath + matchArray[2], canvas);
+            var texture = new Texture(basePath + matchArray[2], { flipY: true }, canvas);
             texture.name = matchArray[2];
             materials[iMCount].diffuseTexture = texture;
           }

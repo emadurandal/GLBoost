@@ -3,11 +3,13 @@ import AbstractTexture from './AbstractTexture';
 import GLExtentionsManager from '../GLExtentionsManager';
 
 export default class Texture extends AbstractTexture {
-  constructor(src, canvas = GLBoost.CURRENT_CANVAS_ID) {
+  constructor(src, parameters = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
 
     this._isTextureReady = false;
     this._texture = null;
+
+    this._parameters = parameters;
 
     if (typeof src === 'string') {
       this.generateTextureFromUri(src);
@@ -16,7 +18,22 @@ export default class Texture extends AbstractTexture {
     }
   }
 
+  _getParameter(paramName) {
+    var isParametersExist = false;
+    if (this._parameters != null) {
+      isParametersExist = true;
+    }
+    var params = this._parameters;
 
+    switch (paramName) {
+    case 'flipY':
+      if (isParametersExist && params[paramName]) {
+        return params[paramName];
+      } else {
+        return false;
+      }
+    }
+  }
 
   generateTextureFromUri(imageUri) {
     this._img = new Image();
@@ -30,7 +47,8 @@ export default class Texture extends AbstractTexture {
 
       var texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, texture);
-      //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParameter('flipY'));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._img);
 
       if (this.isPowerOfTwo(this._width) && this.isPowerOfTwo(this._height)) {
