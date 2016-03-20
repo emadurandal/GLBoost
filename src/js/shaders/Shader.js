@@ -8,7 +8,7 @@ export default class Shader {
       canvas = window.document.querySelector(canvas);
     }
 
-    this._gl = GLContext.getInstance(canvas).gl;
+    this._glContext = GLContext.getInstance(canvas);
 
     this._dirty = true;
   }
@@ -264,15 +264,15 @@ export default class Shader {
   }
 
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
     var vertexAttribsAsResult = [];
-    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights);
+    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas);
     vertexAttribsAsResult.push(position);
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas)();
         vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
       }
     });
@@ -356,9 +356,10 @@ export default class Shader {
   }
 
   getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass) {
-    var gl = this._gl;
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights);
     var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass);
@@ -366,11 +367,11 @@ export default class Shader {
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
     var hash = Hash.toCRC32(baseText);
-    if (!Shader._shaderHashTable[gl._canvas.id]) {
-      Shader._shaderHashTable[gl._canvas.id] = {};
+    if (!Shader._shaderHashTable[canvas.id]) {
+      Shader._shaderHashTable[canvas.id] = {};
     }
     let programToReturn = null;
-    var hashTable = Shader._shaderHashTable[gl._canvas.id];
+    var hashTable = Shader._shaderHashTable[canvas.id];
     if (hash in hashTable) {
       if (hashTable[hash].code === baseText) {
         programToReturn = hashTable[hash].program;
@@ -397,18 +398,19 @@ export default class Shader {
         indexStr = hash;
       }
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
-      Shader._shaderHashTable[gl._canvas.id] = hashTable;
+      Shader._shaderHashTable[canvas.id] = hashTable;
     } else {
       //gl.useProgram(programToReturn);
     }
-    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights);
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, canvas);
 
     return programToReturn;
   }
 
-  static getDefaultPointLightIfNotExsist(gl, lights) {
+  static getDefaultPointLightIfNotExsist(gl, lights, canvas) {
+
     if (lights.length === 0) {
-      return [new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, gl._canvas)]
+      return [new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas)]
     } else {
       return lights;
     }

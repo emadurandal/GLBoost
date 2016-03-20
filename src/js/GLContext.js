@@ -28,5 +28,9 @@ export default class GLContext {
     return this.impl.gl;
   }
 
+  get canvas() {
+    return this.impl.canvas;
+  }
+
 }
 GLContext._instances = new Object();

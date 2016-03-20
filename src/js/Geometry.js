@@ -10,7 +10,7 @@ import ArrayUtil from './misc/ArrayUtil';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    this._gl = GLContext.getInstance(canvas).gl;
+    this._glContext = GLContext.getInstance(canvas);
     this._canvas = canvas;
     this._materials = [];
     this._vertexN = 0;
@@ -74,7 +74,7 @@ export default class Geometry {
     this._indicesArray = indicesArray;
     this._primitiveType = primitiveType;
 
-    var gl = this._gl;
+    var gl = this._glContext.gl;
     var hint = null;
     switch (performanceHint) {
       case GLBoost.STATIC_DRAW:
@@ -91,7 +91,7 @@ export default class Geometry {
   }
 
   updateVerticesData(vertices, isAlreadyInterleaved = false) {
-    var gl = this._gl;
+    var gl = this._glContext.gl;
     let vertexData = this.vertexData;
     //var vertexData = [];
     if (isAlreadyInterleaved) {
@@ -171,10 +171,10 @@ export default class Geometry {
   }
 
   prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh) {
-    var gl = this._gl;
+    var gl = this._glContext.gl;
     var vertices = this._vertices;
 
-    var glem = GLExtentionsManager.getInstance(gl);
+    var glem = GLExtentionsManager.getInstance(this._glContext);
     var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
     glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
     gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
@@ -216,9 +216,9 @@ export default class Geometry {
   prepareForRender(existCamera_f, lights, meshMaterial, renderPasses, mesh) {
 
     var vertices = this._vertices;
-    var gl = this._gl;
+    var gl = this._glContext.gl;
 
-    var glem = GLExtentionsManager.getInstance(gl);
+    var glem = GLExtentionsManager.getInstance(this._glContext);
 
     this._vertexN = vertices.position.length;
 
@@ -297,8 +297,8 @@ export default class Geometry {
   }
 
   draw(lights, camera, mesh, scene, renderPass_index) {
-    var gl = this._gl;
-    var glem = GLExtentionsManager.getInstance(gl);
+    var gl = this._glContext.gl;
+    var glem = GLExtentionsManager.getInstance(this._glContext);
 
     if (this._materials.length > 0) {
       var materials = this._materials;
@@ -343,7 +343,7 @@ export default class Geometry {
         }
 
         if (glslProgram['lightPosition_0']) {
-          lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+          lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, this._glContext.canvas);
           if (glslProgram['viewPosition']) {
             if (camera) {
               let cameraPos = new Vector4(0, 0, 0, 1);

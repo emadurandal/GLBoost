@@ -54,7 +54,7 @@ export class LambertShaderSource {
     return shaderText;
   }
 
-  prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+  prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -67,7 +67,7 @@ export class LambertShaderSource {
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);

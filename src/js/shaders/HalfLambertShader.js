@@ -56,7 +56,7 @@ export class HalfLambertShaderSource {
     return shaderText;
   }
 
-  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -69,7 +69,7 @@ export class HalfLambertShaderSource {
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);

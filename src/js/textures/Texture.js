@@ -22,8 +22,8 @@ export default class Texture extends AbstractTexture {
     this._img = new Image();
     this._img.crossOrigin = 'Anonymous';
     this._img.onload = ()=> {
-      var gl = this._gl;
-      var glem = GLExtentionsManager.getInstance(gl);
+      var gl = this._glContext.gl;
+      var glem = GLExtentionsManager.getInstance(this._glContext);
 
       this._width = this._img.width;
       this._height = this._img.height;
@@ -56,8 +56,8 @@ export default class Texture extends AbstractTexture {
   }
 
   generateTextureFromImageData(imageData) {
-    var gl = this._gl;
-    var glem = GLExtentionsManager.getInstance(gl);
+    var gl = this.this._glContext.gl;
+    var glem = GLExtentionsManager.getInstance(this._glContext);
 
     this._width = imageData.width;
     this._height = imageData.height;

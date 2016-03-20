@@ -2,9 +2,10 @@ import GLBoost from './globals';
 
 export default class GLExtentionsManager {
 
-  constructor(gl) {
-    if (GLExtentionsManager._instances[gl._canvas.id]) {
-      return GLExtentionsManager._instances[gl._canvas.id];
+  constructor(glContext) {
+    var gl = glContext.gl;
+    if (GLExtentionsManager._instances[glContext.canvas.id]) {
+      return GLExtentionsManager._instances[glContext.canvas.id];
     }
 
     if (GLBoost.WEBGL_ONE_USE_EXTENSIONS) {
@@ -19,7 +20,7 @@ export default class GLExtentionsManager {
       this._extEIUI = gl.getExtension('OES_element_index_uint');
     }
 
-    GLExtentionsManager._instances[gl._canvas.id] = this;
+    GLExtentionsManager._instances[glContext.canvas.id] = this;
   }
   static getInstance(gl) {
     return new GLExtentionsManager(gl);

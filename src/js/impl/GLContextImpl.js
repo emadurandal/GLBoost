@@ -17,11 +17,6 @@ export default class GLContextImpl {
     }
 
     this._canvas = canvas;
-    this._canvas._gl = null; // ここでnullを入れておかないと、後段のthis.gl === undefinedのチェックがうまくいかない
-
-    if (this.gl === undefined) {
-      throw new TypeError("Must override gl getter.");
-    }
 
   }
 
@@ -40,9 +35,15 @@ export default class GLContextImpl {
       throw new Error("Unexpected rendering context.");
     }
 
-    gl._canvas = this._canvas;
-    this._canvas._gl = gl;
+    this._gl = gl;
+  }
 
+  get gl() {
+    return this._gl;
+  }
+
+  get canvas() {
+    return this._canvas;
   }
 
 }

@@ -1,7 +1,4 @@
 import GLBoost from './../globals'
-import Element from './../Element'
-import GLContext from './../GLContext'
-import GLExtentionsManager from './../GLExtentionsManager'
 import Geometry from './../Geometry'
 import Vector4 from './../math/Vector4'
 import Vector3 from './../math/Vector3'

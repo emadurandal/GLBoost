@@ -9,8 +9,4 @@ export default class GLContextWebGL2Impl extends GLContextImpl {
 
   }
 
-  get gl() {
-    return this._canvas._gl;
-  }
-
 }

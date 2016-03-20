@@ -7,7 +7,7 @@ export default class AbstractTexture {
       throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }
 
-    this._gl = GLContext.getInstance(canvas).gl;
+    this._glContext = GLContext.getInstance(canvas);
     this._name = '';
   }
 
@@ -16,16 +16,17 @@ export default class AbstractTexture {
   }
 
   setUp() {
+    var gl = this._glContext.gl;
     if (this._texture === null) {
       return false;
     }
-    this._gl.bindTexture(this._gl.TEXTURE_2D, this._texture);
+    gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
     return true;
   }
 
   tearDown() {
-    this._gl.bindTexture(this._gl.TEXTURE_2D, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
   set name(name) {

@@ -1,6 +1,5 @@
 import GLBoost from './../globals';
 import AbstractTexture from './AbstractTexture';
-import GLExtentionsManager from '../GLExtentionsManager';
 
 export default class MutableTexture extends AbstractTexture {
   constructor(width, height, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -12,7 +11,7 @@ export default class MutableTexture extends AbstractTexture {
     this._height = height;
     this._fbo = null;
 
-    var gl = this._gl;
+    var gl = this._glContext.gl;
 
     //var glem = GLExtentionsManager.getInstance(gl);
 

@@ -16,9 +16,9 @@ export default class Renderer {
 
     GLBoost.CURRENT_CANVAS_ID = '#' + parameters.canvas.id;
 
-    this._gl = GLContext.getInstance(_canvas).gl;
+    this._glContext = GLContext.getInstance(_canvas);
 
-    var gl = this._gl;
+    var gl = this._glContext.gl;
 
     var setDefaultGLStates = function setDefaultGLStates() {
 
@@ -51,8 +51,8 @@ export default class Renderer {
       }
     });
 
-    var gl = this._gl;
-    var glem = GLExtentionsManager.getInstance(gl);
+    var gl = this._glContext.gl;
+    var glem = GLExtentionsManager.getInstance(this._glContext);
 
     let lights = scene.lights;
 
@@ -92,7 +92,7 @@ export default class Renderer {
    */
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
 
-    var gl = this._gl;
+    var gl = this._glContext.gl;
 
     var bufferBits = 0;
 
@@ -114,19 +114,20 @@ export default class Renderer {
    */
   createTexturesForRenderTarget(width, height, textureNum) {
 
-    var gl = this._gl;
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
 
-    var glem = GLExtentionsManager.getInstance(gl);
+    var glem = GLExtentionsManager.getInstance(this._glContext);
 
     // Create FBO
     var fbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    fbo.width = width ? width : gl._canvas.width;
-    fbo.height = height ? height : gl._canvas.height;
+    fbo.width = width ? width : canvas.width;
+    fbo.height = height ? height : canvas.height;
 
     var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(fbo.width, fbo.height, gl._canvas);
+      let texture = new MutableTexture(fbo.width, fbo.height, canvas);
       texture.fbo = fbo;
       renderTargetTextures.push(texture);
     }
@@ -155,7 +156,7 @@ export default class Renderer {
   createRenderPasses(number) {
     var renderPasses = [];
     for (let i=0; i<number; i++) {
-      renderPasses.push(new RenderPass(this._gl));
+      renderPasses.push(new RenderPass(this._glContext.gl));
     }
 
     return renderPasses;
@@ -167,7 +168,7 @@ export default class Renderer {
    * @returns {webglcontext} a context of WebGL
    */
   get glContext() {
-    return this._gl;
+    return this._glContext.gl;
   }
 
 
@@ -178,8 +179,8 @@ export default class Renderer {
    * @param {number} height en: height to resize, ja:リサイズする高さ
    */
   resize(width, height) {
-    this._gl._canvas.width = width;
-    this._gl._canvas.height = height;
+    this._glContext.canvas.width = width;
+    this._glContext.canvas.height = height;
 
     this._gl.viewport(0, 0, width, height);
   }

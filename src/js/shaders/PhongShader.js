@@ -60,7 +60,7 @@ export class PhongShaderSource {
     return shaderText;
   }
 
-  prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights) {
+  prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -75,7 +75,7 @@ export class PhongShaderSource {
     shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
     shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights);
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
     shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
 
