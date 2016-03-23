@@ -4321,7 +4321,7 @@
         this._glContext.canvas.width = width;
         this._glContext.canvas.height = height;
 
-        this._gl.viewport(0, 0, width, height);
+        this._glContext.gl.viewport(0, 0, width, height);
       }
     }, {
       key: 'glContext',
