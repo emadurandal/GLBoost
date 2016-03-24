@@ -105,13 +105,6 @@ export default class Scene extends Element {
    * ja: レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
    */
   prepareForRender() {
-    // カメラが最低１つでも存在しているか確認
-    var existCamera_f = false;
-    this._elements.forEach((elm)=> {
-      if (elm instanceof Camera) {
-        existCamera_f = true;
-      }
-    });
 
     let collectMeshes = function(elem) {
       if (elem instanceof Group) {
@@ -155,7 +148,7 @@ export default class Scene extends Element {
       this._lights = this._lights.concat(collectLights(elm));
     });
 
-    existCamera_f = false;
+    let existCamera_f = false;
     let collectCameras = function(elem) {
       if (elem instanceof Group) {
         var children = elem.getChildren();
@@ -177,6 +170,9 @@ export default class Scene extends Element {
     this._elements.forEach((elm)=> {
       this._cameras = this._cameras.concat(collectCameras(elm));
     });
+    if (this._cameras.length !== 0) {
+      this._cameras[0].setAsMainCamera(this);
+    }
 
     // If there is only one renderPass, register meshes to the renderPass automatically.
     if (this._renderPasses.length === 1) {
@@ -237,6 +233,10 @@ export default class Scene extends Element {
    */
   get cameras() {
     return this._cameras;
+  }
+
+  toString() {
+    return this._instanceName;
   }
 }
 

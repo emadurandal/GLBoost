@@ -46,7 +46,7 @@ export default class Renderer {
   draw(scene) {
     var camera = false;
     scene.cameras.forEach((elm)=> {
-      if (elm.isMainCamera) {
+      if (elm.isMainCamera(scene)) {
         camera = elm;
       }
     });

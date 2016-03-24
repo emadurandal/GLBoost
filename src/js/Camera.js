@@ -16,13 +16,12 @@ export default class Camera extends Element {
     this._zNear = perspective.zNear;
     this._zFar = perspective.zFar;
 
-    this.setAsMainCamera();
-
     this._dirtyView = true;
     this._dirtyAsElement = true;
     this._updateCountAsCameraView = 0;
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection = 0;
+    this._mainCamera = {};
   }
 
   _needUpdateView() {
@@ -89,12 +88,12 @@ export default class Camera extends Element {
 
   }
 
-  setAsMainCamera() {
-    Camera._mainCamera = this;
+  setAsMainCamera(scene) {
+    this._mainCamera[scene.toString()] = this;
   }
 
-  get isMainCamera() {
-    return Camera._mainCamera === this;
+  isMainCamera(scene) {
+    return this._mainCamera[scene.toString()] === this;
   }
 
   set translate(vec) {

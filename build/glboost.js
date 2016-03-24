@@ -4180,7 +4180,7 @@
       value: function draw(scene) {
         var camera = false;
         scene.cameras.forEach(function (elm) {
-          if (elm.isMainCamera) {
+          if (elm.isMainCamera(scene)) {
             camera = elm;
           }
         });
@@ -4351,13 +4351,12 @@
       _this._zNear = perspective.zNear;
       _this._zFar = perspective.zFar;
 
-      _this.setAsMainCamera();
-
       _this._dirtyView = true;
       _this._dirtyAsElement = true;
       _this._updateCountAsCameraView = 0;
       _this._dirtyProjection = true;
       _this._updateCountAsCameraProjection = 0;
+      _this._mainCamera = {};
       return _this;
     }
 
@@ -4397,8 +4396,13 @@
       }
     }, {
       key: 'setAsMainCamera',
-      value: function setAsMainCamera() {
-        Camera._mainCamera = this;
+      value: function setAsMainCamera(scene) {
+        this._mainCamera[scene.toString()] = this;
+      }
+    }, {
+      key: 'isMainCamera',
+      value: function isMainCamera(scene) {
+        return this._mainCamera[scene.toString()] === this;
       }
     }, {
       key: 'updateCountAsCameraView',
@@ -4409,11 +4413,6 @@
       key: 'updateCountAsCameraProjection',
       get: function get() {
         return this._updateCountAsCameraProjection;
-      }
-    }, {
-      key: 'isMainCamera',
-      get: function get() {
-        return Camera._mainCamera === this;
       }
     }, {
       key: 'translate',
@@ -4658,14 +4657,6 @@
       value: function prepareForRender() {
         var _this2 = this;
 
-        // カメラが最低１つでも存在しているか確認
-        var existCamera_f = false;
-        this._elements.forEach(function (elm) {
-          if (elm instanceof Camera) {
-            existCamera_f = true;
-          }
-        });
-
         var collectMeshes = function collectMeshes(elem) {
           if (elem instanceof Group) {
             var children = elem.getChildren();
@@ -4708,7 +4699,7 @@
           _this2._lights = _this2._lights.concat(collectLights(elm));
         });
 
-        existCamera_f = false;
+        var existCamera_f = false;
         var collectCameras = function collectCameras(elem) {
           if (elem instanceof Group) {
             var children = elem.getChildren();
@@ -4730,6 +4721,9 @@
         this._elements.forEach(function (elm) {
           _this2._cameras = _this2._cameras.concat(collectCameras(elm));
         });
+        if (this._cameras.length !== 0) {
+          this._cameras[0].setAsMainCamera(this);
+        }
 
         // If there is only one renderPass, register meshes to the renderPass automatically.
         if (this._renderPasses.length === 1) {
@@ -4744,6 +4738,11 @@
         this._meshes.forEach(function (mesh) {
           mesh.prepareForRender(existCamera_f, _this2._lights, _this2._renderPasses);
         });
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
       }
     }, {
       key: 'renderPasses',
