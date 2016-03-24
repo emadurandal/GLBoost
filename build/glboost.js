@@ -4933,6 +4933,16 @@
       get: function get() {
         return typeof this._img == 'undefined';
       }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      }
     }]);
     return Texture;
   }(AbstractTexture);

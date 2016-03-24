@@ -113,6 +113,14 @@ export default class Texture extends AbstractTexture {
     return typeof this._img == 'undefined';
   }
 
+  get width() {
+    return this._width;
+  }
+
+  get height() {
+    return this._height;
+  }
+
 }
 
 GLBoost['Texture'] = Texture;
