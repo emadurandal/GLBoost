@@ -4596,6 +4596,11 @@
           return elem !== element;
         });
       }
+    }, {
+      key: 'removeAll',
+      value: function removeAll() {
+        this._elements.length = 0;
+      }
 
       /**
        * en: Get child elements which belong to this scene.<br>

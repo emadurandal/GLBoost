@@ -58,6 +58,10 @@ export default class Scene extends Element {
     });
   }
 
+  removeAll() {
+    this._elements.length = 0;
+  }
+
   /**
    * en: Get child elements which belong to this scene.<br>
    * ja: このシーンに属していた子供の要素の配列を返します。
