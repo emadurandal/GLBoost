@@ -4532,14 +4532,21 @@
   GLBoost$1['Camera'] = Camera;
 
   /**
-   * en: This Scene class is the top level element of scene graph hierarchy.
+   * [en] This Scene class is the top level element of scene graph hierarchy.
    *       To render scene, pass this scene element to Renderer.draw method.<br>
-   * ja: このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
+   * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
    *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
    */
 
   var Scene = function (_Element) {
     babelHelpers.inherits(Scene, _Element);
+
+
+    /**
+     * [en] constructor
+     * [ja] コンストラクタ
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
 
     function Scene() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
@@ -4561,9 +4568,9 @@
     }
 
     /**
-     * en: Add the element to this scene as a child.<br>
-     * ja: このシーンにelementを子供として追加します。
-     * @param element a instance of Element class
+     * [en] Add the element to this scene as a child.<br>
+     * [ja] このシーンにelementを子供として追加します。
+     * @param {Element} element [en] a instance of Element class [ja] Elementクラスのインスタンス
      */
 
 
@@ -4575,9 +4582,9 @@
       }
 
       /**
-       * en: Add the element to this scene as a child.<br>
-       * ja: このシーンにelementを子供として追加します。
-       * @param element a instance of Element class
+       * [en] Add the element to this scene as a child.<br>
+       * [ja] このシーンにelementを子供として追加します。
+       * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
        */
 
     }, {
@@ -4586,6 +4593,13 @@
         this._elements.push(element);
         element._parent = this;
       }
+
+      /**
+       * [en] remove the element from this scene.
+       * [ja] このシーンから指定した要素を削除します。
+       * @param {Element} element [en] the element to remove [ja] 削除したい要素
+       */
+
     }, {
       key: 'removeChild',
       value: function removeChild(element) {
@@ -4596,22 +4610,16 @@
           return elem !== element;
         });
       }
+
+      /**
+       * [en] remove all elements from this scene.
+       * [ja] このシーンから全ての要素を削除します。
+       */
+
     }, {
       key: 'removeAll',
       value: function removeAll() {
         this._elements.length = 0;
-      }
-
-      /**
-       * en: Get child elements which belong to this scene.<br>
-       * ja: このシーンに属していた子供の要素の配列を返します。
-       * @return {Array} en: child elements of this scene. ja: このシーンの子供の要素
-       */
-
-    }, {
-      key: 'getChildren',
-      value: function getChildren() {
-        return this._elements;
       }
     }, {
       key: '_setDirtyToAnimatedElement',
@@ -4636,10 +4644,10 @@
       }
 
       /**
-       * en: Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-       * ja: アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-       * @param {string} inputName en: inputName name of input value. ja: 入力値の名前
-       * @param {any} inputValue en: input value of animation. ja: アニメーションの入力値
+       * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+       * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+       * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
+       * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
        */
 
     }, {
@@ -4650,8 +4658,8 @@
       }
 
       /**
-       * en: Prepare for Rendering. You have to call this method before Renderer.draw method.
-       * ja: レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
+       * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
+       * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
        */
 
     }, {
@@ -4741,8 +4749,41 @@
           mesh.prepareForRender(existCamera_f, _this2._lights, _this2._renderPasses);
         });
       }
+
+      /**
+       * [en] Set render passes for rendering. if you don't set render passes, this scene has a default render pass.
+       * [ja] レンダリングに使うレンダーパスの配列をセットします。もしレンダーパスをセットしない場合は、このシーンはデフォルトの単一レンダーパスを持っています。
+       * @param {Array<RenderPass>} renderPasses [en] render passes. [ja] レンダーパスの配列
+       */
+
+    }, {
+      key: 'getChildren',
+
+
+      /**
+       * [en] Get child elements which belong to this scene.<br>
+       * [ja] このシーンに属していた子供の要素の配列を返します。
+       * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+       */
+      value: function getChildren() {
+        return this._elements;
+      }
+
+      /**
+       * [en] Get child elements which belong to this scene.<br>
+       * [ja] このシーンに属していた子供の要素の配列を返します。
+       * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+       */
+
     }, {
       key: 'toString',
+
+
+      /**
+       * [en] Return instance name.
+       * [ja] インスタンス名を返します。
+       * @returns {string} [en] the instance name. [ja] インスタンス名
+       */
       value: function toString() {
         return this._instanceName;
       }
@@ -4750,17 +4791,17 @@
       key: 'renderPasses',
       set: function set(renderPasses) {
         this._renderPasses = renderPasses;
-      },
-      get: function get() {
-        return this._renderPasses;
       }
 
       /**
-       * en: Get child elements which belong to this scene.<br>
-       * ja: このシーンに属していた子供の要素の配列を返します。
-       * @return {Array} en: child elements of this scene. ja: このシーンの子供の要素
+       * [en] Get render passes for rendering.
+       * [ja] レンダリングに使うレンダーパスの配列を取得します。
+       * @returns {Array<RenderPass>}
        */
-
+      ,
+      get: function get() {
+        return this._renderPasses;
+      }
     }, {
       key: 'elements',
       get: function get() {
@@ -4768,9 +4809,9 @@
       }
 
       /**
-       * en: Get child meshes which belong to this scene.<br>
-       * ja: このシーンに属していた子供のMesh要素の配列を返します。
-       * @return {Array} en: child meshes of this scene. ja: このシーンの子供のMesh要素
+       * [en] Get child meshes which belong to this scene.<br>
+       * [ja] このシーンに属していた子供のMesh要素の配列を返します。
+       * @return {Array<Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
        */
 
     }, {
@@ -4780,9 +4821,9 @@
       }
 
       /**
-       * en: Get child lights which belong to this scene.<br>
-       * ja: このシーンに属していた子供のLight要素の配列を返します。
-       * @return {Array} en: child lights of this scene. ja: このシーンの子供のLight要素
+       * [en] Get child lights which belong to this scene.<br>
+       * [ja] このシーンに属していた子供のLight要素の配列を返します。
+       * @return {Array<AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
        */
 
     }, {
@@ -4792,9 +4833,9 @@
       }
 
       /**
-       * en: Get child cameras which belong to this scene.<br>
-       * ja: このシーンに属していた子供のCamera要素の配列を返します。
-       * @return {Array} en: child cameras of this scene. ja: このシーンの子供のCamera要素
+       * [en] Get child cameras which belong to this scene.<br>
+       * [ja] このシーンに属していた子供のCamera要素の配列を返します。
+       * @return {Array<Camera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
        */
 
     }, {
