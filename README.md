@@ -137,7 +137,7 @@ render();
 
 ```
 
-for other usage, check [examples](https://rawgit.com/emadurandal/GLBoost/master/examples/index.html)!
+for other usage, check [examples](https://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)!
 
 ## How to Install npm packages to build library, examples and API document
 
