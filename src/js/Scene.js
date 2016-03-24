@@ -25,12 +25,8 @@ export default class Scene extends Element {
     this._renderPasses = [new RenderPass(this._gl)];
     this._currentAnimationInputValues = {};
 
-    // this code for tmlib
-    if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Scene ||
-      this.__proto__.__proto__ && this.__proto__.__proto__.__proto__ && this.__proto__.__proto__.__proto__.constructor == Scene) {
-      Scene._instanceCount = (typeof Scene._instanceCount === 'undefined') ? 0 : (Scene._instanceCount + 1);
-      this._instanceName = Scene.name + '_' + Scene._instanceCount;
-    }
+    Scene._instanceCount = (typeof Scene._instanceCount === 'undefined') ? 0 : (Scene._instanceCount + 1);
+    this._instanceName = Scene.name + '_' + Scene._instanceCount;
   }
 
   /**

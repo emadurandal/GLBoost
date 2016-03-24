@@ -4555,11 +4555,8 @@
       _this._renderPasses = [new RenderPass(_this._gl)];
       _this._currentAnimationInputValues = {};
 
-      // this code for tmlib
-      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Scene || _this.__proto__.__proto__ && _this.__proto__.__proto__.__proto__ && _this.__proto__.__proto__.__proto__.constructor == Scene) {
-        Scene._instanceCount = typeof Scene._instanceCount === 'undefined' ? 0 : Scene._instanceCount + 1;
-        _this._instanceName = Scene.name + '_' + Scene._instanceCount;
-      }
+      Scene._instanceCount = typeof Scene._instanceCount === 'undefined' ? 0 : Scene._instanceCount + 1;
+      _this._instanceName = Scene.name + '_' + Scene._instanceCount;
       return _this;
     }
 
