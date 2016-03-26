@@ -1,5 +1,5 @@
 import GLBoost from './../globals'
-import Geometry from './../Geometry'
+import Geometry from './../geometries/Geometry'
 import Vector4 from './../math/Vector4'
 import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'

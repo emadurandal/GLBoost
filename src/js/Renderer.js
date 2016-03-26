@@ -3,7 +3,7 @@ import GLContext from './GLContext';
 import GLExtentionsManager from './GLExtentionsManager';
 import MutableTexture from './textures/MutableTexture';
 import RenderPass from './RenderPass';
-import Geometry from './Geometry';
+import Geometry from './geometries/Geometry';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>

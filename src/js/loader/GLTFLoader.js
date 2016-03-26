@@ -1,17 +1,20 @@
-import GLBoost from '../globals'
-import GLContext from '../GLContext'
-import Geometry from '../Geometry'
-import ClassicMaterial from '../ClassicMaterial'
-import Mesh from '../meshes/Mesh'
-import PhongShader from '../shaders/PhongShader'
-import Texture from '../textures/Texture'
-import Vector3 from '../math/Vector3'
-import Vector2 from '../math/Vector2'
-import Vector4 from '../math/Vector4'
-import Matrix44 from '../math/Matrix44'
-import Quaternion from '../math/Quaternion'
-import ArrayUtil from '../misc/ArrayUtil'
-import Group from '../Group'
+import GLBoost from '../globals';
+import GLContext from '../GLContext';
+import Geometry from '../geometries/Geometry';
+import ClassicMaterial from '../ClassicMaterial';
+import Mesh from '../meshes/Mesh';
+import SkeletalMesh from '../meshes/SkeletalMesh';
+import PhongShader from '../shaders/PhongShader';
+import Texture from '../textures/Texture';
+import Vector3 from '../math/Vector3';
+import Vector2 from '../math/Vector2';
+import Vector4 from '../math/Vector4';
+import Matrix44 from '../math/Matrix44';
+import Quaternion from '../math/Quaternion';
+import ArrayUtil from '../misc/ArrayUtil';
+import Group from '../Group';
+import Joint from '../skeletons/Joint';
+
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -148,9 +151,17 @@ export default class GLTFLoader {
       let meshStr = nodeJson.meshes[0];
       let meshJson = json.meshes[meshStr];
 
-      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      let rootJointName = null;
+      if (nodeJson.skeletons) {
+        rootJointName = nodeJson.skeletons[0];
+      }
+      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName);
       mesh.userFlavorName = meshStr;
       group.addChild(mesh);
+    } else if (nodeJson.jointName) {
+      let joint = new Joint();
+      joint.userFlavorName = nodeJson.jointName;
+      group.addChild(joint);
     }
 
     for (let i=0; i<nodeJson.children.length; i++) {
@@ -162,9 +173,14 @@ export default class GLTFLoader {
     return group;
   }
 
-  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName) {
     var geometry = new Geometry(canvas);
-    var mesh = new Mesh(geometry);
+    var mesh = null;
+    if (rootJointName) {
+      mesh = new SkeletalMesh(geometry, null, rootJointName);
+    } else {
+      mesh = new Mesh(geometry);
+    }
     var material = new ClassicMaterial(canvas);
 
     let primitiveJson = meshJson.primitives[0];
@@ -180,10 +196,23 @@ export default class GLTFLoader {
     let normalsAccessorStr = primitiveJson.attributes.NORMAL;
     let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
 
+    var additional = {};
+
+    /// if Skeletal
+    let jointAccessorStr = primitiveJson.attributes.JOINT;
+    if (jointAccessorStr) {
+      let joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
+      additional['joint'] = joints;
+    }
+    let weightAccessorStr = primitiveJson.attributes.WEIGHT;
+    if (weightAccessorStr) {
+      let weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
+      additional['weight'] = weights;
+    }
+
     // Texture
     let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
     var texcoords = null;
-    var additional = {};
 
     let materialStr = primitiveJson.material;
     let materialJson = json.materials[materialStr];

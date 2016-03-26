@@ -1,5 +1,5 @@
-import GLBoost from './globals';
-import BlendShapeShaderSource from './shaders/BlendShapeShader';
+import GLBoost from './../globals';
+import BlendShapeShaderSource from './../shaders/BlendShapeShader';
 import Geometry from './Geometry';
 
 export default class BlendShapeGeometry extends Geometry {

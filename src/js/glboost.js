@@ -6,7 +6,7 @@ import Vector4 from './math/Vector4';
 import ClassicMaterial from './ClassicMaterial';
 import Texture from './textures/Texture';
 import Camera from './Camera';
-import BlendShapeGeometry from './BlendShapeGeometry';
+import BlendShapeGeometry from './geometries/BlendShapeGeometry';
 import ObjLoader from './loader/ObjLoader';
 import InitialSettings from './InitialSettings';
 import Plane from './primitives/Plane';

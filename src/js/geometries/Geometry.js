@@ -1,12 +1,12 @@
-import GLBoost from './globals';
-import Vector4 from './math/Vector4';
-import GLContext from './GLContext';
-import GLExtentionsManager from './GLExtentionsManager';
-import Shader from './shaders/Shader';
-import ClassicMaterial from './ClassicMaterial';
-import PointLight from './lights/PointLight';
-import DirectionalLight from './lights/DirectionalLight';
-import ArrayUtil from './misc/ArrayUtil';
+import GLBoost from './../globals';
+import Vector4 from './../math/Vector4';
+import GLContext from './../GLContext';
+import GLExtentionsManager from './../GLExtentionsManager';
+import Shader from './../shaders/Shader';
+import ClassicMaterial from './../ClassicMaterial';
+import PointLight from './../lights/PointLight';
+import DirectionalLight from './../lights/DirectionalLight';
+import ArrayUtil from './../misc/ArrayUtil';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
