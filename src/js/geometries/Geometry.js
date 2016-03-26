@@ -21,6 +21,7 @@ export default class Geometry {
     this._vertexAttribComponentNDic = {};
     this._defaultMaterial = new ClassicMaterial(this._canvas);
     this.vertexData = [];
+    this._extraDataForShader = {};
     this._setName();
   }
 
@@ -187,7 +188,7 @@ export default class Geometry {
     let glslProgramOfPasses = [];
     for (let i=0; i<renderPasses.length; i++) {
       if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
-        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i]);
+        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
         this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
         glslProgramOfPasses.push(glslProgram);
       } else {
@@ -516,8 +517,8 @@ export default class Geometry {
     this._materials = materials;
   }
 
-  toString() {
-    return this._instanceName;
+  setExtraDataForShader(name, value) {
+    this._extraDataForShader[name] = value;
   }
 
   static clearMaterialCache() {

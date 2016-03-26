@@ -1,6 +1,7 @@
 import GLBoost from '../globals';
 import GLContext from '../GLContext';
 import Geometry from '../geometries/Geometry';
+import SkeletalGeometry from '../geometries/SkeletalGeometry';
 import ClassicMaterial from '../ClassicMaterial';
 import Mesh from '../meshes/Mesh';
 import SkeletalMesh from '../meshes/SkeletalMesh';
@@ -178,10 +179,11 @@ export default class GLTFLoader {
   }
 
   _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
-    var geometry = new Geometry(canvas);
     var mesh = null;
+    var geometry = null;
     let gl = GLContext.getInstance(canvas).gl;
     if (rootJointStr) {
+      geometry = new SkeletalGeometry(canvas);
       mesh = new SkeletalMesh(geometry, null, rootJointStr);
       let skin = json.skins[skinStr];
 
@@ -190,6 +192,7 @@ export default class GLTFLoader {
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
       mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
     } else {
+      geometry = new Geometry(canvas);
       mesh = new Mesh(geometry);
     }
     var material = new ClassicMaterial(canvas);

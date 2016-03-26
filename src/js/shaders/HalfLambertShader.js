@@ -56,7 +56,7 @@ export class HalfLambertShaderSource {
     return shaderText;
   }
 
-  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
+  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{

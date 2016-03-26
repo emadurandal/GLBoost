@@ -136,7 +136,7 @@ export default class Shader {
     return processedShaderString;
   }
 
-  _getVertexShaderString(gl, functions, existCamera_f, lights, otherData) {
+  _getVertexShaderString(gl, functions, existCamera_f, lights, extraData) {
     var f = functions;
     var shaderText = '';
 
@@ -148,12 +148,12 @@ export default class Shader {
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSDefine(in_, out_, f, lights, otherData);
+    shaderText += this.VSDefine(in_, out_, f, lights, extraData);
     // and define variables as mixin shaders
     this._classNamesOfVSDefine.forEach((className)=> {
       var method = this['VSDefine_' + className];
       if (method) {
-        shaderText += method.bind(this, in_, out_, f, lights, otherData)();
+        shaderText += method.bind(this, in_, out_, f, lights, extraData)();
       }
     });
 
@@ -164,12 +164,12 @@ export default class Shader {
 
     /// Transform
     // start transforming. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSTransform(existCamera_f, f, lights, otherData);
+    shaderText += this.VSTransform(existCamera_f, f, lights, extraData);
     // and transform as mixin Shaders
     this._classNamesOfVSTransform.forEach((className)=> {
       var method = this['VSTransform_' + className];
       if (method) {
-        shaderText += method.bind(this, existCamera_f, f, lights, otherData)();
+        shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
       }
     });
 
@@ -180,7 +180,7 @@ export default class Shader {
     this._classNamesOfVSShade.forEach((className)=> {
       var method = this['VSShade_' + className];
       if (method) {
-        shaderText += method.bind(this, existCamera_f, f, lights, otherData)();
+        shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
       }
     });
 
@@ -194,7 +194,7 @@ export default class Shader {
   }
 
 
-  _getFragmentShaderString(gl, functions, lights, renderPass, otherData) {
+  _getFragmentShaderString(gl, functions, lights, renderPass, extraData) {
     var f = functions;
     var shaderText = '';
 
@@ -216,12 +216,12 @@ export default class Shader {
 
     /// define variables
     // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSDefine(in_, f, lights, otherData);
+    shaderText += this.FSDefine(in_, f, lights, extraData);
     // and define variables as mixin shaders
     this._classNamesOfFSDefine.forEach((className)=> {
       var method = this['FSDefine_' + className];
       if (method) {
-        shaderText += method.bind(this, in_, f, lights, otherData)();
+        shaderText += method.bind(this, in_, f, lights, extraData)();
       }
     });
 
@@ -232,12 +232,12 @@ export default class Shader {
 
     /// Shading
     // start shading. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSShading(f, gl, lights, otherData);
+    shaderText += this.FSShading(f, gl, lights, extraData);
     // and shade as mixin Shaders
     this._classNamesOfFSShade.forEach((className)=> {
       var method = this['FSShade_' + className];
       if (method) {
-        shaderText += method.bind(this, f, gl, lights, otherData)();
+        shaderText += method.bind(this, f, gl, lights, extraData)();
       }
     });
 
@@ -286,15 +286,15 @@ export default class Shader {
   }
 
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
     var vertexAttribsAsResult = [];
-    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas);
+    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas);
     vertexAttribsAsResult.push(position);
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas)();
         vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
       }
     });
@@ -377,14 +377,14 @@ export default class Shader {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass, otherData = {}) {
+  getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass, extraData = {}) {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
     lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
-    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, otherData);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass, otherData);
+    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, extraData);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass, extraData);
 
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;

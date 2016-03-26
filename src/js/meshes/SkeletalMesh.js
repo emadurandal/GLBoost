@@ -19,6 +19,7 @@ export default class SkeletalMesh extends Mesh {
 
   set inverseBindMatrices(inverseBindMatrices) {
     this._inverseBindMatrices = inverseBindMatrices;
+    this._geometry.setExtraDataForShader('jointN', inverseBindMatrices.length);
   }
 }
 

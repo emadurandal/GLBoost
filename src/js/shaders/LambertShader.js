@@ -54,7 +54,7 @@ export class LambertShaderSource {
     return shaderText;
   }
 
-  prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, canvas) {
+  prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
