@@ -117,6 +117,25 @@ export default class Shader {
     }
   }
 
+  _removeDuplicatedLine(shaderString) {
+    var splittedShaderLines = shaderString.split('\n');
+    for (let i=0; i<splittedShaderLines.length; i++) {
+      splittedShaderLines[i] += '\n';
+      for (let j=0; j<i; j++) {
+        if (splittedShaderLines[j] === splittedShaderLines[i]) {
+          splittedShaderLines[i] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+        }
+      }
+    }
+
+    let processedShaderString = '';
+    for (let i=0; i<splittedShaderLines.length; i++) {
+      processedShaderString += splittedShaderLines[i];
+    }
+
+    return processedShaderString;
+  }
+
   _getVertexShaderString(gl, functions, existCamera_f, lights) {
     var f = functions;
     var shaderText = '';
@@ -167,8 +186,9 @@ export default class Shader {
 
 
     // end of main function
-
     shaderText +=   '}\n';
+
+    shaderText = this._removeDuplicatedLine(shaderText);
 
     return shaderText;
   }
@@ -231,12 +251,14 @@ export default class Shader {
     }
     shaderText +=   '}\n';
 
+    shaderText = this._removeDuplicatedLine(shaderText);
+
     return shaderText;
   }
 
   VSDefine(in_, out_, f) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
-    shaderText +=      'uniform mat4 modelViewProjectionMatrix;';
+    shaderText +=      'uniform mat4 modelViewProjectionMatrix;\n';
     return shaderText;
   }
   VSTransform(existCamera_f, f) {

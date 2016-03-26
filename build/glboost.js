@@ -2778,6 +2778,26 @@
     }
 
     babelHelpers.createClass(Shader, [{
+      key: '_removeDuplicatedLine',
+      value: function _removeDuplicatedLine(shaderString) {
+        var splittedShaderLines = shaderString.split('\n');
+        for (var i = 0; i < splittedShaderLines.length; i++) {
+          splittedShaderLines[i] += '\n';
+          for (var j = 0; j < i; j++) {
+            if (splittedShaderLines[j] === splittedShaderLines[i]) {
+              splittedShaderLines[i] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+            }
+          }
+        }
+
+        var processedShaderString = '';
+        for (var i = 0; i < splittedShaderLines.length; i++) {
+          processedShaderString += splittedShaderLines[i];
+        }
+
+        return processedShaderString;
+      }
+    }, {
       key: '_getVertexShaderString',
       value: function _getVertexShaderString(gl, functions, existCamera_f, lights) {
         var _this = this;
@@ -2828,8 +2848,9 @@
         });
 
         // end of main function
-
         shaderText += '}\n';
+
+        shaderText = this._removeDuplicatedLine(shaderText);
 
         return shaderText;
       }
@@ -2892,13 +2913,15 @@
         }
         shaderText += '}\n';
 
+        shaderText = this._removeDuplicatedLine(shaderText);
+
         return shaderText;
       }
     }, {
       key: 'VSDefine',
       value: function VSDefine(in_, out_, f) {
         var shaderText = in_ + ' vec3 aVertex_position;\n';
-        shaderText += 'uniform mat4 modelViewProjectionMatrix;';
+        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
         return shaderText;
       }
     }, {
@@ -6868,6 +6891,32 @@
 
   GLBoost$1["Particle"] = Particle;
 
+  var SkeletalMesh = function (_Mesh) {
+    babelHelpers.inherits(SkeletalMesh, _Mesh);
+
+    function SkeletalMesh(geometry, material, jointName) {
+      babelHelpers.classCallCheck(this, SkeletalMesh);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalMesh).call(this, geometry, material, jointName));
+
+      _this._rootJointName = jointName;
+      return _this;
+    }
+
+    return SkeletalMesh;
+  }(Mesh);
+
+  var Joint = function (_Element) {
+    babelHelpers.inherits(Joint, _Element);
+
+    function Joint() {
+      babelHelpers.classCallCheck(this, Joint);
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this));
+    }
+
+    return Joint;
+  }(Element);
+
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
@@ -7009,9 +7058,17 @@
           var meshStr = nodeJson.meshes[0];
           var meshJson = json.meshes[meshStr];
 
-          var mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          var rootJointName = null;
+          if (nodeJson.skeletons) {
+            rootJointName = nodeJson.skeletons[0];
+          }
+          var mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName);
           mesh.userFlavorName = meshStr;
           group.addChild(mesh);
+        } else if (nodeJson.jointName) {
+          var joint = new Joint();
+          joint.userFlavorName = nodeJson.jointName;
+          group.addChild(joint);
         }
 
         for (var i = 0; i < nodeJson.children.length; i++) {
@@ -7024,9 +7081,14 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+      value: function _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName) {
         var geometry = new Geometry(canvas);
-        var mesh = new Mesh(geometry);
+        var mesh = null;
+        if (rootJointName) {
+          mesh = new SkeletalMesh(geometry, null, rootJointName);
+        } else {
+          mesh = new Mesh(geometry);
+        }
         var material = new ClassicMaterial(canvas);
 
         var primitiveJson = meshJson.primitives[0];
@@ -7042,10 +7104,23 @@
         var normalsAccessorStr = primitiveJson.attributes.NORMAL;
         var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
 
+        var additional = {};
+
+        /// if Skeletal
+        var jointAccessorStr = primitiveJson.attributes.JOINT;
+        if (jointAccessorStr) {
+          var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
+          additional['joint'] = joints;
+        }
+        var weightAccessorStr = primitiveJson.attributes.WEIGHT;
+        if (weightAccessorStr) {
+          var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
+          additional['weight'] = weights;
+        }
+
         // Texture
         var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
         var texcoords = null;
-        var additional = {};
 
         var materialStr = primitiveJson.material;
         var materialJson = json.materials[materialStr];
