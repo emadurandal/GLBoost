@@ -1523,7 +1523,6 @@
     function Element() {
       babelHelpers.classCallCheck(this, Element);
 
-      this.children = []; // this is compatibility for tmlib. Actually this is NOT used.
       this._parent = null;
       this._translate = Vector3.zero();
       this._rotate = Vector3.zero();
@@ -2155,7 +2154,7 @@
             var hitChildOrChildren = this.searchElementsByType(type, children[i]);
             if (Array.isArray(hitChildOrChildren)) {
               Array.prototype.push.apply(results, hitChildOrChildren); // concat
-            } else {
+            } else if (hitChildOrChildren != null) {
                 results.push(hitChildOrChildren);
               }
           }
@@ -2799,7 +2798,7 @@
       }
     }, {
       key: '_getVertexShaderString',
-      value: function _getVertexShaderString(gl, functions, existCamera_f, lights) {
+      value: function _getVertexShaderString(gl, functions, existCamera_f, lights, otherData) {
         var _this = this;
 
         var f = functions;
@@ -2813,12 +2812,12 @@
 
         /// define variables
         // start defining variables. first, BasicShader, then, sub class Shader, ...
-        shaderText += this.VSDefine(in_, out_, f, lights);
+        shaderText += this.VSDefine(in_, out_, f, lights, otherData);
         // and define variables as mixin shaders
         this._classNamesOfVSDefine.forEach(function (className) {
           var method = _this['VSDefine_' + className];
           if (method) {
-            shaderText += method.bind(_this, in_, out_, f, lights)();
+            shaderText += method.bind(_this, in_, out_, f, lights, otherData)();
           }
         });
 
@@ -2827,12 +2826,12 @@
 
         /// Transform
         // start transforming. first, BasicShader, then, sub class Shader, ...
-        shaderText += this.VSTransform(existCamera_f, f, lights);
+        shaderText += this.VSTransform(existCamera_f, f, lights, otherData);
         // and transform as mixin Shaders
         this._classNamesOfVSTransform.forEach(function (className) {
           var method = _this['VSTransform_' + className];
           if (method) {
-            shaderText += method.bind(_this, existCamera_f, f, lights)();
+            shaderText += method.bind(_this, existCamera_f, f, lights, otherData)();
           }
         });
 
@@ -2843,7 +2842,7 @@
         this._classNamesOfVSShade.forEach(function (className) {
           var method = _this['VSShade_' + className];
           if (method) {
-            shaderText += method.bind(_this, existCamera_f, f)();
+            shaderText += method.bind(_this, existCamera_f, f, lights, otherData)();
           }
         });
 
@@ -2856,7 +2855,7 @@
       }
     }, {
       key: '_getFragmentShaderString',
-      value: function _getFragmentShaderString(gl, functions, lights, renderPass) {
+      value: function _getFragmentShaderString(gl, functions, lights, renderPass, otherData) {
         var _this2 = this;
 
         var f = functions;
@@ -2880,12 +2879,12 @@
 
         /// define variables
         // start defining variables. first, BasicShader, then, sub class Shader, ...
-        shaderText += this.FSDefine(in_, f, lights);
+        shaderText += this.FSDefine(in_, f, lights, otherData);
         // and define variables as mixin shaders
         this._classNamesOfFSDefine.forEach(function (className) {
           var method = _this2['FSDefine_' + className];
           if (method) {
-            shaderText += method.bind(_this2, in_, f, lights)();
+            shaderText += method.bind(_this2, in_, f, lights, otherData)();
           }
         });
 
@@ -2894,12 +2893,12 @@
 
         /// Shading
         // start shading. first, BasicShader, then, sub class Shader, ...
-        shaderText += this.FSShading(f, gl, lights);
+        shaderText += this.FSShading(f, gl, lights, otherData);
         // and shade as mixin Shaders
         this._classNamesOfFSShade.forEach(function (className) {
           var method = _this2['FSShade_' + className];
           if (method) {
-            shaderText += method.bind(_this2, f, gl, lights)();
+            shaderText += method.bind(_this2, f, gl, lights, otherData)();
           }
         });
 
@@ -3044,13 +3043,15 @@
     }, {
       key: 'getShaderProgram',
       value: function getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass) {
+        var otherData = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+
         var gl = this._glContext.gl;
         var canvas = this._glContext.canvas;
 
         lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
 
-        var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights);
-        var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass);
+        var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, otherData);
+        var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass, otherData);
 
         // lookup shaderHashTable
         var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
@@ -5115,10 +5116,6 @@
 
       _this._currentRenderPassIndex = 0;
 
-      if (_this.constructor === BlendShapeGeometry) {
-        BlendShapeGeometry._instanceCount = typeof BlendShapeGeometry._instanceCount === 'undefined' ? 0 : BlendShapeGeometry._instanceCount + 1;
-        _this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
-      }
       return _this;
     }
 
@@ -5186,11 +5183,6 @@
           gl.useProgram(this.glslProgramOfPasses[this._currentRenderPassIndex]);
           gl.uniform1f(this.glslProgramOfPasses[this._currentRenderPassIndex]['uniformFloatSampler_blendWeight_' + blendTarget], weight);
         }
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this._instanceName;
       }
     }, {
       key: 'blendWeight_1',
@@ -6900,11 +6892,31 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalMesh).call(this, geometry, material, jointName));
 
       _this._rootJointName = jointName;
+      _this._jointsHierarchy = null;
+      _this._inverseBindMatrices = [];
       return _this;
     }
 
+    babelHelpers.createClass(SkeletalMesh, [{
+      key: 'jointsHierarchy',
+      set: function set(jointsHierarchy) {
+        this._jointsHierarchy = jointsHierarchy;
+      }
+    }, {
+      key: 'rootJointName',
+      get: function get() {
+        return this._rootJointName;
+      }
+    }, {
+      key: 'inverseBindMatrices',
+      set: function set(inverseBindMatrices) {
+        this._inverseBindMatrices = inverseBindMatrices;
+      }
+    }]);
     return SkeletalMesh;
   }(Mesh);
+
+  GLBoost$1['SkeletalMesh'] = SkeletalMesh;
 
   var Joint = function (_Element) {
     babelHelpers.inherits(Joint, _Element);
@@ -6916,6 +6928,8 @@
 
     return Joint;
   }(Element);
+
+  GLBoost$1['Joint'] = Joint;
 
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
@@ -7026,6 +7040,13 @@
           group.addChild(element);
         }
 
+        // register joints hierarchy to skeletal mesh
+        var skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+        skeletalMeshes.forEach(function (skeletalMesh) {
+          var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+          skeletalMesh.jointsHierarchy = rootJoint;
+        });
+
         // Animation
         this._loadAnimation(group, arrayBuffer, json, canvas, scale);
 
@@ -7048,9 +7069,7 @@
           group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
         }
         if (nodeJson.matrix) {
-          var m = nodeJson.matrix;
-          var matrix = new Matrix44(m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], m[12], m[13], m[14], m[15]);
-          group.multiplyMatrix(matrix.transpose());
+          group.multiplyMatrix(new Matrix44(nodeJson.matrix));
         }
 
         if (nodeJson.meshes) {
@@ -7058,11 +7077,13 @@
           var meshStr = nodeJson.meshes[0];
           var meshJson = json.meshes[meshStr];
 
-          var rootJointName = null;
+          var rootJointStr = null;
+          var skinStr = null;
           if (nodeJson.skeletons) {
-            rootJointName = nodeJson.skeletons[0];
+            rootJointStr = nodeJson.skeletons[0];
+            skinStr = nodeJson.skin;
           }
-          var mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName);
+          var mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
           mesh.userFlavorName = meshStr;
           group.addChild(mesh);
         } else if (nodeJson.jointName) {
@@ -7081,18 +7102,24 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName) {
+      value: function _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
         var geometry = new Geometry(canvas);
         var mesh = null;
-        if (rootJointName) {
-          mesh = new SkeletalMesh(geometry, null, rootJointName);
+        var gl = GLContext.getInstance(canvas).gl;
+        if (rootJointStr) {
+          mesh = new SkeletalMesh(geometry, null, rootJointStr);
+          var skin = json.skins[skinStr];
+
+          mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix));
+
+          var inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
+          mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
         } else {
           mesh = new Mesh(geometry);
         }
         var material = new ClassicMaterial(canvas);
 
         var primitiveJson = meshJson.primitives[0];
-        var gl = GLContext.getInstance(canvas).gl;
 
         // Geometry
         var indicesAccessorStr = primitiveJson.indices;
@@ -7249,6 +7276,9 @@
           case 'VEC4':
             componentN = 4;
             break;
+          case 'MAT4':
+            componentN = 16;
+            break;
         }
 
         var bytesPerComponent = 0;
@@ -7288,6 +7318,13 @@
               } else {
                 vertexAttributeArray.push(new Vector4(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
               }
+              break;
+            case 'MAT4':
+              var matrixComponents = [];
+              for (var i = 0; i < 16; i++) {
+                matrixComponents[i] = dataView[dataViewMethod](pos + bytesPerComponent * i, littleEndian) * scale;
+              }
+              vertexAttributeArray.push(new Matrix44(matrixComponents));
               break;
           }
         }

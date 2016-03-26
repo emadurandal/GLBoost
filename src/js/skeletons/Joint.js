@@ -1,3 +1,4 @@
+import GLBoost from './../globals';
 import Element from '../Element';
 
 export default class Joint extends Element {
@@ -6,3 +7,5 @@ export default class Joint extends Element {
 
   }
 }
+
+GLBoost['Joint'] = Joint;

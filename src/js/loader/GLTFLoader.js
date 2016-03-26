@@ -117,6 +117,13 @@ export default class GLTFLoader {
       group.addChild(element);
     }
 
+    // register joints hierarchy to skeletal mesh
+    let skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+    skeletalMeshes.forEach((skeletalMesh)=>{
+      var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+      skeletalMesh.jointsHierarchy = rootJoint;
+    });
+
     // Animation
     this._loadAnimation(group, arrayBuffer, json, canvas, scale);
 
@@ -138,12 +145,7 @@ export default class GLTFLoader {
       group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
-      let m = nodeJson.matrix;
-      let matrix = new Matrix44(m[0], m[1], m[2], m[3],
-        m[4], m[5], m[6], m[7],
-        m[8], m[9], m[10], m[11],
-        m[12], m[13], m[14], m[15]);
-      group.multiplyMatrix(matrix.transpose());
+      group.multiplyMatrix(new Matrix44(nodeJson.matrix));
     }
 
     if (nodeJson.meshes) {
@@ -151,11 +153,13 @@ export default class GLTFLoader {
       let meshStr = nodeJson.meshes[0];
       let meshJson = json.meshes[meshStr];
 
-      let rootJointName = null;
+      let rootJointStr = null;
+      let skinStr = null;
       if (nodeJson.skeletons) {
-        rootJointName = nodeJson.skeletons[0];
+        rootJointStr = nodeJson.skeletons[0];
+        skinStr = nodeJson.skin;
       }
-      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName);
+      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
       mesh.userFlavorName = meshStr;
       group.addChild(mesh);
     } else if (nodeJson.jointName) {
@@ -173,18 +177,24 @@ export default class GLTFLoader {
     return group;
   }
 
-  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointName) {
+  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
     var geometry = new Geometry(canvas);
     var mesh = null;
-    if (rootJointName) {
-      mesh = new SkeletalMesh(geometry, null, rootJointName);
+    let gl = GLContext.getInstance(canvas).gl;
+    if (rootJointStr) {
+      mesh = new SkeletalMesh(geometry, null, rootJointStr);
+      let skin = json.skins[skinStr];
+
+      mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix));
+
+      let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
+      mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
     } else {
       mesh = new Mesh(geometry);
     }
     var material = new ClassicMaterial(canvas);
 
     let primitiveJson = meshJson.primitives[0];
-    let gl = GLContext.getInstance(canvas).gl;
 
     // Geometry
     let indicesAccessorStr = primitiveJson.indices;
@@ -337,6 +347,9 @@ export default class GLTFLoader {
       case 'VEC4':
         componentN = 4;
         break;
+      case 'MAT4':
+        componentN = 16;
+        break;
     }
 
     var bytesPerComponent = 0;
@@ -393,6 +406,13 @@ export default class GLTFLoader {
               dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
             ));
           }
+          break;
+        case 'MAT4':
+          let matrixComponents = [];
+          for (let i=0; i<16; i++) {
+            matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian)*scale;
+          }
+          vertexAttributeArray.push(new Matrix44(matrixComponents));
           break;
       }
 

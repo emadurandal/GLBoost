@@ -9,7 +9,6 @@ import AnimationUtil from './misc/AnimationUtil';
 
 export default class Element {
   constructor() {
-    this.children = []; // this is compatibility for tmlib. Actually this is NOT used.
     this._parent = null;
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();

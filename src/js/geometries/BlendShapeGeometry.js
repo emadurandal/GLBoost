@@ -19,10 +19,6 @@ export default class BlendShapeGeometry extends Geometry {
 
     this._currentRenderPassIndex = 0;
 
-    if (this.constructor === BlendShapeGeometry) {
-      BlendShapeGeometry._instanceCount = (typeof BlendShapeGeometry._instanceCount === 'undefined') ? 0 : (BlendShapeGeometry._instanceCount + 1);
-      this._instanceName = BlendShapeGeometry.name + '_' + BlendShapeGeometry._instanceCount;
-    }
   }
 
 
@@ -200,9 +196,6 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_10;
   }
 
-  toString() {
-    return this._instanceName;
-  }
 }
 
 GLBoost['BlendShapeGeometry'] = BlendShapeGeometry;

@@ -55,7 +55,7 @@ export default class Group extends Element {
         let hitChildOrChildren = this.searchElementsByType(type, children[i]);
         if (Array.isArray(hitChildOrChildren)) {
           Array.prototype.push.apply(results, hitChildOrChildren); // concat
-        } else {
+        } else if (hitChildOrChildren != null) {
           results.push(hitChildOrChildren);
         }
       }
