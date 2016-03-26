@@ -3,7 +3,7 @@ import Element from './Element';
 import Camera from './Camera';
 import GLContext from './GLContext';
 import AbstractLight from './lights/AbstractLight';
-import Mesh from './Mesh';
+import Mesh from './meshes/Mesh';
 import Group from './Group';
 import RenderPass from './RenderPass';
 

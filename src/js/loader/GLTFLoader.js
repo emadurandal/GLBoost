@@ -2,7 +2,7 @@ import GLBoost from '../globals'
 import GLContext from '../GLContext'
 import Geometry from '../Geometry'
 import ClassicMaterial from '../ClassicMaterial'
-import Mesh from '../Mesh'
+import Mesh from '../meshes/Mesh'
 import PhongShader from '../shaders/PhongShader'
 import Texture from '../textures/Texture'
 import Vector3 from '../math/Vector3'
@@ -104,7 +104,7 @@ export default class GLTFLoader {
     let sceneJson = json.scenes.defaultScene;
 
     let group = new Group();
-    group.userFlavorName = "TopGroup";
+    group.userFlavorName = 'TopGroup';
     let nodeStr = null;
     for (let i=0; i<sceneJson.nodes.length; i++) {
       nodeStr = sceneJson.nodes[i];

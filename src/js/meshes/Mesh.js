@@ -1,8 +1,8 @@
-import GLBoost from './globals';
-import Element from './Element';
-import Vector3 from './math/Vector3';
-import Vector4 from './math/Vector4';
-import Matrix44 from './math/Matrix44';
+import GLBoost from './../globals';
+import Element from './../Element';
+import Vector3 from './../math/Vector3';
+import Vector4 from './../math/Vector4';
+import Matrix44 from './../math/Matrix44';
 
 export default class Mesh extends Element {
   constructor(geometry, material) {
@@ -39,18 +39,6 @@ export default class Mesh extends Element {
   }
 
   set material(material) {
-    /*
-    if (typeof this._geometry === "undefined") {
-      console.assert(false, "set a geometry before a material.");
-    }
-    if (this._geometry._materials.length === 0 && material) {
-      this._geometry.materials = [material];
-      this._material = material;
-    } else {
-      this._material = null;
-    }
-    */
-
     this._material = material;
   }
 

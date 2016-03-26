@@ -2072,18 +2072,6 @@
     }, {
       key: 'material',
       set: function set(material) {
-        /*
-        if (typeof this._geometry === "undefined") {
-          console.assert(false, "set a geometry before a material.");
-        }
-        if (this._geometry._materials.length === 0 && material) {
-          this._geometry.materials = [material];
-          this._material = material;
-        } else {
-          this._material = null;
-        }
-        */
-
         this._material = material;
       },
       get: function get() {
@@ -6979,7 +6967,7 @@
         var sceneJson = json.scenes.defaultScene;
 
         var group = new Group();
-        group.userFlavorName = "TopGroup";
+        group.userFlavorName = 'TopGroup';
         var nodeStr = null;
         for (var i = 0; i < sceneJson.nodes.length; i++) {
           nodeStr = sceneJson.nodes[i];
