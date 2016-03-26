@@ -163,7 +163,7 @@ export default class Element {
         return this._matrix.clone();
       }
 
-      var rotationMatrix = null
+      var rotationMatrix = null;
       if (this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.quaternion.rotationMatrix;
       } else {
@@ -182,6 +182,21 @@ export default class Element {
 
     return this._matrix.clone();
   }
+
+  get transformMatrixOnlyRotate() {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === 'quaternion') {
+      rotationMatrix = this.quaternion.rotationMatrix;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this.rotate.x).
+      multiply(Matrix44.rotateY(this.rotate.y)).
+      multiply(Matrix44.rotateZ(this.rotate.z));
+    }
+
+    return rotationMatrix;
+  }
+
 
   get inverseTransformMatrix() {
     if (!this._calculatedInverseMatrix) {
@@ -257,7 +272,24 @@ export default class Element {
     return this._invMatrixAccumulatedAncestry;
   }
 
+  _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+    if (currentElem._parent === null) {
+      if (withMySelf) {
+        return currentElem.transformMatrixOnlyRotate;
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrixOnlyRotate;
+      }
+      return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+    }
+  }
+
   get rotateMatrixAccumulatedAncestry() {
+    /*
     var mat = this._multiplyMyAndParentTransformMatrices(this);
     var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
     var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
@@ -268,7 +300,8 @@ export default class Element {
       mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
       mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
       0, 0, 0, 1
-    );
+    );*/
+    return this._multiplyMyAndParentRotateMatrices(this, true);
   }
 
   get inverseTransformMatrixAccumulatedAncestry() {

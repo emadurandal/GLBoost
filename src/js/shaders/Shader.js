@@ -123,7 +123,7 @@ export default class Shader {
       splittedShaderLines[i] += '\n';
       for (let j=0; j<i; j++) {
         if (splittedShaderLines[j] === splittedShaderLines[i]) {
-          splittedShaderLines[i] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+          splittedShaderLines[j] = '// commented out because of duplicated: ' + splittedShaderLines[i];
         }
       }
     }
@@ -424,7 +424,7 @@ export default class Shader {
     } else {
       //gl.useProgram(programToReturn);
     }
-    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, canvas);
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
     return programToReturn;
   }

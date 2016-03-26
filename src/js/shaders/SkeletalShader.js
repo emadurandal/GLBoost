@@ -12,10 +12,16 @@ export default class SkeletalShaderSource {
   VSTransform_SkeletalShaderSource(existCamera_f, f, lights, extraData) {
     var shaderText = '';
     shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
+
+    shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+    shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+    shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+    shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+
     if (existCamera_f) {
-      shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText += '  gl_Position = modelViewProjectionMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
     } else {
-      shaderText += '  gl_Position = vec4(blendedPosition, 1.0);\n';
+      shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
     }
     return shaderText;
   }
@@ -35,11 +41,11 @@ export default class SkeletalShaderSource {
     // とりあえず単位行列で初期化
     let identityMatrices = [];
     for (let i=0; i<extraData.jointN; i++) {
-      identityMatrices.concat(
+      Array.prototype.push.apply(identityMatrices,
         [1, 0, 0, 0,
-         0, 1, 0, 0,
-         0, 0, 1, 0,
-         0, 0, 0, 1]
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1]
       );
     }
     gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));

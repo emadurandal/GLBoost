@@ -1,6 +1,8 @@
 import GLBoost from './../globals';
 import SkeletalShaderSource from './../shaders/SkeletalShader';
 import Geometry from './Geometry';
+import Joint from '../skeletons/Joint';
+import Matrix44 from '../math/Matrix44';
 
 export default class SkeletalGeometry extends Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -8,8 +10,45 @@ export default class SkeletalGeometry extends Geometry {
 
   }
 
-  draw(lights, camera, mesh, scene, renderPass_index) {
-    super.draw(lights, camera, mesh, scene, renderPass_index);
+  draw(lights, camera, skeletalMesh, scene, renderPass_index) {
+    var gl = this._glContext.gl;
+    if (this._materials.length > 0) {
+      var materials = this._materials;
+    } else if (skeletalMesh.material){
+      var materials = [skeletalMesh.material];
+    } else {
+      var materials = [];
+    }
+
+    var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+    var matrices = [];
+
+    for (let i=0; i<joints.length; i++) {
+      matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].rotateMatrixAccumulatedAncestry, skeletalMesh.inverseBindMatrices[i]));
+    }
+    var flatMatrices = [];
+    for (let i=0; i<matrices.length; i++) {
+      Array.prototype.push.apply(flatMatrices, matrices[i].flatten());
+    }
+    if (matrices.length < 4) {
+      let identityMatrices = [];
+      for (let i=0; i<(4 - matrices.length); i++) {
+        Array.prototype.push.apply(identityMatrices,
+          [1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1]
+        );
+      }
+      Array.prototype.push.apply(flatMatrices, identityMatrices);
+    }
+
+    for (let i=0; i<materials.length;i++) {
+      var glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+      gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+    }
+
+    super.draw(lights, camera, skeletalMesh, scene, renderPass_index);
   }
 
   prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh) {
@@ -41,14 +80,9 @@ export default class SkeletalGeometry extends Geometry {
       this._defaultMaterial.shader = new SkeletalShader(canvas);
     }
 
-    /*
-     let materials = this._materials;
-     if (materials) {
-     for (let i=0; i<materials.length;i++) {
-     materials[i].shader = new BlendShapeShader(this._canvas);
-     }
-     }
-     */
+
+    //skeletalMesh.jointsHierarchy.multiplyMatrix(skeletalMesh.jointsHierarchy.transformMatrix.multiply(Matrix44.invert(skeletalMesh.transformMatrix)));
+
 
     super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);
   }

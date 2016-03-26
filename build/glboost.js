@@ -1647,6 +1647,23 @@
         }
       }
     }, {
+      key: '_multiplyMyAndParentRotateMatrices',
+      value: function _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrixOnlyRotate;
+          } else {
+            return Matrix44.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrixOnlyRotate;
+          }
+          return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
       key: '_accumulateMyAndParentOpacity',
       value: function _accumulateMyAndParentOpacity(currentElem) {
         if (currentElem._parent === null) {
@@ -1814,6 +1831,19 @@
         return this._matrix.clone();
       }
     }, {
+      key: 'transformMatrixOnlyRotate',
+      get: function get() {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.quaternion.rotationMatrix;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
       key: 'inverseTransformMatrix',
       get: function get() {
         if (!this._calculatedInverseMatrix) {
@@ -1853,12 +1883,18 @@
     }, {
       key: 'rotateMatrixAccumulatedAncestry',
       get: function get() {
+        /*
         var mat = this._multiplyMyAndParentTransformMatrices(this);
-        var scaleX = Math.sqrt(mat.m00 * mat.m00 + mat.m10 * mat.m10 + mat.m20 * mat.m20);
-        var scaleY = Math.sqrt(mat.m01 * mat.m01 + mat.m11 * mat.m11 + mat.m21 * mat.m21);
-        var scaleZ = Math.sqrt(mat.m02 * mat.m02 + mat.m12 * mat.m12 + mat.m22 * mat.m22);
-
-        return new Matrix44(mat.m00 / scaleX, mat.m01 / scaleY, mat.m02 / scaleZ, 0, mat.m10 / scaleX, mat.m11 / scaleY, mat.m12 / scaleZ, 0, mat.m20 / scaleX, mat.m21 / scaleY, mat.m22 / scaleZ, 0, 0, 0, 0, 1);
+        var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
+        var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
+        var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
+         return new Matrix44(
+          mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
+          mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
+          mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
+          0, 0, 0, 1
+        );*/
+        return this._multiplyMyAndParentRotateMatrices(this, true);
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestry',
@@ -2786,7 +2822,7 @@
           splittedShaderLines[i] += '\n';
           for (var j = 0; j < i; j++) {
             if (splittedShaderLines[j] === splittedShaderLines[i]) {
-              splittedShaderLines[i] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+              splittedShaderLines[j] = '// commented out because of duplicated: ' + splittedShaderLines[i];
             }
           }
         }
@@ -3093,7 +3129,7 @@
         } else {
           //gl.useProgram(programToReturn);
         }
-        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, canvas);
+        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
         return programToReturn;
       }
@@ -6901,9 +6937,19 @@
     }
 
     babelHelpers.createClass(SkeletalMesh, [{
+      key: 'prepareForRender',
+      value: function prepareForRender(existCamera_f, lights, renderPasses) {
+        this.bakeTransformToGeometry();
+        this.multiplyMatrix(Matrix44.identity());
+        babelHelpers.get(Object.getPrototypeOf(SkeletalMesh.prototype), 'prepareForRender', this).call(this, existCamera_f, lights, renderPasses);
+      }
+    }, {
       key: 'jointsHierarchy',
       set: function set(jointsHierarchy) {
         this._jointsHierarchy = jointsHierarchy;
+      },
+      get: function get() {
+        return this._jointsHierarchy;
       }
     }, {
       key: 'rootJointName',
@@ -6914,7 +6960,10 @@
       key: 'inverseBindMatrices',
       set: function set(inverseBindMatrices) {
         this._inverseBindMatrices = inverseBindMatrices;
-        this._geometry.setExtraDataForShader('jointN', inverseBindMatrices.length);
+        this._geometry.setExtraDataForShader('jointN', inverseBindMatrices.length < 4 ? 4 : inverseBindMatrices.length);
+      },
+      get: function get() {
+        return this._inverseBindMatrices;
       }
     }]);
     return SkeletalMesh;
@@ -6941,10 +6990,16 @@
       value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, extraData) {
         var shaderText = '';
         shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
+
+        shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+        shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+        shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+        shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+
         if (existCamera_f) {
-          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  gl_Position = modelViewProjectionMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
         } else {
-          shaderText += '  gl_Position = vec4(blendedPosition, 1.0);\n';
+          shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
         }
         return shaderText;
       }
@@ -6965,7 +7020,7 @@
         // とりあえず単位行列で初期化
         var identityMatrices = [];
         for (var i = 0; i < extraData.jointN; i++) {
-          identityMatrices.concat([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+          Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
         }
         gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
 
@@ -6974,6 +7029,19 @@
     }]);
     return SkeletalShaderSource;
   }();
+
+  var Joint = function (_Element) {
+    babelHelpers.inherits(Joint, _Element);
+
+    function Joint() {
+      babelHelpers.classCallCheck(this, Joint);
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this));
+    }
+
+    return Joint;
+  }(Element);
+
+  GLBoost$1['Joint'] = Joint;
 
   var SkeletalGeometry = function (_Geometry) {
     babelHelpers.inherits(SkeletalGeometry, _Geometry);
@@ -6986,8 +7054,40 @@
 
     babelHelpers.createClass(SkeletalGeometry, [{
       key: 'draw',
-      value: function draw(lights, camera, mesh, scene, renderPass_index) {
-        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, mesh, scene, renderPass_index);
+      value: function draw(lights, camera, skeletalMesh, scene, renderPass_index) {
+        var gl = this._glContext.gl;
+        if (this._materials.length > 0) {
+          var materials = this._materials;
+        } else if (skeletalMesh.material) {
+          var materials = [skeletalMesh.material];
+        } else {
+          var materials = [];
+        }
+
+        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+        var matrices = [];
+
+        for (var i = 0; i < joints.length; i++) {
+          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].rotateMatrixAccumulatedAncestry, skeletalMesh.inverseBindMatrices[i]));
+        }
+        var flatMatrices = [];
+        for (var i = 0; i < matrices.length; i++) {
+          Array.prototype.push.apply(flatMatrices, matrices[i].flatten());
+        }
+        if (matrices.length < 4) {
+          var identityMatrices = [];
+          for (var i = 0; i < 4 - matrices.length; i++) {
+            Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+          }
+          Array.prototype.push.apply(flatMatrices, identityMatrices);
+        }
+
+        for (var i = 0; i < materials.length; i++) {
+          var glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+          gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+        }
+
+        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
       }
     }, {
       key: 'prepareForRender',
@@ -7028,14 +7128,7 @@
           this._defaultMaterial.shader = new SkeletalShader(canvas);
         }
 
-        /*
-         let materials = this._materials;
-         if (materials) {
-         for (let i=0; i<materials.length;i++) {
-         materials[i].shader = new BlendShapeShader(this._canvas);
-         }
-         }
-         */
+        //skeletalMesh.jointsHierarchy.multiplyMatrix(skeletalMesh.jointsHierarchy.transformMatrix.multiply(Matrix44.invert(skeletalMesh.transformMatrix)));
 
         babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);
       }
@@ -7044,19 +7137,6 @@
   }(Geometry);
 
   GLBoost$1['SkeletalGeometry'] = SkeletalGeometry;
-
-  var Joint = function (_Element) {
-    babelHelpers.inherits(Joint, _Element);
-
-    function Joint() {
-      babelHelpers.classCallCheck(this, Joint);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this));
-    }
-
-    return Joint;
-  }(Element);
-
-  GLBoost$1['Joint'] = Joint;
 
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
