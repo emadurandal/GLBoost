@@ -20,11 +20,64 @@ export default class SkeletalGeometry extends Geometry {
       var materials = [];
     }
 
+
+    var calcParentJointsMatricesRecursively = (joint)=> {
+      let children = joint.parent.parent._children;
+      let parentJoint = null;
+      for (let i=0; i<children.length; i++) {
+        if (children[i] instanceof Joint) {
+          parentJoint = children[i];
+        }
+      }
+
+      let results = [];
+      if (parentJoint) {
+        let result = calcParentJointsMatricesRecursively(parentJoint);
+        if (Array.isArray(result)) {
+          Array.prototype.push.apply(results, result);
+        }
+
+        results.push(parentJoint);
+
+        return results;
+      }
+
+      return null;
+    };
+
     var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
     var matrices = [];
 
     for (let i=0; i<joints.length; i++) {
-      matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].rotateMatrixAccumulatedAncestry, skeletalMesh.inverseBindMatrices[i]));
+      //matrices[i] = skeletalMesh.inverseBindMatrices[i];
+      let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+
+      /*
+      let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+      console.log(jointsHierarchy);
+      let tempMatrices = [];
+
+      if (jointsHierarchy) {
+        for (let j = 0; j < jointsHierarchy.length; j++) {
+          let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+          if (j > 0) {
+            tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+          } else {
+            tempMatrices[j] = thisLoopMatrix;
+          }
+        }
+        matrices[i] = tempMatrices[jointsHierarchy.length - 1];
+      } else {
+        matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+      }
+      */
+
+      if (i > 0) {
+        matrices[i] = Matrix44.multiply(matrices[i-1], thisLoopMatrix);
+      } else {
+        matrices[i] = thisLoopMatrix;
+      }
+
     }
     var flatMatrices = [];
     for (let i=0; i<matrices.length; i++) {
@@ -80,8 +133,12 @@ export default class SkeletalGeometry extends Geometry {
       this._defaultMaterial.shader = new SkeletalShader(canvas);
     }
 
-
-    //skeletalMesh.jointsHierarchy.multiplyMatrix(skeletalMesh.jointsHierarchy.transformMatrix.multiply(Matrix44.invert(skeletalMesh.transformMatrix)));
+    /*
+    let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+    for (let i=0; i<joints.length; i++) {
+      skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+    }
+    */
 
 
     super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);

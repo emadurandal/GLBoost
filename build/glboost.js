@@ -1066,6 +1066,11 @@
         return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
       }
     }, {
+      key: 'toString',
+      value: function toString() {
+        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' + this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
+      }
+    }, {
       key: 'm00',
       set: function set(val) {
         this.m[0] = val;
@@ -7064,19 +7069,61 @@
           var materials = [];
         }
 
+        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
+          var children = joint.parent.parent._children;
+          var parentJoint = null;
+          for (var i = 0; i < children.length; i++) {
+            if (children[i] instanceof Joint) {
+              parentJoint = children[i];
+            }
+          }
+
+          var results = [];
+          if (parentJoint) {
+            var result = calcParentJointsMatricesRecursively(parentJoint);
+            if (Array.isArray(result)) {
+              Array.prototype.push.apply(results, result);
+            }
+
+            results.push(parentJoint);
+
+            return results;
+          }
+
+          return null;
+        };
+
         var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
         var matrices = [];
 
         for (var i = 0; i < joints.length; i++) {
-          //let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
-          //let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
-          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
+          //matrices[i] = skeletalMesh.inverseBindMatrices[i];
+          var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+
           /*
+          let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+          console.log(jointsHierarchy);
+          let tempMatrices = [];
+           if (jointsHierarchy) {
+            for (let j = 0; j < jointsHierarchy.length; j++) {
+              let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+              if (j > 0) {
+                tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+              } else {
+                tempMatrices[j] = thisLoopMatrix;
+              }
+            }
+            matrices[i] = tempMatrices[jointsHierarchy.length - 1];
+          } else {
+            matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
+          }
+          */
+
           if (i > 0) {
-            matrices[i] = Matrix44.multiply(matrices[i-1], thisLoopMatrix);
+            matrices[i] = Matrix44.multiply(matrices[i - 1], thisLoopMatrix);
           } else {
             matrices[i] = thisLoopMatrix;
-          } */
+          }
         }
         var flatMatrices = [];
         for (var i = 0; i < matrices.length; i++) {
@@ -7136,7 +7183,12 @@
           this._defaultMaterial.shader = new SkeletalShader(canvas);
         }
 
-        //skeletalMesh.jointsHierarchy.multiplyMatrix(skeletalMesh.jointsHierarchy.transformMatrix.multiply(Matrix44.invert(skeletalMesh.transformMatrix)));
+        /*
+        let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+        for (let i=0; i<joints.length; i++) {
+          skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+        }
+        */
 
         babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);
       }
