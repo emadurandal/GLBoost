@@ -197,6 +197,20 @@ export default class Element {
     return rotationMatrix;
   }
 
+  get transformMatrixOnlyRotateOnInit() {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === 'quaternion') {
+      rotationMatrix = this._quaternion.rotationMatrix;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this._rotate.x).
+      multiply(Matrix44.rotateY(this._rotate.y)).
+      multiply(Matrix44.rotateZ(this._rotate.z));
+    }
+
+    return rotationMatrix;
+  }
+
 
   get inverseTransformMatrix() {
     if (!this._calculatedInverseMatrix) {

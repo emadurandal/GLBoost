@@ -1849,6 +1849,19 @@
         return rotationMatrix;
       }
     }, {
+      key: 'transformMatrixOnlyRotateOnInit',
+      get: function get() {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this._quaternion.rotationMatrix;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this._rotate.x).multiply(Matrix44.rotateY(this._rotate.y)).multiply(Matrix44.rotateZ(this._rotate.z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
       key: 'inverseTransformMatrix',
       get: function get() {
         if (!this._calculatedInverseMatrix) {
@@ -6976,6 +6989,19 @@
 
   GLBoost$1['SkeletalMesh'] = SkeletalMesh;
 
+  var Joint = function (_Element) {
+    babelHelpers.inherits(Joint, _Element);
+
+    function Joint() {
+      babelHelpers.classCallCheck(this, Joint);
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this));
+    }
+
+    return Joint;
+  }(Element);
+
+  GLBoost$1['Joint'] = Joint;
+
   var SkeletalShaderSource = function () {
     function SkeletalShaderSource() {
       babelHelpers.classCallCheck(this, SkeletalShaderSource);
@@ -7035,19 +7061,6 @@
     return SkeletalShaderSource;
   }();
 
-  var Joint = function (_Element) {
-    babelHelpers.inherits(Joint, _Element);
-
-    function Joint() {
-      babelHelpers.classCallCheck(this, Joint);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this));
-    }
-
-    return Joint;
-  }(Element);
-
-  GLBoost$1['Joint'] = Joint;
-
   var SkeletalGeometry = function (_Geometry) {
     babelHelpers.inherits(SkeletalGeometry, _Geometry);
 
@@ -7097,33 +7110,38 @@
         var matrices = [];
 
         for (var i = 0; i < joints.length; i++) {
-          //matrices[i] = skeletalMesh.inverseBindMatrices[i];
-          var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
 
-          /*
-          let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          console.log(jointsHierarchy);
-          let tempMatrices = [];
-           if (jointsHierarchy) {
-            for (let j = 0; j < jointsHierarchy.length; j++) {
-              let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
-              if (j > 0) {
-                tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-              } else {
-                tempMatrices[j] = thisLoopMatrix;
+          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+          if (jointsHierarchy == null) {
+            jointsHierarchy = [];
+          }
+          jointsHierarchy.push(joints[i]);
+          //console.log(jointsHierarchy);
+          var tempMatrices = [];
+
+          var mapTable = [];
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            for (var k = 0; k < joints.length; k++) {
+              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
+                mapTable[j] = k;
               }
             }
-            matrices[i] = tempMatrices[jointsHierarchy.length - 1];
-          } else {
-            matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrixOnlyRotate, skeletalMesh.inverseBindMatrices[i]));
           }
-          */
+          for (var j = 0; j < jointsHierarchy.length; j++) {
 
-          if (i > 0) {
-            matrices[i] = Matrix44.multiply(matrices[i - 1], thisLoopMatrix);
-          } else {
-            matrices[i] = thisLoopMatrix;
+            var thisLoopMatrix = null;
+
+            var pivotJoint = joints[mapTable[j]];
+            var rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, joints[mapTable[j]].inverceMatrix);
+            //let rotateMatrix = jointsHierarchy[j].parent.transformMatrixOnlyRotate;
+            thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[mapTable[j]]), Matrix44.multiply(rotateMatrix, skeletalMesh.inverseBindMatrices[mapTable[j]]));
+            if (j > 0) {
+              tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+            } else {
+              tempMatrices[j] = thisLoopMatrix;
+            }
           }
+          matrices[i] = tempMatrices[jointsHierarchy.length - 1];
         }
         var flatMatrices = [];
         for (var i = 0; i < matrices.length; i++) {
@@ -7183,12 +7201,12 @@
           this._defaultMaterial.shader = new SkeletalShader(canvas);
         }
 
-        /*
-        let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        for (let i=0; i<joints.length; i++) {
-          skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+        for (var i = 0; i < joints.length; i++) {
+          //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+          var matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
+          joints[i].inverceMatrix = Matrix44.invert(matrix);
         }
-        */
 
         babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);
       }
