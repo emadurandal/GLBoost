@@ -7497,44 +7497,47 @@
         for (var anim in json.animations) {
           animationJson = json.animations[anim];
           if (animationJson) {
-            var channelJson = animationJson.channels[0];
-            if (!channelJson) {
-              continue;
-            }
+            for (var i = 0; i < animationJson.channels.length; i++) {
+              //for (let i=0; i<1; i++) {
+              var channelJson = animationJson.channels[i];
+              if (!channelJson) {
+                continue;
+              }
 
-            var targetMeshStr = channelJson.target.id;
-            var targetPathStr = channelJson.target.path;
-            var samplerStr = channelJson.sampler;
-            var samplerJson = animationJson.samplers[samplerStr];
-            var animInputStr = samplerJson.input;
-            var animOutputStr = samplerJson.output;
-            var animInputAccessorStr = animationJson.parameters[animInputStr];
-            var animOutputAccessorStr = animationJson.parameters[animOutputStr];
+              var targetMeshStr = channelJson.target.id;
+              var targetPathStr = channelJson.target.path;
+              var samplerStr = channelJson.sampler;
+              var samplerJson = animationJson.samplers[samplerStr];
+              var animInputStr = samplerJson.input;
+              var animOutputStr = samplerJson.output;
+              var animInputAccessorStr = animationJson.parameters[animInputStr];
+              var animOutputAccessorStr = animationJson.parameters[animOutputStr];
 
-            var gl = GLContext.getInstance(canvas).gl;
-            var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
-            if (animOutputStr === 'translation') {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
-            } else if (animOutputStr === 'rotation') {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
-            } else {
-              var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
-            }
+              var gl = GLContext.getInstance(canvas).gl;
+              var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+              if (animOutputStr === 'translation') {
+                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+              } else if (animOutputStr === 'rotation') {
+                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+              } else {
+                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+              }
 
-            var animationAttributeName = '';
-            if (animOutputStr === 'translation') {
-              animationAttributeName = 'translate';
-            } else if (animOutputStr === 'rotation') {
-              animationAttributeName = 'quaternion';
-            } else {
-              animationAttributeName = animOutputStr;
-            }
+              var animationAttributeName = '';
+              if (animOutputStr === 'translation') {
+                animationAttributeName = 'translate';
+              } else if (animOutputStr === 'rotation') {
+                animationAttributeName = 'quaternion';
+              } else {
+                animationAttributeName = animOutputStr;
+              }
 
-            var hitElement = element.searchElement(targetMeshStr);
-            if (hitElement) {
-              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
-              hitElement.setActiveAnimationLine('time');
-              hitElement.currentCalcMode = 'quaternion';
+              var hitElement = element.searchElement(targetMeshStr);
+              if (hitElement) {
+                hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+                hitElement.setActiveAnimationLine('time');
+                hitElement.currentCalcMode = 'quaternion';
+              }
             }
           }
         }

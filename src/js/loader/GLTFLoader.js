@@ -287,44 +287,46 @@ export default class GLTFLoader {
     for (let anim in json.animations) {
       animationJson = json.animations[anim];
       if (animationJson) {
-        let channelJson = animationJson.channels[0];
-        if (!channelJson) {
-          continue;
-        }
+        for (let i=0; i<animationJson.channels.length; i++) {
+          let channelJson = animationJson.channels[i];
+          if (!channelJson) {
+            continue;
+          }
 
-        let targetMeshStr = channelJson.target.id;
-        let targetPathStr = channelJson.target.path;
-        let samplerStr = channelJson.sampler;
-        let samplerJson = animationJson.samplers[samplerStr];
-        let animInputStr = samplerJson.input;
-        var animOutputStr = samplerJson.output;
-        let animInputAccessorStr = animationJson.parameters[animInputStr];
-        let animOutputAccessorStr = animationJson.parameters[animOutputStr];
+          let targetMeshStr = channelJson.target.id;
+          let targetPathStr = channelJson.target.path;
+          let samplerStr = channelJson.sampler;
+          let samplerJson = animationJson.samplers[samplerStr];
+          let animInputStr = samplerJson.input;
+          var animOutputStr = samplerJson.output;
+          let animInputAccessorStr = animationJson.parameters[animInputStr];
+          let animOutputAccessorStr = animationJson.parameters[animOutputStr];
 
-        let gl = GLContext.getInstance(canvas).gl;
-        var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
-        if (animOutputStr === 'translation') {
-          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
-        } else if (animOutputStr === 'rotation') {
-          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
-        } else {
-          var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
-        }
+          let gl = GLContext.getInstance(canvas).gl;
+          var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+          if (animOutputStr === 'translation') {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+          } else if (animOutputStr === 'rotation') {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+          } else {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+          }
 
-        let animationAttributeName = '';
-        if (animOutputStr === 'translation') {
-          animationAttributeName = 'translate';
-        } else if (animOutputStr === 'rotation') {
-          animationAttributeName = 'quaternion';
-        } else {
-          animationAttributeName = animOutputStr;
-        }
+          let animationAttributeName = '';
+          if (animOutputStr === 'translation') {
+            animationAttributeName = 'translate';
+          } else if (animOutputStr === 'rotation') {
+            animationAttributeName = 'quaternion';
+          } else {
+            animationAttributeName = animOutputStr;
+          }
 
-        let hitElement = element.searchElement(targetMeshStr);
-        if (hitElement) {
-          hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
-          hitElement.setActiveAnimationLine('time');
-          hitElement.currentCalcMode = 'quaternion';
+          let hitElement = element.searchElement(targetMeshStr);
+          if (hitElement) {
+            hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+            hitElement.setActiveAnimationLine('time');
+            hitElement.currentCalcMode = 'quaternion';
+          }
         }
       }
     }
