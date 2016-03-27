@@ -4255,7 +4255,7 @@
           if (renderPass.clearColor) {
             var color = renderPass.clearColor;
             gl.clearColor(color[0], color[1], color[2], color[3]);
-            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           }
 
           meshes.forEach(function (mesh) {
@@ -7068,7 +7068,15 @@
         var matrices = [];
 
         for (var i = 0; i < joints.length; i++) {
-          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].rotateMatrixAccumulatedAncestry, skeletalMesh.inverseBindMatrices[i]));
+          //let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
+          //let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
+          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[i]), Matrix44.multiply(joints[i].parent.transformMatrix, skeletalMesh.inverseBindMatrices[i]));
+          /*
+          if (i > 0) {
+            matrices[i] = Matrix44.multiply(matrices[i-1], thisLoopMatrix);
+          } else {
+            matrices[i] = thisLoopMatrix;
+          } */
         }
         var flatMatrices = [];
         for (var i = 0; i < matrices.length; i++) {

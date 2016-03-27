@@ -70,7 +70,7 @@ export default class Renderer {
       if (renderPass.clearColor) {
         var color = renderPass.clearColor;
         gl.clearColor(color[0], color[1], color[2], color[3]);
-        gl.clear( gl.COLOR_BUFFER_BIT );
+        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       }
 
       meshes.forEach((mesh)=> {
