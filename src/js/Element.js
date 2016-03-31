@@ -15,7 +15,7 @@ export default class Element {
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._scale = new Vector3(1, 1, 1);
     this._matrix = Matrix44.identity();
-    this._matrixToMultiply = Matrix44.identity();
+    this._finalMatrix = Matrix44.identity();
     this._invMatrix = Matrix44.identity();
     this._dirtyAsElement = false;
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
@@ -48,7 +48,7 @@ export default class Element {
   }
 
   _getAnimatedTransformValue(value, animation, type) {
-    if (animation[type]) {
+    if (typeof animation !== 'undefined' && animation[type]) {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
     //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
@@ -149,18 +149,30 @@ export default class Element {
   }
 
   multiplyMatrix(mat) {
-    this._matrixToMultiply = mat;
+    this._matrix = mat;
     this._currentCalcMode = 'matrix';
     this._needUpdate();
+  }
+
+  getMatrixAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
+  }
+
+  get matrix() {
+    if (this._activeAnimationLineName) {
+      return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._matrix;
+    }
   }
 
   get transformMatrix() {
     if (this._dirtyAsElement) {
       var matrix = Matrix44.identity();
       if (this._currentCalcMode === 'matrix') {
-        this._matrix = matrix.multiply(this._matrixToMultiply);
+        this._finalMatrix = matrix.multiply(this._matrix);
         this._dirtyAsElement = false;
-        return this._matrix.clone();
+        return this._finalMatrix.clone();
       }
 
       var rotationMatrix = null;
@@ -172,15 +184,15 @@ export default class Element {
         multiply(Matrix44.rotateZ(this.rotate.z));
       }
 
-      this._matrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
-      this._matrix.m03 = this.translate.x;
-      this._matrix.m13 = this.translate.y;
-      this._matrix.m23 = this.translate.z;
+      this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+      this._finalMatrix.m03 = this.translate.x;
+      this._finalMatrix.m13 = this.translate.y;
+      this._finalMatrix.m23 = this.translate.z;
 
       this._dirtyAsElement = false;
     }
 
-    return this._matrix.clone();
+    return this._finalMatrix.clone();
   }
 
   get transformMatrixOnlyRotate() {
@@ -188,6 +200,14 @@ export default class Element {
     var rotationMatrix = null;
     if (this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.quaternion.rotationMatrix;
+    } else if (this._currentCalcMode === 'matrix') {
+      rotationMatrix = this.matrix;
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
     } else {
       rotationMatrix = Matrix44.rotateX(this.rotate.x).
       multiply(Matrix44.rotateY(this.rotate.y)).
@@ -201,11 +221,19 @@ export default class Element {
 
     var rotationMatrix = null;
     if (this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this._quaternion.rotationMatrix;
+      rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
+    } else if (this._currentCalcMode === 'matrix') {
+      rotationMatrix = this.getMatrixAt('time', 0);
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
     } else {
-      rotationMatrix = Matrix44.rotateX(this._rotate.x).
-      multiply(Matrix44.rotateY(this._rotate.y)).
-      multiply(Matrix44.rotateZ(this._rotate.z));
+      rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).
+      multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).
+      multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
     }
 
     return rotationMatrix;
