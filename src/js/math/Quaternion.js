@@ -29,7 +29,7 @@ export default class Quaternion {
   }
 
   static qlerp(lhq, rhq, ratio) {
-    /*
+
     var q = new Quaternion(0, 0, 0, 1);
     var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
     var ss = 1.0 - qr * qr;
@@ -67,12 +67,6 @@ export default class Quaternion {
 
       return q;
     }
-    */
-    var a = quat.fromValues(lhq.x, lhq.y, lhq.z, lhq.w);
-    var b = quat.fromValues(rhq.x, rhq.y, rhq.z, rhq.w);
-    var out = quat.create();
-    quat.slerp(out, a, b, ratio);
-    return new Quaternion(out[0], out[1], out[2], out[3]);
   }
 
   get rotationMatrix() {

@@ -1419,44 +1419,44 @@
     }, {
       key: 'qlerp',
       value: function qlerp(lhq, rhq, ratio) {
-        /*
+
         var q = new Quaternion(0, 0, 0, 1);
         var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
         var ss = 1.0 - qr * qr;
-         if (ss === 0.0) {
+
+        if (ss === 0.0) {
           q.w = lhq.w;
           q.x = lhq.x;
           q.y = lhq.y;
           q.z = lhq.z;
-           return q;
+
+          return q;
         } else {
-           if (qr > 1) {
+
+          if (qr > 1) {
             qr = 0.999;
           } else if (qr < -1) {
             qr = -0.999;
           }
-           let ph = Math.acos(qr);
-          let s2;
-          if(qr < 0.0 && ph > Math.PI / 2.0){
-            qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+
+          var ph = Math.acos(qr);
+          var s2 = undefined;
+          if (qr < 0.0 && ph > Math.PI / 2.0) {
+            qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
             ph = Math.acos(qr);
             s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
           } else {
             s2 = Math.sin(ph * ratio) / Math.sin(ph);
           }
-          let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
-           q.x = lhq.x * s1 + rhq.x * s2;
+          var s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+          q.x = lhq.x * s1 + rhq.x * s2;
           q.y = lhq.y * s1 + rhq.y * s2;
           q.z = lhq.z * s1 + rhq.z * s2;
           q.w = lhq.w * s1 + rhq.w * s2;
-           return q;
+
+          return q;
         }
-        */
-        var a = quat.fromValues(lhq.x, lhq.y, lhq.z, lhq.w);
-        var b = quat.fromValues(rhq.x, rhq.y, rhq.z, rhq.w);
-        var out = quat.create();
-        quat.slerp(out, a, b, ratio);
-        return new Quaternion(out[0], out[1], out[2], out[3]);
       }
     }, {
       key: 'axisAngle',
