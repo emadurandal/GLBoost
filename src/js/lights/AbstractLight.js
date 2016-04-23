@@ -2,6 +2,10 @@ import GLBoost from './../globals'
 import GLContext from './../GLContext'
 import Element from './../Element'
 
+/**
+ * [en] This is a abstract class for all lights classes. Don't use this class directly.<br>
+ * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+ */
 export default class AbstractLight extends Element {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);

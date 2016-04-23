@@ -12,14 +12,28 @@ import PhongShader from './../shaders/PhongShader'
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
+/**
+ * [en] This is a loader class of Obj file format.<br>
+ * [ja] Objファイルを読み込むためのローダークラスです。
+ */
 export default class ObjLoader {
 
+  /**
+   * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
+   * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
+   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+   */
   constructor(enforcer) {
       if (enforcer !== singletonEnforcer) {
           throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
   }
 
+  /**
+   * [en] The static method to get singleton instance of this class.<br>
+   * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
+   * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoaderクラスのシングルトンインスタンス
+   */
   static getInstance() {
       if (!this[singleton]) {
           this[singleton] = new ObjLoader(singletonEnforcer);
@@ -27,6 +41,15 @@ export default class ObjLoader {
       return this[singleton];
   }
 
+  /**
+   * [en] the method to load Obj file.<br>
+   * [ja] Obj fileをロードするためのメソッド。
+   * @param {string} url [en] url of glTF file [ja] Objファイルのurl
+   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
+   * @param {string} mtlString [en] string of mtl file (optional) [ja] mtlファイルの内容の文字列情報（オプショナル。mtlファイルの読み込みが何らかの事情でできない場合に使います）
+   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+   * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+   */
   loadObj(url, defaultShader = null, mtlString = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
