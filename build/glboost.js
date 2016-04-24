@@ -2738,6 +2738,11 @@
 
   GLExtentionsManager._instances = new Object();
 
+  /**
+   * [en] This is a abstract class for all lights classes. Don't use this class directly.<br>
+   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
   var AbstractLight = function (_Element) {
     babelHelpers.inherits(AbstractLight, _Element);
 
@@ -2759,8 +2764,22 @@
     return AbstractLight;
   }(Element);
 
+  /**
+   * [en] This is a Directional Light class.<br>
+   * [ja] 平行光源クラスです。
+   */
+
   var DirectionalLight = function (_AbstractLight) {
     babelHelpers.inherits(DirectionalLight, _AbstractLight);
+
+
+    /**
+     * [en] The constructor of DirectionalLight class. <br>
+     * [ja] DirectionalLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
 
     function DirectionalLight(intensity, direction) {
       var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
@@ -2797,8 +2816,21 @@
 
   GLBoost$1["DirectionalLight"] = DirectionalLight;
 
+  /**
+   * [en] This is a Point Light class.<br>
+   * [ja] 点光源クラスです。
+   */
+
   var PointLight = function (_AbstractLight) {
     babelHelpers.inherits(PointLight, _AbstractLight);
+
+
+    /**
+     * [en] The constructor of PointLight class. <br>
+     * [ja] PointLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
 
     function PointLight(intensity) {
       var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
@@ -5803,7 +5835,19 @@
   var singleton = Symbol();
   var singletonEnforcer = Symbol();
 
+  /**
+   * [en] This is a loader class of Obj file format.<br>
+   * [ja] Objファイルを読み込むためのローダークラスです。
+   */
+
   var ObjLoader = function () {
+
+    /**
+     * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
+     * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
+     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     */
+
     function ObjLoader(enforcer) {
       babelHelpers.classCallCheck(this, ObjLoader);
 
@@ -5812,8 +5856,26 @@
       }
     }
 
+    /**
+     * [en] The static method to get singleton instance of this class.<br>
+     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
+     * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoaderクラスのシングルトンインスタンス
+     */
+
+
     babelHelpers.createClass(ObjLoader, [{
       key: 'loadObj',
+
+
+      /**
+       * [en] the method to load Obj file.<br>
+       * [ja] Obj fileをロードするためのメソッド。
+       * @param {string} url [en] url of glTF file [ja] Objファイルのurl
+       * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
+       * @param {string} mtlString [en] string of mtl file (optional) [ja] mtlファイルの内容の文字列情報（オプショナル。mtlファイルの読み込みが何らかの事情でできない場合に使います）
+       * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+       * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+       */
       value: function loadObj(url) {
         var defaultShader = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
@@ -7317,7 +7379,19 @@
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
+  /**
+   * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
+   * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
+   */
+
   var GLTFLoader = function () {
+
+    /**
+     * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
+     * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
+     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     */
+
     function GLTFLoader(enforcer) {
       babelHelpers.classCallCheck(this, GLTFLoader);
 
@@ -7326,8 +7400,26 @@
       }
     }
 
+    /**
+     * [en] The static method to get singleton instance of this class.<br>
+     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
+     * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoaderクラスのシングルトンインスタンス
+     */
+
+
     babelHelpers.createClass(GLTFLoader, [{
       key: 'loadGLTF',
+
+
+      /**
+       * [en] the method to load glTF file.<br>
+       * [ja] glTF fileをロードするためのメソッド。
+       * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
+       * @param {number} scale [en] scale of size of loaded models [ja] 読み込んだモデルのサイズのスケール
+       * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
+       * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+       * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+       */
       value: function loadGLTF(url) {
         var scale = arguments.length <= 1 || arguments[1] === undefined ? 1.0 : arguments[1];
 
@@ -7768,8 +7860,10 @@
           this.renderer = new GLBoost$1.Renderer({ canvas: this.canvas, clearColor: { red: 1, green: 1, blue: 1, alpha: 1 } });
           this.scene = new GLBoost$1.Scene();
           this.on('enterframe', function () {
-            this.renderer.clearCanvas();
-            this.renderer.draw(this.scene);
+            if (this.scene) {
+              this.renderer.clearCanvas();
+              this.renderer.draw(this.scene);
+            }
           });
           this.domElement = this.canvas;
         }

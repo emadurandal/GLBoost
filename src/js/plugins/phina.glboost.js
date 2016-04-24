@@ -38,8 +38,10 @@ phina.namespace(function() {
       this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:1, green:1, blue:1, alpha:1}});
       this.scene = new GLBoost.Scene();
       this.on('enterframe', function() {
-        this.renderer.clearCanvas();
-        this.renderer.draw(this.scene);
+        if (this.scene) {
+          this.renderer.clearCanvas();
+          this.renderer.draw(this.scene);
+        }
       });
       this.domElement = this.canvas;
 
