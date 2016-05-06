@@ -64,7 +64,7 @@
         var mesh = new GLBoost.Mesh(geometry, null);
         layer.scene.add( mesh );
 
-        var camera = new GLBoost.Camera({
+        this.camera = new GLBoost.Camera({
           eye: new GLBoost.Vector3(0.0, 0, 10.0),
           center: new GLBoost.Vector3(0.0, 0.0, 0.0),
           up: new GLBoost.Vector3(0.0, 1.0, 0.0)
@@ -74,7 +74,7 @@
           zNear: 0.1,
           zFar: 1000.0
         });
-        layer.scene.add( camera );
+        layer.scene.add( this.camera );
 
         layer.scene.prepareForRender();
 
@@ -85,6 +85,12 @@
         label.strokeWidth = 4;
         label.x = this.gridX.center();
         label.y = this.gridY.center();
+      },
+
+      update: function() {
+        var rotateMatrix = GLBoost.Matrix33.rotateY(-5.0);
+        var rotatedVector = rotateMatrix.multiplyVector(this.camera.eye);
+        this.camera.eye = rotatedVector;
       }
     });
 
