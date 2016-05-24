@@ -2514,7 +2514,20 @@
 
   GLBoost$1['RenderPass'] = RenderPass;
 
+  /**
+   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
+   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
   var AbstractTexture = function () {
+
+    /**
+     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
+     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     *
+     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+
     function AbstractTexture() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
       babelHelpers.classCallCheck(this, AbstractTexture);
@@ -2527,8 +2540,22 @@
       this._name = '';
     }
 
+    /**
+     * [en] get the WebGL texture resource within this class. <br />
+     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     *
+     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     */
+
+
     babelHelpers.createClass(AbstractTexture, [{
       key: 'setUp',
+
+
+      /**
+       * [en] bind the texture. <br />
+       * [ja] テクスチャをバインドします。
+       */
       value: function setUp() {
         var gl = this._glContext.gl;
         if (this._texture === null) {
@@ -2538,6 +2565,12 @@
 
         return true;
       }
+
+      /**
+       * [en] unbind the texture. <br />
+       * [ja] テクスチャをバインド解除します。
+       */
+
     }, {
       key: 'tearDown',
       value: function tearDown() {
@@ -2545,8 +2578,17 @@
         gl.bindTexture(gl.TEXTURE_2D, null);
       }
     }, {
-      key: 'isPowerOfTwo',
-      value: function isPowerOfTwo(x) {
+      key: '_isPowerOfTwo',
+
+
+      /**
+       * [en] check whether or not this texture size is power of two. <br />
+       * [ja] テクスチャサイズが２の累乗かどうかを返します
+       *
+       * @param {number} x [en] texture size. [ja] テクスチャサイズ
+       * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+       */
+      value: function _isPowerOfTwo(x) {
         return (x & x - 1) == 0;
       }
     }, {
@@ -2740,7 +2782,7 @@
   GLExtentionsManager._instances = new Object();
 
   /**
-   * [en] This is a abstract class for all lights classes. Don't use this class directly.<br>
+   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
    * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
    */
 
@@ -5048,7 +5090,7 @@
           gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParameter('flipY'));
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
 
-          if (_this2.isPowerOfTwo(_this2._width) && _this2.isPowerOfTwo(_this2._height)) {
+          if (_this2._isPowerOfTwo(_this2._width) && _this2._isPowerOfTwo(_this2._height)) {
             if (glem.extTFA) {
               gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
             }
@@ -5080,7 +5122,7 @@
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
         //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-        if (this.isPowerOfTwo(this._width) && this.isPowerOfTwo(this._height)) {
+        if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {
           if (glem.extTFA) {
             gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
           }

@@ -51,7 +51,7 @@ export default class Texture extends AbstractTexture {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParameter('flipY'));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._img);
 
-      if (this.isPowerOfTwo(this._width) && this.isPowerOfTwo(this._height)) {
+      if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {
         if (glem.extTFA) {
           gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
@@ -82,7 +82,7 @@ export default class Texture extends AbstractTexture {
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    if (this.isPowerOfTwo(this._width) && this.isPowerOfTwo(this._height)) {
+    if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {
       if (glem.extTFA) {
         gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
       }
