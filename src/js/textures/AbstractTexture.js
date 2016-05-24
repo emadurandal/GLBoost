@@ -26,6 +26,7 @@ export default class AbstractTexture {
   }
 
   tearDown() {
+    var gl = this._glContext.gl;
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
