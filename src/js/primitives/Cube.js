@@ -1,12 +1,17 @@
-import GLBoost from './../globals'
-import Geometry from './../geometries/Geometry'
-import Vector4 from './../math/Vector4'
-import Vector3 from './../math/Vector3'
-import Vector2 from './../math/Vector2'
+import GLBoost from './../globals';
+import Geometry from './../geometries/Geometry';
+import Vector4 from './../math/Vector4';
+import Vector3 from './../math/Vector3';
+import Vector2 from './../math/Vector2';
+import MathUtil from '../math/MathUtil';
 
 export default class Cube extends Geometry {
   constructor(widthVector, vertexColor, canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
+
+    // if array, convert to vector[2/3/4]
+    widthVector = MathUtil.arrayToVector(widthVector);
+    vertexColor = MathUtil.arrayToVector(vertexColor);
 
     this._setupVertexData(widthVector.divide(2.0), vertexColor);
   }

@@ -119,6 +119,7 @@ export default class Geometry {
       this._vertices.position.forEach((elem, index) => {
         allVertexAttribs.forEach((attribName)=> {
           var element = this._vertices[attribName][index];
+          // if array, convert to vector[2/3/4]
           this._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
           vertexData[idx++] = element.x;

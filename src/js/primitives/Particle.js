@@ -5,6 +5,7 @@ import Vector3 from './../math/Vector3'
 import Vector2 from './../math/Vector2'
 import ArrayUtil from '.././misc/ArrayUtil'
 import ParticleShaderSource from '../shaders/ParticleShader'
+import MathUtil from '../math/MathUtil';
 
 /**
  * This Particle class handles particles expressions.
@@ -16,10 +17,10 @@ export default class Particle extends Geometry {
   /**
    * This is Particle class's constructor
    *
-   * @param {Array} centerPointData position array and the other data
+   * @param {Object} centerPointData [en] a JSON object consisted of position (by the particle) array and the other data (by the particle) array.
    * @param {Number} particleWidth Width of each particle
    * @param {Number} particleHeight Height of each particle
-   * @param {Object} JSON which has other vertex attribute arrays you want
+   * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
    * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
    */
   constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -48,6 +49,11 @@ export default class Particle extends Geometry {
 
     this.positions = [];
     let positions = this.positions;
+
+    // if array, convert to vector[2/3/4]
+    for (let i=0; i<positionArray.length; i++) {
+      positionArray[i] = MathUtil.arrayToVector(positionArray[i]);
+    }
 
     for (let i=0; i<positionArray.length; i++) {
       positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
@@ -120,7 +126,7 @@ export default class Particle extends Geometry {
     return {
       vertexAttributes: completeAttributes,
       indexArray: [indices]
-    }
+    };
   }
 
   _updateVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
@@ -203,7 +209,7 @@ export default class Particle extends Geometry {
 
   updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
     //var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
-const result = this._updateVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
+    const result = this._updateVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
     super.updateVerticesData(result.vertexAttributes);
   }
 

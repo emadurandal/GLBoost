@@ -36,7 +36,10 @@
         }).addChildTo(this);
 
         var shader = new GLBoost.PhongShader();
-        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1,1));
+        var geometry = new GLBoost.Cube(
+            [20, 20, 20], [1, 1, 1, 1] // GLBoost can accept arrays as vector values other than instances of vector class.
+            //new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1, 1) // of course you can use vector class.
+        );
 
         for ( var i = 0; i < 2000; i ++ ) {
           var material = new GLBoost.ClassicMaterial();

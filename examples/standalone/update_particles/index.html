@@ -60,7 +60,10 @@ scene.add( directionalLight );
 var wide = 10;
 var particlesPosition = [];
 for (var i=0; i<100; i++) {
-  particlesPosition.push(new GLBoost.Vector3((Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide));
+  particlesPosition.push(
+      [(Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide] // GLBoost can accept arrays as vector values other than instances of vector class.
+  //    new GLBoost.Vector3((Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide)   // of course you can use vector class.
+  );
 }
 
 var particleGeometry = new GLBoost.Particle(
@@ -87,6 +90,7 @@ var render = function(){
   camera.eye = rotatedVector;
 
   for (var i=0; i<100; i++) {
+    // You have to access this element using .y property, because GLBoost converted the above-specified arrays to instances of vector class.
     particlesPosition[i].y -= 0.1;
     if (particlesPosition[i].y < -1.0) {
       particlesPosition[i].y = 5.0;

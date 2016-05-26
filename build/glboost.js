@@ -3895,6 +3895,7 @@
             _this2._vertices.position.forEach(function (elem, index) {
               allVertexAttribs.forEach(function (attribName) {
                 var element = _this2._vertices[attribName][index];
+                // if array, convert to vector[2/3/4]
                 _this2._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
                 vertexData[idx++] = element.x;
@@ -6612,7 +6613,13 @@
       var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
       babelHelpers.classCallCheck(this, Cube);
 
+
+      // if array, convert to vector[2/3/4]
+
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Cube).call(this, canvas));
+
+      widthVector = MathUtil.arrayToVector(widthVector);
+      vertexColor = MathUtil.arrayToVector(vertexColor);
 
       _this._setupVertexData(widthVector.divide(2.0), vertexColor);
       return _this;
@@ -6815,10 +6822,10 @@
     /**
      * This is Particle class's constructor
      *
-     * @param {Array} centerPointData position array and the other data
+     * @param {Object} centerPointData [en] a JSON object consisted of position (by the particle) array and the other data (by the particle) array.
      * @param {Number} particleWidth Width of each particle
      * @param {Number} particleHeight Height of each particle
-     * @param {Object} JSON which has other vertex attribute arrays you want
+     * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
      * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
 
@@ -6854,6 +6861,11 @@
 
         this.positions = [];
         var positions = this.positions;
+
+        // if array, convert to vector[2/3/4]
+        for (var i = 0; i < positionArray.length; i++) {
+          positionArray[i] = MathUtil.arrayToVector(positionArray[i]);
+        }
 
         for (var i = 0; i < positionArray.length; i++) {
           positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
