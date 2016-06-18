@@ -425,9 +425,9 @@ export default class Geometry {
       gl.uniform1f(glslProgram.opacity, opacity);
 
       if (camera) {
-        var viewMatrix = camera.lookAtRHMatrix();
-        var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
+        let viewMatrix = camera.lookAtRHMatrix();
+        let projectionMatrix = camera.perspectiveRHMatrix();
+        let mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
         gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
 
       }
