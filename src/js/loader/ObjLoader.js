@@ -1,13 +1,14 @@
-import GLBoost from './../globals'
-import Vector3 from './../math/Vector3'
-import Vector2 from './../math/Vector2'
-import ClassicMaterial from './../ClassicMaterial'
-import Texture from './../textures/Texture'
-import Geometry from './../geometries/Geometry'
-import Mesh from './../meshes/Mesh'
-import LambertShader from './../shaders/LambertShader'
-import HalfLambertShader from './../shaders/HalfLambertShader'
-import PhongShader from './../shaders/PhongShader'
+import GLBoost from './../globals';
+import Vector3 from './../math/Vector3';
+import Vector2 from './../math/Vector2';
+import ClassicMaterial from './../ClassicMaterial';
+import Texture from './../textures/Texture';
+import Geometry from './../geometries/Geometry';
+import Mesh from './../meshes/Mesh';
+import LambertShader from './../shaders/LambertShader';
+import HalfLambertShader from './../shaders/HalfLambertShader';
+import PhongShader from './../shaders/PhongShader';
+import Hash from '../misc/Hash';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -278,15 +279,14 @@ export default class ObjLoader {
         }
       }
 
-      var positions = new Array();//new Array( fCount );
-      var texcoords = new Array();//new Array( fCount );
-      var normals = new Array();//new Array( fCount );
+      var positions = new Array();
+      var texcoords = new Array();
+      var normals = new Array();
       var indices = [];
 
       var boFlag = false;
 
       var FaceN = fCount;
-      var iFaceBufferArray = new Array();//new Array(FaceN*3);
       fCount = 0;
       var partFCount = 0;
 
@@ -294,8 +294,13 @@ export default class ObjLoader {
 
       for(let i=0; i<materials.length; i++) {
         partFCount = 0;
-        iFaceBufferArray.length = 0;
+        let matIndices = new Array();
+        let tmpIndices = new Array();
+        let tmpPositions = new Array();
+        let tmpTexcoords = new Array();
+        let tmpNormals = new Array();
 
+        let _i = 0;
         for (let j=0; (j<objTextRows.length) && (fCount < FaceN); j++) {
           let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
@@ -320,34 +325,49 @@ export default class ObjLoader {
               isQuad = false;
             }
 
-            if(materials[i].diffuseTexture) {
 
+
+
+            if(materials[i].diffuseTexture) {
               if (isQuad) {
-                this._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                this._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               } else {
-                this._addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                this._addTriangleDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               }
             } else {
               if (isQuad) {
-                this._addQuadDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                this._addQuadDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               } else {
-                this._addTriangleDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                this._addTriangleDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               }
             }
 
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3, matIndices, tmpIndices, _i);
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+1, matIndices, tmpIndices, _i);
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+2, matIndices, tmpIndices, _i);
+
+            /*
             iFaceBufferArray[partFCount*3]=fCount*3;
             iFaceBufferArray[partFCount*3+1]=fCount*3+1;
             iFaceBufferArray[partFCount*3+2]=fCount*3+2;
+            */
             if (isQuad) {
+              /*
               iFaceBufferArray[partFCount*3+3]=fCount*3+3;
               iFaceBufferArray[partFCount*3+4]=fCount*3+4;
               iFaceBufferArray[partFCount*3+5]=fCount*3+5;
+              */
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+3, matIndices, tmpIndices, _i);
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+4, matIndices, tmpIndices, _i);
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+5, matIndices, tmpIndices, _i);
+
               partFCount += 2;
               fCount += 2;
             } else {
               partFCount++;
               fCount++;
             }
+
           }
         }
 
@@ -356,9 +376,11 @@ export default class ObjLoader {
           continue;
         }
 
-        materials[i].setVertexN(geometry, partFCount*3);
+//        materials[i].setVertexN(geometry, partFCount*3);
+        materials[i].setVertexN(geometry, matIndices.length);
 
-        indices[i] = iFaceBufferArray.concat();
+        //indices[i] = iFaceBufferArray.concat();
+        indices[i] = matIndices.concat();
 
       }
 
@@ -375,6 +397,25 @@ export default class ObjLoader {
       console.error(error);
     });
 
+  }
+
+  _reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, vCount, matIndices, tmpIndices, _i) {
+    var str = '' + tmpPositions[vCount].x + ',' + tmpPositions[vCount].y + ',' + tmpPositions[vCount].z +
+      ',' + tmpNormals[vCount].x + ',' + tmpNormals[vCount].y + ',' + tmpNormals[vCount].z +
+      ',' + tmpTexcoords[vCount].x + ',' + tmpTexcoords[vCount].y;
+
+    var hashCode = Hash.toCRC32(str);
+    if (typeof tmpIndices[hashCode] === 'undefined') {
+      tmpIndices[hashCode] = _i;
+      _i++;
+      positions.push(tmpPositions[vCount]);
+      normals.push(tmpNormals[vCount]);
+      texcoords.push(tmpTexcoords[vCount]);
+    }
+
+    matIndices.push(tmpIndices[hashCode]);
+
+    return _i;
   }
 
   _addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
