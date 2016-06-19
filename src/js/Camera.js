@@ -33,6 +33,11 @@ export default class Camera extends Element {
     return this._updateCountAsCameraView;
   }
 
+  get latestViewStateInfoString() {
+    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
+  }
+
   _needUpdateProjection() {
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection++;

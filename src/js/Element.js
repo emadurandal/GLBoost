@@ -25,6 +25,7 @@ export default class Element {
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
     this._animationLine = {};
     this._userFlavorName = '';
+    this._transparentByUser = false;
     this.opacity = 1.0;
 
     this._activeAnimationLineName = null;
@@ -368,6 +369,14 @@ export default class Element {
 
   get opacity() {
     return this._opacity;
+  }
+
+  set transparent(flg) {
+    this._transparentByUser = flg;
+  }
+
+  isTransparent() {
+    return (this._opacity < 1.0 || this._transparentByUser) ? true : false;
   }
 
   set dirty(flg) {

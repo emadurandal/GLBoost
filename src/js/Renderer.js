@@ -58,8 +58,6 @@ export default class Renderer {
 
     scene.renderPasses.forEach((renderPass, index)=>{
 
-      var meshes = renderPass.meshes;
-
       if (renderPass.fboOfRenderTargetTextures) {
         gl.bindTexture(gl.TEXTURE_2D, null);
         Geometry.clearMaterialCache();
@@ -73,7 +71,18 @@ export default class Renderer {
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       }
 
-      meshes.forEach((mesh)=> {
+      // draw opacity meshes.
+      var opacityMeshes = renderPass.opacityMeshes;
+      opacityMeshes.forEach((mesh)=> {
+        mesh.draw(lights, camera, scene, index);
+      });
+
+      if (camera) {
+        renderPass.sortTransparentMeshes(camera);
+      }
+      // draw transparent meshes.
+      var transparentMeshes = renderPass.transparentMeshes;
+      transparentMeshes.forEach((mesh)=> {
         mesh.draw(lights, camera, scene, index);
       });
 

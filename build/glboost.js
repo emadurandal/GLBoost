@@ -149,258 +149,6 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector3 = function () {
-    function Vector3(x, y, z) {
-      babelHelpers.classCallCheck(this, Vector3);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-    }
-
-    babelHelpers.createClass(Vector3, [{
-      key: "isEqual",
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      /**
-       * Zero Vector
-       */
-
-    }, {
-      key: "length",
-      value: function length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-      }
-    }, {
-      key: "clone",
-      value: function clone() {
-        return new Vector3(this.x, this.y, this.z);
-      }
-
-      /*
-       * disabled for now because Safari's Function.prototype.length is not configurable yet.
-       */
-      /*
-      static length(vec3) {
-        return Math.sqrt(vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z);
-      }
-      */
-
-      /**
-       * 長さの2乗
-       */
-
-    }, {
-      key: "lengthSquared",
-      value: function lengthSquared() {
-        return this.x * this.x + this.y * this.y + this.z * this.z;
-      }
-
-      /**
-       * 長さの2乗（static版）
-       */
-
-    }, {
-      key: "lengthSquared",
-      value: function lengthSquared(vec3) {
-        return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
-      }
-
-      /**
-       * 内積
-       */
-
-    }, {
-      key: "dotProduct",
-      value: function dotProduct(vec3) {
-        return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
-      }
-
-      /**
-       * 内積（static版）
-       */
-
-    }, {
-      key: "cross",
-
-
-      /**
-       * 外積
-       */
-      value: function cross(v) {
-        var x = this.y * v.z - this.z * v.y;
-        var y = this.z * v.x - this.x * v.z;
-        var z = this.x * v.y - this.y * v.x;
-
-        this.setComponents(x, y, z);
-
-        return this;
-      }
-
-      /**
-      * 外積(static版)
-      */
-
-    }, {
-      key: "normalize",
-
-
-      /**
-       * 正規化
-       */
-      value: function normalize() {
-        var length = this.length();
-        this.divide(length);
-
-        return this;
-      }
-
-      /**
-       * 正規化（static版）
-       */
-
-    }, {
-      key: "add",
-
-
-      /**
-       * 加算
-       */
-      value: function add(v) {
-        this.x += v.x;
-        this.y += v.y;
-        this.z += v.z;
-
-        return this;
-      }
-
-      /**
-       * 加算（static版）
-       */
-
-    }, {
-      key: "subtract",
-
-
-      /**
-       * 減算
-       */
-      value: function subtract(v) {
-        this.x -= v.x;
-        this.y -= v.y;
-        this.z -= v.z;
-
-        return this;
-      }
-
-      /**
-       * 減算（static版）
-       */
-
-    }, {
-      key: "divide",
-
-
-      /**
-       * 除算
-       */
-      value: function divide(val) {
-        console.assert(val != 0, "0 division!");
-        this.x /= val;
-        this.y /= val;
-        this.z /= val;
-
-        return this;
-      }
-
-      /**
-       * 除算（static版）
-       */
-
-    }, {
-      key: "multiply",
-      value: function multiply(val) {
-        this.x *= val;
-        this.y *= val;
-        this.z *= val;
-
-        return this;
-      }
-
-      /**
-       * 除算（static版）
-       */
-
-    }], [{
-      key: "zero",
-      value: function zero() {
-        return new Vector3(0, 0, 0);
-      }
-    }, {
-      key: "dotProduct",
-      value: function dotProduct(lv, rv) {
-        return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
-      }
-    }, {
-      key: "cross",
-      value: function cross(lv, rv) {
-        var x = lv.y * rv.z - lv.z * rv.y;
-        var y = lv.z * rv.x - lv.x * rv.z;
-        var z = lv.x * rv.y - lv.y * rv.x;
-
-        return new Vector3(x, y, z);
-      }
-    }, {
-      key: "normalize",
-      value: function normalize(vec3) {
-        var length = vec3.length();
-        var newVec = new Vector3(vec3.x, vec3.y, vec3.z);
-        newVec.divide(length);
-
-        return newVec;
-      }
-    }, {
-      key: "add",
-      value: function add(lv, rv) {
-        return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
-      }
-    }, {
-      key: "subtract",
-      value: function subtract(lv, rv) {
-        return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
-      }
-    }, {
-      key: "divide",
-      value: function divide(vec3, val) {
-        console.assert(val != 0, "0 division!");
-        return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
-      }
-    }, {
-      key: "multiply",
-      value: function multiply(vec3, val) {
-        return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
-      }
-    }]);
-    return Vector3;
-  }();
-
-  GLBoost$1["Vector3"] = Vector3;
-
-  var Vector2 = function Vector2(x, y) {
-    babelHelpers.classCallCheck(this, Vector2);
-
-    this.x = x;
-    this.y = y;
-  };
-
-  GLBoost$1["Vector2"] = Vector2;
-
   var Vector4 = function () {
     function Vector4(x, y, z, w) {
       babelHelpers.classCallCheck(this, Vector4);
@@ -425,6 +173,263 @@
   }();
 
   GLBoost$1["Vector4"] = Vector4;
+
+  var Vector3 = function () {
+    function Vector3(x, y, z) {
+      babelHelpers.classCallCheck(this, Vector3);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+
+    babelHelpers.createClass(Vector3, [{
+      key: 'isEqual',
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      /**
+       * Zero Vector
+       */
+
+    }, {
+      key: 'length',
+      value: function length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+      }
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Vector3(this.x, this.y, this.z);
+      }
+
+      /*
+       * disabled for now because Safari's Function.prototype.length is not configurable yet.
+       */
+      /*
+      static length(vec3) {
+        return Math.sqrt(vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z);
+      }
+      */
+
+      /**
+       * 長さの2乗
+       */
+
+    }, {
+      key: 'lengthSquared',
+      value: function lengthSquared() {
+        return this.x * this.x + this.y * this.y + this.z * this.z;
+      }
+
+      /**
+       * 長さの2乗（static版）
+       */
+
+    }, {
+      key: 'lengthSquared',
+      value: function lengthSquared(vec3) {
+        return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
+      }
+
+      /**
+       * 内積
+       */
+
+    }, {
+      key: 'dotProduct',
+      value: function dotProduct(vec3) {
+        return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
+      }
+
+      /**
+       * 内積（static版）
+       */
+
+    }, {
+      key: 'cross',
+
+
+      /**
+       * 外積
+       */
+      value: function cross(v) {
+        var x = this.y * v.z - this.z * v.y;
+        var y = this.z * v.x - this.x * v.z;
+        var z = this.x * v.y - this.y * v.x;
+
+        this.setComponents(x, y, z);
+
+        return this;
+      }
+
+      /**
+      * 外積(static版)
+      */
+
+    }, {
+      key: 'normalize',
+
+
+      /**
+       * 正規化
+       */
+      value: function normalize() {
+        var length = this.length();
+        this.divide(length);
+
+        return this;
+      }
+
+      /**
+       * 正規化（static版）
+       */
+
+    }, {
+      key: 'add',
+
+
+      /**
+       * 加算
+       */
+      value: function add(v) {
+        this.x += v.x;
+        this.y += v.y;
+        this.z += v.z;
+
+        return this;
+      }
+
+      /**
+       * 加算（static版）
+       */
+
+    }, {
+      key: 'subtract',
+
+
+      /**
+       * 減算
+       */
+      value: function subtract(v) {
+        this.x -= v.x;
+        this.y -= v.y;
+        this.z -= v.z;
+
+        return this;
+      }
+
+      /**
+       * 減算（static版）
+       */
+
+    }, {
+      key: 'divide',
+
+
+      /**
+       * 除算
+       */
+      value: function divide(val) {
+        console.assert(val != 0, "0 division!");
+        this.x /= val;
+        this.y /= val;
+        this.z /= val;
+
+        return this;
+      }
+
+      /**
+       * 除算（static版）
+       */
+
+    }, {
+      key: 'multiply',
+      value: function multiply(val) {
+        this.x *= val;
+        this.y *= val;
+        this.z *= val;
+
+        return this;
+      }
+
+      /**
+       * 除算（static版）
+       */
+
+    }, {
+      key: 'toVector4',
+      value: function toVector4() {
+        return new Vector4(this.x, this.y, this.z, 1.0);
+      }
+    }], [{
+      key: 'zero',
+      value: function zero() {
+        return new Vector3(0, 0, 0);
+      }
+    }, {
+      key: 'dotProduct',
+      value: function dotProduct(lv, rv) {
+        return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
+      }
+    }, {
+      key: 'cross',
+      value: function cross(lv, rv) {
+        var x = lv.y * rv.z - lv.z * rv.y;
+        var y = lv.z * rv.x - lv.x * rv.z;
+        var z = lv.x * rv.y - lv.y * rv.x;
+
+        return new Vector3(x, y, z);
+      }
+    }, {
+      key: 'normalize',
+      value: function normalize(vec3) {
+        var length = vec3.length();
+        var newVec = new Vector3(vec3.x, vec3.y, vec3.z);
+        newVec.divide(length);
+
+        return newVec;
+      }
+    }, {
+      key: 'add',
+      value: function add(lv, rv) {
+        return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
+      }
+    }, {
+      key: 'subtract',
+      value: function subtract(lv, rv) {
+        return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
+      }
+    }, {
+      key: 'divide',
+      value: function divide(vec3, val) {
+        console.assert(val != 0, "0 division!");
+        return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+      }
+    }, {
+      key: 'multiply',
+      value: function multiply(vec3, val) {
+        return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
+      }
+    }]);
+    return Vector3;
+  }();
+
+  GLBoost$1['Vector3'] = Vector3;
+
+  var Vector2 = function Vector2(x, y) {
+    babelHelpers.classCallCheck(this, Vector2);
+
+    this.x = x;
+    this.y = y;
+  };
+
+  GLBoost$1["Vector2"] = Vector2;
 
   var MathUtil = function () {
     function MathUtil() {
@@ -1567,6 +1572,7 @@
       this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
       this._animationLine = {};
       this._userFlavorName = '';
+      this._transparentByUser = false;
       this.opacity = 1.0;
 
       this._activeAnimationLineName = null;
@@ -1702,6 +1708,11 @@
         } else {
           return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
         }
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent() {
+        return this._opacity < 1.0 || this._transparentByUser ? true : false;
       }
     }, {
       key: 'toString',
@@ -1984,6 +1995,11 @@
         return this._opacity;
       }
     }, {
+      key: 'transparent',
+      set: function set(flg) {
+        this._transparentByUser = flg;
+      }
+    }, {
       key: 'dirty',
       set: function set(flg) {
         this._dirtyAsElement = flg;
@@ -2033,6 +2049,7 @@
 
       _this.geometry = geometry;
       _this.material = material;
+      _this._transformedDepth = 0;
 
       if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
         // this code for tmlib
@@ -2166,6 +2183,18 @@
         }
       }
     }, {
+      key: 'calcTransformedDepth',
+      value: function calcTransformedDepth(camera) {
+        var viewMatrix = camera.lookAtRHMatrix();
+        var m_m = this.transformMatrixAccumulatedAncestry;
+        var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+
+        var centerPosition = this.geometry.centerPosition.toVector4();
+        var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
+
+        this._transformedDepth = transformedCenterPosition.z;
+      }
+    }, {
       key: 'geometry',
       set: function set(geometry) {
         this._geometry = geometry;
@@ -2182,6 +2211,11 @@
       },
       get: function get() {
         return this._material;
+      }
+    }, {
+      key: 'transformedDepth',
+      get: function get() {
+        return this._transformedDepth;
       }
     }]);
     return Mesh;
@@ -2407,6 +2441,8 @@
 
       this._elements = [];
       this._meshes = [];
+      this._opacityMeshes = [];
+      this._transparentMeshes = [];
       this._drawBuffers = [gl.BACK];
       this._clearColor = null;
       this._renderTargetTextures = null;
@@ -2478,6 +2514,30 @@
         this._elements.forEach(function (elm) {
           _this3._meshes = _this3._meshes.concat(collectMeshes(elm));
         });
+
+        this._opacityMeshes = [];
+        this._transparentMeshes = [];
+        this._meshes.forEach(function (mesh) {
+          if (mesh.isTransparent()) {
+            _this3._transparentMeshes.push(mesh);
+          } else {
+            _this3._opacityMeshes.push(mesh);
+          }
+        });
+      }
+    }, {
+      key: 'sortTransparentMeshes',
+      value: function sortTransparentMeshes(camera) {
+
+        this._transparentMeshes.forEach(function (mesh) {
+          mesh.calcTransformedDepth(camera);
+        });
+
+        this._transparentMeshes.sort(function (a, b) {
+          if (a.transformedDepth < b.transformedDepth) return -1;
+          if (a.transformedDepth > b.transformedDepth) return 1;
+          return 0;
+        });
       }
     }, {
       key: 'containsMeshAfterPrepareForRender',
@@ -2498,6 +2558,16 @@
       key: 'meshes',
       get: function get() {
         return this._meshes;
+      }
+    }, {
+      key: 'opacityMeshes',
+      get: function get() {
+        return this._opacityMeshes;
+      }
+    }, {
+      key: 'transparentMeshes',
+      get: function get() {
+        return this._transparentMeshes;
       }
     }, {
       key: 'buffersToDraw',
@@ -3777,6 +3847,9 @@
       this._defaultMaterial = new ClassicMaterial(this._canvas);
       this._vertexData = [];
       this._extraDataForShader = {};
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._centerPosition = Vector3.zero();
       this._setName();
     }
 
@@ -3833,6 +3906,23 @@
         return attribNameArray;
       }
     }, {
+      key: '_updateAABB',
+      value: function _updateAABB(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: '_updateCenterPosition',
+      value: function _updateCenterPosition() {
+        this._centerPosition = Vector3.divide(Vector3.subtract(this._AABB_max, this._AABB_min), 2);
+      }
+    }, {
       key: 'setVerticesData',
       value: function setVerticesData(vertices, indicesArray) {
         var _this = this;
@@ -3849,8 +3939,14 @@
           allVertexAttribs.forEach(function (attribName) {
             var element = _this._vertices[attribName][index];
             _this._vertices[attribName][index] = MathUtil.arrayToVector(element);
+
+            if (attribName === 'position') {
+              _this._updateAABB(_this._vertices[attribName][index]);
+            }
           });
         });
+
+        this._updateCenterPosition();
 
         this._indicesArray = indicesArray;
         this._primitiveType = primitiveType;
@@ -3898,6 +3994,10 @@
                 // if array, convert to vector[2/3/4]
                 _this2._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
+                if (attribName === 'position') {
+                  _this2._updateAABB(_this2._vertices[attribName][index]);
+                }
+
                 vertexData[idx++] = element.x;
                 vertexData[idx++] = element.y;
                 if (element.z !== void 0) {
@@ -3908,6 +4008,8 @@
                 }
               });
             });
+
+            _this2._updateCenterPosition();
 
             if (!isCached) {
               _this2.Float32AryVertexData = new Float32Array(vertexData);
@@ -4205,10 +4307,10 @@
           gl.uniform1f(glslProgram.opacity, opacity);
 
           if (camera) {
-            var viewMatrix = camera.lookAtRHMatrix();
-            var projectionMatrix = camera.perspectiveRHMatrix();
-            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
+            var _viewMatrix = camera.lookAtRHMatrix();
+            var _projectionMatrix = camera.perspectiveRHMatrix();
+            var _mvp_m = _projectionMatrix.multiply(_viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(_mvp_m.flatten()));
           }
 
           if (typeof this._defaultMaterial.shader.setUniforms !== 'undefined') {
@@ -4305,6 +4407,11 @@
       set: function set(materials) {
         this._materials = materials;
       }
+    }, {
+      key: 'centerPosition',
+      get: function get() {
+        return this._centerPosition;
+      }
     }], [{
       key: 'clearMaterialCache',
       value: function clearMaterialCache() {
@@ -4382,8 +4489,6 @@
 
         scene.renderPasses.forEach(function (renderPass, index) {
 
-          var meshes = renderPass.meshes;
-
           if (renderPass.fboOfRenderTargetTextures) {
             gl.bindTexture(gl.TEXTURE_2D, null);
             Geometry.clearMaterialCache();
@@ -4397,7 +4502,18 @@
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           }
 
-          meshes.forEach(function (mesh) {
+          // draw opacity meshes.
+          var opacityMeshes = renderPass.opacityMeshes;
+          opacityMeshes.forEach(function (mesh) {
+            mesh.draw(lights, camera, scene, index);
+          });
+
+          if (camera) {
+            renderPass.sortTransparentMeshes(camera);
+          }
+          // draw transparent meshes.
+          var transparentMeshes = renderPass.transparentMeshes;
+          transparentMeshes.forEach(function (mesh) {
             mesh.draw(lights, camera, scene, index);
           });
 
@@ -4598,6 +4714,12 @@
       key: 'updateCountAsCameraView',
       get: function get() {
         return this._updateCountAsCameraView;
+      }
+    }, {
+      key: 'latestViewStateInfoString',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
       }
     }, {
       key: 'updateCountAsCameraProjection',
@@ -6160,15 +6282,14 @@
             }
           }
 
-          var positions = new Array(); //new Array( fCount );
-          var texcoords = new Array(); //new Array( fCount );
-          var normals = new Array(); //new Array( fCount );
+          var positions = new Array();
+          var texcoords = new Array();
+          var normals = new Array();
           var indices = [];
 
           var boFlag = false;
 
           var FaceN = fCount;
-          var iFaceBufferArray = new Array(); //new Array(FaceN*3);
           fCount = 0;
           var partFCount = 0;
 
@@ -6176,8 +6297,13 @@
 
           for (var i = 0; i < materials.length; i++) {
             partFCount = 0;
-            iFaceBufferArray.length = 0;
+            var matIndices = new Array();
+            var tmpIndices = new Array();
+            var tmpPositions = new Array();
+            var tmpTexcoords = new Array();
+            var tmpNormals = new Array();
 
+            var _i = 0;
             for (var j = 0; j < objTextRows.length && fCount < FaceN; j++) {
               var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
 
@@ -6203,27 +6329,38 @@
                 }
 
                 if (materials[i].diffuseTexture) {
-
                   if (isQuad) {
-                    _this3._addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                    _this3._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   } else {
-                    _this3._addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                    _this3._addTriangleDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   }
                 } else {
                   if (isQuad) {
-                    _this3._addQuadDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                    _this3._addQuadDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   } else {
-                    _this3._addTriangleDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+                    _this3._addTriangleDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   }
                 }
 
-                iFaceBufferArray[partFCount * 3] = fCount * 3;
-                iFaceBufferArray[partFCount * 3 + 1] = fCount * 3 + 1;
-                iFaceBufferArray[partFCount * 3 + 2] = fCount * 3 + 2;
+                _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3, matIndices, tmpIndices, _i);
+                _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3 + 1, matIndices, tmpIndices, _i);
+                _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3 + 2, matIndices, tmpIndices, _i);
+
+                /*
+                iFaceBufferArray[partFCount*3]=fCount*3;
+                iFaceBufferArray[partFCount*3+1]=fCount*3+1;
+                iFaceBufferArray[partFCount*3+2]=fCount*3+2;
+                */
                 if (isQuad) {
-                  iFaceBufferArray[partFCount * 3 + 3] = fCount * 3 + 3;
-                  iFaceBufferArray[partFCount * 3 + 4] = fCount * 3 + 4;
-                  iFaceBufferArray[partFCount * 3 + 5] = fCount * 3 + 5;
+                  /*
+                  iFaceBufferArray[partFCount*3+3]=fCount*3+3;
+                  iFaceBufferArray[partFCount*3+4]=fCount*3+4;
+                  iFaceBufferArray[partFCount*3+5]=fCount*3+5;
+                  */
+                  _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3 + 3, matIndices, tmpIndices, _i);
+                  _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3 + 4, matIndices, tmpIndices, _i);
+                  _i = _this3._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount * 3 + 5, matIndices, tmpIndices, _i);
+
                   partFCount += 2;
                   fCount += 2;
                 } else {
@@ -6238,9 +6375,11 @@
                 continue;
               }
 
-            materials[i].setVertexN(geometry, partFCount * 3);
+            //        materials[i].setVertexN(geometry, partFCount*3);
+            materials[i].setVertexN(geometry, matIndices.length);
 
-            indices[i] = iFaceBufferArray.concat();
+            //indices[i] = iFaceBufferArray.concat();
+            indices[i] = matIndices.concat();
           }
 
           var mesh = new Mesh(geometry);
@@ -6255,6 +6394,24 @@
         }).catch(function onRejected(error) {
           console.error(error);
         });
+      }
+    }, {
+      key: '_reductionVertices',
+      value: function _reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, vCount, matIndices, tmpIndices, _i) {
+        var str = '' + tmpPositions[vCount].x + ',' + tmpPositions[vCount].y + ',' + tmpPositions[vCount].z + ',' + tmpNormals[vCount].x + ',' + tmpNormals[vCount].y + ',' + tmpNormals[vCount].z + ',' + tmpTexcoords[vCount].x + ',' + tmpTexcoords[vCount].y;
+
+        var hashCode = Hash.toCRC32(str);
+        if (typeof tmpIndices[hashCode] === 'undefined') {
+          tmpIndices[hashCode] = _i;
+          _i++;
+          positions.push(tmpPositions[vCount]);
+          normals.push(tmpNormals[vCount]);
+          texcoords.push(tmpTexcoords[vCount]);
+        }
+
+        matIndices.push(tmpIndices[hashCode]);
+
+        return _i;
       }
     }, {
       key: '_addTriangleDataToArraysWithTexture',

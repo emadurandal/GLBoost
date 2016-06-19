@@ -9,6 +9,8 @@ export default class RenderPass {
   constructor(gl) {
     this._elements = [];
     this._meshes = [];
+    this._opacityMeshes = [];
+    this._transparentMeshes = [];
     this._drawBuffers = [gl.BACK];
     this._clearColor = null;
     this._renderTargetTextures = null;
@@ -33,6 +35,14 @@ export default class RenderPass {
 
   get meshes() {
     return this._meshes;
+  }
+
+  get opacityMeshes() {
+    return this._opacityMeshes;
+  }
+
+  get transparentMeshes() {
+    return this._transparentMeshes;
   }
 
   specifyRenderTargetTextures(renderTargetTextures, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -95,6 +105,30 @@ export default class RenderPass {
     this._elements.forEach((elm)=> {
       this._meshes = this._meshes.concat(collectMeshes(elm));
     });
+
+    this._opacityMeshes = [];
+    this._transparentMeshes = [];
+    this._meshes.forEach((mesh)=>{
+      if (mesh.isTransparent()) {
+        this._transparentMeshes.push(mesh);
+      } else {
+        this._opacityMeshes.push(mesh);
+      }
+    });
+  }
+
+  sortTransparentMeshes(camera) {
+
+    this._transparentMeshes.forEach((mesh)=> {
+      mesh.calcTransformedDepth(camera);
+    });
+
+    this._transparentMeshes.sort(function(a,b){
+      if( a.transformedDepth < b.transformedDepth ) return -1;
+      if( a.transformedDepth > b.transformedDepth ) return 1;
+      return 0;
+    });
+
   }
 
   containsMeshAfterPrepareForRender(mesh) {
