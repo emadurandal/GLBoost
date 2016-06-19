@@ -1,5 +1,6 @@
 import GLBoost from './../globals';
 import Vector4 from './../math/Vector4';
+import Vector3 from './../math/Vector3';
 import GLContext from './../GLContext';
 import GLExtentionsManager from './../GLExtentionsManager';
 import Shader from './../shaders/Shader';
@@ -23,6 +24,9 @@ export default class Geometry {
     this._defaultMaterial = new ClassicMaterial(this._canvas);
     this._vertexData = [];
     this._extraDataForShader = {};
+    this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+    this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+    this._centerPosition = Vector3.zero();
     this._setName();
   }
 
@@ -71,6 +75,21 @@ export default class Geometry {
     return attribNameArray;
   }
 
+  _updateAABB(positionVector) {
+    this._AABB_min.x = (positionVector.x < this._AABB_min.x) ? positionVector.x : this._AABB_min.x;
+    this._AABB_min.y = (positionVector.y < this._AABB_min.y) ? positionVector.y : this._AABB_min.y;
+    this._AABB_min.z = (positionVector.z < this._AABB_min.z) ? positionVector.z : this._AABB_min.z;
+    this._AABB_max.x = (this._AABB_max.x < positionVector.x) ? positionVector.x : this._AABB_max.x;
+    this._AABB_max.y = (this._AABB_max.y < positionVector.y) ? positionVector.y : this._AABB_max.y;
+    this._AABB_max.z = (this._AABB_max.z < positionVector.z) ? positionVector.z : this._AABB_max.z;
+
+    return positionVector;
+  }
+
+  _updateCenterPosition() {
+    this._centerPosition = Vector3.divide(Vector3.subtract(this._AABB_max, this._AABB_min), 2);
+  }
+
   setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
 
@@ -81,9 +100,14 @@ export default class Geometry {
       allVertexAttribs.forEach((attribName)=> {
         var element = this._vertices[attribName][index];
         this._vertices[attribName][index] = MathUtil.arrayToVector(element);
+
+        if (attribName === 'position') {
+          this._updateAABB(this._vertices[attribName][index]);
+        }
       });
     });
 
+    this._updateCenterPosition();
 
     this._indicesArray = indicesArray;
     this._primitiveType = primitiveType;
@@ -122,6 +146,10 @@ export default class Geometry {
           // if array, convert to vector[2/3/4]
           this._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
+          if (attribName === 'position') {
+            this._updateAABB(this._vertices[attribName][index]);
+          }
+
           vertexData[idx++] = element.x;
           vertexData[idx++] = element.y;
           if (element.z !== void 0) {
@@ -132,6 +160,8 @@ export default class Geometry {
           }
         });
       });
+
+      this._updateCenterPosition();
 
       if(!isCached) {
         this.Float32AryVertexData = new Float32Array(vertexData);
@@ -510,6 +540,10 @@ export default class Geometry {
 
   set materials(materials) {
     this._materials = materials;
+  }
+
+  get centerPosition() {
+    return this._centerPosition;
   }
 
   setExtraDataForShader(name, value) {

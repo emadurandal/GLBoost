@@ -1,4 +1,5 @@
-import GLBoost from './../globals'
+import GLBoost from './../globals';
+import Vector4 from './Vector4';
 
 export default class Vector3 {
 
@@ -66,7 +67,7 @@ export default class Vector3 {
    * 内積（static版）
    */
   static dotProduct(lv, rv) {
-      return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
+    return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
   }
 
   /**
@@ -184,6 +185,10 @@ export default class Vector3 {
   static multiply(vec3, val) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }
+
+  toVector4() {
+    return new Vector4(this.x, this.y, this.z, 1.0);
+  }
 }
 
-GLBoost["Vector3"] = Vector3;
+GLBoost['Vector3'] = Vector3;

@@ -9,6 +9,7 @@ export default class Mesh extends Element {
     super();
     this.geometry = geometry;
     this.material = material;
+    this._transformedDepth = 0;
 
     if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) {  // this code for tmlib
       Mesh._instanceCount = (typeof Mesh._instanceCount === 'undefined') ? 0 : (Mesh._instanceCount + 1);
@@ -153,7 +154,20 @@ export default class Mesh extends Element {
     }
   }
 
+  calcTransformedDepth(camera) {
+    var viewMatrix = camera.lookAtRHMatrix();
+    var m_m = this.transformMatrixAccumulatedAncestry;
+    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
 
+    var centerPosition = this.geometry.centerPosition.toVector4();
+    var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
+
+    this._transformedDepth = transformedCenterPosition.z;
+  }
+
+  get transformedDepth() {
+    return this._transformedDepth;
+  }
 
 }
 Mesh._geometries = {};
