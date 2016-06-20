@@ -73,7 +73,7 @@ class MyCustomShaderSource {
 }
 
 
-class MyCustomShader extends GLBoost.SimpleShader {
+class MyCustomShader extends GLBoost.DecalShader {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super(canvas);
     MyCustomShader.mixin(MyCustomShaderSource);

@@ -147,9 +147,8 @@ export default class Shader {
     shaderText +=   'precision highp float;\n';
 
     /// define variables
-    // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSDefine(in_, out_, f, lights, extraData);
-    // and define variables as mixin shaders
+    // start defining variables. first, sub class Shader, ...
+    // seconds, define variables as mixin shaders
     this._classNamesOfVSDefine.forEach((className)=> {
       var method = this['VSDefine_' + className];
       if (method) {
@@ -163,9 +162,8 @@ export default class Shader {
 
 
     /// Transform
-    // start transforming. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSTransform(existCamera_f, f, lights, extraData);
-    // and transform as mixin Shaders
+    // start transforming. first, sub class Shader, ...
+    // seconds, transform as mixin Shaders
     this._classNamesOfVSTransform.forEach((className)=> {
       var method = this['VSTransform_' + className];
       if (method) {
@@ -174,9 +172,8 @@ export default class Shader {
     });
 
     /// Shading
-    // start shading. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.VSShading(f);
-    // and shade as mixin Shaders
+    // start shading. first, sub class Shader, ...
+    // seconds, shade as mixin Shaders
     this._classNamesOfVSShade.forEach((className)=> {
       var method = this['VSShade_' + className];
       if (method) {
@@ -215,9 +212,8 @@ export default class Shader {
     }
 
     /// define variables
-    // start defining variables. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSDefine(in_, f, lights, extraData);
-    // and define variables as mixin shaders
+    // start defining variables. first, sub class Shader, ...
+    // seconds, define variables as mixin shaders
     this._classNamesOfFSDefine.forEach((className)=> {
       var method = this['FSDefine_' + className];
       if (method) {
@@ -231,9 +227,8 @@ export default class Shader {
 
 
     /// Shading
-    // start shading. first, BasicShader, then, sub class Shader, ...
-    shaderText += this.FSShading(f, gl, lights, extraData);
-    // and shade as mixin Shaders
+    // start shading. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
     this._classNamesOfFSShade.forEach((className)=> {
       var method = this['FSShade_' + className];
       if (method) {
@@ -256,40 +251,9 @@ export default class Shader {
     return shaderText;
   }
 
-  VSDefine(in_, out_, f) {
-    var shaderText =   `${in_} vec3 aVertex_position;\n`;
-    shaderText +=      'uniform mat4 modelViewProjectionMatrix;\n';
-    return shaderText;
-  }
-  VSTransform(existCamera_f, f) {
-    var shaderText = '';
-    if (existCamera_f) {
-      shaderText +=   '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
-    } else {
-      shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
-    }
-    return shaderText;
-  }
-  VSShading() {
-    return '';
-  }
-
-  FSDefine(in_, f) {
-    var shaderText =   `${in_} vec3 aVertex_position;\n`;
-    shaderText +=      'uniform float opacity;';
-    return shaderText;
-  }
-
-  FSShading(f, gl) {
-    var shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
-    return shaderText;
-  }
-
-
   _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
     var vertexAttribsAsResult = [];
-    var position = this.prepare(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas);
-    vertexAttribsAsResult.push(position);
+
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
@@ -300,18 +264,6 @@ export default class Shader {
     });
 
     return vertexAttribsAsResult;
-  }
-
-  prepare(gl, shaderProgram, vertexAttribs, existCamera_f) {
-    shaderProgram['vertexAttribute_position'] = gl.getAttribLocation(shaderProgram, 'aVertex_position');
-    gl.enableVertexAttribArray(shaderProgram['vertexAttribute_position']);
-
-    if (existCamera_f) {
-      shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
-    }
-    shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
-
-    return 'position';
   }
 
   get dirty() {

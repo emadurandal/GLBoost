@@ -1,7 +1,7 @@
 import GLBoost from './globals';
 import GLContext from './GLContext';
 import Vector4 from './math/Vector4';
-import SimpleShader from './shaders/SimpleShader';
+import DecalShader from './shaders/DecalShader';
 
 export default class ClassicMaterial {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -13,7 +13,7 @@ export default class ClassicMaterial {
     this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
     this._name = '';
-    this._shader = new SimpleShader(canvas);
+    this._shader = new DecalShader(canvas);
     this._vertexNofGeometries = {};
 
     if (this.constructor === ClassicMaterial) {

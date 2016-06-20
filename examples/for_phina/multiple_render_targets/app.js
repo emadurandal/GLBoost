@@ -89,8 +89,8 @@
     return MyCustomShaderSource;
   }();
 
-  var MyCustomShader = function (_GLBoost$SimpleShader) {
-    babelHelpers.inherits(MyCustomShader, _GLBoost$SimpleShader);
+  var MyCustomShader = function (_GLBoost$DecalShader) {
+    babelHelpers.inherits(MyCustomShader, _GLBoost$DecalShader);
 
     function MyCustomShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
@@ -103,7 +103,7 @@
     }
 
     return MyCustomShader;
-  }(GLBoost.SimpleShader);
+  }(GLBoost.DecalShader);
 
   phina.define('MainScene', {
     superClass: 'DisplayScene',

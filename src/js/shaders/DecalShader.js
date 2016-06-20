@@ -1,7 +1,9 @@
 import Shader from './Shader';
+import VertexLocalShader from './VertexLocalShader';
+import FragmentSimpleShader from './FragmentSimpleShader';
 
-export class SimpleShaderSource {
-  VSDefine_SimpleShaderSource(in_, out_, f) {
+export class DecalShaderSource {
+  VSDefine_DecalShaderSource(in_, out_, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += `${in_} vec4 aVertex_color;\n`;
@@ -14,7 +16,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  VSTransform_SimpleShaderSource(existCamera_f, f) {
+  VSTransform_DecalShaderSource(existCamera_f, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = aVertex_color;\n';
@@ -25,7 +27,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  FSDefine_SimpleShaderSource(in_, f) {
+  FSDefine_DecalShaderSource(in_, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += `${in_} vec4 color;\n`;
@@ -39,7 +41,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  FSShade_SimpleShaderSource(f, gl) {
+  FSShade_DecalShaderSource(f, gl) {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
@@ -53,7 +55,7 @@ export class SimpleShaderSource {
     return shaderText;
   }
 
-  prepare_SimpleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -76,11 +78,13 @@ export class SimpleShaderSource {
   }
 }
 
-export default class SimpleShader extends Shader {
+export default class DecalShader extends Shader {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
-    SimpleShader.mixin(SimpleShaderSource);
+    DecalShader.mixin(VertexLocalShader);
+    DecalShader.mixin(FragmentSimpleShader);
+    DecalShader.mixin(DecalShaderSource);
   }
 
   setUniforms(gl, glslProgram, material) {
@@ -90,4 +94,4 @@ export default class SimpleShader extends Shader {
   }
 }
 
-GLBoost['SimpleShader'] = SimpleShader;
+GLBoost['DecalShader'] = DecalShader;

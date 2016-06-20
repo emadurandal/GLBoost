@@ -1,5 +1,5 @@
 import Shader from './Shader';
-import SimpleShader from './SimpleShader';
+import DecalShader from './DecalShader';
 
 export class PhongShaderSource {
   VSDefine_PhongShaderSource(in_, out_, f, lights) {
@@ -90,7 +90,7 @@ export class PhongShaderSource {
 
 
 
-export default class PhongShader extends SimpleShader {
+export default class PhongShader extends DecalShader {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);

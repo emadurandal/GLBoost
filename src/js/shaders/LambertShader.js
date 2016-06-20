@@ -1,5 +1,5 @@
 import Shader from './Shader';
-import SimpleShader from './SimpleShader';
+import DecalShader from './DecalShader';
 
 export class LambertShaderSource {
   VSDefine_LambertShaderSource(in_, out_, f, lights) {
@@ -80,7 +80,7 @@ export class LambertShaderSource {
 
 
 
-export default class LambertShader extends SimpleShader {
+export default class LambertShader extends DecalShader {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
