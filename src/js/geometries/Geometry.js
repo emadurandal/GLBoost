@@ -9,7 +9,7 @@ import PointLight from './../lights/PointLight';
 import DirectionalLight from './../lights/DirectionalLight';
 import ArrayUtil from './../misc/ArrayUtil';
 import MathUtil from '../math/MathUtil';
-import DrawKickerLocal from './DrawKickerLocal';
+import DrawKickerLocal from '../draw_kickers/DrawKickerLocal';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {

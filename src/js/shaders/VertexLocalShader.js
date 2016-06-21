@@ -1,3 +1,4 @@
+import Shader from './Shader';
 
 export default class VertexLocalShaderSource {
   VSDefine_VertexLocalShaderSource(in_, out_, f) {
@@ -16,7 +17,17 @@ export default class VertexLocalShaderSource {
     return shaderText;
   }
 
-  prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
+    var shaderText = '';
+    if(lights.length > 0) {
+      shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
+      shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
+    }
+
+    return shaderText;
+  }
+
+  prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
 
@@ -27,6 +38,13 @@ export default class VertexLocalShaderSource {
 
     if (existCamera_f) {
       shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+    }
+
+    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+
+    for(let i=0; i<lights.length; i++) {
+      shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
+      shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
     }
 
     return vertexAttribsAsResult;

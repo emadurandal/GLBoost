@@ -27,8 +27,6 @@ export class PhongShaderSource {
     }
     shaderText += `${in_} vec4 position;\n`;
     shaderText += `uniform vec3 viewPosition;\n`;
-    shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
-    shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec4 Ks;\n`;
     shaderText += `uniform float power;\n`;
@@ -75,14 +73,7 @@ export class PhongShaderSource {
     shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
     shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
     shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
-
-    for(let i=0; i<lights.length; i++) {
-      shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
-    }
 
     return vertexAttribsAsResult;
   }

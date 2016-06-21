@@ -1,5 +1,6 @@
 import Shader from './Shader';
 import VertexLocalShader from './VertexLocalShader';
+import VertexViewShader from './VertexViewShader';
 import FragmentSimpleShader from './FragmentSimpleShader';
 
 export class DecalShaderSource {

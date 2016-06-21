@@ -3556,8 +3556,8 @@
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.perspectiveRHMatrix();
             var m_m = mesh.transformMatrixAccumulatedAncestry;
-            var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
+            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(pvm_m.flatten()));
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -3651,7 +3651,7 @@
     babelHelpers.createClass(FragmentSimpleShaderSource, [{
       key: 'FSDefine_FragmentSimpleShaderSource',
       value: function FSDefine_FragmentSimpleShaderSource(in_, f) {
-        var shaderText = 'uniform float opacity;';
+        var shaderText = 'uniform float opacity;\n';
         return shaderText;
       }
     }, {
@@ -3698,8 +3698,19 @@
         return shaderText;
       }
     }, {
+      key: 'FSDefine_VertexLocalShaderSource',
+      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
+        var shaderText = '';
+        if (lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        return shaderText;
+      }
+    }, {
       key: 'prepare_VertexLocalShaderSource',
-      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
 
         var vertexAttribsAsResult = [];
 
@@ -3712,10 +3723,88 @@
           shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
         }
 
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
         return vertexAttribsAsResult;
       }
     }]);
     return VertexLocalShaderSource;
+  }();
+
+  var VertexViewShaderSource = function () {
+    function VertexViewShaderSource() {
+      babelHelpers.classCallCheck(this, VertexViewShaderSource);
+    }
+
+    babelHelpers.createClass(VertexViewShaderSource, [{
+      key: 'VSDefine_VertexViewShaderSource',
+      value: function VSDefine_VertexViewShaderSource(in_, out_, f, lights, extraData) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+        if (typeof extraData.transformLightPositionInVertex !== 'undefined' && extraData.transformLightPositionInVertex && lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        }
+        shaderText += 'uniform mat4 worldMatrix;\n';
+        shaderText += 'uniform mat4 viewMatrix;\n';
+        shaderText += 'uniform mat4 projectionMatrix;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexViewShaderSource',
+      value: function VSTransform_VertexViewShaderSource(existCamera_f, f, lights, extraData) {
+        var shaderText = '';
+        if (existCamera_f) {
+          shaderText += '  gl_Position = projectionMatrix * viewMatrix * worldMatrix * vec4(aVertex_position, 1.0);\n';
+        } else {
+          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexViewShaderSource',
+      value: function FSDefine_VertexViewShaderSource(in_, f, lights, extraData) {
+        var shaderText = '';
+        if (lights.length > 0) {
+          if (!(typeof extraData.transformLightPositionInVertex !== 'undefined' && extraData.transformLightPositionInVertex)) {
+            shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          }
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexViewShaderSource',
+      value: function prepare_VertexViewShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+
+        var attribName = 'position';
+        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+
+        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        if (existCamera_f) {
+          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexViewShaderSource;
   }();
 
   var DecalShaderSource = function () {
@@ -5661,8 +5750,6 @@
         }
         shaderText += in_ + ' vec4 position;\n';
         shaderText += 'uniform vec3 viewPosition;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
         shaderText += 'uniform vec4 Kd;\n';
         shaderText += 'uniform vec4 Ks;\n';
         shaderText += 'uniform float power;\n';
@@ -5710,14 +5797,7 @@
         shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
         shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
 
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
         shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
 
         return vertexAttribsAsResult;
       }
@@ -5816,8 +5896,6 @@
           shaderText += in_ + ' vec3 v_normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
         shaderText += 'uniform vec4 Kd;\n';
 
         return shaderText;
@@ -5856,13 +5934,6 @@
         });
 
         shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
 
         return vertexAttribsAsResult;
       }
@@ -5932,8 +6003,6 @@
           shaderText += in_ + ' vec3 v_normal;\n';
         }
         shaderText += in_ + ' vec4 position;\n';
-        shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
         shaderText += 'uniform vec4 Kd;\n';
 
         return shaderText;
@@ -5973,13 +6042,6 @@
         });
 
         shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
 
         return vertexAttribsAsResult;
       }

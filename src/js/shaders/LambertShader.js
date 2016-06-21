@@ -27,8 +27,6 @@ export class LambertShaderSource {
       shaderText += `${in_} vec3 v_normal;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
-    shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
-    shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     shaderText += `uniform vec4 Kd;\n`;
 
     return shaderText;
@@ -66,13 +64,6 @@ export class LambertShaderSource {
     });
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-    for(let i=0; i<lights.length; i++) {
-      shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
-    }
 
     return vertexAttribsAsResult;
   }

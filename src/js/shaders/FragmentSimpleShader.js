@@ -2,7 +2,7 @@
 export default class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
-    var shaderText =      'uniform float opacity;';
+    var shaderText =      'uniform float opacity;\n';
     return shaderText;
   }
 
