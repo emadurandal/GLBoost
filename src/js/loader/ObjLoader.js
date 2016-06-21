@@ -105,9 +105,9 @@ export default class ObjLoader {
         iMCount++;
         materials[iMCount] = new ClassicMaterial(canvas);
         if (defaultShader) {
-          materials[iMCount].shader = defaultShader;
+          materials[iMCount].shaderClass = defaultShader;
         } else {
-          materials[iMCount].shader = new PhongShader(canvas);
+          materials[iMCount].shaderClass = PhongShader;
         }
         materials[iMCount].name = matchArray[2];
       }

@@ -1,15 +1,12 @@
 import GLBoost from './../globals';
-import Vector4 from './../math/Vector4';
 import Vector3 from './../math/Vector3';
 import GLContext from './../GLContext';
 import GLExtentionsManager from './../GLExtentionsManager';
-import Shader from './../shaders/Shader';
 import ClassicMaterial from './../ClassicMaterial';
-import PointLight from './../lights/PointLight';
-import DirectionalLight from './../lights/DirectionalLight';
 import ArrayUtil from './../misc/ArrayUtil';
 import MathUtil from '../math/MathUtil';
 import DrawKickerLocal from '../draw_kickers/DrawKickerLocal';
+import DrawKickerView from '../draw_kickers/DrawKickerView';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -29,7 +26,7 @@ export default class Geometry {
     this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
     this._centerPosition = Vector3.zero();
     this._setName();
-    this._drawKicker = DrawKickerLocal.getInstance();
+    this._drawKicker = DrawKickerView.getInstance();
   }
 
   _setName() {
@@ -216,7 +213,11 @@ export default class Geometry {
     let glslProgramOfPasses = [];
     for (let i=0; i<renderPasses.length; i++) {
       if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
-        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
+        if (material.shaderInstance === null) {
+          let shaderClass = material.shaderClass;
+          material.shaderInstance = new shaderClass(this._glContext.canvas);
+        }
+        var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
         this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
         glslProgramOfPasses.push(glslProgram);
       } else {

@@ -94,9 +94,9 @@ export default class DrawKickerView {
 
       let isMaterialSetupDone = true;
 
-      if (materials[i].shader.dirty || materialName !== DrawKickerView._lastMaterial) {
-        var needTobeStillDirty = materials[i].shader.setUniforms(gl, glslProgram, materials[i], camera, mesh);
-        materials[i].shader.dirty = needTobeStillDirty ? true : false;
+      if (materials[i].shaderInstance.dirty || materialName !== DrawKickerView._lastMaterial) {
+        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+        materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
       if (materialName !== DrawKickerView._lastMaterial) {

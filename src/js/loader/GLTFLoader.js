@@ -296,9 +296,9 @@ export default class GLTFLoader {
 
     material.setVertexN(geometry, indices.length);
     if (defaultShader) {
-      material.shader = defaultShader;
+      material.shaderClass = defaultShader;
     } else {
-      material.shader = new PhongShader(canvas);
+      material.shaderClass = PhongShader;
     }
     geometry.materials = [material];
 

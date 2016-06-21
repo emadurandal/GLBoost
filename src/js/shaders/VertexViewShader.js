@@ -1,9 +1,10 @@
 import Shader from './Shader';
+import MiscUtil from '../misc/MiscUtil';
 
 export default class VertexViewShaderSource {
   VSDefine_VertexViewShaderSource(in_, out_, f, lights, extraData) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
-    if(typeof extraData.transformLightPositionInVertex !== 'undefined' && extraData.transformLightPositionInVertex && lights.length > 0) {
+    if(MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex) && lights.length > 0) {
       shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
     }
     shaderText +=      'uniform mat4 worldMatrix;\n';
@@ -25,7 +26,7 @@ export default class VertexViewShaderSource {
   FSDefine_VertexViewShaderSource(in_, f, lights, extraData) {
     var shaderText = '';
     if(lights.length > 0) {
-      if (!(typeof extraData.transformLightPositionInVertex !== 'undefined' && extraData.transformLightPositionInVertex)) {
+      if (!MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex)) {
         shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
       }
       shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;

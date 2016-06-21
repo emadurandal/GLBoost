@@ -223,7 +223,7 @@ export default class Particle extends Geometry {
       this._materialForBillboard = this._defaultMaterial;
     }
 
-    class ParticleShader extends this._materialForBillboard.shader.constructor {
+    class ParticleShader extends this._materialForBillboard.shaderClass {
       constructor(canvas) {
         super(canvas, ParticleShaderSource);
         ParticleShader.mixin(ParticleShaderSource);
@@ -253,9 +253,9 @@ export default class Particle extends Geometry {
     }
 
     if (meshMaterial) {
-      meshMaterial.shader = new ParticleShader(canvas);
+      meshMaterial.shaderClass = ParticleShader;
     } else {
-      this._defaultMaterial.shader = new ParticleShader(canvas);
+      this._defaultMaterial.shaderClass = ParticleShader;
     }
 
     /*

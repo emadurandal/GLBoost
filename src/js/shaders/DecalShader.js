@@ -1,7 +1,7 @@
 import Shader from './Shader';
-import VertexLocalShader from './VertexLocalShader';
-import VertexViewShader from './VertexViewShader';
-import FragmentSimpleShader from './FragmentSimpleShader';
+import VertexLocalShaderSource from './VertexLocalShader';
+import VertexViewShaderSource from './VertexViewShader';
+import FragmentSimpleShaderSource from './FragmentSimpleShader';
 
 export class DecalShaderSource {
   VSDefine_DecalShaderSource(in_, out_, f) {
@@ -83,8 +83,8 @@ export default class DecalShader extends Shader {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
 
     super(canvas);
-    DecalShader.mixin(VertexLocalShader);
-    DecalShader.mixin(FragmentSimpleShader);
+    DecalShader.mixin(VertexViewShaderSource);
+    DecalShader.mixin(FragmentSimpleShaderSource);
     DecalShader.mixin(DecalShaderSource);
   }
 

@@ -35,7 +35,7 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
         var material = new GLBoost.ClassicMaterial();
-        material.shader = new GLBoost.PhongShader();
+        material.shaderClass = GLBoost.PhongShader;
 
         var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
 

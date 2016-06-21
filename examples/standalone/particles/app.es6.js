@@ -130,7 +130,7 @@ var particleGeometry = new GLBoost.Particle(
   }, 0.5, 0.5, null, GLBoost.STATIC_DRAW);
 
 var material = new GLBoost.ClassicMaterial();
-material.shader = new MyCustomShader(GLBoost.CURRENT_CANVAS_ID);
+material.shaderClass = MyCustomShader;
 var texture = new GLBoost.Texture('resources/iceball.png');
 material.diffuseTexture = texture;
 var particle = new GLBoost.Mesh(particleGeometry, material);
@@ -148,7 +148,7 @@ var render = function(){
   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
   camera.eye = rotatedVector;
 
-  var myCustomShader = particle.material.shader;
+  var myCustomShader = particle.material.shaderInstance;
   myCustomShader.increaseTime(0.016);
   //myCustomShader.dirty = true;
 

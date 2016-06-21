@@ -43,7 +43,7 @@ var texture_1 = new GLBoost.Texture('resources/texture.png', canvas_1);
 material_1.diffuseTexture = texture_1;
 
 var shader_1 = new GLBoost.PhongShader(canvas_1);
-material_1.shader = shader_1;
+material_1.shaderInstance = shader_1;
 
 var geometry_1 = new GLBoost.Cube(new GLBoost.Vector3(24,24,24), new GLBoost.Vector3(1,0,0));
 
@@ -69,7 +69,7 @@ var texture_2 = new GLBoost.Texture('resources/texture.png');
 material_2.diffuseTexture = texture_2;
 
 var shader_2 = new GLBoost.PhongShader(canvas_2);
-material_2.shader = shader_2;
+material_2.shaderInstance = shader_2;
 var geometry_2 = new GLBoost.Sphere(20, 24, 24, null);
 
 var sphere = new GLBoost.Mesh(geometry_2, material_2);

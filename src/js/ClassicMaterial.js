@@ -13,7 +13,8 @@ export default class ClassicMaterial {
     this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
     this._name = '';
-    this._shader = new DecalShader(canvas);
+    this._shaderClass = DecalShader;
+    this._shaderInstance = null;
     this._vertexNofGeometries = {};
 
     if (this.constructor === ClassicMaterial) {
@@ -28,7 +29,8 @@ export default class ClassicMaterial {
     material._diffuseColor = this._diffuseColor;
     material._specularColor = this._specularColor;
     material._ambientColor = this._ambientColor;
-    material._shader = this._shader;
+    material._shaderClass = this._shaderClass;
+    material._shaderInstance = this._shaderInstance;
 
     for (let geom in this._vertexNofGeometries) {
       material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
@@ -37,12 +39,20 @@ export default class ClassicMaterial {
     return material;
   }
 
-  set shader(shader) {
-    this._shader = shader;
+  set shaderClass(shaderClass) {
+    this._shaderClass = shaderClass;
   }
 
-  get shader() {
-    return this._shader;
+  get shaderClass() {
+    return this._shaderClass;
+  }
+
+  set shaderInstance(shaderInstance) {
+    this._shaderInstance = shaderInstance;
+  }
+
+  get shaderInstance() {
+    return this._shaderInstance;
   }
 
   set diffuseTexture(tex) {

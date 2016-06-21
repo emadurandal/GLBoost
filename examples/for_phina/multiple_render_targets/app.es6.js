@@ -95,7 +95,7 @@ phina.define('MainScene', {
     var geometry = new GLBoost.BlendShapeGeometry();
     var texture = new GLBoost.Texture('resources/texture.png');
     var material = new GLBoost.ClassicMaterial();
-    material.shader =  new MyCustomShader();
+    material.shaderClass = MyCustomShader;
     material.diffuseTexture = texture;
     var mesh = new GLBoost.Mesh(geometry, material);
     geometry.setVerticesData({

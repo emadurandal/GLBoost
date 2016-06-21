@@ -94,7 +94,7 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
 
 
 var objLoader = GLBoost.ObjLoader.getInstance();
-var promise = objLoader.loadObj('resources/teapot/teapot.obj', new MyCustomShader(), null);
+var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
 promise.then(function(mesh) {
 //            console.log(mesh);
 
@@ -113,7 +113,7 @@ promise.then(function(mesh) {
     camera.eye = rotatedVector;
 
     mesh.geometry._materials.forEach(function(material){
-      var myCustomShader = material.shader;
+      var myCustomShader = material.shaderInstance;
       myCustomShader.increaseTime(0.16);
       myCustomShader.dirty = true;
 
