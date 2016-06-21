@@ -2984,7 +2984,7 @@
           splittedShaderLines[i] += '\n';
           for (var j = 0; j < i; j++) {
             if (splittedShaderLines[j] === splittedShaderLines[i]) {
-              splittedShaderLines[j] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+              splittedShaderLines[j] = '//                                                            commented out because of duplicated: ' + splittedShaderLines[i];
             }
           }
         }
@@ -3016,6 +3016,7 @@
         this._classNamesOfVSDefine.forEach(function (className) {
           var method = _this['VSDefine_' + className];
           if (method) {
+            shaderText += '//                                                            VSDefine_' + className + ' //\n';
             shaderText += method.bind(_this, in_, out_, f, lights, extraData)();
           }
         });
@@ -3029,6 +3030,7 @@
         this._classNamesOfVSTransform.forEach(function (className) {
           var method = _this['VSTransform_' + className];
           if (method) {
+            shaderText += '//                                                            VSTransform_' + className + ' //\n';
             shaderText += method.bind(_this, existCamera_f, f, lights, extraData)();
           }
         });
@@ -3039,6 +3041,7 @@
         this._classNamesOfVSShade.forEach(function (className) {
           var method = _this['VSShade_' + className];
           if (method) {
+            shaderText += '//                                                            VSShade_' + className + ' //\n';
             shaderText += method.bind(_this, existCamera_f, f, lights, extraData)();
           }
         });
@@ -3080,6 +3083,7 @@
         this._classNamesOfFSDefine.forEach(function (className) {
           var method = _this2['FSDefine_' + className];
           if (method) {
+            shaderText += '//                                                            FSDefine_' + className + ' //\n';
             shaderText += method.bind(_this2, in_, f, lights, extraData)();
           }
         });
@@ -3093,6 +3097,7 @@
         this._classNamesOfFSShade.forEach(function (className) {
           var method = _this2['FSShade_' + className];
           if (method) {
+            shaderText += '//                                                            FSShade_' + className + ' //\n';
             shaderText += method.bind(_this2, f, gl, lights, extraData)();
           }
         });

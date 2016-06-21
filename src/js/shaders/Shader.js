@@ -123,7 +123,7 @@ export default class Shader {
       splittedShaderLines[i] += '\n';
       for (let j=0; j<i; j++) {
         if (splittedShaderLines[j] === splittedShaderLines[i]) {
-          splittedShaderLines[j] = '// commented out because of duplicated: ' + splittedShaderLines[i];
+          splittedShaderLines[j] = '//                                                            commented out because of duplicated: ' + splittedShaderLines[i];
         }
       }
     }
@@ -152,6 +152,7 @@ export default class Shader {
     this._classNamesOfVSDefine.forEach((className)=> {
       var method = this['VSDefine_' + className];
       if (method) {
+        shaderText += '//                                                            VSDefine_' + className + ' //\n';
         shaderText += method.bind(this, in_, out_, f, lights, extraData)();
       }
     });
@@ -167,6 +168,7 @@ export default class Shader {
     this._classNamesOfVSTransform.forEach((className)=> {
       var method = this['VSTransform_' + className];
       if (method) {
+        shaderText += '//                                                            VSTransform_' + className + ' //\n';
         shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
       }
     });
@@ -177,6 +179,7 @@ export default class Shader {
     this._classNamesOfVSShade.forEach((className)=> {
       var method = this['VSShade_' + className];
       if (method) {
+        shaderText += '//                                                            VSShade_' + className + ' //\n';
         shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
       }
     });
@@ -217,6 +220,7 @@ export default class Shader {
     this._classNamesOfFSDefine.forEach((className)=> {
       var method = this['FSDefine_' + className];
       if (method) {
+        shaderText += '//                                                            FSDefine_' + className + ' //\n';
         shaderText += method.bind(this, in_, f, lights, extraData)();
       }
     });
@@ -232,6 +236,7 @@ export default class Shader {
     this._classNamesOfFSShade.forEach((className)=> {
       var method = this['FSShade_' + className];
       if (method) {
+        shaderText += '//                                                            FSShade_' + className + ' //\n';
         shaderText += method.bind(this, f, gl, lights, extraData)();
       }
     });
