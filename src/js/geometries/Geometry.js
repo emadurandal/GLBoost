@@ -7,6 +7,8 @@ import ArrayUtil from './../misc/ArrayUtil';
 import MathUtil from '../math/MathUtil';
 import DrawKickerLocal from '../draw_kickers/DrawKickerLocal';
 import DrawKickerView from '../draw_kickers/DrawKickerView';
+import VertexLocalShaderSource from '../shaders/VertexLocalShader';
+import VertexViewShaderSource from '../shaders/VertexViewShader';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -27,6 +29,11 @@ export default class Geometry {
     this._centerPosition = Vector3.zero();
     this._setName();
     this._drawKicker = DrawKickerView.getInstance();
+    if (this._drawKicker instanceof DrawKickerView) {
+
+    } else if (this._drawKicker instanceof DrawKickerLocal) {
+      this._extraDataForShader.transformByMultipliedPVWMatrix = true;
+    }
   }
 
   _setName() {
@@ -215,7 +222,15 @@ export default class Geometry {
       if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
         if (material.shaderInstance === null) {
           let shaderClass = material.shaderClass;
-          material.shaderInstance = new shaderClass(this._glContext.canvas);
+
+          let basicShaderSource = null;
+          if (this._drawKicker instanceof DrawKickerView) {
+            basicShaderSource = VertexViewShaderSource;
+          } else if (this._drawKicker instanceof DrawKickerLocal) {
+            basicShaderSource = VertexLocalShaderSource;
+          }
+
+          material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
         }
         var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
         this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);

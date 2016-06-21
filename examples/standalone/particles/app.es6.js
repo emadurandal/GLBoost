@@ -88,8 +88,8 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.HalfLambertShader {
-  constructor(canvas, ParticleShaderSource) {
-    super(canvas);
+  constructor(canvas, basicShader, ParticleShaderSource) {
+    super(canvas, basicShader);
     if (ParticleShaderSource) {
       MyCustomShader.mixin(ParticleShaderSource);
       MyCustomShader.mixin(MyCustomShaderSource);

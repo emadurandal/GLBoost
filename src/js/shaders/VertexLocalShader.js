@@ -50,3 +50,5 @@ export default class VertexLocalShaderSource {
     return vertexAttribsAsResult;
   }
 }
+
+GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;

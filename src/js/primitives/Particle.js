@@ -224,8 +224,8 @@ export default class Particle extends Geometry {
     }
 
     class ParticleShader extends this._materialForBillboard.shaderClass {
-      constructor(canvas) {
-        super(canvas, ParticleShaderSource);
+      constructor(canvas, basicShader) {
+        super(canvas, basicShader, ParticleShaderSource);
         ParticleShader.mixin(ParticleShaderSource);
 
         this._meshTransformUpdateCount = -9999;

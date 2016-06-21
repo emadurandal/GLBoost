@@ -2866,36 +2866,6 @@
 
   GLExtentionsManager._instances = new Object();
 
-  var ArrayUtil = function () {
-    function ArrayUtil() {
-      babelHelpers.classCallCheck(this, ArrayUtil);
-    }
-
-    babelHelpers.createClass(ArrayUtil, null, [{
-      key: 'merge',
-      value: function merge() {
-        var key,
-            result = false;
-        if (arguments && arguments.length > 0) {
-          result = [];
-          for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
-              for (key in arguments[i]) {
-                if (isFinite(key)) {
-                  result.push(arguments[i][key]);
-                } else {
-                  result[key] = arguments[i][key];
-                }
-              }
-            }
-          }
-        }
-        return result;
-      }
-    }]);
-    return ArrayUtil;
-  }();
-
   /**
    * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
    * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
@@ -2921,58 +2891,6 @@
 
     return AbstractLight;
   }(Element);
-
-  /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
-   */
-
-  var DirectionalLight = function (_AbstractLight) {
-    babelHelpers.inherits(DirectionalLight, _AbstractLight);
-
-
-    /**
-     * [en] The constructor of DirectionalLight class. <br>
-     * [ja] DirectionalLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-
-    function DirectionalLight(intensity, direction) {
-      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
-      babelHelpers.classCallCheck(this, DirectionalLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, canvas));
-
-      _this._gl = GLContext.getInstance(canvas).gl;
-      _this._name = "";
-      _this._intensity = intensity;
-      _this._direction = direction;
-      return _this;
-    }
-
-    babelHelpers.createClass(DirectionalLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }, {
-      key: 'direction',
-      set: function set(vec) {
-        this._direction = vec;
-      },
-      get: function get() {
-        return this._direction;
-      }
-    }]);
-    return DirectionalLight;
-  }(AbstractLight);
-
-  GLBoost$1["DirectionalLight"] = DirectionalLight;
 
   /**
    * [en] This is a Point Light class.<br>
@@ -3513,6 +3431,343 @@
   Shader._instances = new Object();
   Shader._shaderHashTable = {};
 
+  var VertexLocalShaderSource = function () {
+    function VertexLocalShaderSource() {
+      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
+    }
+
+    babelHelpers.createClass(VertexLocalShaderSource, [{
+      key: 'VSDefine_VertexLocalShaderSource',
+      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexLocalShaderSource',
+      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (existCamera_f) {
+          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+        } else {
+          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexLocalShaderSource',
+      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
+        var shaderText = '';
+        if (lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexLocalShaderSource',
+      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+
+        var attribName = 'position';
+        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+
+        if (existCamera_f) {
+          shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexLocalShaderSource;
+  }();
+
+  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
+
+  /**
+   * [en] This is a Directional Light class.<br>
+   * [ja] 平行光源クラスです。
+   */
+
+  var DirectionalLight = function (_AbstractLight) {
+    babelHelpers.inherits(DirectionalLight, _AbstractLight);
+
+
+    /**
+     * [en] The constructor of DirectionalLight class. <br>
+     * [ja] DirectionalLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+
+    function DirectionalLight(intensity, direction) {
+      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
+      babelHelpers.classCallCheck(this, DirectionalLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, canvas));
+
+      _this._gl = GLContext.getInstance(canvas).gl;
+      _this._name = "";
+      _this._intensity = intensity;
+      _this._direction = direction;
+      return _this;
+    }
+
+    babelHelpers.createClass(DirectionalLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }, {
+      key: 'direction',
+      set: function set(vec) {
+        this._direction = vec;
+      },
+      get: function get() {
+        return this._direction;
+      }
+    }]);
+    return DirectionalLight;
+  }(AbstractLight);
+
+  GLBoost$1["DirectionalLight"] = DirectionalLight;
+
+  var singleton$2 = Symbol();
+  var singletonEnforcer$2 = Symbol();
+
+  var DrawKickerLocal = function () {
+    function DrawKickerLocal(enforcer) {
+      babelHelpers.classCallCheck(this, DrawKickerLocal);
+
+      if (enforcer !== singletonEnforcer$2) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+      this._glslProgram = null;
+    }
+
+    babelHelpers.createClass(DrawKickerLocal, [{
+      key: 'draw',
+      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, renderPass_index, vertexN) {
+        var isVAOBound = false;
+        if (DrawKickerLocal._lastGeometry !== geometryName) {
+          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
+        }
+
+        for (var i = 0; i < materials.length; i++) {
+          var materialName = materials[i].toString();
+          if (materialName !== DrawKickerLocal._lastMaterial) {
+            this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+            gl.useProgram(this._glslProgram);
+          }
+          var glslProgram = this._glslProgram;
+
+          if (!isVAOBound) {
+            if (DrawKickerLocal._lastGeometry !== geometryName) {
+              gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[geometryName]);
+              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+            }
+          }
+
+          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+          gl.uniform1f(glslProgram.opacity, opacity);
+
+          if (camera) {
+            var viewMatrix = camera.lookAtRHMatrix();
+            var projectionMatrix = camera.perspectiveRHMatrix();
+            var m_m = mesh.transformMatrixAccumulatedAncestry;
+            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(pvm_m.flatten()));
+          }
+
+          if (glslProgram['lightPosition_0']) {
+            lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, glContext.canvas);
+            if (glslProgram['viewPosition']) {
+              var cameraPosInLocalCoord = null;
+              if (camera) {
+                var cameraPos = new Vector4(0, 0, 0, 1);
+                cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+              } else {
+                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
+              }
+              gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+            }
+
+            for (var j = 0; j < lights.length; j++) {
+              if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
+                var lightVec = null;
+                var isPointLight = -9999;
+                if (lights[j] instanceof PointLight) {
+                  lightVec = new Vector4(0, 0, 0, 1);
+                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  isPointLight = 1.0;
+                } else if (lights[j] instanceof DirectionalLight) {
+                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  lightVec.w = 0.0;
+                  isPointLight = 0.0;
+                }
+
+                var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+
+                gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+              }
+            }
+          }
+
+          var isMaterialSetupDone = true;
+
+          if (materials[i].shaderInstance.dirty || materialName !== DrawKickerLocal._lastMaterial) {
+            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+            materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
+          }
+
+          if (materialName !== DrawKickerLocal._lastMaterial) {
+            if (materials[i]) {
+              isMaterialSetupDone = materials[i].setUp();
+            }
+          }
+          if (!isMaterialSetupDone) {
+            return;
+          }
+
+          if (iboArrayDic[geometryName].length > 0) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
+            gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+          } else {
+            gl.drawArrays(gl[primitiveType], 0, vertexN);
+          }
+
+          DrawKickerLocal._lastMaterial = isMaterialSetupDone ? materialName : null;
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        DrawKickerLocal._lastGeometry = geometryName;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton$2]) {
+          this[singleton$2] = new DrawKickerLocal(singletonEnforcer$2);
+        }
+        return this[singleton$2];
+      }
+    }]);
+    return DrawKickerLocal;
+  }();
+
+  DrawKickerLocal._lastMaterial = null;
+  DrawKickerLocal._lastGeometry = null;
+
+  var MiscUtil = function () {
+    function MiscUtil() {
+      babelHelpers.classCallCheck(this, MiscUtil);
+    }
+
+    babelHelpers.createClass(MiscUtil, null, [{
+      key: 'isDefinedAndTrue',
+      value: function isDefinedAndTrue(value) {
+        if (typeof value !== 'undefined' && value) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }]);
+    return MiscUtil;
+  }();
+
+  var VertexViewShaderSource = function () {
+    function VertexViewShaderSource() {
+      babelHelpers.classCallCheck(this, VertexViewShaderSource);
+    }
+
+    babelHelpers.createClass(VertexViewShaderSource, [{
+      key: 'VSDefine_VertexViewShaderSource',
+      value: function VSDefine_VertexViewShaderSource(in_, out_, f, lights, extraData) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+        if (MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex) && lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+        }
+        shaderText += 'uniform mat4 worldMatrix;\n';
+        shaderText += 'uniform mat4 viewMatrix;\n';
+        shaderText += 'uniform mat4 projectionMatrix;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexViewShaderSource',
+      value: function VSTransform_VertexViewShaderSource(existCamera_f, f, lights, extraData) {
+        var shaderText = '';
+        if (existCamera_f) {
+          shaderText += '  gl_Position = projectionMatrix * viewMatrix * worldMatrix * vec4(aVertex_position, 1.0);\n';
+        } else {
+          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexViewShaderSource',
+      value: function FSDefine_VertexViewShaderSource(in_, f, lights, extraData) {
+        var shaderText = '';
+        if (lights.length > 0) {
+          if (!MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex)) {
+            shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          }
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexViewShaderSource',
+      value: function prepare_VertexViewShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+
+        var attribName = 'position';
+        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+
+        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        if (existCamera_f) {
+          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+        }
+
+        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexViewShaderSource;
+  }();
+
+  GLBoost['VertexViewShaderSource'] = VertexViewShaderSource;
+
   var singleton$3 = Symbol();
   var singletonEnforcer$3 = Symbol();
 
@@ -3645,6 +3900,36 @@
   DrawKickerView._lastMaterial = null;
   DrawKickerView._lastGeometry = null;
 
+  var ArrayUtil = function () {
+    function ArrayUtil() {
+      babelHelpers.classCallCheck(this, ArrayUtil);
+    }
+
+    babelHelpers.createClass(ArrayUtil, null, [{
+      key: 'merge',
+      value: function merge() {
+        var key,
+            result = false;
+        if (arguments && arguments.length > 0) {
+          result = [];
+          for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
+              for (key in arguments[i]) {
+                if (isFinite(key)) {
+                  result.push(arguments[i][key]);
+                } else {
+                  result[key] = arguments[i][key];
+                }
+              }
+            }
+          }
+        }
+        return result;
+      }
+    }]);
+    return ArrayUtil;
+  }();
+
   var FragmentSimpleShaderSource = function () {
     function FragmentSimpleShaderSource() {
       babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
@@ -3674,157 +3959,6 @@
       }
     }]);
     return FragmentSimpleShaderSource;
-  }();
-
-  var MiscUtil = function () {
-    function MiscUtil() {
-      babelHelpers.classCallCheck(this, MiscUtil);
-    }
-
-    babelHelpers.createClass(MiscUtil, null, [{
-      key: 'isDefinedAndTrue',
-      value: function isDefinedAndTrue(value) {
-        if (typeof value !== 'undefined' && value) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }]);
-    return MiscUtil;
-  }();
-
-  var VertexViewShaderSource = function () {
-    function VertexViewShaderSource() {
-      babelHelpers.classCallCheck(this, VertexViewShaderSource);
-    }
-
-    babelHelpers.createClass(VertexViewShaderSource, [{
-      key: 'VSDefine_VertexViewShaderSource',
-      value: function VSDefine_VertexViewShaderSource(in_, out_, f, lights, extraData) {
-        var shaderText = in_ + ' vec3 aVertex_position;\n';
-        if (MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex) && lights.length > 0) {
-          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-        }
-        shaderText += 'uniform mat4 worldMatrix;\n';
-        shaderText += 'uniform mat4 viewMatrix;\n';
-        shaderText += 'uniform mat4 projectionMatrix;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexViewShaderSource',
-      value: function VSTransform_VertexViewShaderSource(existCamera_f, f, lights, extraData) {
-        var shaderText = '';
-        if (existCamera_f) {
-          shaderText += '  gl_Position = projectionMatrix * viewMatrix * worldMatrix * vec4(aVertex_position, 1.0);\n';
-        } else {
-          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexViewShaderSource',
-      value: function FSDefine_VertexViewShaderSource(in_, f, lights, extraData) {
-        var shaderText = '';
-        if (lights.length > 0) {
-          if (!MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex)) {
-            shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-          }
-          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexViewShaderSource',
-      value: function prepare_VertexViewShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
-
-        var vertexAttribsAsResult = [];
-
-        var attribName = 'position';
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
-
-        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-        if (existCamera_f) {
-          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexViewShaderSource;
-  }();
-
-  var VertexLocalShaderSource = function () {
-    function VertexLocalShaderSource() {
-      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
-    }
-
-    babelHelpers.createClass(VertexLocalShaderSource, [{
-      key: 'VSDefine_VertexLocalShaderSource',
-      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
-        var shaderText = in_ + ' vec3 aVertex_position;\n';
-        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexLocalShaderSource',
-      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (existCamera_f) {
-          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
-        } else {
-          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexLocalShaderSource',
-      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
-        var shaderText = '';
-        if (lights.length > 0) {
-          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        }
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexLocalShaderSource',
-      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
-
-        var vertexAttribsAsResult = [];
-
-        var attribName = 'position';
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
-
-        if (existCamera_f) {
-          shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
-        }
-
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-        for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexLocalShaderSource;
   }();
 
   var DecalShaderSource = function () {
@@ -3920,11 +4054,12 @@
 
     function DecalShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments.length <= 1 || arguments[1] === undefined ? VertexViewShaderSource : arguments[1];
       babelHelpers.classCallCheck(this, DecalShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DecalShader).call(this, canvas));
 
-      DecalShader.mixin(VertexViewShaderSource);
+      DecalShader.mixin(basicShader);
       DecalShader.mixin(FragmentSimpleShaderSource);
       DecalShader.mixin(DecalShaderSource);
       return _this;
@@ -4101,136 +4236,6 @@
 
   GLBoost$1['ClassicMaterial'] = ClassicMaterial;
 
-  var singleton$2 = Symbol();
-  var singletonEnforcer$2 = Symbol();
-
-  var DrawKickerLocal = function () {
-    function DrawKickerLocal(enforcer) {
-      babelHelpers.classCallCheck(this, DrawKickerLocal);
-
-      if (enforcer !== singletonEnforcer$2) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-      this._glslProgram = null;
-    }
-
-    babelHelpers.createClass(DrawKickerLocal, [{
-      key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, renderPass_index, vertexN) {
-        var isVAOBound = false;
-        if (DrawKickerLocal._lastGeometry !== geometryName) {
-          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-        }
-
-        for (var i = 0; i < materials.length; i++) {
-          var materialName = materials[i].toString();
-          if (materialName !== DrawKickerLocal._lastMaterial) {
-            this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
-            gl.useProgram(this._glslProgram);
-          }
-          var glslProgram = this._glslProgram;
-
-          if (!isVAOBound) {
-            if (DrawKickerLocal._lastGeometry !== geometryName) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[geometryName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
-            }
-          }
-
-          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-          gl.uniform1f(glslProgram.opacity, opacity);
-
-          if (camera) {
-            var viewMatrix = camera.lookAtRHMatrix();
-            var projectionMatrix = camera.perspectiveRHMatrix();
-            var m_m = mesh.transformMatrixAccumulatedAncestry;
-            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(pvm_m.flatten()));
-          }
-
-          if (glslProgram['lightPosition_0']) {
-            lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, glContext.canvas);
-            if (glslProgram['viewPosition']) {
-              var cameraPosInLocalCoord = null;
-              if (camera) {
-                var cameraPos = new Vector4(0, 0, 0, 1);
-                cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
-                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
-              } else {
-                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
-              }
-              gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
-            }
-
-            for (var j = 0; j < lights.length; j++) {
-              if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
-                var lightVec = null;
-                var isPointLight = -9999;
-                if (lights[j] instanceof PointLight) {
-                  lightVec = new Vector4(0, 0, 0, 1);
-                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  isPointLight = 1.0;
-                } else if (lights[j] instanceof DirectionalLight) {
-                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
-                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  lightVec.w = 0.0;
-                  isPointLight = 0.0;
-                }
-
-                var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
-
-                gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
-              }
-            }
-          }
-
-          var isMaterialSetupDone = true;
-
-          if (materials[i].shaderInstance.dirty || materialName !== DrawKickerLocal._lastMaterial) {
-            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
-            materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
-          }
-
-          if (materialName !== DrawKickerLocal._lastMaterial) {
-            if (materials[i]) {
-              isMaterialSetupDone = materials[i].setUp();
-            }
-          }
-          if (!isMaterialSetupDone) {
-            return;
-          }
-
-          if (iboArrayDic[geometryName].length > 0) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-            gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-          } else {
-            gl.drawArrays(gl[primitiveType], 0, vertexN);
-          }
-
-          DrawKickerLocal._lastMaterial = isMaterialSetupDone ? materialName : null;
-        }
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        DrawKickerLocal._lastGeometry = geometryName;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton$2]) {
-          this[singleton$2] = new DrawKickerLocal(singletonEnforcer$2);
-        }
-        return this[singleton$2];
-      }
-    }]);
-    return DrawKickerLocal;
-  }();
-
-  DrawKickerLocal._lastMaterial = null;
-  DrawKickerLocal._lastGeometry = null;
-
   var Geometry = function () {
     function Geometry() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
@@ -4253,6 +4258,9 @@
       this._centerPosition = Vector3.zero();
       this._setName();
       this._drawKicker = DrawKickerView.getInstance();
+      if (this._drawKicker instanceof DrawKickerView) {} else if (this._drawKicker instanceof DrawKickerLocal) {
+        this._extraDataForShader.transformByMultipliedPVWMatrix = true;
+      }
     }
 
     babelHelpers.createClass(Geometry, [{
@@ -4472,7 +4480,15 @@
           if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
             if (material.shaderInstance === null) {
               var shaderClass = material.shaderClass;
-              material.shaderInstance = new shaderClass(this._glContext.canvas);
+
+              var basicShaderSource = null;
+              if (this._drawKicker instanceof DrawKickerView) {
+                basicShaderSource = VertexViewShaderSource;
+              } else if (this._drawKicker instanceof DrawKickerLocal) {
+                basicShaderSource = VertexLocalShaderSource;
+              }
+
+              material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
             }
             var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
             this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
@@ -5704,10 +5720,10 @@
         var BlendShapeShader = function (_materialForBlend$sha) {
           babelHelpers.inherits(BlendShapeShader, _materialForBlend$sha);
 
-          function BlendShapeShader(canvas) {
+          function BlendShapeShader(canvas, basicShader) {
             babelHelpers.classCallCheck(this, BlendShapeShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeShader).call(this, canvas));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeShader).call(this, canvas, basicShader));
 
             BlendShapeShader.mixin(BlendShapeShaderSource);
             return _this2;
@@ -5978,9 +5994,10 @@
 
     function PhongShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments[1];
       babelHelpers.classCallCheck(this, PhongShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PhongShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PhongShader).call(this, canvas, basicShader));
 
       PhongShader.mixin(PhongShaderSource);
 
@@ -6114,9 +6131,10 @@
 
     function LambertShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments[1];
       babelHelpers.classCallCheck(this, LambertShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, canvas, basicShader));
 
       LambertShader.mixin(LambertShaderSource);
       return _this;
@@ -6222,9 +6240,10 @@
 
     function HalfLambertShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments[1];
       babelHelpers.classCallCheck(this, HalfLambertShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, canvas, basicShader));
 
       HalfLambertShader.mixin(HalfLambertShaderSource);
       return _this;
@@ -7437,10 +7456,10 @@
         var ParticleShader = function (_materialForBillboard) {
           babelHelpers.inherits(ParticleShader, _materialForBillboard);
 
-          function ParticleShader(canvas) {
+          function ParticleShader(canvas, basicShader) {
             babelHelpers.classCallCheck(this, ParticleShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(ParticleShader).call(this, canvas, ParticleShaderSource));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(ParticleShader).call(this, canvas, basicShader, ParticleShaderSource));
 
             ParticleShader.mixin(ParticleShaderSource);
 
@@ -7750,10 +7769,10 @@
         var SkeletalShader = function (_materialForSkeletal$) {
           babelHelpers.inherits(SkeletalShader, _materialForSkeletal$);
 
-          function SkeletalShader(canvas) {
+          function SkeletalShader(canvas, basicShader) {
             babelHelpers.classCallCheck(this, SkeletalShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, canvas));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, canvas, basicShader));
 
             SkeletalShader.mixin(SkeletalShaderSource);
             return _this2;

@@ -134,8 +134,8 @@ export default class SkeletalGeometry extends Geometry {
     }
 
     class SkeletalShader extends this._materialForSkeletal.shaderClass {
-      constructor(canvas) {
-        super(canvas);
+      constructor(canvas, basicShader) {
+        super(canvas, basicShader);
         SkeletalShader.mixin(SkeletalShaderSource);
       }
     }

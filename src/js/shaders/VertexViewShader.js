@@ -60,3 +60,5 @@ export default class VertexViewShaderSource {
     return vertexAttribsAsResult;
   }
 }
+
+GLBoost['VertexViewShaderSource'] = VertexViewShaderSource;

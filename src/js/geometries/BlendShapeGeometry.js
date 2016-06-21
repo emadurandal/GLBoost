@@ -38,8 +38,8 @@ export default class BlendShapeGeometry extends Geometry {
     }
 
     class BlendShapeShader extends this._materialForBlend.shaderClass {
-      constructor(canvas) {
-        super(canvas);
+      constructor(canvas, basicShader) {
+        super(canvas, basicShader);
         BlendShapeShader.mixin(BlendShapeShaderSource);
       }
     }

@@ -176,10 +176,10 @@
   var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
-    function MyCustomShader(canvas, ParticleShaderSource) {
+    function MyCustomShader(canvas, basicShader, ParticleShaderSource) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
 
       if (ParticleShaderSource) {
         MyCustomShader.mixin(ParticleShaderSource);
