@@ -4,12 +4,36 @@ import MathUtil from './MathUtil';
 
 export default class Matrix33 {
 
-  constructor() {
-    this.m = [];
+  constructor(m, isColumnMajor = false) {
+    this.m = new Float32Array(9);
     if (arguments.length >= 9) {
-      this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values
-    } else if (Array.isArray(arguments[0])) {
-      this.m = arguments[0].concat();            // arguments[0] must be column major array
+      if (isColumnMajor === true) {
+        let m = arguments;
+        this.setComponents(
+          m[0], m[3], m[6],
+          m[1], m[4], m[7],
+          m[2], m[5], m[8]);
+      } else {
+        this.setComponents.apply(this, arguments);  // arguments[0-8] must be row major values if isColumnMajor is false
+      }
+    } else if (Array.isArray(m)) {
+      if (isColumnMajor === true) {
+        this.setComponents(
+          m[0], m[3], m[6],
+          m[1], m[4], m[7],
+          m[2], m[5], m[8]);
+      } else {
+        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+      }
+    } else if (m instanceof Float32Array) {
+      if (isColumnMajor === true) {
+        this.setComponents(
+          m[0], m[3], m[6],
+          m[1], m[4], m[7],
+          m[2], m[5], m[8]);
+      } else {
+        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+      }
     } else {
       this.identity();
     }
@@ -178,6 +202,12 @@ export default class Matrix33 {
 
   flatten() {
     return this.m;
+  }
+
+  flattenAsArray() {
+    return [this.m[0], this.m[1], this.m[2],
+      this.m[3], this.m[4], this.m[5],
+      this.m[6], this.m[7], this.m[8]];
   }
 
   _swap(l, r) {
@@ -362,7 +392,7 @@ export default class Matrix33 {
   }
 
   set m02(val) {
-    this.m[6  ] = val;
+    this.m[6] = val;
   }
 
   get m02() {
@@ -387,4 +417,4 @@ export default class Matrix33 {
 
 }
 
-GLBoost["Matrix33"] = Matrix33;
+GLBoost['Matrix33'] = Matrix33;

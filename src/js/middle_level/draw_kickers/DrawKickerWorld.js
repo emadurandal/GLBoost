@@ -46,15 +46,15 @@ export default class DrawKickerWorld {
       gl.uniform1f(glslProgram.opacity, opacity);
 
       let world_m = mesh.transformMatrixAccumulatedAncestry;
-      gl.uniformMatrix4fv(glslProgram.worldMatrix, false, new Float32Array(world_m.flatten()));
+      gl.uniformMatrix4fv(glslProgram.worldMatrix, false, world_m.flatten());
       let normal_m = mesh.normalMatrixAccumulatedAncestry;
-      gl.uniformMatrix3fv(glslProgram.normalMatrix, false, new Float32Array(normal_m.flatten()));
+      gl.uniformMatrix3fv(glslProgram.normalMatrix, false, normal_m.flatten());
       if (camera) {
         let cameraMatrix = camera.lookAtRHMatrix();
         let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
         let projectionMatrix = camera.perspectiveRHMatrix();
-        gl.uniformMatrix4fv(glslProgram.viewMatrix, false, new Float32Array(viewMatrix.flatten()));
-        gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(projectionMatrix.flatten()));
+        gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
+        gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
       }
 
       if (glslProgram['lightPosition_0']) {

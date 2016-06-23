@@ -50,7 +50,7 @@ export default class DrawKickerLocal {
         var projectionMatrix = camera.perspectiveRHMatrix();
         var m_m = mesh.transformMatrixAccumulatedAncestry;
         var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(pvm_m.flatten()));
+        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
       }
 
       if (glslProgram['lightPosition_0']) {

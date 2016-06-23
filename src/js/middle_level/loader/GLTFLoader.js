@@ -169,7 +169,7 @@ export default class GLTFLoader {
       group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
-      group.multiplyMatrix(new Matrix44(nodeJson.matrix));
+      group.multiplyMatrix(new Matrix44(nodeJson.matrix, true));
     }
 
     if (nodeJson.meshes) {
@@ -210,7 +210,7 @@ export default class GLTFLoader {
       mesh = new SkeletalMesh(geometry, null, rootJointStr);
       let skin = json.skins[skinStr];
 
-      mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix));
+      mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix, true));
 
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
       mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
@@ -440,7 +440,7 @@ export default class GLTFLoader {
           for (let i=0; i<16; i++) {
             matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian)*scale;
           }
-          vertexAttributeArray.push(new Matrix44(matrixComponents));
+          vertexAttributeArray.push(new Matrix44(matrixComponents, true));
           break;
       }
 

@@ -97,7 +97,7 @@ export default class SkeletalGeometry extends Geometry {
     }
     var flatMatrices = [];
     for (let i=0; i<matrices.length; i++) {
-      Array.prototype.push.apply(flatMatrices, matrices[i].flatten());
+      Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
     }
     if (matrices.length < 4) {
       let identityMatrices = [];
