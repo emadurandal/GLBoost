@@ -3711,24 +3711,6 @@
   DrawKickerLocal._lastMaterial = null;
   DrawKickerLocal._lastGeometry = null;
 
-  var MiscUtil = function () {
-    function MiscUtil() {
-      babelHelpers.classCallCheck(this, MiscUtil);
-    }
-
-    babelHelpers.createClass(MiscUtil, null, [{
-      key: 'isDefinedAndTrue',
-      value: function isDefinedAndTrue(value) {
-        if (typeof value !== 'undefined' && value) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }]);
-    return MiscUtil;
-  }();
-
   var VertexWorldShaderSource = function () {
     function VertexWorldShaderSource() {
       babelHelpers.classCallCheck(this, VertexWorldShaderSource);
@@ -3738,7 +3720,6 @@
       key: 'VSDefine_VertexWorldShaderSource',
       value: function VSDefine_VertexWorldShaderSource(in_, out_, f, lights, extraData) {
         var shaderText = in_ + ' vec3 aVertex_position;\n';
-        //if(MiscUtil.isDefinedAndTrue(extraData.transformLightPositionInVertex) && lights.length > 0) {
 
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += in_ + ' vec3 aVertex_normal;\n';
@@ -8271,7 +8252,7 @@
 
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
-  if (typeof phina !== "undefined") {
+  if (typeof phina !== 'undefined') {
 
     phina.namespace(function () {
 
