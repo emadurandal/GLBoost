@@ -22,6 +22,7 @@ export default class Element {
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
+    this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
     this._animationLine = {};
     this._userFlavorName = '';
@@ -299,6 +300,19 @@ export default class Element {
 
     return this._matrixAccumulatedAncestry;
   }
+
+  get normalMatrixAccumulatedAncestry() {
+    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempString);
+    if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+      let world_m = this._multiplyMyAndParentTransformMatrices(this, true);
+      this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
+      this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
+    }
+
+    return this._normalMatrixAccumulatedAncestry;
+  }
+
 
   get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
     if (this._parent === null) {

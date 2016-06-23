@@ -1,6 +1,5 @@
 import Shader from './Shader';
-import VertexLocalShaderSource from './VertexLocalShader';
-import VertexViewShaderSource from './VertexViewShader';
+import VertexWorldShaderSource from './VertexWorldShader';
 import FragmentSimpleShaderSource from './FragmentSimpleShader';
 
 export class DecalShaderSource {
@@ -80,7 +79,7 @@ export class DecalShaderSource {
 }
 
 export default class DecalShader extends Shader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader = VertexViewShaderSource) {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader = VertexWorldShaderSource) {
 
     super(canvas);
 

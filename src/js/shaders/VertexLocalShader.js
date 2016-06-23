@@ -3,6 +3,11 @@ import Shader from './Shader';
 export default class VertexLocalShaderSource {
   VSDefine_VertexLocalShaderSource(in_, out_, f) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += `${in_} vec3 aVertex_normal;\n`;
+      shaderText += `${out_} vec3 v_normal;\n`;
+    }
+    shaderText += `${out_} vec4 position;\n`;
     shaderText +=      'uniform mat4 modelViewProjectionMatrix;\n';
     return shaderText;
   }
@@ -11,14 +16,24 @@ export default class VertexLocalShaderSource {
     var shaderText = '';
     if (existCamera_f) {
       shaderText +=   '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
     } else {
       shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
     }
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += '  v_normal = aVertex_normal;\n';
+    }
+    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+
     return shaderText;
   }
 
   FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
     var shaderText = '';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += `${in_} vec3 v_normal;\n`;
+    }
+    shaderText += `${in_} vec4 position;\n`;
     if(lights.length > 0) {
       shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
       shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;

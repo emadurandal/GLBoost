@@ -6,9 +6,9 @@ import ClassicMaterial from './../ClassicMaterial';
 import ArrayUtil from './../misc/ArrayUtil';
 import MathUtil from '../math/MathUtil';
 import DrawKickerLocal from '../draw_kickers/DrawKickerLocal';
-import DrawKickerView from '../draw_kickers/DrawKickerView';
+import DrawKickerWorld from '../draw_kickers/DrawKickerWorld';
 import VertexLocalShaderSource from '../shaders/VertexLocalShader';
-import VertexViewShaderSource from '../shaders/VertexViewShader';
+import VertexWorldShaderSource from '../shaders/VertexWorldShader';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -28,11 +28,12 @@ export default class Geometry {
     this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
     this._centerPosition = Vector3.zero();
     this._setName();
-    this._drawKicker = DrawKickerView.getInstance();
-    if (this._drawKicker instanceof DrawKickerView) {
+    this._drawKicker = DrawKickerWorld.getInstance();
+
+    if (this._drawKicker instanceof DrawKickerWorld) {
 
     } else if (this._drawKicker instanceof DrawKickerLocal) {
-      this._extraDataForShader.transformByMultipliedPVWMatrix = true;
+
     }
   }
 
@@ -224,8 +225,8 @@ export default class Geometry {
           let shaderClass = material.shaderClass;
 
           let basicShaderSource = null;
-          if (this._drawKicker instanceof DrawKickerView) {
-            basicShaderSource = VertexViewShaderSource;
+          if (this._drawKicker instanceof DrawKickerWorld) {
+            basicShaderSource = VertexWorldShaderSource;
           } else if (this._drawKicker instanceof DrawKickerLocal) {
             basicShaderSource = VertexLocalShaderSource;
           }

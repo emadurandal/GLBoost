@@ -10,7 +10,7 @@ export default class ClassicMaterial {
     this._canvas = canvas;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-    this._specularColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
     this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
     this._name = '';
     this._shaderClass = DecalShader;

@@ -2,31 +2,9 @@ import Shader from './Shader';
 import DecalShader from './DecalShader';
 
 export class LambertShaderSource {
-  VSDefine_LambertShaderSource(in_, out_, f, lights) {
-    var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 aVertex_normal;\n`;
-      shaderText += `${out_} vec3 v_normal;\n`;
-    }
-    shaderText += `${out_} vec4 position;\n`;
-
-    return shaderText;
-  }
-
-  VSTransform_LambertShaderSource(existCamera_f, f, lights) {
-    var shaderText = '';
-    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-    shaderText += '  v_normal = aVertex_normal;\n';
-
-    return shaderText;
-  }
 
   FSDefine_LambertShaderSource(in_, f, lights) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
     shaderText += `uniform vec4 Kd;\n`;
 
     return shaderText;

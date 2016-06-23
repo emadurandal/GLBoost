@@ -20,11 +20,7 @@ export default class SkeletalShaderSource {
     shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
 
     if (existCamera_f) {
-      if (MiscUtil.isDefinedAndTrue(extraData.transformByMultipliedPVWMatrix)) {
-        shaderText += '  gl_Position = modelViewProjectionMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-      } else {
-        shaderText += '  gl_Position = projectionMatrix * viewMatrix * worldMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-      }
+      shaderText += '  gl_Position = pvwMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
     } else {
       shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
     }

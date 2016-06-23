@@ -2,30 +2,9 @@ import Shader from './Shader';
 import DecalShader from './DecalShader';
 
 export class PhongShaderSource {
-  VSDefine_PhongShaderSource(in_, out_, f, lights) {
-    var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 aVertex_normal;\n`;
-      shaderText += `${out_} vec3 v_normal;\n`;
-    }
-    shaderText += `${out_} vec4 position;\n`;
-    return shaderText;
-  }
-
-  VSTransform_PhongShaderSource(existCamera_f, f, lights) {
-    var shaderText = '';
-    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-    shaderText += '  v_normal = aVertex_normal;\n';
-
-    return shaderText;
-  }
 
   FSDefine_PhongShaderSource(in_, f, lights) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
     shaderText += `uniform vec3 viewPosition;\n`;
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec4 Ks;\n`;
@@ -36,21 +15,20 @@ export class PhongShaderSource {
 
   FSShade_PhongShaderSource(f, gl, lights) {
     var shaderText = '';
-
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-    shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-    shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-    shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-    shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
-    shaderText += '    vec3 reflect = -view + 2.0 * dot(normal, view) * normal;\n';
-    shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
-    shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
-    shaderText += '  }\n';
+    shaderText += `    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n`;
+    shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
+    shaderText += `    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+    shaderText += `    vec3 view = normalize(viewPosition - position.xyz);\n`;
+    shaderText += `    vec3 reflect = -view + 2.0 * max(dot(normal, view), 0.0) * normal;\n`;
+    shaderText += `    float specular = pow(max(dot(light, reflect), 0.0), power);\n`;
+    shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
+    shaderText += `  }\n`;
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 

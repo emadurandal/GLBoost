@@ -2,32 +2,9 @@ import Shader from './Shader';
 import DecalShader from './DecalShader';
 
 export class HalfLambertShaderSource {
-  VSDefine_HalfLambertShaderSource(in_, out_, f, lights) {
-    var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 aVertex_normal;\n`;
-      shaderText += `${out_} vec3 v_normal;\n`;
-    }
-    shaderText += `${out_} vec4 position;\n`;
-
-    return shaderText;
-  }
-
-  VSTransform_HalfLambertShaderSource(existCamera_f, f, lights) {
-    var shaderText = '';
-
-    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-    shaderText += '  v_normal = aVertex_normal;\n';
-
-    return shaderText;
-  }
 
   FSDefine_HalfLambertShaderSource(in_, f, lights) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
     shaderText += `uniform vec4 Kd;\n`;
 
     return shaderText;
@@ -43,7 +20,7 @@ export class HalfLambertShaderSource {
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-    shaderText += '    float halfLambert = dot(light, normal)*0.5+0.5;\n';
+    shaderText += '    float halfLambert = max(dot(light, normal), 0.0)*0.5+0.5;\n';
     shaderText += '    float diffuse = halfLambert*halfLambert;\n';
     shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '  }\n';
