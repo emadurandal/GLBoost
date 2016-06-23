@@ -86,8 +86,7 @@ var scene = new GLBoost.Scene();
 var material = new GLBoost.ClassicMaterial();
 var texture = new GLBoost.Texture('resources/texture.png'); // earth.jpg
 material.diffuseTexture = texture;
-var shader = new GLBoost.PhongShader();
-material.shader = shader;
+material.shaderClass = GLBoost.PhongShader;
 
 // make a Sphere geometry
 var geometry = new GLBoost.Sphere(20, 24, 24, null);
