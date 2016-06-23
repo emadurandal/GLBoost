@@ -6,12 +6,39 @@ import MathUtil from './MathUtil';
 
 export default class Matrix44 {
 
-  constructor() {
-    this.m = [];
+  constructor(m, isColumnMajor = false) {
+    this.m = new Float32Array(16);
     if (arguments.length >= 16) {
-      this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values
-    } else if (Array.isArray(arguments[0])) {
-      this.m = arguments[0].concat();             // arguments[0] must be column major array
+      if (isColumnMajor === true) {
+        let m = arguments;
+        this.setComponents(
+          m[0], m[4], m[8], m[12],
+          m[1], m[5], m[9], m[13],
+          m[2], m[6], m[10], m[14],
+          m[3], m[7], m[11], m[15]);
+      } else {
+        this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
+      }
+    } else if (Array.isArray(m)) {
+      if (isColumnMajor === true) {
+        this.setComponents(
+          m[0], m[4], m[8], m[12],
+          m[1], m[5], m[9], m[13],
+          m[2], m[6], m[10], m[14],
+          m[3], m[7], m[11], m[15]);
+      } else {
+        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+      }
+    } else if (m instanceof Float32Array) {
+      if (isColumnMajor === true) {
+        this.setComponents(
+          m[0], m[4], m[8], m[12],
+          m[1], m[5], m[9], m[13],
+          m[2], m[6], m[10], m[14],
+          m[3], m[7], m[11], m[15]);
+      } else {
+        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+      }
     } else {
       this.identity();
     }
@@ -27,7 +54,12 @@ export default class Matrix44 {
   }
 
   clone() {
-    return new Matrix44(this.m);
+    return new Matrix44(
+      this.m[0], this.m[4], this.m[8], this.m[12],
+      this.m[1], this.m[5], this.m[9], this.m[13],
+      this.m[2], this.m[6], this.m[10], this.m[14],
+      this.m[3], this.m[7], this.m[11], this.m[15]
+    );
   }
 
   /**
@@ -218,8 +250,8 @@ export default class Matrix44 {
    * ゼロ行列
    */
   zero() {
-      this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      return this;
+    this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    return this;
   }
 
   static zero() {
@@ -230,6 +262,13 @@ export default class Matrix44 {
     return this.m;
   }
 
+  flattenAsArray() {
+    return [this.m[0], this.m[1], this.m[2], this.m[3],
+      this.m[4], this.m[5], this.m[6], this.m[7],
+      this.m[8], this.m[9], this.m[10], this.m[11],
+      this.m[12], this.m[13], this.m[14], this.m[15]];
+  }
+
   _swap(l, r) {
     this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
   }
@@ -238,14 +277,14 @@ export default class Matrix44 {
    * 転置
    */
   transpose() {
-      this._swap(1, 4);
-      this._swap(2, 8);
-      this._swap(3, 12);
-      this._swap(6, 9);
-      this._swap(7, 13);
-      this._swap(11, 14);
+    this._swap(1, 4);
+    this._swap(2, 8);
+    this._swap(3, 12);
+    this._swap(6, 9);
+    this._swap(7, 13);
+    this._swap(11, 14);
 
-      return this;
+    return this;
   }
 
   /**
@@ -341,7 +380,7 @@ export default class Matrix44 {
       this.m00, this.m01, this.m02,
       this.m10, this.m11, this.m12,
       this.m20, this.m21, this.m22
-    )
+    );
   }
 
   static toMatrix33(mat) {
@@ -349,7 +388,7 @@ export default class Matrix44 {
       mat.m00, mat.m01, mat.m02,
       mat.m10, mat.m11, mat.m12,
       mat.m20, mat.m21, mat.m22
-    )
+    );
   }
 
   determinant() {

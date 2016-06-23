@@ -594,17 +594,33 @@
   GLBoost$1["MathUtil"] = MathUtil;
 
   var Matrix33 = function () {
-    function Matrix33() {
+    function Matrix33(m) {
+      var isColumnMajor = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
       babelHelpers.classCallCheck(this, Matrix33);
 
-      this.m = [];
+      this.m = new Float32Array(9);
       if (arguments.length >= 9) {
-        this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values
-      } else if (Array.isArray(arguments[0])) {
-          this.m = arguments[0].concat(); // arguments[0] must be column major array
+        if (isColumnMajor === true) {
+          var _m = arguments;
+          this.setComponents(_m[0], _m[3], _m[6], _m[1], _m[4], _m[7], _m[2], _m[5], _m[8]);
         } else {
-            this.identity();
+          this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+          if (isColumnMajor === true) {
+            this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+          } else {
+            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
           }
+        } else if (m instanceof Float32Array) {
+            if (isColumnMajor === true) {
+              this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+            } else {
+              this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+            }
+          } else {
+              this.identity();
+            }
     }
 
     babelHelpers.createClass(Matrix33, [{
@@ -717,6 +733,11 @@
       key: 'flatten',
       value: function flatten() {
         return this.m;
+      }
+    }, {
+      key: 'flattenAsArray',
+      value: function flattenAsArray() {
+        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8]];
       }
     }, {
       key: '_swap',
@@ -973,20 +994,36 @@
     return Matrix33;
   }();
 
-  GLBoost$1["Matrix33"] = Matrix33;
+  GLBoost$1['Matrix33'] = Matrix33;
 
   var Matrix44 = function () {
-    function Matrix44() {
+    function Matrix44(m) {
+      var isColumnMajor = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
       babelHelpers.classCallCheck(this, Matrix44);
 
-      this.m = [];
+      this.m = new Float32Array(16);
       if (arguments.length >= 16) {
-        this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values
-      } else if (Array.isArray(arguments[0])) {
-          this.m = arguments[0].concat(); // arguments[0] must be column major array
+        if (isColumnMajor === true) {
+          var _m = arguments;
+          this.setComponents(_m[0], _m[4], _m[8], _m[12], _m[1], _m[5], _m[9], _m[13], _m[2], _m[6], _m[10], _m[14], _m[3], _m[7], _m[11], _m[15]);
         } else {
-            this.identity();
+          this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+          if (isColumnMajor === true) {
+            this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+          } else {
+            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
           }
+        } else if (m instanceof Float32Array) {
+            if (isColumnMajor === true) {
+              this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+            } else {
+              this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+            }
+          } else {
+              this.identity();
+            }
     }
 
     babelHelpers.createClass(Matrix44, [{
@@ -1002,7 +1039,7 @@
     }, {
       key: 'clone',
       value: function clone() {
-        return new Matrix44(this.m);
+        return new Matrix44(this.m[0], this.m[4], this.m[8], this.m[12], this.m[1], this.m[5], this.m[9], this.m[13], this.m[2], this.m[6], this.m[10], this.m[14], this.m[3], this.m[7], this.m[11], this.m[15]);
       }
 
       /**
@@ -1114,6 +1151,11 @@
       key: 'flatten',
       value: function flatten() {
         return this.m;
+      }
+    }, {
+      key: 'flattenAsArray',
+      value: function flattenAsArray() {
+        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8], this.m[9], this.m[10], this.m[11], this.m[12], this.m[13], this.m[14], this.m[15]];
       }
     }, {
       key: '_swap',
@@ -3973,7 +4015,7 @@
             var projectionMatrix = camera.perspectiveRHMatrix();
             var m_m = mesh.transformMatrixAccumulatedAncestry;
             var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(pvm_m.flatten()));
+            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -4099,15 +4141,15 @@
           gl.uniform1f(glslProgram.opacity, opacity);
 
           var world_m = mesh.transformMatrixAccumulatedAncestry;
-          gl.uniformMatrix4fv(glslProgram.worldMatrix, false, new Float32Array(world_m.flatten()));
+          gl.uniformMatrix4fv(glslProgram.worldMatrix, false, world_m.flatten());
           var normal_m = mesh.normalMatrixAccumulatedAncestry;
-          gl.uniformMatrix3fv(glslProgram.normalMatrix, false, new Float32Array(normal_m.flatten()));
+          gl.uniformMatrix3fv(glslProgram.normalMatrix, false, normal_m.flatten());
           if (camera) {
             var cameraMatrix = camera.lookAtRHMatrix();
             var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
             var projectionMatrix = camera.perspectiveRHMatrix();
-            gl.uniformMatrix4fv(glslProgram.viewMatrix, false, new Float32Array(viewMatrix.flatten()));
-            gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(projectionMatrix.flatten()));
+            gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
+            gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -5454,11 +5496,11 @@
               babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().flatten()));
+                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.perspectiveRHMatrix().flatten());
               }
 
               if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten()));
+                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
               }
 
               this._meshTransformUpdateCount = mesh.updateCountAsElement;
