@@ -1,10 +1,10 @@
-import babel from "rollup-plugin-babel"
+import babel from 'rollup-plugin-babel';
 
 export default {
-  entry: "src/js/glboost.js",
-  dest: "build/glboost.js",
-  format: "umd",
-  moduleName: "GLBoost",
+  entry: 'src/js/low_level/glboost_include.js',
+  dest: 'build/glboost-low.js',
+  format: 'umd',
+  moduleName: 'GLBoost',
 
   plugins: [
     // refs: https://github.com/rollup/rollup/issues/357#issuecomment-180447881

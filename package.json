@@ -7,7 +7,9 @@
     "example": "examples"
   },
   "scripts": {
-    "build": "rollup -c rollup.config.js",
+    "build": "npm run build-low && npm run build-middle",
+    "build-middle": "rollup -c src/js/middle_level/rollup.config.js",
+    "build-low": "rollup -c src/js/low_level/rollup.config.js",
     "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
     "esdoc": "esdoc -c esdoc.json",
     "build-examples": "npm run standalone",
