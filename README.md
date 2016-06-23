@@ -32,6 +32,15 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 
 [Check our examples page!](https://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
 
+If you wan't to watch examples in local. Go to GLBoost top directory by terminal and start local web server up.
+
+```
+$ cd GLBoost
+$ ruby -run -e httpd -- --port 3000 ./
+```
+
+Then, access http://localhost:3000/examples by your web browser.
+
 ## Key features
 
 * ECMAScript 2015 based library (using Babel)
