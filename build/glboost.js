@@ -2736,7 +2736,7 @@
 
       var gl = _this._glContext.gl;
 
-      //var glem = GLExtentionsManager.getInstance(gl);
+      //var glem = GLExtensionsManager.getInstance(gl);
 
       _this._texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, _this._texture);
@@ -2772,13 +2772,13 @@
 
   GLBoost$1['MutableTexture'] = MutableTexture;
 
-  var GLExtentionsManager = function () {
-    function GLExtentionsManager(glContext) {
-      babelHelpers.classCallCheck(this, GLExtentionsManager);
+  var GLExtensionsManager = function () {
+    function GLExtensionsManager(glContext) {
+      babelHelpers.classCallCheck(this, GLExtensionsManager);
 
       var gl = glContext.gl;
-      if (GLExtentionsManager._instances[glContext.canvas.id]) {
-        return GLExtentionsManager._instances[glContext.canvas.id];
+      if (GLExtensionsManager._instances[glContext.canvas.id]) {
+        return GLExtensionsManager._instances[glContext.canvas.id];
       }
 
       if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
@@ -2791,10 +2791,10 @@
         this._extEIUI = gl.getExtension('OES_element_index_uint');
       }
 
-      GLExtentionsManager._instances[glContext.canvas.id] = this;
+      GLExtensionsManager._instances[glContext.canvas.id] = this;
     }
 
-    babelHelpers.createClass(GLExtentionsManager, [{
+    babelHelpers.createClass(GLExtensionsManager, [{
       key: 'createVertexArray',
       value: function createVertexArray(gl) {
         if (GLBoost$1.isThisGLVersion_2(gl)) {
@@ -2872,13 +2872,13 @@
     }], [{
       key: 'getInstance',
       value: function getInstance(gl) {
-        return new GLExtentionsManager(gl);
+        return new GLExtensionsManager(gl);
       }
     }]);
-    return GLExtentionsManager;
+    return GLExtensionsManager;
   }();
 
-  GLExtentionsManager._instances = new Object();
+  GLExtensionsManager._instances = new Object();
 
   /**
    * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
@@ -4496,7 +4496,7 @@
         var gl = this._glContext.gl;
         var vertices = this._vertices;
 
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
         var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
         glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
         gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
@@ -4554,7 +4554,7 @@
         var vertices = this._vertices;
         var gl = this._glContext.gl;
 
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
         this._vertexN = vertices.position.length;
 
@@ -4629,7 +4629,7 @@
       key: 'draw',
       value: function draw(lights, camera, mesh, scene, renderPass_index) {
         var gl = this._glContext.gl;
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
         var materials = null;
         if (this._materials.length > 0) {
@@ -4790,7 +4790,7 @@
         });
 
         var gl = this._glContext.gl;
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
         var lights = scene.lights;
 
@@ -4868,7 +4868,7 @@
         var gl = this._glContext.gl;
         var canvas = this._glContext.canvas;
 
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
         // Create FBO
         var fbo = gl.createFramebuffer();
@@ -5518,7 +5518,7 @@
         this._img.crossOrigin = 'Anonymous';
         this._img.onload = function () {
           var gl = _this2._glContext.gl;
-          var glem = GLExtentionsManager.getInstance(_this2._glContext);
+          var glem = GLExtensionsManager.getInstance(_this2._glContext);
 
           _this2._width = _this2._img.width;
           _this2._height = _this2._img.height;
@@ -5554,7 +5554,7 @@
       key: 'generateTextureFromImageData',
       value: function generateTextureFromImageData(imageData) {
         var gl = this.this._glContext.gl;
-        var glem = GLExtentionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
         this._width = imageData.width;
         this._height = imageData.height;

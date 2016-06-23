@@ -13,7 +13,7 @@ export default class MutableTexture extends AbstractTexture {
 
     var gl = this._glContext.gl;
 
-    //var glem = GLExtentionsManager.getInstance(gl);
+    //var glem = GLExtensionsManager.getInstance(gl);
 
     this._texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this._texture);

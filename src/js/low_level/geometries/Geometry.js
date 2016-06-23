@@ -1,7 +1,7 @@
 import GLBoost from '../../globals';
 import Vector3 from '../../low_level/math/Vector3';
 import GLContext from './../GLContext';
-import GLExtentionsManager from './../GLExtentionsManager';
+import GLExtensionsManager from './../GLExtensionsManager';
 import ClassicMaterial from './../ClassicMaterial';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import MathUtil from '../../low_level/math/MathUtil';
@@ -208,7 +208,7 @@ export default class Geometry {
     var gl = this._glContext.gl;
     var vertices = this._vertices;
 
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
     var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
     glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
     gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
@@ -264,7 +264,7 @@ export default class Geometry {
     var vertices = this._vertices;
     var gl = this._glContext.gl;
 
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
 
     this._vertexN = vertices.position.length;
 
@@ -343,7 +343,7 @@ export default class Geometry {
 
   draw(lights, camera, mesh, scene, renderPass_index) {
     var gl = this._glContext.gl;
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
 
     var materials = null;
     if (this._materials.length > 0) {

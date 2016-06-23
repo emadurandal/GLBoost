@@ -1,6 +1,6 @@
 import GLBoost from '../../globals';
 import AbstractTexture from './AbstractTexture';
-import GLExtentionsManager from '../GLExtentionsManager';
+import GLExtensionsManager from '../GLExtensionsManager';
 
 export default class Texture extends AbstractTexture {
   constructor(src, parameters = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -40,7 +40,7 @@ export default class Texture extends AbstractTexture {
     this._img.crossOrigin = 'Anonymous';
     this._img.onload = ()=> {
       var gl = this._glContext.gl;
-      var glem = GLExtentionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
 
       this._width = this._img.width;
       this._height = this._img.height;
@@ -75,7 +75,7 @@ export default class Texture extends AbstractTexture {
 
   generateTextureFromImageData(imageData) {
     var gl = this.this._glContext.gl;
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
 
     this._width = imageData.width;
     this._height = imageData.height;

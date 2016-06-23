@@ -1,6 +1,6 @@
 import GLBoost from '../globals';
 import GLContext from '../low_level/GLContext';
-import GLExtentionsManager from '../low_level/GLExtentionsManager';
+import GLExtensionsManager from '../low_level/GLExtensionsManager';
 import MutableTexture from '../low_level/textures/MutableTexture';
 import RenderPass from './RenderPass';
 import Geometry from '../low_level/geometries/Geometry';
@@ -52,7 +52,7 @@ export default class Renderer {
     });
 
     var gl = this._glContext.gl;
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
 
     let lights = scene.lights;
 
@@ -126,7 +126,7 @@ export default class Renderer {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
-    var glem = GLExtentionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(this._glContext);
 
     // Create FBO
     var fbo = gl.createFramebuffer();
