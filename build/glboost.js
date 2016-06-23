@@ -2765,7 +2765,15 @@
     babelHelpers.inherits(MutableTexture, _AbstractTexture);
 
     function MutableTexture(width, height) {
-      var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[2];
+      var level = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+      var internalFormat = arguments.length <= 3 || arguments[3] === undefined ? 0x1908 : arguments[3];
+      var format = arguments.length <= 4 || arguments[4] === undefined ? 0x1908 : arguments[4];
+      var type = arguments.length <= 5 || arguments[5] === undefined ? 0x1401 : arguments[5];
+      var magFileter = arguments.length <= 6 || arguments[6] === undefined ? 0x2601 : arguments[6];
+      var minFilter = arguments.length <= 7 || arguments[7] === undefined ? 0x2601 : arguments[7];
+      var wrapS = arguments.length <= 8 || arguments[8] === undefined ? 0x812F : arguments[8];
+      var wrapT = arguments.length <= 9 || arguments[9] === undefined ? 0x812F : arguments[9];
+      var canvas = arguments.length <= 10 || arguments[10] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[10];
       babelHelpers.classCallCheck(this, MutableTexture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MutableTexture).call(this, canvas));
@@ -2775,6 +2783,8 @@
       _this._width = width;
       _this._height = height;
       _this._fbo = null;
+      _this._colorAttachmentId = null;
+      _this._depthAttachmentId = null;
 
       var gl = _this._glContext.gl;
 
@@ -2782,23 +2792,31 @@
 
       _this._texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, _this._texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFileter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+      gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, 0, format, type, null);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
       return _this;
     }
 
     babelHelpers.createClass(MutableTexture, [{
-      key: 'colorAttachiment',
+      key: 'colorAttachment',
       set: function set(attachmentId) {
-        this._attachmentId = attachmentId;
+        this._colorAttachmentId = attachmentId;
       },
       get: function get() {
-        return this._attachmentId;
+        return this._colorAttachmentId;
+      }
+    }, {
+      key: 'depthAttachment',
+      set: function set(attachmentId) {
+        this._depthAttachmentId = attachmentId;
+      },
+      get: function get() {
+        return this._depthAttachmentId;
       }
     }, {
       key: 'frameBufferObject',
@@ -4920,7 +4938,7 @@
 
         var renderTargetTextures = [];
         for (var i = 0; i < textureNum; i++) {
-          var texture = new MutableTexture(fbo.width, fbo.height, canvas);
+          var texture = new MutableTexture(fbo.width, fbo.height);
           texture.fbo = fbo;
           renderTargetTextures.push(texture);
         }
@@ -4939,11 +4957,38 @@
         });
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 
-        gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         return renderTargetTextures;
+      }
+    }, {
+      key: 'createDepthTexturesForRenderTarget',
+      value: function createDepthTexturesForRenderTarget(width, height) {
+
+        var gl = this._glContext.gl;
+        var canvas = this._glContext.canvas;
+
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+
+        // Create FBO
+        var fbo = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        fbo.width = width ? width : canvas.width;
+        fbo.height = height ? height : canvas.height;
+
+        var depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
+        depthTexture.fbo = fbo;
+
+        // Attach Buffers
+        var glTexture = depthTexture.glTextureResource;
+        var attachimentId = gl.DEPTH_ATTACHMENT;
+        depthTexture.colorAttachment = attachimentId;
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        return depthTexture;
       }
     }, {
       key: 'createRenderPasses',
@@ -6311,7 +6356,7 @@
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
               var gotText = xmlHttp.responseText;
               var partsOfPath = url.split('/');
               var basePath = '';
@@ -6407,7 +6452,7 @@
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
               resolve(_this2._loadMaterialsFromString(xmlHttp.responseText, canvas, defaultShader, basePath));
             }
           };
@@ -7901,7 +7946,7 @@
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
               var gotText = xmlHttp.responseText;
               var partsOfPath = url.split('/');
               var basePath = '';

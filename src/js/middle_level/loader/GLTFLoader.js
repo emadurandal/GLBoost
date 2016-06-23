@@ -62,7 +62,7 @@ export default class GLTFLoader {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+        if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
           var gotText = xmlHttp.responseText;
           var partsOfPath = url.split('/');
           var basePath = '';
