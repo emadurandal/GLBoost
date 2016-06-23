@@ -37,17 +37,17 @@ export default class BlendShapeGeometry extends Geometry {
       this._materialForBlend = this._defaultMaterial;
     }
 
-    class BlendShapeShader extends this._materialForBlend.shader.constructor {
-      constructor(canvas) {
-        super(canvas);
+    class BlendShapeShader extends this._materialForBlend.shaderClass {
+      constructor(canvas, basicShader) {
+        super(canvas, basicShader);
         BlendShapeShader.mixin(BlendShapeShaderSource);
       }
     }
 
     if (meshMaterial) {
-      meshMaterial.shader = new BlendShapeShader(canvas);
+      meshMaterial.shaderClass = BlendShapeShader;
     } else {
-      this._defaultMaterial.shader = new BlendShapeShader(canvas);
+      this._defaultMaterial.shaderClass = BlendShapeShader;
     }
 
     /*

@@ -1,14 +1,14 @@
 import GLBoost from './../globals';
-import Vector4 from './../math/Vector4';
 import Vector3 from './../math/Vector3';
 import GLContext from './../GLContext';
 import GLExtentionsManager from './../GLExtentionsManager';
-import Shader from './../shaders/Shader';
 import ClassicMaterial from './../ClassicMaterial';
-import PointLight from './../lights/PointLight';
-import DirectionalLight from './../lights/DirectionalLight';
 import ArrayUtil from './../misc/ArrayUtil';
 import MathUtil from '../math/MathUtil';
+import DrawKickerLocal from '../draw_kickers/DrawKickerLocal';
+import DrawKickerWorld from '../draw_kickers/DrawKickerWorld';
+import VertexLocalShaderSource from '../shaders/VertexLocalShader';
+import VertexWorldShaderSource from '../shaders/VertexWorldShader';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
@@ -28,6 +28,13 @@ export default class Geometry {
     this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
     this._centerPosition = Vector3.zero();
     this._setName();
+    this._drawKicker = DrawKickerWorld.getInstance();
+
+    if (this._drawKicker instanceof DrawKickerWorld) {
+
+    } else if (this._drawKicker instanceof DrawKickerLocal) {
+
+    }
   }
 
   _setName() {
@@ -40,10 +47,11 @@ export default class Geometry {
    * 不必要な頂点属性のデータは無視する。
    */
   _decideNeededVertexAttribs(vertices, material) {
+    var _material = null;
     if (material) {
-      var _material = material;
+      _material = material;
     } else {
-      var _material = this._materials[0];
+      _material = this._materials[0];
     }
 
     var attribNameArray = [];
@@ -213,7 +221,19 @@ export default class Geometry {
     let glslProgramOfPasses = [];
     for (let i=0; i<renderPasses.length; i++) {
       if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
-        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
+        if (material.shaderInstance === null) {
+          let shaderClass = material.shaderClass;
+
+          let basicShaderSource = null;
+          if (this._drawKicker instanceof DrawKickerWorld) {
+            basicShaderSource = VertexWorldShaderSource;
+          } else if (this._drawKicker instanceof DrawKickerLocal) {
+            basicShaderSource = VertexLocalShaderSource;
+          }
+
+          material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
+        }
+        var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
         this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
         glslProgramOfPasses.push(glslProgram);
       } else {
@@ -304,7 +324,6 @@ export default class Geometry {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     Geometry._iboArrayDic[this.toString()] = [];
-    Geometry._idxNArrayDic[this.toString()] = [];
     if (this._indicesArray) {
       // create Index Buffer
       for (let i=0; i<this._indicesArray.length; i++) {
@@ -313,7 +332,7 @@ export default class Geometry {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
         Geometry._iboArrayDic[this.toString()][i] = ibo;
-        Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
+        this._defaultMaterial.setVertexN(this._indicesArray[i].length);
       }
     }
     glem.bindVertexArray(gl, null);
@@ -326,162 +345,18 @@ export default class Geometry {
     var gl = this._glContext.gl;
     var glem = GLExtentionsManager.getInstance(this._glContext);
 
+    var materials = null;
     if (this._materials.length > 0) {
-      var materials = this._materials;
+      materials = this._materials;
     } else if (mesh.material){
-      var materials = [mesh.material];
+      materials = [mesh.material];
     } else {
-      var materials = [];
+      materials = [this._defaultMaterial];
     }
 
     let thisName = this.toString();
 
-    var isVAOBound = false;
-    if (Geometry._lastGeometry !== thisName) {
-      isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[thisName]);
-    }
-
-    if (materials.length > 0) {
-      for (let i=0; i<materials.length;i++) {
-        let materialName = materials[i].toString();
-        if (materialName !== Geometry._lastMaterial) {
-          this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
-          gl.useProgram(this._glslProgram);
-        }
-        let glslProgram = this._glslProgram;
-
-        if (!isVAOBound) {
-          if (Geometry._lastGeometry !== thisName) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
-            this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
-          }
-        }
-
-        let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-        gl.uniform1f(glslProgram.opacity, opacity);
-
-        if (camera) {
-          var viewMatrix = camera.lookAtRHMatrix();
-          var projectionMatrix = camera.perspectiveRHMatrix();
-          var m_m = mesh.transformMatrixAccumulatedAncestry;
-          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-          gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
-        }
-
-        if (glslProgram['lightPosition_0']) {
-          lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, this._glContext.canvas);
-          if (glslProgram['viewPosition']) {
-            if (camera) {
-              let cameraPos = new Vector4(0, 0, 0, 1);
-              cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
-            } else {
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
-            }
-            gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
-          }
-
-          for(let j=0; j<lights.length; j++) {
-            if (glslProgram[`lightPosition_${j}`] && glslProgram[`lightDiffuse_${j}`]) {
-              let lightVec = null;
-              let isPointLight = -9999;
-              if (lights[j] instanceof PointLight) {
-                lightVec = new Vector4(0, 0, 0, 1);
-                lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                isPointLight = 1.0;
-              } else if (lights[j] instanceof DirectionalLight) {
-                lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
-                lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                lightVec.w = 0.0;
-                isPointLight = 0.0;
-              }
-
-              let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-              gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
-
-              gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
-            }
-          }
-        }
-
-        let isMaterialSetupDone = true;
-
-        if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
-          var needTobeStillDirty = materials[i].shader.setUniforms(gl, glslProgram, materials[i], camera, mesh);
-          materials[i].shader.dirty = needTobeStillDirty ? true : false;
-        }
-
-        if (materialName !== Geometry._lastMaterial) {
-          if (materials[i]) {
-            isMaterialSetupDone = materials[i].setUp();
-          }
-        }
-        if (!isMaterialSetupDone) {
-          return;
-        }
-
-        //if (this._ibo.length > 0) {
-        if (Geometry._iboArrayDic[thisName].length > 0) {
-          //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][i] );
-          gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), glem.elementIndexBitSize(gl), 0);
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-        } else {
-          gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
-        }
-
-        /*
-        if (materials[i].toString() !== Geometry._lastMaterial) {
-          if (materials[i]) {
-            materials[i].tearDown();
-          }
-        }
-        */
-
-        Geometry._lastMaterial = isMaterialSetupDone ? materialName : null;
-      }
-    } else {
-      let glslProgram = this.glslProgramOfPasses[renderPass_index];
-      gl.useProgram(glslProgram);
-
-      if (!isVAOBound) {
-        if (Geometry._lastGeometry !== thisName) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
-          this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
-        }
-      }
-
-      let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      gl.uniform1f(glslProgram.opacity, opacity);
-
-      if (camera) {
-        let viewMatrix = camera.lookAtRHMatrix();
-        let projectionMatrix = camera.perspectiveRHMatrix();
-        let mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
-        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
-
-      }
-
-      if (typeof this._defaultMaterial.shader.setUniforms !== 'undefined') {
-        this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
-      }
-
-      //if (this._ibo.length > 0) {
-      if (Geometry._iboArrayDic[thisName].length > 0) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][0] );
-        gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], glem.elementIndexBitSize(gl), 0);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-      } else {
-        gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
-      }
-
-      Geometry._lastMaterial = null;
-    }
-
-    //glem.bindVertexArray(gl, null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    Geometry._lastGeometry = thisName;
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, renderPass_index, this._vertexN);
 
   }
 
@@ -561,8 +436,5 @@ export default class Geometry {
 Geometry._vaoDic = {};
 Geometry._vboDic = {};
 Geometry._iboArrayDic = {};
-Geometry._idxNArrayDic = {};
-Geometry._lastGeometry = null;
-Geometry._lastMaterial = null;
 
 GLBoost['Geometry'] = Geometry;

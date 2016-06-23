@@ -73,9 +73,9 @@ class MyCustomShaderSource {
 }
 
 
-class MyCustomShader extends GLBoost.SimpleShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+class MyCustomShader extends GLBoost.DecalShader {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
+    super(canvas, basicShader);
     MyCustomShader.mixin(MyCustomShaderSource);
 
     this._time = 0;
@@ -104,7 +104,7 @@ for(let i=0; i<=vSpan; i++) {
 }
 
 var material = new GLBoost.ClassicMaterial();
-material.shader = new MyCustomShader();
+material.shaderClass = MyCustomShader;
 var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
 var plane = new GLBoost.Mesh(planeGeometry, material);
 scene.add( plane );
@@ -119,7 +119,7 @@ var render = function(){
   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
   camera.eye = rotatedVector;
 
-  var myCustomShader = material.shader;
+  var myCustomShader = material.shaderInstance;
   myCustomShader.increaseTime(0.016);
   myCustomShader.dirty = true;
 

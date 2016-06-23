@@ -1,34 +1,10 @@
 import Shader from './Shader';
-import SimpleShader from './SimpleShader';
+import DecalShader from './DecalShader';
 
 export class LambertShaderSource {
-  VSDefine_LambertShaderSource(in_, out_, f, lights) {
-    var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 aVertex_normal;\n`;
-      shaderText += `${out_} vec3 v_normal;\n`;
-    }
-    shaderText += `${out_} vec4 position;\n`;
-
-    return shaderText;
-  }
-
-  VSTransform_LambertShaderSource(existCamera_f, f, lights) {
-    var shaderText = '';
-    shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-    shaderText += '  v_normal = aVertex_normal;\n';
-
-    return shaderText;
-  }
 
   FSDefine_LambertShaderSource(in_, f, lights) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
-    shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
-    shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     shaderText += `uniform vec4 Kd;\n`;
 
     return shaderText;
@@ -67,23 +43,16 @@ export class LambertShaderSource {
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
-
-    for(let i=0; i<lights.length; i++) {
-      shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
-    }
-
     return vertexAttribsAsResult;
   }
 }
 
 
 
-export default class LambertShader extends SimpleShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
+export default class LambertShader extends DecalShader {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
 
-    super(canvas);
+    super(canvas, basicShader);
     LambertShader.mixin(LambertShaderSource);
   }
 

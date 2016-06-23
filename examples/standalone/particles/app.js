@@ -176,10 +176,10 @@
   var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
-    function MyCustomShader(canvas, ParticleShaderSource) {
+    function MyCustomShader(canvas, basicShader, ParticleShaderSource) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
 
       if (ParticleShaderSource) {
         MyCustomShader.mixin(ParticleShaderSource);
@@ -223,7 +223,7 @@
   }, 0.5, 0.5, null, GLBoost.STATIC_DRAW);
 
   var material = new GLBoost.ClassicMaterial();
-  material.shader = new MyCustomShader(GLBoost.CURRENT_CANVAS_ID);
+  material.shaderClass = MyCustomShader;
   var texture = new GLBoost.Texture('resources/iceball.png');
   material.diffuseTexture = texture;
   var particle = new GLBoost.Mesh(particleGeometry, material);
@@ -240,7 +240,7 @@
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
     camera.eye = rotatedVector;
 
-    var myCustomShader = particle.material.shader;
+    var myCustomShader = particle.material.shaderInstance;
     myCustomShader.increaseTime(0.016);
     //myCustomShader.dirty = true;
 

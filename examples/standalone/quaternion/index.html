@@ -45,8 +45,8 @@ var material = new GLBoost.ClassicMaterial();
 var texture = new GLBoost.Texture('resources/texture.png'); // earth.jpg
 material.diffuseTexture = texture;
 
-var shader = new GLBoost.PhongShader();
-material.shader = shader;
+var shader = GLBoost.PhongShader;
+material.shaderClass = shader;
 var geometry = new GLBoost.Cube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector3(1,0,0));
 
 var cube = new GLBoost.Mesh(geometry, material);

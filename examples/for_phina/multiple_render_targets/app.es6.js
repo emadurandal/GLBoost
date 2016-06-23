@@ -32,9 +32,9 @@ class MyCustomShaderSource {
 }
 
 
-class MyCustomShader extends GLBoost.SimpleShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+class MyCustomShader extends GLBoost.DecalShader {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
+    super(canvas, basicShader);
     MyCustomShader.mixin(MyCustomShaderSource);
   }
 
@@ -95,7 +95,7 @@ phina.define('MainScene', {
     var geometry = new GLBoost.BlendShapeGeometry();
     var texture = new GLBoost.Texture('resources/texture.png');
     var material = new GLBoost.ClassicMaterial();
-    material.shader =  new MyCustomShader();
+    material.shaderClass = MyCustomShader;
     material.diffuseTexture = texture;
     var mesh = new GLBoost.Mesh(geometry, material);
     geometry.setVerticesData({

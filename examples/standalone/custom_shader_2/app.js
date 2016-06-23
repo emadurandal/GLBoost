@@ -159,14 +159,15 @@
     return MyCustomShaderSource;
   }();
 
-  var MyCustomShader = function (_GLBoost$SimpleShader) {
-    babelHelpers.inherits(MyCustomShader, _GLBoost$SimpleShader);
+  var MyCustomShader = function (_GLBoost$DecalShader) {
+    babelHelpers.inherits(MyCustomShader, _GLBoost$DecalShader);
 
     function MyCustomShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments[1];
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
 
@@ -188,7 +189,7 @@
       }
     }]);
     return MyCustomShader;
-  }(GLBoost.SimpleShader);
+  }(GLBoost.DecalShader);
 
   var uSpan = 40;
   var vSpan = 40;
@@ -202,7 +203,7 @@
   }
 
   var material = new GLBoost.ClassicMaterial();
-  material.shader = new MyCustomShader();
+  material.shaderClass = MyCustomShader;
   var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
   var plane = new GLBoost.Mesh(planeGeometry, material);
   scene.add(plane);
@@ -217,7 +218,7 @@
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
     camera.eye = rotatedVector;
 
-    var myCustomShader = material.shader;
+    var myCustomShader = material.shaderInstance;
     myCustomShader.increaseTime(0.016);
     myCustomShader.dirty = true;
 

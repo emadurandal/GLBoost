@@ -1,4 +1,5 @@
 import Shader from './Shader';
+import MiscUtil from '../misc/MiscUtil';
 
 export default class BlendShapeShaderSource {
 
@@ -13,7 +14,7 @@ export default class BlendShapeShaderSource {
     return shaderText;
   }
 
-  VSTransform_BlendShapeShaderSource(existCamera_f, f) {
+  VSTransform_BlendShapeShaderSource(existCamera_f, f, lights, extraData) {
     var shaderText = '';
     shaderText +=     'float sumOfWeights = 0.0;\n';
     f.forEach((attribName)=>{
@@ -29,7 +30,7 @@ export default class BlendShapeShaderSource {
       }
     });
     if (existCamera_f) {
-      shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(blendedPosition, 1.0);\n';
+      shaderText += '  gl_Position = pvwMatrix * vec4(blendedPosition, 1.0);\n';
     } else {
       shaderText += '  gl_Position = vec4(blendedPosition, 1.0);\n';
     }

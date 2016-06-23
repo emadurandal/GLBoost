@@ -133,21 +133,21 @@ export default class SkeletalGeometry extends Geometry {
       this._materialForSkeletal = this._defaultMaterial;
     }
 
-    class SkeletalShader extends this._materialForSkeletal.shader.constructor {
-      constructor(canvas) {
-        super(canvas);
+    class SkeletalShader extends this._materialForSkeletal.shaderClass {
+      constructor(canvas, basicShader) {
+        super(canvas, basicShader);
         SkeletalShader.mixin(SkeletalShaderSource);
       }
     }
 
     if (this._materials.length > 0) {
       for (let i=0; i<this._materials.length; i++) {
-        this._materials[i].shader = new SkeletalShader(canvas);
+        this._materials[i].shaderClass = SkeletalShader;
       }
     } else if (meshMaterial) {
-      meshMaterial.shader = new SkeletalShader(canvas);
+      meshMaterial.shaderClass = SkeletalShader;
     } else {
-      this._defaultMaterial.shader = new SkeletalShader(canvas);
+      this._defaultMaterial.shaderClass = SkeletalShader;
     }
 
 

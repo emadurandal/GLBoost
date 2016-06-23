@@ -89,21 +89,22 @@
     return MyCustomShaderSource;
   }();
 
-  var MyCustomShader = function (_GLBoost$SimpleShader) {
-    babelHelpers.inherits(MyCustomShader, _GLBoost$SimpleShader);
+  var MyCustomShader = function (_GLBoost$DecalShader) {
+    babelHelpers.inherits(MyCustomShader, _GLBoost$DecalShader);
 
     function MyCustomShader() {
       var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
+      var basicShader = arguments[1];
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
       return _this;
     }
 
     return MyCustomShader;
-  }(GLBoost.SimpleShader);
+  }(GLBoost.DecalShader);
 
   phina.define('MainScene', {
     superClass: 'DisplayScene',
@@ -127,7 +128,7 @@
       var geometry = new GLBoost.BlendShapeGeometry();
       var texture = new GLBoost.Texture('resources/texture.png');
       var material = new GLBoost.ClassicMaterial();
-      material.shader = new MyCustomShader();
+      material.shaderClass = MyCustomShader;
       material.diffuseTexture = texture;
       var mesh = new GLBoost.Mesh(geometry, material);
       geometry.setVerticesData({
