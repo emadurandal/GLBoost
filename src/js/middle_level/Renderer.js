@@ -67,7 +67,7 @@ export default class Renderer {
 
       if (renderPass.clearColor) {
         var color = renderPass.clearColor;
-        gl.clearColor(color[0], color[1], color[2], color[3]);
+        gl.clearColor(color.x, color.y, color.z, color.w);
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       }
 
@@ -136,7 +136,7 @@ export default class Renderer {
 
     var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(fbo.width, fbo.height, canvas);
+      let texture = new MutableTexture(fbo.width, fbo.height);
       texture.fbo = fbo;
       renderTargetTextures.push(texture);
     }
@@ -155,11 +155,37 @@ export default class Renderer {
     });
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 
-    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     return renderTargetTextures;
+  }
+
+  createDepthTexturesForRenderTarget(width, height) {
+
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    // Create FBO
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    fbo.width = width ? width : canvas.width;
+    fbo.height = height ? height : canvas.height;
+
+    let depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
+    depthTexture.fbo = fbo;
+
+    // Attach Buffers
+    var glTexture = depthTexture.glTextureResource;
+    var attachimentId = gl.DEPTH_ATTACHMENT;
+    depthTexture.colorAttachment = attachimentId;
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return depthTexture;
   }
 
   createRenderPasses(number) {

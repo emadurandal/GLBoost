@@ -90,7 +90,7 @@
         layer.scene.add( mesh );
 
         renderPasses[0].addElements([mesh]);
-        renderPasses[0].setClearColor([0, 0, 0, 1]);
+        renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
         renderPasses[0].specifyRenderTargetTextures(renderTextures);
 
         var geometry2 = new GLBoost.Geometry();
@@ -104,7 +104,7 @@
         layer.scene.add( mesh2 );
 
         renderPasses[1].addElements([mesh2]);
-        renderPasses[1].setClearColor([1, 0, 0, 1]);
+        renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
 
         layer.scene.renderPasses = renderPasses;
         layer.scene.prepareForRender();

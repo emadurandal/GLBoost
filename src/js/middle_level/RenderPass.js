@@ -2,7 +2,7 @@ import GLBoost from '../globals';
 import GLContext from '../low_level/GLContext';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
-
+import Vector4 from '../low_level/math/Vector4';
 
 export default class RenderPass {
 
@@ -12,7 +12,8 @@ export default class RenderPass {
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._drawBuffers = [gl.BACK];
-    this._clearColor = null;
+    this._clearColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._clearDepth = 1.0;
     this._renderTargetTextures = null;
   }
 
@@ -82,6 +83,14 @@ export default class RenderPass {
 
   get clearColor() {
     return this._clearColor;
+  }
+
+  setClearDepth(depth) {
+    this._clearDepth = depth;
+  }
+
+  get clearDepth() {
+    return this._clearDepth;
   }
 
   prepareForRender() {

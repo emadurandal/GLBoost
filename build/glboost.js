@@ -2500,7 +2500,8 @@
       this._opacityMeshes = [];
       this._transparentMeshes = [];
       this._drawBuffers = [gl.BACK];
-      this._clearColor = null;
+      this._clearColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._clearDepth = 0;
       this._renderTargetTextures = null;
     }
 
@@ -4865,7 +4866,7 @@
 
           if (renderPass.clearColor) {
             var color = renderPass.clearColor;
-            gl.clearColor(color[0], color[1], color[2], color[3]);
+            gl.clearColor(color.x, color.y, color.z, color.w);
             gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
           }
 

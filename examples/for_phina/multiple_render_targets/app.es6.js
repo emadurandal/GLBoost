@@ -107,7 +107,7 @@ phina.define('MainScene', {
     layer.scene.add( mesh );
 
     renderPasses[0].addElements([mesh]);
-    renderPasses[0].setClearColor([0, 0, 0, 1]);
+    renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
     renderPasses[0].specifyRenderTargetTextures(renderTextures);
 
     var geometry2_1 = new GLBoost.Cube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
@@ -125,7 +125,7 @@ phina.define('MainScene', {
     mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
 
     renderPasses[1].addElements([mesh2_1, mesh2_2]);
-    renderPasses[1].setClearColor([1, 0, 0, 1]);
+    renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
 
     layer.scene.renderPasses = renderPasses;
 
