@@ -12,7 +12,7 @@ export default class RenderPass {
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._drawBuffers = [gl.BACK];
-    this._clearColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._clearColor = null;
     this._clearDepth = 1.0;
     this._renderTargetTextures = null;
   }
