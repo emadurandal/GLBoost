@@ -2,17 +2,20 @@ import GLBoost from '../globals';
 import GLContext from '../low_level/GLContext';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
+import GLBoostObject from '../low_level/core/GLBoostObject';
 
-
-export default class RenderPass {
+export default class RenderPass extends GLBoostObject {
 
   constructor(gl) {
+    super();
+
     this._elements = [];
     this._meshes = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._drawBuffers = [gl.BACK];
     this._clearColor = null;
+    this._clearDepth = 1.0;
     this._renderTargetTextures = null;
   }
 
@@ -82,6 +85,14 @@ export default class RenderPass {
 
   get clearColor() {
     return this._clearColor;
+  }
+
+  setClearDepth(depth) {
+    this._clearDepth = depth;
+  }
+
+  get clearDepth() {
+    return this._clearDepth;
   }
 
   prepareForRender() {

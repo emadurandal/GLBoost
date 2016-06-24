@@ -1,9 +1,12 @@
 import GLContext from '../GLContext';
 import PointLight from '../lights/PointLight';
 import Hash from '../misc/Hash';
+import GLBoostObject from '../core/GLBoostObject';
 
-export default class Shader {
+export default class Shader extends GLBoostObject {
   constructor(canvas) {
+    super();
+
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
@@ -438,6 +441,7 @@ export default class Shader {
   static _set_glFragData_inGLVer1(gl, i) {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
+
 }
 
 Shader._instances = new Object();

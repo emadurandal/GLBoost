@@ -1,11 +1,12 @@
 import GLBoost from '../../globals';
 import GLContext from './../GLContext';
+import GLBoostObject from '../core/GLBoostObject';
 
 /**
  * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
  * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
  */
-export default class AbstractTexture {
+export default class AbstractTexture extends GLBoostObject {
 
   /**
    * [en] The constructor of PointLight class. Do not construct this class directly.<br>
@@ -14,6 +15,8 @@ export default class AbstractTexture {
    * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
+    super();
+
     if (this.constructor === AbstractTexture) {
       throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }

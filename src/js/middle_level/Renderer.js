@@ -4,13 +4,16 @@ import GLExtensionsManager from '../low_level/GLExtensionsManager';
 import MutableTexture from '../low_level/textures/MutableTexture';
 import RenderPass from './RenderPass';
 import Geometry from '../low_level/geometries/Geometry';
+import GLBoostObject from '../low_level/core/GLBoostObject';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
  * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
  */
-export default class Renderer {
+export default class Renderer extends GLBoostObject {
   constructor(parameters) {
+    super();
+
     var _canvas = parameters.canvas;
     var _clearColor = parameters.clearColor;
 
@@ -67,7 +70,7 @@ export default class Renderer {
 
       if (renderPass.clearColor) {
         var color = renderPass.clearColor;
-        gl.clearColor(color[0], color[1], color[2], color[3]);
+        gl.clearColor(color.x, color.y, color.z, color.w);
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       }
 
@@ -136,7 +139,7 @@ export default class Renderer {
 
     var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(fbo.width, fbo.height, canvas);
+      let texture = new MutableTexture(fbo.width, fbo.height);
       texture.fbo = fbo;
       renderTargetTextures.push(texture);
     }
@@ -155,11 +158,37 @@ export default class Renderer {
     });
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
 
-    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     return renderTargetTextures;
+  }
+
+  createDepthTexturesForRenderTarget(width, height) {
+
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    // Create FBO
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    fbo.width = width ? width : canvas.width;
+    fbo.height = height ? height : canvas.height;
+
+    let depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
+    depthTexture.fbo = fbo;
+
+    // Attach Buffers
+    var glTexture = depthTexture.glTextureResource;
+    var attachimentId = gl.DEPTH_ATTACHMENT;
+    depthTexture.colorAttachment = attachimentId;
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return depthTexture;
   }
 
   createRenderPasses(number) {
