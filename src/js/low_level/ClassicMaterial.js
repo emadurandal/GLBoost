@@ -2,9 +2,12 @@ import GLBoost from '../globals';
 import GLContext from './GLContext';
 import Vector4 from './math/Vector4';
 import DecalShader from '../middle_level/shaders/DecalShader';
+import GLBoostObject from './core/GLBoostObject';
 
-export default class ClassicMaterial {
+export default class ClassicMaterial extends GLBoostObject {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
+    super();
+
     this._diffuseTexture = null;
     this._gl = GLContext.getInstance(canvas).gl;
     this._canvas = canvas;
@@ -17,10 +20,6 @@ export default class ClassicMaterial {
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
 
-    if (this.constructor === ClassicMaterial) {
-      ClassicMaterial._instanceCount = (typeof ClassicMaterial._instanceCount === 'undefined') ? 0 : (ClassicMaterial._instanceCount + 1);
-      this._instanceName = ClassicMaterial.name + '_' + ClassicMaterial._instanceCount;
-    }
   }
 
   clone() {
@@ -141,9 +140,6 @@ export default class ClassicMaterial {
     }
   }
 
-  toString() {
-    return this._instanceName;
-  }
 }
 
 GLBoost['ClassicMaterial'] = ClassicMaterial;

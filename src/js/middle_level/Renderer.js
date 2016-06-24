@@ -4,13 +4,16 @@ import GLExtensionsManager from '../low_level/GLExtensionsManager';
 import MutableTexture from '../low_level/textures/MutableTexture';
 import RenderPass from './RenderPass';
 import Geometry from '../low_level/geometries/Geometry';
+import GLBoostObject from '../low_level/core/GLBoostObject';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
  * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
  */
-export default class Renderer {
+export default class Renderer extends GLBoostObject {
   constructor(parameters) {
+    super();
+
     var _canvas = parameters.canvas;
     var _clearColor = parameters.clearColor;
 

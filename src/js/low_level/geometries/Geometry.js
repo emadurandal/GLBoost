@@ -1,4 +1,5 @@
 import GLBoost from '../../globals';
+import GLBoostObject from '../core/GLBoostObject';
 import Vector3 from '../../low_level/math/Vector3';
 import GLContext from './../GLContext';
 import GLExtensionsManager from './../GLExtensionsManager';
@@ -9,15 +10,16 @@ import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
 import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
-import GLBoostContext from '../contexts/GLBoostContext';
 
-export default class Geometry {
+
+export default class Geometry extends GLBoostObject {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
+    super();
+
     this._glContext = GLContext.getInstance(canvas);
     this._canvas = canvas;
     this._setName();
-    this._glBoostContext = GLBoostContext.getInstance();
-    this._glBoostContext.registerGLBoostObject(this);
+
 
     this._materials = [];
     this._vertexN = 0;
@@ -39,11 +41,6 @@ export default class Geometry {
     } else if (this._drawKicker instanceof DrawKickerLocal) {
 
     }
-  }
-
-  _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
-    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   /**
@@ -433,9 +430,6 @@ export default class Geometry {
     Geometry._lastMaterial = null;
   }
 
-  toString() {
-    return this._instanceName;
-  }
 }
 Geometry._vaoDic = {};
 Geometry._vboDic = {};

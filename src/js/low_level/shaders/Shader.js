@@ -1,25 +1,19 @@
 import GLContext from '../GLContext';
 import PointLight from '../lights/PointLight';
 import Hash from '../misc/Hash';
-import GLBoostContext from '../contexts/GLBoostContext';
+import GLBoostObject from '../core/GLBoostObject';
 
-export default class Shader {
+export default class Shader extends GLBoostObject {
   constructor(canvas) {
+    super();
+
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
-    this._setName();
-    this._glBoostContext = GLBoostContext.getInstance();
-    this._glBoostContext.registerGLBoostObject(this);
 
     this._glContext = GLContext.getInstance(canvas);
 
     this._dirty = true;
-  }
-
-  _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
-    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   static initMixinMethodArray() {
@@ -448,9 +442,6 @@ export default class Shader {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 
-  toString() {
-    return this._instanceName;
-  }
 }
 
 Shader._instances = new Object();

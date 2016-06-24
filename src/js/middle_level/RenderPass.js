@@ -2,11 +2,13 @@ import GLBoost from '../globals';
 import GLContext from '../low_level/GLContext';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
-import Vector4 from '../low_level/math/Vector4';
+import GLBoostObject from '../low_level/core/GLBoostObject';
 
-export default class RenderPass {
+export default class RenderPass extends GLBoostObject {
 
   constructor(gl) {
+    super();
+
     this._elements = [];
     this._meshes = [];
     this._opacityMeshes = [];

@@ -5,13 +5,12 @@ import Vector4 from './math/Vector4';
 import Quaternion from './math/Quaternion';
 import Matrix44 from './math/Matrix44';
 import AnimationUtil from './misc/AnimationUtil';
-import GLBoostContext from './contexts/GLBoostContext';
+import GLBoostObject from './core/GLBoostObject';
 
-export default class Element {
+export default class Element extends GLBoostObject {
   constructor() {
-    this._setName();
-    this._glBoostContext = GLBoostContext.getInstance();
-    this._glBoostContext.registerGLBoostObject(this);
+    super();
+
     this._parent = null;
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();
@@ -28,7 +27,6 @@ export default class Element {
     this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
     this._animationLine = {};
-    this._userFlavorName = '';
     this._transparentByUser = false;
     this.opacity = 1.0;
 
@@ -36,10 +34,6 @@ export default class Element {
 
   }
 
-  _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
-    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
-  }
 
   _needUpdate() {
     this._dirtyAsElement = true;
@@ -404,22 +398,6 @@ export default class Element {
 
   get parent() {
     return this._parent;
-  }
-
-  toString() {
-    return this._instanceName;
-  }
-
-  set userFlavorName(name) {
-    this._userFlavorName = name;
-  }
-
-  get userFlavorName() {
-    return this._userFlavorName;
-  }
-
-  get instanceNameWithUserFlavor() {
-    this._instanceName + '_' + this._userFlavorName;
   }
 
   // used by library (not Application)
