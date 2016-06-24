@@ -73,11 +73,16 @@
   );
   scene.add( camera );
 
+  /*
   renderPasses[0].addElements([camera, cube, plane]);
   renderPasses[0].setClearColor([0, 0, 0, 1]);
   renderPasses[0].specifyRenderTargetTextures(renderTextures);
+    */
 
   scene.prepareForRender();
+
+  var glBoostContext = GLBoost.GLBoostContext.getInstance();
+  glBoostContext.printGLBoostObjects();
 
   var render = function() {
     renderer.clearCanvas();

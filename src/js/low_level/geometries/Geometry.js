@@ -9,11 +9,16 @@ import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
 import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
+import GLBoostContext from '../contexts/GLBoostContext';
 
 export default class Geometry {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     this._glContext = GLContext.getInstance(canvas);
     this._canvas = canvas;
+    this._setName();
+    this._glBoostContext = GLBoostContext.getInstance();
+    this._glBoostContext.registerGLBoostObject(this);
+
     this._materials = [];
     this._vertexN = 0;
     this._glslProgram = null;
@@ -27,7 +32,6 @@ export default class Geometry {
     this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
     this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
     this._centerPosition = Vector3.zero();
-    this._setName();
     this._drawKicker = DrawKickerWorld.getInstance();
 
     if (this._drawKicker instanceof DrawKickerWorld) {

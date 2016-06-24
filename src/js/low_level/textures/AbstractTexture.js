@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import GLContext from './../GLContext';
+import GLBoostContext from '../contexts/GLBoostContext';
 
 /**
  * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -18,8 +19,17 @@ export default class AbstractTexture {
       throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }
 
+    this._setName();
+    this._glBoostContext = GLBoostContext.getInstance();
+    this._glBoostContext.registerGLBoostObject(this);
+
     this._glContext = GLContext.getInstance(canvas);
     this._name = '';
+  }
+
+  _setName() {
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
   /**
@@ -80,6 +90,10 @@ export default class AbstractTexture {
    */
   _isPowerOfTwo(x) {
     return (x & (x - 1)) == 0;
+  }
+
+  toString() {
+    return this._instanceName;
   }
 
 }

@@ -5,10 +5,13 @@ import Vector4 from './math/Vector4';
 import Quaternion from './math/Quaternion';
 import Matrix44 from './math/Matrix44';
 import AnimationUtil from './misc/AnimationUtil';
-
+import GLBoostContext from './contexts/GLBoostContext';
 
 export default class Element {
   constructor() {
+    this._setName();
+    this._glBoostContext = GLBoostContext.getInstance();
+    this._glBoostContext.registerGLBoostObject(this);
     this._parent = null;
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();
@@ -31,7 +34,6 @@ export default class Element {
 
     this._activeAnimationLineName = null;
 
-    this._setName();
   }
 
   _setName() {

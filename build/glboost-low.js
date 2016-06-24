@@ -1720,10 +1720,58 @@
     return AnimationUtil;
   }();
 
+  var singleton = Symbol();
+  var singletonEnforcer = Symbol();
+
+  var GLBoostContext = function () {
+    function GLBoostContext(enforcer) {
+      babelHelpers.classCallCheck(this, GLBoostContext);
+
+      if (enforcer !== singletonEnforcer) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+
+      this._glBoostObjects = {};
+    }
+
+    babelHelpers.createClass(GLBoostContext, [{
+      key: 'registerGLBoostObject',
+      value: function registerGLBoostObject(glBoostObject) {
+        this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+      }
+    }, {
+      key: 'printGLBoostObjects',
+      value: function printGLBoostObjects() {
+        var objects = this._glBoostObjects;
+        console.log('========== GLBoost Object Lists [begin] ==========');
+        for (var key in objects) {
+          if (objects.hasOwnProperty(key)) {
+            console.log(key);
+          }
+        }
+        console.log('========== GLBoost Object Lists [end] ==========');
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton]) {
+          this[singleton] = new GLBoostContext(singletonEnforcer);
+        }
+        return this[singleton];
+      }
+    }]);
+    return GLBoostContext;
+  }();
+
+  GLBoost['GLBoostContext'] = GLBoostContext;
+
   var Element = function () {
     function Element() {
       babelHelpers.classCallCheck(this, Element);
 
+      this._setName();
+      this._glBoostContext = GLBoostContext.getInstance();
+      this._glBoostContext.registerGLBoostObject(this);
       this._parent = null;
       this._translate = Vector3.zero();
       this._rotate = Vector3.zero();
@@ -1745,8 +1793,6 @@
       this.opacity = 1.0;
 
       this._activeAnimationLineName = null;
-
-      this._setName();
     }
 
     babelHelpers.createClass(Element, [{
@@ -2325,6 +2371,9 @@
       if (typeof canvas === 'string') {
         canvas = window.document.querySelector(canvas);
       }
+      this._setName();
+      this._glBoostContext = GLBoostContext.getInstance();
+      this._glBoostContext.registerGLBoostObject(this);
 
       this._glContext = GLContext.getInstance(canvas);
 
@@ -2332,6 +2381,12 @@
     }
 
     babelHelpers.createClass(Shader, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+    }, {
       key: '_removeDuplicatedLine',
       value: function _removeDuplicatedLine(shaderString) {
         var splittedShaderLines = shaderString.split('\n');
@@ -2599,6 +2654,11 @@
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
         return programToReturn;
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
       }
     }, {
       key: 'dirty',
@@ -3320,19 +3380,29 @@
         throw new TypeError('Cannot construct AbstractTexture instances directly.');
       }
 
+      this._setName();
+      this._glBoostContext = GLBoostContext.getInstance();
+      this._glBoostContext.registerGLBoostObject(this);
+
       this._glContext = GLContext.getInstance(canvas);
       this._name = '';
     }
 
-    /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
-     *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
-     */
-
-
     babelHelpers.createClass(AbstractTexture, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+
+      /**
+       * [en] get the WebGL texture resource within this class. <br />
+       * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+       *
+       * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+       */
+
+    }, {
       key: 'setUp',
 
 
@@ -3374,6 +3444,11 @@
        */
       value: function _isPowerOfTwo(x) {
         return (x & x - 1) == 0;
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
       }
     }, {
       key: 'glTextureResource',
@@ -3971,14 +4046,14 @@
 
   GLBoost$1["DirectionalLight"] = DirectionalLight;
 
-  var singleton = Symbol();
-  var singletonEnforcer = Symbol();
+  var singleton$1 = Symbol();
+  var singletonEnforcer$1 = Symbol();
 
   var DrawKickerLocal = function () {
     function DrawKickerLocal(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerLocal);
 
-      if (enforcer !== singletonEnforcer) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -4089,10 +4164,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton]) {
-          this[singleton] = new DrawKickerLocal(singletonEnforcer);
+        if (!this[singleton$1]) {
+          this[singleton$1] = new DrawKickerLocal(singletonEnforcer$1);
         }
-        return this[singleton];
+        return this[singleton$1];
       }
     }]);
     return DrawKickerLocal;
@@ -4101,14 +4176,14 @@
   DrawKickerLocal._lastMaterial = null;
   DrawKickerLocal._lastGeometry = null;
 
-  var singleton$1 = Symbol();
-  var singletonEnforcer$1 = Symbol();
+  var singleton$2 = Symbol();
+  var singletonEnforcer$2 = Symbol();
 
   var DrawKickerWorld = function () {
     function DrawKickerWorld(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerWorld);
 
-      if (enforcer !== singletonEnforcer$1) {
+      if (enforcer !== singletonEnforcer$2) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -4217,10 +4292,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$1]) {
-          this[singleton$1] = new DrawKickerWorld(singletonEnforcer$1);
+        if (!this[singleton$2]) {
+          this[singleton$2] = new DrawKickerWorld(singletonEnforcer$2);
         }
-        return this[singleton$1];
+        return this[singleton$2];
       }
     }]);
     return DrawKickerWorld;
@@ -4266,6 +4341,10 @@
 
       this._glContext = GLContext.getInstance(canvas);
       this._canvas = canvas;
+      this._setName();
+      this._glBoostContext = GLBoostContext.getInstance();
+      this._glBoostContext.registerGLBoostObject(this);
+
       this._materials = [];
       this._vertexN = 0;
       this._glslProgram = null;
@@ -4279,7 +4358,6 @@
       this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
       this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
       this._centerPosition = Vector3.zero();
-      this._setName();
       this._drawKicker = DrawKickerWorld.getInstance();
 
       if (this._drawKicker instanceof DrawKickerWorld) {} else if (this._drawKicker instanceof DrawKickerLocal) {}
