@@ -96,3 +96,5 @@ export default class GLExtensionsManager {
 
 }
 GLExtensionsManager._instances = new Object();
+
+GLBoost['GLExtensionsManager'] = GLExtensionsManager;

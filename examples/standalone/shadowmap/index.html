@@ -42,8 +42,9 @@
   });
 
   var scene = new GLBoost.Scene();
-  var depthTexture = renderer.createTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 1);
-  var renderPasses = renderer.createRenderPasses(2);
+  var glBoostContext = GLBoost.GLBoostContext.getInstance();
+  var depthTexture = glBoostContext.createTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 1);
+  var renderPasses = glBoostContext.createRenderPasses(2);
 
   var material = new GLBoost.ClassicMaterial();
   var texture = new GLBoost.Texture('resources/texture.png');
@@ -81,8 +82,8 @@
 
   scene.prepareForRender();
 
-  var glBoostContext = GLBoost.GLBoostContext.getInstance();
-  glBoostContext.printGLBoostObjects();
+  var glBoostMonitor = GLBoost.GLBoostMonitor.getInstance();
+  glBoostMonitor.printGLBoostObjects();
 
   var render = function() {
     renderer.clearCanvas();

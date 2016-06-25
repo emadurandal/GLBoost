@@ -52,8 +52,9 @@ phina.define('MainScene', {
       height: SCREEN_HEIGHT
     }).addChildTo(this);
 
-    var renderTextures = layer.renderer.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
-    var renderPasses = layer.renderer.createRenderPasses(2);
+    var glBoostContext = GLBoost.GLBoostContext.getInstance();
+    var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
+    var renderPasses = glBoostContext.createRenderPasses(2);
 
     var positions = [
       new GLBoost.Vector3(-0.5, -0.5, 0.0),

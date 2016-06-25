@@ -1,4 +1,4 @@
-import GLBoostContext from './GLBoostContext';
+import GLBoostMonitor from './GLBoostMonitor';
 
 export default class GLBoostObject {
   constructor() {
@@ -6,8 +6,8 @@ export default class GLBoostObject {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
     this._setName();
-    this._glBoostContext = GLBoostContext.getInstance();
-    this._glBoostContext.registerGLBoostObject(this);
+    this._glBoostMonitor = GLBoostMonitor.getInstance();
+    this._glBoostMonitor.registerGLBoostObject(this);
     this._userFlavorName = '';
   }
 
