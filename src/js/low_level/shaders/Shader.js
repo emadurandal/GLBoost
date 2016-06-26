@@ -392,7 +392,10 @@ export default class Shader extends GLBoostObject {
   static getDefaultPointLightIfNotExsist(gl, lights, canvas) {
 
     if (lights.length === 0) {
-      return [new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas)]
+      if (Shader._defaultLight === null) {
+        Shader._defaultLight = new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas);
+      }
+      return [Shader._defaultLight];
     } else {
       return lights;
     }
@@ -446,3 +449,4 @@ export default class Shader extends GLBoostObject {
 
 Shader._instances = new Object();
 Shader._shaderHashTable = {};
+Shader._defaultLight = null;

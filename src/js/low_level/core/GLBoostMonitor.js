@@ -20,6 +20,7 @@ export default class GLBoostMonitor {
 
   registerGLBoostObject(glBoostObject) {
     this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+    console.log(glBoostObject.toString() + ' was created.');
   }
 
   printGLBoostObjects() {

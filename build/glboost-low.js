@@ -1612,6 +1612,7 @@
       key: 'registerGLBoostObject',
       value: function registerGLBoostObject(glBoostObject) {
         this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+        console.log(glBoostObject.toString() + ' was created.');
       }
     }, {
       key: 'printGLBoostObjects',
@@ -3674,7 +3675,10 @@
       value: function getDefaultPointLightIfNotExsist(gl, lights, canvas) {
 
         if (lights.length === 0) {
-          return [new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas)];
+          if (Shader._defaultLight === null) {
+            Shader._defaultLight = new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas);
+          }
+          return [Shader._defaultLight];
         } else {
           return lights;
         }
@@ -3743,6 +3747,7 @@
 
   Shader._instances = new Object();
   Shader._shaderHashTable = {};
+  Shader._defaultLight = null;
 
   var FragmentSimpleShaderSource = function () {
     function FragmentSimpleShaderSource() {
