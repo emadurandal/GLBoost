@@ -260,14 +260,6 @@ export default class Scene extends Element {
     return this._cameras;
   }
 
-  /**
-   * [en] Return instance name.
-   * [ja] インスタンス名を返します。
-   * @returns {string} [en] the instance name. [ja] インスタンス名
-   */
-  toString() {
-    return this._instanceName;
-  }
 }
 
 GLBoost['Scene'] = Scene;

@@ -16,6 +16,11 @@ export default class GLBoostObject {
     this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
+  /**
+   * [en] Return instance name.
+   * [ja] インスタンス名を返します。
+   * @returns {string} [en] the instance name. [ja] インスタンス名
+   */
   toString() {
     return this._instanceName;
   }

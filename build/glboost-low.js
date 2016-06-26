@@ -1683,6 +1683,13 @@
         this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
         this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
       }
+
+      /**
+       * [en] Return instance name.
+       * [ja] インスタンス名を返します。
+       * @returns {string} [en] the instance name. [ja] インスタンス名
+       */
+
     }, {
       key: 'toString',
       value: function toString() {

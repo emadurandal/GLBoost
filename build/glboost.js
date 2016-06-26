@@ -1971,6 +1971,13 @@
         this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
         this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
       }
+
+      /**
+       * [en] Return instance name.
+       * [ja] インスタンス名を返します。
+       * @returns {string} [en] the instance name. [ja] インスタンス名
+       */
+
     }, {
       key: 'toString',
       value: function toString() {
@@ -5562,18 +5569,6 @@
        * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
        */
 
-    }, {
-      key: 'toString',
-
-
-      /**
-       * [en] Return instance name.
-       * [ja] インスタンス名を返します。
-       * @returns {string} [en] the instance name. [ja] インスタンス名
-       */
-      value: function toString() {
-        return this._instanceName;
-      }
     }, {
       key: 'renderPasses',
       set: function set(renderPasses) {
