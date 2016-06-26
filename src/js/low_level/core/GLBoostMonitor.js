@@ -9,6 +9,7 @@ export default class GLBoostMonitor {
     }
 
     this._glBoostObjects = {};
+    this._glResources = [];
   }
 
   static getInstance() {
@@ -20,7 +21,7 @@ export default class GLBoostMonitor {
 
   registerGLBoostObject(glBoostObject) {
     this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-    console.log(glBoostObject.toString() + ' was created.');
+    console.log('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
   }
 
   printGLBoostObjects() {
@@ -33,6 +34,14 @@ export default class GLBoostMonitor {
     }
     console.log('========== GLBoost Object Lists [end] ==========');
   }
+
+  registerGLResource(glBoostObject, glResource) {
+    var glResourceName = glResource.constructor.name;
+    var glBoostObjectName = glBoostObject.toString();
+    this._glResources.push([glBoostObjectName, glResourceName]);
+    console.log('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+  }
+
 }
 
 GLBoost['GLBoostMonitor'] = GLBoostMonitor;

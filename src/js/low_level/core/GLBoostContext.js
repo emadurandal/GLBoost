@@ -53,7 +53,7 @@ export default class GLBoostContext {
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
     // Create FBO
-    var fbo = gl.createFramebuffer();
+    var fbo = this._glContext.createFramebuffer(GLBoostContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -66,7 +66,7 @@ export default class GLBoostContext {
     }
 
     // Create RenderBuffer
-    var renderbuffer = gl.createRenderbuffer();
+    var renderbuffer = this._glContext.createRenderbuffer(GLBoostContext.name);
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -92,7 +92,7 @@ export default class GLBoostContext {
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
     // Create FBO
-    var fbo = gl.createFramebuffer();
+    var fbo = this._glContext.createFramebuffer(GLBoostContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;

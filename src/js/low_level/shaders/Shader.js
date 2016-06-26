@@ -290,9 +290,9 @@ export default class Shader extends GLBoostObject {
     var shader;
 
     if (type == 'x-shader/x-fragment') {
-      shader = gl.createShader(gl.FRAGMENT_SHADER);
+      shader = this._glContext.createShader(this, gl.FRAGMENT_SHADER);
     } else if (type == 'x-shader/x-vertex') {
-      shader = gl.createShader(gl.VERTEX_SHADER);
+      shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
     } else {
       // Unknown shader type
       return null;
@@ -322,7 +322,7 @@ export default class Shader extends GLBoostObject {
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
 
     // Create the shader program
-    var shaderProgram = gl.createProgram();
+    var shaderProgram = this._glContext.createProgram(this);
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);

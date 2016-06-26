@@ -45,7 +45,7 @@ export default class Texture extends AbstractTexture {
       this._width = this._img.width;
       this._height = this._img.height;
 
-      var texture = gl.createTexture();
+      var texture = this._glContext.createTexture(this);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParameter('flipY'));
@@ -55,6 +55,8 @@ export default class Texture extends AbstractTexture {
         if (glem.extTFA) {
           gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
         }
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -79,7 +81,7 @@ export default class Texture extends AbstractTexture {
 
     this._width = imageData.width;
     this._height = imageData.height;
-    var texture = gl.createTexture();
+    var texture = this._glContext.createTexture(this);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {

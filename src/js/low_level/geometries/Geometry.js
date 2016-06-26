@@ -18,8 +18,6 @@ export default class Geometry extends GLBoostObject {
 
     this._glContext = GLContext.getInstance(canvas);
     this._canvas = canvas;
-    this._setName();
-
 
     this._materials = [];
     this._vertexN = 0;
@@ -273,7 +271,7 @@ export default class Geometry extends GLBoostObject {
     if (Geometry._vaoDic[this.toString()]) {
       return;
     }
-    var vao = glem.createVertexArray(gl);
+    var vao = this._glContext.createVertexArray(this);
     glem.bindVertexArray(gl, vao);
     Geometry._vaoDic[this.toString()] = vao;
 
@@ -281,7 +279,7 @@ export default class Geometry extends GLBoostObject {
     if (Geometry._vboDic[this.toString()]) {
       return;
     }
-    var vbo = gl.createBuffer();
+    var vbo = this._glContext.createBuffer(this);
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     Geometry._vboDic[this.toString()] = vbo;
 
@@ -328,7 +326,7 @@ export default class Geometry extends GLBoostObject {
     if (this._indicesArray) {
       // create Index Buffer
       for (let i=0; i<this._indicesArray.length; i++) {
-        var ibo = gl.createBuffer();
+        var ibo = this._glContext.createBuffer(this);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
