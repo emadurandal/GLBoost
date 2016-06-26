@@ -39,43 +39,43 @@ export default class GLContext {
     var gl = this.gl;
     var glem = GLExtensionsManager.getInstance(this);
     var glResource = glem.createVertexArray(gl);
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createBuffer(glBoostObject) {
     var glResource = this.gl.createBuffer();
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createFramebuffer(glBoostObject) {
     var glResource = this.gl.createFramebuffer();
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createRenderbuffer(glBoostObject) {
     var glResource = this.gl.createRenderbuffer();
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createShader(glBoostObject, shaderType) {
     var glResource = this.gl.createShader(shaderType);
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createProgram(glBoostObject) {
     var glResource = this.gl.createProgram();
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 
   createTexture(glBoostObject) {
     var glResource = this.gl.createTexture();
-    this._monitor.registerGLResource(glBoostObject, glResource);
+    this._monitor.registerWebGLResource(glBoostObject, glResource);
     return glResource;
   }
 

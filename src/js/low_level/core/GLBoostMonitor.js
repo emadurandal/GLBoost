@@ -35,11 +35,27 @@ export default class GLBoostMonitor {
     console.log('========== GLBoost Object Lists [end] ==========');
   }
 
-  registerGLResource(glBoostObject, glResource) {
+  registerWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
     var glBoostObjectName = glBoostObject.toString();
     this._glResources.push([glBoostObjectName, glResourceName]);
     console.log('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+  }
+
+  printWebGLResources() {
+    var glResources = this._glResources;
+    glResources.sort(
+      function(a,b){
+        if( a[0] < b[0] ) return -1;
+        if( a[0] > b[0] ) return 1;
+        return 0;
+      }
+    );
+    console.log('========== WebGL Resource Lists [begin] ==========');
+    glResources.forEach((glResource, i)=>{
+      console.log(i+1 +': ' +glResource[0] + ' created ' + glResource[1]);
+    });
+    console.log('========== WebGL Resource Lists [end] ==========');
   }
 
 }

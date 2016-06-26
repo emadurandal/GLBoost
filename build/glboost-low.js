@@ -1628,12 +1628,27 @@
         console.log('========== GLBoost Object Lists [end] ==========');
       }
     }, {
-      key: 'registerGLResource',
-      value: function registerGLResource(glBoostObject, glResource) {
+      key: 'registerWebGLResource',
+      value: function registerWebGLResource(glBoostObject, glResource) {
         var glResourceName = glResource.constructor.name;
         var glBoostObjectName = glBoostObject.toString();
         this._glResources.push([glBoostObjectName, glResourceName]);
         console.log('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+      }
+    }, {
+      key: 'printWebGLResources',
+      value: function printWebGLResources() {
+        var glResources = this._glResources;
+        glResources.sort(function (a, b) {
+          if (a[0] < b[0]) return -1;
+          if (a[0] > b[0]) return 1;
+          return 0;
+        });
+        console.log('========== WebGL Resource Lists [begin] ==========');
+        glResources.forEach(function (glResource, i) {
+          console.log(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
+        });
+        console.log('========== WebGL Resource Lists [end] ==========');
       }
     }], [{
       key: 'getInstance',
@@ -2659,49 +2674,49 @@
         var gl = this.gl;
         var glem = GLExtensionsManager.getInstance(this);
         var glResource = glem.createVertexArray(gl);
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createBuffer',
       value: function createBuffer(glBoostObject) {
         var glResource = this.gl.createBuffer();
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createFramebuffer',
       value: function createFramebuffer(glBoostObject) {
         var glResource = this.gl.createFramebuffer();
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createRenderbuffer',
       value: function createRenderbuffer(glBoostObject) {
         var glResource = this.gl.createRenderbuffer();
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createShader',
       value: function createShader(glBoostObject, shaderType) {
         var glResource = this.gl.createShader(shaderType);
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createProgram',
       value: function createProgram(glBoostObject) {
         var glResource = this.gl.createProgram();
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
       key: 'createTexture',
       value: function createTexture(glBoostObject) {
         var glResource = this.gl.createTexture();
-        this._monitor.registerGLResource(glBoostObject, glResource);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
       }
     }, {
