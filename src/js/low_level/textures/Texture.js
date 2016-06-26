@@ -1,6 +1,6 @@
 import GLBoost from '../../globals';
 import AbstractTexture from './AbstractTexture';
-import GLExtensionsManager from '../GLExtensionsManager';
+import GLExtensionsManager from '../core/GLExtensionsManager';
 
 export default class Texture extends AbstractTexture {
   constructor(src, parameters = null, canvas = GLBoost.CURRENT_CANVAS_ID) {

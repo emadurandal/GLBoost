@@ -2,7 +2,7 @@ import GLBoost from '../../globals';
 import GLBoostObject from '../core/GLBoostObject';
 import Vector3 from '../../low_level/math/Vector3';
 import GLContext from '../core/GLContext';
-import GLExtensionsManager from './../GLExtensionsManager';
+import GLExtensionsManager from '../core/GLExtensionsManager';
 import ClassicMaterial from './../ClassicMaterial';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import MathUtil from '../../low_level/math/MathUtil';
