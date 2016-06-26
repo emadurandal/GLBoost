@@ -96,6 +96,11 @@ scene_2.addChild(camera);
 scene_1.prepareForRender();
 scene_2.prepareForRender();
 
+var glBoostMonitor = GLBoost.GLBoostMonitor.getInstance();
+glBoostMonitor.printGLBoostObjects();
+glBoostMonitor.printWebGLResources();
+glBoostMonitor.printHierarchy();
+
 var render = function() {
   renderer_1.clearCanvas();
   renderer_1.draw(scene_1);
