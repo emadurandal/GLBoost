@@ -327,6 +327,8 @@ export default class Shader extends GLBoostObject {
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
+    this._glContext.deleteShader(this, vertexShader);
+    this._glContext.deleteShader(this, fragmentShader);
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {

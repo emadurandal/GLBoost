@@ -1641,6 +1641,12 @@
         MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
       }
     }, {
+      key: 'deregisterGLBoostObject',
+      value: function deregisterGLBoostObject(glBoostObject) {
+        delete this._glBoostObjects[glBoostObject.toString()];
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
+      }
+    }, {
       key: 'printGLBoostObjects',
       value: function printGLBoostObjects() {
         var objects = this._glBoostObjects;
@@ -1680,6 +1686,21 @@
         var glBoostObjectName = glBoostObject.toString();
         this._glResources.push([glBoostObjectName, glResourceName]);
         MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+      }
+    }, {
+      key: 'deregisterWebGLResource',
+      value: function deregisterWebGLResource(glBoostObject, glResource) {
+        var _this = this;
+
+        var glResourceName = glResource.constructor.name;
+        var glBoostObjectName = glBoostObject.toString();
+
+        this._glResources.forEach(function (glResource, i) {
+          if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
+            _this._glResources.splice(i, 1);
+          }
+        });
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
       }
     }, {
       key: 'printWebGLResources',
@@ -1762,6 +1783,7 @@
       this._glBoostMonitor = GLBoostMonitor.getInstance();
       this._glBoostMonitor.registerGLBoostObject(this);
       this._userFlavorName = '';
+      this._readyForDiscard = false;
     }
 
     babelHelpers.createClass(GLBoostObject, [{
@@ -1783,6 +1805,12 @@
         return this._instanceName;
       }
     }, {
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        this._readyForDiscard = true;
+        this._glBoostMonitor.deregisterGLBoostObject(this);
+      }
+    }, {
       key: 'userFlavorName',
       set: function set(name) {
         this._userFlavorName = name;
@@ -1794,6 +1822,11 @@
       key: 'instanceNameWithUserFlavor',
       get: function get() {
         this._instanceName + '_' + this._userFlavorName;
+      }
+    }, {
+      key: 'isReadyForDiscard',
+      get: function get() {
+        return this._readyForDiscard;
       }
     }]);
     return GLBoostObject;
@@ -2828,6 +2861,12 @@
         return glResource;
       }
     }, {
+      key: 'deleteShader',
+      value: function deleteShader(glBoostObject, shader) {
+        this._monitor.deregisterWebGLResource(glBoostObject, shader);
+        this.gl.deleteShader(shader);
+      }
+    }, {
       key: 'createProgram',
       value: function createProgram(glBoostObject) {
         var glResource = this.gl.createProgram();
@@ -3687,6 +3726,8 @@
         gl.attachShader(shaderProgram, vertexShader);
         gl.attachShader(shaderProgram, fragmentShader);
         gl.linkProgram(shaderProgram);
+        this._glContext.deleteShader(this, vertexShader);
+        this._glContext.deleteShader(this, fragmentShader);
 
         // If creating the shader program failed, alert
         if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -4276,6 +4317,7 @@
       key: 'shaderClass',
       set: function set(shaderClass) {
         this._shaderClass = shaderClass;
+        this._shaderInstance = null;
       },
       get: function get() {
         return this._shaderClass;

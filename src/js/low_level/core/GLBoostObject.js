@@ -9,6 +9,7 @@ export default class GLBoostObject {
     this._glBoostMonitor = GLBoostMonitor.getInstance();
     this._glBoostMonitor.registerGLBoostObject(this);
     this._userFlavorName = '';
+    this._readyForDiscard = false;
   }
 
   _setName() {
@@ -35,6 +36,15 @@ export default class GLBoostObject {
 
   get instanceNameWithUserFlavor() {
     this._instanceName + '_' + this._userFlavorName;
+  }
+
+  readyForDiscard() {
+    this._readyForDiscard = true;
+    this._glBoostMonitor.deregisterGLBoostObject(this);
+  }
+
+  get isReadyForDiscard() {
+    return this._readyForDiscard;
   }
 
 }

@@ -25,6 +25,11 @@ export default class GLBoostMonitor {
     MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
   }
 
+  deregisterGLBoostObject(glBoostObject) {
+    delete this._glBoostObjects[glBoostObject.toString()];
+    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
+  }
+
   printGLBoostObjects() {
     var objects = this._glBoostObjects;
     MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
@@ -63,6 +68,18 @@ export default class GLBoostMonitor {
     var glBoostObjectName = glBoostObject.toString();
     this._glResources.push([glBoostObjectName, glResourceName]);
     MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+  }
+
+  deregisterWebGLResource(glBoostObject, glResource) {
+    var glResourceName = glResource.constructor.name;
+    var glBoostObjectName = glBoostObject.toString();
+
+    this._glResources.forEach((glResource, i)=>{
+      if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
+        this._glResources.splice(i,1);
+      }
+    });
+    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
   }
 
   printWebGLResources() {
