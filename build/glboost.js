@@ -293,6 +293,27 @@
         console.log('========== GLBoost Object Lists [end] ==========');
       }
     }, {
+      key: 'printGLBoostObjectsOrderByName',
+      value: function printGLBoostObjectsOrderByName() {
+        var objects = this._glBoostObjects;
+        var objectArray = [];
+        for (var key in objects) {
+          if (objects.hasOwnProperty(key)) {
+            objectArray.push(key);
+          }
+        }
+        objectArray.sort(function (a, b) {
+          if (a < b) return -1;
+          if (a > b) return 1;
+          return 0;
+        });
+        console.log('========== GLBoost Object Lists [begin] ==========');
+        objectArray.forEach(function (object) {
+          console.log(object);
+        });
+        console.log('========== GLBoost Object Lists [end] ==========');
+      }
+    }, {
       key: 'registerWebGLResource',
       value: function registerWebGLResource(glBoostObject, glResource) {
         var glResourceName = glResource.constructor.name;
