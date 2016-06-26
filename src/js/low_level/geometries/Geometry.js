@@ -21,7 +21,6 @@ export default class Geometry extends GLBoostObject {
 
     this._materials = [];
     this._vertexN = 0;
-    this._glslProgram = null;
     this._vertices = null;
     this._indicesArray = null;
     this._performanceHint = null;
@@ -283,22 +282,19 @@ export default class Geometry extends GLBoostObject {
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     Geometry._vboDic[this.toString()] = vbo;
 
-    var materials = this._materials;
-    var optimizedVertexAttribs = null;
-
-    if (materials.length > 0) {
-      for (let i=0; i<materials.length;i++) {
-        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
-        materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
-        optimizedVertexAttribs = materials[i].glslProgramOfPasses[0].optimizedVertexAttribs;
-
-      }
-    } else if (!meshMaterial) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights, renderPasses, mesh);
-      this.glslProgramOfPasses = material.glslProgramOfPasses;
-      optimizedVertexAttribs = material.glslProgramOfPasses[0].optimizedVertexAttribs;
+    var materials = null;
+    if (this._materials.length > 0) {
+      materials = this._materials;
+    } else if (mesh.material){
+      materials = [mesh.material];
+    } else {
+      materials = [this._defaultMaterial];
     }
 
+    for (let i=0; i<materials.length;i++) {
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+      materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
+    }
 
 
     var vertexData = [];

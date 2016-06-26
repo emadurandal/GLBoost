@@ -3890,16 +3890,6 @@
       }
     }, {
       key: 'setVertexN',
-
-      /*
-      set faceN(num) {
-        this._faceN = num;
-      }
-       get faceN() {
-        return this._faceN;
-      }
-      */
-
       value: function setVertexN(geom, num) {
         this._vertexNofGeometries[geom] = num;
       }
@@ -4016,7 +4006,6 @@
 
       _this._materials = [];
       _this._vertexN = 0;
-      _this._glslProgram = null;
       _this._vertices = null;
       _this._indicesArray = null;
       _this._performanceHint = null;
@@ -4307,19 +4296,18 @@
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         Geometry._vboDic[this.toString()] = vbo;
 
-        var materials = this._materials;
-        var optimizedVertexAttribs = null;
+        var materials = null;
+        if (this._materials.length > 0) {
+          materials = this._materials;
+        } else if (mesh.material) {
+          materials = [mesh.material];
+        } else {
+          materials = [this._defaultMaterial];
+        }
 
-        if (materials.length > 0) {
-          for (var i = 0; i < materials.length; i++) {
-            var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
-            materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
-            optimizedVertexAttribs = materials[i].glslProgramOfPasses[0].optimizedVertexAttribs;
-          }
-        } else if (!meshMaterial) {
-          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights, renderPasses, mesh);
-          this.glslProgramOfPasses = material.glslProgramOfPasses;
-          optimizedVertexAttribs = material.glslProgramOfPasses[0].optimizedVertexAttribs;
+        for (var i = 0; i < materials.length; i++) {
+          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+          materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
         }
 
         var vertexData = [];
@@ -7800,7 +7788,7 @@
       }
     }, {
       key: 'prepareForRender',
-      value: function prepareForRender(existCamera_f, pointLight, meshMaterial) {
+      value: function prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
         var canvas = this._canvas;
 
@@ -7864,7 +7852,7 @@
          }
          */
 
-        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial);
+        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'prepareForRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
       }
     }]);
     return Particle;

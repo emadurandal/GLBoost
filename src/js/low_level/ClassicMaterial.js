@@ -102,15 +102,6 @@ export default class ClassicMaterial extends GLBoostObject {
   get name() {
     return this._name;
   }
-  /*
-  set faceN(num) {
-    this._faceN = num;
-  }
-
-  get faceN() {
-    return this._faceN;
-  }
-  */
 
   setVertexN(geom, num) {
     this._vertexNofGeometries[geom] = num;
