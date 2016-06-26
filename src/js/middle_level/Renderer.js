@@ -1,5 +1,5 @@
 import GLBoost from '../globals';
-import GLContext from '../low_level/GLContext';
+import GLContext from '../low_level/core/GLContext';
 import GLExtensionsManager from '../low_level/GLExtensionsManager';
 import MutableTexture from '../low_level/textures/MutableTexture';
 import RenderPass from './RenderPass';

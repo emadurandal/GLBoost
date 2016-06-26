@@ -1,4 +1,4 @@
-import GLContext from '../GLContext';
+import GLContext from '../core/GLContext';
 import PointLight from '../lights/PointLight';
 import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';

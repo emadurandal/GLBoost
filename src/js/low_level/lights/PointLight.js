@@ -1,5 +1,5 @@
 import GLBoost from '../../globals';
-import GLContext from './../GLContext';
+import GLContext from '../core/GLContext';
 import AbstractLight from './AbstractLight';
 
 /**

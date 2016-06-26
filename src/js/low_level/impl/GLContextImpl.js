@@ -1,4 +1,4 @@
-import GLContext from '../GLContext'
+import GLContext from '../core/GLContext'
 
 export default class GLContextImpl {
 

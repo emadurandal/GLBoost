@@ -1,5 +1,5 @@
 import GLBoost from '../globals';
-import GLContext from '../low_level/GLContext';
+import GLContext from '../low_level/core/GLContext';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
 import GLBoostObject from '../low_level/core/GLBoostObject';

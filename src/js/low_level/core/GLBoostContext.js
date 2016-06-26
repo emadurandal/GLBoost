@@ -1,4 +1,4 @@
-import GLContext from '../GLContext';
+import GLContext from './GLContext';
 import MutableTexture from '../textures/MutableTexture';
 import GLExtensionsManager from '../GLExtensionsManager';
 import RenderPass from '../../middle_level/RenderPass';

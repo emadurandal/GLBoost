@@ -1,5 +1,5 @@
 import GLBoost from '../globals';
-import GLContext from './GLContext';
+import GLContext from './core/GLContext';
 import Vector4 from './math/Vector4';
 import DecalShader from '../middle_level/shaders/DecalShader';
 import GLBoostObject from './core/GLBoostObject';

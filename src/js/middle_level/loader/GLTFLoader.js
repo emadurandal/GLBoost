@@ -1,5 +1,5 @@
 import GLBoost from '../../globals';
-import GLContext from '../../low_level/GLContext';
+import GLContext from '../../low_level/core/GLContext';
 import Geometry from '../../low_level/geometries/Geometry';
 import SkeletalGeometry from '../../low_level/geometries/SkeletalGeometry';
 import ClassicMaterial from '../../low_level/ClassicMaterial';
