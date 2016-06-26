@@ -14,6 +14,7 @@ export default class Shader extends GLBoostObject {
 
     this._glContext = GLContext.getInstance(canvas);
 
+    this._glslProgram = null;
     this._dirty = true;
   }
 
@@ -384,6 +385,8 @@ export default class Shader extends GLBoostObject {
       }
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
       Shader._shaderHashTable[canvas.id] = hashTable;
+
+      this._glslProgram = programToReturn;
     } else {
       //gl.useProgram(programToReturn);
     }
@@ -446,6 +449,11 @@ export default class Shader extends GLBoostObject {
   }
   static _set_glFragData_inGLVer1(gl, i) {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
+  }
+
+  readyForDiscard() {
+    super.readyForDiscard();
+    this._glContext.deleteProgram(this, this._glslProgram);
   }
 
 }

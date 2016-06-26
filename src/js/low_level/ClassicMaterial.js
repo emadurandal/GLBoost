@@ -40,6 +40,9 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set shaderClass(shaderClass) {
     this._shaderClass = shaderClass;
+    if (this._shaderInstance) {
+      this._shaderInstance.readyForDiscard();
+    }
     this._shaderInstance = null;
   }
 

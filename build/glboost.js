@@ -591,6 +591,12 @@
         return glResource;
       }
     }, {
+      key: 'deleteProgram',
+      value: function deleteProgram(glBoostObject, program) {
+        this._monitor.deregisterWebGLResource(glBoostObject, program);
+        this.gl.deleteProgram(program);
+      }
+    }, {
       key: 'createTexture',
       value: function createTexture(glBoostObject) {
         var glResource = this.gl.createTexture();
@@ -2717,6 +2723,7 @@
 
       _this._glContext = GLContext.getInstance(canvas);
 
+      _this._glslProgram = null;
       _this._dirty = true;
       return _this;
     }
@@ -2985,12 +2992,20 @@
           }
           hashTable[indexStr] = { code: baseText, program: programToReturn, collisionN: 0 };
           Shader._shaderHashTable[canvas.id] = hashTable;
+
+          this._glslProgram = programToReturn;
         } else {
           //gl.useProgram(programToReturn);
         }
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
         return programToReturn;
+      }
+    }, {
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        babelHelpers.get(Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
+        this._glContext.deleteProgram(this, this._glslProgram);
       }
     }, {
       key: 'dirty',
@@ -3925,6 +3940,9 @@
       key: 'shaderClass',
       set: function set(shaderClass) {
         this._shaderClass = shaderClass;
+        if (this._shaderInstance) {
+          this._shaderInstance.readyForDiscard();
+        }
         this._shaderInstance = null;
       },
       get: function get() {

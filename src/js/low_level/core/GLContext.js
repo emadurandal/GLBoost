@@ -78,6 +78,11 @@ export default class GLContext {
     return glResource;
   }
 
+  deleteProgram(glBoostObject, program) {
+    this._monitor.deregisterWebGLResource(glBoostObject, program);
+    this.gl.deleteProgram(program);
+  }
+
   createTexture(glBoostObject) {
     var glResource = this.gl.createTexture();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
