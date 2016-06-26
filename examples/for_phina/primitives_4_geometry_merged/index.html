@@ -60,7 +60,7 @@
 
         mesh.mergeHarder(cubes);
 
-        layer.scene.add( mesh );
+        layer.scene.addChild( mesh );
 
         var camera = new GLBoost.Camera(
             {
@@ -75,7 +75,7 @@
               zFar: 1000.0
             }
         );
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         layer.scene.prepareForRender();
 

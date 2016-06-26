@@ -107,7 +107,7 @@
         var material = new GLBoost.ClassicMaterial();
         material.diffuseTexture = texture;
         var mesh = new GLBoost.Mesh(geometry, material);
-        layer.scene.add( mesh );
+        layer.scene.addChild( mesh );
 
         var camera = new GLBoost.Camera(
             {
@@ -122,7 +122,7 @@
               zFar: 300.0
             }
         );
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         layer.scene.prepareForRender();
 

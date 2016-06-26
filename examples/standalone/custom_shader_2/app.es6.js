@@ -28,10 +28,10 @@ var camera = new GLBoost.Camera(
     zFar: 300.0
   }
 );
-scene.add( camera );
+scene.addChild( camera );
 
 var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
-scene.add( directionalLight );
+scene.addChild( directionalLight );
 
 var attributeName = 'heightpoints';
 
@@ -107,7 +107,7 @@ var material = new GLBoost.ClassicMaterial();
 material.shaderClass = MyCustomShader;
 var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
 var plane = new GLBoost.Mesh(planeGeometry, material);
-scene.add( plane );
+scene.addChild( plane );
 
 scene.prepareForRender();
 

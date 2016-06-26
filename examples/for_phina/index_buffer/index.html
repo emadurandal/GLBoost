@@ -59,7 +59,7 @@
           color: colors
         }, [indices]);
         var mesh1 = new GLBoost.Mesh(geometry1, null);
-        layer.scene.add( mesh1 );
+        layer.scene.addChild( mesh1 );
 
         var positions = [
           new GLBoost.Vector3(0.5, -0.5, 0.0),
@@ -83,7 +83,7 @@
           texcoord: texcoords
         }, [indices]);
         var mesh2 = new GLBoost.Mesh(geometry2, material);
-        layer.scene.add( mesh2 );
+        layer.scene.addChild( mesh2 );
 
         var camera = new GLBoost.Camera({
           eye: new GLBoost.Vector3(0.0, 0, 5.0),
@@ -95,7 +95,7 @@
           zNear: 0.1,
           zFar: 1000.0
         });
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         layer.scene.prepareForRender();
 

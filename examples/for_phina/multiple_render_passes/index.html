@@ -88,7 +88,7 @@
           shapetarget_1: shapetarget_1,
           shapetarget_2: shapetarget_2
         });
-        layer.scene.add( mesh );
+        layer.scene.addChild( mesh );
 
         renderPasses[0].addElements([mesh]);
         renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
@@ -102,7 +102,7 @@
           position: positions,
           texcoord: texcoords
         });
-        layer.scene.add( mesh2 );
+        layer.scene.addChild( mesh2 );
 
         renderPasses[1].addElements([mesh2]);
         renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));

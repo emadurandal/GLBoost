@@ -22,7 +22,7 @@ export default class SkeletalGeometry extends Geometry {
 
 
     var calcParentJointsMatricesRecursively = (joint)=> {
-      let children = joint.parent.parent._children;
+      let children = joint.parent.parent.getChildren();
       let parentJoint = null;
       for (let i=0; i<children.length; i++) {
         if (children[i] instanceof Joint) {

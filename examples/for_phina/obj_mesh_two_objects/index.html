@@ -45,13 +45,13 @@
           zNear: 0.1,
           zFar: 300.0
         });
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(1, 1, 1));
         pointLight_1.translate = new GLBoost.Vector3(0, 0, -10);
         var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10));
-        layer.scene.add( pointLight_1 );
-        layer.scene.add( directionalLight_2 );
+        layer.scene.addChild( pointLight_1 );
+        layer.scene.addChild( directionalLight_2 );
 
         var objLoader = GLBoost.ObjLoader.getInstance();
         var promise = objLoader.loadObj('resources/teapot/teapot.obj');
@@ -60,8 +60,8 @@
           var mesh_2 = new GLBoost.Mesh(mesh.geometry, mesh.material);
           mesh_1.translate = new GLBoost.Vector3(-2, 0, 0);
           mesh_2.translate = new GLBoost.Vector3(2, 0, 0);
-          layer.scene.add( mesh_1 );
-          layer.scene.add( mesh_2 );
+          layer.scene.addChild( mesh_1 );
+          layer.scene.addChild( mesh_2 );
 
           layer.scene.prepareForRender();
 
