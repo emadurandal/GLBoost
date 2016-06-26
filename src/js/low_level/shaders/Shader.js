@@ -2,6 +2,7 @@ import GLContext from '../core/GLContext';
 import PointLight from '../lights/PointLight';
 import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';
+import MiscUtil from '../misc/MiscUtil';
 
 export default class Shader extends GLBoostObject {
   constructor(canvas) {
@@ -313,10 +314,10 @@ export default class Shader extends GLBoostObject {
   }
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-    console.log('Vertex Shader:');
-    console.log(vertexShaderStr);
-    console.log('Fragment Shader:');
-    console.log(fragmentShaderStr);
+    MiscUtil.consoleLog('Vertex Shader:');
+    MiscUtil.consoleLog(vertexShaderStr);
+    MiscUtil.consoleLog('Fragment Shader:');
+    MiscUtil.consoleLog(fragmentShaderStr);
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');

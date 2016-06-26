@@ -1,3 +1,5 @@
+import GLBoost from '../../globals';
+
 export default class MiscUtil {
 
   constructor() {
@@ -9,6 +11,12 @@ export default class MiscUtil {
       return true;
     } else {
       return false;
+    }
+  }
+  
+  static consoleLog(text) {
+    if (GLBoost.CONSOLE_OUT_FOR_DEBUGGING) {
+      console.log(text);
     }
   }
 }

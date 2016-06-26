@@ -1,3 +1,4 @@
+import MiscUtil from '../misc/MiscUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -21,18 +22,18 @@ export default class GLBoostMonitor {
 
   registerGLBoostObject(glBoostObject) {
     this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-    console.log('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
+    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
   }
 
   printGLBoostObjects() {
     var objects = this._glBoostObjects;
-    console.log('========== GLBoost Object Lists [begin] ==========');
+    MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
     for (var key in objects) {
       if (objects.hasOwnProperty(key)) {
-        console.log(key);
+        MiscUtil.consoleLog(key);
       }
     }
-    console.log('========== GLBoost Object Lists [end] ==========');
+    MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
   }
 
   printGLBoostObjectsOrderByName() {
@@ -50,18 +51,18 @@ export default class GLBoostMonitor {
         return 0;
       }
     );
-    console.log('========== GLBoost Object Lists [begin] ==========');
+    MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
     objectArray.forEach((object)=>{
-      console.log(object);
+      MiscUtil.consoleLog(object);
     });
-    console.log('========== GLBoost Object Lists [end] ==========');
+    MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
   }
 
   registerWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
     var glBoostObjectName = glBoostObject.toString();
     this._glResources.push([glBoostObjectName, glResourceName]);
-    console.log('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
   }
 
   printWebGLResources() {
@@ -73,11 +74,11 @@ export default class GLBoostMonitor {
         return 0;
       }
     );
-    console.log('========== WebGL Resource Lists [begin] ==========');
+    MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
     glResources.forEach((glResource, i)=>{
-      console.log(i+1 +': ' +glResource[0] + ' created ' + glResource[1]);
+      MiscUtil.consoleLog(i+1 +': ' +glResource[0] + ' created ' + glResource[1]);
     });
-    console.log('========== WebGL Resource Lists [end] ==========');
+    MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
   }
 
   printHierarchy() {
@@ -99,7 +100,7 @@ export default class GLBoostMonitor {
       return str;
     }
 
-    console.log('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
+    MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
     scenes.forEach((scene)=> {
       var outputText = (function searchRecursively(element, level) {
         var outputText = '';
@@ -115,9 +116,9 @@ export default class GLBoostMonitor {
       })(scene, 0);
 
       outputText = outputText.replace( /\n+/g , '\n');
-      console.log(outputText);
+      MiscUtil.consoleLog(outputText);
     });
-    console.log('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
+    MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
 
   }
 

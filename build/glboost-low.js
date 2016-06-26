@@ -1594,6 +1594,31 @@
     return AnimationUtil;
   }();
 
+  var MiscUtil = function () {
+    function MiscUtil() {
+      babelHelpers.classCallCheck(this, MiscUtil);
+    }
+
+    babelHelpers.createClass(MiscUtil, null, [{
+      key: 'isDefinedAndTrue',
+      value: function isDefinedAndTrue(value) {
+        if (typeof value !== 'undefined' && value) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'consoleLog',
+      value: function consoleLog(text) {
+        if (GLBoost$1.CONSOLE_OUT_FOR_DEBUGGING) {
+          console.log(text);
+        }
+      }
+    }]);
+    return MiscUtil;
+  }();
+
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
@@ -1613,19 +1638,19 @@
       key: 'registerGLBoostObject',
       value: function registerGLBoostObject(glBoostObject) {
         this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-        console.log('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
       }
     }, {
       key: 'printGLBoostObjects',
       value: function printGLBoostObjects() {
         var objects = this._glBoostObjects;
-        console.log('========== GLBoost Object Lists [begin] ==========');
+        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
         for (var key in objects) {
           if (objects.hasOwnProperty(key)) {
-            console.log(key);
+            MiscUtil.consoleLog(key);
           }
         }
-        console.log('========== GLBoost Object Lists [end] ==========');
+        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
       }
     }, {
       key: 'printGLBoostObjectsOrderByName',
@@ -1642,11 +1667,11 @@
           if (a > b) return 1;
           return 0;
         });
-        console.log('========== GLBoost Object Lists [begin] ==========');
+        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
         objectArray.forEach(function (object) {
-          console.log(object);
+          MiscUtil.consoleLog(object);
         });
-        console.log('========== GLBoost Object Lists [end] ==========');
+        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
       }
     }, {
       key: 'registerWebGLResource',
@@ -1654,7 +1679,7 @@
         var glResourceName = glResource.constructor.name;
         var glBoostObjectName = glBoostObject.toString();
         this._glResources.push([glBoostObjectName, glResourceName]);
-        console.log('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
       }
     }, {
       key: 'printWebGLResources',
@@ -1665,11 +1690,11 @@
           if (a[0] > b[0]) return 1;
           return 0;
         });
-        console.log('========== WebGL Resource Lists [begin] ==========');
+        MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
         glResources.forEach(function (glResource, i) {
-          console.log(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
+          MiscUtil.consoleLog(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
         });
-        console.log('========== WebGL Resource Lists [end] ==========');
+        MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
       }
     }, {
       key: 'printHierarchy',
@@ -1692,7 +1717,7 @@
           return str;
         }
 
-        console.log('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
+        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
         scenes.forEach(function (scene) {
           var outputText = function searchRecursively(element, level) {
             var outputText = '';
@@ -1708,9 +1733,9 @@
           }(scene, 0);
 
           outputText = outputText.replace(/\n+/g, '\n');
-          console.log(outputText);
+          MiscUtil.consoleLog(outputText);
         });
-        console.log('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
+        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
       }
     }], [{
       key: 'getInstance',
@@ -3649,10 +3674,10 @@
     }, {
       key: '_initShaders',
       value: function _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-        console.log('Vertex Shader:');
-        console.log(vertexShaderStr);
-        console.log('Fragment Shader:');
-        console.log(fragmentShaderStr);
+        MiscUtil.consoleLog('Vertex Shader:');
+        MiscUtil.consoleLog(vertexShaderStr);
+        MiscUtil.consoleLog('Fragment Shader:');
+        MiscUtil.consoleLog(fragmentShaderStr);
 
         var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
         var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
@@ -5867,6 +5892,7 @@
   GLBoost$1['DEFAULT_POINTLIGHT_INTENSITY'] = new Vector3(1, 1, 1);
   GLBoost$1['ANGLE_UNIT'] = GLBoost$1.DEGREE;
   GLBoost$1['WEBGL_ONE_USE_EXTENSIONS'] = true;
+  GLBoost$1['CONSOLE_OUT_FOR_DEBUGGING'] = true;
 
   var Plane = function (_Geometry) {
     babelHelpers.inherits(Plane, _Geometry);
