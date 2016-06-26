@@ -38,7 +38,7 @@ var scene = new GLBoost.Scene();
 
 var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0));
 pointLight.translate = new GLBoost.Vector3(10, 10, 10);
-scene.add( pointLight );
+scene.addChild( pointLight );
 
 var camera = new GLBoost.Camera(
     {
@@ -53,7 +53,7 @@ var camera = new GLBoost.Camera(
       zFar: 30000.0
     }
 );
-scene.add( camera );
+scene.addChild( camera );
 
 var gtime = 0;
 
@@ -63,7 +63,7 @@ promise.then(function(group) {
   console.log(group);
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
-  scene.add( group );
+  scene.addChild( group );
   scene.prepareForRender();
 
   var meshes = group.searchElementsByType(GLBoost.Mesh);

@@ -51,10 +51,10 @@ material.shaderClass = shader;
 var geometry = new GLBoost.Sphere(20, 24, 24, null);
 
 var earth = new GLBoost.Mesh(geometry, material);
-scene.add(earth);
+scene.addChild(earth);
 
 var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
-scene.add( directionalLight );
+scene.addChild( directionalLight );
 
 
 var camera = new GLBoost.Camera({
@@ -68,7 +68,7 @@ var camera = new GLBoost.Camera({
   zFar: 1000.0
 });
 
-scene.add(camera);
+scene.addChild(camera);
 scene.prepareForRender();
 
 var render = function() {

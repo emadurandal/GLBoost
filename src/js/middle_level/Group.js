@@ -4,17 +4,27 @@ import Element from '../low_level/Element';
 export default class Group extends Element {
   constructor() {
     super();
-    this._children = [];
+    this._elements = [];
   }
 
+  /**
+   * [en] Add the element to this group as a child.<br>
+   * [ja] このグループにelementを子供として追加します。
+   * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
+   */
   addChild(element) {
     this.removeChild(element);
-    this._children.push(element);
+    this._elements.push(element);
     element._parent = this;
   }
 
+  /**
+   * [en] remove the element from this group.
+   * [ja] このグループから指定した要素を削除します。
+   * @param {Element} element [en] the element to remove [ja] 削除したい要素
+   */
   removeChild(element) {
-    this._children = this._children.filter(function(elem) {
+    this._elements = this._elements.filter(function(elem) {
       if (elem === element) {
         element._parent = null;
       }
@@ -22,8 +32,19 @@ export default class Group extends Element {
     });
   }
 
+  /**
+   * [en] remove all elements from this group.
+   * [ja] このグループから全ての要素を削除します。
+   */
+  removeAll() {
+    this._elements = this._elements.filter(function(elem) {
+      elem._parent = null;
+    });
+    this._elements.length = 0;
+  }
+
   getChildren() {
-    return this._children;
+    return this._elements;
   }
 
   searchElement(userflavorName, element = this) {

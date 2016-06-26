@@ -96,10 +96,10 @@
         var matterial = new GLBoost.ClassicMaterial();
         matterial.shaderClass = GLBoost.PhongShader;
         var mesh = new GLBoost.Mesh(geometry, matterial);
-        layer.scene.add( mesh );
+        layer.scene.addChild( mesh );
 
         var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(0.75, 0.75, 0.75), new GLBoost.Vector3(0, 0, -10));
-        layer.scene.add( directionalLight );
+        layer.scene.addChild( directionalLight );
 
         layer.scene.prepareForRender();
 

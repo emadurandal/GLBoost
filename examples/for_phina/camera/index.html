@@ -65,7 +65,7 @@
           color: colors
         });
         var mesh = new GLBoost.Mesh(geometry, null);
-        layer.scene.add( mesh );
+        layer.scene.addChild( mesh );
         this.camera = new GLBoost.Camera({
           eye: new GLBoost.Vector3(0.0, 0, 10.0),
           center: new GLBoost.Vector3(0.0, 0.0, 0.0),
@@ -76,7 +76,7 @@
           zNear: 0.1,
           zFar: 1000.0
         });
-        layer.scene.add( this.camera );
+        layer.scene.addChild( this.camera );
         layer.scene.prepareForRender();
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
         label.fill = 'white';

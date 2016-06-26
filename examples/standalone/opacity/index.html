@@ -62,8 +62,8 @@ group1.opacity = 0.5;
 var cube3 = new GLBoost.Mesh(planeGeometry, material);
 cube3.translate = new GLBoost.Vector3(3, 0, 0);
 
-scene.add(cube3);
-scene.add(group1);
+scene.addChild(cube3);
+scene.addChild(group1);
 scene.opacity = 0.5;
 
 var camera = new GLBoost.Camera(
@@ -79,7 +79,7 @@ var camera = new GLBoost.Camera(
       zFar: 300.0
     }
 );
-scene.add( camera );
+scene.addChild( camera );
 
 scene.prepareForRender();
 

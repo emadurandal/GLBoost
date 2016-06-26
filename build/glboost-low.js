@@ -2386,31 +2386,59 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this));
 
-      _this._children = [];
+      _this._elements = [];
       return _this;
     }
+
+    /**
+     * [en] Add the element to this group as a child.<br>
+     * [ja] このグループにelementを子供として追加します。
+     * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
+     */
+
 
     babelHelpers.createClass(Group, [{
       key: 'addChild',
       value: function addChild(element) {
         this.removeChild(element);
-        this._children.push(element);
+        this._elements.push(element);
         element._parent = this;
       }
+
+      /**
+       * [en] remove the element from this group.
+       * [ja] このグループから指定した要素を削除します。
+       * @param {Element} element [en] the element to remove [ja] 削除したい要素
+       */
+
     }, {
       key: 'removeChild',
       value: function removeChild(element) {
-        this._children = this._children.filter(function (elem) {
+        this._elements = this._elements.filter(function (elem) {
           if (elem === element) {
             element._parent = null;
           }
           return elem !== element;
         });
       }
+
+      /**
+       * [en] remove all elements from this group.
+       * [ja] このグループから全ての要素を削除します。
+       */
+
+    }, {
+      key: 'removeAll',
+      value: function removeAll() {
+        this._elements = this._elements.filter(function (elem) {
+          elem._parent = null;
+        });
+        this._elements.length = 0;
+      }
     }, {
       key: 'getChildren',
       value: function getChildren() {
-        return this._children;
+        return this._elements;
       }
     }, {
       key: 'searchElement',

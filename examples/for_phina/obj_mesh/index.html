@@ -48,14 +48,14 @@
               zFar: 300.0
             }
         );
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         var objLoader = GLBoost.ObjLoader.getInstance();
         var promise = objLoader.loadObj('resources/teapot/teapot.obj');
         promise.then(function(mesh) {
 //            console.log(mesh);
 
-          layer.scene.add( mesh );
+          layer.scene.addChild( mesh );
 
           layer.scene.prepareForRender();
 

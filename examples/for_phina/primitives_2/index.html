@@ -58,7 +58,7 @@
           //object.scale = new GLBoost.Vector3(Math.random() + 0.5, Math.random() + 0.5, Math.random() + 0.5);
           object.dirty = true;
 
-          layer.scene.add( object );
+          layer.scene.addChild( object );
         }
 
         var camera = new GLBoost.Camera(
@@ -74,7 +74,7 @@
               zFar: 1000.0
             }
         );
-        layer.scene.add( camera );
+        layer.scene.addChild( camera );
 
         layer.scene.prepareForRender();
 
