@@ -70,6 +70,16 @@ export default class Scene extends Group {
   prepareForRender() {
     this._reset();
 
+    (function setParentRecursively(elem) {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        for(let i=0; i<children.length; i++) {
+          children[i]._parent = elem;
+          setParentRecursively(children[i]);
+        }
+      }
+    })(this);
+
     let collectMeshes = function(elem) {
       if (elem instanceof Group) {
         var children = elem.getChildren();

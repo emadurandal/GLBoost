@@ -4225,7 +4225,6 @@
         var offset = 0;
         _allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-            //gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
             gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this4._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
           }
           offset += _this4._vertexAttribComponentNDic[attribName] * 4;
@@ -4881,7 +4880,7 @@
       value: function addChild(element) {
         this.removeChild(element);
         this._elements.push(element);
-        element._parent = this;
+        //element._parent = this;
       }
 
       /**
@@ -5590,6 +5589,16 @@
         var _this2 = this;
 
         this._reset();
+
+        (function setParentRecursively(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            for (var i = 0; i < children.length; i++) {
+              children[i]._parent = elem;
+              setParentRecursively(children[i]);
+            }
+          }
+        })(this);
 
         var collectMeshes = function collectMeshes(elem) {
           if (elem instanceof Group) {

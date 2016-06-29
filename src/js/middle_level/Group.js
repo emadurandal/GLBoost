@@ -15,7 +15,6 @@ export default class Group extends Element {
   addChild(element) {
     this.removeChild(element);
     this._elements.push(element);
-    element._parent = this;
   }
 
   /**

@@ -68,8 +68,10 @@
   var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(2, 2, 2));
   pointLight_1.translate = new GLBoost.Vector3(0, 10, -10);
   var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10));
-  scene.addChild( pointLight_1 );
-  scene.addChild( directionalLight_2 );
+  group_1.addChild( pointLight_1 );
+  group_1.addChild( directionalLight_2 );
+  group_2.addChild( pointLight_1 );
+  group_2.addChild( directionalLight_2 );
   scene.addChild(group_1);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
@@ -79,23 +81,19 @@
   var currentGroup = 'group_1';
   function switchSceneGraph() {
     if (currentGroup === 'group_1') {
-      group_1.removeChild(g_mesh);
       scene.removeChild(group_1);
       scene.addChild(group_2);
-      group_2.addChild(g_mesh);
       currentGroup = 'group_2';
     } else {
-      group_2.removeChild(g_mesh);
       scene.removeChild(group_2);
       scene.addChild(group_1);
-      group_1.addChild(g_mesh);
       currentGroup = 'group_1';
     }
   }
 
   promise.then(function(mesh) {
     group_1.addChild( mesh );
-    g_mesh = mesh;
+    group_2.addChild( mesh );
 
     var that = this;
     var tick = 0;
