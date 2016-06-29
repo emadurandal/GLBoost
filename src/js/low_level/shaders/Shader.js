@@ -372,7 +372,7 @@ export default class Shader extends GLBoostObject {
       }
     }
 
-    if (programToReturn === null) {
+    if (programToReturn === null || !gl.isProgram(programToReturn)) {
     // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
       programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
@@ -386,10 +386,10 @@ export default class Shader extends GLBoostObject {
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
       Shader._shaderHashTable[canvas.id] = hashTable;
 
-      this._glslProgram = programToReturn;
     } else {
       //gl.useProgram(programToReturn);
     }
+    this._glslProgram = programToReturn;
     programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
     return programToReturn;

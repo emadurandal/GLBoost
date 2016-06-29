@@ -582,6 +582,7 @@
       value: function deleteShader(glBoostObject, shader) {
         this._monitor.deregisterWebGLResource(glBoostObject, shader);
         this.gl.deleteShader(shader);
+        shader = null;
       }
     }, {
       key: 'createProgram',
@@ -2979,7 +2980,7 @@
           }
         }
 
-        if (programToReturn === null) {
+        if (programToReturn === null || !gl.isProgram(programToReturn)) {
           // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
           programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
@@ -2992,11 +2993,10 @@
           }
           hashTable[indexStr] = { code: baseText, program: programToReturn, collisionN: 0 };
           Shader._shaderHashTable[canvas.id] = hashTable;
-
-          this._glslProgram = programToReturn;
         } else {
           //gl.useProgram(programToReturn);
         }
+        this._glslProgram = programToReturn;
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
 
         return programToReturn;
@@ -3355,8 +3355,8 @@
         }
 
         for (var i = 0; i < materials.length; i++) {
-          var materialName = materials[i].toString();
-          if (materialName !== DrawKickerLocal._lastMaterial) {
+          var shaderName = materials[i].shaderInstance.toString();
+          if (shaderName !== DrawKickerLocal._lastShaderName) {
             this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
             gl.useProgram(this._glslProgram);
           }
@@ -3419,12 +3419,12 @@
 
           var isMaterialSetupDone = true;
 
-          if (materials[i].shaderInstance.dirty || materialName !== DrawKickerLocal._lastMaterial) {
+          if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerLocal._lastShaderName) {
             var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
             materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
-          if (materialName !== DrawKickerLocal._lastMaterial) {
+          if (shaderName !== DrawKickerLocal._lastShaderName) {
             if (materials[i]) {
               isMaterialSetupDone = materials[i].setUp();
             }
@@ -3441,7 +3441,7 @@
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
 
-          DrawKickerLocal._lastMaterial = isMaterialSetupDone ? materialName : null;
+          DrawKickerLocal._lastShaderName = isMaterialSetupDone ? shaderName : null;
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -3460,7 +3460,7 @@
     return DrawKickerLocal;
   }();
 
-  DrawKickerLocal._lastMaterial = null;
+  DrawKickerLocal._lastShaderName = null;
   DrawKickerLocal._lastGeometry = null;
 
   var VertexWorldShaderSource = function () {
@@ -3578,8 +3578,8 @@
         }
 
         for (var i = 0; i < materials.length; i++) {
-          var materialName = materials[i].toString();
-          if (materialName !== DrawKickerWorld._lastMaterial) {
+          var shaderName = materials[i].shaderInstance.toString();
+          if (shaderName !== DrawKickerWorld._lastShaderName) {
             this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
             gl.useProgram(this._glslProgram);
           }
@@ -3640,12 +3640,12 @@
 
           var isMaterialSetupDone = true;
 
-          if (materials[i].shaderInstance.dirty || materialName !== DrawKickerWorld._lastMaterial) {
+          if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerWorld._lastShaderName) {
             var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
             materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
-          if (materialName !== DrawKickerWorld._lastMaterial) {
+          if (shaderName !== DrawKickerWorld._lastShaderName) {
             if (materials[i]) {
               isMaterialSetupDone = materials[i].setUp();
             }
@@ -3662,7 +3662,7 @@
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
 
-          DrawKickerWorld._lastMaterial = isMaterialSetupDone ? materialName : null;
+          DrawKickerWorld._lastShaderName = isMaterialSetupDone ? shaderName : null;
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -3681,7 +3681,7 @@
     return DrawKickerWorld;
   }();
 
-  DrawKickerWorld._lastMaterial = null;
+  DrawKickerWorld._lastShaderName = null;
   DrawKickerWorld._lastGeometry = null;
 
   var ArrayUtil = function () {
@@ -3939,6 +3939,9 @@
     }, {
       key: 'shaderClass',
       set: function set(shaderClass) {
+        if (this._shaderClass === shaderClass) {
+          return;
+        }
         this._shaderClass = shaderClass;
         if (this._shaderInstance) {
           this._shaderInstance.readyForDiscard();
@@ -4222,7 +4225,7 @@
         var offset = 0;
         _allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-            gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+            //gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
             gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this4._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
           }
           offset += _this4._vertexAttribComponentNDic[attribName] * 4;
@@ -4233,13 +4236,18 @@
       value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh) {
         var _this5 = this;
 
+        var doSetupVertexAttribs = arguments.length <= 6 || arguments[6] === undefined ? true : arguments[6];
+
         var gl = this._glContext.gl;
         var vertices = this._vertices;
 
         var glem = GLExtensionsManager.getInstance(this._glContext);
         var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
-        glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+        if (doSetupVertexAttribs) {
+          glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        }
 
         var allVertexAttribs = this._allVertexAttribs(vertices);
         allVertexAttribs.forEach(function (attribName) {
@@ -4262,14 +4270,17 @@
               material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
             }
             var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
-            this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+            if (doSetupVertexAttribs) {
+              this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+            }
             glslProgramOfPasses.push(glslProgram);
           } else {
             glslProgramOfPasses.push(null);
           }
         }
-        glem.bindVertexArray(gl, null);
-
+        if (doSetupVertexAttribs) {
+          glem.bindVertexArray(gl, null);
+        }
         this._setVertexNtoSingleMaterial(material, index);
         material.glslProgramOfPasses = glslProgramOfPasses;
 
@@ -4299,20 +4310,22 @@
         this._vertexN = vertices.position.length;
 
         // create VAO
-        if (Geometry._vaoDic[this.toString()]) {
-          return;
+        if (Geometry._vaoDic[this.toString()]) {} else {
+          var vao = this._glContext.createVertexArray(this);
+          Geometry._vaoDic[this.toString()] = vao;
         }
-        var vao = this._glContext.createVertexArray(this);
-        glem.bindVertexArray(gl, vao);
-        Geometry._vaoDic[this.toString()] = vao;
+        glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+
+        var doAfter = true;
 
         // create VBO
         if (Geometry._vboDic[this.toString()]) {
-          return;
+          doAfter = false;
+        } else {
+          var vbo = this._glContext.createBuffer(this);
+          Geometry._vboDic[this.toString()] = vbo;
         }
-        var vbo = this._glContext.createBuffer(this);
-        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-        Geometry._vboDic[this.toString()] = vbo;
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
 
         var materials = null;
         if (this._materials.length > 0) {
@@ -4324,43 +4337,45 @@
         }
 
         for (var i = 0; i < materials.length; i++) {
-          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+          var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh, doAfter);
           materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
         }
 
-        var vertexData = [];
-        var allVertexAttribs = this._allVertexAttribs(vertices);
-        vertices.position.forEach(function (elem, index, array) {
-          allVertexAttribs.forEach(function (attribName) {
-            var element = vertices[attribName][index];
-            vertexData.push(element.x);
-            vertexData.push(element.y);
-            if (element.z !== void 0) {
-              vertexData.push(element.z);
-            }
-            if (element.w !== void 0) {
-              vertexData.push(element.w);
-            }
+        if (doAfter) {
+
+          var vertexData = [];
+          var allVertexAttribs = this._allVertexAttribs(vertices);
+          vertices.position.forEach(function (elem, index, array) {
+            allVertexAttribs.forEach(function (attribName) {
+              var element = vertices[attribName][index];
+              vertexData.push(element.x);
+              vertexData.push(element.y);
+              if (element.z !== void 0) {
+                vertexData.push(element.z);
+              }
+              if (element.w !== void 0) {
+                vertexData.push(element.w);
+              }
+            });
           });
-        });
 
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+          gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        Geometry._iboArrayDic[this.toString()] = [];
-        if (this._indicesArray) {
-          // create Index Buffer
-          for (var i = 0; i < this._indicesArray.length; i++) {
-            var ibo = this._glContext.createBuffer(this);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-            Geometry._iboArrayDic[this.toString()][i] = ibo;
-            this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+          Geometry._iboArrayDic[this.toString()] = [];
+          if (this._indicesArray) {
+            // create Index Buffer
+            for (var i = 0; i < this._indicesArray.length; i++) {
+              var ibo = this._glContext.createBuffer(this);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+              Geometry._iboArrayDic[this.toString()][i] = ibo;
+              this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+            }
           }
+          glem.bindVertexArray(gl, null);
         }
-        glem.bindVertexArray(gl, null);
 
         return true;
       }
@@ -4450,6 +4465,9 @@
       key: 'materials',
       set: function set(materials) {
         this._materials = materials;
+      },
+      get: function get() {
+        return this._materials;
       }
     }, {
       key: 'centerPosition',
@@ -5512,15 +5530,20 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Scene).call(this));
 
       _this._gl = GLContext.getInstance(canvas).gl;
-      _this._meshes = [];
-      _this._lights = [];
-      _this._cameras = [];
-      _this._renderPasses = [new RenderPass(_this._gl)];
       _this._currentAnimationInputValues = {};
+      _this._renderPasses = [new RenderPass(_this._gl)];
+      _this._reset();
       return _this;
     }
 
     babelHelpers.createClass(Scene, [{
+      key: '_reset',
+      value: function _reset() {
+        this._meshes = [];
+        this._lights = [];
+        this._cameras = [];
+      }
+    }, {
       key: '_setDirtyToAnimatedElement',
       value: function _setDirtyToAnimatedElement(inputName) {
         var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
@@ -5565,6 +5588,8 @@
       key: 'prepareForRender',
       value: function prepareForRender() {
         var _this2 = this;
+
+        this._reset();
 
         var collectMeshes = function collectMeshes(elem) {
           if (elem instanceof Group) {

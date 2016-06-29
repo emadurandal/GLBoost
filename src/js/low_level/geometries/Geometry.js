@@ -194,7 +194,6 @@ export default class Geometry extends GLBoostObject {
     var offset = 0;
     _allVertexAttribs.forEach((attribName)=> {
       if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
           this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
       }
@@ -202,14 +201,17 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh, doSetupVertexAttribs = true) {
     var gl = this._glContext.gl;
     var vertices = this._vertices;
 
     var glem = GLExtensionsManager.getInstance(this._glContext);
     var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
-    glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+    if (doSetupVertexAttribs) {
+      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+    }
 
     var allVertexAttribs = this._allVertexAttribs(vertices);
     allVertexAttribs.forEach((attribName)=> {
@@ -232,14 +234,17 @@ export default class Geometry extends GLBoostObject {
           material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
         }
         var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
-        this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+        if (doSetupVertexAttribs) {
+          this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+        }
         glslProgramOfPasses.push(glslProgram);
       } else {
         glslProgramOfPasses.push(null);
       }
     }
-    glem.bindVertexArray(gl, null);
-
+    if (doSetupVertexAttribs) {
+      glem.bindVertexArray(gl, null);
+    }
     this._setVertexNtoSingleMaterial(material, index);
     material.glslProgramOfPasses = glslProgramOfPasses;
 
@@ -268,19 +273,22 @@ export default class Geometry extends GLBoostObject {
 
     // create VAO
     if (Geometry._vaoDic[this.toString()]) {
-      return;
+    } else {
+      var vao = this._glContext.createVertexArray(this);
+      Geometry._vaoDic[this.toString()] = vao;
     }
-    var vao = this._glContext.createVertexArray(this);
-    glem.bindVertexArray(gl, vao);
-    Geometry._vaoDic[this.toString()] = vao;
+    glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+
+    var doAfter = true;
 
     // create VBO
     if (Geometry._vboDic[this.toString()]) {
-      return;
+      doAfter = false;
+    } else {
+      var vbo = this._glContext.createBuffer(this);
+      Geometry._vboDic[this.toString()] = vbo;
     }
-    var vbo = this._glContext.createBuffer(this);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    Geometry._vboDic[this.toString()] = vbo;
+    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
 
     var materials = null;
     if (this._materials.length > 0) {
@@ -291,46 +299,47 @@ export default class Geometry extends GLBoostObject {
       materials = [this._defaultMaterial];
     }
 
+
     for (let i=0; i<materials.length;i++) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh, doAfter);
       materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
     }
 
+    if (doAfter) {
 
-    var vertexData = [];
-    var allVertexAttribs = this._allVertexAttribs(vertices);
-    vertices.position.forEach((elem, index, array) => {
-      allVertexAttribs.forEach((attribName)=> {
-        var element = vertices[attribName][index];
-        vertexData.push(element.x);
-        vertexData.push(element.y);
-        if (element.z !== void 0) {
-          vertexData.push(element.z);
-        }
-        if (element.w !== void 0) {
-          vertexData.push(element.w);
-        }
+      var vertexData = [];
+      var allVertexAttribs = this._allVertexAttribs(vertices);
+      vertices.position.forEach((elem, index, array) => {
+        allVertexAttribs.forEach((attribName)=> {
+          var element = vertices[attribName][index];
+          vertexData.push(element.x);
+          vertexData.push(element.y);
+          if (element.z !== void 0) {
+            vertexData.push(element.z);
+          }
+          if (element.w !== void 0) {
+            vertexData.push(element.w);
+          }
+        });
       });
-    });
 
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-    Geometry._iboArrayDic[this.toString()] = [];
-    if (this._indicesArray) {
-      // create Index Buffer
-      for (let i=0; i<this._indicesArray.length; i++) {
-        var ibo = this._glContext.createBuffer(this);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-        Geometry._iboArrayDic[this.toString()][i] = ibo;
-        this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+      Geometry._iboArrayDic[this.toString()] = [];
+      if (this._indicesArray) {
+        // create Index Buffer
+        for (let i=0; i<this._indicesArray.length; i++) {
+          var ibo = this._glContext.createBuffer(this);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
+          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+          Geometry._iboArrayDic[this.toString()][i] = ibo;
+          this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+        }
       }
+      glem.bindVertexArray(gl, null);
     }
-    glem.bindVertexArray(gl, null);
 
 
     return true;
@@ -410,6 +419,10 @@ export default class Geometry extends GLBoostObject {
 
   set materials(materials) {
     this._materials = materials;
+  }
+
+  get materials() {
+    return this._materials;
   }
 
   get centerPosition() {

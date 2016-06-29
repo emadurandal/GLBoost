@@ -70,6 +70,7 @@ export default class GLContext {
   deleteShader(glBoostObject, shader) {
     this._monitor.deregisterWebGLResource(glBoostObject, shader);
     this.gl.deleteShader(shader);
+    shader = null;
   }
 
   createProgram(glBoostObject) {

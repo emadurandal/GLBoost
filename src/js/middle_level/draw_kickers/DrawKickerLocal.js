@@ -28,8 +28,8 @@ export default class DrawKickerLocal {
     }
 
     for (let i=0; i<materials.length;i++) {
-      let materialName = materials[i].toString();
-      if (materialName !== DrawKickerLocal._lastMaterial) {
+      let shaderName = materials[i].shaderInstance.toString();
+      if (shaderName !== DrawKickerLocal._lastShaderName) {
         this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
         gl.useProgram(this._glslProgram);
       }
@@ -92,12 +92,12 @@ export default class DrawKickerLocal {
 
       let isMaterialSetupDone = true;
 
-      if (materials[i].shaderInstance.dirty || materialName !== DrawKickerLocal._lastMaterial) {
+      if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerLocal._lastShaderName) {
         var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
         materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
-      if (materialName !== DrawKickerLocal._lastMaterial) {
+      if (shaderName !== DrawKickerLocal._lastShaderName) {
         if (materials[i]) {
           isMaterialSetupDone = materials[i].setUp();
         }
@@ -115,7 +115,7 @@ export default class DrawKickerLocal {
       }
 
 
-      DrawKickerLocal._lastMaterial = isMaterialSetupDone ? materialName : null;
+      DrawKickerLocal._lastShaderName = isMaterialSetupDone ? shaderName : null;
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -124,5 +124,5 @@ export default class DrawKickerLocal {
   }
 }
 
-DrawKickerLocal._lastMaterial = null;
+DrawKickerLocal._lastShaderName = null;
 DrawKickerLocal._lastGeometry = null;

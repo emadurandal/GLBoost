@@ -24,11 +24,15 @@ export default class Scene extends Group {
   constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
     super();
     this._gl = GLContext.getInstance(canvas).gl;
+    this._currentAnimationInputValues = {};
+    this._renderPasses = [new RenderPass(this._gl)];
+    this._reset();
+  }
+
+  _reset() {
     this._meshes = [];
     this._lights = [];
     this._cameras = [];
-    this._renderPasses = [new RenderPass(this._gl)];
-    this._currentAnimationInputValues = {};
   }
 
   _setDirtyToAnimatedElement(inputName, element = this) {
@@ -64,6 +68,7 @@ export default class Scene extends Group {
    * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
    */
   prepareForRender() {
+    this._reset();
 
     let collectMeshes = function(elem) {
       if (elem instanceof Group) {
