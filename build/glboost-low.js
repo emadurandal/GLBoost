@@ -2522,7 +2522,6 @@
       value: function addChild(element) {
         this.removeChild(element);
         this._elements.push(element);
-        //element._parent = this;
       }
 
       /**
@@ -2911,13 +2910,13 @@
 
   GLContext._instances = new Object();
 
-  var RenderPass = function (_GLBoostObject) {
-    babelHelpers.inherits(RenderPass, _GLBoostObject);
+  var RenderPath = function (_GLBoostObject) {
+    babelHelpers.inherits(RenderPath, _GLBoostObject);
 
-    function RenderPass(gl) {
-      babelHelpers.classCallCheck(this, RenderPass);
+    function RenderPath(gl) {
+      babelHelpers.classCallCheck(this, RenderPath);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RenderPass).call(this));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RenderPath).call(this));
 
       _this._elements = [];
       _this._meshes = [];
@@ -2930,14 +2929,14 @@
       return _this;
     }
 
-    babelHelpers.createClass(RenderPass, [{
+    babelHelpers.createClass(RenderPath, [{
       key: 'addElements',
       value: function addElements(elements) {
         var _this2 = this;
 
         elements.forEach(function (elem) {
           if (!(elem instanceof Mesh || elem instanceof Group)) {
-            throw new TypeError('RenderPass accepts Mesh or Group element only.');
+            throw new TypeError('RenderPath accepts Mesh or Group element only.');
           }
           _this2._elements.push(elem);
         });
@@ -3086,10 +3085,10 @@
         return this._clearDepth;
       }
     }]);
-    return RenderPass;
+    return RenderPath;
   }(GLBoostObject);
 
-  GLBoost$1['RenderPass'] = RenderPass;
+  GLBoost$1['RenderPath'] = RenderPath;
 
   /**
    * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -3395,7 +3394,7 @@
 
         var renderPasses = [];
         for (var i = 0; i < number; i++) {
-          renderPasses.push(new RenderPass(this._glContext.gl));
+          renderPasses.push(new RenderPath(this._glContext.gl));
         }
 
         return renderPasses;

@@ -119,7 +119,7 @@
 
       var glBoostContext = GLBoost.GLBoostContext.getInstance();
       var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
-      var renderPasses = glBoostContext.createRenderPasses(2);
+      var renderPaths = glBoostContext.createRenderPasses(2);
 
       var positions = [new GLBoost.Vector3(-0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, 0.5, 0.0)];
       var shapetarget_1 = [new GLBoost.Vector3(-1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, 0.5, 0.0)];
@@ -140,9 +140,9 @@
       });
       layer.scene.addChild(mesh);
 
-      renderPasses[0].addElements([mesh]);
-      renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
-      renderPasses[0].specifyRenderTargetTextures(renderTextures);
+      renderPaths[0].addElements([mesh]);
+      renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
+      renderPaths[0].specifyRenderTargetTextures(renderTextures);
 
       var geometry2_1 = new GLBoost.Cube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
       var material2_1 = new GLBoost.ClassicMaterial();
@@ -158,10 +158,10 @@
       layer.scene.addChild(mesh2_2);
       mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
 
-      renderPasses[1].addElements([mesh2_1, mesh2_2]);
-      renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
+      renderPaths[1].addElements([mesh2_1, mesh2_2]);
+      renderPaths[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
 
-      layer.scene.renderPasses = renderPasses;
+      layer.scene.renderPaths = renderPaths;
 
       var camera = new GLBoost.Camera({
         eye: new GLBoost.Vector3(0.0, 0, 5.0),

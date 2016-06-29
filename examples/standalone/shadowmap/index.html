@@ -44,7 +44,7 @@
   var scene = new GLBoost.Scene();
   var glBoostContext = GLBoost.GLBoostContext.getInstance();
   var depthTexture = glBoostContext.createTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 1);
-  var renderPasses = glBoostContext.createRenderPasses(2);
+  var renderPaths = glBoostContext.createRenderPasses(2);
 
   var material = new GLBoost.ClassicMaterial();
   var texture = new GLBoost.Texture('resources/texture.png');
@@ -75,9 +75,9 @@
   scene.addChild( camera );
 
   /*
-  renderPasses[0].addElements([camera, cube, plane]);
-  renderPasses[0].setClearColor([0, 0, 0, 1]);
-  renderPasses[0].specifyRenderTargetTextures(renderTextures);
+  renderPaths[0].addElements([camera, cube, plane]);
+  renderPaths[0].setClearColor([0, 0, 0, 1]);
+  renderPaths[0].specifyRenderTargetTextures(renderTextures);
     */
 
   scene.prepareForRender();

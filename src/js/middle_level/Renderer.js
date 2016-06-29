@@ -1,8 +1,6 @@
 import GLBoost from '../globals';
 import GLContext from '../low_level/core/GLContext';
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
-import MutableTexture from '../low_level/textures/MutableTexture';
-import RenderPass from './RenderPass';
 import Geometry from '../low_level/geometries/Geometry';
 import GLBoostObject from '../low_level/core/GLBoostObject';
 
@@ -59,32 +57,32 @@ export default class Renderer extends GLBoostObject {
 
     let lights = scene.lights;
 
-    scene.renderPasses.forEach((renderPass, index)=>{
+    scene.renderPaths.forEach((renderPath, index)=>{
 
-      if (renderPass.fboOfRenderTargetTextures) {
+      if (renderPath.fboOfRenderTargetTextures) {
         gl.bindTexture(gl.TEXTURE_2D, null);
         Geometry.clearMaterialCache();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fboOfRenderTargetTextures);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPath.fboOfRenderTargetTextures);
       }
-      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+      glem.drawBuffers(gl, renderPath.buffersToDraw); // set render target buffers for each RenderPath.
 
-      if (renderPass.clearColor) {
-        var color = renderPass.clearColor;
+      if (renderPath.clearColor) {
+        var color = renderPath.clearColor;
         gl.clearColor(color.x, color.y, color.z, color.w);
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       }
 
       // draw opacity meshes.
-      var opacityMeshes = renderPass.opacityMeshes;
+      var opacityMeshes = renderPath.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         mesh.draw(lights, camera, scene, index);
       });
 
       if (camera) {
-        renderPass.sortTransparentMeshes(camera);
+        renderPath.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = renderPass.transparentMeshes;
+      var transparentMeshes = renderPath.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
         mesh.draw(lights, camera, scene, index);
       });
