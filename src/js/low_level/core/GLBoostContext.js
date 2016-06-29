@@ -1,7 +1,7 @@
 import GLContext from './GLContext';
 import MutableTexture from '../textures/MutableTexture';
 import GLExtensionsManager from './GLExtensionsManager';
-import RenderPass from '../../middle_level/expressions/RenderPath';
+import RenderPath from '../../middle_level/expressions/RenderPath';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -114,12 +114,12 @@ export default class GLBoostContext {
   createRenderPasses(number, canvas = GLBoost.CURRENT_CANVAS_ID) {
     this._glContext = GLContext.getInstance(canvas);
 
-    var renderPasses = [];
+    var renderPaths = [];
     for (let i=0; i<number; i++) {
-      renderPasses.push(new RenderPass(this._glContext.gl));
+      renderPaths.push(new RenderPath(this._glContext.gl));
     }
 
-    return renderPasses;
+    return renderPaths;
   }
 }
 
