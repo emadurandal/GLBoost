@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+<title>GLBoost Obj Mesh example</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="stylesheet" href="app.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+<script src="../../../libs/phina.js"></script>
+<script src="../../../build/glboost.js"></script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Obj Mesh example</p>
+</header>
+<main>
+  <canvas id="world" width="600" height="600"></canvas>
+</main>
+<script>
+
+  var arg = new Object;
+  var pair = location.search.substring(1).split('&');
+  for(var i = 0; pair[i] ; i++) {
+    var kv = pair[i].split('=');
+    arg[kv[0]] = kv[1];
+  }
+
+  GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+  var SCREEN_WIDTH = 640;
+  var SCREEN_HEIGHT = 640;
+
+  var canvas = document.getElementById("world");
+  canvas.width = SCREEN_WIDTH;
+  canvas.height = SCREEN_HEIGHT;
+
+
+  var renderer = new GLBoost.Renderer({
+    canvas: canvas,
+    clearColor: {
+      red: 0.5,
+      green: 0.5,
+      blue: 1.0,
+      alpha: 1
+    }
+  });
+
+  var camera = new GLBoost.Camera({
+    eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
+    center: new GLBoost.Vector3(0.0, 1.5, 0.0),
+    up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+  }, {
+    fovy: 45.0,
+    aspect: 1.0,
+    zNear: 0.1,
+    zFar: 300.0
+  });
+
+  var scene = new GLBoost.Scene();
+
+  scene.addChild( camera );
+
+  var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(2, 2, 2));
+  pointLight_1.translate = new GLBoost.Vector3(0, 10, -10);
+  var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10));
+  scene.addChild( pointLight_1 );
+  scene.addChild( directionalLight_2 );
+
+  var objLoader = GLBoost.ObjLoader.getInstance();
+  var promise = objLoader.loadObj('resources/teapot/teapot.obj');
+  promise.then(function(mesh) {
+    scene.addChild( mesh );
+    this.mesh = mesh;
+
+    var that = this;
+    var tick = 0;
+    scene.prepareForRender();
+    var render = function() {
+      renderer.clearCanvas();
+      renderer.draw(scene);
+
+      var material = that.mesh.geometry.materials[0];
+      material.shaderClass = (tick%120) > 60 ? GLBoost.HalfLambertShader : GLBoost.PhongShader;
+
+      scene.prepareForRender();
+
+      var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
+      var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+      camera.eye = rotatedVector;
+
+      tick++;
+      requestAnimationFrame(render);
+    };
+    render();
+  });
+
+
+
+</script>
+</body>
+</html>
