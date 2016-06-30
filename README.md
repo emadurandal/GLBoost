@@ -94,7 +94,7 @@ var scene = glBoostContext.createScene();
 
 // setup material
 var material = glBoostContext.createClassicMaterial();
-var texture = glBoostContext.create('resources/texture.png');
+var texture = glBoostContext.createTexture('resources/texture.png');
 material.diffuseTexture = texture;
 material.shaderClass = GLBoost.PhongShader;
 
