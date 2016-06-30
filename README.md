@@ -78,8 +78,9 @@ Then, access http://localhost:3000/examples by your web browser.
 ```javascript
 // setup GLBoost renderer
 var canvas = document.getElementById("world");
-var renderer = new GLBoost.Renderer({
-  canvas: canvas,
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+var renderer = glBoostContext.createRenderer({
   clearColor: {
     red: 0.0,
     green: 0.0,
@@ -89,29 +90,29 @@ var renderer = new GLBoost.Renderer({
 });
 
 // make a scene
-var scene = new GLBoost.Scene();
+var scene = glBoostContext.createScene();
 
 // setup material
-var material = new GLBoost.ClassicMaterial();
-var texture = new GLBoost.Texture('resources/texture.png'); // earth.jpg
+var material = glBoostContext.createClassicMaterial();
+var texture = glBoostContext.create('resources/texture.png');
 material.diffuseTexture = texture;
 material.shaderClass = GLBoost.PhongShader;
 
 // make a Sphere geometry
-var geometry = new GLBoost.Sphere(20, 24, 24, null);
+var geometry = glBoostContext.createSphere(20, 24, 24, null);
 
 // set Sphere geometry and material to make a Mesh.
-var earth = new GLBoost.Mesh(geometry, material);
+var earth = glBoostContext.createMesh(geometry, material);
 // add the earth mesh to the scene
 scene.add(earth);
 
 // make a directonal light
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 // add the light to the scene
 scene.add( directionalLight );
 
 // setup camera
-var camera = new GLBoost.Camera({
+var camera = glBoostContext.createCamera({
   eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
   center: new GLBoost.Vector3(0.0, 0.0, 0.0),
   up: new GLBoost.Vector3(0.0, 1.0, 0.0)
