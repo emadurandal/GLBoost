@@ -113,14 +113,14 @@ export default class SkeletalGeometry extends Geometry {
     }
 
     for (let i=0; i<materials.length;i++) {
-      var glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+      var glslProgram = materials[i].shaderInstance.glslProgram;
       gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
     }
 
     super.draw(lights, camera, skeletalMesh, scene, renderPass_index);
   }
 
-  prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh) {
+  prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
     var canvas = this._canvas;
 
@@ -222,7 +222,7 @@ export default class SkeletalGeometry extends Geometry {
 
     }
     */
-    super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, skeletalMesh);
+    super.prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh);
   }
 }
 

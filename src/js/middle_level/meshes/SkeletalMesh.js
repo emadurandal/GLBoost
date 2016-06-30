@@ -10,10 +10,10 @@ export default class SkeletalMesh extends Mesh {
     this._inverseBindMatrices = [];
   }
 
-  prepareForRender(existCamera_f, lights, renderPasses) {
+  prepareToRender(existCamera_f, lights, renderPasses) {
     this.bakeTransformToGeometry();
     this.multiplyMatrix(Matrix44.identity());
-    super.prepareForRender(existCamera_f, lights, renderPasses);
+    super.prepareToRender(existCamera_f, lights, renderPasses);
   }
 
   set jointsHierarchy(jointsHierarchy) {

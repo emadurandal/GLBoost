@@ -18,7 +18,7 @@ export default class BlendShapeGeometry extends Geometry {
     this._blendWeight_10 = 0.0;
 
     this._currentRenderPassIndex = 0;
-
+    this._materialForBlend = null;
   }
 
 
@@ -27,7 +27,7 @@ export default class BlendShapeGeometry extends Geometry {
     super.draw(lights, camera, mesh, scene, renderPass_index);
   }
 
-  prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+  prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
     var canvas = this._canvas;
 
@@ -45,35 +45,17 @@ export default class BlendShapeGeometry extends Geometry {
       }
     }
 
-    if (meshMaterial) {
-      meshMaterial.shaderClass = BlendShapeShader;
-    } else {
-      this._defaultMaterial.shaderClass = BlendShapeShader;
-    }
+    this._materialForBlend.shaderClass = BlendShapeShader;
 
-    /*
-    let materials = this._materials;
-    if (materials) {
-      for (let i=0; i<materials.length;i++) {
-        materials[i].shader = new BlendShapeShader(this._canvas);
-      }
-    }
-    */
-
-    super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+    super.prepareToRender(existCamera_f, pointLight, meshMaterial, mesh);
   }
 
   _setBlendWeightToGlslProgram(blendTarget, weight) {
     var gl = this._glContext.gl;
     var materials = [this._materialForBlend];
-    if (materials) {
-      for (let i=0; i<materials.length;i++) {
-        gl.useProgram(materials[i].glslProgramOfPasses[this._currentRenderPassIndex]);
-        gl.uniform1f(materials[i].glslProgramOfPasses[this._currentRenderPassIndex]['uniformFloatSampler_blendWeight_' + blendTarget], weight);
-      }
-    } else {
-      gl.useProgram(this.glslProgramOfPasses[this._currentRenderPassIndex]);
-      gl.uniform1f(this.glslProgramOfPasses[this._currentRenderPassIndex]['uniformFloatSampler_blendWeight_' + blendTarget], weight);
+    for (let i=0; i<materials.length;i++) {
+      gl.useProgram(materials[i].shaderInstance.glslProgram);
+      gl.uniform1f(materials[i].shaderInstance.glslProgram['uniformFloatSampler_blendWeight_' + blendTarget], weight);
     }
   }
 

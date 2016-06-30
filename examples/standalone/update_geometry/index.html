@@ -80,12 +80,13 @@
   );
   scene.addChild( camera );
 
-  scene.prepareForRender();
-
+  var expression = glBoostContext.createExpressionAndRenderPaths(1);
+  expression.renderPaths[0].scene = scene;
+  expression.prepareToRender();
 
   var render = function(){
     renderer.clearCanvas();
-    renderer.draw(scene);
+    renderer.draw(expression);
 
     var delta = 0.05;
     texcoords[0].x += delta;

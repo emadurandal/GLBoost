@@ -59,7 +59,7 @@
         var promise = objLoader.loadObj(glBoostContext, 'resources/teapot/fighter.obj');
         promise.then(function(mesh) {
           layer.scene.addChild( mesh );
-          layer.scene.prepareForRender();
+          layer.expression.prepareToRender();
         });
 
         layer.update = function() {

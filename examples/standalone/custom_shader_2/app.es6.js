@@ -111,11 +111,13 @@ var planeGeometry = glBoostContext.createPlane(10, 10, uSpan, vSpan, additionalA
 var plane = glBoostContext.createMesh(planeGeometry, material);
 scene.addChild( plane );
 
-scene.prepareForRender();
+var expression = glBoostContext.createExpressionAndRenderPaths(1);
+expression.renderPaths[0].scene = scene;
+expression.prepareToRender();
 
 var render = function(){
   renderer.clearCanvas();
-  renderer.draw(scene);
+  renderer.draw(expression);
 
   var rotateMatrix = GLBoost.Matrix33.rotateY(-0.2);
   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);

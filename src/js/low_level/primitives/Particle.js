@@ -213,7 +213,7 @@ export default class Particle extends Geometry {
     super.updateVerticesData(result.vertexAttributes);
   }
 
-  prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+  prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
     var canvas = this._canvas;
 
@@ -267,7 +267,7 @@ export default class Particle extends Geometry {
      }
      */
 
-    super.prepareForRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+    super.prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
   }
 
 }

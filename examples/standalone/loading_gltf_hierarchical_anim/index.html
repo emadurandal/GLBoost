@@ -66,14 +66,17 @@ promise.then(function(group) {
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
   scene.addChild( group );
-  scene.prepareForRender();
+
+  var expression = glBoostContext.createExpressionAndRenderPaths(1);
+  expression.renderPaths[0].scene = scene;
+  expression.prepareToRender();
 
   var meshes = group.searchElementsByType(GLBoost.Mesh);
 
   var render = function(){
     scene.setCurrentAnimationValue('time', gtime);
     renderer.clearCanvas();
-    renderer.draw(scene);
+    renderer.draw(expression);
 
     gtime += 0.001;
 

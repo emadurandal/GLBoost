@@ -14,6 +14,7 @@ phina.namespace(function() {
     superClass: 'phina.display.Layer',
 
     scene: null,
+    expression: null,
     camera: null,
     light: null,
     glBoostContext: null,
@@ -40,14 +41,17 @@ phina.namespace(function() {
       // レンダラーを生成
       this.renderer = this.glBoostContext.createRenderer({clearColor: {red:1, green:1, blue:1, alpha:1}});
       this.scene = this.glBoostContext.createScene();
+      this.expression = this.glBoostContext.createExpressionAndRenderPaths(1);
+      this.expression.renderPaths[0].scene = this.scene;
+
       this.on('enterframe', function() {
         if (this.scene) {
           this.renderer.clearCanvas();
-          this.renderer.draw(this.scene);
+          this.renderer.draw(this.expression);
         }
       });
-      this.domElement = this.canvas;
 
+      this.domElement = this.canvas;
     }
   });
 
@@ -91,7 +95,7 @@ phina.namespace(function() {
     },
 
     renderObject: function(obj) {
-      var layer = CanvasElement();
+      var layer = DisplayElement();
       obj.addChildTo(layer);
       this.renderer2d.renderObject(layer);
     },

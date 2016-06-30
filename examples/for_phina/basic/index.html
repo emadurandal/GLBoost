@@ -66,7 +66,7 @@
         var mesh = glBoostContext.createMesh(geometry, null);
         layer.scene.addChild( mesh );
 
-        layer.scene.prepareForRender();
+        layer.expression.prepareToRender();
 
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
         label.fill = 'white';

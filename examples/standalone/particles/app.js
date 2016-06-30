@@ -232,11 +232,13 @@
 
   scene.addChild(particle);
 
-  scene.prepareForRender();
+  var expression = glBoostContext.createExpressionAndRenderPaths(1);
+  expression.renderPaths[0].scene = scene;
+  expression.prepareToRender();
 
   var render = function render() {
     renderer.clearCanvas();
-    renderer.draw(scene);
+    renderer.draw(expression);
 
     var rotateMatrix = GLBoost.Matrix33.rotateY(-5.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
