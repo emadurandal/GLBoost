@@ -34,20 +34,22 @@
           width: SCREEN_WIDTH,
           height: SCREEN_HEIGHT
         }).addChildTo(this);
-        var material = new GLBoost.ClassicMaterial();
+
+        var glBoostContext = layer.glBoostContext;
+
+        var material = glBoostContext.createClassicMaterial();
         material.shaderClass = GLBoost.PhongShader;
 
-
-        var geometry = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
-        var mesh = new GLBoost.Mesh(geometry, material);
+        var geometry = glBoostContext.createCube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
+        var mesh = glBoostContext.createMesh(geometry, material);
 
         var scale = 0.3;
         mesh.scale = new GLBoost.Vector3((Math.random() + 0.5)*scale, (Math.random() + 0.5)*scale, (Math.random() + 0.5)*scale);
 
         var cubes = [];
         for ( var i = 0; i < 10000-1; i ++ ) {
-          var cube = new GLBoost.Cube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
-          var cubeMesh = new GLBoost.Mesh(cube, material);
+          var cube = glBoostContext.createCube(new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(Math.random()*1,Math.random()*1,Math.random()*1,1));
+          var cubeMesh = glBoostContext.createMesh(cube, material);
 
           cubeMesh.translate = new GLBoost.Vector3(Math.random() * 600 - 300, Math.random() * 600 - 300, Math.random() * 600 - 300);
 
@@ -62,7 +64,7 @@
 
         layer.scene.addChild( mesh );
 
-        var camera = new GLBoost.Camera(
+        var camera = glBoostContext.createCamera(
             {
               eye: new GLBoost.Vector3(0.0, 5, 15.0),
               center: new GLBoost.Vector3(0.0, 0.0, 0.0),

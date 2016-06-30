@@ -92,12 +92,10 @@
   var MyCustomShader = function (_GLBoost$DecalShader) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$DecalShader);
 
-    function MyCustomShader() {
-      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
-      var basicShader = arguments[1];
+    function MyCustomShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, glBoostContext, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
       return _this;
@@ -117,7 +115,7 @@
         height: SCREEN_HEIGHT
       }).addChildTo(this);
 
-      var glBoostContext = new GLBoost.GLBoostMiddleContext(layer.canvas);
+      var glBoostContext = layer.glBoostContext;
       var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
       var renderPaths = glBoostContext.createRenderPaths(2);
 
@@ -126,12 +124,12 @@
       var shapetarget_2 = [new GLBoost.Vector3(-0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, 1.0, 0.0)];
       var texcoords = [new GLBoost.Vector2(0.0, 1.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(1.0, 0.0)];
 
-      var geometry = new GLBoost.BlendShapeGeometry();
-      var texture = new GLBoost.Texture('resources/texture.png');
-      var material = new GLBoost.ClassicMaterial();
+      var geometry = glBoostContext.createBlendShapeGeometry();
+      var texture = glBoostContext.createTexture('resources/texture.png');
+      var material = glBoostContext.createClassicMaterial();
       material.shaderClass = MyCustomShader;
       material.diffuseTexture = texture;
-      var mesh = new GLBoost.Mesh(geometry, material);
+      var mesh = glBoostContext.createMesh(geometry, material);
       geometry.setVerticesData({
         position: positions,
         texcoord: texcoords,
@@ -144,17 +142,17 @@
       renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
       renderPaths[0].specifyRenderTargetTextures(renderTextures);
 
-      var geometry2_1 = new GLBoost.Cube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
-      var material2_1 = new GLBoost.ClassicMaterial();
+      var geometry2_1 = glBoostContext.createCube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
+      var material2_1 = glBoostContext.createClassicMaterial();
       material2_1.diffuseTexture = renderTextures[0];
-      var mesh2_1 = new GLBoost.Mesh(geometry2_1, material2_1);
+      var mesh2_1 = glBoostContext.createMesh(geometry2_1, material2_1);
       layer.scene.addChild(mesh2_1);
       mesh2_1.translate = new GLBoost.Vector3(-1, 0, 0);
 
-      var geometry2_2 = new GLBoost.Cube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
-      var material2_2 = new GLBoost.ClassicMaterial();
+      var geometry2_2 = glBoostContext.createCube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
+      var material2_2 = glBoostContext.createClassicMaterial();
       material2_2.diffuseTexture = renderTextures[1];
-      var mesh2_2 = new GLBoost.Mesh(geometry2_2, material2_2);
+      var mesh2_2 = glBoostContext.createMesh(geometry2_2, material2_2);
       layer.scene.addChild(mesh2_2);
       mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
 
@@ -163,7 +161,7 @@
 
       layer.scene.renderPaths = renderPaths;
 
-      var camera = new GLBoost.Camera({
+      var camera = glBoostContext.createCamera({
         eye: new GLBoost.Vector3(0.0, 0, 5.0),
         center: new GLBoost.Vector3(0.0, 0.0, 0.0),
         up: new GLBoost.Vector3(0.0, 1.0, 0.0)

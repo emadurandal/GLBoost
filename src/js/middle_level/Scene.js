@@ -21,11 +21,11 @@ export default class Scene extends Group {
    * [ja] コンストラクタ
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super();
-    this._gl = GLContext.getInstance(canvas).gl;
+  constructor(glBoostContext) {
+    super(glBoostContext);
+    this._gl = this._glContext.gl;
     this._currentAnimationInputValues = {};
-    this._renderPaths = [new RenderPath(this._gl)];
+    this._renderPaths = glBoostContext.createRenderPaths(1);
     this._reset();
   }
 
@@ -229,5 +229,3 @@ export default class Scene extends Group {
   }
 
 }
-
-GLBoost['Scene'] = Scene;

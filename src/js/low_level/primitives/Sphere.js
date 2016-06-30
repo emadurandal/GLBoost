@@ -5,8 +5,8 @@ import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 
 export default class Sphere extends Geometry {
-  constructor(radius, widthSegments, heightSegments, vertexColor, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, radius, widthSegments, heightSegments, vertexColor) {
+    super(glBoostContext);
 
     this._setupVertexData(radius, widthSegments, heightSegments, vertexColor);
   }

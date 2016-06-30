@@ -2,16 +2,15 @@ import GLBoost from '../../globals';
 import AbstractTexture from './AbstractTexture';
 
 export default class MutableTexture extends AbstractTexture {
-  constructor(width, height, level = 0,
+  constructor(glBoostContext, width, height, level = 0,
               internalFormat = 0x1908, // gl.RGBA
               format = 0x1908, //gl.RGBA
               type = 0x1401, // gl.UNSIGNED_BYTE
               magFileter = 0x2601, //gl.LINEAR
               minFilter = 0x2601, //gl.LINEAR
               wrapS = 0x812F, // gl.CLAMP_TO_EDGE
-              wrapT = 0x812F, // gl.CLAMP_TO_EDGE
-              canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+              wrapT = 0x812F) { // gl.CLAMP_TO_EDGE
+    super(glBoostContext);
 
     this._isTextureReady = false;
     this._texture = null;
@@ -60,5 +59,3 @@ export default class MutableTexture extends AbstractTexture {
     return this._fbo;
   }
 }
-
-GLBoost['MutableTexture'] = MutableTexture;

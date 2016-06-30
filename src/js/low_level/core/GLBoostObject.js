@@ -1,12 +1,13 @@
 import GLBoostMonitor from './GLBoostMonitor';
 
 export default class GLBoostObject {
-  constructor(glContext) {
+  constructor(glBoostContext) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
     this._setName();
-    this._glContext = glContext;
+    this._glBoostContext = glBoostContext;
+    this._glContext = glBoostContext.glContext;
     this._glBoostMonitor = GLBoostMonitor.getInstance();
     this._glBoostMonitor.registerGLBoostObject(this);
     this._userFlavorName = '';

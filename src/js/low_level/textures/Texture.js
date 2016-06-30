@@ -3,8 +3,8 @@ import AbstractTexture from './AbstractTexture';
 import GLExtensionsManager from '../core/GLExtensionsManager';
 
 export default class Texture extends AbstractTexture {
-  constructor(src, parameters = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, src, parameters = null) {
+    super(glBoostContext);
 
     this._isTextureReady = false;
     this._texture = null;
@@ -124,5 +124,3 @@ export default class Texture extends AbstractTexture {
   }
 
 }
-
-GLBoost['Texture'] = Texture;

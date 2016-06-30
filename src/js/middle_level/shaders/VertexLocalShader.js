@@ -55,7 +55,7 @@ export default class VertexLocalShaderSource {
       shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
     }
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);

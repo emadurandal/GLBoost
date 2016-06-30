@@ -13,11 +13,10 @@ import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShade
 
 
 export default class Geometry extends GLBoostObject {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super();
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
-    this._glContext = GLContext.getInstance(canvas);
-    this._canvas = canvas;
+    this._canvas = this._glContext.canvas;
 
     this._materials = [];
     this._vertexN = 0;
@@ -25,7 +24,7 @@ export default class Geometry extends GLBoostObject {
     this._indicesArray = null;
     this._performanceHint = null;
     this._vertexAttribComponentNDic = {};
-    this._defaultMaterial = new ClassicMaterial(this._canvas);
+    this._defaultMaterial = glBoostContext.createClassicMaterial();
     this._vertexData = [];
     this._extraDataForShader = {};
     this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
@@ -231,7 +230,7 @@ export default class Geometry extends GLBoostObject {
             basicShaderSource = VertexLocalShaderSource;
           }
 
-          material.shaderInstance = new shaderClass(this._glContext.canvas, basicShaderSource);
+          material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
         }
         var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
         if (doSetupVertexAttribs) {
@@ -441,5 +440,3 @@ export default class Geometry extends GLBoostObject {
 Geometry._vaoDic = {};
 Geometry._vboDic = {};
 Geometry._iboArrayDic = {};
-
-GLBoost['Geometry'] = Geometry;

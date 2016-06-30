@@ -11,11 +11,13 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-var scene = new GLBoost.Scene();
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
 
-var camera = new GLBoost.Camera(
+var scene = glBoostContext.createScene();
+
+var camera = glBoostContext.createCamera(
   {
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
@@ -30,7 +32,7 @@ var camera = new GLBoost.Camera(
 );
 scene.addChild( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.addChild( directionalLight );
 
 
@@ -73,8 +75,8 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.HalfLambertShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
-    super(canvas, basicShader);
+  constructor(glBoostContext, basicShader) {
+    super(glBoostContext, basicShader);
     MyCustomShader.mixin(MyCustomShaderSource);
 
     this._time = 0;
@@ -94,7 +96,7 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
 
 
 var objLoader = GLBoost.ObjLoader.getInstance();
-var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
+var promise = objLoader.loadObj(glBoostContext, 'resources/teapot/teapot.obj', MyCustomShader, null);
 promise.then(function(mesh) {
 //            console.log(mesh);
 

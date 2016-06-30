@@ -79,9 +79,9 @@ export class DecalShaderSource {
 }
 
 export default class DecalShader extends Shader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader = VertexWorldShaderSource) {
+  constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
-    super(canvas);
+    super(glBoostContext);
 
     DecalShader.mixin(basicShader);
     DecalShader.mixin(FragmentSimpleShaderSource);

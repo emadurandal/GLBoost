@@ -49,9 +49,9 @@ export class LambertShaderSource {
 
 
 export default class LambertShader extends DecalShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
+  constructor(glBoostContext, basicShader) {
 
-    super(canvas, basicShader);
+    super(glBoostContext, basicShader);
     LambertShader.mixin(LambertShaderSource);
   }
 

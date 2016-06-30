@@ -5,8 +5,8 @@ import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 
 export default class Mesh extends Element {
-  constructor(geometry, material) {
-    super();
+  constructor(glBoostContext, geometry, material) {
+    super(glBoostContext);
     this.geometry = geometry;
     this.material = material;
     this._transformedDepth = 0;

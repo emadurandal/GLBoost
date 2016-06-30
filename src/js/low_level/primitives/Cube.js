@@ -6,8 +6,8 @@ import Vector2 from '../../low_level/math/Vector2';
 import MathUtil from '../../low_level/math/MathUtil';
 
 export default class Cube extends Geometry {
-  constructor(widthVector, vertexColor, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, widthVector, vertexColor) {
+    super(glBoostContext);
 
     // if array, convert to vector[2/3/4]
     widthVector = MathUtil.arrayToVector(widthVector);

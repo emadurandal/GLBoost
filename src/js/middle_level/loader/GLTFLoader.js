@@ -55,10 +55,9 @@ export default class GLTFLoader {
    * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
    * @param {number} scale [en] scale of size of loaded models [ja] 読み込んだモデルのサイズのスケール
    * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
-   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(url, scale = 1.0, defaultShader = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
+  loadGLTF(glBoostContext, url, scale = 1.0, defaultShader = null) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -70,7 +69,7 @@ export default class GLTFLoader {
             basePath += partsOfPath[i] + '/';
           }
           console.log(basePath);
-          this._constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve);
+          this._constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
         }
       };
 
@@ -79,7 +78,7 @@ export default class GLTFLoader {
     });
   }
 
-  _constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve) {
+  _constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
     var json = JSON.parse(gotText);
 
     for (let bufferName in json.buffers) {
@@ -87,14 +86,14 @@ export default class GLTFLoader {
       let bufferInfo = json.buffers[bufferName];
 
       if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
-        this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadBinaryFile(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       } else {
-        this._loadBinaryFileUsingXHR(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       }
     }
   }
 
-  _loadBinaryFile(dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadBinaryFile(glBoostContext, dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
     dataUrI = dataUrI.split(',');
     var type = dataUrI[0].split(':')[1].split(';')[0];
     var byteString = atob(dataUrI[1]);
@@ -106,11 +105,11 @@ export default class GLTFLoader {
     }
 
     if (arrayBuffer) {
-      this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+      this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
     }
   }
 
-  _loadBinaryFileUsingXHR(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
@@ -120,24 +119,24 @@ export default class GLTFLoader {
       var arrayBuffer = oReq.response; // Note: not oReq.responseText
 
       if (arrayBuffer) {
-        this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+        this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
       }
     };
 
     oReq.send(null);
   }
 
-  _IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+  _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
     let sceneJson = json.scenes.defaultScene;
 
-    let group = new Group();
+    let group = glBoostContext.createGroup();
     group.userFlavorName = 'TopGroup';
     let nodeStr = null;
     for (let i=0; i<sceneJson.nodes.length; i++) {
       nodeStr = sceneJson.nodes[i];
 
       // iterate nodes and load meshes
-      let element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
+      let element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
       group.addChild(element);
     }
 
@@ -154,9 +153,9 @@ export default class GLTFLoader {
     resolve(group);
   }
 
-  _recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+  _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
     var nodeJson = json.nodes[nodeStr];
-    var group = new Group();
+    var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
 
     if (nodeJson.translation) {
@@ -183,31 +182,31 @@ export default class GLTFLoader {
         rootJointStr = nodeJson.skeletons[0];
         skinStr = nodeJson.skin;
       }
-      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+      let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
       mesh.userFlavorName = meshStr;
       group.addChild(mesh);
     } else if (nodeJson.jointName) {
-      let joint = new Joint();
+      let joint = glBoostContext.createJoint();
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     }
 
     for (let i=0; i<nodeJson.children.length; i++) {
       let nodeStr = nodeJson.children[i];
-      let childElement = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
       group.addChild(childElement);
     }
 
     return group;
   }
 
-  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
+  _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
     var mesh = null;
     var geometry = null;
     let gl = GLContext.getInstance(canvas).gl;
     if (rootJointStr) {
-      geometry = new SkeletalGeometry(canvas);
-      mesh = new SkeletalMesh(geometry, null, rootJointStr);
+      geometry = glBoostContext.createSkeletalGeometry();
+      mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
       let skin = json.skins[skinStr];
 
       mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix, true));
@@ -215,10 +214,10 @@ export default class GLTFLoader {
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
       mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
     } else {
-      geometry = new Geometry(canvas);
-      mesh = new Mesh(geometry);
+      geometry = glBoostContext.createGeometry(canvas);
+      mesh = glBoostContext.createMesh(geometry);
     }
-    var material = new ClassicMaterial(canvas);
+    var material = glBoostContext.createClassicMaterial(canvas);
 
     let primitiveJson = meshJson.primitives[0];
 
@@ -265,7 +264,7 @@ export default class GLTFLoader {
         let imageJson = json.images[imageStr];
         let imageFileStr = imageJson.uri;
 
-        var texture = new Texture(basePath + imageFileStr, canvas);
+        var texture = glBoostContext.createTexture(basePath + imageFileStr);
         texture.name = textureStr;
         material.diffuseTexture = texture;
       }

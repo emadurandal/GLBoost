@@ -30,43 +30,45 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-var scene = new GLBoost.Scene();
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
 
-var material = new GLBoost.ClassicMaterial();
-var texture = new GLBoost.Texture('resources/texture.png');
+var scene = glBoostContext.createScene();
+
+var material = glBoostContext.createClassicMaterial();
+var texture = glBoostContext.createTexture('resources/texture.png');
 material.diffuseTexture = texture;
 
-var group1 = new GLBoost.Group();
-var group2 = new GLBoost.Group();
+var group1 = glBoostContext.createGroup();
+var group2 = glBoostContext.createGroup();
 
-var planeGeometry = new GLBoost.Plane(1, 1, 1, 1, null);
-var cube0 = new GLBoost.Mesh(planeGeometry, material);
+var planeGeometry = glBoostContext.createPlane(1, 1, 1, 1, null);
+var cube0 = glBoostContext.createMesh(planeGeometry, material);
 cube0.translate = new GLBoost.Vector3(-3, 0, 0);
 cube0.opacity = 0.5;
 group2.addChild( cube0 );
 
-var cube1 = new GLBoost.Mesh(planeGeometry, material);
+var cube1 = glBoostContext.createMesh(planeGeometry, material);
 cube1.translate = new GLBoost.Vector3(-1, 0, 0);
 group2.addChild( cube1 );
 group2.opacity = 0.5;
 
-var cube2 = new GLBoost.Mesh(planeGeometry, material);
+var cube2 = glBoostContext.createMesh(planeGeometry, material);
 cube2.translate = new GLBoost.Vector3(1, 0, 0);
 
 group1.addChild(cube2);
 group1.addChild(group2);
 group1.opacity = 0.5;
 
-var cube3 = new GLBoost.Mesh(planeGeometry, material);
+var cube3 = glBoostContext.createMesh(planeGeometry, material);
 cube3.translate = new GLBoost.Vector3(3, 0, 0);
 
 scene.addChild(cube3);
 scene.addChild(group1);
 scene.opacity = 0.5;
 
-var camera = new GLBoost.Camera(
+var camera = glBoostContext.createCamera(
     {
       eye: new GLBoost.Vector3(0.0, 10, 0),
       center: new GLBoost.Vector3(0.0, 0.0, 0.0),

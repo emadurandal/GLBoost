@@ -31,8 +31,9 @@
 
   var canvas = document.getElementById("world");
 
-  var renderer = new GLBoost.Renderer({
-    canvas: canvas,
+  var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+  var renderer = glBoostContext.createRenderer({
     clearColor: {
       red: 1.0,
       green: 1.0,
@@ -41,25 +42,24 @@
     }
   });
 
-  var scene = new GLBoost.Scene();
-  var glBoostContext = GLBoost.GLBoostMiddleContext.getInstance();
+  var scene = glBoostContext.createScene();
   var depthTexture = glBoostContext.createTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 1);
   var renderPaths = glBoostContext.createRenderPaths(2);
 
-  var material = new GLBoost.ClassicMaterial();
-  var texture = new GLBoost.Texture('resources/texture.png');
+  var material = glBoostContext.createClassicMaterial();
+  var texture = glBoostContext.createTexture('resources/texture.png');
   material.diffuseTexture = texture;
 
-  var planeGeometry = new GLBoost.Plane(10, 10, 10, 10, null);
-  var plane = new GLBoost.Mesh(planeGeometry, material);
+  var planeGeometry = glBoostContext.createPlane(10, 10, 10, 10, null);
+  var plane = glBoostContext.createMesh(planeGeometry, material);
   scene.addChild( plane );
 
-  var cubeGeometry = new GLBoost.Cube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
-  var cube = new GLBoost.Mesh(cubeGeometry, material);
+  var cubeGeometry = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
+  var cube = glBoostContext.createMesh(cubeGeometry, material);
   cube.translate = new GLBoost.Vector3(0,2,0);
   scene.addChild( cube );
 
-  var camera = new GLBoost.Camera(
+  var camera = glBoostContext.createCamera(
       {
         eye: new GLBoost.Vector3(0.0, 5, 15.0),
         center: new GLBoost.Vector3(0.0, 5.0, 0.0),

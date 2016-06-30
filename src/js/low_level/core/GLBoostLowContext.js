@@ -1,10 +1,79 @@
 import GLContext from './GLContext';
-import MutableTexture from '../textures/MutableTexture';
 import GLExtensionsManager from './GLExtensionsManager';
+import Geometry from '../geometries/Geometry';
+import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
+import SkeletalGeometry from '../geometries/SkeletalGeometry';
+import ClassicMaterial from '../ClassicMaterial';
+import Camera from '../Camera';
+import MutableTexture from '../textures/MutableTexture';
+import Texture from '../textures/Texture';
+import Cube from '../primitives/Cube';
+import Plane from '../primitives/Plane';
+import Sphere from '../primitives/Sphere';
+import Particle from '../primitives/Particle';
+import DirectionalLight from '../lights/DirectionalLight';
+import PointLight from '../lights/PointLight';
+import Joint from '../skeletons/Joint';
 
 export default class GLBoostLowContext {
   constructor(canvas) {
     this._glContext = GLContext.getInstance(canvas);
+  }
+
+  get glContext() {
+    return this._glContext;
+  }
+
+  createGeometry() {
+    return new Geometry(this);
+  }
+
+  createBlendShapeGeometry() {
+    return new BlendShapeGeometry(this);
+  }
+
+  createSkeletalGeometry() {
+    return new SkeletalGeometry(this);
+  }
+
+  createCube(widthVector, vertexColor) {
+    return new Cube(this, widthVector, vertexColor);
+  }
+
+  createPlane(width, height, uSpan, vSpan, customVertexAttributes) {
+    return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes);
+  }
+
+  createSphere(radius, widthSegments, heightSegments, vertexColor) {
+    return new Sphere(this, radius, widthSegments, heightSegments, vertexColor);
+  }
+
+  createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+    return new Particle(this, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
+  }
+
+  createClassicMaterial() {
+    return new ClassicMaterial(this);
+  }
+
+  createCamera(lookat, perspective) {
+    return new Camera(this, lookat, perspective);
+  }
+
+  createTexture(src, parameters = null) {
+    return new Texture(this, src, parameters);
+  }
+
+  createDirectionalLight(intensity, direction) {
+    return new DirectionalLight(this, intensity, direction);
+  }
+
+  createPointLight(intensity) {
+    return new PointLight(this, intensity);
+  }
+
+  createJoint() {
+    return new Joint(this);
   }
 
   /**
@@ -31,7 +100,7 @@ export default class GLBoostLowContext {
 
     var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
-      let texture = new MutableTexture(fbo.width, fbo.height);
+      let texture = new MutableTexture(this, fbo.width, fbo.height);
       texture.fbo = fbo;
       renderTargetTextures.push(texture);
     }
@@ -69,7 +138,7 @@ export default class GLBoostLowContext {
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
 
-    let depthTexture = new MutableTexture(fbo.width, fbo.height);
+    let depthTexture = new MutableTexture(this, fbo.width, fbo.height);
     depthTexture.fbo = fbo;
 
     // Attach Buffers

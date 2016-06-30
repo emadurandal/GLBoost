@@ -5,8 +5,8 @@ import Joint from '../skeletons/Joint';
 import Matrix44 from '../../low_level/math/Matrix44';
 
 export default class SkeletalGeometry extends Geometry {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
   }
 
@@ -133,8 +133,8 @@ export default class SkeletalGeometry extends Geometry {
     }
 
     class SkeletalShader extends this._materialForSkeletal.shaderClass {
-      constructor(canvas, basicShader) {
-        super(canvas, basicShader);
+      constructor(glBoostContext, basicShader) {
+        super(glBoostContext, basicShader);
         SkeletalShader.mixin(SkeletalShaderSource);
       }
     }

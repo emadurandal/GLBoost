@@ -6,8 +6,8 @@ import Vector2 from '../../low_level/math/Vector2';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 
 export default class Plane extends Geometry {
-  constructor(width, height, uSpan, vSpan, customVertexAttributes, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes) {
+    super(glBoostContext);
 
     this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
   }

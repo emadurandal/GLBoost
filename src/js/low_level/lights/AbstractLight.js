@@ -7,14 +7,14 @@ import Element from './../Element';
  * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
  */
 export default class AbstractLight extends Element {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     if (this.constructor === AbstractLight) {
       throw new TypeError("Cannot construct AbstractLight instances directly.");
     }
 
-    this._gl = GLContext.getInstance(canvas).gl;
+    this._gl = this._glContext.gl;
     this._name = "";
   }
 }

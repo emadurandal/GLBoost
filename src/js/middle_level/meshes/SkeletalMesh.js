@@ -3,9 +3,9 @@ import Mesh from './Mesh';
 import Matrix44 from '../../low_level/math/Matrix44';
 
 export default class SkeletalMesh extends Mesh {
-  constructor(geometry, material, jointName) {
-    super(geometry, material, jointName);
-    this._rootJointName = jointName;
+  constructor(glBoostContext, geometry, material, rootJointName) {
+    super(glBoostContext, geometry, material, rootJointName);
+    this._rootJointName = rootJointName;
     this._jointsHierarchy = null;
     this._inverseBindMatrices = [];
   }

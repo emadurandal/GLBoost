@@ -36,6 +36,8 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
 
+        var glBoostContext = layer.glBoostContext;
+
         var indices = [
           0, 1, 3, 3, 1, 2
         ];
@@ -53,12 +55,12 @@
           new GLBoost.Vector3(0.0, 0.0, 1.0)
         ];
 
-        var geometry1 = new GLBoost.Geometry();
+        var geometry1 = glBoostContext.createGeometry();
         geometry1.setVerticesData({
           position: positions,
           color: colors
         }, [indices]);
-        var mesh1 = new GLBoost.Mesh(geometry1, null);
+        var mesh1 = glBoostContext.createMesh(geometry1, null);
         layer.scene.addChild( mesh1 );
 
         var positions = [
@@ -74,18 +76,18 @@
           new GLBoost.Vector2(0.0, 0.0)
           ];
 
-        var geometry2 = new GLBoost.Geometry();
-        var texture = new GLBoost.Texture('resources/texture.png');
-        var material = new GLBoost.ClassicMaterial();
+        var geometry2 = glBoostContext.createGeometry();
+        var texture = glBoostContext.createTexture('resources/texture.png');
+        var material = glBoostContext.createClassicMaterial();
         material.diffuseTexture = texture;
         geometry2.setVerticesData({
           position: positions,
           texcoord: texcoords
         }, [indices]);
-        var mesh2 = new GLBoost.Mesh(geometry2, material);
+        var mesh2 = glBoostContext.createMesh(geometry2, material);
         layer.scene.addChild( mesh2 );
 
-        var camera = new GLBoost.Camera({
+        var camera = glBoostContext.createCamera({
           eye: new GLBoost.Vector3(0.0, 0, 5.0),
           center: new GLBoost.Vector3(0.0, 0.0, 0.0),
           up: new GLBoost.Vector3(0.0, 1.0, 0.0)

@@ -51,7 +51,7 @@ export default class ObjLoader {
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadObj(url, defaultShader = null, mtlString = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
+  loadObj(glBoostContext, url, defaultShader = null, mtlString = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -62,7 +62,7 @@ export default class ObjLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          this._constructMesh(gotText, basePath, canvas, defaultShader, mtlString, resolve);
+          this._constructMesh(glBoostContext, gotText, basePath, canvas, defaultShader, mtlString, resolve);
         }
       };
 
@@ -71,7 +71,7 @@ export default class ObjLoader {
     });
   }
 
-  _loadMaterialsFromString(mtlString, canvas, defaultShader, basePath = '') {
+  _loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader, basePath = '') {
 
     var mtlTextRows = mtlString.split('\n');
 
@@ -103,7 +103,7 @@ export default class ObjLoader {
       if (matchArray[1] === "newmtl")
       {
         iMCount++;
-        materials[iMCount] = new ClassicMaterial(canvas);
+        materials[iMCount] = glBoostContext.createClassicMaterial();
         if (defaultShader) {
           materials[iMCount].shaderClass = defaultShader;
         } else {
@@ -139,7 +139,7 @@ export default class ObjLoader {
       if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-        var texture = new Texture(basePath + matchArray[2], {flipY: true}, canvas);
+        var texture = glBoostContext.createTexture(basePath + matchArray[2], {flipY: true});
         texture.name = matchArray[2];
         materials[iMCount].diffuseTexture = texture;
       }
@@ -147,12 +147,12 @@ export default class ObjLoader {
     return materials;
   }
 
-  _loadMaterialsFromFile(basePath, fileName, canvas, defaultShader) {
+  _loadMaterialsFromFile(glBoostContext, basePath, fileName, canvas, defaultShader) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
         if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-          resolve(this._loadMaterialsFromString(xmlHttp.responseText, canvas, defaultShader, basePath));
+          resolve(this._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, canvas, defaultShader, basePath));
         }
       };
 
@@ -161,7 +161,7 @@ export default class ObjLoader {
     });
   }
 
-  _constructMesh(objText, basePath, canvas, defaultShader, mtlString, resolve) {
+  _constructMesh(glBoostContext, objText, basePath, canvas, defaultShader, mtlString, resolve) {
 
     console.log(basePath);
 
@@ -175,7 +175,7 @@ export default class ObjLoader {
     if (mtlString) {
       promise = (()=>{
         return new Promise((resolve, reject)=> {
-          resolve(this._loadMaterialsFromString(mtlString, canvas, defaultShader));
+          resolve(this._loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader));
         });
       })();
     }
@@ -188,7 +188,7 @@ export default class ObjLoader {
 
       // material file
       if (matchArray[1] === "mtllib" && mtlString === null) {
-        promise = this._loadMaterialsFromFile(basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+        promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + '.mtl', canvas, defaultShader);
       }
     }
 
@@ -290,7 +290,7 @@ export default class ObjLoader {
       fCount = 0;
       var partFCount = 0;
 
-      var geometry = new Geometry(canvas);
+      var geometry = glBoostContext.createGeometry();
 
       for(let i=0; i<materials.length; i++) {
         partFCount = 0;
@@ -384,7 +384,7 @@ export default class ObjLoader {
 
       }
 
-      var mesh = new Mesh(geometry);
+      var mesh = glBoostContext.createMesh(geometry, null);
       geometry.materials = materials;
       geometry.setVerticesData({
         position: positions,
