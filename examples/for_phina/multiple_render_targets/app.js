@@ -117,9 +117,9 @@
         height: SCREEN_HEIGHT
       }).addChildTo(this);
 
-      var glBoostContext = GLBoost.GLBoostContext.getInstance();
+      var glBoostContext = GLBoost.GLBoostMiddleContext.getInstance();
       var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
-      var renderPaths = glBoostContext.createRenderPasses(2);
+      var renderPaths = glBoostContext.createRenderPaths(2);
 
       var positions = [new GLBoost.Vector3(-0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, 0.5, 0.0)];
       var shapetarget_1 = [new GLBoost.Vector3(-1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, 0.5, 0.0)];

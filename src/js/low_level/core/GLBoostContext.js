@@ -4,15 +4,13 @@ import GLExtensionsManager from './GLExtensionsManager';
 import RenderPath from '../../middle_level/expressions/RenderPath';
 
 let singleton = Symbol();
-let singletonEnforcer = Symbol();
+export var singletonEnforcer = Symbol();
 
 export default class GLBoostContext {
   constructor(enforcer) {
     if (enforcer !== singletonEnforcer) {
       throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
     }
-
-    this._glBoostObjects = {};
   }
 
   static getInstance() {
@@ -21,21 +19,7 @@ export default class GLBoostContext {
     }
     return this[singleton];
   }
-
-  registerGLBoostObject(glBoostObject) {
-    this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-  }
-
-  printGLBoostObjects() {
-    var objects = this._glBoostObjects;
-    console.log('========== GLBoost Object Lists [begin] ==========');
-    for (var key in objects) {
-      if (objects.hasOwnProperty(key)) {
-        console.log(key);
-      }
-    }
-    console.log('========== GLBoost Object Lists [end] ==========');
-  }
+  
 
   /**
    * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
@@ -47,13 +31,13 @@ export default class GLBoostContext {
    * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
    */
   createTexturesForRenderTarget(width, height, textureNum, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    this._glContext = GLContext.getInstance(canvas);
-    var gl = this._glContext.gl;
+    var glContext = GLContext.getInstance(canvas);
+    var gl = glContext.gl;
 
-    var glem = GLExtensionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = this._glContext.createFramebuffer(GLBoostContext.name);
+    var fbo = glContext.createFramebuffer(GLBoostContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -66,7 +50,7 @@ export default class GLBoostContext {
     }
 
     // Create RenderBuffer
-    var renderbuffer = this._glContext.createRenderbuffer(GLBoostContext.name);
+    var renderbuffer = glContext.createRenderbuffer(GLBoostContext.name);
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -86,13 +70,13 @@ export default class GLBoostContext {
   }
 
   createDepthTexturesForRenderTarget(width, height, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    this._glContext = GLContext.getInstance(canvas);
-    var gl = this._glContext.gl;
+    var glContext = GLContext.getInstance(canvas);
+    var gl = glContext.gl;
 
-    var glem = GLExtensionsManager.getInstance(this._glContext);
+    var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = this._glContext.createFramebuffer(GLBoostContext.name);
+    var fbo = glContext.createFramebuffer(GLBoostContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -111,16 +95,6 @@ export default class GLBoostContext {
     return depthTexture;
   }
 
-  createRenderPasses(number, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    this._glContext = GLContext.getInstance(canvas);
-
-    var renderPaths = [];
-    for (let i=0; i<number; i++) {
-      renderPaths.push(new RenderPath(this._glContext.gl));
-    }
-
-    return renderPaths;
-  }
 }
 
 GLBoost['GLBoostContext'] = GLBoostContext;

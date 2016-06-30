@@ -42,9 +42,9 @@
   });
 
   var scene = new GLBoost.Scene();
-  var glBoostContext = GLBoost.GLBoostContext.getInstance();
+  var glBoostContext = GLBoost.GLBoostMiddleContext.getInstance();
   var depthTexture = glBoostContext.createTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE, 1);
-  var renderPaths = glBoostContext.createRenderPasses(2);
+  var renderPaths = glBoostContext.createRenderPaths(2);
 
   var material = new GLBoost.ClassicMaterial();
   var texture = new GLBoost.Texture('resources/texture.png');
