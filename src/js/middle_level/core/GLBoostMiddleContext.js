@@ -1,25 +1,15 @@
-import GLBoostContext, {singletonEnforcer} from '../../low_level/core/GLBoostLowContext';
-import GLContext from '../../low_level/core/GLContext';
-import MutableTexture from '../../low_level/textures/MutableTexture';
+import GLBoostContext from '../../low_level/core/GLBoostLowContext';
 import RenderPath from '../expressions/RenderPath';
 
 let singleton = Symbol();
 
 export default class GLBoostMiddleContext extends GLBoostContext {
-  constructor(enforcer) {
-    super(enforcer);
-    this._glBoostObjects = {};
+  constructor(canvas) {
+    super(canvas);
   }
 
-  static getInstance() {
-    if (!this[singleton]) {
-      this[singleton] = new GLBoostMiddleContext(singletonEnforcer);
-    }
-    return this[singleton];
-  }
-
-  createRenderPaths(number, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    var glContext = GLContext.getInstance(canvas);
+  createRenderPaths(number) {
+    var glContext = this._glContext;
 
     var renderPaths = [];
     for (let i=0; i<number; i++) {

@@ -117,7 +117,7 @@
         height: SCREEN_HEIGHT
       }).addChildTo(this);
 
-      var glBoostContext = GLBoost.GLBoostMiddleContext.getInstance();
+      var glBoostContext = new GLBoost.GLBoostMiddleContext(layer.canvas);
       var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
       var renderPaths = glBoostContext.createRenderPaths(2);
 

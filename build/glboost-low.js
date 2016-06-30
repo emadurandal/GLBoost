@@ -456,14 +456,14 @@
     return MiscUtil;
   }();
 
-  var singleton$1 = Symbol();
-  var singletonEnforcer$1 = Symbol();
+  var singleton = Symbol();
+  var singletonEnforcer = Symbol();
 
   var GLBoostMonitor = function () {
     function GLBoostMonitor(enforcer) {
       babelHelpers.classCallCheck(this, GLBoostMonitor);
 
-      if (enforcer !== singletonEnforcer$1) {
+      if (enforcer !== singletonEnforcer) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
 
@@ -598,10 +598,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$1]) {
-          this[singleton$1] = new GLBoostMonitor(singletonEnforcer$1);
+        if (!this[singleton]) {
+          this[singleton] = new GLBoostMonitor(singletonEnforcer);
         }
-        return this[singleton$1];
+        return this[singleton];
       }
     }]);
     return GLBoostMonitor;
@@ -911,13 +911,14 @@
   GLContext._instances = new Object();
 
   var GLBoostObject = function () {
-    function GLBoostObject() {
+    function GLBoostObject(glContext) {
       babelHelpers.classCallCheck(this, GLBoostObject);
 
       if (this.constructor === GLBoostObject) {
         throw new TypeError('Cannot construct GLBoostObject instances directly.');
       }
       this._setName();
+      this._glContext = glContext;
       this._glBoostMonitor = GLBoostMonitor.getInstance();
       this._glBoostMonitor.registerGLBoostObject(this);
       this._userFlavorName = '';
@@ -947,6 +948,11 @@
       value: function readyForDiscard() {
         this._readyForDiscard = true;
         this._glBoostMonitor.deregisterGLBoostObject(this);
+      }
+    }, {
+      key: 'belongingCanvasId',
+      get: function get() {
+        return this._glContext.canvas.id;
       }
     }, {
       key: 'userFlavorName',
@@ -1151,6 +1157,99 @@
   }(AbstractTexture);
 
   GLBoost$1['MutableTexture'] = MutableTexture;
+
+  var GLBoostLowContext = function () {
+    function GLBoostLowContext(canvas) {
+      babelHelpers.classCallCheck(this, GLBoostLowContext);
+
+      this._glContext = GLContext.getInstance(canvas);
+    }
+
+    /**
+     * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
+     * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
+     * @param {number} width en: width of texture. ja: テクスチャの幅
+     * @param {number} height en: height of texture. ja: テクスチャの高さ
+     * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+     */
+
+
+    babelHelpers.createClass(GLBoostLowContext, [{
+      key: 'createTexturesForRenderTarget',
+      value: function createTexturesForRenderTarget(width, height, textureNum) {
+        var glContext = this._glContext;
+        var gl = glContext.gl;
+        var canvas = glContext.canvas;
+
+        var glem = GLExtensionsManager.getInstance(glContext);
+
+        // Create FBO
+        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        fbo.width = width ? width : canvas.width;
+        fbo.height = height ? height : canvas.height;
+
+        var renderTargetTextures = [];
+        for (var i = 0; i < textureNum; i++) {
+          var texture = new MutableTexture(fbo.width, fbo.height);
+          texture.fbo = fbo;
+          renderTargetTextures.push(texture);
+        }
+
+        // Create RenderBuffer
+        var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+
+        // Attach Buffers
+        renderTargetTextures.forEach(function (texture, i) {
+          var glTexture = texture.glTextureResource;
+          var attachimentId = glem.colorAttachiment(gl, i);
+          texture.colorAttachiment = attachimentId;
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+        });
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        return renderTargetTextures;
+      }
+    }, {
+      key: 'createDepthTexturesForRenderTarget',
+      value: function createDepthTexturesForRenderTarget(width, height) {
+        var glContext = this._glContext;
+
+        var gl = glContext.gl;
+
+        var glem = GLExtensionsManager.getInstance(glContext);
+
+        // Create FBO
+        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        fbo.width = width ? width : canvas.width;
+        fbo.height = height ? height : canvas.height;
+
+        var depthTexture = new MutableTexture(fbo.width, fbo.height);
+        depthTexture.fbo = fbo;
+
+        // Attach Buffers
+        var glTexture = depthTexture.glTextureResource;
+        var attachimentId = gl.DEPTH_ATTACHMENT;
+        depthTexture.colorAttachment = attachimentId;
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+        return depthTexture;
+      }
+    }]);
+    return GLBoostLowContext;
+  }();
+
+  GLBoost['GLBoostLowContext'] = GLBoostLowContext;
 
   var MathUtil = function () {
     function MathUtil() {
@@ -2795,591 +2894,6 @@
 
   GLBoost$1['Element'] = Element;
 
-  var Mesh = function (_Element) {
-    babelHelpers.inherits(Mesh, _Element);
-
-    function Mesh(geometry, material) {
-      babelHelpers.classCallCheck(this, Mesh);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mesh).call(this));
-
-      _this.geometry = geometry;
-      _this.material = material;
-      _this._transformedDepth = 0;
-
-      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
-        // this code for tmlib
-        Mesh._instanceCount = typeof Mesh._instanceCount === 'undefined' ? 0 : Mesh._instanceCount + 1;
-        _this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
-      }
-      return _this;
-    }
-
-    babelHelpers.createClass(Mesh, [{
-      key: 'prepareForRender',
-      value: function prepareForRender(existCamera_f, lights, renderPasses) {
-        this._geometry.prepareForRender(existCamera_f, lights, this._material, renderPasses, this);
-        if (this._geometry._materials.length === 0 && this._material) {
-          //if (this._material) {
-          this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights, renderPasses, this);
-        }
-      }
-    }, {
-      key: 'draw',
-      value: function draw(lights, camera, scene, renderPass_index) {
-        this._geometry.draw(lights, camera, this, scene, renderPass_index);
-      }
-    }, {
-      key: 'bakeTransformToGeometry',
-      value: function bakeTransformToGeometry() {
-        var positions = this._geometry._vertices.position;
-        var mat = this.transformMatrixAccumulatedAncestry;
-        for (var i = 0; i < positions.length; i++) {
-          var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
-          var transformedPosVec = mat.multiplyVector(posVector4);
-          positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
-        }
-        this._geometry._vertices.position = positions;
-
-        if (this._geometry._vertices.normal) {
-          var normals = this._geometry._vertices.normal;
-          for (var i = 0; i < normals.length; i++) {
-            var normalVector3 = normals[i];
-            var transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
-          }
-          this._geometry._vertices.normal = normals;
-        }
-      }
-    }, {
-      key: 'bakeInverseTransformToGeometry',
-      value: function bakeInverseTransformToGeometry() {
-        var positions = this._geometry._vertices.position;
-        var invMat = this.inverseTransformMatrixAccumulatedAncestry;
-        for (var i = 0; i < positions.length; i++) {
-          var posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
-          var transformedPosVec = invMat.multiplyVector(posVector4);
-          positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
-        }
-        this._geometry._vertices.position = positions;
-
-        var mat = this.transformMatrixAccumulatedAncestry;
-        if (this._geometry._vertices.normal) {
-          var normals = this._geometry._vertices.normal;
-          for (var i = 0; i < normals.length; i++) {
-            var normalVector3 = normals[i];
-            var transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
-          }
-          this._geometry._vertices.normal = normals;
-        }
-      }
-    }, {
-      key: '_copyMaterials',
-      value: function _copyMaterials() {
-        if (this.geometry._indicesArray.length !== this.geometry._materials.length) {
-          for (var i = 0; i < this.geometry._indicesArray.length; i++) {
-            this.geometry._materials[i] = this._material; //.clone();
-            this.geometry._materials[i].setVertexN(this.geometry, this.geometry._indicesArray[i].length);
-          }
-        }
-      }
-    }, {
-      key: 'merge',
-      value: function merge(meshOrMeshes) {
-        if (Array.isArray(meshOrMeshes)) {
-          this.bakeTransformToGeometry();
-
-          var meshes = meshOrMeshes;
-          for (var i = 0; i < meshes.length; i++) {
-            meshes[i].bakeTransformToGeometry();
-            this.geometry.merge(meshes[i].geometry);
-            delete meshes[i];
-          }
-
-          this._copyMaterials();
-
-          this.bakeInverseTransformToGeometry();
-        } else {
-          //
-          var mesh = meshOrMeshes;
-          mesh.bakeTransformToGeometry();
-          this.bakeTransformToGeometry();
-          this.geometry.merge(mesh.geometry);
-
-          this._copyMaterials();
-
-          this.bakeInverseTransformToGeometry();
-        }
-      }
-    }, {
-      key: 'mergeHarder',
-      value: function mergeHarder(meshOrMeshes) {
-
-        if (Array.isArray(meshOrMeshes)) {
-
-          this.bakeTransformToGeometry();
-
-          var meshes = meshOrMeshes;
-          for (var i = 0; i < meshes.length; i++) {
-            meshes[i].bakeTransformToGeometry();
-            this.geometry.mergeHarder(meshes[i].geometry);
-            delete meshes[i];
-          }
-
-          this.bakeInverseTransformToGeometry();
-        } else {
-          //
-          var mesh = meshOrMeshes;
-          mesh.bakeTransformToGeometry();
-          this.bakeTransformToGeometry();
-          this.geometry.mergeHarder(mesh.geometry);
-
-          this.bakeInverseTransformToGeometry();
-        }
-      }
-    }, {
-      key: 'calcTransformedDepth',
-      value: function calcTransformedDepth(camera) {
-        var viewMatrix = camera.lookAtRHMatrix();
-        var m_m = this.transformMatrixAccumulatedAncestry;
-        var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
-
-        var centerPosition = this.geometry.centerPosition.toVector4();
-        var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
-
-        this._transformedDepth = transformedCenterPosition.z;
-      }
-    }, {
-      key: 'geometry',
-      set: function set(geometry) {
-        this._geometry = geometry;
-        geometry._parent = this;
-        Mesh._geometries[geometry.toString()] = geometry;
-      },
-      get: function get() {
-        return this._geometry;
-      }
-    }, {
-      key: 'material',
-      set: function set(material) {
-        this._material = material;
-      },
-      get: function get() {
-        return this._material;
-      }
-    }, {
-      key: 'transformedDepth',
-      get: function get() {
-        return this._transformedDepth;
-      }
-    }]);
-    return Mesh;
-  }(Element);
-
-  Mesh._geometries = {};
-
-  GLBoost$1['Mesh'] = Mesh;
-
-  var Group = function (_Element) {
-    babelHelpers.inherits(Group, _Element);
-
-    function Group() {
-      babelHelpers.classCallCheck(this, Group);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this));
-
-      _this._elements = [];
-      return _this;
-    }
-
-    /**
-     * [en] Add the element to this group as a child.<br>
-     * [ja] このグループにelementを子供として追加します。
-     * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
-     */
-
-
-    babelHelpers.createClass(Group, [{
-      key: 'addChild',
-      value: function addChild(element) {
-        this.removeChild(element);
-        this._elements.push(element);
-      }
-
-      /**
-       * [en] remove the element from this group.
-       * [ja] このグループから指定した要素を削除します。
-       * @param {Element} element [en] the element to remove [ja] 削除したい要素
-       */
-
-    }, {
-      key: 'removeChild',
-      value: function removeChild(element) {
-        this._elements = this._elements.filter(function (elem) {
-          if (elem === element) {
-            element._parent = null;
-          }
-          return elem !== element;
-        });
-      }
-
-      /**
-       * [en] remove all elements from this group.
-       * [ja] このグループから全ての要素を削除します。
-       */
-
-    }, {
-      key: 'removeAll',
-      value: function removeAll() {
-        this._elements = this._elements.filter(function (elem) {
-          elem._parent = null;
-        });
-        this._elements.length = 0;
-      }
-    }, {
-      key: 'getChildren',
-      value: function getChildren() {
-        return this._elements;
-      }
-    }, {
-      key: 'searchElement',
-      value: function searchElement(userflavorName) {
-        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
-
-        if (element.userFlavorName === userflavorName) {
-          return element;
-        }
-
-        if (element instanceof Group) {
-          var children = element.getChildren();
-          for (var i = 0; i < children.length; i++) {
-            var hitChild = this.searchElement(userflavorName, children[i]);
-            if (hitChild) {
-              return hitChild;
-            }
-          }
-        }
-        return null;
-      }
-    }, {
-      key: 'searchElementsByType',
-      value: function searchElementsByType(type) {
-        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
-
-        if (element instanceof type) {
-          return element;
-        }
-
-        if (element instanceof Group) {
-          var children = element.getChildren();
-          var results = [];
-          for (var i = 0; i < children.length; i++) {
-            var hitChildOrChildren = this.searchElementsByType(type, children[i]);
-            if (Array.isArray(hitChildOrChildren)) {
-              Array.prototype.push.apply(results, hitChildOrChildren); // concat
-            } else if (hitChildOrChildren != null) {
-                results.push(hitChildOrChildren);
-              }
-          }
-          return results;
-        }
-        return null;
-      }
-    }]);
-    return Group;
-  }(Element);
-
-  GLBoost$1['Group'] = Group;
-
-  var RenderPath = function (_GLBoostObject) {
-    babelHelpers.inherits(RenderPath, _GLBoostObject);
-
-    function RenderPath(gl) {
-      babelHelpers.classCallCheck(this, RenderPath);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RenderPath).call(this));
-
-      _this._elements = [];
-      _this._meshes = [];
-      _this._opacityMeshes = [];
-      _this._transparentMeshes = [];
-      _this._drawBuffers = [gl.BACK];
-      _this._clearColor = null;
-      _this._clearDepth = 1.0;
-      _this._renderTargetTextures = null;
-      return _this;
-    }
-
-    babelHelpers.createClass(RenderPath, [{
-      key: 'addElements',
-      value: function addElements(elements) {
-        var _this2 = this;
-
-        elements.forEach(function (elem) {
-          if (!(elem instanceof Mesh || elem instanceof Group)) {
-            throw new TypeError('RenderPath accepts Mesh or Group element only.');
-          }
-          _this2._elements.push(elem);
-        });
-      }
-    }, {
-      key: 'clearElements',
-      value: function clearElements() {
-        this._elements.length = 0;
-      }
-    }, {
-      key: 'specifyRenderTargetTextures',
-      value: function specifyRenderTargetTextures(renderTargetTextures) {
-        var _this3 = this;
-
-        var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
-
-        var gl = GLContext.getInstance(canvas).gl;
-
-        if (renderTargetTextures) {
-          this._drawBuffers = [];
-          renderTargetTextures.forEach(function (texture) {
-            _this3._drawBuffers.push(texture.colorAttachiment);
-          });
-          this._renderTargetTextures = renderTargetTextures;
-        } else {
-          this._drawBuffers = [gl.BACK];
-        }
-      }
-    }, {
-      key: 'setClearColor',
-      value: function setClearColor(color) {
-        this._clearColor = color;
-      }
-    }, {
-      key: 'setClearDepth',
-      value: function setClearDepth(depth) {
-        this._clearDepth = depth;
-      }
-    }, {
-      key: 'prepareForRender',
-      value: function prepareForRender() {
-        var _this4 = this;
-
-        var collectMeshes = function collectMeshes(elem) {
-          if (elem instanceof Group) {
-            var children = elem.getChildren();
-            var meshes = [];
-            children.forEach(function (child) {
-              var childMeshes = collectMeshes(child);
-              meshes = meshes.concat(childMeshes);
-            });
-            return meshes;
-          } else if (elem instanceof Mesh) {
-            return [elem];
-          } else {
-            return [];
-          }
-        };
-
-        this._meshes = [];
-        this._elements.forEach(function (elm) {
-          _this4._meshes = _this4._meshes.concat(collectMeshes(elm));
-        });
-
-        this._opacityMeshes = [];
-        this._transparentMeshes = [];
-        this._meshes.forEach(function (mesh) {
-          if (mesh.isTransparent()) {
-            _this4._transparentMeshes.push(mesh);
-          } else {
-            _this4._opacityMeshes.push(mesh);
-          }
-        });
-      }
-    }, {
-      key: 'sortTransparentMeshes',
-      value: function sortTransparentMeshes(camera) {
-
-        this._transparentMeshes.forEach(function (mesh) {
-          mesh.calcTransformedDepth(camera);
-        });
-
-        this._transparentMeshes.sort(function (a, b) {
-          if (a.transformedDepth < b.transformedDepth) return -1;
-          if (a.transformedDepth > b.transformedDepth) return 1;
-          return 0;
-        });
-      }
-    }, {
-      key: 'containsMeshAfterPrepareForRender',
-      value: function containsMeshAfterPrepareForRender(mesh) {
-        for (var i = 0; i < this._meshes.length; i++) {
-          if (this._meshes[i] === mesh) {
-            return true;
-          }
-        }
-        return false;
-      }
-    }, {
-      key: 'elements',
-      get: function get() {
-        return this._elements;
-      }
-    }, {
-      key: 'meshes',
-      get: function get() {
-        return this._meshes;
-      }
-    }, {
-      key: 'opacityMeshes',
-      get: function get() {
-        return this._opacityMeshes;
-      }
-    }, {
-      key: 'transparentMeshes',
-      get: function get() {
-        return this._transparentMeshes;
-      }
-    }, {
-      key: 'buffersToDraw',
-      get: function get() {
-        return this._drawBuffers;
-      }
-    }, {
-      key: 'fboOfRenderTargetTextures',
-      get: function get() {
-        if (this._renderTargetTextures) {
-          return this._renderTargetTextures[0].fbo;
-        } else {
-          return null;
-        }
-      }
-    }, {
-      key: 'renderTargetTextures',
-      get: function get() {
-        return this._renderTargetTextures;
-      }
-    }, {
-      key: 'clearColor',
-      get: function get() {
-        return this._clearColor;
-      }
-    }, {
-      key: 'clearDepth',
-      get: function get() {
-        return this._clearDepth;
-      }
-    }]);
-    return RenderPath;
-  }(GLBoostObject);
-
-  GLBoost$1['RenderPath'] = RenderPath;
-
-  var singleton = Symbol();
-  var singletonEnforcer = Symbol();
-
-  var GLBoostLowContext = function () {
-    function GLBoostLowContext(enforcer) {
-      babelHelpers.classCallCheck(this, GLBoostLowContext);
-
-      if (enforcer !== singletonEnforcer) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-    }
-
-    babelHelpers.createClass(GLBoostLowContext, [{
-      key: 'createTexturesForRenderTarget',
-
-
-      /**
-       * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
-       * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
-       * @param {number} width en: width of texture. ja: テクスチャの幅
-       * @param {number} height en: height of texture. ja: テクスチャの高さ
-       * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
-       * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-       * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
-       */
-      value: function createTexturesForRenderTarget(width, height, textureNum) {
-        var canvas = arguments.length <= 3 || arguments[3] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[3];
-
-        var glContext = GLContext.getInstance(canvas);
-        var gl = glContext.gl;
-
-        var glem = GLExtensionsManager.getInstance(glContext);
-
-        // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-        fbo.width = width ? width : canvas.width;
-        fbo.height = height ? height : canvas.height;
-
-        var renderTargetTextures = [];
-        for (var i = 0; i < textureNum; i++) {
-          var texture = new MutableTexture(fbo.width, fbo.height);
-          texture.fbo = fbo;
-          renderTargetTextures.push(texture);
-        }
-
-        // Create RenderBuffer
-        var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
-
-        // Attach Buffers
-        renderTargetTextures.forEach(function (texture, i) {
-          var glTexture = texture.glTextureResource;
-          var attachimentId = glem.colorAttachiment(gl, i);
-          texture.colorAttachiment = attachimentId;
-          gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
-        });
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        return renderTargetTextures;
-      }
-    }, {
-      key: 'createDepthTexturesForRenderTarget',
-      value: function createDepthTexturesForRenderTarget(width, height) {
-        var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[2];
-
-        var glContext = GLContext.getInstance(canvas);
-        var gl = glContext.gl;
-
-        var glem = GLExtensionsManager.getInstance(glContext);
-
-        // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-        fbo.width = width ? width : canvas.width;
-        fbo.height = height ? height : canvas.height;
-
-        var depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
-        depthTexture.fbo = fbo;
-
-        // Attach Buffers
-        var glTexture = depthTexture.glTextureResource;
-        var attachimentId = gl.DEPTH_ATTACHMENT;
-        depthTexture.colorAttachment = attachimentId;
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        return depthTexture;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton]) {
-          this[singleton] = new GLBoostLowContext(singletonEnforcer);
-        }
-        return this[singleton];
-      }
-    }]);
-    return GLBoostLowContext;
-  }();
-
-  GLBoost['GLBoostLowContext'] = GLBoostLowContext;
-
   /**
    * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
    * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
@@ -4930,14 +4444,14 @@
 
   GLBoost$1["DirectionalLight"] = DirectionalLight;
 
-  var singleton$2 = Symbol();
-  var singletonEnforcer$2 = Symbol();
+  var singleton$1 = Symbol();
+  var singletonEnforcer$1 = Symbol();
 
   var DrawKickerLocal = function () {
     function DrawKickerLocal(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerLocal);
 
-      if (enforcer !== singletonEnforcer$2) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -5048,10 +4562,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$2]) {
-          this[singleton$2] = new DrawKickerLocal(singletonEnforcer$2);
+        if (!this[singleton$1]) {
+          this[singleton$1] = new DrawKickerLocal(singletonEnforcer$1);
         }
-        return this[singleton$2];
+        return this[singleton$1];
       }
     }]);
     return DrawKickerLocal;
@@ -5060,14 +4574,14 @@
   DrawKickerLocal._lastShaderName = null;
   DrawKickerLocal._lastGeometry = null;
 
-  var singleton$3 = Symbol();
-  var singletonEnforcer$3 = Symbol();
+  var singleton$2 = Symbol();
+  var singletonEnforcer$2 = Symbol();
 
   var DrawKickerWorld = function () {
     function DrawKickerWorld(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerWorld);
 
-      if (enforcer !== singletonEnforcer$3) {
+      if (enforcer !== singletonEnforcer$2) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -5176,10 +4690,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$3]) {
-          this[singleton$3] = new DrawKickerWorld(singletonEnforcer$3);
+        if (!this[singleton$2]) {
+          this[singleton$2] = new DrawKickerWorld(singletonEnforcer$2);
         }
-        return this[singleton$3];
+        return this[singleton$2];
       }
     }]);
     return DrawKickerWorld;

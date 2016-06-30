@@ -1,25 +1,11 @@
 import GLContext from './GLContext';
 import MutableTexture from '../textures/MutableTexture';
 import GLExtensionsManager from './GLExtensionsManager';
-import RenderPath from '../../middle_level/expressions/RenderPath';
-
-let singleton = Symbol();
-export var singletonEnforcer = Symbol();
 
 export default class GLBoostLowContext {
-  constructor(enforcer) {
-    if (enforcer !== singletonEnforcer) {
-      throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-    }
+  constructor(canvas) {
+    this._glContext = GLContext.getInstance(canvas);
   }
-
-  static getInstance() {
-    if (!this[singleton]) {
-      this[singleton] = new GLBoostLowContext(singletonEnforcer);
-    }
-    return this[singleton];
-  }
-  
 
   /**
    * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
@@ -30,9 +16,10 @@ export default class GLBoostLowContext {
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
    */
-  createTexturesForRenderTarget(width, height, textureNum, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    var glContext = GLContext.getInstance(canvas);
+  createTexturesForRenderTarget(width, height, textureNum) {
+    var glContext = this._glContext;
     var gl = glContext.gl;
+    var canvas = glContext.canvas;
 
     var glem = GLExtensionsManager.getInstance(glContext);
 
@@ -69,8 +56,9 @@ export default class GLBoostLowContext {
     return renderTargetTextures;
   }
 
-  createDepthTexturesForRenderTarget(width, height, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    var glContext = GLContext.getInstance(canvas);
+  createDepthTexturesForRenderTarget(width, height) {
+    var glContext = this._glContext;
+
     var gl = glContext.gl;
 
     var glem = GLExtensionsManager.getInstance(glContext);
@@ -81,7 +69,7 @@ export default class GLBoostLowContext {
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
 
-    let depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
+    let depthTexture = new MutableTexture(fbo.width, fbo.height);
     depthTexture.fbo = fbo;
 
     // Attach Buffers

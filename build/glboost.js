@@ -149,727 +149,6 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var MiscUtil = function () {
-    function MiscUtil() {
-      babelHelpers.classCallCheck(this, MiscUtil);
-    }
-
-    babelHelpers.createClass(MiscUtil, null, [{
-      key: 'isDefinedAndTrue',
-      value: function isDefinedAndTrue(value) {
-        if (typeof value !== 'undefined' && value) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'consoleLog',
-      value: function consoleLog(text) {
-        if (GLBoost$1.CONSOLE_OUT_FOR_DEBUGGING) {
-          console.log(text);
-        }
-      }
-    }]);
-    return MiscUtil;
-  }();
-
-  var singleton$4 = Symbol();
-  var singletonEnforcer$3 = Symbol();
-
-  var GLBoostMonitor = function () {
-    function GLBoostMonitor(enforcer) {
-      babelHelpers.classCallCheck(this, GLBoostMonitor);
-
-      if (enforcer !== singletonEnforcer$3) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-
-      this._glBoostObjects = {};
-      this._glResources = [];
-    }
-
-    babelHelpers.createClass(GLBoostMonitor, [{
-      key: 'registerGLBoostObject',
-      value: function registerGLBoostObject(glBoostObject) {
-        this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
-      }
-    }, {
-      key: 'deregisterGLBoostObject',
-      value: function deregisterGLBoostObject(glBoostObject) {
-        delete this._glBoostObjects[glBoostObject.toString()];
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
-      }
-    }, {
-      key: 'printGLBoostObjects',
-      value: function printGLBoostObjects() {
-        var objects = this._glBoostObjects;
-        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
-        for (var key in objects) {
-          if (objects.hasOwnProperty(key)) {
-            MiscUtil.consoleLog(key);
-          }
-        }
-        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
-      }
-    }, {
-      key: 'printGLBoostObjectsOrderByName',
-      value: function printGLBoostObjectsOrderByName() {
-        var objects = this._glBoostObjects;
-        var objectArray = [];
-        for (var key in objects) {
-          if (objects.hasOwnProperty(key)) {
-            objectArray.push(key);
-          }
-        }
-        objectArray.sort(function (a, b) {
-          if (a < b) return -1;
-          if (a > b) return 1;
-          return 0;
-        });
-        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
-        objectArray.forEach(function (object) {
-          MiscUtil.consoleLog(object);
-        });
-        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
-      }
-    }, {
-      key: 'registerWebGLResource',
-      value: function registerWebGLResource(glBoostObject, glResource) {
-        var glResourceName = glResource.constructor.name;
-        var glBoostObjectName = glBoostObject.toString();
-        this._glResources.push([glBoostObjectName, glResourceName]);
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
-      }
-    }, {
-      key: 'deregisterWebGLResource',
-      value: function deregisterWebGLResource(glBoostObject, glResource) {
-        var _this = this;
-
-        var glResourceName = glResource.constructor.name;
-        var glBoostObjectName = glBoostObject.toString();
-
-        this._glResources.forEach(function (glResource, i) {
-          if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
-            _this._glResources.splice(i, 1);
-          }
-        });
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
-      }
-    }, {
-      key: 'printWebGLResources',
-      value: function printWebGLResources() {
-        var glResources = this._glResources;
-        glResources.sort(function (a, b) {
-          if (a[0] < b[0]) return -1;
-          if (a[0] > b[0]) return 1;
-          return 0;
-        });
-        MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
-        glResources.forEach(function (glResource, i) {
-          MiscUtil.consoleLog(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
-        });
-        MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
-      }
-    }, {
-      key: 'printHierarchy',
-      value: function printHierarchy() {
-        var glBoostObjects = this._glBoostObjects;
-        var scenes = [];
-        for (var key in glBoostObjects) {
-          if (glBoostObjects.hasOwnProperty(key)) {
-            if (key.match(/Scene/)) {
-              scenes.push(glBoostObjects[key]);
-            }
-          }
-        }
-
-        function putWhiteSpace(level) {
-          var str = '';
-          for (var i = 0; i < level; i++) {
-            str += '  ';
-          }
-          return str;
-        }
-
-        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
-        scenes.forEach(function (scene) {
-          var outputText = function searchRecursively(element, level) {
-            var outputText = '';
-            outputText += putWhiteSpace(level) + element.toString() + '\n';
-            if (typeof element.getChildren === 'undefined') {
-              return outputText;
-            }
-            var children = element.getChildren();
-            children.forEach(function (child) {
-              outputText += searchRecursively(child, level + 1);
-            });
-            return outputText += '\n';
-          }(scene, 0);
-
-          outputText = outputText.replace(/\n+/g, '\n');
-          MiscUtil.consoleLog(outputText);
-        });
-        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton$4]) {
-          this[singleton$4] = new GLBoostMonitor(singletonEnforcer$3);
-        }
-        return this[singleton$4];
-      }
-    }]);
-    return GLBoostMonitor;
-  }();
-
-  GLBoost['GLBoostMonitor'] = GLBoostMonitor;
-
-  var GLContextImpl = function () {
-    function GLContextImpl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextImpl);
-
-      //    if (new.target === GLContextImpl) {
-      if (this.constructor === GLContextImpl) {
-        throw new TypeError("Cannot construct GLContextImpl instances directly");
-      }
-
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
-
-      if (canvas === void 0) {
-        throw new Error("Failed to create WebGL Context due to no canvas object.");
-      }
-
-      this._canvas = canvas;
-    }
-
-    babelHelpers.createClass(GLContextImpl, [{
-      key: "init",
-      value: function init(glVersionString, ContextType) {
-
-        var gl = this._canvas.getContext(glVersionString);
-
-        if (!gl) {
-          gl = this._canvas.getContext('experimental-' + glVersionString);
-          if (!gl) {
-            throw new Error("This platform doesn't support WebGL.");
-          }
-        }
-
-        if (!gl instanceof ContextType) {
-          throw new Error("Unexpected rendering context.");
-        }
-
-        this._gl = gl;
-      }
-    }, {
-      key: "gl",
-      get: function get() {
-        return this._gl;
-      }
-    }, {
-      key: "canvas",
-      get: function get() {
-        return this._canvas;
-      }
-    }]);
-    return GLContextImpl;
-  }();
-
-  var GLContextWebGL2Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
-
-    function GLContextWebGL2Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
-
-      return _this;
-    }
-
-    return GLContextWebGL2Impl;
-  }(GLContextImpl);
-
-  var GLContextWebGL1Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
-
-    function GLContextWebGL1Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
-
-      return _this;
-    }
-
-    return GLContextWebGL1Impl;
-  }(GLContextImpl);
-
-  var GLExtensionsManager = function () {
-    function GLExtensionsManager(glContext) {
-      babelHelpers.classCallCheck(this, GLExtensionsManager);
-
-      var gl = glContext.gl;
-      if (GLExtensionsManager._instances[glContext.canvas.id]) {
-        return GLExtensionsManager._instances[glContext.canvas.id];
-      }
-
-      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
-        this._extVAO = gl.getExtension('OES_vertex_array_object');
-
-        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
-
-        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
-
-        this._extEIUI = gl.getExtension('OES_element_index_uint');
-      }
-
-      GLExtensionsManager._instances[glContext.canvas.id] = this;
-    }
-
-    babelHelpers.createClass(GLExtensionsManager, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(gl) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          return gl.createVertexArray();
-        } else if (this._extVAO) {
-          return this._extVAO.createVertexArrayOES();
-        } else {
-          return null;
-        }
-      }
-    }, {
-      key: 'bindVertexArray',
-      value: function bindVertexArray(gl, vao) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          gl.bindVertexArray(vao);
-          return true;
-        } else if (this._extVAO) {
-          this._extVAO.bindVertexArrayOES(vao);
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'drawBuffers',
-      value: function drawBuffers(gl, buffers) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          gl.drawBuffers(buffers);
-          return true;
-        } else if (this._extDBs) {
-          this.extDBs.drawBuffersWEBGL(buffers);
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'colorAttachiment',
-      value: function colorAttachiment(gl, index) {
-        return this._extDBs ? this._extDBs['COLOR_ATTACHMENT' + index + '_WEBGL'] : gl['COLOR_ATTACHMENT' + index];
-      }
-    }, {
-      key: 'elementIndexBitSize',
-      value: function elementIndexBitSize(gl) {
-        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-          return gl.UNSIGNED_INT;
-        } else {
-          return gl.UNSIGNED_SHORT;
-        }
-      }
-    }, {
-      key: 'createUintArrayForElementIndex',
-      value: function createUintArrayForElementIndex(gl, array) {
-        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-          return new Uint32Array(array);
-        } else {
-          return new Uint16Array(array);
-        }
-      }
-    }, {
-      key: 'extVAO',
-      get: function get() {
-        return this._extVAO;
-      }
-    }, {
-      key: 'extDBs',
-      get: function get() {
-        return this._extDBs;
-      }
-    }, {
-      key: 'extTFA',
-      get: function get() {
-        return this._extTFA;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(gl) {
-        return new GLExtensionsManager(gl);
-      }
-    }]);
-    return GLExtensionsManager;
-  }();
-
-  GLExtensionsManager._instances = new Object();
-
-  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
-
-  var GLContext = function () {
-    function GLContext(canvas) {
-      babelHelpers.classCallCheck(this, GLContext);
-
-      if (GLContext._instances[canvas.id] instanceof GLContext) {
-        return GLContext._instances[canvas.id];
-      }
-
-      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
-      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
-      }
-
-      GLContext._instances[canvas.id] = this;
-      this._monitor = GLBoostMonitor.getInstance();
-    }
-
-    babelHelpers.createClass(GLContext, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(glBoostObject) {
-        var gl = this.gl;
-        var glem = GLExtensionsManager.getInstance(this);
-        var glResource = glem.createVertexArray(gl);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createBuffer',
-      value: function createBuffer(glBoostObject) {
-        var glResource = this.gl.createBuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createFramebuffer',
-      value: function createFramebuffer(glBoostObject) {
-        var glResource = this.gl.createFramebuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createRenderbuffer',
-      value: function createRenderbuffer(glBoostObject) {
-        var glResource = this.gl.createRenderbuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createShader',
-      value: function createShader(glBoostObject, shaderType) {
-        var glResource = this.gl.createShader(shaderType);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteShader',
-      value: function deleteShader(glBoostObject, shader) {
-        this._monitor.deregisterWebGLResource(glBoostObject, shader);
-        this.gl.deleteShader(shader);
-        shader = null;
-      }
-    }, {
-      key: 'createProgram',
-      value: function createProgram(glBoostObject) {
-        var glResource = this.gl.createProgram();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteProgram',
-      value: function deleteProgram(glBoostObject, program) {
-        this._monitor.deregisterWebGLResource(glBoostObject, program);
-        this.gl.deleteProgram(program);
-      }
-    }, {
-      key: 'createTexture',
-      value: function createTexture(glBoostObject) {
-        var glResource = this.gl.createTexture();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'gl',
-      get: function get() {
-        return this.impl.gl;
-      }
-    }, {
-      key: 'canvas',
-      get: function get() {
-        return this.impl.canvas;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(canvas) {
-        if (typeof canvas === 'string') {
-          canvas = window.document.querySelector(canvas);
-        }
-        return new GLContext(canvas);
-      }
-    }]);
-    return GLContext;
-  }();
-
-  GLContext._instances = new Object();
-
-  var GLBoostObject = function () {
-    function GLBoostObject() {
-      babelHelpers.classCallCheck(this, GLBoostObject);
-
-      if (this.constructor === GLBoostObject) {
-        throw new TypeError('Cannot construct GLBoostObject instances directly.');
-      }
-      this._setName();
-      this._glBoostMonitor = GLBoostMonitor.getInstance();
-      this._glBoostMonitor.registerGLBoostObject(this);
-      this._userFlavorName = '';
-      this._readyForDiscard = false;
-    }
-
-    babelHelpers.createClass(GLBoostObject, [{
-      key: '_setName',
-      value: function _setName() {
-        this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
-        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
-      }
-
-      /**
-       * [en] Return instance name.
-       * [ja] インスタンス名を返します。
-       * @returns {string} [en] the instance name. [ja] インスタンス名
-       */
-
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this._instanceName;
-      }
-    }, {
-      key: 'readyForDiscard',
-      value: function readyForDiscard() {
-        this._readyForDiscard = true;
-        this._glBoostMonitor.deregisterGLBoostObject(this);
-      }
-    }, {
-      key: 'userFlavorName',
-      set: function set(name) {
-        this._userFlavorName = name;
-      },
-      get: function get() {
-        return this._userFlavorName;
-      }
-    }, {
-      key: 'instanceNameWithUserFlavor',
-      get: function get() {
-        this._instanceName + '_' + this._userFlavorName;
-      }
-    }, {
-      key: 'isReadyForDiscard',
-      get: function get() {
-        return this._readyForDiscard;
-      }
-    }]);
-    return GLBoostObject;
-  }();
-
-  /**
-   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
-   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var AbstractTexture = function (_GLBoostObject) {
-    babelHelpers.inherits(AbstractTexture, _GLBoostObject);
-
-
-    /**
-     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
-     *
-     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-
-    function AbstractTexture() {
-      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
-      babelHelpers.classCallCheck(this, AbstractTexture);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractTexture).call(this));
-
-      if (_this.constructor === AbstractTexture) {
-        throw new TypeError('Cannot construct AbstractTexture instances directly.');
-      }
-
-      _this._glContext = GLContext.getInstance(canvas);
-      _this._name = '';
-      return _this;
-    }
-
-    /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
-     *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
-     */
-
-
-    babelHelpers.createClass(AbstractTexture, [{
-      key: 'setUp',
-
-
-      /**
-       * [en] bind the texture. <br />
-       * [ja] テクスチャをバインドします。
-       */
-      value: function setUp() {
-        var gl = this._glContext.gl;
-        if (this._texture === null) {
-          return false;
-        }
-        gl.bindTexture(gl.TEXTURE_2D, this._texture);
-
-        return true;
-      }
-
-      /**
-       * [en] unbind the texture. <br />
-       * [ja] テクスチャをバインド解除します。
-       */
-
-    }, {
-      key: 'tearDown',
-      value: function tearDown() {
-        var gl = this._glContext.gl;
-        gl.bindTexture(gl.TEXTURE_2D, null);
-      }
-    }, {
-      key: '_isPowerOfTwo',
-
-
-      /**
-       * [en] check whether or not this texture size is power of two. <br />
-       * [ja] テクスチャサイズが２の累乗かどうかを返します
-       *
-       * @param {number} x [en] texture size. [ja] テクスチャサイズ
-       * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
-       */
-      value: function _isPowerOfTwo(x) {
-        return (x & x - 1) == 0;
-      }
-    }, {
-      key: 'glTextureResource',
-      get: function get() {
-        return this._texture;
-      }
-    }, {
-      key: 'name',
-      set: function set(name) {
-        this._name = name;
-      },
-      get: function get() {
-        return this._name;
-      }
-    }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      }
-    }]);
-    return AbstractTexture;
-  }(GLBoostObject);
-
-  GLBoost$1['AbstractTexture'] = AbstractTexture;
-
-  var MutableTexture = function (_AbstractTexture) {
-    babelHelpers.inherits(MutableTexture, _AbstractTexture);
-
-    function MutableTexture(width, height) {
-      var level = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
-      var internalFormat = arguments.length <= 3 || arguments[3] === undefined ? 0x1908 : arguments[3];
-      var format = arguments.length <= 4 || arguments[4] === undefined ? 0x1908 : arguments[4];
-      var type = arguments.length <= 5 || arguments[5] === undefined ? 0x1401 : arguments[5];
-      var magFileter = arguments.length <= 6 || arguments[6] === undefined ? 0x2601 : arguments[6];
-      var minFilter = arguments.length <= 7 || arguments[7] === undefined ? 0x2601 : arguments[7];
-      var wrapS = arguments.length <= 8 || arguments[8] === undefined ? 0x812F : arguments[8];
-      var wrapT = arguments.length <= 9 || arguments[9] === undefined ? 0x812F : arguments[9];
-      var canvas = arguments.length <= 10 || arguments[10] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[10];
-      babelHelpers.classCallCheck(this, MutableTexture);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MutableTexture).call(this, canvas));
-
-      _this._isTextureReady = false;
-      _this._texture = null;
-      _this._width = width;
-      _this._height = height;
-      _this._fbo = null;
-      _this._colorAttachmentId = null;
-      _this._depthAttachmentId = null;
-
-      var gl = _this._glContext.gl;
-
-      //var glem = GLExtensionsManager.getInstance(gl);
-
-      _this._texture = _this._glContext.createTexture(_this);
-      gl.bindTexture(gl.TEXTURE_2D, _this._texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFileter);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
-      gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, 0, format, type, null);
-      gl.bindTexture(gl.TEXTURE_2D, null);
-
-      return _this;
-    }
-
-    babelHelpers.createClass(MutableTexture, [{
-      key: 'colorAttachment',
-      set: function set(attachmentId) {
-        this._colorAttachmentId = attachmentId;
-      },
-      get: function get() {
-        return this._colorAttachmentId;
-      }
-    }, {
-      key: 'depthAttachment',
-      set: function set(attachmentId) {
-        this._depthAttachmentId = attachmentId;
-      },
-      get: function get() {
-        return this._depthAttachmentId;
-      }
-    }, {
-      key: 'frameBufferObject',
-      set: function set(fbo) {
-        this._fbo = fbo;
-      },
-      get: function get() {
-        return this._fbo;
-      }
-    }]);
-    return MutableTexture;
-  }(AbstractTexture);
-
-  GLBoost$1['MutableTexture'] = MutableTexture;
-
   var Vector4 = function () {
     function Vector4(x, y, z, w) {
       babelHelpers.classCallCheck(this, Vector4);
@@ -2315,6 +1594,250 @@
     return AnimationUtil;
   }();
 
+  var MiscUtil = function () {
+    function MiscUtil() {
+      babelHelpers.classCallCheck(this, MiscUtil);
+    }
+
+    babelHelpers.createClass(MiscUtil, null, [{
+      key: 'isDefinedAndTrue',
+      value: function isDefinedAndTrue(value) {
+        if (typeof value !== 'undefined' && value) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'consoleLog',
+      value: function consoleLog(text) {
+        if (GLBoost$1.CONSOLE_OUT_FOR_DEBUGGING) {
+          console.log(text);
+        }
+      }
+    }]);
+    return MiscUtil;
+  }();
+
+  var singleton$3 = Symbol();
+  var singletonEnforcer$2 = Symbol();
+
+  var GLBoostMonitor = function () {
+    function GLBoostMonitor(enforcer) {
+      babelHelpers.classCallCheck(this, GLBoostMonitor);
+
+      if (enforcer !== singletonEnforcer$2) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+
+      this._glBoostObjects = {};
+      this._glResources = [];
+    }
+
+    babelHelpers.createClass(GLBoostMonitor, [{
+      key: 'registerGLBoostObject',
+      value: function registerGLBoostObject(glBoostObject) {
+        this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
+      }
+    }, {
+      key: 'deregisterGLBoostObject',
+      value: function deregisterGLBoostObject(glBoostObject) {
+        delete this._glBoostObjects[glBoostObject.toString()];
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
+      }
+    }, {
+      key: 'printGLBoostObjects',
+      value: function printGLBoostObjects() {
+        var objects = this._glBoostObjects;
+        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+        for (var key in objects) {
+          if (objects.hasOwnProperty(key)) {
+            MiscUtil.consoleLog(key);
+          }
+        }
+        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+      }
+    }, {
+      key: 'printGLBoostObjectsOrderByName',
+      value: function printGLBoostObjectsOrderByName() {
+        var objects = this._glBoostObjects;
+        var objectArray = [];
+        for (var key in objects) {
+          if (objects.hasOwnProperty(key)) {
+            objectArray.push(key);
+          }
+        }
+        objectArray.sort(function (a, b) {
+          if (a < b) return -1;
+          if (a > b) return 1;
+          return 0;
+        });
+        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+        objectArray.forEach(function (object) {
+          MiscUtil.consoleLog(object);
+        });
+        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+      }
+    }, {
+      key: 'registerWebGLResource',
+      value: function registerWebGLResource(glBoostObject, glResource) {
+        var glResourceName = glResource.constructor.name;
+        var glBoostObjectName = glBoostObject.toString();
+        this._glResources.push([glBoostObjectName, glResourceName]);
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+      }
+    }, {
+      key: 'deregisterWebGLResource',
+      value: function deregisterWebGLResource(glBoostObject, glResource) {
+        var _this = this;
+
+        var glResourceName = glResource.constructor.name;
+        var glBoostObjectName = glBoostObject.toString();
+
+        this._glResources.forEach(function (glResource, i) {
+          if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
+            _this._glResources.splice(i, 1);
+          }
+        });
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
+      }
+    }, {
+      key: 'printWebGLResources',
+      value: function printWebGLResources() {
+        var glResources = this._glResources;
+        glResources.sort(function (a, b) {
+          if (a[0] < b[0]) return -1;
+          if (a[0] > b[0]) return 1;
+          return 0;
+        });
+        MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
+        glResources.forEach(function (glResource, i) {
+          MiscUtil.consoleLog(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
+        });
+        MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
+      }
+    }, {
+      key: 'printHierarchy',
+      value: function printHierarchy() {
+        var glBoostObjects = this._glBoostObjects;
+        var scenes = [];
+        for (var key in glBoostObjects) {
+          if (glBoostObjects.hasOwnProperty(key)) {
+            if (key.match(/Scene/)) {
+              scenes.push(glBoostObjects[key]);
+            }
+          }
+        }
+
+        function putWhiteSpace(level) {
+          var str = '';
+          for (var i = 0; i < level; i++) {
+            str += '  ';
+          }
+          return str;
+        }
+
+        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
+        scenes.forEach(function (scene) {
+          var outputText = function searchRecursively(element, level) {
+            var outputText = '';
+            outputText += putWhiteSpace(level) + element.toString() + '\n';
+            if (typeof element.getChildren === 'undefined') {
+              return outputText;
+            }
+            var children = element.getChildren();
+            children.forEach(function (child) {
+              outputText += searchRecursively(child, level + 1);
+            });
+            return outputText += '\n';
+          }(scene, 0);
+
+          outputText = outputText.replace(/\n+/g, '\n');
+          MiscUtil.consoleLog(outputText);
+        });
+        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton$3]) {
+          this[singleton$3] = new GLBoostMonitor(singletonEnforcer$2);
+        }
+        return this[singleton$3];
+      }
+    }]);
+    return GLBoostMonitor;
+  }();
+
+  GLBoost['GLBoostMonitor'] = GLBoostMonitor;
+
+  var GLBoostObject = function () {
+    function GLBoostObject(glContext) {
+      babelHelpers.classCallCheck(this, GLBoostObject);
+
+      if (this.constructor === GLBoostObject) {
+        throw new TypeError('Cannot construct GLBoostObject instances directly.');
+      }
+      this._setName();
+      this._glContext = glContext;
+      this._glBoostMonitor = GLBoostMonitor.getInstance();
+      this._glBoostMonitor.registerGLBoostObject(this);
+      this._userFlavorName = '';
+      this._readyForDiscard = false;
+    }
+
+    babelHelpers.createClass(GLBoostObject, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+
+      /**
+       * [en] Return instance name.
+       * [ja] インスタンス名を返します。
+       * @returns {string} [en] the instance name. [ja] インスタンス名
+       */
+
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
+      }
+    }, {
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        this._readyForDiscard = true;
+        this._glBoostMonitor.deregisterGLBoostObject(this);
+      }
+    }, {
+      key: 'belongingCanvasId',
+      get: function get() {
+        return this._glContext.canvas.id;
+      }
+    }, {
+      key: 'userFlavorName',
+      set: function set(name) {
+        this._userFlavorName = name;
+      },
+      get: function get() {
+        return this._userFlavorName;
+      }
+    }, {
+      key: 'instanceNameWithUserFlavor',
+      get: function get() {
+        this._instanceName + '_' + this._userFlavorName;
+      }
+    }, {
+      key: 'isReadyForDiscard',
+      get: function get() {
+        return this._readyForDiscard;
+      }
+    }]);
+    return GLBoostObject;
+  }();
+
   var Element = function (_GLBoostObject) {
     babelHelpers.inherits(Element, _GLBoostObject);
 
@@ -3092,6 +2615,307 @@
 
   GLBoost$1['Group'] = Group;
 
+  var GLContextImpl = function () {
+    function GLContextImpl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextImpl);
+
+      //    if (new.target === GLContextImpl) {
+      if (this.constructor === GLContextImpl) {
+        throw new TypeError("Cannot construct GLContextImpl instances directly");
+      }
+
+      if (!(parent instanceof GLContext)) {
+        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+      }
+
+      if (canvas === void 0) {
+        throw new Error("Failed to create WebGL Context due to no canvas object.");
+      }
+
+      this._canvas = canvas;
+    }
+
+    babelHelpers.createClass(GLContextImpl, [{
+      key: "init",
+      value: function init(glVersionString, ContextType) {
+
+        var gl = this._canvas.getContext(glVersionString);
+
+        if (!gl) {
+          gl = this._canvas.getContext('experimental-' + glVersionString);
+          if (!gl) {
+            throw new Error("This platform doesn't support WebGL.");
+          }
+        }
+
+        if (!gl instanceof ContextType) {
+          throw new Error("Unexpected rendering context.");
+        }
+
+        this._gl = gl;
+      }
+    }, {
+      key: "gl",
+      get: function get() {
+        return this._gl;
+      }
+    }, {
+      key: "canvas",
+      get: function get() {
+        return this._canvas;
+      }
+    }]);
+    return GLContextImpl;
+  }();
+
+  var GLContextWebGL2Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+    function GLContextWebGL2Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
+
+      return _this;
+    }
+
+    return GLContextWebGL2Impl;
+  }(GLContextImpl);
+
+  var GLContextWebGL1Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+
+    function GLContextWebGL1Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
+
+      return _this;
+    }
+
+    return GLContextWebGL1Impl;
+  }(GLContextImpl);
+
+  var GLExtensionsManager = function () {
+    function GLExtensionsManager(glContext) {
+      babelHelpers.classCallCheck(this, GLExtensionsManager);
+
+      var gl = glContext.gl;
+      if (GLExtensionsManager._instances[glContext.canvas.id]) {
+        return GLExtensionsManager._instances[glContext.canvas.id];
+      }
+
+      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
+        this._extVAO = gl.getExtension('OES_vertex_array_object');
+
+        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
+
+        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
+
+        this._extEIUI = gl.getExtension('OES_element_index_uint');
+      }
+
+      GLExtensionsManager._instances[glContext.canvas.id] = this;
+    }
+
+    babelHelpers.createClass(GLExtensionsManager, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          return gl.createVertexArray();
+        } else if (this._extVAO) {
+          return this._extVAO.createVertexArrayOES();
+        } else {
+          return null;
+        }
+      }
+    }, {
+      key: 'bindVertexArray',
+      value: function bindVertexArray(gl, vao) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.bindVertexArray(vao);
+          return true;
+        } else if (this._extVAO) {
+          this._extVAO.bindVertexArrayOES(vao);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'drawBuffers',
+      value: function drawBuffers(gl, buffers) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.drawBuffers(buffers);
+          return true;
+        } else if (this._extDBs) {
+          this.extDBs.drawBuffersWEBGL(buffers);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'colorAttachiment',
+      value: function colorAttachiment(gl, index) {
+        return this._extDBs ? this._extDBs['COLOR_ATTACHMENT' + index + '_WEBGL'] : gl['COLOR_ATTACHMENT' + index];
+      }
+    }, {
+      key: 'elementIndexBitSize',
+      value: function elementIndexBitSize(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return gl.UNSIGNED_INT;
+        } else {
+          return gl.UNSIGNED_SHORT;
+        }
+      }
+    }, {
+      key: 'createUintArrayForElementIndex',
+      value: function createUintArrayForElementIndex(gl, array) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return new Uint32Array(array);
+        } else {
+          return new Uint16Array(array);
+        }
+      }
+    }, {
+      key: 'extVAO',
+      get: function get() {
+        return this._extVAO;
+      }
+    }, {
+      key: 'extDBs',
+      get: function get() {
+        return this._extDBs;
+      }
+    }, {
+      key: 'extTFA',
+      get: function get() {
+        return this._extTFA;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(gl) {
+        return new GLExtensionsManager(gl);
+      }
+    }]);
+    return GLExtensionsManager;
+  }();
+
+  GLExtensionsManager._instances = new Object();
+
+  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
+
+  var GLContext = function () {
+    function GLContext(canvas) {
+      babelHelpers.classCallCheck(this, GLContext);
+
+      if (GLContext._instances[canvas.id] instanceof GLContext) {
+        return GLContext._instances[canvas.id];
+      }
+
+      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+        this.impl = new GLContextWebGL1Impl(canvas, this);
+      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+        this.impl = new GLContextWebGL2Impl(canvas, this);
+      }
+
+      GLContext._instances[canvas.id] = this;
+      this._monitor = GLBoostMonitor.getInstance();
+    }
+
+    babelHelpers.createClass(GLContext, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(glBoostObject) {
+        var gl = this.gl;
+        var glem = GLExtensionsManager.getInstance(this);
+        var glResource = glem.createVertexArray(gl);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createBuffer',
+      value: function createBuffer(glBoostObject) {
+        var glResource = this.gl.createBuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createFramebuffer',
+      value: function createFramebuffer(glBoostObject) {
+        var glResource = this.gl.createFramebuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createRenderbuffer',
+      value: function createRenderbuffer(glBoostObject) {
+        var glResource = this.gl.createRenderbuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createShader',
+      value: function createShader(glBoostObject, shaderType) {
+        var glResource = this.gl.createShader(shaderType);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteShader',
+      value: function deleteShader(glBoostObject, shader) {
+        this._monitor.deregisterWebGLResource(glBoostObject, shader);
+        this.gl.deleteShader(shader);
+        shader = null;
+      }
+    }, {
+      key: 'createProgram',
+      value: function createProgram(glBoostObject) {
+        var glResource = this.gl.createProgram();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteProgram',
+      value: function deleteProgram(glBoostObject, program) {
+        this._monitor.deregisterWebGLResource(glBoostObject, program);
+        this.gl.deleteProgram(program);
+      }
+    }, {
+      key: 'createTexture',
+      value: function createTexture(glBoostObject) {
+        var glResource = this.gl.createTexture();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'gl',
+      get: function get() {
+        return this.impl.gl;
+      }
+    }, {
+      key: 'canvas',
+      get: function get() {
+        return this.impl.canvas;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(canvas) {
+        if (typeof canvas === 'string') {
+          canvas = window.document.querySelector(canvas);
+        }
+        return new GLContext(canvas);
+      }
+    }]);
+    return GLContext;
+  }();
+
+  GLContext._instances = new Object();
+
   var RenderPath = function (_GLBoostObject) {
     babelHelpers.inherits(RenderPath, _GLBoostObject);
 
@@ -3272,36 +3096,212 @@
 
   GLBoost$1['RenderPath'] = RenderPath;
 
-  var singleton$1 = Symbol();
-  var singletonEnforcer = Symbol();
+  /**
+   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
+   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
 
-  var GLBoostLowContext = function () {
-    function GLBoostLowContext(enforcer) {
-      babelHelpers.classCallCheck(this, GLBoostLowContext);
+  var AbstractTexture = function (_GLBoostObject) {
+    babelHelpers.inherits(AbstractTexture, _GLBoostObject);
 
-      if (enforcer !== singletonEnforcer) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+
+    /**
+     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
+     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     *
+     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+
+    function AbstractTexture() {
+      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[0];
+      babelHelpers.classCallCheck(this, AbstractTexture);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractTexture).call(this));
+
+      if (_this.constructor === AbstractTexture) {
+        throw new TypeError('Cannot construct AbstractTexture instances directly.');
       }
+
+      _this._glContext = GLContext.getInstance(canvas);
+      _this._name = '';
+      return _this;
     }
 
-    babelHelpers.createClass(GLBoostLowContext, [{
-      key: 'createTexturesForRenderTarget',
+    /**
+     * [en] get the WebGL texture resource within this class. <br />
+     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     *
+     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     */
+
+
+    babelHelpers.createClass(AbstractTexture, [{
+      key: 'setUp',
 
 
       /**
-       * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
-       * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
-       * @param {number} width en: width of texture. ja: テクスチャの幅
-       * @param {number} height en: height of texture. ja: テクスチャの高さ
-       * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
-       * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-       * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+       * [en] bind the texture. <br />
+       * [ja] テクスチャをバインドします。
        */
-      value: function createTexturesForRenderTarget(width, height, textureNum) {
-        var canvas = arguments.length <= 3 || arguments[3] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[3];
+      value: function setUp() {
+        var gl = this._glContext.gl;
+        if (this._texture === null) {
+          return false;
+        }
+        gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
-        var glContext = GLContext.getInstance(canvas);
+        return true;
+      }
+
+      /**
+       * [en] unbind the texture. <br />
+       * [ja] テクスチャをバインド解除します。
+       */
+
+    }, {
+      key: 'tearDown',
+      value: function tearDown() {
+        var gl = this._glContext.gl;
+        gl.bindTexture(gl.TEXTURE_2D, null);
+      }
+    }, {
+      key: '_isPowerOfTwo',
+
+
+      /**
+       * [en] check whether or not this texture size is power of two. <br />
+       * [ja] テクスチャサイズが２の累乗かどうかを返します
+       *
+       * @param {number} x [en] texture size. [ja] テクスチャサイズ
+       * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+       */
+      value: function _isPowerOfTwo(x) {
+        return (x & x - 1) == 0;
+      }
+    }, {
+      key: 'glTextureResource',
+      get: function get() {
+        return this._texture;
+      }
+    }, {
+      key: 'name',
+      set: function set(name) {
+        this._name = name;
+      },
+      get: function get() {
+        return this._name;
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      }
+    }]);
+    return AbstractTexture;
+  }(GLBoostObject);
+
+  GLBoost$1['AbstractTexture'] = AbstractTexture;
+
+  var MutableTexture = function (_AbstractTexture) {
+    babelHelpers.inherits(MutableTexture, _AbstractTexture);
+
+    function MutableTexture(width, height) {
+      var level = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+      var internalFormat = arguments.length <= 3 || arguments[3] === undefined ? 0x1908 : arguments[3];
+      var format = arguments.length <= 4 || arguments[4] === undefined ? 0x1908 : arguments[4];
+      var type = arguments.length <= 5 || arguments[5] === undefined ? 0x1401 : arguments[5];
+      var magFileter = arguments.length <= 6 || arguments[6] === undefined ? 0x2601 : arguments[6];
+      var minFilter = arguments.length <= 7 || arguments[7] === undefined ? 0x2601 : arguments[7];
+      var wrapS = arguments.length <= 8 || arguments[8] === undefined ? 0x812F : arguments[8];
+      var wrapT = arguments.length <= 9 || arguments[9] === undefined ? 0x812F : arguments[9];
+      var canvas = arguments.length <= 10 || arguments[10] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[10];
+      babelHelpers.classCallCheck(this, MutableTexture);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MutableTexture).call(this, canvas));
+
+      _this._isTextureReady = false;
+      _this._texture = null;
+      _this._width = width;
+      _this._height = height;
+      _this._fbo = null;
+      _this._colorAttachmentId = null;
+      _this._depthAttachmentId = null;
+
+      var gl = _this._glContext.gl;
+
+      //var glem = GLExtensionsManager.getInstance(gl);
+
+      _this._texture = _this._glContext.createTexture(_this);
+      gl.bindTexture(gl.TEXTURE_2D, _this._texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFileter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+      gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, 0, format, type, null);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+
+      return _this;
+    }
+
+    babelHelpers.createClass(MutableTexture, [{
+      key: 'colorAttachment',
+      set: function set(attachmentId) {
+        this._colorAttachmentId = attachmentId;
+      },
+      get: function get() {
+        return this._colorAttachmentId;
+      }
+    }, {
+      key: 'depthAttachment',
+      set: function set(attachmentId) {
+        this._depthAttachmentId = attachmentId;
+      },
+      get: function get() {
+        return this._depthAttachmentId;
+      }
+    }, {
+      key: 'frameBufferObject',
+      set: function set(fbo) {
+        this._fbo = fbo;
+      },
+      get: function get() {
+        return this._fbo;
+      }
+    }]);
+    return MutableTexture;
+  }(AbstractTexture);
+
+  GLBoost$1['MutableTexture'] = MutableTexture;
+
+  var GLBoostLowContext = function () {
+    function GLBoostLowContext(canvas) {
+      babelHelpers.classCallCheck(this, GLBoostLowContext);
+
+      this._glContext = GLContext.getInstance(canvas);
+    }
+
+    /**
+     * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
+     * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
+     * @param {number} width en: width of texture. ja: テクスチャの幅
+     * @param {number} height en: height of texture. ja: テクスチャの高さ
+     * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+     */
+
+
+    babelHelpers.createClass(GLBoostLowContext, [{
+      key: 'createTexturesForRenderTarget',
+      value: function createTexturesForRenderTarget(width, height, textureNum) {
+        var glContext = this._glContext;
         var gl = glContext.gl;
+        var canvas = glContext.canvas;
 
         var glem = GLExtensionsManager.getInstance(glContext);
 
@@ -3340,9 +3340,8 @@
     }, {
       key: 'createDepthTexturesForRenderTarget',
       value: function createDepthTexturesForRenderTarget(width, height) {
-        var canvas = arguments.length <= 2 || arguments[2] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[2];
+        var glContext = this._glContext;
 
-        var glContext = GLContext.getInstance(canvas);
         var gl = glContext.gl;
 
         var glem = GLExtensionsManager.getInstance(glContext);
@@ -3353,7 +3352,7 @@
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
 
-        var depthTexture = new MutableTexture(fbo.width, fbo.height, canvas);
+        var depthTexture = new MutableTexture(fbo.width, fbo.height);
         depthTexture.fbo = fbo;
 
         // Attach Buffers
@@ -3366,40 +3365,24 @@
 
         return depthTexture;
       }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton$1]) {
-          this[singleton$1] = new GLBoostLowContext(singletonEnforcer);
-        }
-        return this[singleton$1];
-      }
     }]);
     return GLBoostLowContext;
   }();
 
   GLBoost['GLBoostLowContext'] = GLBoostLowContext;
 
-  var singleton = Symbol();
-
   var GLBoostMiddleContext = function (_GLBoostContext) {
     babelHelpers.inherits(GLBoostMiddleContext, _GLBoostContext);
 
-    function GLBoostMiddleContext(enforcer) {
+    function GLBoostMiddleContext(canvas) {
       babelHelpers.classCallCheck(this, GLBoostMiddleContext);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLBoostMiddleContext).call(this, enforcer));
-
-      _this._glBoostObjects = {};
-      return _this;
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLBoostMiddleContext).call(this, canvas));
     }
 
     babelHelpers.createClass(GLBoostMiddleContext, [{
       key: 'createRenderPaths',
       value: function createRenderPaths(number) {
-        var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[1];
-
-        var glContext = GLContext.getInstance(canvas);
+        var glContext = this._glContext;
 
         var renderPaths = [];
         for (var i = 0; i < number; i++) {
@@ -3407,14 +3390,6 @@
         }
 
         return renderPaths;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton]) {
-          this[singleton] = new GLBoostMiddleContext(singletonEnforcer);
-        }
-        return this[singleton];
       }
     }]);
     return GLBoostMiddleContext;
@@ -4142,14 +4117,14 @@
 
   GLBoost$1["DirectionalLight"] = DirectionalLight;
 
-  var singleton$5 = Symbol();
-  var singletonEnforcer$4 = Symbol();
+  var singleton$4 = Symbol();
+  var singletonEnforcer$3 = Symbol();
 
   var DrawKickerLocal = function () {
     function DrawKickerLocal(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerLocal);
 
-      if (enforcer !== singletonEnforcer$4) {
+      if (enforcer !== singletonEnforcer$3) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -4260,10 +4235,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$5]) {
-          this[singleton$5] = new DrawKickerLocal(singletonEnforcer$4);
+        if (!this[singleton$4]) {
+          this[singleton$4] = new DrawKickerLocal(singletonEnforcer$3);
         }
-        return this[singleton$5];
+        return this[singleton$4];
       }
     }]);
     return DrawKickerLocal;
@@ -4365,14 +4340,14 @@
 
   GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
-  var singleton$6 = Symbol();
-  var singletonEnforcer$5 = Symbol();
+  var singleton$5 = Symbol();
+  var singletonEnforcer$4 = Symbol();
 
   var DrawKickerWorld = function () {
     function DrawKickerWorld(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerWorld);
 
-      if (enforcer !== singletonEnforcer$5) {
+      if (enforcer !== singletonEnforcer$4) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -4481,10 +4456,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$6]) {
-          this[singleton$6] = new DrawKickerWorld(singletonEnforcer$5);
+        if (!this[singleton$5]) {
+          this[singleton$5] = new DrawKickerWorld(singletonEnforcer$4);
         }
-        return this[singleton$6];
+        return this[singleton$5];
       }
     }]);
     return DrawKickerWorld;
@@ -6667,8 +6642,8 @@
 
   GLBoost['HalfLambertShader'] = HalfLambertShader;
 
-  var singleton$2 = Symbol();
-  var singletonEnforcer$1 = Symbol();
+  var singleton$1 = Symbol();
+  var singletonEnforcer = Symbol();
 
   /**
    * [en] This is a loader class of Obj file format.<br>
@@ -6686,7 +6661,7 @@
     function ObjLoader(enforcer) {
       babelHelpers.classCallCheck(this, ObjLoader);
 
-      if (enforcer !== singletonEnforcer$1) {
+      if (enforcer !== singletonEnforcer) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -7326,10 +7301,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$2]) {
-          this[singleton$2] = new ObjLoader(singletonEnforcer$1);
+        if (!this[singleton$1]) {
+          this[singleton$1] = new ObjLoader(singletonEnforcer);
         }
-        return this[singleton$2];
+        return this[singleton$1];
       }
     }]);
     return ObjLoader;
@@ -8258,8 +8233,8 @@
 
   GLBoost$1['SkeletalGeometry'] = SkeletalGeometry;
 
-  var singleton$3 = Symbol();
-  var singletonEnforcer$2 = Symbol();
+  var singleton$2 = Symbol();
+  var singletonEnforcer$1 = Symbol();
 
   /**
    * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
@@ -8277,7 +8252,7 @@
     function GLTFLoader(enforcer) {
       babelHelpers.classCallCheck(this, GLTFLoader);
 
-      if (enforcer !== singletonEnforcer$2) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -8695,10 +8670,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$3]) {
-          this[singleton$3] = new GLTFLoader(singletonEnforcer$2);
+        if (!this[singleton$2]) {
+          this[singleton$2] = new GLTFLoader(singletonEnforcer$1);
         }
-        return this[singleton$3];
+        return this[singleton$2];
       }
     }]);
     return GLTFLoader;
