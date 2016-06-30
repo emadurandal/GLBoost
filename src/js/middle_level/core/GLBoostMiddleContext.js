@@ -1,4 +1,4 @@
-import GLBoostContext, {singletonEnforcer} from '../../low_level/core/GLBoostContext';
+import GLBoostContext, {singletonEnforcer} from '../../low_level/core/GLBoostLowContext';
 import GLContext from '../../low_level/core/GLContext';
 import MutableTexture from '../../low_level/textures/MutableTexture';
 import RenderPath from '../expressions/RenderPath';

@@ -6,7 +6,7 @@ import RenderPath from '../../middle_level/expressions/RenderPath';
 let singleton = Symbol();
 export var singletonEnforcer = Symbol();
 
-export default class GLBoostContext {
+export default class GLBoostLowContext {
   constructor(enforcer) {
     if (enforcer !== singletonEnforcer) {
       throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
@@ -15,7 +15,7 @@ export default class GLBoostContext {
 
   static getInstance() {
     if (!this[singleton]) {
-      this[singleton] = new GLBoostContext(singletonEnforcer);
+      this[singleton] = new GLBoostLowContext(singletonEnforcer);
     }
     return this[singleton];
   }
@@ -37,7 +37,7 @@ export default class GLBoostContext {
     var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = glContext.createFramebuffer(GLBoostContext.name);
+    var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -50,7 +50,7 @@ export default class GLBoostContext {
     }
 
     // Create RenderBuffer
-    var renderbuffer = glContext.createRenderbuffer(GLBoostContext.name);
+    var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -76,7 +76,7 @@ export default class GLBoostContext {
     var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = glContext.createFramebuffer(GLBoostContext.name);
+    var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -97,4 +97,4 @@ export default class GLBoostContext {
 
 }
 
-GLBoost['GLBoostContext'] = GLBoostContext;
+GLBoost['GLBoostLowContext'] = GLBoostLowContext;

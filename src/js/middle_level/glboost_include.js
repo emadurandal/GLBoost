@@ -4,7 +4,7 @@ import Scene from './Scene';
 import Vector2 from '../low_level/math/Vector2';
 import Vector3 from '../low_level/math/Vector3';
 import Vector4 from '../low_level/math/Vector4';
-import GLBoostContext from '../low_level/core/GLBoostContext';
+import GLBoostContext from '../low_level/core/GLBoostLowContext';
 import ClassicMaterial from '../low_level/ClassicMaterial';
 import Texture from '../low_level/textures/Texture';
 import Camera from '../low_level/Camera';

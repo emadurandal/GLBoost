@@ -3275,16 +3275,16 @@
   var singleton$1 = Symbol();
   var singletonEnforcer = Symbol();
 
-  var GLBoostContext = function () {
-    function GLBoostContext(enforcer) {
-      babelHelpers.classCallCheck(this, GLBoostContext);
+  var GLBoostLowContext = function () {
+    function GLBoostLowContext(enforcer) {
+      babelHelpers.classCallCheck(this, GLBoostLowContext);
 
       if (enforcer !== singletonEnforcer) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
     }
 
-    babelHelpers.createClass(GLBoostContext, [{
+    babelHelpers.createClass(GLBoostLowContext, [{
       key: 'createTexturesForRenderTarget',
 
 
@@ -3306,7 +3306,7 @@
         var glem = GLExtensionsManager.getInstance(glContext);
 
         // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostContext.name);
+        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
@@ -3319,7 +3319,7 @@
         }
 
         // Create RenderBuffer
-        var renderbuffer = glContext.createRenderbuffer(GLBoostContext.name);
+        var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
         gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -3348,7 +3348,7 @@
         var glem = GLExtensionsManager.getInstance(glContext);
 
         // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostContext.name);
+        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
@@ -3370,15 +3370,15 @@
       key: 'getInstance',
       value: function getInstance() {
         if (!this[singleton$1]) {
-          this[singleton$1] = new GLBoostContext(singletonEnforcer);
+          this[singleton$1] = new GLBoostLowContext(singletonEnforcer);
         }
         return this[singleton$1];
       }
     }]);
-    return GLBoostContext;
+    return GLBoostLowContext;
   }();
 
-  GLBoost['GLBoostContext'] = GLBoostContext;
+  GLBoost['GLBoostLowContext'] = GLBoostLowContext;
 
   var singleton = Symbol();
 
@@ -3418,7 +3418,7 @@
       }
     }]);
     return GLBoostMiddleContext;
-  }(GLBoostContext);
+  }(GLBoostLowContext);
 
   GLBoost['GLBoostMiddleContext'] = GLBoostMiddleContext;
 
