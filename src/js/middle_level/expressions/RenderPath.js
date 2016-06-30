@@ -110,9 +110,11 @@ export default class RenderPath extends GLBoostObject {
     };
 
     this._meshes = [];
-    this._scene.getChildren().forEach((elm)=> {
-      this._meshes = this._meshes.concat(collectMeshes(elm));
-    });
+    if (this._scene) {
+      this._scene.getChildren().forEach((elm)=> {
+        this._meshes = this._meshes.concat(collectMeshes(elm));
+      });
+    }
 
     this._opacityMeshes = [];
     this._transparentMeshes = [];
@@ -124,7 +126,9 @@ export default class RenderPath extends GLBoostObject {
       }
     });
 
-    this._scene.prepareToRender();
+    if (this._scene) {
+      this._scene.prepareToRender();
+    }
   }
 
   sortTransparentMeshes(camera) {

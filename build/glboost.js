@@ -2979,9 +2979,11 @@
         };
 
         this._meshes = [];
-        this._scene.getChildren().forEach(function (elm) {
-          _this3._meshes = _this3._meshes.concat(collectMeshes(elm));
-        });
+        if (this._scene) {
+          this._scene.getChildren().forEach(function (elm) {
+            _this3._meshes = _this3._meshes.concat(collectMeshes(elm));
+          });
+        }
 
         this._opacityMeshes = [];
         this._transparentMeshes = [];
@@ -2993,7 +2995,9 @@
           }
         });
 
-        this._scene.prepareToRender();
+        if (this._scene) {
+          this._scene.prepareToRender();
+        }
       }
     }, {
       key: 'sortTransparentMeshes',
@@ -5038,6 +5042,9 @@
         var _this2 = this;
 
         expression.renderPaths.forEach(function (renderPath) {
+          if (!renderPath.scene) {
+            return;
+          }
 
           var camera = false;
           renderPath.scene.cameras.forEach(function (elm) {

@@ -40,6 +40,9 @@ export default class Renderer extends GLBoostObject {
    */
   draw(expression) {
     expression.renderPaths.forEach((renderPath)=>{
+      if (!renderPath.scene) {
+        return;
+      }
 
       var camera = false;
       renderPath.scene.cameras.forEach((elm)=> {
