@@ -104,12 +104,12 @@ var geometry = glBoostContext.createSphere(20, 24, 24, null);
 // set Sphere geometry and material to make a Mesh.
 var earth = glBoostContext.createMesh(geometry, material);
 // add the earth mesh to the scene
-scene.add(earth);
+scene.addChild(earth);
 
 // make a directonal light
 var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 // add the light to the scene
-scene.add( directionalLight );
+scene.addChild( directionalLight );
 
 // setup camera
 var camera = glBoostContext.createCamera({
@@ -123,7 +123,7 @@ var camera = glBoostContext.createCamera({
   zFar: 1000.0
 });
 // add the camera to the scene
-scene.add(camera);
+scene.addChild(camera);
 
 // call this method before rendering
 scene.prepareForRender();
