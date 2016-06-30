@@ -48,8 +48,8 @@ export default class RenderPath extends GLBoostObject {
     return this._transparentMeshes;
   }
 
-  specifyRenderTargetTextures(renderTargetTextures, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    var gl = GLContext.getInstance(canvas).gl;
+  specifyRenderTargetTextures(renderTargetTextures) {
+    var gl = this._glContext.gl;
 
     if (renderTargetTextures) {
       this._drawBuffers = [];

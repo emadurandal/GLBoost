@@ -13,8 +13,6 @@ export default class Renderer extends GLBoostObject {
     super(glBoostContext);
     var _clearColor = parameters.clearColor;
 
-    GLBoost.CURRENT_CANVAS_ID = '#' + this._glContext.canvas.id;
-
     var gl = this._glContext.gl;
 
     var setDefaultGLStates = function setDefaultGLStates() {

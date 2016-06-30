@@ -2954,9 +2954,7 @@
       value: function specifyRenderTargetTextures(renderTargetTextures) {
         var _this3 = this;
 
-        var canvas = arguments.length <= 1 || arguments[1] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[1];
-
-        var gl = GLContext.getInstance(canvas).gl;
+        var gl = this._glContext.gl;
 
         if (renderTargetTextures) {
           this._drawBuffers = [];
@@ -4960,8 +4958,6 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Renderer).call(this, glBoostContext));
 
       var _clearColor = parameters.clearColor;
-
-      GLBoost$1.CURRENT_CANVAS_ID = '#' + _this._glContext.canvas.id;
 
       var gl = _this._glContext.gl;
 
@@ -7641,12 +7637,10 @@
        * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
        */
       value: function loadObj(glBoostContext, url) {
-        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-
         var _this = this;
 
+        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
         var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
-        var canvas = arguments.length <= 4 || arguments[4] === undefined ? GLBoost$1.CURRENT_CANVAS_ID : arguments[4];
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -7658,7 +7652,7 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              _this._constructMesh(glBoostContext, gotText, basePath, canvas, defaultShader, mtlString, resolve);
+              _this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
             }
           };
 
@@ -7668,8 +7662,8 @@
       }
     }, {
       key: '_loadMaterialsFromString',
-      value: function _loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader) {
-        var basePath = arguments.length <= 4 || arguments[4] === undefined ? '' : arguments[4];
+      value: function _loadMaterialsFromString(glBoostContext, mtlString, defaultShader) {
+        var basePath = arguments.length <= 3 || arguments[3] === undefined ? '' : arguments[3];
 
 
         var mtlTextRows = mtlString.split('\n');
@@ -7741,14 +7735,14 @@
       }
     }, {
       key: '_loadMaterialsFromFile',
-      value: function _loadMaterialsFromFile(glBoostContext, basePath, fileName, canvas, defaultShader) {
+      value: function _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
         var _this2 = this;
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
           xmlHttp.onreadystatechange = function () {
             if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-              resolve(_this2._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, canvas, defaultShader, basePath));
+              resolve(_this2._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, defaultShader, basePath));
             }
           };
 
@@ -7758,7 +7752,7 @@
       }
     }, {
       key: '_constructMesh',
-      value: function _constructMesh(glBoostContext, objText, basePath, canvas, defaultShader, mtlString, resolve) {
+      value: function _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {
         var _this3 = this;
 
         console.log(basePath);
@@ -7773,7 +7767,7 @@
         if (mtlString) {
           promise = function () {
             return new Promise(function (resolve, reject) {
-              resolve(_this3._loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader));
+              resolve(_this3._loadMaterialsFromString(glBoostContext, mtlString, defaultShader));
             });
           }();
         }
@@ -7786,7 +7780,7 @@
 
           // material file
           if (matchArray[1] === "mtllib" && mtlString === null) {
-            promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+            promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + '.mtl', defaultShader);
           }
         }
 

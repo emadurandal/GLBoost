@@ -51,7 +51,7 @@ export default class ObjLoader {
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadObj(glBoostContext, url, defaultShader = null, mtlString = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
+  loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
@@ -62,7 +62,7 @@ export default class ObjLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          this._constructMesh(glBoostContext, gotText, basePath, canvas, defaultShader, mtlString, resolve);
+          this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
         }
       };
 
@@ -71,7 +71,7 @@ export default class ObjLoader {
     });
   }
 
-  _loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader, basePath = '') {
+  _loadMaterialsFromString(glBoostContext, mtlString, defaultShader, basePath = '') {
 
     var mtlTextRows = mtlString.split('\n');
 
@@ -147,12 +147,12 @@ export default class ObjLoader {
     return materials;
   }
 
-  _loadMaterialsFromFile(glBoostContext, basePath, fileName, canvas, defaultShader) {
+  _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
     return new Promise((resolve, reject)=> {
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.onreadystatechange = ()=> {
         if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-          resolve(this._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, canvas, defaultShader, basePath));
+          resolve(this._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, defaultShader, basePath));
         }
       };
 
@@ -161,7 +161,7 @@ export default class ObjLoader {
     });
   }
 
-  _constructMesh(glBoostContext, objText, basePath, canvas, defaultShader, mtlString, resolve) {
+  _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {
 
     console.log(basePath);
 
@@ -175,7 +175,7 @@ export default class ObjLoader {
     if (mtlString) {
       promise = (()=>{
         return new Promise((resolve, reject)=> {
-          resolve(this._loadMaterialsFromString(glBoostContext, mtlString, canvas, defaultShader));
+          resolve(this._loadMaterialsFromString(glBoostContext, mtlString, defaultShader));
         });
       })();
     }
@@ -188,7 +188,7 @@ export default class ObjLoader {
 
       // material file
       if (matchArray[1] === "mtllib" && mtlString === null) {
-        promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + '.mtl', canvas, defaultShader);
+        promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + '.mtl', defaultShader);
       }
     }
 
