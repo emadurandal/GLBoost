@@ -36,9 +36,9 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
 
-        var glBoostContext = GLBoost.GLBoostContext.getInstance();
+        var glBoostContext = layer.glBoostContext;
         var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 1);
-        var renderPaths = glBoostContext.createRenderPasses(2);
+        var renderPaths = glBoostContext.createRenderPaths(2);
 
         var positions = [
           new GLBoost.Vector3(-0.5, -0.5, 0.0),
@@ -77,11 +77,11 @@
           new GLBoost.Vector2(1.0, 0.0)
         ];
 
-        var geometry = new GLBoost.BlendShapeGeometry();
-        var texture = new GLBoost.Texture('resources/texture.png');
-        var material = new GLBoost.ClassicMaterial();
+        var geometry = glBoostContext.createBlendShapeGeometry();
+        var texture = glBoostContext.createTexture('resources/texture.png');
+        var material = glBoostContext.createClassicMaterial();
         material.diffuseTexture = texture;
-        var mesh = new GLBoost.Mesh(geometry, material);
+        var mesh = glBoostContext.createMesh(geometry, material);
         geometry.setVerticesData({
           position: positions,
           texcoord: texcoords,
@@ -94,10 +94,10 @@
         renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
         renderPaths[0].specifyRenderTargetTextures(renderTextures);
 
-        var geometry2 = new GLBoost.Geometry();
-        var material2 = new GLBoost.ClassicMaterial();
+        var geometry2 = glBoostContext.createGeometry();
+        var material2 = glBoostContext.createClassicMaterial();
         material2.diffuseTexture = renderTextures[0];
-        var mesh2 = new GLBoost.Mesh(geometry2, material2);
+        var mesh2 = glBoostContext.createMesh(geometry2, material2);
         geometry2.setVerticesData({
           position: positions,
           texcoord: texcoords
@@ -121,10 +121,10 @@
         var tweener = phina.accessory.Tweener();
         tweener.setTarget(geometry);
         tweener
-          .set({blendWeight_1: 0.0}).to({blendWeight_1: 1.0,}, 500, 'easeInCirc')
-          .set({blendWeight_2: 0.0}).to({blendWeight_2: 1.0,}, 500, 'easeOutElastic')
-          .to({blendWeight_1: 0.0,}, 500, 'easeInOutBack')
-          .to({blendWeight_2: 0.0,}, 500, 'easeOutCirc')
+          .set({blendWeight_1: 0.0}).to({blendWeight_1: 1.0}, 500, 'easeInCirc')
+          .set({blendWeight_2: 0.0}).to({blendWeight_2: 1.0}, 500, 'easeOutElastic')
+          .to({blendWeight_1: 0.0}, 500, 'easeInOutBack')
+          .to({blendWeight_2: 0.0}, 500, 'easeOutCirc')
           .setLoop(true);
         
         layer.update= function(app){

@@ -1,11 +1,10 @@
-import GLBoost from '../globals';
 import Vector3 from './math/Vector3';
 import Element from './Element';
 import Matrix44 from './math/Matrix44';
 
 export default class Camera extends Element {
-  constructor(lookat, perspective) {
-    super();
+  constructor(glBoostContext, lookat, perspective) {
+    super(glBoostContext);
 
     this._translate = lookat.eye;
     this._center = lookat.center;
@@ -193,5 +192,3 @@ export default class Camera extends Element {
 
 }
 Camera._mainCamera = null;
-
-GLBoost['Camera'] = Camera;

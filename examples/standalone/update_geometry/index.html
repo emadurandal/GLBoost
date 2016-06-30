@@ -29,12 +29,14 @@
 
   var canvas = document.getElementById("world");
 
-  var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+  var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-  var scene = new GLBoost.Scene();
+  var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
 
-  var material = new GLBoost.ClassicMaterial();
-  var texture = new GLBoost.Texture('resources/texture.png');
+  var scene = glBoostContext.createScene();
+
+  var material = glBoostContext.createClassicMaterial();
+  var texture = glBoostContext.createTexture('resources/texture.png');
   material.diffuseTexture = texture;
 
   var indices = [
@@ -54,16 +56,16 @@
     [0.0, 0.0]   // GLBoost converts the arrays to instances of vector class.
   ];
 
-  var geometry = new GLBoost.Geometry();
+  var geometry = glBoostContext.createGeometry();
   geometry.setVerticesData({
     position: positions,
     texcoord: texcoords
   }, [indices], GLBoost.TRIANGLE_STRIP, GLBoost.DYNAMIC_DRAW);
 
-  var mesh = new GLBoost.Mesh(geometry, material);
+  var mesh = glBoostContext.createMesh(geometry, material);
   scene.addChild(mesh);
 
-  var camera = new GLBoost.Camera(
+  var camera = glBoostContext.createCamera(
       {
         eye: new GLBoost.Vector3(0.0, 0.0, 5.0),
         center: new GLBoost.Vector3(0.0, 0.0, 0.0),

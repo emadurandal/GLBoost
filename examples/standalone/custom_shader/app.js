@@ -92,11 +92,13 @@
 
   var canvas = document.getElementById("world");
 
-  var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
+  var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-  var scene = new GLBoost.Scene();
+  var renderer = glBoostContext.createRenderer({ clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
 
-  var camera = new GLBoost.Camera({
+  var scene = glBoostContext.createScene();
+
+  var camera = glBoostContext.createCamera({
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
     up: new GLBoost.Vector3(0.0, 1.0, 0.0)
@@ -108,7 +110,7 @@
   });
   scene.addChild(camera);
 
-  var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
+  var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
   scene.addChild(directionalLight);
 
   var MyCustomShaderSource = function () {
@@ -159,12 +161,10 @@
   var MyCustomShader = function (_GLBoost$HalfLambertS) {
     babelHelpers.inherits(MyCustomShader, _GLBoost$HalfLambertS);
 
-    function MyCustomShader() {
-      var canvas = arguments.length <= 0 || arguments[0] === undefined ? GLBoost.CURRENT_CANVAS_ID : arguments[0];
-      var basicShader = arguments[1];
+    function MyCustomShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, canvas, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, glBoostContext, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
 
@@ -189,7 +189,7 @@
   }(GLBoost.HalfLambertShader);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
-  var promise = objLoader.loadObj('resources/teapot/teapot.obj', MyCustomShader, null);
+  var promise = objLoader.loadObj(glBoostContext, 'resources/teapot/teapot.obj', MyCustomShader, null);
   promise.then(function (mesh) {
     //            console.log(mesh);
 

@@ -5,12 +5,12 @@ import DecalShader from '../middle_level/shaders/DecalShader';
 import GLBoostObject from './core/GLBoostObject';
 
 export default class ClassicMaterial extends GLBoostObject {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super();
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     this._diffuseTexture = null;
-    this._gl = GLContext.getInstance(canvas).gl;
-    this._canvas = canvas;
+    this._gl = this._glContext.gl;
+    this._canvas = this._glContext.canvas;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);

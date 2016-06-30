@@ -50,9 +50,9 @@ export class HalfLambertShaderSource {
 
 
 export default class HalfLambertShader extends DecalShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
+  constructor(glBoostContext, basicShader) {
 
-    super(canvas, basicShader);
+    super(glBoostContext, basicShader);
     HalfLambertShader.mixin(HalfLambertShaderSource);
   }
 

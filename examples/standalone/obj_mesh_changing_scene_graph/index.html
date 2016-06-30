@@ -34,9 +34,9 @@
   canvas.width = SCREEN_WIDTH;
   canvas.height = SCREEN_HEIGHT;
 
+  var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-  var renderer = new GLBoost.Renderer({
-    canvas: canvas,
+  var renderer = glBoostContext.createRenderer({
     clearColor: {
       red: 0.5,
       green: 0.5,
@@ -45,7 +45,7 @@
     }
   });
 
-  var camera = new GLBoost.Camera({
+  var camera = glBoostContext.createCamera({
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
     up: new GLBoost.Vector3(0.0, 1.0, 0.0)
@@ -56,18 +56,18 @@
     zFar: 300.0
   });
 
-  var scene = new GLBoost.Scene();
+  var scene = glBoostContext.createScene();
 
   scene.addChild( camera );
 
-  var group_1 = new GLBoost.Group();
+  var group_1 = glBoostContext.createGroup();
   group_1.rotate = new GLBoost.Vector3(90, 0, 0);
-  var group_2 = new GLBoost.Group();
+  var group_2 = glBoostContext.createGroup();
   group_2.rotate = new GLBoost.Vector3(0, 0, 30);
 
-  var pointLight_1 = new GLBoost.PointLight(new GLBoost.Vector3(2, 2, 2));
+  var pointLight_1 = glBoostContext.createPointLight(new GLBoost.Vector3(2, 2, 2));
   pointLight_1.translate = new GLBoost.Vector3(0, 10, -10);
-  var directionalLight_2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10));
+  var directionalLight_2 = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(0, 0, -10));
   group_1.addChild( pointLight_1 );
   group_1.addChild( directionalLight_2 );
   group_2.addChild( pointLight_1 );
@@ -75,7 +75,7 @@
   scene.addChild(group_1);
 
   var objLoader = GLBoost.ObjLoader.getInstance();
-  var promise = objLoader.loadObj('resources/teapot/teapot.obj');
+  var promise = objLoader.loadObj(glBoostContext, 'resources/teapot/teapot.obj');
 
   var g_mesh;
   var currentGroup = 'group_1';

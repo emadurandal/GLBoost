@@ -29,8 +29,9 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({
-  canvas: canvas,
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+var renderer = glBoostContext.createRenderer({
   clearColor: {
     red: 0.0,
     green: 0.0,
@@ -39,26 +40,26 @@ var renderer = new GLBoost.Renderer({
   }
 });
 
-var scene = new GLBoost.Scene();
+var scene = glBoostContext.createScene();
 
-var material = new GLBoost.ClassicMaterial();
-var texture = new GLBoost.Texture('resources/texture.png'); // earth.jpg
+var material = glBoostContext.createClassicMaterial();
+var texture = glBoostContext.createTexture('resources/texture.png'); // earth.jpg
 material.diffuseTexture = texture;
 
 var shader = GLBoost.PhongShader;
 material.shaderClass = shader;
-var geometry = new GLBoost.Cube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector3(1,0,0));
+var geometry = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector3(1,0,0));
 
-var cube = new GLBoost.Mesh(geometry, material);
+var cube = glBoostContext.createMesh(geometry, material);
 scene.addChild(cube);
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
 scene.addChild( directionalLight );
-var directionalLight2 = new GLBoost.DirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(1, 1, 1));
+var directionalLight2 = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(1, 1, 1));
 scene.addChild( directionalLight2 );
 
 
-var camera = new GLBoost.Camera({
+var camera = glBoostContext.createCamera({
   eye: new GLBoost.Vector3(0.0, 0.0, 10.0),
   center: new GLBoost.Vector3(0.0, 0.0, 0.0),
   up: new GLBoost.Vector3(0.0, 1.0, 0.0)

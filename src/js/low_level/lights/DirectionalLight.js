@@ -13,12 +13,10 @@ export default class DirectionalLight extends AbstractLight {
    * [ja] DirectionalLightクラスのコンストラクタ
    * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
    * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
-   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
-  constructor(intensity, direction, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, intensity, direction) {
+    super(glBoostContext);
 
-    this._gl = GLContext.getInstance(canvas).gl;
     this._name = "";
     this._intensity = intensity;
     this._direction = direction;
@@ -41,5 +39,3 @@ export default class DirectionalLight extends AbstractLight {
   }
 
 }
-
-GLBoost["DirectionalLight"] = DirectionalLight;

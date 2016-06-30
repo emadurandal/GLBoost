@@ -35,6 +35,7 @@
           height: SCREEN_HEIGHT
         }).addChildTo(this);
 
+        var glBoostContext = layer.glBoostContext;
 
         var positions = [
           new GLBoost.Vector3(-0.5, -0.5, 0.0),
@@ -66,7 +67,7 @@
           new GLBoost.Vector2(1.0, 0.0)
         ];
 
-        var geometry = new GLBoost.Geometry();
+        var geometry = glBoostContext.createGeometry();
         geometry.setVerticesData({
           position: positions,
           //color: colors,
@@ -101,15 +102,15 @@
         offscreen.renderObject(heart);
         var imageData = offscreen.getImageDataURL();
 
-        var texture = new GLBoost.Texture(imageData);
+        var texture = glBoostContext.createTexture(imageData);
 
 //        var texture = new GLBoost.Texture('resources/texture.png', layer.canvas);
-        var material = new GLBoost.ClassicMaterial();
+        var material = glBoostContext.createClassicMaterial();
         material.diffuseTexture = texture;
-        var mesh = new GLBoost.Mesh(geometry, material);
+        var mesh = glBoostContext.createMesh(geometry, material);
         layer.scene.addChild( mesh );
 
-        var camera = new GLBoost.Camera(
+        var camera = glBoostContext.createCamera(
             {
               eye: new GLBoost.Vector3(0.0, 0, 2.0),
               center: new GLBoost.Vector3(0.0, 0.0, 0.0),

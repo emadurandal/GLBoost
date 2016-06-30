@@ -1,4 +1,5 @@
 import GLBoost from '../../globals';
+import GLBoostMiddleContext from '../core/GLBoostMiddleContext';
 
 if (typeof phina !== 'undefined') {
 
@@ -15,6 +16,7 @@ phina.namespace(function() {
     scene: null,
     camera: null,
     light: null,
+    glBoostContext: null,
     renderer: null,
     canvas: null,
 
@@ -34,9 +36,10 @@ phina.namespace(function() {
       bodyElm.appendChild(this.canvas);
       this.canvas.style.display = "none";
 
+      this.glBoostContext = new GLBoostMiddleContext(this.canvas);
       // レンダラーを生成
-      this.renderer = new GLBoost.Renderer({ canvas: this.canvas, clearColor: {red:1, green:1, blue:1, alpha:1}});
-      this.scene = new GLBoost.Scene();
+      this.renderer = this.glBoostContext.createRenderer({clearColor: {red:1, green:1, blue:1, alpha:1}});
+      this.scene = this.glBoostContext.createScene();
       this.on('enterframe', function() {
         if (this.scene) {
           this.renderer.clearCanvas();

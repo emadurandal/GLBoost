@@ -3,8 +3,8 @@ import BlendShapeShaderSource from '../../middle_level/shaders/BlendShapeShader'
 import Geometry from './Geometry';
 
 export default class BlendShapeGeometry extends Geometry {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     this._blendWeight_1  = 0.0;
     this._blendWeight_2  = 0.0;
@@ -37,9 +37,10 @@ export default class BlendShapeGeometry extends Geometry {
       this._materialForBlend = this._defaultMaterial;
     }
 
+
     class BlendShapeShader extends this._materialForBlend.shaderClass {
-      constructor(canvas, basicShader) {
-        super(canvas, basicShader);
+      constructor(glBoostContext, basicShader) {
+        super(glBoostContext, basicShader);
         BlendShapeShader.mixin(BlendShapeShaderSource);
       }
     }

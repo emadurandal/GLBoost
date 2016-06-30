@@ -58,7 +58,7 @@ export default class DrawKickerWorld {
       }
 
       if (glslProgram['lightPosition_0']) {
-        lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, glContext.canvas);
+        lights = materials[i].shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
         if (glslProgram['viewPosition']) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {

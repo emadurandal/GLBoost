@@ -11,11 +11,13 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-var scene = new GLBoost.Scene();
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
 
-var camera = new GLBoost.Camera(
+var scene = glBoostContext.createScene();
+
+var camera = glBoostContext.createCamera(
   {
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
@@ -30,7 +32,7 @@ var camera = new GLBoost.Camera(
 );
 scene.addChild( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.addChild( directionalLight );
 
 var attributeName = 'heightpoints';
@@ -74,8 +76,8 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.DecalShader {
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID, basicShader) {
-    super(canvas, basicShader);
+  constructor(glBoostContext, basicShader) {
+    super(glBoostContext, basicShader);
     MyCustomShader.mixin(MyCustomShaderSource);
 
     this._time = 0;
@@ -103,10 +105,10 @@ for(let i=0; i<=vSpan; i++) {
   }
 }
 
-var material = new GLBoost.ClassicMaterial();
+var material = glBoostContext.createClassicMaterial();
 material.shaderClass = MyCustomShader;
-var planeGeometry = new GLBoost.Plane(10, 10, uSpan, vSpan, additionalAttributes);
-var plane = new GLBoost.Mesh(planeGeometry, material);
+var planeGeometry = glBoostContext.createPlane(10, 10, uSpan, vSpan, additionalAttributes);
+var plane = glBoostContext.createMesh(planeGeometry, material);
 scene.addChild( plane );
 
 scene.prepareForRender();

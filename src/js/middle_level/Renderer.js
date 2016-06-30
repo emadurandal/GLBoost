@@ -9,15 +9,11 @@ import GLBoostObject from '../low_level/core/GLBoostObject';
  * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
  */
 export default class Renderer extends GLBoostObject {
-  constructor(parameters) {
-    super();
-
-    var _canvas = parameters.canvas;
+  constructor(glBoostContext, parameters) {
+    super(glBoostContext);
     var _clearColor = parameters.clearColor;
 
-    GLBoost.CURRENT_CANVAS_ID = '#' + parameters.canvas.id;
-
-    this._glContext = GLContext.getInstance(_canvas);
+    GLBoost.CURRENT_CANVAS_ID = '#' + this._glContext.canvas.id;
 
     var gl = this._glContext.gl;
 
@@ -138,5 +134,3 @@ export default class Renderer extends GLBoostObject {
   }
 
 }
-
-GLBoost['Renderer'] = Renderer;

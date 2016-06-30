@@ -14,14 +14,13 @@ export default class AbstractTexture extends GLBoostObject {
    *
    * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
-  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super();
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     if (this.constructor === AbstractTexture) {
       throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }
 
-    this._glContext = GLContext.getInstance(canvas);
     this._name = '';
   }
 
@@ -86,5 +85,3 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
 }
-
-GLBoost['AbstractTexture'] = AbstractTexture;

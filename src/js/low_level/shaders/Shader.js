@@ -5,14 +5,8 @@ import GLBoostObject from '../core/GLBoostObject';
 import MiscUtil from '../misc/MiscUtil';
 
 export default class Shader extends GLBoostObject {
-  constructor(canvas) {
-    super();
-
-    if (typeof canvas === 'string') {
-      canvas = window.document.querySelector(canvas);
-    }
-
-    this._glContext = GLContext.getInstance(canvas);
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     this._glslProgram = null;
     this._dirty = true;
@@ -345,7 +339,7 @@ export default class Shader extends GLBoostObject {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
-    lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, canvas);
+    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, extraData);
     var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass, extraData);
@@ -395,11 +389,11 @@ export default class Shader extends GLBoostObject {
     return programToReturn;
   }
 
-  static getDefaultPointLightIfNotExsist(gl, lights, canvas) {
+  getDefaultPointLightIfNotExist(gl, lights, canvas) {
 
     if (lights.length === 0) {
       if (Shader._defaultLight === null) {
-        Shader._defaultLight = new PointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY, canvas);
+        Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY);
       }
       return [Shader._defaultLight];
     } else {

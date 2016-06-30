@@ -11,14 +11,16 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
 var gl = renderer.glContext;
 gl.disable(gl.DEPTH_TEST);
 gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
 
-var scene = new GLBoost.Scene();
+var scene = glBoostContext.createScene();
 
-var camera = new GLBoost.Camera(
+var camera = glBoostContext.createCamera(
   {
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
@@ -33,7 +35,7 @@ var camera = new GLBoost.Camera(
 );
 scene.addChild( camera );
 
-var directionalLight = new GLBoost.DirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
 scene.addChild( directionalLight );
 
 
@@ -88,8 +90,8 @@ class MyCustomShaderSource {
 
 
 class MyCustomShader extends GLBoost.HalfLambertShader {
-  constructor(canvas, basicShader, ParticleShaderSource) {
-    super(canvas, basicShader);
+  constructor(glBoostContext, basicShader, ParticleShaderSource) {
+    super(glBoostContext, basicShader);
     if (ParticleShaderSource) {
       MyCustomShader.mixin(ParticleShaderSource);
       MyCustomShader.mixin(MyCustomShaderSource);
@@ -123,17 +125,17 @@ for (let i=0; i<100; i++) {
   particlesVelocity.push(new GLBoost.Vector3((Math.random()-0.5)*4, Math.random()*10, (Math.random()-0.5)*4));
 }
 
-var particleGeometry = new GLBoost.Particle(
+var particleGeometry = glBoostContext.createParticle(
   {
     position: particlesPosition,
     particlesVelocity: particlesVelocity
   }, 0.5, 0.5, null, GLBoost.STATIC_DRAW);
 
-var material = new GLBoost.ClassicMaterial();
+var material = glBoostContext.createClassicMaterial();
 material.shaderClass = MyCustomShader;
-var texture = new GLBoost.Texture('resources/iceball.png');
+var texture = glBoostContext.createTexture('resources/iceball.png');
 material.diffuseTexture = texture;
-var particle = new GLBoost.Mesh(particleGeometry, material);
+var particle = glBoostContext.createMesh(particleGeometry, material);
 
 scene.addChild(particle);
 

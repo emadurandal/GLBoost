@@ -31,17 +31,19 @@ GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
 var canvas = document.getElementById("world");
 
-var renderer = new GLBoost.Renderer({ canvas: canvas, clearColor: {red:1.0, green:0.5, blue:0.5, alpha:1}});
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-var scene = new GLBoost.Scene();
+var renderer = glBoostContext.createRenderer({ clearColor: {red:1.0, green:0.5, blue:0.5, alpha:1}});
+
+var scene = glBoostContext.createScene();
 
 
 
-var pointLight = new GLBoost.PointLight(new GLBoost.Vector3(1.0, 1.0, 1.0));
+var pointLight = glBoostContext.createPointLight(new GLBoost.Vector3(1.0, 1.0, 1.0));
 pointLight.translate = new GLBoost.Vector3(10, 10, 10);
 scene.addChild( pointLight );
 
-var camera = new GLBoost.Camera(
+var camera = glBoostContext.createCamera(
     {
      // eye: new GLBoost.Vector3(10.0, 10.0, -10.0),
       eye: new GLBoost.Vector3(15.0, 3.5, -5.0),
@@ -62,7 +64,7 @@ scene.addChild( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF('resources/simple2/simple3.gltf', 1, null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/simple2/simple3.gltf', 1, null);
 //var promise = glTFLoader.loadGLTF('resources/simple/body_movement_3_wrong.gltf', 400, null);
 //var promise = glTFLoader.loadGLTF('resources/GLTF/Cesium_Man.gltf', 3, null);
 //var promise = glTFLoader.loadGLTF('resources/GLTF/riggedSimple.gltf', 1, null);

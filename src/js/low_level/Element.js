@@ -8,8 +8,8 @@ import AnimationUtil from './misc/AnimationUtil';
 import GLBoostObject from './core/GLBoostObject';
 
 export default class Element extends GLBoostObject {
-  constructor() {
-    super();
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     this._parent = null;
     this._translate = Vector3.zero();
@@ -450,5 +450,3 @@ export default class Element extends GLBoostObject {
     return this._currentCalcMode;
   }
 }
-
-GLBoost['Element'] = Element;

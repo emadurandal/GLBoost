@@ -14,10 +14,9 @@ export default class PointLight extends AbstractLight {
    * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
-  constructor(intensity, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, intensity) {
+    super(glBoostContext);
 
-    this._gl = GLContext.getInstance(canvas).gl;
     this._name = "";
     this._intensity = intensity;
 
@@ -32,5 +31,3 @@ export default class PointLight extends AbstractLight {
   }
 
 }
-
-GLBoost["PointLight"] = PointLight;

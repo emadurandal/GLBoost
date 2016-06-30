@@ -23,8 +23,8 @@ export default class Particle extends Geometry {
    * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
    * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
    */
-  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas = GLBoost.CURRENT_CANVAS_ID) {
-    super(canvas);
+  constructor(glBoostContext, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+    super(glBoostContext);
 
     this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, performanceHint);
   }
@@ -224,8 +224,8 @@ export default class Particle extends Geometry {
     }
 
     class ParticleShader extends this._materialForBillboard.shaderClass {
-      constructor(canvas, basicShader) {
-        super(canvas, basicShader, ParticleShaderSource);
+      constructor(glBoostContext, basicShader) {
+        super(glBoostContext, basicShader, ParticleShaderSource);
         ParticleShader.mixin(ParticleShaderSource);
 
         this._meshTransformUpdateCount = -9999;
