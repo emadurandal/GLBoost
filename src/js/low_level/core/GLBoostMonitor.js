@@ -22,12 +22,12 @@ export default class GLBoostMonitor {
 
   registerGLBoostObject(glBoostObject) {
     this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
+    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
   }
 
   deregisterGLBoostObject(glBoostObject) {
     delete this._glBoostObjects[glBoostObject.toString()];
-    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
+    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
   }
 
   printGLBoostObjects() {
@@ -35,7 +35,7 @@ export default class GLBoostMonitor {
     MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
     for (var key in objects) {
       if (objects.hasOwnProperty(key)) {
-        MiscUtil.consoleLog(key);
+        MiscUtil.consoleLog(key + '(' + objects[key].belongingCanvasId + ')');
       }
     }
     MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
@@ -46,7 +46,7 @@ export default class GLBoostMonitor {
     var objectArray = [];
     for (var key in objects) {
       if (objects.hasOwnProperty(key)) {
-        objectArray.push(key);
+        objectArray.push(objects[key]);
       }
     }
     objectArray.sort(
@@ -58,28 +58,25 @@ export default class GLBoostMonitor {
     );
     MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
     objectArray.forEach((object)=>{
-      MiscUtil.consoleLog(object);
+      MiscUtil.consoleLog(object.toString() + ' (' + object.belongingCanvasId + ')');
     });
     MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
   }
 
   registerWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
-    var glBoostObjectName = glBoostObject.toString();
-    this._glResources.push([glBoostObjectName, glResourceName]);
-    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+    this._glResources.push([glBoostObject, glResourceName]);
+    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
   deregisterWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
-    var glBoostObjectName = glBoostObject.toString();
-
     this._glResources.forEach((glResource, i)=>{
-      if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
+      if (glResource[0] === glBoostObject && glResource[1] === glResourceName) {
         this._glResources.splice(i,1);
       }
     });
-    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
+    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
   printWebGLResources() {
@@ -93,7 +90,7 @@ export default class GLBoostMonitor {
     );
     MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
     glResources.forEach((glResource, i)=>{
-      MiscUtil.consoleLog(i+1 +': ' +glResource[0] + ' created ' + glResource[1]);
+      MiscUtil.consoleLog(i+1 +': ' + glResource[0].toString() + ' (' + glResource[0].belongingCanvasId + ') created ' + glResource[1]);
     });
     MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
   }
@@ -121,7 +118,7 @@ export default class GLBoostMonitor {
     scenes.forEach((scene)=> {
       var outputText = (function searchRecursively(element, level) {
         var outputText = '';
-        outputText += putWhiteSpace(level) + element.toString() + '\n';
+        outputText += putWhiteSpace(level) + element.toString() + ' (' + element.belongingCanvasId + ')\n';
         if (typeof element.getChildren === 'undefined') {
           return outputText;
         }

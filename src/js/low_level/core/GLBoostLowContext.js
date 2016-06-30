@@ -17,7 +17,17 @@ import Joint from '../skeletons/Joint';
 
 export default class GLBoostLowContext {
   constructor(canvas) {
+    this._setName();
     this._glContext = GLContext.getInstance(canvas);
+  }
+
+  _setName() {
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+  }
+
+  toString() {
+    return this._instanceName;
   }
 
   get glContext() {
@@ -93,7 +103,7 @@ export default class GLBoostLowContext {
     var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+    var fbo = glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -106,7 +116,7 @@ export default class GLBoostLowContext {
     }
 
     // Create RenderBuffer
-    var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
+    var renderbuffer = glContext.createRenderbuffer(this);
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -133,7 +143,7 @@ export default class GLBoostLowContext {
     var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
-    var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+    var fbo = glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
@@ -150,6 +160,10 @@ export default class GLBoostLowContext {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     return depthTexture;
+  }
+
+  get belongingCanvasId() {
+    return this._glContext.canvas.id;
   }
 
 }

@@ -475,13 +475,13 @@
       key: 'registerGLBoostObject',
       value: function registerGLBoostObject(glBoostObject) {
         this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was created.');
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
       }
     }, {
       key: 'deregisterGLBoostObject',
       value: function deregisterGLBoostObject(glBoostObject) {
         delete this._glBoostObjects[glBoostObject.toString()];
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' was ready for discard.');
+        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
       }
     }, {
       key: 'printGLBoostObjects',
@@ -490,7 +490,7 @@
         MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
         for (var key in objects) {
           if (objects.hasOwnProperty(key)) {
-            MiscUtil.consoleLog(key);
+            MiscUtil.consoleLog(key + '(' + objects[key].belongingCanvasId + ')');
           }
         }
         MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
@@ -502,7 +502,7 @@
         var objectArray = [];
         for (var key in objects) {
           if (objects.hasOwnProperty(key)) {
-            objectArray.push(key);
+            objectArray.push(objects[key]);
           }
         }
         objectArray.sort(function (a, b) {
@@ -512,7 +512,7 @@
         });
         MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
         objectArray.forEach(function (object) {
-          MiscUtil.consoleLog(object);
+          MiscUtil.consoleLog(object.toString() + ' (' + object.belongingCanvasId + ')');
         });
         MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
       }
@@ -520,9 +520,8 @@
       key: 'registerWebGLResource',
       value: function registerWebGLResource(glBoostObject, glResource) {
         var glResourceName = glResource.constructor.name;
-        var glBoostObjectName = glBoostObject.toString();
-        this._glResources.push([glBoostObjectName, glResourceName]);
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObjectName + '.');
+        this._glResources.push([glBoostObject, glResourceName]);
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
       }
     }, {
       key: 'deregisterWebGLResource',
@@ -530,14 +529,12 @@
         var _this = this;
 
         var glResourceName = glResource.constructor.name;
-        var glBoostObjectName = glBoostObject.toString();
-
         this._glResources.forEach(function (glResource, i) {
-          if (glResource[0] === glBoostObjectName && glResource[1] === glResourceName) {
+          if (glResource[0] === glBoostObject && glResource[1] === glResourceName) {
             _this._glResources.splice(i, 1);
           }
         });
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObjectName + '.');
+        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
       }
     }, {
       key: 'printWebGLResources',
@@ -550,7 +547,7 @@
         });
         MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
         glResources.forEach(function (glResource, i) {
-          MiscUtil.consoleLog(i + 1 + ': ' + glResource[0] + ' created ' + glResource[1]);
+          MiscUtil.consoleLog(i + 1 + ': ' + glResource[0].toString() + ' (' + glResource[0].belongingCanvasId + ') created ' + glResource[1]);
         });
         MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
       }
@@ -579,7 +576,7 @@
         scenes.forEach(function (scene) {
           var outputText = function searchRecursively(element, level) {
             var outputText = '';
-            outputText += putWhiteSpace(level) + element.toString() + '\n';
+            outputText += putWhiteSpace(level) + element.toString() + ' (' + element.belongingCanvasId + ')\n';
             if (typeof element.getChildren === 'undefined') {
               return outputText;
             }
@@ -6159,10 +6156,22 @@
     function GLBoostLowContext(canvas) {
       babelHelpers.classCallCheck(this, GLBoostLowContext);
 
+      this._setName();
       this._glContext = GLContext.getInstance(canvas);
     }
 
     babelHelpers.createClass(GLBoostLowContext, [{
+      key: '_setName',
+      value: function _setName() {
+        this.constructor._instanceCount = typeof this.constructor._instanceCount === 'undefined' ? 0 : this.constructor._instanceCount + 1;
+        this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this._instanceName;
+      }
+    }, {
       key: 'createGeometry',
       value: function createGeometry() {
         return new Geometry(this);
@@ -6250,7 +6259,7 @@
         var glem = GLExtensionsManager.getInstance(glContext);
 
         // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+        var fbo = glContext.createFramebuffer(this);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
@@ -6263,7 +6272,7 @@
         }
 
         // Create RenderBuffer
-        var renderbuffer = glContext.createRenderbuffer(GLBoostLowContext.name);
+        var renderbuffer = glContext.createRenderbuffer(this);
         gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
 
@@ -6291,7 +6300,7 @@
         var glem = GLExtensionsManager.getInstance(glContext);
 
         // Create FBO
-        var fbo = glContext.createFramebuffer(GLBoostLowContext.name);
+        var fbo = glContext.createFramebuffer(this);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
@@ -6313,6 +6322,11 @@
       key: 'glContext',
       get: function get() {
         return this._glContext;
+      }
+    }, {
+      key: 'belongingCanvasId',
+      get: function get() {
+        return this._glContext.canvas.id;
       }
     }]);
     return GLBoostLowContext;
