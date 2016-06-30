@@ -1,4 +1,5 @@
 import GLBoostContext from '../../low_level/core/GLBoostLowContext';
+import Expression from '../expressions/Expression';
 import RenderPath from '../expressions/RenderPath';
 import Renderer from '../Renderer';
 import Group from '../Group';
@@ -31,9 +32,15 @@ export default class GLBoostMiddleContext extends GLBoostContext {
     return new Renderer(this, parameters);
   }
 
-  createRenderPaths(number) {
-    var glContext = this._glContext;
+  createExpressionAndRenderPaths(number) {
+    var expression = new Expression(this);
+    var renderPaths = this.createRenderPaths(number);
+    expression.addRenderPaths(renderPaths);
 
+    return expression;
+  }
+
+  createRenderPaths(number) {
     var renderPaths = [];
     for (let i=0; i<number; i++) {
       renderPaths.push(new RenderPath(this));

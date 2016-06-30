@@ -1,8 +1,7 @@
-import GLContext from '../core/GLContext';
-import PointLight from '../lights/PointLight';
 import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';
 import MiscUtil from '../misc/MiscUtil';
+import GLExtensionsManager from '../core/GLExtensionsManager';
 
 export default class Shader extends GLBoostObject {
   constructor(glBoostContext) {
@@ -193,24 +192,21 @@ export default class Shader extends GLBoostObject {
   }
 
 
-  _getFragmentShaderString(gl, functions, lights, renderPass, extraData) {
+  _getFragmentShaderString(gl, functions, lights, extraData) {
     var f = functions;
     var shaderText = '';
 
     var in_ = Shader._in_onFrag(gl);
 
     shaderText +=   Shader._glslVer(gl);
-    if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
+    var maxDrawBuffers = this._getMaxDrawBuffers();
+    if (maxDrawBuffers > 1) {
       shaderText += Shader._glsl1DrawBufferExt(gl);
     }
     shaderText +=   'precision mediump float;\n';
 
-    if (renderPass.renderTargetTextures) {
-      renderPass.renderTargetTextures.forEach((texture, index)=>{
-        shaderText +=   Shader._set_outColor_onFrag(gl, index);
-      });
-    } else {
-      shaderText +=   Shader._set_outColor_onFrag(gl, 0);
+    for (let i=0; i<maxDrawBuffers; i++) {
+      shaderText +=   Shader._set_outColor_onFrag(gl, i);
     }
 
     /// define variables
@@ -241,10 +237,10 @@ export default class Shader extends GLBoostObject {
     });
 
     // end of main function
-    if (renderPass.renderTargetTextures && renderPass.renderTargetTextures.length > 1) {
-      renderPass.renderTargetTextures.forEach((texture, index)=> {
-        shaderText += Shader._set_glFragData_inGLVer1(gl, index);
-      });
+    if (maxDrawBuffers > 1) {
+      for (let i=0; i<maxDrawBuffers; i++) {
+        shaderText += Shader._set_glFragData_inGLVer1(gl, i);
+      }
     } else {
       shaderText += Shader._set_glFragColor_inGLVer1(gl);
     }
@@ -335,14 +331,14 @@ export default class Shader extends GLBoostObject {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, lights, renderPass, extraData = {}) {
+  getShaderProgram(vertexAttribs, existCamera_f, lights, extraData = {}) {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
     lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, extraData);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, renderPass, extraData);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, extraData);
 
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
@@ -402,7 +398,22 @@ export default class Shader extends GLBoostObject {
   }
 
   static _exist(functions, attribute) {
-    return functions.indexOf(attribute) >= 0
+    return functions.indexOf(attribute) >= 0;
+  }
+
+  _getMaxDrawBuffers() {
+    var gl = this._glContext.gl;
+    var isWebGL2 = Shader.isThisGLVersion_2(gl);
+    if (isWebGL2) {
+      return gl.getParameter(gl.MAX_DRAW_BUFFERS);
+    }
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+    if (glem.extDBs) {
+      return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
+    } else {
+      return 1;
+    }
   }
 
   static isThisGLVersion_2(gl) {
@@ -443,6 +454,10 @@ export default class Shader extends GLBoostObject {
   }
   static _set_glFragData_inGLVer1(gl, i) {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
+  }
+
+  get glslProgram() {
+    return this._glslProgram;
   }
 
   readyForDiscard() {

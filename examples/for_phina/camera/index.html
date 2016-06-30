@@ -80,7 +80,9 @@
           zFar: 1000.0
         });
         layer.scene.addChild( this.camera );
-        layer.scene.prepareForRender();
+
+        layer.expression.prepareToRender();
+
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
         label.fill = 'white';
         label.stroke = 'black';
@@ -105,7 +107,7 @@
 
         this.guiCameraEye.open();
         this.guiCamera.open();
-      },
+      }
     });
 
     phina.main(function() {

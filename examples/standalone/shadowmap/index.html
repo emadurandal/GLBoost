@@ -74,13 +74,14 @@
   );
   scene.addChild( camera );
 
+  var expression = glBoostContext.createExpressionAndRenderPaths(1);
+  expression.renderPaths[0].scene = scene;
+  expression.prepareToRender();
   /*
   renderPaths[0].addElements([camera, cube, plane]);
   renderPaths[0].setClearColor([0, 0, 0, 1]);
   renderPaths[0].specifyRenderTargetTextures(renderTextures);
     */
-
-  scene.prepareForRender();
 
   var glBoostMonitor = GLBoost.GLBoostMonitor.getInstance();
   glBoostMonitor.printGLBoostObjects();
@@ -88,7 +89,7 @@
 
   var render = function() {
     renderer.clearCanvas();
-    renderer.draw(scene);
+    renderer.draw(expression);
 
     var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);

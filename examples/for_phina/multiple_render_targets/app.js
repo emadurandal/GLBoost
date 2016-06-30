@@ -124,6 +124,17 @@
       var shapetarget_2 = [new GLBoost.Vector3(-0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, 1.0, 0.0)];
       var texcoords = [new GLBoost.Vector2(0.0, 1.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(1.0, 0.0)];
 
+      var camera = glBoostContext.createCamera({
+        eye: new GLBoost.Vector3(0.0, 0, 5.0),
+        center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+        up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+      }, {
+        fovy: 45.0,
+        aspect: 1.0,
+        zNear: 0.1,
+        zFar: 1000.0
+      });
+
       var geometry = glBoostContext.createBlendShapeGeometry();
       var texture = glBoostContext.createTexture('resources/texture.png');
       var material = glBoostContext.createClassicMaterial();
@@ -136,44 +147,37 @@
         shapetarget_1: shapetarget_1,
         shapetarget_2: shapetarget_2
       });
-      layer.scene.addChild(mesh);
+      var scene = glBoostContext.createScene();
+      scene.addChild(camera);
+      scene.addChild(mesh);
 
-      renderPaths[0].addElements([mesh]);
       renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
       renderPaths[0].specifyRenderTargetTextures(renderTextures);
+      renderPaths[0].scene = scene;
 
+      var scene2 = glBoostContext.createScene();
+      scene2.addChild(camera);
       var geometry2_1 = glBoostContext.createCube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
       var material2_1 = glBoostContext.createClassicMaterial();
       material2_1.diffuseTexture = renderTextures[0];
       var mesh2_1 = glBoostContext.createMesh(geometry2_1, material2_1);
-      layer.scene.addChild(mesh2_1);
+      scene2.addChild(mesh2_1);
       mesh2_1.translate = new GLBoost.Vector3(-1, 0, 0);
 
       var geometry2_2 = glBoostContext.createCube(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector4(1, 1, 1, 1));
       var material2_2 = glBoostContext.createClassicMaterial();
       material2_2.diffuseTexture = renderTextures[1];
       var mesh2_2 = glBoostContext.createMesh(geometry2_2, material2_2);
-      layer.scene.addChild(mesh2_2);
+      scene2.addChild(mesh2_2);
+
       mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
 
-      renderPaths[1].addElements([mesh2_1, mesh2_2]);
       renderPaths[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
+      renderPaths[1].scene = scene2;
 
-      layer.scene.renderPaths = renderPaths;
-
-      var camera = glBoostContext.createCamera({
-        eye: new GLBoost.Vector3(0.0, 0, 5.0),
-        center: new GLBoost.Vector3(0.0, 0.0, 0.0),
-        up: new GLBoost.Vector3(0.0, 1.0, 0.0)
-      }, {
-        fovy: 45.0,
-        aspect: 1.0,
-        zNear: 0.1,
-        zFar: 1000.0
-      });
-      layer.scene.addChild(camera);
-
-      layer.scene.prepareForRender();
+      layer.expression.clearRenderPaths();
+      layer.expression.addRenderPaths(renderPaths);
+      layer.expression.prepareToRender();
 
       var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
       label.fill = 'white';

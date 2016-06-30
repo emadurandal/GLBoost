@@ -200,7 +200,7 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh, doSetupVertexAttribs = true) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, doSetupVertexAttribs = true) {
     var gl = this._glContext.gl;
     var vertices = this._vertices;
 
@@ -217,35 +217,27 @@ export default class Geometry extends GLBoostObject {
       this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
     });
 
-    let glslProgramOfPasses = [];
-    for (let i=0; i<renderPasses.length; i++) {
-      if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
-        if (material.shaderInstance === null) {
-          let shaderClass = material.shaderClass;
+    if (material.shaderInstance === null) {
+      let shaderClass = material.shaderClass;
 
-          let basicShaderSource = null;
-          if (this._drawKicker instanceof DrawKickerWorld) {
-            basicShaderSource = VertexWorldShaderSource;
-          } else if (this._drawKicker instanceof DrawKickerLocal) {
-            basicShaderSource = VertexLocalShaderSource;
-          }
-
-          material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
-        }
-        var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
-        if (doSetupVertexAttribs) {
-          this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-        }
-        glslProgramOfPasses.push(glslProgram);
-      } else {
-        glslProgramOfPasses.push(null);
+      let basicShaderSource = null;
+      if (this._drawKicker instanceof DrawKickerWorld) {
+        basicShaderSource = VertexWorldShaderSource;
+      } else if (this._drawKicker instanceof DrawKickerLocal) {
+        basicShaderSource = VertexLocalShaderSource;
       }
+
+      material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
     }
+    var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, this._extraDataForShader);
+    if (doSetupVertexAttribs) {
+      this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+    }
+
     if (doSetupVertexAttribs) {
       glem.bindVertexArray(gl, null);
     }
     this._setVertexNtoSingleMaterial(material, index);
-    material.glslProgramOfPasses = glslProgramOfPasses;
 
     return material;
   }
@@ -261,7 +253,7 @@ export default class Geometry extends GLBoostObject {
     }
   }
 
-  prepareForRender(existCamera_f, lights, meshMaterial, renderPasses, mesh) {
+  prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
 
     var vertices = this._vertices;
     var gl = this._glContext.gl;
@@ -300,8 +292,7 @@ export default class Geometry extends GLBoostObject {
 
 
     for (let i=0; i<materials.length;i++) {
-      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh, doAfter);
-      materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
+      this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
     }
 
     if (doAfter) {
@@ -344,7 +335,7 @@ export default class Geometry extends GLBoostObject {
     return true;
   }
 
-  draw(lights, camera, mesh, scene, renderPass_index) {
+  draw(lights, camera, mesh, scene) {
     var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -359,7 +350,7 @@ export default class Geometry extends GLBoostObject {
 
     let thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, renderPass_index, this._vertexN);
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN);
 
   }
 

@@ -104,7 +104,6 @@
 
         var texture = glBoostContext.createTexture(imageData);
 
-//        var texture = new GLBoost.Texture('resources/texture.png', layer.canvas);
         var material = glBoostContext.createClassicMaterial();
         material.diffuseTexture = texture;
         var mesh = glBoostContext.createMesh(geometry, material);
@@ -125,7 +124,7 @@
         );
         layer.scene.addChild( camera );
 
-        layer.scene.prepareForRender();
+        layer.expression.prepareToRender();
 
         var delta = 0;
         layer.update = function() {

@@ -102,7 +102,7 @@
         var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(0.75, 0.75, 0.75), new GLBoost.Vector3(0, 0, -10));
         layer.scene.addChild( directionalLight );
 
-        layer.scene.prepareForRender();
+        layer.expression.prepareToRender();
 
         var theta = 0.02;
         var value = 0;

@@ -95,7 +95,9 @@ group5.addChild( group4 );
 
 scene.addChild( group5 );
 
-scene.prepareForRender();
+var expression = glBoostContext.createExpressionAndRenderPaths(1);
+expression.renderPaths[0].scene = scene;
+expression.prepareToRender();
 
 var glBoostMonitor = GLBoost.GLBoostMonitor.getInstance();
 glBoostMonitor.printGLBoostObjectsOrderByName();
@@ -104,7 +106,7 @@ glBoostMonitor.printHierarchy();
 
 var render = function(){
   renderer.clearCanvas();
-  renderer.draw(scene);
+  renderer.draw(expression);
 
 //  var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
 //  var rotatedVector = rotateMatrix.multiplyVector(camera.eye);

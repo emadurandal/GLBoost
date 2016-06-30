@@ -88,11 +88,12 @@
           shapetarget_1: shapetarget_1,
           shapetarget_2: shapetarget_2
         });
-        layer.scene.addChild( mesh );
+        var scene = glBoostContext.createScene();
+        scene.addChild( mesh );
 
-        renderPaths[0].addElements([mesh]);
         renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
         renderPaths[0].specifyRenderTargetTextures(renderTextures);
+        renderPaths[0].scene = scene;
 
         var geometry2 = glBoostContext.createGeometry();
         var material2 = glBoostContext.createClassicMaterial();
@@ -102,13 +103,15 @@
           position: positions,
           texcoord: texcoords
         });
-        layer.scene.addChild( mesh2 );
+        var scene2 = glBoostContext.createScene();
+        scene2.addChild( mesh2 );
 
-        renderPaths[1].addElements([mesh2]);
         renderPaths[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
+        renderPaths[1].scene = scene2;
 
-        layer.scene.renderPaths = renderPaths;
-        layer.scene.prepareForRender();
+        layer.expression.clearRenderPaths();
+        layer.expression.addRenderPaths(renderPaths);
+        layer.expression.prepareToRender();
 
         var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
         label.fill = 'white';

@@ -25,7 +25,6 @@ export default class Scene extends Group {
     super(glBoostContext);
     this._gl = this._glContext.gl;
     this._currentAnimationInputValues = {};
-    this._renderPaths = glBoostContext.createRenderPaths(1);
     this._reset();
   }
 
@@ -67,7 +66,7 @@ export default class Scene extends Group {
    * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
    * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
    */
-  prepareForRender() {
+  prepareToRender() {
     this._reset();
 
     (function setParentRecursively(elem) {
@@ -148,39 +147,11 @@ export default class Scene extends Group {
       this._cameras[0].setAsMainCamera(this);
     }
 
-    // If there is only one renderPass, register meshes to the renderPass automatically.
-    if (this._renderPaths.length === 1) {
-      this._renderPaths[0].clearElements();
-      this._renderPaths[0].addElements(this._meshes);
-    }
-
-    this._renderPaths.forEach((renderPass)=> {
-      renderPass.prepareForRender();
-    });
-
     this._meshes.forEach((mesh)=> {
-      mesh.prepareForRender(existCamera_f, this._lights, this._renderPaths);
+      mesh.prepareToRender(existCamera_f, this._lights);
     });
 
 
-  }
-
-  /**
-   * [en] Set render passes for rendering. if you don't set render passes, this scene has a default render pass.
-   * [ja] レンダリングに使うレンダーパスの配列をセットします。もしレンダーパスをセットしない場合は、このシーンはデフォルトの単一レンダーパスを持っています。
-   * @param {Array<RenderPath>} renderPaths [en] render passes. [ja] レンダーパスの配列
-   */
-  set renderPaths(renderPaths) {
-    this._renderPaths = renderPaths;
-  }
-
-  /**
-   * [en] Get render passes for rendering.
-   * [ja] レンダリングに使うレンダーパスの配列を取得します。
-   * @returns {Array<RenderPath>}
-   */
-  get renderPaths() {
-    return this._renderPaths;
   }
 
   /**

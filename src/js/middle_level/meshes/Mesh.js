@@ -17,16 +17,15 @@ export default class Mesh extends Element {
     }
   }
 
-  prepareForRender(existCamera_f, lights, renderPasses) {
-    this._geometry.prepareForRender(existCamera_f, lights, this._material, renderPasses, this);
+  prepareToRender(existCamera_f, lights) {
+    this._geometry.prepareToRender(existCamera_f, lights, this._material, this);
     if (this._geometry._materials.length === 0 && this._material) {
-    //if (this._material) {
-      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights, renderPasses, this);
+      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights);
     }
   }
 
-  draw(lights, camera, scene, renderPass_index) {
-    this._geometry.draw(lights, camera, this, scene, renderPass_index);
+  draw(lights, camera, scene) {
+    this._geometry.draw(lights, camera, this, scene);
   }
 
   set geometry(geometry) {

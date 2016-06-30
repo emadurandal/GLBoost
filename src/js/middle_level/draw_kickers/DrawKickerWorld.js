@@ -21,7 +21,7 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, renderPass_index, vertexN) {
+  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN) {
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -30,7 +30,7 @@ export default class DrawKickerWorld {
     for (let i=0; i<materials.length;i++) {
       let shaderName = materials[i].shaderInstance.toString();
       if (shaderName !== DrawKickerWorld._lastShaderName) {
-        this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+        this._glslProgram = materials[i].shaderInstance.glslProgram;
         gl.useProgram(this._glslProgram);
       }
       let glslProgram = this._glslProgram;

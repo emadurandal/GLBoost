@@ -102,13 +102,15 @@ promise.then(function(mesh) {
 
   scene.addChild( mesh );
 
-  scene.prepareForRender();
+  var expression = glBoostContext.createExpressionAndRenderPaths(1);
+  expression.renderPaths[0].scene = scene;
+  expression.prepareToRender();
 
 
 
   var render = function(){
     renderer.clearCanvas();
-    renderer.draw(scene);
+    renderer.draw(expression);
 
     var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);

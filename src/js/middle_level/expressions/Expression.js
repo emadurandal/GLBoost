@@ -3,21 +3,29 @@ import GLBoostObject from '../../low_level/core/GLBoostObject';
 
 export default class Expression extends GLBoostObject {
 
-  constructor() {
-    super();
+  constructor(glBoostContext) {
+    super(glBoostContext);
 
     this._renderPaths = [];
   }
 
   addRenderPaths(renderPaths) {
-    this._renderPaths.concat(renderPaths);
+    renderPaths.forEach((renderPath)=>{
+      renderPath._expression = this;
+    });
+    
+    this._renderPaths = this._renderPaths.concat(renderPaths);
   }
 
   addRenderPath(renderPath) {
+    renderPath._expression = this;
     this._renderPaths.push(renderPath);
   }
 
   clearRenderPaths() {
+    this._renderPaths.forEach((renderPath)=>{
+      renderPath._expression = null;
+    });
     this._renderPaths.length = 0;
   }
 
@@ -25,8 +33,10 @@ export default class Expression extends GLBoostObject {
     return this._renderPaths;
   }
 
-  prepareForRender() {
-
+  prepareToRender() {
+    this._renderPaths.forEach((renderPath)=>{
+      renderPath.prepareToRender();
+    });
   }
 
 }
