@@ -125,14 +125,22 @@ var camera = glBoostContext.createCamera({
 // add the camera to the scene
 scene.addChild(camera);
 
+// create an expression (which is composed of several rendering paths)
+var expression = glBoostContext.createExpressionAndRenderPaths(1);
+
+// set scene to render path of expression
+expression.renderPaths[0].scene = scene;
+
 // call this method before rendering
-scene.prepareForRender();
+expression.prepareToRender();
 
 // rendering loop
 var render = function() {
-  // render the scene
+  // clear canvas
   renderer.clearCanvas();
-  renderer.draw(scene);
+
+  // render the expression
+  renderer.draw(expression);
 
   // rotate camera
   var rotateMatrixY = GLBoost.Matrix33.rotateY(-1.0);
