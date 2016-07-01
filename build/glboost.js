@@ -2827,7 +2827,10 @@
         var gl = this.gl;
         var glem = GLExtensionsManager.getInstance(this);
         var glResource = glem.createVertexArray(gl);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        if (glResource) {
+          this._monitor.registerWebGLResource(glBoostObject, glResource);
+        }
+
         return glResource;
       }
     }, {
@@ -2940,7 +2943,7 @@
         if (renderTargetTextures) {
           this._drawBuffers = [];
           renderTargetTextures.forEach(function (texture) {
-            _this2._drawBuffers.push(texture.colorAttachiment);
+            _this2._drawBuffers.push(texture.attachment);
           });
           this._renderTargetTextures = renderTargetTextures;
         } else {
@@ -5753,8 +5756,7 @@
       _this._width = width;
       _this._height = height;
       _this._fbo = null;
-      _this._colorAttachmentId = null;
-      _this._depthAttachmentId = null;
+      _this._attachmentId = null;
 
       var gl = _this._glContext.gl;
 
@@ -5773,20 +5775,12 @@
     }
 
     babelHelpers.createClass(MutableTexture, [{
-      key: 'colorAttachment',
+      key: 'attachment',
       set: function set(attachmentId) {
-        this._colorAttachmentId = attachmentId;
+        this._attachmentId = attachmentId;
       },
       get: function get() {
-        return this._colorAttachmentId;
-      }
-    }, {
-      key: 'depthAttachment',
-      set: function set(attachmentId) {
-        this._depthAttachmentId = attachmentId;
-      },
-      get: function get() {
-        return this._depthAttachmentId;
+        return this._attachmentId;
       }
     }, {
       key: 'frameBufferObject',
@@ -7226,7 +7220,7 @@
         renderTargetTextures.forEach(function (texture, i) {
           var glTexture = texture.glTextureResource;
           var attachimentId = glem.colorAttachiment(gl, i);
-          texture.colorAttachiment = attachimentId;
+          texture.attachment = attachimentId;
           gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
         });
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
@@ -7257,7 +7251,7 @@
         // Attach Buffers
         var glTexture = depthTexture.glTextureResource;
         var attachimentId = gl.DEPTH_ATTACHMENT;
-        depthTexture.colorAttachment = attachimentId;
+        depthTexture.attachment = attachimentId;
         gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -8757,7 +8751,7 @@
         canvas: null,
 
         /** 子供を 自分のCanvasRenderer で描画するか */
-        renderChildBySelf: false,
+        renderChildBySelf: true,
 
         init: function init(params) {
           this.superInit(params);
@@ -8830,6 +8824,7 @@
 
         renderObject: function renderObject(obj) {
           var layer = DisplayElement();
+          obj.flare('enterframe');
           obj.addChildTo(layer);
           this.renderer2d.renderObject(layer);
         },

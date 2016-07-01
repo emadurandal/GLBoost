@@ -124,7 +124,7 @@ export default class GLBoostLowContext {
     renderTargetTextures.forEach((texture, i)=>{
       var glTexture = texture.glTextureResource;
       var attachimentId = glem.colorAttachiment(gl, i);
-      texture.colorAttachiment = attachimentId;
+      texture.attachment = attachimentId;
       gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
     });
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
@@ -154,7 +154,7 @@ export default class GLBoostLowContext {
     // Attach Buffers
     var glTexture = depthTexture.glTextureResource;
     var attachimentId = gl.DEPTH_ATTACHMENT;
-    depthTexture.colorAttachment = attachimentId;
+    depthTexture.attachment = attachimentId;
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

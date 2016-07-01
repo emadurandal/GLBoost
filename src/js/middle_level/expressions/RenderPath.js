@@ -51,7 +51,7 @@ export default class RenderPath extends GLBoostObject {
     if (renderTargetTextures) {
       this._drawBuffers = [];
       renderTargetTextures.forEach((texture)=>{
-        this._drawBuffers.push(texture.colorAttachiment);
+        this._drawBuffers.push(texture.attachment);
       });
       this._renderTargetTextures = renderTargetTextures;
     } else {

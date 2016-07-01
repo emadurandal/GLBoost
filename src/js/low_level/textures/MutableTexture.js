@@ -17,8 +17,7 @@ export default class MutableTexture extends AbstractTexture {
     this._width = width;
     this._height = height;
     this._fbo = null;
-    this._colorAttachmentId = null;
-    this._depthAttachmentId = null;
+    this._attachmentId = null;
 
     var gl = this._glContext.gl;
 
@@ -35,20 +34,12 @@ export default class MutableTexture extends AbstractTexture {
 
   }
 
-  set colorAttachment(attachmentId) {
-    this._colorAttachmentId = attachmentId;
+  set attachment(attachmentId) {
+    this._attachmentId = attachmentId;
   }
 
-  get colorAttachment() {
-    return this._colorAttachmentId;
-  }
-
-  set depthAttachment(attachmentId) {
-    this._depthAttachmentId = attachmentId;
-  }
-
-  get depthAttachment() {
-    return this._depthAttachmentId;
+  get attachment() {
+    return this._attachmentId;
   }
 
   set frameBufferObject(fbo) {

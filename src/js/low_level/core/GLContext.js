@@ -39,7 +39,10 @@ export default class GLContext {
     var gl = this.gl;
     var glem = GLExtensionsManager.getInstance(this);
     var glResource = glem.createVertexArray(gl);
-    this._monitor.registerWebGLResource(glBoostObject, glResource);
+    if (glResource) {
+      this._monitor.registerWebGLResource(glBoostObject, glResource);
+    }
+
     return glResource;
   }
 
