@@ -9,7 +9,7 @@ A New WebGL Rendering Library for 3D Graphics Geeks
 
 Our concept is ...
 
-### "__Convenience like Three.js, Infinit Flexibility like raw WebGL, We get both.__"
+### "__Convenience like Three.js, Infinite Flexibility like raw WebGL, We get both.__"
 
 ## Attention
 
