@@ -39,7 +39,7 @@ export default class Renderer extends GLBoostObject {
    * @param {Scene} scene a instance of Scene class
    */
   draw(expression) {
-    expression.renderPaths.forEach((renderPath)=>{
+    expression.renderPasses.forEach((renderPath)=>{
       if (!renderPath.scene) {
         return;
       }
@@ -61,7 +61,7 @@ export default class Renderer extends GLBoostObject {
         Geometry.clearMaterialCache();
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPath.fboOfRenderTargetTextures);
       }
-      glem.drawBuffers(gl, renderPath.buffersToDraw); // set render target buffers for each RenderPath.
+      glem.drawBuffers(gl, renderPath.buffersToDraw); // set render target buffers for each RenderPass.
 
       if (renderPath.clearColor) {
         var color = renderPath.clearColor;

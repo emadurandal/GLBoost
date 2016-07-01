@@ -117,7 +117,7 @@
 
       var glBoostContext = layer.glBoostContext;
       var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
-      var renderPaths = glBoostContext.createRenderPaths(2);
+      var renderPasses = glBoostContext.createRenderPasses(2);
 
       var positions = [new GLBoost.Vector3(-0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(-0.5, 0.5, 0.0), new GLBoost.Vector3(0.5, -0.5, 0.0), new GLBoost.Vector3(0.5, 0.5, 0.0)];
       var shapetarget_1 = [new GLBoost.Vector3(-1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(-1.0, 0.5, 0.0), new GLBoost.Vector3(1.0, -0.5, 0.0), new GLBoost.Vector3(1.0, 0.5, 0.0)];
@@ -151,9 +151,9 @@
       scene.addChild(camera);
       scene.addChild(mesh);
 
-      renderPaths[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
-      renderPaths[0].specifyRenderTargetTextures(renderTextures);
-      renderPaths[0].scene = scene;
+      renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
+      renderPasses[0].specifyRenderTargetTextures(renderTextures);
+      renderPasses[0].scene = scene;
 
       var scene2 = glBoostContext.createScene();
       scene2.addChild(camera);
@@ -172,11 +172,11 @@
 
       mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
 
-      renderPaths[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
-      renderPaths[1].scene = scene2;
+      renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
+      renderPasses[1].scene = scene2;
 
-      layer.expression.clearRenderPaths();
-      layer.expression.addRenderPaths(renderPaths);
+      layer.expression.clearRenderPasses();
+      layer.expression.addRenderPasses(renderPasses);
       layer.expression.prepareToRender();
 
       var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);

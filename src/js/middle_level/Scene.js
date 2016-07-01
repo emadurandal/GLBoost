@@ -5,7 +5,7 @@ import GLContext from '../low_level/core/GLContext';
 import AbstractLight from '../low_level/lights/AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
-import RenderPath from './expressions/RenderPath';
+import RenderPath from './expressions/RenderPass';
 
 
 /**

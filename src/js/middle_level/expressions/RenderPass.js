@@ -1,10 +1,9 @@
 import GLBoost from '../../globals';
-import GLContext from '../../low_level/core/GLContext';
 import Mesh from '../meshes/Mesh';
 import Group from '../Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 
-export default class RenderPath extends GLBoostObject {
+export default class RenderPass extends GLBoostObject {
 
   constructor(glBoostContext) {
     super(glBoostContext);
@@ -147,4 +146,3 @@ export default class RenderPath extends GLBoostObject {
 
 }
 
-GLBoost['RenderPath'] = RenderPath;

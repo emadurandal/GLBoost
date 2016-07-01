@@ -6,36 +6,36 @@ export default class Expression extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
 
-    this._renderPaths = [];
+    this._renderPasses = [];
   }
 
-  addRenderPaths(renderPaths) {
-    renderPaths.forEach((renderPath)=>{
-      renderPath._expression = this;
+  addRenderPasses(renderPasses) {
+    renderPasses.forEach((renderPass)=>{
+      renderPass._expression = this;
     });
     
-    this._renderPaths = this._renderPaths.concat(renderPaths);
+    this._renderPasses = this._renderPasses.concat(renderPasses);
   }
 
-  addRenderPath(renderPath) {
+  addRenderPass(renderPass) {
     renderPath._expression = this;
-    this._renderPaths.push(renderPath);
+    this._renderPasses.push(renderPass);
   }
 
-  clearRenderPaths() {
-    this._renderPaths.forEach((renderPath)=>{
-      renderPath._expression = null;
+  clearRenderPasses() {
+    this._renderPasses.forEach((renderPass)=>{
+      renderPass._expression = null;
     });
-    this._renderPaths.length = 0;
+    this._renderPasses.length = 0;
   }
 
-  get renderPaths() {
-    return this._renderPaths;
+  get renderPasses() {
+    return this._renderPasses;
   }
 
   prepareToRender() {
-    this._renderPaths.forEach((renderPath)=>{
-      renderPath.prepareToRender();
+    this._renderPasses.forEach((renderPass)=>{
+      renderPass.prepareToRender();
     });
   }
 

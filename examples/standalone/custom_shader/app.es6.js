@@ -102,8 +102,8 @@ promise.then(function(mesh) {
 
   scene.addChild( mesh );
 
-  var expression = glBoostContext.createExpressionAndRenderPaths(1);
-  expression.renderPaths[0].scene = scene;
+  var expression = glBoostContext.createExpressionAndRenderPasses(1);
+  expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
 
 

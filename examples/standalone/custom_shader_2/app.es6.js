@@ -111,8 +111,8 @@ var planeGeometry = glBoostContext.createPlane(10, 10, uSpan, vSpan, additionalA
 var plane = glBoostContext.createMesh(planeGeometry, material);
 scene.addChild( plane );
 
-var expression = glBoostContext.createExpressionAndRenderPaths(1);
-expression.renderPaths[0].scene = scene;
+var expression = glBoostContext.createExpressionAndRenderPasses(1);
+expression.renderPasses[0].scene = scene;
 expression.prepareToRender();
 
 var render = function(){

@@ -93,12 +93,12 @@ var camera = glBoostContext_1.createCamera({
 scene_1.addChild(camera);
 scene_2.addChild(camera);
 
-var expression_1 = glBoostContext_1.createExpressionAndRenderPaths(1);
-expression_1.renderPaths[0].scene = scene_1;
+var expression_1 = glBoostContext_1.createExpressionAndRenderPasses(1);
+expression_1.renderPasses[0].scene = scene_1;
 expression_1.prepareToRender();
 
-var expression_2 = glBoostContext_2.createExpressionAndRenderPaths(1);
-expression_2.renderPaths[0].scene = scene_2;
+var expression_2 = glBoostContext_2.createExpressionAndRenderPasses(1);
+expression_2.renderPasses[0].scene = scene_2;
 expression_2.prepareToRender();
 
 

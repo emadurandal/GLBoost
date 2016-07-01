@@ -130,10 +130,10 @@ var camera = glBoostContext.createCamera({
 scene.addChild(camera);
 
 // create an expression (which is composed of several rendering paths)
-var expression = glBoostContext.createExpressionAndRenderPaths(1);
+var expression = glBoostContext.createExpressionAndRenderPasses(1);
 
 // set scene to render path of expression
-expression.renderPaths[0].scene = scene;
+expression.renderPasses[0].scene = scene;
 
 // call this method before rendering
 expression.prepareToRender();
