@@ -22,7 +22,7 @@ phina.namespace(function() {
     canvas: null,
 
     /** 子供を 自分のCanvasRenderer で描画するか */
-    renderChildBySelf: false,
+    renderChildBySelf: true,
 
     init: function(params) {
       this.superInit(params);
@@ -96,6 +96,7 @@ phina.namespace(function() {
 
     renderObject: function(obj) {
       var layer = DisplayElement();
+      obj.flare('enterframe');
       obj.addChildTo(layer);
       this.renderer2d.renderObject(layer);
     },
