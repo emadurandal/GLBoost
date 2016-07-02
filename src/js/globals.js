@@ -29,7 +29,8 @@ global.GLBoost['BLENDTARGET9'] = 'shapetarget_9';
 global.GLBoost['BLENDTARGET10'] = 'shapetarget_10';
 global.GLBoost['RADIAN'] = 'radian';
 global.GLBoost['DEGREE'] = 'degree';
-
+global.GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
+global.GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
 
 export default global.GLBoost;
 

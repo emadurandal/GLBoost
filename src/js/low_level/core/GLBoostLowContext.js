@@ -124,7 +124,7 @@ export default class GLBoostLowContext {
     renderTargetTextures.forEach((texture, i)=>{
       var glTexture = texture.glTextureResource;
       var attachimentId = glem.colorAttachiment(gl, i);
-      texture.attachment = attachimentId;
+      texture.colorAttachment = attachimentId;
       gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
     });
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
@@ -148,13 +148,25 @@ export default class GLBoostLowContext {
     fbo.width = width ? width : canvas.width;
     fbo.height = height ? height : canvas.height;
 
-    let depthTexture = new MutableTexture(this, fbo.width, fbo.height);
+    // Create color RenderBuffer
+    var colorBuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, colorBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
+
+    // Create MutableTexture for Depth Texture
+    let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
+      gl.DEPTH_COMPONENT, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT,
+      gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
 
-    // Attach Buffers
+    /// Attach Buffers
+    // color
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+
+    // depth
     var glTexture = depthTexture.glTextureResource;
     var attachimentId = gl.DEPTH_ATTACHMENT;
-    depthTexture.attachment = attachimentId;
+    depthTexture.depthAttachment = attachimentId;
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);

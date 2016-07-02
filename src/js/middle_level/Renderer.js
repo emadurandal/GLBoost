@@ -37,14 +37,14 @@ export default class Renderer extends GLBoostObject {
    * @param {Scene} scene a instance of Scene class
    */
   draw(expression) {
-    expression.renderPasses.forEach((renderPath)=>{
-      if (!renderPath.scene) {
+    expression.renderPasses.forEach((renderPass)=>{
+      if (!renderPass.scene) {
         return;
       }
 
       var camera = false;
-      renderPath.scene.cameras.forEach((elm)=> {
-        if (elm.isMainCamera(renderPath.scene)) {
+      renderPass.scene.cameras.forEach((elm)=> {
+        if (elm.isMainCamera(renderPass.scene)) {
           camera = elm;
         }
       });
@@ -52,38 +52,47 @@ export default class Renderer extends GLBoostObject {
       var gl = this._glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
-      let lights = renderPath.scene.lights;
+      let lights = renderPass.scene.lights;
 
-      if (renderPath.fboOfRenderTargetTextures) {
+      if (renderPass.fbo) {
         gl.bindTexture(gl.TEXTURE_2D, null);
         Geometry.clearMaterialCache();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPath.fboOfRenderTargetTextures);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
       }
-      glem.drawBuffers(gl, renderPath.buffersToDraw); // set render target buffers for each RenderPass.
+      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-      if (renderPath.clearColor) {
-        var color = renderPath.clearColor;
-        gl.clearColor(color.x, color.y, color.z, color.w);
+      var clearColor = renderPass.clearColor;
+      var clearDepth = renderPass.clearDepth;
+      if (clearColor) {
+        gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+      }
+      if (clearDepth) {
+        gl.clearDepth(clearDepth);
+      }
+      if (clearColor || clearDepth) {
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      } else if (clearColor) {
+        gl.clear( gl.COLOR_BUFFER_BIT );
+      } else {
+        gl.clear( gl.DEPTH_BUFFER_BIT );
       }
-
       // draw opacity meshes.
-      var opacityMeshes = renderPath.opacityMeshes;
+      var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
-        mesh.draw(lights, camera, renderPath.scene);
+        mesh.draw(lights, camera, renderPass.scene);
       });
 
       if (camera) {
-        renderPath.sortTransparentMeshes(camera);
+        renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = renderPath.transparentMeshes;
+      var transparentMeshes = renderPass.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
-        mesh.draw(lights, camera, renderPath.scene);
+        mesh.draw(lights, camera, renderPass.scene);
       });
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-      glem.drawBuffers(gl, [gl.BACK]);
+//      glem.drawBuffers(gl, [gl.BACK]);
 
     });
   }

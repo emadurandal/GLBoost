@@ -10,6 +10,7 @@ import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
 import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
+import AABB from '../../low_level/math/AABB';
 
 
 export default class Geometry extends GLBoostObject {
@@ -27,9 +28,7 @@ export default class Geometry extends GLBoostObject {
     this._defaultMaterial = glBoostContext.createClassicMaterial();
     this._vertexData = [];
     this._extraDataForShader = {};
-    this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-    this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-    this._centerPosition = Vector3.zero();
+    this._AABB = new AABB();
     this._drawKicker = DrawKickerWorld.getInstance();
 
     if (this._drawKicker instanceof DrawKickerWorld) {
@@ -80,21 +79,6 @@ export default class Geometry extends GLBoostObject {
     return attribNameArray;
   }
 
-  _updateAABB(positionVector) {
-    this._AABB_min.x = (positionVector.x < this._AABB_min.x) ? positionVector.x : this._AABB_min.x;
-    this._AABB_min.y = (positionVector.y < this._AABB_min.y) ? positionVector.y : this._AABB_min.y;
-    this._AABB_min.z = (positionVector.z < this._AABB_min.z) ? positionVector.z : this._AABB_min.z;
-    this._AABB_max.x = (this._AABB_max.x < positionVector.x) ? positionVector.x : this._AABB_max.x;
-    this._AABB_max.y = (this._AABB_max.y < positionVector.y) ? positionVector.y : this._AABB_max.y;
-    this._AABB_max.z = (this._AABB_max.z < positionVector.z) ? positionVector.z : this._AABB_max.z;
-
-    return positionVector;
-  }
-
-  _updateCenterPosition() {
-    this._centerPosition = Vector3.divide(Vector3.subtract(this._AABB_max, this._AABB_min), 2);
-  }
-
   setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
 
@@ -107,12 +91,12 @@ export default class Geometry extends GLBoostObject {
         this._vertices[attribName][index] = MathUtil.arrayToVector(element);
 
         if (attribName === 'position') {
-          this._updateAABB(this._vertices[attribName][index]);
+          this._AABB.addPosition(this._vertices[attribName][index]);
         }
       });
     });
 
-    this._updateCenterPosition();
+    this._AABB.updateAllInfo();
 
     this._indicesArray = indicesArray;
     this._primitiveType = primitiveType;
@@ -152,7 +136,7 @@ export default class Geometry extends GLBoostObject {
           this._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
           if (attribName === 'position') {
-            this._updateAABB(this._vertices[attribName][index]);
+            this._AABB.addPosition(this._vertices[attribName][index]);
           }
 
           vertexData[idx++] = element.x;
@@ -166,7 +150,8 @@ export default class Geometry extends GLBoostObject {
         });
       });
 
-      this._updateCenterPosition();
+      this._AABB.updateAllInfo();
+
 
       if(!isCached) {
         this.Float32AryVertexData = new Float32Array(vertexData);
@@ -416,7 +401,7 @@ export default class Geometry extends GLBoostObject {
   }
 
   get centerPosition() {
-    return this._centerPosition;
+    return this._AABB.centerPoint;
   }
 
   setExtraDataForShader(name, value) {

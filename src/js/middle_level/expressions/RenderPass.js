@@ -15,8 +15,10 @@ export default class RenderPass extends GLBoostObject {
     this._transparentMeshes = [];
     this._drawBuffers = [this._glContext.gl.BACK];
     this._clearColor = null;
-    this._clearDepth = 1.0;
-    this._renderTargetTextures = null;
+    this._clearDepth = null;  // default is 1.0
+    this._renderTargetColorTextures = null;
+    this._renderTargetDepthTexture = null;
+    this._fbo = null;
   }
 
   get expression() {
@@ -45,33 +47,54 @@ export default class RenderPass extends GLBoostObject {
 
   specifyRenderTargetTextures(renderTargetTextures) {
     var gl = this._glContext.gl;
+    
+    var colorRenderTargetTextures = renderTargetTextures.filter((renderTargetTexture)=>{
+      if (renderTargetTexture.colorAttachment) {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
-    if (renderTargetTextures) {
+
+    if (colorRenderTargetTextures.length > 0) {
       this._drawBuffers = [];
-      renderTargetTextures.forEach((texture)=>{
-        this._drawBuffers.push(texture.attachment);
+      colorRenderTargetTextures.forEach((texture)=>{
+        var attachment = texture.colorAttachment;
+        this._drawBuffers.push(attachment);
       });
-      this._renderTargetTextures = renderTargetTextures;
+      this._renderTargetColorTextures = colorRenderTargetTextures;
     } else {
-      this._drawBuffers = [gl.BACK];
+      this._drawBuffers = [gl.NONE];
     }
 
+    var depthRenderTargetTextures = renderTargetTextures.filter((renderTargetTexture)=>{
+      if (renderTargetTexture.depthAttachment) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    this._renderTargetDepthTexture = depthRenderTargetTextures[0];
   }
 
   get buffersToDraw() {
     return this._drawBuffers;
   }
 
-  get fboOfRenderTargetTextures() {
-    if (this._renderTargetTextures) {
-      return this._renderTargetTextures[0].fbo;
+  get fbo() {
+    if (this._renderTargetColorTextures) {
+      return this._renderTargetColorTextures[0].fbo;
+    } else if (this._renderTargetDepthTexture) {
+      return this._renderTargetDepthTexture.fbo;
     } else {
       return null;
     }
   }
 
-  get renderTargetTextures() {
-    return this._renderTargetTextures;
+  get renderTargetColorTextures() {
+    return this._renderTargetColorTextures;
   }
 
   setClearColor(color) {

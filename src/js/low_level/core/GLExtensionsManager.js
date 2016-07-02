@@ -18,6 +18,8 @@ export default class GLExtensionsManager {
         gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
 
       this._extEIUI = gl.getExtension('OES_element_index_uint');
+
+      this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
     }
 
     GLExtensionsManager._instances[glContext.canvas.id] = this;
@@ -68,6 +70,11 @@ export default class GLExtensionsManager {
       this.extDBs.drawBuffersWEBGL(buffers);
       return true;
     } else {
+      if (buffers[0] === gl.NONE) {
+        gl.colorMask(false, false, false, false);
+      } else {
+        gl.colorMask(true, true, true, true);
+      }
       return false;
     }
   }

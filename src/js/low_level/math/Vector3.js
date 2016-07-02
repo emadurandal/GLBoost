@@ -24,13 +24,12 @@ export default class Vector3 {
     return new Vector3(0, 0, 0);
   }
 
+  clone() {
+    return new Vector3(this.x, this.y, this.z);
+  }
 
   length() {
     return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
-  }
-
-  clone() {
-    return new Vector3(this.x, this.y, this.z);
   }
 
   /*
@@ -52,8 +51,22 @@ export default class Vector3 {
   /**
    * 長さの2乗（static版）
    */
-  lengthSquared(vec3) {
+  static lengthSquared(vec3) {
     return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
+  }
+
+  lengthTo(vec3) {
+    var deltaX = vec3.x - this.x;
+    var deltaY = vec3.y - this.y;
+    var deltaZ = vec3.z - this.z;
+    return Math.sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
+  }
+
+  static lengthBtw(lhv, rhv) {
+    var deltaX = rhv.x - lhv.x;
+    var deltaY = rhv.y - lhv.y;
+    var deltaZ = rhv.z - lhv.z;
+    return Math.sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
   }
 
   /**

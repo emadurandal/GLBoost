@@ -139,6 +139,8 @@
   global.GLBoost['BLENDTARGET10'] = 'shapetarget_10';
   global.GLBoost['RADIAN'] = 'radian';
   global.GLBoost['DEGREE'] = 'degree';
+  global.GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
+  global.GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
 
   var GLBoost$1 = global.GLBoost;
 
@@ -207,14 +209,14 @@
        */
 
     }, {
-      key: 'length',
-      value: function length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-      }
-    }, {
       key: 'clone',
       value: function clone() {
         return new Vector3(this.x, this.y, this.z);
+      }
+    }, {
+      key: 'length',
+      value: function length() {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
       }
 
       /*
@@ -241,17 +243,20 @@
        */
 
     }, {
-      key: 'lengthSquared',
-      value: function lengthSquared(vec3) {
-        return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
+      key: 'lengthTo',
+      value: function lengthTo(vec3) {
+        var deltaX = vec3.x - this.x;
+        var deltaY = vec3.y - this.y;
+        var deltaZ = vec3.z - this.z;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
       }
+    }, {
+      key: 'dotProduct',
+
 
       /**
        * 内積
        */
-
-    }, {
-      key: 'dotProduct',
       value: function dotProduct(vec3) {
         return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
       }
@@ -380,6 +385,19 @@
       key: 'zero',
       value: function zero() {
         return new Vector3(0, 0, 0);
+      }
+    }, {
+      key: 'lengthSquared',
+      value: function lengthSquared(vec3) {
+        return vec3.x * vec3.x + vec3.y * vec3.y + vec3.z * vec3.z;
+      }
+    }, {
+      key: 'lengthBtw',
+      value: function lengthBtw(lhv, rhv) {
+        var deltaX = rhv.x - lhv.x;
+        var deltaY = rhv.y - lhv.y;
+        var deltaZ = rhv.z - lhv.z;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
       }
     }, {
       key: 'dotProduct',
@@ -775,6 +793,8 @@
         this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
 
         this._extEIUI = gl.getExtension('OES_element_index_uint');
+
+        this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
       }
 
       GLExtensionsManager._instances[glContext.canvas.id] = this;
@@ -814,6 +834,11 @@
           this.extDBs.drawBuffersWEBGL(buffers);
           return true;
         } else {
+          if (buffers[0] === gl.NONE) {
+            gl.colorMask(false, false, false, false);
+          } else {
+            gl.colorMask(true, true, true, true);
+          }
           return false;
         }
       }
@@ -1106,7 +1131,8 @@
       _this._width = width;
       _this._height = height;
       _this._fbo = null;
-      _this._attachmentId = null;
+      _this._colorAttachmentId = null;
+      _this._depthAttachmentId = null;
 
       var gl = _this._glContext.gl;
 
@@ -1125,12 +1151,20 @@
     }
 
     babelHelpers.createClass(MutableTexture, [{
-      key: 'attachment',
-      set: function set(attachmentId) {
-        this._attachmentId = attachmentId;
+      key: 'colorAttachment',
+      set: function set(colorAttachmentId) {
+        this._colorAttachmentId = colorAttachmentId;
       },
       get: function get() {
-        return this._attachmentId;
+        return this._colorAttachmentId;
+      }
+    }, {
+      key: 'depthAttachment',
+      set: function set(depthAttachmentId) {
+        this._depthAttachmentId = depthAttachmentId;
+      },
+      get: function get() {
+        return this._depthAttachmentId;
       }
     }, {
       key: 'frameBufferObject',
@@ -4581,6 +4615,60 @@
   DrawKickerWorld._lastShaderName = null;
   DrawKickerWorld._lastGeometry = null;
 
+  var AABB = function () {
+    function AABB() {
+      babelHelpers.classCallCheck(this, AABB);
+
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+    }
+
+    babelHelpers.createClass(AABB, [{
+      key: 'addPosition',
+      value: function addPosition(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: 'updateAllInfo',
+      value: function updateAllInfo() {
+        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      }
+    }, {
+      key: 'minPoint',
+      get: function get() {
+        return this._AABB_min;
+      }
+    }, {
+      key: 'maxPoint',
+      get: function get() {
+        return this._AABB_max;
+      }
+    }, {
+      key: 'centerPoint',
+      get: function get() {
+        return this._centerPoint;
+      }
+    }, {
+      key: 'lengthCenterToCorner',
+      get: function get() {
+        return this._lengthCenterToCorner;
+      }
+    }]);
+    return AABB;
+  }();
+
+  GLBoost$1['AABB'] = AABB;
+
   var Geometry = function (_GLBoostObject) {
     babelHelpers.inherits(Geometry, _GLBoostObject);
 
@@ -4600,9 +4688,7 @@
       _this._defaultMaterial = glBoostContext.createClassicMaterial();
       _this._vertexData = [];
       _this._extraDataForShader = {};
-      _this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      _this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-      _this._centerPosition = Vector3.zero();
+      _this._AABB = new AABB();
       _this._drawKicker = DrawKickerWorld.getInstance();
 
       if (_this._drawKicker instanceof DrawKickerWorld) {} else if (_this._drawKicker instanceof DrawKickerLocal) {}
@@ -4657,23 +4743,6 @@
         return attribNameArray;
       }
     }, {
-      key: '_updateAABB',
-      value: function _updateAABB(positionVector) {
-        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
-        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
-        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
-
-        return positionVector;
-      }
-    }, {
-      key: '_updateCenterPosition',
-      value: function _updateCenterPosition() {
-        this._centerPosition = Vector3.divide(Vector3.subtract(this._AABB_max, this._AABB_min), 2);
-      }
-    }, {
       key: 'setVerticesData',
       value: function setVerticesData(vertices, indicesArray) {
         var _this2 = this;
@@ -4692,12 +4761,12 @@
             _this2._vertices[attribName][index] = MathUtil.arrayToVector(element);
 
             if (attribName === 'position') {
-              _this2._updateAABB(_this2._vertices[attribName][index]);
+              _this2._AABB.addPosition(_this2._vertices[attribName][index]);
             }
           });
         });
 
-        this._updateCenterPosition();
+        this._AABB.updateAllInfo();
 
         this._indicesArray = indicesArray;
         this._primitiveType = primitiveType;
@@ -4746,7 +4815,7 @@
                 _this3._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
 
                 if (attribName === 'position') {
-                  _this3._updateAABB(_this3._vertices[attribName][index]);
+                  _this3._AABB.addPosition(_this3._vertices[attribName][index]);
                 }
 
                 vertexData[idx++] = element.x;
@@ -4760,7 +4829,7 @@
               });
             });
 
-            _this3._updateCenterPosition();
+            _this3._AABB.updateAllInfo();
 
             if (!isCached) {
               _this3.Float32AryVertexData = new Float32Array(vertexData);
@@ -5028,7 +5097,7 @@
     }, {
       key: 'centerPosition',
       get: function get() {
-        return this._centerPosition;
+        return this._AABB.centerPoint;
       }
     }], [{
       key: 'clearMaterialCache',
@@ -6274,7 +6343,7 @@
         renderTargetTextures.forEach(function (texture, i) {
           var glTexture = texture.glTextureResource;
           var attachimentId = glem.colorAttachiment(gl, i);
-          texture.attachment = attachimentId;
+          texture.colorAttachment = attachimentId;
           gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
         });
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
@@ -6299,13 +6368,23 @@
         fbo.width = width ? width : canvas.width;
         fbo.height = height ? height : canvas.height;
 
-        var depthTexture = new MutableTexture(this, fbo.width, fbo.height);
+        // Create color RenderBuffer
+        var colorBuffer = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, colorBuffer);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
+
+        // Create MutableTexture for Depth Texture
+        var depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0, gl.DEPTH_COMPONENT, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         depthTexture.fbo = fbo;
 
-        // Attach Buffers
+        /// Attach Buffers
+        // color
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+
+        // depth
         var glTexture = depthTexture.glTextureResource;
         var attachimentId = gl.DEPTH_ATTACHMENT;
-        depthTexture.attachment = attachimentId;
+        depthTexture.depthAttachment = attachimentId;
         gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);

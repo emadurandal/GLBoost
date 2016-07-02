@@ -21,3 +21,4 @@ import GLBoost from './plugins/phina.glboost';
 import PhongShader from './shaders/PhongShader';
 import LambertShader from './shaders/LambertShader';
 import HalfLambertShader from './shaders/HalfLambertShader';
+import DepthDisplayShader from './shaders/DepthDisplayShader';
