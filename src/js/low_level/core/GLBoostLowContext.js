@@ -4,7 +4,7 @@ import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import SkeletalGeometry from '../geometries/SkeletalGeometry';
 import ClassicMaterial from '../ClassicMaterial';
-import PerspectiveCamera from '../elements/PerspectiveCamera';
+import PerspectiveCamera from '../elements/cameras/PerspectiveCamera';
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import Cube from '../primitives/Cube';

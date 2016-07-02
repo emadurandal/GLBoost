@@ -1,5 +1,5 @@
 import Element from '../../low_level/elements/Element';
-import Camera from '../../low_level/elements/PerspectiveCamera';
+import Camera from '../../low_level/elements/cameras/PerspectiveCamera';
 import AbstractLight from '../../low_level/lights/AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';

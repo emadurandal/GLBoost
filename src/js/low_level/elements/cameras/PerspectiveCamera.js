@@ -1,6 +1,6 @@
-import Vector3 from '../math/Vector3';
-import Element from './Element';
-import Matrix44 from '../math/Matrix44';
+import Vector3 from '../../math/Vector3';
+import Element from '../Element';
+import Matrix44 from '../../math/Matrix44';
 
 export default class PerspectiveCamera extends Element {
   constructor(glBoostContext, lookat, perspective) {

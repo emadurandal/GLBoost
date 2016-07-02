@@ -47,6 +47,7 @@
   var plane = null;
   var cube = null;
   var depthTexture = null;
+  var depthCamera = null
   var camera = null;
   var directionOfDirectionalLight = new GLBoost.Vector3(5, -10, 5);
 
@@ -73,7 +74,7 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    var camera = glBoostContext.createPerspectiveCamera(
+    depthCamera = glBoostContext.createPerspectiveCamera(
         {
           eye: new GLBoost.Vector3(0.0, 5, 15.0),
           center: new GLBoost.Vector3(0.0, 5.0, 0.0),
@@ -86,9 +87,9 @@
           zFar: 1.0
         }
     );
-    scene.addChild( camera );
+    scene.addChild( depthCamera );
 
-    scene.addChild( camera );
+    scene.addChild( depthCamera );
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
@@ -97,11 +98,11 @@
       var centerOfAABB = aabb.centerPoint;
       var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
       var normalizedLightDirection = GLBoost.Vector3.normalize(directionOfDirectionalLight);
-      var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + camera.zNear)));
+      var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCamera.zNear)));
       var cameraCenter = GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
-      camera.eye = cameraEye;
-      camera.center = cameraCenter;
-      camera.zFar = lengthBtwCenterToCornerOfAABB * 2 + camera.zNear;
+      depthCamera.eye = cameraEye;
+      depthCamera.center = cameraCenter;
+      depthCamera.zFar = lengthBtwCenterToCornerOfAABB * 2 + depthCamera.zNear;
       console.log(aabb.minPoint + ' ' + aabb.maxPoint);
     }).bind(this);
   })();
