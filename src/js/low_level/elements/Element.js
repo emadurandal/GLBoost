@@ -19,7 +19,7 @@ export default class Element extends GLBoostObject {
     this._matrix = Matrix44.identity();
     this._finalMatrix = Matrix44.identity();
     this._invMatrix = Matrix44.identity();
-    this._dirtyAsElement = false;
+    this._dirtyAsElement = true;
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;

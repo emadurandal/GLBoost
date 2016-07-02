@@ -1,40 +1,18 @@
 import Vector3 from '../../math/Vector3';
-import Element from '../Element';
+import AbstractCamera from './AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
-export default class PerspectiveCamera extends Element {
+export default class PerspectiveCamera extends AbstractCamera {
   constructor(glBoostContext, lookat, perspective) {
-    super(glBoostContext);
-
-    this._translate = lookat.eye;
-    this._center = lookat.center;
-    this._up = lookat.up;
+    super(glBoostContext, lookat);
 
     this._fovy = perspective.fovy;
     this._aspect = perspective.aspect;
     this._zNear = perspective.zNear;
     this._zFar = perspective.zFar;
 
-    this._dirtyView = true;
-    this._dirtyAsElement = true;
-    this._updateCountAsCameraView = 0;
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection = 0;
-    this._mainCamera = {};
-  }
-
-  _needUpdateView() {
-    this._dirtyView = true;
-    this._updateCountAsCameraView++;
-  }
-
-  get updateCountAsCameraView() {
-    return this._updateCountAsCameraView;
-  }
-
-  get latestViewStateInfoString() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
   }
 
   _needUpdateProjection() {
@@ -44,28 +22,6 @@ export default class PerspectiveCamera extends Element {
 
   get updateCountAsCameraProjection() {
     return this._updateCountAsCameraProjection;
-  }
-
-  lookAtRHMatrix() {
-    if (this._dirtyView) {
-      this._viewMatrix = PerspectiveCamera.lookAtRHMatrix(this._translate, this._center, this._up);
-      this._dirtyView = false;
-      return this._viewMatrix.clone();
-    } else {
-      return this._viewMatrix.clone();
-    }
-  }
-
-  static lookAtRHMatrix(eye, center, up) {
-
-    var f = Vector3.normalize(Vector3.subtract(center, eye));
-    var s = Vector3.normalize(Vector3.cross(f, up));
-    var u = Vector3.cross(s, f);
-
-    return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
-                         u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
-                         -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
-                         0, 0, 0, 1);
   }
 
   perspectiveRHMatrix() {
@@ -90,56 +46,6 @@ export default class PerspectiveCamera extends Element {
       0.0, 0.0, -1.0, 0.0
     );
 
-  }
-
-  setAsMainCamera(scene) {
-    this._mainCamera[scene.toString()] = this;
-  }
-
-  isMainCamera(scene) {
-    return this._mainCamera[scene.toString()] === this;
-  }
-
-  set translate(vec) {
-    super.translate = vec;
-    this._needUpdateView();
-  }
-
-  get translate() {
-    return super.translate;
-  }
-
-  set eye(vec) {
-    super.translate = vec;
-    this._needUpdateView();
-  }
-
-  get eye() {
-    return this._translate;
-  }
-
-  set center(vec) {
-    if (this._center.isEqual(vec)) {
-      return;
-    }
-    this._center = vec;
-    this._needUpdateView();
-  }
-
-  get center() {
-    return this._center;
-  }
-
-  set up(vec) {
-    if (this._up.isEqual(vec)) {
-      return;
-    }
-    this._up = vec;
-    this._needUpdateView();
-  }
-
-  get up() {
-    return this._up;
   }
 
   set fovy(value) {
@@ -191,4 +97,3 @@ export default class PerspectiveCamera extends Element {
   }
 
 }
-PerspectiveCamera._mainCamera = null;

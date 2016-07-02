@@ -2362,7 +2362,7 @@
       _this._matrix = Matrix44.identity();
       _this._finalMatrix = Matrix44.identity();
       _this._invMatrix = Matrix44.identity();
-      _this._dirtyAsElement = false;
+      _this._dirtyAsElement = true;
       _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
       _this._calculatedInverseMatrix = false;
       _this._updateCountAsElement = 0;
@@ -3086,64 +3086,44 @@
     return Texture;
   }(AbstractTexture);
 
-  var PerspectiveCamera = function (_Element) {
-    babelHelpers.inherits(PerspectiveCamera, _Element);
+  var AbstractCamera = function (_Element) {
+    babelHelpers.inherits(AbstractCamera, _Element);
 
-    function PerspectiveCamera(glBoostContext, lookat, perspective) {
-      babelHelpers.classCallCheck(this, PerspectiveCamera);
+    function AbstractCamera(glBoostContext, lookat) {
+      babelHelpers.classCallCheck(this, AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext));
+
+      if (_this.constructor === AbstractCamera) {
+        throw new TypeError('Cannot construct AbstractCamera instances directly.');
+      }
 
       _this._translate = lookat.eye;
       _this._center = lookat.center;
       _this._up = lookat.up;
 
-      _this._fovy = perspective.fovy;
-      _this._aspect = perspective.aspect;
-      _this._zNear = perspective.zNear;
-      _this._zFar = perspective.zFar;
-
       _this._dirtyView = true;
-      _this._dirtyAsElement = true;
       _this._updateCountAsCameraView = 0;
-      _this._dirtyProjection = true;
-      _this._updateCountAsCameraProjection = 0;
       _this._mainCamera = {};
+
       return _this;
     }
 
-    babelHelpers.createClass(PerspectiveCamera, [{
+    babelHelpers.createClass(AbstractCamera, [{
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
         this._updateCountAsCameraView++;
       }
     }, {
-      key: '_needUpdateProjection',
-      value: function _needUpdateProjection() {
-        this._dirtyProjection = true;
-        this._updateCountAsCameraProjection++;
-      }
-    }, {
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
-          this._viewMatrix = PerspectiveCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
           return this._viewMatrix.clone();
-        }
-      }
-    }, {
-      key: 'perspectiveRHMatrix',
-      value: function perspectiveRHMatrix() {
-        if (this._dirtyProjection) {
-          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
-          this._dirtyProjection = false;
-          return this._projectionMatrix.clone();
-        } else {
-          return this._projectionMatrix.clone();
         }
       }
     }, {
@@ -3166,25 +3146,22 @@
       get: function get() {
         var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
         tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
-      }
-    }, {
-      key: 'updateCountAsCameraProjection',
-      get: function get() {
-        return this._updateCountAsCameraProjection;
+
+        return tempString;
       }
     }, {
       key: 'translate',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', this);
+        return babelHelpers.get(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
@@ -3213,6 +3190,60 @@
       },
       get: function get() {
         return this._up;
+      }
+    }], [{
+      key: 'lookAtRHMatrix',
+      value: function lookAtRHMatrix(eye, center, up) {
+
+        var f = Vector3.normalize(Vector3.subtract(center, eye));
+        var s = Vector3.normalize(Vector3.cross(f, up));
+        var u = Vector3.cross(s, f);
+
+        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
+      }
+    }]);
+    return AbstractCamera;
+  }(Element);
+
+  var PerspectiveCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
+
+    function PerspectiveCamera(glBoostContext, lookat, perspective) {
+      babelHelpers.classCallCheck(this, PerspectiveCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, lookat));
+
+      _this._fovy = perspective.fovy;
+      _this._aspect = perspective.aspect;
+      _this._zNear = perspective.zNear;
+      _this._zFar = perspective.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(PerspectiveCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'perspectiveRHMatrix',
+      value: function perspectiveRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
       }
     }, {
       key: 'fovy',
@@ -3263,16 +3294,6 @@
         return this._zFar;
       }
     }], [{
-      key: 'lookAtRHMatrix',
-      value: function lookAtRHMatrix(eye, center, up) {
-
-        var f = Vector3.normalize(Vector3.subtract(center, eye));
-        var s = Vector3.normalize(Vector3.cross(f, up));
-        var u = Vector3.cross(s, f);
-
-        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
-      }
-    }, {
       key: 'perspectiveRHMatrix',
       value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
 
@@ -3283,9 +3304,7 @@
       }
     }]);
     return PerspectiveCamera;
-  }(Element);
-
-  PerspectiveCamera._mainCamera = null;
+  }(AbstractCamera);
 
   var Hash = function () {
     function Hash() {
