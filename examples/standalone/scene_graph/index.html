@@ -72,7 +72,7 @@ group3.addChild( pointLight );
 var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(0, 0, 10), new GLBoost.Vector3(1, 0, 0));
 group3.addChild( directionalLight );
 
-var camera = glBoostContext.createCamera(
+var camera = glBoostContext.createPerspectiveCamera(
     {
       eye: new GLBoost.Vector3(0.0, 100, 0),
       center: new GLBoost.Vector3(0.0, 0.0, 0.0),

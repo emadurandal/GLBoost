@@ -101,7 +101,7 @@
 
   var scene = glBoostContext.createScene();
 
-  var camera = glBoostContext.createCamera({
+  var camera = glBoostContext.createPerspectiveCamera({
     eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
     center: new GLBoost.Vector3(0.0, 1.5, 0.0),
     up: new GLBoost.Vector3(0.0, 1.0, 0.0)

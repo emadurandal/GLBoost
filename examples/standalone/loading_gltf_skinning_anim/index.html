@@ -43,7 +43,7 @@ var pointLight = glBoostContext.createPointLight(new GLBoost.Vector3(1.0, 1.0, 1
 pointLight.translate = new GLBoost.Vector3(10, 10, 10);
 scene.addChild( pointLight );
 
-var camera = glBoostContext.createCamera(
+var camera = glBoostContext.createPerspectiveCamera(
     {
      // eye: new GLBoost.Vector3(10.0, 10.0, -10.0),
       eye: new GLBoost.Vector3(15.0, 3.5, -5.0),

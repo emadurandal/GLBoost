@@ -2,7 +2,7 @@ import Vector3 from '../math/Vector3';
 import Element from './Element';
 import Matrix44 from '../math/Matrix44';
 
-export default class Camera extends Element {
+export default class PerspectiveCamera extends Element {
   constructor(glBoostContext, lookat, perspective) {
     super(glBoostContext);
 
@@ -48,7 +48,7 @@ export default class Camera extends Element {
 
   lookAtRHMatrix() {
     if (this._dirtyView) {
-      this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+      this._viewMatrix = PerspectiveCamera.lookAtRHMatrix(this._translate, this._center, this._up);
       this._dirtyView = false;
       return this._viewMatrix.clone();
     } else {
@@ -70,7 +70,7 @@ export default class Camera extends Element {
 
   perspectiveRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+      this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {
@@ -191,4 +191,4 @@ export default class Camera extends Element {
   }
 
 }
-Camera._mainCamera = null;
+PerspectiveCamera._mainCamera = null;

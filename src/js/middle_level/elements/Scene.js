@@ -1,5 +1,5 @@
 import Element from '../../low_level/elements/Element';
-import Camera from '../../low_level/elements/Camera';
+import Camera from '../../low_level/elements/PerspectiveCamera';
 import AbstractLight from '../../low_level/lights/AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
@@ -203,7 +203,7 @@ export default class Scene extends Group {
   /**
    * [en] Get child cameras which belong to this scene.<br>
    * [ja] このシーンに属していた子供のCamera要素の配列を返します。
-   * @return {Array<Camera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
+   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
    */
   get cameras() {
     return this._cameras;

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>GLBoost Camera example</title>
+  <title>GLBoost PerspectiveCamera example</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -69,7 +69,7 @@
         });
         var mesh = glBoostContext.createMesh(geometry, null);
         layer.scene.addChild( mesh );
-        this.camera = glBoostContext.createCamera({
+        this.camera = glBoostContext.createPerspectiveCamera({
           eye: new GLBoost.Vector3(0.0, 0, 10.0),
           center: new GLBoost.Vector3(0.0, 0.0, 0.0),
           up: new GLBoost.Vector3(0.0, 1.0, 0.0)
@@ -129,7 +129,7 @@
 </head>
 <body>
 <header>
-  <p class="header-title">GLBoost Camera example</p>
+  <p class="header-title">GLBoost PerspectiveCamera example</p>
 </header>
 <main>
 </main>

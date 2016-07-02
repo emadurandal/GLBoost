@@ -7,7 +7,7 @@ import Vector4 from '../low_level/math/Vector4';
 import GLBoostContext from '../low_level/core/GLBoostLowContext';
 import ClassicMaterial from '../low_level/ClassicMaterial';
 import Texture from '../low_level/textures/Texture';
-import Camera from '../low_level/elements/Camera';
+import Camera from '../low_level/elements/PerspectiveCamera';
 import BlendShapeGeometry from '../low_level/geometries/BlendShapeGeometry';
 import ObjLoader from './loader/ObjLoader';
 import InitialSettings from '../InitialSettings';

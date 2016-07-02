@@ -5358,13 +5358,13 @@
 
   GLBoost$1['SkeletalMesh'] = SkeletalMesh;
 
-  var Camera = function (_Element) {
-    babelHelpers.inherits(Camera, _Element);
+  var PerspectiveCamera = function (_Element) {
+    babelHelpers.inherits(PerspectiveCamera, _Element);
 
-    function Camera(glBoostContext, lookat, perspective) {
-      babelHelpers.classCallCheck(this, Camera);
+    function PerspectiveCamera(glBoostContext, lookat, perspective) {
+      babelHelpers.classCallCheck(this, PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Camera).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext));
 
       _this._translate = lookat.eye;
       _this._center = lookat.center;
@@ -5384,7 +5384,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Camera, [{
+    babelHelpers.createClass(PerspectiveCamera, [{
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
@@ -5400,7 +5400,7 @@
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
-          this._viewMatrix = Camera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._viewMatrix = PerspectiveCamera.lookAtRHMatrix(this._translate, this._center, this._up);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
@@ -5411,7 +5411,7 @@
       key: 'perspectiveRHMatrix',
       value: function perspectiveRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = Camera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -5447,16 +5447,16 @@
     }, {
       key: 'translate',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(Camera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(Camera.prototype), 'translate', this);
+        return babelHelpers.get(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(Camera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(PerspectiveCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
@@ -5554,10 +5554,10 @@
         return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
     }]);
-    return Camera;
+    return PerspectiveCamera;
   }(Element);
 
-  Camera._mainCamera = null;
+  PerspectiveCamera._mainCamera = null;
 
   /**
    * [en] This Scene class is the top level element of scene graph hierarchy.
@@ -5716,7 +5716,7 @@
               cameras = cameras.concat(childCameras);
             });
             return cameras;
-          } else if (elem instanceof Camera) {
+          } else if (elem instanceof PerspectiveCamera) {
             existCamera_f = true;
             return [elem];
           } else {
@@ -5788,7 +5788,7 @@
       /**
        * [en] Get child cameras which belong to this scene.<br>
        * [ja] このシーンに属していた子供のCamera要素の配列を返します。
-       * @return {Array<Camera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
+       * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
        */
 
     }, {
@@ -7334,9 +7334,9 @@
         return new ClassicMaterial(this);
       }
     }, {
-      key: 'createCamera',
-      value: function createCamera(lookat, perspective) {
-        return new Camera(this, lookat, perspective);
+      key: 'createPerspectiveCamera',
+      value: function createPerspectiveCamera(lookat, perspective) {
+        return new PerspectiveCamera(this, lookat, perspective);
       }
     }, {
       key: 'createTexture',

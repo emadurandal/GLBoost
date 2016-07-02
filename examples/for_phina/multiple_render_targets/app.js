@@ -124,7 +124,7 @@
       var shapetarget_2 = [new GLBoost.Vector3(-0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(-0.5, 1.0, 0.0), new GLBoost.Vector3(0.5, -1.0, 0.0), new GLBoost.Vector3(0.5, 1.0, 0.0)];
       var texcoords = [new GLBoost.Vector2(0.0, 1.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(0.0, 0.0), new GLBoost.Vector2(1.0, 1.0), new GLBoost.Vector2(1.0, 0.0)];
 
-      var camera = glBoostContext.createCamera({
+      var camera = glBoostContext.createPerspectiveCamera({
         eye: new GLBoost.Vector3(0.0, 0, 5.0),
         center: new GLBoost.Vector3(0.0, 0.0, 0.0),
         up: new GLBoost.Vector3(0.0, 1.0, 0.0)

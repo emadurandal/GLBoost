@@ -109,7 +109,7 @@
         var mesh = glBoostContext.createMesh(geometry, material);
         layer.scene.addChild( mesh );
 
-        var camera = glBoostContext.createCamera(
+        var camera = glBoostContext.createPerspectiveCamera(
             {
               eye: new GLBoost.Vector3(0.0, 0, 2.0),
               center: new GLBoost.Vector3(0.0, 0.0, 0.0),
