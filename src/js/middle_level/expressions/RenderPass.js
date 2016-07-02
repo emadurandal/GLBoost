@@ -1,6 +1,5 @@
-import GLBoost from '../../globals';
-import Mesh from '../meshes/Mesh';
-import Group from '../Group';
+import Mesh from '../elements/meshes/Mesh';
+import Group from '../elements/Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 
 export default class RenderPass extends GLBoostObject {

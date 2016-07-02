@@ -1,5 +1,5 @@
-import GLBoost from '../globals';
-import Element from '../low_level/Element';
+import GLBoost from '../../globals';
+import Element from '../../low_level/elements/Element';
 
 export default class Group extends Element {
   constructor(glBoostContext) {

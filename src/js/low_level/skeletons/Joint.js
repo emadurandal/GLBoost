@@ -1,5 +1,4 @@
-import GLBoost from '../../globals';
-import Element from '../../low_level/Element';
+import Element from '../elements/Element';
 
 export default class Joint extends Element {
   constructor(glBoostContext) {

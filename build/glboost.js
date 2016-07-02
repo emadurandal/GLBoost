@@ -1619,14 +1619,14 @@
     return MiscUtil;
   }();
 
-  var singleton$2 = Symbol();
-  var singletonEnforcer$2 = Symbol();
+  var singleton$4 = Symbol();
+  var singletonEnforcer$4 = Symbol();
 
   var GLBoostMonitor = function () {
     function GLBoostMonitor(enforcer) {
       babelHelpers.classCallCheck(this, GLBoostMonitor);
 
-      if (enforcer !== singletonEnforcer$2) {
+      if (enforcer !== singletonEnforcer$4) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
 
@@ -1758,10 +1758,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$2]) {
-          this[singleton$2] = new GLBoostMonitor(singletonEnforcer$2);
+        if (!this[singleton$4]) {
+          this[singleton$4] = new GLBoostMonitor(singletonEnforcer$4);
         }
-        return this[singleton$2];
+        return this[singleton$4];
       }
     }]);
     return GLBoostMonitor;
@@ -3549,6 +3549,31 @@
 
   GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
+  /**
+   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
+   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
+  var AbstractLight = function (_Element) {
+    babelHelpers.inherits(AbstractLight, _Element);
+
+    function AbstractLight(glBoostContext) {
+      babelHelpers.classCallCheck(this, AbstractLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, glBoostContext));
+
+      if (_this.constructor === AbstractLight) {
+        throw new TypeError("Cannot construct AbstractLight instances directly.");
+      }
+
+      _this._gl = _this._glContext.gl;
+      _this._name = "";
+      return _this;
+    }
+
+    return AbstractLight;
+  }(Element);
+
   var GLContextImpl = function () {
     function GLContextImpl(canvas, parent) {
       babelHelpers.classCallCheck(this, GLContextImpl);
@@ -3744,31 +3769,6 @@
   GLContext._instances = new Object();
 
   /**
-   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
-   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var AbstractLight = function (_Element) {
-    babelHelpers.inherits(AbstractLight, _Element);
-
-    function AbstractLight(glBoostContext) {
-      babelHelpers.classCallCheck(this, AbstractLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, glBoostContext));
-
-      if (_this.constructor === AbstractLight) {
-        throw new TypeError("Cannot construct AbstractLight instances directly.");
-      }
-
-      _this._gl = _this._glContext.gl;
-      _this._name = "";
-      return _this;
-    }
-
-    return AbstractLight;
-  }(Element);
-
-  /**
    * [en] This is a Directional Light class.<br>
    * [ja] 平行光源クラスです。
    */
@@ -3854,14 +3854,14 @@
     return PointLight;
   }(AbstractLight);
 
-  var singleton$3 = Symbol();
-  var singletonEnforcer$3 = Symbol();
+  var singleton$2 = Symbol();
+  var singletonEnforcer$2 = Symbol();
 
   var DrawKickerLocal = function () {
     function DrawKickerLocal(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerLocal);
 
-      if (enforcer !== singletonEnforcer$3) {
+      if (enforcer !== singletonEnforcer$2) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -3972,10 +3972,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$3]) {
-          this[singleton$3] = new DrawKickerLocal(singletonEnforcer$3);
+        if (!this[singleton$2]) {
+          this[singleton$2] = new DrawKickerLocal(singletonEnforcer$2);
         }
-        return this[singleton$3];
+        return this[singleton$2];
       }
     }]);
     return DrawKickerLocal;
@@ -4077,14 +4077,14 @@
 
   GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
-  var singleton$4 = Symbol();
-  var singletonEnforcer$4 = Symbol();
+  var singleton$3 = Symbol();
+  var singletonEnforcer$3 = Symbol();
 
   var DrawKickerWorld = function () {
     function DrawKickerWorld(enforcer) {
       babelHelpers.classCallCheck(this, DrawKickerWorld);
 
-      if (enforcer !== singletonEnforcer$4) {
+      if (enforcer !== singletonEnforcer$3) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
@@ -4193,10 +4193,10 @@
     }], [{
       key: 'getInstance',
       value: function getInstance() {
-        if (!this[singleton$4]) {
-          this[singleton$4] = new DrawKickerWorld(singletonEnforcer$4);
+        if (!this[singleton$3]) {
+          this[singleton$3] = new DrawKickerWorld(singletonEnforcer$3);
         }
-        return this[singleton$4];
+        return this[singleton$3];
       }
     }]);
     return DrawKickerWorld;
@@ -7306,6 +7306,11 @@
         return new Renderer(this, parameters);
       }
     }, {
+      key: 'createExpression',
+      value: function createExpression() {
+        return this.createExpressionAndRenderPasses(1);
+      }
+    }, {
       key: 'createExpressionAndRenderPasses',
       value: function createExpressionAndRenderPasses(number) {
         var expression = new Expression(this);
@@ -7449,167 +7454,6 @@
   }(DecalShader);
 
   GLBoost['PhongShader'] = PhongShader;
-
-  var LambertShaderSource = function () {
-    function LambertShaderSource() {
-      babelHelpers.classCallCheck(this, LambertShaderSource);
-    }
-
-    babelHelpers.createClass(LambertShaderSource, [{
-      key: 'FSDefine_LambertShaderSource',
-      value: function FSDefine_LambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        shaderText += 'uniform vec4 Kd;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_LambertShaderSource',
-      value: function FSShade_LambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt0;\n';
-        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-        shaderText += '  vec3 normal = normalize(v_normal);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt0.a = 1.0;\n';
-        //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_LambertShaderSource',
-      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return LambertShaderSource;
-  }();
-
-  var LambertShader = function (_DecalShader) {
-    babelHelpers.inherits(LambertShader, _DecalShader);
-
-    function LambertShader(glBoostContext, basicShader) {
-      babelHelpers.classCallCheck(this, LambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, glBoostContext, basicShader));
-
-      LambertShader.mixin(LambertShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(LambertShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
-
-        var Kd = material.diffuseColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-      }
-    }]);
-    return LambertShader;
-  }(DecalShader);
-
-  GLBoost['LambertShader'] = LambertShader;
-
-  var HalfLambertShaderSource = function () {
-    function HalfLambertShaderSource() {
-      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
-    }
-
-    babelHelpers.createClass(HalfLambertShaderSource, [{
-      key: 'FSDefine_HalfLambertShaderSource',
-      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
-        var shaderText = '';
-        shaderText += 'uniform vec4 Kd;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_HalfLambertShaderSource',
-      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        shaderText += '  vec4 surfaceColor = rt0;\n';
-        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-        shaderText += '  vec3 normal = normalize(v_normal);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float halfLambert = max(dot(light, normal), 0.0)*0.5+0.5;\n';
-        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-        shaderText += '  }\n';
-        //shaderText += '  rt0.a = 1.0;\n';
-        //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_HalfLambertShaderSource',
-      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return HalfLambertShaderSource;
-  }();
-
-  var HalfLambertShader = function (_DecalShader) {
-    babelHelpers.inherits(HalfLambertShader, _DecalShader);
-
-    function HalfLambertShader(glBoostContext, basicShader) {
-      babelHelpers.classCallCheck(this, HalfLambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, glBoostContext, basicShader));
-
-      HalfLambertShader.mixin(HalfLambertShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(HalfLambertShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
-
-        var Kd = material.diffuseColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-      }
-    }]);
-    return HalfLambertShader;
-  }(DecalShader);
-
-  GLBoost['HalfLambertShader'] = HalfLambertShader;
 
   var singleton = Symbol();
   var singletonEnforcer = Symbol();
@@ -8833,5 +8677,166 @@
       });
     });
   }
+
+  var LambertShaderSource = function () {
+    function LambertShaderSource() {
+      babelHelpers.classCallCheck(this, LambertShaderSource);
+    }
+
+    babelHelpers.createClass(LambertShaderSource, [{
+      key: 'FSDefine_LambertShaderSource',
+      value: function FSDefine_LambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        shaderText += 'uniform vec4 Kd;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_LambertShaderSource',
+      value: function FSShade_LambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt0;\n';
+        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt0.a = 1.0;\n';
+        //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_LambertShaderSource',
+      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return LambertShaderSource;
+  }();
+
+  var LambertShader = function (_DecalShader) {
+    babelHelpers.inherits(LambertShader, _DecalShader);
+
+    function LambertShader(glBoostContext, basicShader) {
+      babelHelpers.classCallCheck(this, LambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, glBoostContext, basicShader));
+
+      LambertShader.mixin(LambertShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(LambertShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+      }
+    }]);
+    return LambertShader;
+  }(DecalShader);
+
+  GLBoost['LambertShader'] = LambertShader;
+
+  var HalfLambertShaderSource = function () {
+    function HalfLambertShaderSource() {
+      babelHelpers.classCallCheck(this, HalfLambertShaderSource);
+    }
+
+    babelHelpers.createClass(HalfLambertShaderSource, [{
+      key: 'FSDefine_HalfLambertShaderSource',
+      value: function FSDefine_HalfLambertShaderSource(in_, f, lights) {
+        var shaderText = '';
+        shaderText += 'uniform vec4 Kd;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_HalfLambertShaderSource',
+      value: function FSShade_HalfLambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        shaderText += '  vec4 surfaceColor = rt0;\n';
+        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float halfLambert = max(dot(light, normal), 0.0)*0.5+0.5;\n';
+        shaderText += '    float diffuse = halfLambert*halfLambert;\n';
+        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+        shaderText += '  }\n';
+        //shaderText += '  rt0.a = 1.0;\n';
+        //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_HalfLambertShaderSource',
+      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return HalfLambertShaderSource;
+  }();
+
+  var HalfLambertShader = function (_DecalShader) {
+    babelHelpers.inherits(HalfLambertShader, _DecalShader);
+
+    function HalfLambertShader(glBoostContext, basicShader) {
+      babelHelpers.classCallCheck(this, HalfLambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, glBoostContext, basicShader));
+
+      HalfLambertShader.mixin(HalfLambertShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(HalfLambertShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+      }
+    }]);
+    return HalfLambertShader;
+  }(DecalShader);
+
+  GLBoost['HalfLambertShader'] = HalfLambertShader;
 
 }));

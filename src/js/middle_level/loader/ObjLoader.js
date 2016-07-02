@@ -1,12 +1,6 @@
 import GLBoost from '../../globals';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
-import ClassicMaterial from '../../low_level/ClassicMaterial';
-import Texture from '../../low_level/textures/Texture';
-import Geometry from '../../low_level/geometries/Geometry';
-import Mesh from './../meshes/Mesh';
-import LambertShader from '../../middle_level/shaders/LambertShader';
-import HalfLambertShader from '../../middle_level/shaders/HalfLambertShader';
 import PhongShader from '../../middle_level/shaders/PhongShader';
 import Hash from '../../low_level/misc/Hash';
 

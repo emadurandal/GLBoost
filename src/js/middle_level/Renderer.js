@@ -1,5 +1,3 @@
-import GLBoost from '../globals';
-import GLContext from '../low_level/core/GLContext';
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import Geometry from '../low_level/geometries/Geometry';
 import GLBoostObject from '../low_level/core/GLBoostObject';

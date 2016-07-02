@@ -1,6 +1,6 @@
-import GLBoost from '../../globals';
+import GLBoost from '../../../globals';
 import Mesh from './Mesh';
-import Matrix44 from '../../low_level/math/Matrix44';
+import Matrix44 from '../../../low_level/math/Matrix44';
 
 export default class SkeletalMesh extends Mesh {
   constructor(glBoostContext, geometry, material, rootJointName) {

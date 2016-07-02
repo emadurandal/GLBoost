@@ -1,4 +1,3 @@
-import Shader from '../../low_level/shaders/Shader';
 import PointLight from '../../low_level/lights/PointLight';
 import DirectionalLight from '../../low_level/lights/DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';

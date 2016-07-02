@@ -1,6 +1,4 @@
-import GLBoost from '../../globals';
-import GLContext from '../core/GLContext';
-import Element from './../Element';
+import Element from '../elements/Element';
 
 /**
  * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>

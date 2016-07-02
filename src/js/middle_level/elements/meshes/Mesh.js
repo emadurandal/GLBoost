@@ -1,8 +1,8 @@
-import GLBoost from '../../globals';
-import Element from '../../low_level/Element';
-import Vector3 from '../../low_level/math/Vector3';
-import Vector4 from '../../low_level/math/Vector4';
-import Matrix44 from '../../low_level/math/Matrix44';
+import GLBoost from '../../../globals';
+import Element from '../../../low_level/elements/Element';
+import Vector3 from '../../../low_level/math/Vector3';
+import Vector4 from '../../../low_level/math/Vector4';
+import Matrix44 from '../../../low_level/math/Matrix44';
 
 export default class Mesh extends Element {
   constructor(glBoostContext, geometry, material) {

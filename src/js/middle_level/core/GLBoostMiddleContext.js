@@ -2,10 +2,10 @@ import GLBoostContext from '../../low_level/core/GLBoostLowContext';
 import Expression from '../expressions/Expression';
 import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
-import Group from '../Group';
-import Scene from '../Scene';
-import Mesh from '../meshes/Mesh';
-import SkeletalMesh from '../meshes/SkeletalMesh';
+import Group from '../elements/Group';
+import Scene from '../elements/Scene';
+import Mesh from '../elements/meshes/Mesh';
+import SkeletalMesh from '../elements/meshes/SkeletalMesh';
 
 export default class GLBoostMiddleContext extends GLBoostContext {
   constructor(canvas) {
@@ -30,6 +30,10 @@ export default class GLBoostMiddleContext extends GLBoostContext {
 
   createRenderer(parameters) {
     return new Renderer(this, parameters);
+  }
+
+  createExpression() {
+    return this.createExpressionAndRenderPasses(1);
   }
 
   createExpressionAndRenderPasses(number) {

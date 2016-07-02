@@ -1,20 +1,13 @@
 import GLBoost from '../../globals';
 import GLContext from '../../low_level/core/GLContext';
-import Geometry from '../../low_level/geometries/Geometry';
-import SkeletalGeometry from '../../low_level/geometries/SkeletalGeometry';
-import ClassicMaterial from '../../low_level/ClassicMaterial';
-import Mesh from '../meshes/Mesh';
-import SkeletalMesh from '../meshes/SkeletalMesh';
+import SkeletalMesh from '../elements/meshes/SkeletalMesh';
 import PhongShader from '../shaders/PhongShader';
-import Texture from '../../low_level/textures/Texture';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
-import Group from '../Group';
-import Joint from '../../low_level/skeletons/Joint';
 
 
 let singleton = Symbol();
