@@ -1,6 +1,3 @@
-[submodule "tmlib.js"]
-	path = tmlib.js
-	url = git@github.com:emadurandal/tmlib.js.git
 [submodule "phina.js"]
 	path = phina.js
 	url = git@github.com:emadurandal/phina.js.git
