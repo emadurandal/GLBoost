@@ -412,6 +412,10 @@ export default class Geometry extends GLBoostObject {
     Geometry._lastMaterial = null;
   }
 
+  get AABB() {
+    return this._AABB;
+  }
+
 }
 Geometry._vaoDic = {};
 Geometry._vboDic = {};

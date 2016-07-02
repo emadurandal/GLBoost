@@ -168,6 +168,10 @@ export default class Mesh extends Element {
     return this._transformedDepth;
   }
 
+  get AABB() {
+    return this._geometry.AABB;
+  }
+
 }
 Mesh._geometries = {};
 

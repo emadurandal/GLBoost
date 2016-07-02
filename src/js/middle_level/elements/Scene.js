@@ -3,6 +3,7 @@ import Camera from '../../low_level/elements/Camera';
 import AbstractLight from '../../low_level/lights/AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
+import AABB from '../../low_level/math/AABB';
 
 
 /**
@@ -66,15 +67,27 @@ export default class Scene extends Group {
   prepareToRender() {
     this._reset();
 
-    (function setParentRecursively(elem) {
+    var aabb = (function setParentAndMergeAABBRecursively(elem) {
       if (elem instanceof Group) {
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
-          setParentRecursively(children[i]);
+          var aabb = setParentAndMergeAABBRecursively(children[i]);
+          if (aabb instanceof AABB) {
+            elem.AABB.mergeAABB(aabb);
+          } else {
+            console.assert('calculation of AABB error!');
+          }
         }
+        return elem.AABB;
       }
+      if (elem instanceof Mesh) {
+        return elem.AABB;
+      }
+
+      return null;
     })(this);
+    this.AABB.mergeAABB(aabb);
 
     let collectMeshes = function(elem) {
       if (elem instanceof Group) {

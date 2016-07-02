@@ -48,6 +48,7 @@
   var cube = null;
   var depthTexture = null;
   var camera = null;
+  var directionOfDirectionalLight = new GLBoost.Vector3(5, -10, 5);
 
   (function commonProcess(){
     var material = glBoostContext.createClassicMaterial();
@@ -81,8 +82,8 @@
         {
           fovy: 45.0,
           aspect: 1.0,
-          zNear: 10,
-          zFar: 30.0
+          zNear: 1,
+          zFar: 1.0
         }
     );
     scene.addChild( camera );
@@ -91,6 +92,18 @@
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
+    expression.renderPasses[0].customFunction = (function(){
+      var aabb = scene.AABB;
+      var centerOfAABB = aabb.centerPoint;
+      var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
+      var normalizedLightDirection = GLBoost.Vector3.normalize(directionOfDirectionalLight);
+      var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + camera.zNear)));
+      var cameraCenter = GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
+      camera.eye = cameraEye;
+      camera.center = cameraCenter;
+      camera.zFar = lengthBtwCenterToCornerOfAABB * 2 + camera.zNear;
+      console.log(aabb.minPoint + ' ' + aabb.maxPoint);
+    }).bind(this);
   })();
 
   (function renderingPass() {
@@ -100,7 +113,7 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), new GLBoost.Vector3(5, -10, 5));
+    var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), directionOfDirectionalLight);
     scene.addChild( directionalLight );
 
     camera = glBoostContext.createCamera(

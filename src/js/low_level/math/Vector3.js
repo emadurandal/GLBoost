@@ -202,6 +202,10 @@ export default class Vector3 {
   toVector4() {
     return new Vector4(this.x, this.y, this.z, 1.0);
   }
+
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
+  }
 }
 
 GLBoost['Vector3'] = Vector3;

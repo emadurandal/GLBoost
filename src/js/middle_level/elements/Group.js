@@ -1,10 +1,12 @@
 import GLBoost from '../../globals';
 import Element from '../../low_level/elements/Element';
+import AABB from '../../low_level/math/AABB';
 
 export default class Group extends Element {
   constructor(glBoostContext) {
     super(glBoostContext);
     this._elements = [];
+    this._AABB = new AABB();
   }
 
   /**
@@ -82,5 +84,9 @@ export default class Group extends Element {
       return results;
     }
     return null;
+  }
+
+  get AABB() {
+    return this._AABB;
   }
 }

@@ -372,6 +372,11 @@
       value: function toVector4() {
         return new Vector4(this.x, this.y, this.z, 1.0);
       }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return '(' + this.x + ', ' + this.y + ', ' + this.z + ')';
+      }
     }], [{
       key: 'zero',
       value: function zero() {
@@ -2509,6 +2514,11 @@
       get: function get() {
         return this._transformedDepth;
       }
+    }, {
+      key: 'AABB',
+      get: function get() {
+        return this._geometry.AABB;
+      }
     }]);
     return Mesh;
   }(Element);
@@ -2516,6 +2526,92 @@
   Mesh._geometries = {};
 
   GLBoost$1['Mesh'] = Mesh;
+
+  var AABB = function () {
+    function AABB() {
+      babelHelpers.classCallCheck(this, AABB);
+
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+    }
+
+    babelHelpers.createClass(AABB, [{
+      key: 'addPosition',
+      value: function addPosition(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: 'updateAllInfo',
+      value: function updateAllInfo() {
+        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      }
+    }, {
+      key: 'mergeAABB',
+      value: function mergeAABB(aabb) {
+        var isUpdated = false;
+        if (aabb.minPoint.x < this._AABB_min.x) {
+          this._AABB_min.x = aabb.minPoint.x;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.y < this._AABB_min.y) {
+          this._AABB_min.y = aabb.minPoint.y;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.z < this._AABB_min.z) {
+          this._AABB_min.z = aabb.minPoint.z;
+          isUpdated = true;
+        }
+        if (this._AABB_max.x < aabb.maxPoint.x) {
+          this._AABB_max.x = aabb.maxPoint.x;
+          isUpdated = true;
+        }
+        if (this._AABB_max.y < aabb.maxPoint.y) {
+          this._AABB_max.y = aabb.maxPoint.y;
+          isUpdated = true;
+        }
+        if (this._AABB_max.z < aabb.maxPoint.z) {
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+        }
+        this.updateAllInfo();
+
+        return isUpdated;
+      }
+    }, {
+      key: 'minPoint',
+      get: function get() {
+        return this._AABB_min;
+      }
+    }, {
+      key: 'maxPoint',
+      get: function get() {
+        return this._AABB_max;
+      }
+    }, {
+      key: 'centerPoint',
+      get: function get() {
+        return this._centerPoint;
+      }
+    }, {
+      key: 'lengthCenterToCorner',
+      get: function get() {
+        return this._lengthCenterToCorner;
+      }
+    }]);
+    return AABB;
+  }();
+
+  GLBoost$1['AABB'] = AABB;
 
   var Group = function (_Element) {
     babelHelpers.inherits(Group, _Element);
@@ -2526,7 +2622,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this, glBoostContext));
 
       _this._elements = [];
-      _this._;
+      _this._AABB = new AABB();
       return _this;
     }
 
@@ -2623,6 +2719,11 @@
         }
         return null;
       }
+    }, {
+      key: 'AABB',
+      get: function get() {
+        return this._AABB;
+      }
     }]);
     return Group;
   }(Element);
@@ -2635,9 +2736,7 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RenderPass).call(this, glBoostContext));
 
-      _this._expression = null;
       _this._scene = null;
-      //this._elements = [];
       _this._meshes = [];
       _this._opacityMeshes = [];
       _this._transparentMeshes = [];
@@ -2646,7 +2745,10 @@
       _this._clearDepth = null; // default is 1.0
       _this._renderTargetColorTextures = null;
       _this._renderTargetDepthTexture = null;
+      _this._expression = null;
       _this._fbo = null;
+
+      _this._customFunction = null;
       return _this;
     }
 
@@ -2737,6 +2839,10 @@
         if (this._scene) {
           this._scene.prepareToRender();
         }
+
+        if (this._customFunction) {
+          this._customFunction();
+        }
       }
     }, {
       key: 'sortTransparentMeshes',
@@ -2810,6 +2916,19 @@
       key: 'clearDepth',
       get: function get() {
         return this._clearDepth;
+      }
+
+      /**
+       * this function is called final part of prepareToRender
+       */
+
+    }, {
+      key: 'customFunction',
+      set: function set(func) {
+        this._customFunction = func;
+      },
+      get: function get() {
+        return this._customFunction;
       }
     }]);
     return RenderPass;
@@ -4284,60 +4403,6 @@
     return ArrayUtil;
   }();
 
-  var AABB = function () {
-    function AABB() {
-      babelHelpers.classCallCheck(this, AABB);
-
-      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-      this._centerPoint = null;
-      this._lengthCenterToCorner = null;
-    }
-
-    babelHelpers.createClass(AABB, [{
-      key: 'addPosition',
-      value: function addPosition(positionVector) {
-        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
-        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
-        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
-
-        return positionVector;
-      }
-    }, {
-      key: 'updateAllInfo',
-      value: function updateAllInfo() {
-        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
-      }
-    }, {
-      key: 'minPoint',
-      get: function get() {
-        return this._AABB_min;
-      }
-    }, {
-      key: 'maxPoint',
-      get: function get() {
-        return this._AABB_max;
-      }
-    }, {
-      key: 'centerPoint',
-      get: function get() {
-        return this._centerPoint;
-      }
-    }, {
-      key: 'lengthCenterToCorner',
-      get: function get() {
-        return this._lengthCenterToCorner;
-      }
-    }]);
-    return AABB;
-  }();
-
-  GLBoost$1['AABB'] = AABB;
-
   var FragmentSimpleShaderSource = function () {
     function FragmentSimpleShaderSource() {
       babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
@@ -5065,6 +5130,11 @@
       get: function get() {
         return this._AABB.centerPoint;
       }
+    }, {
+      key: 'AABB',
+      get: function get() {
+        return this._AABB;
+      }
     }], [{
       key: 'clearMaterialCache',
       value: function clearMaterialCache() {
@@ -5572,15 +5642,27 @@
 
         this._reset();
 
-        (function setParentRecursively(elem) {
+        var aabb = function setParentAndMergeAABBRecursively(elem) {
           if (elem instanceof Group) {
             var children = elem.getChildren();
             for (var i = 0; i < children.length; i++) {
               children[i]._parent = elem;
-              setParentRecursively(children[i]);
+              var aabb = setParentAndMergeAABBRecursively(children[i]);
+              if (aabb instanceof AABB) {
+                elem.AABB.mergeAABB(aabb);
+              } else {
+                console.assert('calculation of AABB error!');
+              }
             }
+            return elem.AABB;
           }
-        })(this);
+          if (elem instanceof Mesh) {
+            return elem.AABB;
+          }
+
+          return null;
+        }(this);
+        this.AABB.mergeAABB(aabb);
 
         var collectMeshes = function collectMeshes(elem) {
           if (elem instanceof Group) {

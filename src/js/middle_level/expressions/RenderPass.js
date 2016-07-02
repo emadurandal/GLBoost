@@ -7,9 +7,7 @@ export default class RenderPass extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
 
-    this._expression = null;
     this._scene = null;
-    //this._elements = [];
     this._meshes = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
@@ -18,7 +16,10 @@ export default class RenderPass extends GLBoostObject {
     this._clearDepth = null;  // default is 1.0
     this._renderTargetColorTextures = null;
     this._renderTargetDepthTexture = null;
+    this._expression = null;
     this._fbo = null;
+
+    this._customFunction = null;
   }
 
   get expression() {
@@ -113,6 +114,17 @@ export default class RenderPass extends GLBoostObject {
     return this._clearDepth;
   }
 
+  /**
+   * this function is called final part of prepareToRender
+   */
+  set customFunction(func) {
+    this._customFunction = func;
+  }
+
+  get customFunction() {
+    return this._customFunction;
+  }
+
   prepareToRender() {
     let collectMeshes = function(elem) {
       if (elem instanceof Group) {
@@ -149,6 +161,10 @@ export default class RenderPass extends GLBoostObject {
 
     if (this._scene) {
       this._scene.prepareToRender();
+    }
+
+    if (this._customFunction) {
+      this._customFunction();
     }
   }
 

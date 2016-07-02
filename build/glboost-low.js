@@ -381,6 +381,11 @@
       value: function toVector4() {
         return new Vector4(this.x, this.y, this.z, 1.0);
       }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return '(' + this.x + ', ' + this.y + ', ' + this.z + ')';
+      }
     }], [{
       key: 'zero',
       value: function zero() {
@@ -4644,6 +4649,38 @@
         this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
       }
     }, {
+      key: 'mergeAABB',
+      value: function mergeAABB(aabb) {
+        var isUpdated = false;
+        if (aabb.minPoint.x < this._AABB_min.x) {
+          this._AABB_min.x = aabb.minPoint.x;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.y < this._AABB_min.y) {
+          this._AABB_min.y = aabb.minPoint.y;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.z < this._AABB_min.z) {
+          this._AABB_min.z = aabb.minPoint.z;
+          isUpdated = true;
+        }
+        if (this._AABB_max.x < aabb.maxPoint.x) {
+          this._AABB_max.x = aabb.maxPoint.x;
+          isUpdated = true;
+        }
+        if (this._AABB_max.y < aabb.maxPoint.y) {
+          this._AABB_max.y = aabb.maxPoint.y;
+          isUpdated = true;
+        }
+        if (this._AABB_max.z < aabb.maxPoint.z) {
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+        }
+        this.updateAllInfo();
+
+        return isUpdated;
+      }
+    }, {
       key: 'minPoint',
       get: function get() {
         return this._AABB_min;
@@ -5098,6 +5135,11 @@
       key: 'centerPosition',
       get: function get() {
         return this._AABB.centerPoint;
+      }
+    }, {
+      key: 'AABB',
+      get: function get() {
+        return this._AABB;
       }
     }], [{
       key: 'clearMaterialCache',
