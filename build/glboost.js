@@ -2499,8 +2499,8 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, scene) {
-        this._geometry.draw(lights, camera, this, scene);
+      value: function draw(lights, camera, scene, renderPassIndex) {
+        this._geometry.draw(lights, camera, this, scene, renderPassIndex);
       }
     }, {
       key: 'bakeTransformToGeometry',
@@ -3704,6 +3704,11 @@
         return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
       }
     }, {
+      key: '_sampler2DShadow_func',
+      value: function _sampler2DShadow_func(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
+      }
+    }, {
       key: '_set_outColor_onFrag',
       value: function _set_outColor_onFrag(gl, i) {
         return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = ' + i + ') out vec4 rt' + i + ';\n' : 'vec4 rt' + i + ';\n';
@@ -4362,15 +4367,15 @@
 
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN) {
+      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
         }
 
         for (var i = 0; i < materials.length; i++) {
-          var shaderName = materials[i].shaderInstance.toString();
-          if (shaderName !== DrawKickerWorld._lastShaderName) {
+          var materialUpdateStateString = materials[i].getUpdateStateString();
+          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
             this._glslProgram = materials[i].shaderInstance.glslProgram;
             gl.useProgram(this._glslProgram);
           }
@@ -4431,12 +4436,12 @@
 
           var isMaterialSetupDone = true;
 
-          if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerWorld._lastShaderName) {
+          if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
             var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
             materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
-          if (shaderName !== DrawKickerWorld._lastShaderName) {
+          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
             if (materials[i]) {
               isMaterialSetupDone = materials[i].setUp();
             }
@@ -4453,11 +4458,12 @@
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
 
-          DrawKickerWorld._lastShaderName = isMaterialSetupDone ? shaderName : null;
+          DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
+        DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
         DrawKickerWorld._lastGeometry = geometryName;
       }
     }], [{
@@ -4472,8 +4478,9 @@
     return DrawKickerWorld;
   }();
 
-  DrawKickerWorld._lastShaderName = null;
+  DrawKickerWorld._lastMaterialUpdateStateString = null;
   DrawKickerWorld._lastGeometry = null;
+  DrawKickerWorld._lastRenderPassIndex = -1;
 
   var ArrayUtil = function () {
     function ArrayUtil() {
@@ -4674,6 +4681,7 @@
       _this._shaderInstance = null;
       _this._vertexNofGeometries = {};
 
+      _this._countOfUpdate = 0;
       return _this;
     }
 
@@ -4693,6 +4701,16 @@
         }
 
         return material;
+      }
+    }, {
+      key: '_updateCount',
+      value: function _updateCount() {
+        this._countOfUpdate += 1;
+      }
+    }, {
+      key: 'getUpdateStateString',
+      value: function getUpdateStateString() {
+        return this.toString() + '_updateCount_' + this._countOfUpdate;
       }
     }, {
       key: 'setVertexN',
@@ -4746,6 +4764,7 @@
       key: 'shaderInstance',
       set: function set(shaderInstance) {
         this._shaderInstance = shaderInstance;
+        this._updateCount();
       },
       get: function get() {
         return this._shaderInstance;
@@ -4754,6 +4773,7 @@
       key: 'diffuseTexture',
       set: function set(tex) {
         this._diffuseTexture = tex;
+        this._updateCount();
       },
       get: function get() {
         return this._diffuseTexture;
@@ -4762,6 +4782,7 @@
       key: 'baseColor',
       set: function set(vec) {
         this._baseColor = vec;
+        this._updateCount();
       },
       get: function get() {
         return this._baseColor;
@@ -4770,6 +4791,7 @@
       key: 'diffuseColor',
       set: function set(vec) {
         this._diffuseColor = vec;
+        this._updateCount();
       },
       get: function get() {
         return this._diffuseColor;
@@ -4778,6 +4800,7 @@
       key: 'specularColor',
       set: function set(vec) {
         this._specularColor = vec;
+        this._updateCount();
       },
       get: function get() {
         return this._specularColor;
@@ -4786,6 +4809,7 @@
       key: 'ambientColor',
       set: function set(vec) {
         this._ambientColor = vec;
+        this._updateCount();
       },
       get: function get() {
         return this._ambientColor;
@@ -5141,7 +5165,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, mesh, scene) {
+      value: function draw(lights, camera, mesh, scene, renderPassIndex) {
         var gl = this._glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -5156,7 +5180,7 @@
 
         var thisName = this.toString();
 
-        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN);
+        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
       }
 
       /**
@@ -5300,7 +5324,7 @@
       value: function draw(expression) {
         var _this2 = this;
 
-        expression.renderPasses.forEach(function (renderPass) {
+        expression.renderPasses.forEach(function (renderPass, index) {
           if (!renderPass.scene) {
             return;
           }
@@ -5336,7 +5360,7 @@
           // draw opacity meshes.
           var opacityMeshes = renderPass.opacityMeshes;
           opacityMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene);
+            mesh.draw(lights, camera, renderPass.scene, index);
           });
 
           if (camera) {
@@ -5345,7 +5369,7 @@
           // draw transparent meshes.
           var transparentMeshes = renderPass.transparentMeshes;
           transparentMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene);
+            mesh.draw(lights, camera, renderPass.scene, index);
           });
 
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);

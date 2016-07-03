@@ -320,7 +320,7 @@ export default class Geometry extends GLBoostObject {
     return true;
   }
 
-  draw(lights, camera, mesh, scene) {
+  draw(lights, camera, mesh, scene, renderPassIndex) {
     var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -335,7 +335,7 @@ export default class Geometry extends GLBoostObject {
 
     let thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN);
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
 
   }
 

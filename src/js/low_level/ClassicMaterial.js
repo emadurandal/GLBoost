@@ -44,7 +44,7 @@ export default class ClassicMaterial extends GLBoostObject {
   }
 
   getUpdateStateString() {
-    return + this.toString() + '_updateCount_' + this._countOfUpdate;
+    return this.toString() + '_updateCount_' + this._countOfUpdate;
   }
 
   set shaderClass(shaderClass) {
