@@ -445,6 +445,10 @@ export default class Shader extends GLBoostObject {
     return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
   }
 
+  static _sampler2DShadow_func(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
+  }
+
   static _set_outColor_onFrag(gl, i) {
     return GLBoost.isThisGLVersion_2(gl) ? `layout(location = ${i}) out vec4 rt${i};\n` : `vec4 rt${i};\n`;
   }
