@@ -17,7 +17,7 @@
   <canvas id="world" width="600" height="600"></canvas>
 </main>
 <script>
-  var DEPTH_TEXTURE_SIZE = 512;
+  var DEPTH_TEXTURE_SIZE = 1024;
 
 
   var arg = new Object;
@@ -53,7 +53,7 @@
   var directionalLight = null;
   (function commonProcess(){
     var material = glBoostContext.createClassicMaterial();
-    material.shaderClass = GLBoost.PhongShader;
+    material.shaderClass = GLBoost.LambertShader;
     var texture = glBoostContext.createTexture('resources/texture.png');
     material.diffuseTexture = texture;
 
@@ -89,9 +89,9 @@
           zFar: 1.0
         }
     );
+    depthCamera.texture = depthTexture;
     scene.addChild( depthCamera );
 
-    scene.addChild( depthCamera );
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);

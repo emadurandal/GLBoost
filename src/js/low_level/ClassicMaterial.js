@@ -136,9 +136,7 @@ export default class ClassicMaterial extends GLBoostObject {
     var gl = this._gl;
     var result = false;
     if (this._diffuseTexture) {
-      // テクスチャユニット０にテクスチャオブジェクトをバインドする
-      gl.activeTexture(gl.TEXTURE0);
-      result = this._diffuseTexture.setUp();
+      result = this._diffuseTexture.setUp(0);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
       result = true;

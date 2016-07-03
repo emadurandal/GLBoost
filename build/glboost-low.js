@@ -1048,6 +1048,8 @@
       }
 
       _this._name = '';
+
+      _this._textureUnitIndex = 0;
       return _this;
     }
 
@@ -1067,11 +1069,13 @@
        * [en] bind the texture. <br />
        * [ja] テクスチャをバインドします。
        */
-      value: function setUp() {
+      value: function setUp(textureUnitIndex) {
         var gl = this._glContext.gl;
         if (this._texture === null) {
           return false;
         }
+        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+        gl.activeTexture(gl['TEXTURE' + index]);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
         return true;
@@ -1124,6 +1128,14 @@
       key: 'height',
       get: function get() {
         return this._height;
+      }
+    }, {
+      key: 'textureUnitIndex',
+      set: function set(index) {
+        this._textureUnitIndex = index;
+      },
+      get: function get() {
+        return this._textureUnitIndex;
       }
     }]);
     return AbstractTexture;
@@ -3156,6 +3168,7 @@
       _this._updateCountAsCameraView = 0;
       _this._mainCamera = {};
 
+      _this._texture = null; // for example, depth texture
       return _this;
     }
 
@@ -3240,6 +3253,14 @@
       },
       get: function get() {
         return this._up;
+      }
+    }, {
+      key: 'texture',
+      set: function set(texture) {
+        this._texture = texture;
+      },
+      get: function get() {
+        return this._texture;
       }
     }], [{
       key: 'lookAtRHMatrix',
@@ -3820,6 +3841,12 @@
         }
       }
     }, {
+      key: '_sampler2DShadow_func',
+      value: function _sampler2DShadow_func() {
+        var gl = this._glContext.gl;
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
+      }
+    }, {
       key: 'readyForDiscard',
       value: function readyForDiscard() {
         babelHelpers.get(Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
@@ -3988,11 +4015,6 @@
       key: '_texture_func',
       value: function _texture_func(gl) {
         return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
-      }
-    }, {
-      key: '_sampler2DShadow_func',
-      value: function _sampler2DShadow_func(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
       }
     }, {
       key: '_set_outColor_onFrag',
@@ -4220,8 +4242,8 @@
         shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
         if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-          shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
-          // サンプラーにテクスチャユニット０を指定する
+          shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'uTexture');
+          // set texture unit 0 to the sampler
           gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
         }
 
@@ -4326,9 +4348,7 @@
         var gl = this._gl;
         var result = false;
         if (this._diffuseTexture) {
-          // テクスチャユニット０にテクスチャオブジェクトをバインドする
-          gl.activeTexture(gl.TEXTURE0);
-          result = this._diffuseTexture.setUp();
+          result = this._diffuseTexture.setUp(0);
         } else {
           gl.bindTexture(gl.TEXTURE_2D, null);
           result = true;
@@ -4796,7 +4816,7 @@
           var isMaterialSetupDone = true;
 
           if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh, lights);
             materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
@@ -4805,6 +4825,8 @@
               isMaterialSetupDone = materials[i].setUp();
             }
           }
+          this.setupOtherTextures(lights);
+
           if (!isMaterialSetupDone) {
             return;
           }
@@ -4824,6 +4846,15 @@
 
         DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
         DrawKickerWorld._lastGeometry = geometryName;
+      }
+    }, {
+      key: 'setupOtherTextures',
+      value: function setupOtherTextures(lights) {
+        for (var i; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.setUp();
+          }
+        }
       }
     }], [{
       key: 'getInstance',

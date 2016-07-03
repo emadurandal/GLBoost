@@ -71,8 +71,8 @@ export class DecalShaderSource {
     shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
-      // サンプラーにテクスチャユニット０を指定する
+        shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'uTexture');
+      // set texture unit 0 to the sampler
       gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
     }
 

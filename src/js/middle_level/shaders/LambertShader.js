@@ -3,9 +3,18 @@ import DecalShader from './DecalShader';
 export class LambertShaderSource {
 
   FSDefine_LambertShaderSource(in_, f, lights) {
+    
+    var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
     shaderText += `uniform vec4 Kd;\n`;
 
+    let textureUnitIndex = 1;   // 0 is used for diffuse texture
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        shaderText += `uniform ${sampler2D} uDepthTexture_1;\n`;//${textureUnitIndex};\n`;
+        textureUnitIndex++;
+      }
+    }
     return shaderText;
   }
 
@@ -43,6 +52,17 @@ export class LambertShaderSource {
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
+    let textureUnitIndex = 1;   // 0 is used for diffuse texture
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        shaderProgram['uniformDepthTextureSampler_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'uDepthTexture_1');// + textureUnitIndex);
+        // set texture unit i+1 to the sampler
+        gl.uniform1i(shaderProgram['uniformDepthTextureSampler_' + textureUnitIndex], textureUnitIndex);
+        lights[i].camera.texture.textureUnitIndex = textureUnitIndex;
+        textureUnitIndex++;
+      }
+    }
+
     return vertexAttribsAsResult;
   }
 }
@@ -56,7 +76,7 @@ export default class LambertShader extends DecalShader {
     LambertShader.mixin(LambertShaderSource);
   }
 
-  setUniforms(gl, glslProgram, material) {
+  setUniforms(gl, glslProgram, material, lights) {
     super.setUniforms(gl, glslProgram, material);
 
     var Kd = material.diffuseColor;

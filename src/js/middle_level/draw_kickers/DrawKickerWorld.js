@@ -90,7 +90,7 @@ export default class DrawKickerWorld {
       let isMaterialSetupDone = true;
 
       if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh, lights);
         materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
@@ -99,6 +99,8 @@ export default class DrawKickerWorld {
           isMaterialSetupDone = materials[i].setUp();
         }
       }
+      this.setupOtherTextures(lights);
+
       if (!isMaterialSetupDone) {
         return;
       }
@@ -119,6 +121,14 @@ export default class DrawKickerWorld {
 
     DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     DrawKickerWorld._lastGeometry = geometryName;
+  }
+
+  setupOtherTextures(lights) {
+    for(let i; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        lights[i].camera.texture.setUp();
+      }
+    }
   }
 }
 
