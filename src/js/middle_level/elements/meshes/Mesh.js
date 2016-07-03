@@ -3,6 +3,7 @@ import Element from '../../../low_level/elements/Element';
 import Vector3 from '../../../low_level/math/Vector3';
 import Vector4 from '../../../low_level/math/Vector4';
 import Matrix44 from '../../../low_level/math/Matrix44';
+import AABB from '../../../low_level/math/AABB';
 
 export default class Mesh extends Element {
   constructor(glBoostContext, geometry, material) {
@@ -169,7 +170,8 @@ export default class Mesh extends Element {
   }
 
   get AABB() {
-    return this._geometry.AABB;
+    var world_m = this.transformMatrixAccumulatedAncestry;
+    return AABB.multiplyMatrix(world_m, this._geometry.AABB);
   }
 
 }

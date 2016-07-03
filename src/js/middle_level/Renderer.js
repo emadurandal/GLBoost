@@ -50,6 +50,7 @@ export default class Renderer extends GLBoostObject {
       });
 
       var gl = this._glContext.gl;
+      var canvas = this._glContext.canvas;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
       let lights = renderPass.scene.lights;
@@ -61,21 +62,14 @@ export default class Renderer extends GLBoostObject {
       }
       glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-      var clearColor = renderPass.clearColor;
-      var clearDepth = renderPass.clearDepth;
-      if (clearColor) {
-        gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-      }
-      if (clearDepth) {
-        gl.clearDepth(clearDepth);
-      }
-      if (clearColor || clearDepth) {
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      } else if (clearColor) {
-        gl.clear( gl.COLOR_BUFFER_BIT );
+      if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+        gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
-        gl.clear( gl.DEPTH_BUFFER_BIT );
+        gl.viewport(0, 0, canvas.width, canvas.width);
       }
+      
+      this._clearBuffer(gl, renderPass);
+
       // draw opacity meshes.
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
@@ -95,6 +89,24 @@ export default class Renderer extends GLBoostObject {
 //      glem.drawBuffers(gl, [gl.BACK]);
 
     });
+  }
+
+  _clearBuffer(gl, renderPass) {
+    var clearColor = renderPass.clearColor;
+    var clearDepth = renderPass.clearDepth;
+    if (clearColor) {
+      gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+    }
+    if (clearDepth) {
+      gl.clearDepth(clearDepth);
+    }
+    if (clearColor || clearDepth) {
+      gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    } else if (clearColor) {
+      gl.clear( gl.COLOR_BUFFER_BIT );
+    } else {
+      gl.clear( gl.DEPTH_BUFFER_BIT );
+    }
   }
 
   /**

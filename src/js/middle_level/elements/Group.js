@@ -1,6 +1,6 @@
-import GLBoost from '../../globals';
 import Element from '../../low_level/elements/Element';
 import AABB from '../../low_level/math/AABB';
+import Mesh from './meshes/Mesh';
 
 export default class Group extends Element {
   constructor(glBoostContext) {
@@ -84,6 +84,30 @@ export default class Group extends Element {
       return results;
     }
     return null;
+  }
+
+
+  updateAABB() {
+    var aabb = (function mergeAABBRecursively(elem) {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        for(let i=0; i<children.length; i++) {
+          var aabb = mergeAABBRecursively(children[i]);
+          if (aabb instanceof AABB) {
+            elem.AABB.mergeAABB(aabb);
+          } else {
+            console.assert('calculation of AABB error!');
+          }
+        }
+        return elem.AABB;
+      }
+      if (elem instanceof Mesh) {
+        return elem.AABB;
+      }
+
+      return null;
+    })(this);
+    this.AABB.mergeAABB(aabb);
   }
 
   get AABB() {

@@ -74,15 +74,17 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    depthCamera = glBoostContext.createPerspectiveCamera(
+    depthCamera = glBoostContext.createOrthoCamera(
         {
           eye: new GLBoost.Vector3(0.0, 5, 15.0),
           center: new GLBoost.Vector3(0.0, 5.0, 0.0),
           up: new GLBoost.Vector3(0.0, 1.0, 0.0)
         },
         {
-          fovy: 45.0,
-          aspect: 1.0,
+          left: -1,
+          right: 1,
+          bottom: -1,
+          top: 1,
           zNear: 1,
           zFar: 1.0
         }
@@ -94,14 +96,24 @@
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
     expression.renderPasses[0].customFunction = (function(){
+      scene.updateAABB();
       var aabb = scene.AABB;
       var centerOfAABB = aabb.centerPoint;
       var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
       var normalizedLightDirection = GLBoost.Vector3.normalize(directionOfDirectionalLight);
       var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCamera.zNear)));
-      var cameraCenter = GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
+      var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
+
       depthCamera.eye = cameraEye;
       depthCamera.center = cameraCenter;
+  //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
+  //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
+      //depthCamera.up = new GLBoost.Vector3(1.0, 0, 0.0);
+
+      depthCamera.left = -lengthBtwCenterToCornerOfAABB;
+      depthCamera.right = lengthBtwCenterToCornerOfAABB;
+      depthCamera.bottom = -lengthBtwCenterToCornerOfAABB;
+      depthCamera.top = lengthBtwCenterToCornerOfAABB;
       depthCamera.zFar = lengthBtwCenterToCornerOfAABB * 2 + depthCamera.zNear;
       console.log(aabb.minPoint + ' ' + aabb.maxPoint);
     }).bind(this);
@@ -144,9 +156,9 @@
     var material = glBoostContext.createClassicMaterial();
     material.diffuseTexture = depthTexture;
     material.shaderClass = GLBoost.DepthDisplayShader;
-    plane = glBoostContext.createMesh(planeGeometry, material);
+    var plane = glBoostContext.createMesh(planeGeometry, material);
     plane.rotate = new GLBoost.Vector3(90, 0, 0);
-    plane.translate = new GLBoost.Vector3(0.5, 0.5, 0);
+    plane.translate = new GLBoost.Vector3(0.4, 0.4, 0);
 
     scene.addChild(plane);
 

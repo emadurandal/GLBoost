@@ -171,13 +171,28 @@
     }
 
     babelHelpers.createClass(Vector4, [{
-      key: "isEqual",
+      key: 'isEqual',
       value: function isEqual(vec) {
         if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
           return true;
         } else {
           return false;
         }
+      }
+
+      /**
+       * Zero Vector
+       */
+
+    }, {
+      key: 'toVector3',
+      value: function toVector3() {
+        return new Vector3(this.x, this.y, this.z);
+      }
+    }], [{
+      key: 'zero',
+      value: function zero() {
+        return new Vector4(0, 0, 0, 1);
       }
     }]);
     return Vector4;
@@ -2375,6 +2390,7 @@
 
       _this._activeAnimationLineName = null;
 
+      _this._camera = null;
       return _this;
     }
 
@@ -2820,6 +2836,14 @@
       get: function get() {
         return this._currentCalcMode;
       }
+    }, {
+      key: 'camera',
+      set: function set(camera) {
+        this._camera = camera;
+      },
+      get: function get() {
+        return this._camera;
+      }
     }]);
     return Element;
   }(GLBoostObject);
@@ -3205,6 +3229,130 @@
     return AbstractCamera;
   }(Element);
 
+  var OrthoCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
+
+    function OrthoCamera(glBoostContext, lookat, ortho) {
+      babelHelpers.classCallCheck(this, OrthoCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, lookat));
+
+      _this._left = ortho.left;
+      _this._right = ortho.right;
+      _this._bottom = ortho.bottom;
+      _this._top = ortho.top;
+      _this._zNear = ortho.zNear;
+      _this._zFar = ortho.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(OrthoCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        if (this._left === value) {
+          return;
+        }
+        this._left = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        if (this._right === value) {
+          return;
+        }
+        this._right = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._right;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        if (this._bottom === value) {
+          return;
+        }
+        this._bottom = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._bottom;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        if (this._top === value) {
+          return;
+        }
+        this._top = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._top;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }], [{
+      key: 'orthoRHMatrix',
+      value: function orthoRHMatrix(left, right, bottom, top, near, far) {
+
+        return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+      }
+    }]);
+    return OrthoCamera;
+  }(AbstractCamera);
+
   var PerspectiveCamera = function (_AbstractCamera) {
     babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
 
@@ -3230,8 +3378,8 @@
         this._updateCountAsCameraProjection++;
       }
     }, {
-      key: 'perspectiveRHMatrix',
-      value: function perspectiveRHMatrix() {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
           this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
           this._dirtyProjection = false;
@@ -4422,7 +4570,7 @@
 
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
-            var projectionMatrix = camera.perspectiveRHMatrix();
+            var projectionMatrix = camera.projectionRHMatrix();
             var m_m = mesh.transformMatrixAccumulatedAncestry;
             var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
@@ -4557,7 +4705,7 @@
           if (camera) {
             var cameraMatrix = camera.lookAtRHMatrix();
             var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-            var projectionMatrix = camera.perspectiveRHMatrix();
+            var projectionMatrix = camera.projectionRHMatrix();
             gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
             gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
           }
@@ -4718,6 +4866,16 @@
       key: 'lengthCenterToCorner',
       get: function get() {
         return this._lengthCenterToCorner;
+      }
+    }], [{
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(matrix, aabb) {
+        var newAabb = new AABB();
+        newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
+        newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
+        newAabb.updateAllInfo();
+
+        return newAabb;
       }
     }]);
     return AABB;
@@ -5425,7 +5583,7 @@
               babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.perspectiveRHMatrix().flatten());
+                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.projectionRHMatrix().flatten());
               }
 
               if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
@@ -6339,6 +6497,11 @@
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
         return new PerspectiveCamera(this, lookat, perspective);
+      }
+    }, {
+      key: 'createOrthoCamera',
+      value: function createOrthoCamera(lookat, ortho) {
+        return new OrthoCamera(this, lookat, ortho);
       }
     }, {
       key: 'createTexture',

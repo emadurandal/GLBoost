@@ -51,7 +51,7 @@ export default class DrawKickerWorld {
       if (camera) {
         let cameraMatrix = camera.lookAtRHMatrix();
         let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-        let projectionMatrix = camera.perspectiveRHMatrix();
+        let projectionMatrix = camera.projectionRHMatrix();
         gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
         gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
       }

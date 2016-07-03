@@ -1,5 +1,5 @@
 import Element from '../../low_level/elements/Element';
-import Camera from '../../low_level/elements/cameras/PerspectiveCamera';
+import AbstractCamera from '../../low_level/elements/cameras/AbstractCamera';
 import AbstractLight from '../../low_level/lights/AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
@@ -141,7 +141,7 @@ export default class Scene extends Group {
           cameras = cameras.concat(childCameras);
         });
         return cameras;
-      } else if (elem instanceof Camera) {
+      } else if (elem instanceof AbstractCamera) {
         existCamera_f = true;
         return [elem];
       } else {

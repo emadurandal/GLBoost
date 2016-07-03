@@ -151,31 +151,6 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector4 = function () {
-    function Vector4(x, y, z, w) {
-      babelHelpers.classCallCheck(this, Vector4);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    babelHelpers.createClass(Vector4, [{
-      key: "isEqual",
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }]);
-    return Vector4;
-  }();
-
-  GLBoost$1["Vector4"] = Vector4;
-
   var Vector3 = function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -444,6 +419,46 @@
   }();
 
   GLBoost$1['Vector3'] = Vector3;
+
+  var Vector4 = function () {
+    function Vector4(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Vector4);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Vector4, [{
+      key: 'isEqual',
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      /**
+       * Zero Vector
+       */
+
+    }, {
+      key: 'toVector3',
+      value: function toVector3() {
+        return new Vector3(this.x, this.y, this.z);
+      }
+    }], [{
+      key: 'zero',
+      value: function zero() {
+        return new Vector4(0, 0, 0, 1);
+      }
+    }]);
+    return Vector4;
+  }();
+
+  GLBoost$1["Vector4"] = Vector4;
 
   var Vector2 = function Vector2(x, y) {
     babelHelpers.classCallCheck(this, Vector2);
@@ -1426,6 +1441,102 @@
 
   GLBoost$1["Matrix44"] = Matrix44;
 
+  var AABB = function () {
+    function AABB() {
+      babelHelpers.classCallCheck(this, AABB);
+
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+    }
+
+    babelHelpers.createClass(AABB, [{
+      key: 'addPosition',
+      value: function addPosition(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: 'updateAllInfo',
+      value: function updateAllInfo() {
+        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      }
+    }, {
+      key: 'mergeAABB',
+      value: function mergeAABB(aabb) {
+        var isUpdated = false;
+        if (aabb.minPoint.x < this._AABB_min.x) {
+          this._AABB_min.x = aabb.minPoint.x;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.y < this._AABB_min.y) {
+          this._AABB_min.y = aabb.minPoint.y;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.z < this._AABB_min.z) {
+          this._AABB_min.z = aabb.minPoint.z;
+          isUpdated = true;
+        }
+        if (this._AABB_max.x < aabb.maxPoint.x) {
+          this._AABB_max.x = aabb.maxPoint.x;
+          isUpdated = true;
+        }
+        if (this._AABB_max.y < aabb.maxPoint.y) {
+          this._AABB_max.y = aabb.maxPoint.y;
+          isUpdated = true;
+        }
+        if (this._AABB_max.z < aabb.maxPoint.z) {
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+        }
+        this.updateAllInfo();
+
+        return isUpdated;
+      }
+    }, {
+      key: 'minPoint',
+      get: function get() {
+        return this._AABB_min;
+      }
+    }, {
+      key: 'maxPoint',
+      get: function get() {
+        return this._AABB_max;
+      }
+    }, {
+      key: 'centerPoint',
+      get: function get() {
+        return this._centerPoint;
+      }
+    }, {
+      key: 'lengthCenterToCorner',
+      get: function get() {
+        return this._lengthCenterToCorner;
+      }
+    }], [{
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(matrix, aabb) {
+        var newAabb = new AABB();
+        newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
+        newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
+        newAabb.updateAllInfo();
+
+        return newAabb;
+      }
+    }]);
+    return AABB;
+  }();
+
+  GLBoost$1['AABB'] = AABB;
+
   var Quaternion = function () {
     function Quaternion(x, y, z, w) {
       babelHelpers.classCallCheck(this, Quaternion);
@@ -1888,6 +1999,7 @@
 
       _this._activeAnimationLineName = null;
 
+      _this._camera = null;
       return _this;
     }
 
@@ -2333,6 +2445,14 @@
       get: function get() {
         return this._currentCalcMode;
       }
+    }, {
+      key: 'camera',
+      set: function set(camera) {
+        this._camera = camera;
+      },
+      get: function get() {
+        return this._camera;
+      }
     }]);
     return Element;
   }(GLBoostObject);
@@ -2517,7 +2637,8 @@
     }, {
       key: 'AABB',
       get: function get() {
-        return this._geometry.AABB;
+        var world_m = this.transformMatrixAccumulatedAncestry;
+        return AABB.multiplyMatrix(world_m, this._geometry.AABB);
       }
     }]);
     return Mesh;
@@ -2526,92 +2647,6 @@
   Mesh._geometries = {};
 
   GLBoost$1['Mesh'] = Mesh;
-
-  var AABB = function () {
-    function AABB() {
-      babelHelpers.classCallCheck(this, AABB);
-
-      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-      this._centerPoint = null;
-      this._lengthCenterToCorner = null;
-    }
-
-    babelHelpers.createClass(AABB, [{
-      key: 'addPosition',
-      value: function addPosition(positionVector) {
-        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
-        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
-        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
-
-        return positionVector;
-      }
-    }, {
-      key: 'updateAllInfo',
-      value: function updateAllInfo() {
-        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
-      }
-    }, {
-      key: 'mergeAABB',
-      value: function mergeAABB(aabb) {
-        var isUpdated = false;
-        if (aabb.minPoint.x < this._AABB_min.x) {
-          this._AABB_min.x = aabb.minPoint.x;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.y < this._AABB_min.y) {
-          this._AABB_min.y = aabb.minPoint.y;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.z < this._AABB_min.z) {
-          this._AABB_min.z = aabb.minPoint.z;
-          isUpdated = true;
-        }
-        if (this._AABB_max.x < aabb.maxPoint.x) {
-          this._AABB_max.x = aabb.maxPoint.x;
-          isUpdated = true;
-        }
-        if (this._AABB_max.y < aabb.maxPoint.y) {
-          this._AABB_max.y = aabb.maxPoint.y;
-          isUpdated = true;
-        }
-        if (this._AABB_max.z < aabb.maxPoint.z) {
-          this._AABB_max.z = aabb.maxPoint.z;
-          isUpdated = true;
-        }
-        this.updateAllInfo();
-
-        return isUpdated;
-      }
-    }, {
-      key: 'minPoint',
-      get: function get() {
-        return this._AABB_min;
-      }
-    }, {
-      key: 'maxPoint',
-      get: function get() {
-        return this._AABB_max;
-      }
-    }, {
-      key: 'centerPoint',
-      get: function get() {
-        return this._centerPoint;
-      }
-    }, {
-      key: 'lengthCenterToCorner',
-      get: function get() {
-        return this._lengthCenterToCorner;
-      }
-    }]);
-    return AABB;
-  }();
-
-  GLBoost$1['AABB'] = AABB;
 
   var Group = function (_Element) {
     babelHelpers.inherits(Group, _Element);
@@ -2718,6 +2753,30 @@
           return results;
         }
         return null;
+      }
+    }, {
+      key: 'updateAABB',
+      value: function updateAABB() {
+        var aabb = function mergeAABBRecursively(elem) {
+          if (elem instanceof Group) {
+            var children = elem.getChildren();
+            for (var i = 0; i < children.length; i++) {
+              var aabb = mergeAABBRecursively(children[i]);
+              if (aabb instanceof AABB) {
+                elem.AABB.mergeAABB(aabb);
+              } else {
+                console.assert('calculation of AABB error!');
+              }
+            }
+            return elem.AABB;
+          }
+          if (elem instanceof Mesh) {
+            return elem.AABB;
+          }
+
+          return null;
+        }(this);
+        this.AABB.mergeAABB(aabb);
       }
     }, {
       key: 'AABB',
@@ -2903,9 +2962,26 @@
         }
       }
     }, {
+      key: 'viewport',
+      get: function get() {
+        var texture = null;
+        if (this._renderTargetColorTextures) {
+          texture = this._renderTargetColorTextures[0];
+        } else if (this._renderTargetDepthTexture) {
+          texture = this._renderTargetDepthTexture;
+        }
+
+        return new Vector4(0, 0, texture.width, texture.height);
+      }
+    }, {
       key: 'renderTargetColorTextures',
       get: function get() {
         return this._renderTargetColorTextures;
+      }
+    }, {
+      key: 'renderTargetDepthTexture',
+      get: function get() {
+        return this._renderTargetDepthTexture;
       }
     }, {
       key: 'clearColor',
@@ -4063,7 +4139,7 @@
 
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
-            var projectionMatrix = camera.perspectiveRHMatrix();
+            var projectionMatrix = camera.projectionRHMatrix();
             var m_m = mesh.transformMatrixAccumulatedAncestry;
             var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
@@ -4291,7 +4367,7 @@
           if (camera) {
             var cameraMatrix = camera.lookAtRHMatrix();
             var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-            var projectionMatrix = camera.perspectiveRHMatrix();
+            var projectionMatrix = camera.projectionRHMatrix();
             gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
             gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
           }
@@ -5209,6 +5285,7 @@
           });
 
           var gl = _this2._glContext.gl;
+          var canvas = _this2._glContext.canvas;
           var glem = GLExtensionsManager.getInstance(_this2._glContext);
 
           var lights = renderPass.scene.lights;
@@ -5220,21 +5297,14 @@
           }
           glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-          var clearColor = renderPass.clearColor;
-          var clearDepth = renderPass.clearDepth;
-          if (clearColor) {
-            gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-          }
-          if (clearDepth) {
-            gl.clearDepth(clearDepth);
-          }
-          if (clearColor || clearDepth) {
-            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-          } else if (clearColor) {
-            gl.clear(gl.COLOR_BUFFER_BIT);
+          if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+            gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
           } else {
-            gl.clear(gl.DEPTH_BUFFER_BIT);
+            gl.viewport(0, 0, canvas.width, canvas.width);
           }
+
+          _this2._clearBuffer(gl, renderPass);
+
           // draw opacity meshes.
           var opacityMeshes = renderPass.opacityMeshes;
           opacityMeshes.forEach(function (mesh) {
@@ -5253,6 +5323,25 @@
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
           //      glem.drawBuffers(gl, [gl.BACK]);
         });
+      }
+    }, {
+      key: '_clearBuffer',
+      value: function _clearBuffer(gl, renderPass) {
+        var clearColor = renderPass.clearColor;
+        var clearDepth = renderPass.clearDepth;
+        if (clearColor) {
+          gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+        }
+        if (clearDepth) {
+          gl.clearDepth(clearDepth);
+        }
+        if (clearColor || clearDepth) {
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        } else if (clearColor) {
+          gl.clear(gl.COLOR_BUFFER_BIT);
+        } else {
+          gl.clear(gl.DEPTH_BUFFER_BIT);
+        }
       }
 
       /**
@@ -5477,107 +5566,6 @@
     return AbstractCamera;
   }(Element);
 
-  var PerspectiveCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
-
-    function PerspectiveCamera(glBoostContext, lookat, perspective) {
-      babelHelpers.classCallCheck(this, PerspectiveCamera);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, lookat));
-
-      _this._fovy = perspective.fovy;
-      _this._aspect = perspective.aspect;
-      _this._zNear = perspective.zNear;
-      _this._zFar = perspective.zFar;
-
-      _this._dirtyProjection = true;
-      _this._updateCountAsCameraProjection = 0;
-      return _this;
-    }
-
-    babelHelpers.createClass(PerspectiveCamera, [{
-      key: '_needUpdateProjection',
-      value: function _needUpdateProjection() {
-        this._dirtyProjection = true;
-        this._updateCountAsCameraProjection++;
-      }
-    }, {
-      key: 'perspectiveRHMatrix',
-      value: function perspectiveRHMatrix() {
-        if (this._dirtyProjection) {
-          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
-          this._dirtyProjection = false;
-          return this._projectionMatrix.clone();
-        } else {
-          return this._projectionMatrix.clone();
-        }
-      }
-    }, {
-      key: 'updateCountAsCameraProjection',
-      get: function get() {
-        return this._updateCountAsCameraProjection;
-      }
-    }, {
-      key: 'fovy',
-      set: function set(value) {
-        if (this._fovy === value) {
-          return;
-        }
-        this._fovy = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._fovy;
-      }
-    }, {
-      key: 'aspect',
-      set: function set(value) {
-        if (this._aspect === value) {
-          return;
-        }
-        this._aspect = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._aspect;
-      }
-    }, {
-      key: 'zNear',
-      set: function set(value) {
-        if (this._zNear === value) {
-          return;
-        }
-        this._zNear = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zNear;
-      }
-    }, {
-      key: 'zFar',
-      set: function set(value) {
-        if (this._zFar === value) {
-          return;
-        }
-        this._zFar = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zFar;
-      }
-    }], [{
-      key: 'perspectiveRHMatrix',
-      value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
-
-        var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
-        var xscale = yscale / aspect;
-
-        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
-      }
-    }]);
-    return PerspectiveCamera;
-  }(AbstractCamera);
-
   /**
    * [en] This Scene class is the top level element of scene graph hierarchy.
    *       To render scene, pass this scene element to Renderer.draw method.<br>
@@ -5735,7 +5723,7 @@
               cameras = cameras.concat(childCameras);
             });
             return cameras;
-          } else if (elem instanceof PerspectiveCamera) {
+          } else if (elem instanceof AbstractCamera) {
             existCamera_f = true;
             return [elem];
           } else {
@@ -6146,6 +6134,231 @@
     return Texture;
   }(AbstractTexture);
 
+  var OrthoCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
+
+    function OrthoCamera(glBoostContext, lookat, ortho) {
+      babelHelpers.classCallCheck(this, OrthoCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, lookat));
+
+      _this._left = ortho.left;
+      _this._right = ortho.right;
+      _this._bottom = ortho.bottom;
+      _this._top = ortho.top;
+      _this._zNear = ortho.zNear;
+      _this._zFar = ortho.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(OrthoCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        if (this._left === value) {
+          return;
+        }
+        this._left = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        if (this._right === value) {
+          return;
+        }
+        this._right = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._right;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        if (this._bottom === value) {
+          return;
+        }
+        this._bottom = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._bottom;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        if (this._top === value) {
+          return;
+        }
+        this._top = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._top;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }], [{
+      key: 'orthoRHMatrix',
+      value: function orthoRHMatrix(left, right, bottom, top, near, far) {
+
+        return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+      }
+    }]);
+    return OrthoCamera;
+  }(AbstractCamera);
+
+  var PerspectiveCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
+
+    function PerspectiveCamera(glBoostContext, lookat, perspective) {
+      babelHelpers.classCallCheck(this, PerspectiveCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, lookat));
+
+      _this._fovy = perspective.fovy;
+      _this._aspect = perspective.aspect;
+      _this._zNear = perspective.zNear;
+      _this._zFar = perspective.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(PerspectiveCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'fovy',
+      set: function set(value) {
+        if (this._fovy === value) {
+          return;
+        }
+        this._fovy = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._fovy;
+      }
+    }, {
+      key: 'aspect',
+      set: function set(value) {
+        if (this._aspect === value) {
+          return;
+        }
+        this._aspect = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._aspect;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }], [{
+      key: 'perspectiveRHMatrix',
+      value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+
+        var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
+        var xscale = yscale / aspect;
+
+        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+      }
+    }]);
+    return PerspectiveCamera;
+  }(AbstractCamera);
+
   var ParticleShaderSource = function () {
     function ParticleShaderSource() {
       babelHelpers.classCallCheck(this, ParticleShaderSource);
@@ -6442,7 +6655,7 @@
               babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.perspectiveRHMatrix().flatten());
+                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.projectionRHMatrix().flatten());
               }
 
               if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
@@ -7356,6 +7569,11 @@
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
         return new PerspectiveCamera(this, lookat, perspective);
+      }
+    }, {
+      key: 'createOrthoCamera',
+      value: function createOrthoCamera(lookat, ortho) {
+        return new OrthoCamera(this, lookat, ortho);
       }
     }, {
       key: 'createTexture',

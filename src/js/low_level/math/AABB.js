@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import Vector3 from './Vector3';
+import Matrix44 from './Matrix44';
 
 export default class AABB {
 
@@ -72,6 +73,15 @@ export default class AABB {
 
   get lengthCenterToCorner() {
     return this._lengthCenterToCorner;
+  }
+
+  static multiplyMatrix(matrix, aabb) {
+    var newAabb = new AABB();
+    newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
+    newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
+    newAabb.updateAllInfo();
+
+    return newAabb;
   }
 }
 

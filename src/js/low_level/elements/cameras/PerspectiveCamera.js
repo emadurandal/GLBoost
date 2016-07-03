@@ -24,7 +24,7 @@ export default class PerspectiveCamera extends AbstractCamera {
     return this._updateCountAsCameraProjection;
   }
 
-  perspectiveRHMatrix() {
+  projectionRHMatrix() {
     if (this._dirtyProjection) {
       this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
       this._dirtyProjection = false;

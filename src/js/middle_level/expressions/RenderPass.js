@@ -1,6 +1,7 @@
 import Mesh from '../elements/meshes/Mesh';
 import Group from '../elements/Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
+import Vector4 from '../../low_level/math/Vector4';
 
 export default class RenderPass extends GLBoostObject {
 
@@ -94,8 +95,23 @@ export default class RenderPass extends GLBoostObject {
     }
   }
 
+  get viewport() {
+    var texture = null;
+    if (this._renderTargetColorTextures) {
+      texture = this._renderTargetColorTextures[0];
+    } else if (this._renderTargetDepthTexture) {
+      texture = this._renderTargetDepthTexture;
+    }
+
+    return new Vector4(0, 0, texture.width, texture.height);
+  }
+
   get renderTargetColorTextures() {
     return this._renderTargetColorTextures;
+  }
+
+  get renderTargetDepthTexture() {
+    return this._renderTargetDepthTexture;
   }
 
   setClearColor(color) {

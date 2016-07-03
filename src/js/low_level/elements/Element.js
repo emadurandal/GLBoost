@@ -32,6 +32,7 @@ export default class Element extends GLBoostObject {
 
     this._activeAnimationLineName = null;
 
+    this._camera = null;
   }
 
 
@@ -448,5 +449,13 @@ export default class Element extends GLBoostObject {
 
   get currentCalcMode() {
     return this._currentCalcMode;
+  }
+
+  set camera(camera) {
+    this._camera = camera;
+  }
+
+  get camera() {
+    return this._camera;
   }
 }
