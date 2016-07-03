@@ -50,7 +50,7 @@
   var depthCamera = null
   var camera = null;
   var directionOfDirectionalLight = new GLBoost.Vector3(5, -10, 5);
-
+  var directionalLight = null;
   (function commonProcess(){
     var material = glBoostContext.createClassicMaterial();
     material.shaderClass = GLBoost.PhongShader;
@@ -95,19 +95,19 @@
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
-    expression.renderPasses[0].customFunction = (function(){
+    function updateDepthCamera(light){
       scene.updateAABB();
       var aabb = scene.AABB;
       var centerOfAABB = aabb.centerPoint;
       var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
-      var normalizedLightDirection = GLBoost.Vector3.normalize(directionOfDirectionalLight);
+      var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction);
       var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCamera.zNear)));
       var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
 
       depthCamera.eye = cameraEye;
       depthCamera.center = cameraCenter;
-  //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
-  //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
+      //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
+      //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
       //depthCamera.up = new GLBoost.Vector3(1.0, 0, 0.0);
 
       depthCamera.left = -lengthBtwCenterToCornerOfAABB;
@@ -115,8 +115,11 @@
       depthCamera.bottom = -lengthBtwCenterToCornerOfAABB;
       depthCamera.top = lengthBtwCenterToCornerOfAABB;
       depthCamera.zFar = lengthBtwCenterToCornerOfAABB * 2 + depthCamera.zNear;
-      console.log(aabb.minPoint + ' ' + aabb.maxPoint);
-    }).bind(this);
+//      console.log(aabb.minPoint + ' ' + aabb.maxPoint);
+    }
+    //expression.renderPasses[0].customFunction = updateDepthCamera.bind(this);
+    depthCamera.customFunction = updateDepthCamera.bind(this);
+
   })();
 
   (function renderingPass() {
@@ -126,7 +129,8 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), directionOfDirectionalLight);
+    directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), directionOfDirectionalLight);
+    directionalLight.camera = depthCamera;
     scene.addChild( directionalLight );
 
     camera = glBoostContext.createPerspectiveCamera(
@@ -176,9 +180,10 @@
     renderer.clearCanvas();
     renderer.draw(expression);
 
-    var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
-    var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+    var rotateMatrixForCamera = GLBoost.Matrix33.rotateY(-1.0);
+    camera.eye = rotateMatrixForCamera.multiplyVector(camera.eye);
+    var rotateMatrix = GLBoost.Matrix33.rotateY(1.0);
+    directionalLight.direction = rotateMatrix.multiplyVector(directionalLight.direction);
 
     requestAnimationFrame(render);
   };

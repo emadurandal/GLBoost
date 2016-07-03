@@ -2391,6 +2391,7 @@
       _this._activeAnimationLineName = null;
 
       _this._camera = null;
+      _this._customFunction = null;
       return _this;
     }
 
@@ -2570,6 +2571,9 @@
           return false;
         }
       }
+    }, {
+      key: 'prepareToRender',
+      value: function prepareToRender() {}
     }, {
       key: 'updateCountAsElement',
       get: function get() {
@@ -2844,6 +2848,14 @@
       get: function get() {
         return this._camera;
       }
+    }, {
+      key: 'customFunction',
+      set: function set(func) {
+        this._customFunction = func;
+      },
+      get: function get() {
+        return this._customFunction;
+      }
     }]);
     return Element;
   }(GLBoostObject);
@@ -2873,14 +2885,23 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, glBoostContext));
 
       if (_this.constructor === AbstractLight) {
-        throw new TypeError("Cannot construct AbstractLight instances directly.");
+        throw new TypeError('Cannot construct AbstractLight instances directly.');
       }
 
       _this._gl = _this._glContext.gl;
-      _this._name = "";
       return _this;
     }
 
+    babelHelpers.createClass(AbstractLight, [{
+      key: 'prepareToRender',
+      value: function prepareToRender() {
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      }
+    }]);
     return AbstractLight;
   }(Element);
 
@@ -2962,6 +2983,11 @@
       key: 'direction',
       set: function set(vec) {
         this._direction = vec;
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
       },
       get: function get() {
         return this._direction;
@@ -4168,6 +4194,8 @@
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
+        shaderText += '    float shadowRatio = 0.0;\n';
+
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
       }

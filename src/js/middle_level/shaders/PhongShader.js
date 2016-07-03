@@ -28,6 +28,7 @@ export class PhongShaderSource {
     shaderText += `    float specular = pow(max(dot(light, reflect), 0.0), power);\n`;
     shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
     shaderText += `  }\n`;
+    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 

@@ -33,6 +33,7 @@ export default class Element extends GLBoostObject {
     this._activeAnimationLineName = null;
 
     this._camera = null;
+    this._customFunction = null;
   }
 
 
@@ -457,5 +458,17 @@ export default class Element extends GLBoostObject {
 
   get camera() {
     return this._camera;
+  }
+
+  set customFunction(func) {
+    this._customFunction = func;
+  }
+
+  get customFunction() {
+    return this._customFunction;
+  }
+
+  prepareToRender() {
+
   }
 }
