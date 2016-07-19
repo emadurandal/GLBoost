@@ -134,7 +134,7 @@ export default class Shader extends GLBoostObject {
     return processedShaderString;
   }
 
-  _getVertexShaderString(gl, functions, existCamera_f, lights, extraData) {
+  _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
     var f = functions;
     var shaderText = '';
 
@@ -151,7 +151,7 @@ export default class Shader extends GLBoostObject {
       var method = this['VSDefine_' + className];
       if (method) {
         shaderText += '//                                                            VSDefine_' + className + ' //\n';
-        shaderText += method.bind(this, in_, out_, f, lights, extraData)();
+        shaderText += method.bind(this, in_, out_, f, lights, material, extraData)();
       }
     });
 
@@ -167,7 +167,7 @@ export default class Shader extends GLBoostObject {
       var method = this['VSTransform_' + className];
       if (method) {
         shaderText += '//                                                            VSTransform_' + className + ' //\n';
-        shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
       }
     });
 
@@ -178,7 +178,7 @@ export default class Shader extends GLBoostObject {
       var method = this['VSShade_' + className];
       if (method) {
         shaderText += '//                                                            VSShade_' + className + ' //\n';
-        shaderText += method.bind(this, existCamera_f, f, lights, extraData)();
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
       }
     });
 
@@ -192,7 +192,7 @@ export default class Shader extends GLBoostObject {
   }
 
 
-  _getFragmentShaderString(gl, functions, lights, extraData) {
+  _getFragmentShaderString(gl, functions, lights, material, extraData) {
     var f = functions;
     var shaderText = '';
 
@@ -216,7 +216,7 @@ export default class Shader extends GLBoostObject {
       var method = this['FSDefine_' + className];
       if (method) {
         shaderText += '//                                                            FSDefine_' + className + ' //\n';
-        shaderText += method.bind(this, in_, f, lights, extraData)();
+        shaderText += method.bind(this, in_, f, lights, material, extraData)();
       }
     });
 
@@ -232,7 +232,7 @@ export default class Shader extends GLBoostObject {
       var method = this['FSShade_' + className];
       if (method) {
         shaderText += '//                                                            FSShade_' + className + ' //\n';
-        shaderText += method.bind(this, f, gl, lights, extraData)();
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
       }
     });
 
@@ -251,14 +251,14 @@ export default class Shader extends GLBoostObject {
     return shaderText;
   }
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var vertexAttribsAsResult = [];
 
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
         vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
       }
     });
@@ -331,14 +331,14 @@ export default class Shader extends GLBoostObject {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, lights, extraData = {}) {
+  getShaderProgram(vertexAttribs, existCamera_f, lights, material, extraData = {}) {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
     lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
-    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, extraData);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, extraData);
+    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
 
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;

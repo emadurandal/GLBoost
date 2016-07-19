@@ -1,7 +1,7 @@
 
 export default class SkeletalShaderSource {
 
-  VSDefine_SkeletalShaderSource(in_, out_, f, lights, extraData) {
+  VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
     var shaderText = '';
     shaderText += `${in_} vec4 aVertex_joint;\n`;
     shaderText += `${in_} vec4 aVertex_weight;\n`;
@@ -9,7 +9,7 @@ export default class SkeletalShaderSource {
     return shaderText;
   }
 
-  VSTransform_SkeletalShaderSource(existCamera_f, f, lights, extraData) {
+  VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
 
@@ -26,7 +26,7 @@ export default class SkeletalShaderSource {
     return shaderText;
   }
 
-  prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var vertexAttribsAsResult = [];
 
     vertexAttribs.forEach((attribName)=>{

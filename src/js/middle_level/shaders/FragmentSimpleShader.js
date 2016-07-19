@@ -1,5 +1,7 @@
+import Shader from '../../low_level/shaders/Shader';
+import VertexWorldShaderSource from './VertexWorldShader';
 
-export default class FragmentSimpleShaderSource {
+export class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     var shaderText =      'uniform float opacity;\n';
@@ -20,3 +22,17 @@ export default class FragmentSimpleShaderSource {
     return vertexAttribsAsResult;
   }
 }
+
+export default class SimpleShader extends Shader {
+  constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+
+    super(glBoostContext);
+
+    SimpleShader.mixin(basicShader);
+    SimpleShader.mixin(FragmentSimpleShaderSource);
+  }
+
+}
+
+
+GLBoost['SimpleShader'] = SimpleShader;

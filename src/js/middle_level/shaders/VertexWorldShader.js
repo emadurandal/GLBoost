@@ -1,7 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 
 export default class VertexWorldShaderSource {
-  VSDefine_VertexWorldShaderSource(in_, out_, f, lights, extraData) {
+  VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
@@ -17,7 +17,7 @@ export default class VertexWorldShaderSource {
     return shaderText;
   }
 
-  VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, extraData) {
+  VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     if (existCamera_f) {
       shaderText +=   '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
@@ -33,16 +33,18 @@ export default class VertexWorldShaderSource {
     return shaderText;
   }
 
-  FSDefine_VertexWorldShaderSource(in_, f, lights, extraData) {
+  FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
+
     if(lights.length > 0) {
       shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
       shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     }
+
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += `${in_} vec3 v_normal;\n`;
+    }
+    shaderText += `${in_} vec4 position;\n`;
 
     return shaderText;
   }
@@ -53,14 +55,17 @@ export default class VertexWorldShaderSource {
     return shaderText;
   }
 
-  prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
 
-    var attribName = 'position';
-    shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-    gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-    vertexAttribsAsResult.push(attribName);
+    vertexAttribs.forEach((attribName)=>{
+      if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+      }
+    });
 
     shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
     shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
@@ -68,8 +73,6 @@ export default class VertexWorldShaderSource {
       shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
       shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
     }
-
-    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);

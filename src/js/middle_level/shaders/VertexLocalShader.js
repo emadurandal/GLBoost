@@ -28,34 +28,35 @@ export default class VertexLocalShaderSource {
     return shaderText;
   }
 
-  FSDefine_VertexLocalShaderSource(in_, f, lights, extraData) {
+  FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
     var shaderText = '';
-    if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
-    }
-    shaderText += `${in_} vec4 position;\n`;
     if(lights.length > 0) {
       shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
       shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
     }
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += `${in_} vec3 v_normal;\n`;
+    }
+    shaderText += `${in_} vec4 position;\n`;
 
     return shaderText;
   }
 
-  prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
 
-    var attribName = 'position';
-    shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-    gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-    vertexAttribsAsResult.push(attribName);
+    vertexAttribs.forEach((attribName)=>{
+      if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+      }
+    });
 
     if (existCamera_f) {
       shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
     }
-
-    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
 
     for(let i=0; i<lights.length; i++) {
       shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
