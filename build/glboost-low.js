@@ -1921,6 +1921,23 @@
         return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' + this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
       }
     }, {
+      key: 'nearZeroToZero',
+      value: function nearZeroToZero(value) {
+        if (Math.abs(value) < 0.00001) {
+          value = 0;
+        } else if (0.99999 < value && value < 1.00001) {
+          value = 1;
+        } else if (-1.00001 < value && value < -0.99999) {
+          value = -1;
+        }
+        return value;
+      }
+    }, {
+      key: 'toStringApproximately',
+      value: function toStringApproximately() {
+        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' + this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+      }
+    }, {
       key: 'm00',
       set: function set(val) {
         this.m[0] = val;
@@ -2462,6 +2479,27 @@
         return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
       }
     }, {
+      key: 'getTransformMatrixOnlyRotateOn',
+      value: function getTransformMatrixOnlyRotateOn(value) {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.getMatrixAt('time', value);
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
       value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
         if (currentElem._parent === null) {
@@ -2694,6 +2732,34 @@
           this._finalMatrix.m03 = this.translate.x;
           this._finalMatrix.m13 = this.translate.y;
           this._finalMatrix.m23 = this.translate.z;
+
+          this._dirtyAsElement = false;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixOnInit',
+      get: function get() {
+        if (this._dirtyAsElement) {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
+          this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
+          this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
 
           this._dirtyAsElement = false;
         }
@@ -6083,14 +6149,42 @@
             var thisLoopMatrix = null;
 
             var pivotJoint = joints[mapTable[j]];
-            var rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, joints[mapTable[j]].inverceMatrix);
+            var rotateMatrix = Matrix44.multiply(joints[mapTable[j]].inverseMatrix, jointsHierarchy[j].parent.transformMatrixOnlyRotate);
+            //rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, rotateMatrix);
+
+            //let rotateMatrix = Matrix44.multiply(joints[mapTable[j]].inverseRotateMatrix, jointsHierarchy[j].parent.transformMatrixOnlyRotate);
+            //let rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, Matrix44.invert(joints[mapTable[j]].inverseMatrix));
+            //let rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, (joints[mapTable[j]].inverseMatrix));
+            //let rotateMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, joints[mapTable[j]].inverseRotateMatrix);
             //let rotateMatrix = jointsHierarchy[j].parent.transformMatrixOnlyRotate;
-            thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[mapTable[j]]), Matrix44.multiply(rotateMatrix, skeletalMesh.inverseBindMatrices[mapTable[j]]));
+            //thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[mapTable[j]]), Matrix44.multiply(rotateMatrix, skeletalMesh.inverseBindMatrices[mapTable[j]]));
+
+            thisLoopMatrix = Matrix44.multiply(Matrix44.invert(pivotJoint.inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, pivotJoint.inverseBindPoseMatrix));
+            //thisLoopMatrix = pivotJoint.inverseBindPoseMatrix;
+
             if (j > 0) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+              //tempMatrices[j] = Matrix44.multiply(Matrix44.multiply(tempMatrices[j - 1], joints[mapTable[j-1]].inverseMatrix), thisLoopMatrix);
             } else {
-              tempMatrices[j] = thisLoopMatrix;
-            }
+                tempMatrices[j] = thisLoopMatrix;
+              }
+
+            /*
+            let tempRotateMatrix = thisLoopMatrix.clone();
+            tempRotateMatrix.m03 = 0;
+            tempRotateMatrix.m13 = 0;
+            tempRotateMatrix.m23 = 0;
+            tempRotateMatrix.m30 = 0;
+            tempRotateMatrix.m31 = 0;
+            tempRotateMatrix.m32 = 0;
+            let tempTranslateMatrix = new Matrix44(
+              1, 0, 0, thisLoopMatrix.m03,
+              0, 1, 0, thisLoopMatrix.m13,
+              0, 0, 1, thisLoopMatrix.m23,
+              0, 0, 0, 1
+            );
+             tempMatrices[j] = Matrix44.multiply(tempTranslateMatrix, tempRotateMatrix);
+            */
           }
           matrices[i] = tempMatrices[jointsHierarchy.length - 1];
         }
@@ -6156,60 +6250,84 @@
         for (var i = 0; i < joints.length; i++) {
           //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
           var matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
-          joints[i].inverceMatrix = Matrix44.invert(matrix);
-          //joints[i].inverceMatrix = Matrix44.identity();
+          joints[i].inverseMatrix = Matrix44.invert(matrix);
+          //joints[i].inverseMatrix = Matrix44.identity();
         }
 
-        /*
-        var calcParentJointsMatricesRecursively = (joint)=> {
-          let children = joint.parent.parent._children;
-          let parentJoint = null;
-          for (let i=0; i<children.length; i++) {
+        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
+          var children = joint.parent.parent._elements;
+          var parentJoint = null;
+          for (var i = 0; i < children.length; i++) {
             if (children[i] instanceof Joint) {
               parentJoint = children[i];
             }
           }
-           let results = [];
+
+          var results = [];
           if (parentJoint) {
-            let result = calcParentJointsMatricesRecursively(parentJoint);
+            var result = calcParentJointsMatricesRecursively(parentJoint);
             if (Array.isArray(result)) {
               Array.prototype.push.apply(results, result);
             }
-             results.push(parentJoint);
-             return results;
+
+            results.push(parentJoint);
+
+            return results;
           }
-           return null;
+
+          return null;
         };
-         var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+
+        //var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
         var matrices = [];
-         for (let i=0; i<joints.length; i++) {
-           let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+
+        for (var i = 0; i < joints.length; i++) {
+
+          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
           if (jointsHierarchy == null) {
             jointsHierarchy = [];
           }
           jointsHierarchy.push(joints[i]);
           //console.log(jointsHierarchy);
-          let tempMatrices = [];
-            let mapTable = [];
-          for (let j = 0; j < jointsHierarchy.length; j++) {
-            for (let k = 0; k < joints.length; k++) {
+          var tempMatrices = [];
+
+          var mapTable = [];
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            for (var k = 0; k < joints.length; k++) {
               if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
                 mapTable[j] = k;
               }
             }
           }
-          for (let j = 0; j < jointsHierarchy.length; j++) {
-             let thisLoopMatrix = null;
-             thisLoopMatrix = joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit;
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+
+            var thisLoopMatrix = null;
+
+            //        thisLoopMatrix = joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit;
+            thisLoopMatrix = skeletalMesh.inverseBindMatrices[mapTable[j]].clone();
+            thisLoopMatrix.m03 = 0;
+            thisLoopMatrix.m13 = 0;
+            thisLoopMatrix.m23 = 0;
+            thisLoopMatrix.m30 = 0;
+            thisLoopMatrix.m31 = 0;
+            thisLoopMatrix.m32 = 0;
             if (j > 0) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
             } else {
               tempMatrices[j] = thisLoopMatrix;
             }
           }
-          joints[i].inverceMatrix = Matrix44.invert(tempMatrices[jointsHierarchy.length - 1]);
-         }
-        */
+          //joints[i].inverseRotateMatrix = (tempMatrices[tempMatrices.length - 1]);
+          joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
+          joints[i].inverseRotateMatrix = joints[i].inverseBindPoseMatrix.clone();
+          joints[i].inverseRotateMatrix.m03 = 0;
+          joints[i].inverseRotateMatrix.m13 = 0;
+          joints[i].inverseRotateMatrix.m23 = 0;
+          joints[i].inverseRotateMatrix.m30 = 0;
+          joints[i].inverseRotateMatrix.m31 = 0;
+          joints[i].inverseRotateMatrix.m32 = 0;
+        }
+
         babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
       }
     }]);
