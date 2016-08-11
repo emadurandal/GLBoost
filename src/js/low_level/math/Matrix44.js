@@ -604,6 +604,25 @@ export default class Matrix44 {
       this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
   }
 
+  nearZeroToZero(value) {
+    if (Math.abs(value) < 0.00001) {
+      value = 0;
+    } else if (0.99999 < value && value < 1.00001) {
+      value = 1;
+    } else if (-1.00001 < value && value < -0.99999) {
+      value = -1;
+    }
+    return value;
+  }
+
+  toStringApproximately() {
+    return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' +
+      this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' +
+      this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' +
+      this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+  }
+
+
 }
 
 GLBoost["Matrix44"] = Matrix44;
