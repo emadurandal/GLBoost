@@ -380,7 +380,7 @@ export default class Shader extends GLBoostObject {
       //gl.useProgram(programToReturn);
     }
     this._glslProgram = programToReturn;
-    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
 
     return programToReturn;
   }
