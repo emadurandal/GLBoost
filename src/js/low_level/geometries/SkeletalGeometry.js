@@ -66,12 +66,36 @@ export default class SkeletalGeometry extends Geometry {
           }
         }
       }
+
+      // skip if there are incomplete joint data
+      let doContinue = false;
+      for (let j = 0; j < jointsHierarchy.length; j++) {
+        if (typeof mapTable[j] === 'undefined') {
+          doContinue = true;
+          break;
+        }
+      }
+      if (doContinue) {
+        matrices[i] = Matrix44.identity();
+        continue;
+      }
+
       for (let j = 0; j < jointsHierarchy.length; j++) {
 
         let pivotJoint = joints[mapTable[j]];
         let rotateMatrix = Matrix44.multiply(joints[mapTable[j]].inverseMatrix, (jointsHierarchy[j].parent.transformMatrixOnlyRotate));
 
-        let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(pivotJoint.inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, pivotJoint.inverseBindPoseMatrix));
+        let inverseBindPoseMatrix = null;
+        if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
+          inverseBindPoseMatrix = joints[mapTable[Math.max(j-1, 0)]].inverseBindPoseMatrix;
+          if (!inverseBindPoseMatrix) {
+            inverseBindPoseMatrix = Matrix44.identity();
+          }
+        } else {
+          inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
+        }
+
+        let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
 
         if (j > 0) {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
@@ -88,6 +112,7 @@ export default class SkeletalGeometry extends Geometry {
     for (let i=0; i<matrices.length; i++) {
       Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
     }
+
     if (matrices.length < 4) {
       let identityMatrices = [];
       for (let i=0; i<(4 - matrices.length); i++) {
@@ -103,6 +128,7 @@ export default class SkeletalGeometry extends Geometry {
 
     for (let i=0; i<materials.length;i++) {
       var glslProgram = materials[i].shaderInstance.glslProgram;
+      gl.useProgram(glslProgram);
       gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
     }
 
@@ -194,13 +220,33 @@ export default class SkeletalGeometry extends Geometry {
           }
         }
       }
+
+      // skip if there are incomplete joint data
+      let doContinue = false;
+      for (let j = 0; j < jointsHierarchy.length; j++) {
+        if (typeof mapTable[j] === 'undefined') {
+          doContinue = true;
+          break;
+        } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
+          doContinue = true;
+          break;
+        }
+      }
+      if (doContinue) {
+        continue;
+      }
+      /*
       for (let j = 0; j < jointsHierarchy.length; j++) {
 
         let thisLoopMatrix = null;
 
         //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
 
-        thisLoopMatrix = (skeletalMesh.inverseBindMatrices[mapTable[j]].clone());
+        if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
+          thisLoopMatrix = Matrix44.identity();
+        } else {
+          thisLoopMatrix = (skeletalMesh.inverseBindMatrices[mapTable[j]].clone());
+        }
 
         thisLoopMatrix.m03 = 0;
         thisLoopMatrix.m13 = 0;
@@ -216,7 +262,9 @@ export default class SkeletalGeometry extends Geometry {
           tempMatrices[j] = thisLoopMatrix;
         }
       }
-      joints[i].inverseRotateMatrix = (tempMatrices[tempMatrices.length - 1]);
+      //joints[i].inverseRotateMatrix = (tempMatrices[tempMatrices.length - 1]);
+       */
+
       joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
 
     }

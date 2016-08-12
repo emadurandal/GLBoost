@@ -3566,7 +3566,7 @@
           //gl.useProgram(programToReturn);
         }
         this._glslProgram = programToReturn;
-        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, extraData, canvas);
+        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
 
         return programToReturn;
       }
@@ -5331,6 +5331,11 @@
       key: 'setExtraDataForShader',
       value: function setExtraDataForShader(name, value) {
         this._extraDataForShader[name] = value;
+      }
+    }, {
+      key: 'getExtraDataForShader',
+      value: function getExtraDataForShader(name) {
+        return this._extraDataForShader[name];
       }
     }, {
       key: 'materials',
@@ -7228,12 +7233,36 @@
               }
             }
           }
+
+          // skip if there are incomplete joint data
+          var doContinue = false;
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            if (typeof mapTable[j] === 'undefined') {
+              doContinue = true;
+              break;
+            }
+          }
+          if (doContinue) {
+            matrices[i] = Matrix44.identity();
+            continue;
+          }
+
           for (var j = 0; j < jointsHierarchy.length; j++) {
 
             var pivotJoint = joints[mapTable[j]];
             var rotateMatrix = Matrix44.multiply(joints[mapTable[j]].inverseMatrix, jointsHierarchy[j].parent.transformMatrixOnlyRotate);
 
-            var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(pivotJoint.inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, pivotJoint.inverseBindPoseMatrix));
+            var inverseBindPoseMatrix = null;
+            if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
+              inverseBindPoseMatrix = joints[mapTable[Math.max(j - 1, 0)]].inverseBindPoseMatrix;
+              if (!inverseBindPoseMatrix) {
+                inverseBindPoseMatrix = Matrix44.identity();
+              }
+            } else {
+              inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
+            }
+
+            var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
 
             if (j > 0) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
@@ -7247,6 +7276,7 @@
         for (var i = 0; i < matrices.length; i++) {
           Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
         }
+
         if (matrices.length < 4) {
           var identityMatrices = [];
           for (var i = 0; i < 4 - matrices.length; i++) {
@@ -7257,6 +7287,7 @@
 
         for (var i = 0; i < materials.length; i++) {
           var glslProgram = materials[i].shaderInstance.glslProgram;
+          gl.useProgram(glslProgram);
           gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
         }
 
@@ -7354,29 +7385,46 @@
               }
             }
           }
+
+          // skip if there are incomplete joint data
+          var doContinue = false;
           for (var j = 0; j < jointsHierarchy.length; j++) {
-
-            var thisLoopMatrix = null;
-
-            //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
-
-            thisLoopMatrix = skeletalMesh.inverseBindMatrices[mapTable[j]].clone();
-
-            thisLoopMatrix.m03 = 0;
+            if (typeof mapTable[j] === 'undefined') {
+              doContinue = true;
+              break;
+            } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
+              doContinue = true;
+              break;
+            }
+          }
+          if (doContinue) {
+            continue;
+          }
+          /*
+          for (let j = 0; j < jointsHierarchy.length; j++) {
+             let thisLoopMatrix = null;
+             //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
+             if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
+              thisLoopMatrix = Matrix44.identity();
+            } else {
+              thisLoopMatrix = (skeletalMesh.inverseBindMatrices[mapTable[j]].clone());
+            }
+             thisLoopMatrix.m03 = 0;
             thisLoopMatrix.m13 = 0;
             thisLoopMatrix.m23 = 0;
             thisLoopMatrix.m30 = 0;
             thisLoopMatrix.m31 = 0;
             thisLoopMatrix.m32 = 0;
-
-            if (j > 0) {
-              //        if (false) {
+             if (j > 0) {
+          //        if (false) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
             } else {
               tempMatrices[j] = thisLoopMatrix;
             }
           }
-          joints[i].inverseRotateMatrix = tempMatrices[tempMatrices.length - 1];
+          //joints[i].inverseRotateMatrix = (tempMatrices[tempMatrices.length - 1]);
+           */
+
           joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
         }
 

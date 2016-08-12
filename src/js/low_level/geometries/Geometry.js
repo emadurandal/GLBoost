@@ -392,6 +392,10 @@ export default class Geometry extends GLBoostObject {
     this._extraDataForShader[name] = value;
   }
 
+  getExtraDataForShader(name) {
+    return this._extraDataForShader[name];
+  }
+
   static clearMaterialCache() {
     Geometry._lastMaterial = null;
   }
