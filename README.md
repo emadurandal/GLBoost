@@ -174,8 +174,13 @@ $ npm run build
 
 ### Build of examples
 
+[en]
 Some examples needs to be built by Babel because they are written ECMAScript 2015.
 The following command builds them all.
+
+[ja]
+いくつかのサンプルはECMAScript 2015で書かれているため、Babelでのビルドを必要とします。
+次のコマンドでそれら全てをビルドできます。
 
 ```
 $ npm run build-examples
