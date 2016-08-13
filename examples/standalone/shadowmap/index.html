@@ -17,7 +17,7 @@
   <canvas id="world" width="600" height="600"></canvas>
 </main>
 <script>
-  var DEPTH_TEXTURE_SIZE = 512;
+  var DEPTH_TEXTURE_SIZE = 1024;
 
 
   var arg = new Object;
@@ -46,23 +46,37 @@
   var expression = glBoostContext.createExpressionAndRenderPasses(3);
   var plane = null;
   var cube = null;
+  var planeForDepth = null;
+  var cubeForDepth = null;
   var depthTexture = null;
-  var depthCamera = null
+  var depthCamera = null;
   var camera = null;
   var directionOfDirectionalLight = new GLBoost.Vector3(5, -10, 5);
-
+  var directionalLight = null;
   (function commonProcess(){
     var material = glBoostContext.createClassicMaterial();
-    material.shaderClass = GLBoost.PhongShader;
+    material.shaderClass = GLBoost.LambertShader;
     var texture = glBoostContext.createTexture('resources/texture.png');
     material.diffuseTexture = texture;
 
     var planeGeometry = glBoostContext.createPlane(10, 10, 10, 10, null);
-    plane = glBoostContext.createMesh(planeGeometry, material);
     var cubeGeometry = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
+
+    plane = glBoostContext.createMesh(planeGeometry, material);
     cube = glBoostContext.createMesh(cubeGeometry, material);
     cube.translate = new GLBoost.Vector3(0,2,0);
 
+    var materialForDepth = glBoostContext.createClassicMaterial();
+    materialForDepth.shaderClass = GLBoost.PassThroughShader;
+    //materialForDepth.diffuseTexture = texture;
+    /*
+    materialForDepth.shaderClass = GLBoost.LambertShader;
+    texture = glBoostContext.createTexture('resources/texture.png');
+    materialForDepth.diffuseTexture = texture;
+      */
+    planeForDepth = glBoostContext.createMesh(planeGeometry, materialForDepth);
+    cubeForDepth = glBoostContext.createMesh(cubeGeometry, materialForDepth);
+    cubeForDepth.translate = new GLBoost.Vector3(0,2,0);
 
 
   })();
@@ -71,8 +85,10 @@
     depthTexture = glBoostContext.createDepthTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
 
     var scene = glBoostContext.createScene();
-    scene.addChild( plane );
-    scene.addChild( cube );
+    scene.addChild( planeForDepth );
+    scene.addChild( cubeForDepth );
+    //scene.addChild( plane );
+    //scene.addChild( cube );
 
     depthCamera = glBoostContext.createOrthoCamera(
         {
@@ -89,25 +105,25 @@
           zFar: 1.0
         }
     );
+    depthCamera.texture = depthTexture;
     scene.addChild( depthCamera );
 
-    scene.addChild( depthCamera );
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
-    expression.renderPasses[0].customFunction = (function(){
+    function updateDepthCamera(light){
       scene.updateAABB();
       var aabb = scene.AABB;
       var centerOfAABB = aabb.centerPoint;
       var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
-      var normalizedLightDirection = GLBoost.Vector3.normalize(directionOfDirectionalLight);
+      var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction);
       var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCamera.zNear)));
       var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
 
       depthCamera.eye = cameraEye;
       depthCamera.center = cameraCenter;
-  //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
-  //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
+      //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
+      //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
       //depthCamera.up = new GLBoost.Vector3(1.0, 0, 0.0);
 
       depthCamera.left = -lengthBtwCenterToCornerOfAABB;
@@ -115,8 +131,11 @@
       depthCamera.bottom = -lengthBtwCenterToCornerOfAABB;
       depthCamera.top = lengthBtwCenterToCornerOfAABB;
       depthCamera.zFar = lengthBtwCenterToCornerOfAABB * 2 + depthCamera.zNear;
-      console.log(aabb.minPoint + ' ' + aabb.maxPoint);
-    }).bind(this);
+//      console.log(aabb.minPoint + ' ' + aabb.maxPoint);
+    }
+    //expression.renderPasses[0].customFunction = updateDepthCamera.bind(this);
+    depthCamera.customFunction = updateDepthCamera.bind(this);
+
   })();
 
   (function renderingPass() {
@@ -126,7 +145,8 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), directionOfDirectionalLight);
+    directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.5, 1.5, 1.5), directionOfDirectionalLight);
+    directionalLight.camera = depthCamera;
     scene.addChild( directionalLight );
 
     camera = glBoostContext.createPerspectiveCamera(
@@ -176,9 +196,10 @@
     renderer.clearCanvas();
     renderer.draw(expression);
 
-    var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
-    var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+    var rotateMatrixForCamera = GLBoost.Matrix33.rotateY(-1.0);
+    camera.eye = rotateMatrixForCamera.multiplyVector(camera.eye);
+    var rotateMatrix = GLBoost.Matrix33.rotateY(1.0);
+    directionalLight.direction = rotateMatrix.multiplyVector(directionalLight.direction);
 
     requestAnimationFrame(render);
   };

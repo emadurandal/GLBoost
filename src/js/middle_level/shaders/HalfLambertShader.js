@@ -23,6 +23,7 @@ export class HalfLambertShaderSource {
     shaderText += '    float diffuse = halfLambert*halfLambert;\n';
     shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
     shaderText += '  }\n';
+//    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 
@@ -30,16 +31,9 @@ export class HalfLambertShaderSource {
     return shaderText;
   }
 
-  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
-    vertexAttribs.forEach((attribName)=>{
-      if (attribName === GLBoost.NORMAL) {
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
-      }
-    });
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 

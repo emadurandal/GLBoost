@@ -32,6 +32,11 @@ export default class DirectionalLight extends AbstractLight {
 
   set direction(vec) {
     this._direction = vec;
+    if (this._camera) {
+      if (this._camera.customFunction) {
+        this._camera.customFunction(this);
+      }
+    }
   }
 
   get direction() {

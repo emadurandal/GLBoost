@@ -37,7 +37,7 @@ export default class Renderer extends GLBoostObject {
    * @param {Scene} scene a instance of Scene class
    */
   draw(expression) {
-    expression.renderPasses.forEach((renderPass)=>{
+    expression.renderPasses.forEach((renderPass, index)=>{
       if (!renderPass.scene) {
         return;
       }
@@ -73,7 +73,7 @@ export default class Renderer extends GLBoostObject {
       // draw opacity meshes.
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
-        mesh.draw(lights, camera, renderPass.scene);
+        mesh.draw(lights, camera, renderPass.scene, index);
       });
 
       if (camera) {
@@ -82,7 +82,7 @@ export default class Renderer extends GLBoostObject {
       // draw transparent meshes.
       var transparentMeshes = renderPass.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
-        mesh.draw(lights, camera, renderPass.scene);
+        mesh.draw(lights, camera, renderPass.scene, index);
       });
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);

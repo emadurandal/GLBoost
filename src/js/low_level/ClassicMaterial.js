@@ -20,6 +20,7 @@ export default class ClassicMaterial extends GLBoostObject {
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
 
+    this._countOfUpdate = 0;
   }
 
   clone() {
@@ -36,6 +37,14 @@ export default class ClassicMaterial extends GLBoostObject {
     }
 
     return material;
+  }
+
+  _updateCount() {
+    this._countOfUpdate += 1;
+  }
+
+  getUpdateStateString() {
+    return this.toString() + '_updateCount_' + this._countOfUpdate;
   }
 
   set shaderClass(shaderClass) {
@@ -55,6 +64,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set shaderInstance(shaderInstance) {
     this._shaderInstance = shaderInstance;
+    this._updateCount();
   }
 
   get shaderInstance() {
@@ -63,6 +73,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set diffuseTexture(tex) {
     this._diffuseTexture = tex;
+    this._updateCount();
   }
 
   get diffuseTexture() {
@@ -71,6 +82,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set baseColor(vec) {
     this._baseColor = vec;
+    this._updateCount();
   }
 
   get baseColor() {
@@ -79,6 +91,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set diffuseColor(vec) {
     this._diffuseColor = vec;
+    this._updateCount();
   }
 
   get diffuseColor() {
@@ -87,6 +100,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set specularColor(vec) {
     this._specularColor = vec;
+    this._updateCount();
   }
 
   get specularColor() {
@@ -95,6 +109,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   set ambientColor(vec) {
     this._ambientColor = vec;
+    this._updateCount();
   }
 
   get ambientColor() {
@@ -121,9 +136,7 @@ export default class ClassicMaterial extends GLBoostObject {
     var gl = this._gl;
     var result = false;
     if (this._diffuseTexture) {
-      // テクスチャユニット０にテクスチャオブジェクトをバインドする
-      gl.activeTexture(gl.TEXTURE0);
-      result = this._diffuseTexture.setUp();
+      result = this._diffuseTexture.setUp(0);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
       result = true;

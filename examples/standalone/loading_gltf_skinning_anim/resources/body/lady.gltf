@@ -1,0 +1,1684 @@
+{
+    "accessors": {
+        "IBM_AzumaAnimeHead1Shape-skin": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 16,
+            "type": "MAT4"
+        },
+        "accessor_213": {
+            "bufferView": "bufferView_221",
+            "byteOffset": 1166720,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                1,
+                0.99989,
+                0.999758,
+                0.999246
+            ],
+            "min": [
+                0.000100062,
+                0,
+                0,
+                0
+            ],
+            "type": "VEC4"
+        },
+        "accessor_216": {
+            "bufferView": "bufferView_221",
+            "byteOffset": 700032,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                15,
+                15,
+                15,
+                15
+            ],
+            "min": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "type": "VEC4"
+        },
+        "accessor_24": {
+            "bufferView": "bufferView_220",
+            "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 158694,
+            "type": "SCALAR"
+        },
+        "accessor_26": {
+            "bufferView": "bufferView_221",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                2.50683,
+                1.6565,
+                0.46288
+            ],
+            "min": [
+                -2.50683,
+                -5.23968,
+                -0.39165
+            ],
+            "type": "VEC3"
+        },
+        "accessor_28": {
+            "bufferView": "bufferView_221",
+            "byteOffset": 350016,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                0.999999,
+                0.999981,
+                0.999996
+            ],
+            "min": [
+                -0.999999,
+                -0.999959,
+                -0.999984
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_0": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1024,
+            "componentType": 5126,
+            "count": 6,
+            "type": "SCALAR"
+        },
+        "animAccessor_1": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1048,
+            "componentType": 5126,
+            "count": 6,
+            "type": "VEC3"
+        },
+        "animAccessor_10": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1340,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_11": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1364,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_12": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1388,
+            "componentType": 5126,
+            "count": 6,
+            "type": "VEC4"
+        },
+        "animAccessor_13": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1484,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_14": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1548,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_15": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1572,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC4"
+        },
+        "animAccessor_16": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1620,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_17": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1644,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_18": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1668,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_19": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1732,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_2": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1120,
+            "componentType": 5126,
+            "count": 2,
+            "type": "SCALAR"
+        },
+        "animAccessor_20": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1756,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_21": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1820,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_22": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1844,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_23": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1868,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_24": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1932,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_25": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1956,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_26": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 2020,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_27": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 2044,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_28": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 2068,
+            "componentType": 5126,
+            "count": 6,
+            "type": "VEC4"
+        },
+        "animAccessor_29": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 2164,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_3": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1128,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_4": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1152,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_5": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1176,
+            "componentType": 5126,
+            "count": 4,
+            "type": "SCALAR"
+        },
+        "animAccessor_6": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1192,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_7": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1256,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC3"
+        },
+        "animAccessor_8": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1280,
+            "componentType": 5126,
+            "count": 3,
+            "type": "SCALAR"
+        },
+        "animAccessor_9": {
+            "bufferView": "bufferView_219",
+            "byteOffset": 1292,
+            "componentType": 5126,
+            "count": 3,
+            "type": "VEC4"
+        }
+    },
+    "animations": {
+        "animation_0": {
+            "channels": [
+                {
+                    "sampler": "animation_0_translation_sampler",
+                    "target": {
+                        "id": "_koshi",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "translation": "animAccessor_1"
+            },
+            "samplers": {
+                "animation_0_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_1": {
+            "channels": [
+                {
+                    "sampler": "animation_1_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_3"
+            },
+            "samplers": {
+                "animation_1_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_10": {
+            "channels": [
+                {
+                    "sampler": "animation_10_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_4"
+            },
+            "samplers": {
+                "animation_10_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_11": {
+            "channels": [
+                {
+                    "sampler": "animation_11_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_6"
+            },
+            "samplers": {
+                "animation_11_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_12": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_13": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_14": {
+            "channels": [
+                {
+                    "sampler": "animation_14_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_7"
+            },
+            "samplers": {
+                "animation_14_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_15": {
+            "channels": [
+                {
+                    "sampler": "animation_15_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_8",
+                "rotation": "animAccessor_9"
+            },
+            "samplers": {
+                "animation_15_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_16": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_8"
+            },
+            "samplers": {}
+        },
+        "animation_17": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_8"
+            },
+            "samplers": {}
+        },
+        "animation_18": {
+            "channels": [
+                {
+                    "sampler": "animation_18_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi_R_te",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_10"
+            },
+            "samplers": {
+                "animation_18_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_19": {
+            "channels": [
+                {
+                    "sampler": "animation_19_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_11"
+            },
+            "samplers": {
+                "animation_19_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_2": {
+            "channels": [
+                {
+                    "sampler": "animation_2_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_12"
+            },
+            "samplers": {
+                "animation_2_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_20": {
+            "channels": [
+                {
+                    "sampler": "animation_20_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_13"
+            },
+            "samplers": {
+                "animation_20_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_21": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_22": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_23": {
+            "channels": [
+                {
+                    "sampler": "animation_23_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_14"
+            },
+            "samplers": {
+                "animation_23_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_24": {
+            "channels": [
+                {
+                    "sampler": "animation_24_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_8",
+                "rotation": "animAccessor_15"
+            },
+            "samplers": {
+                "animation_24_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_25": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_8"
+            },
+            "samplers": {}
+        },
+        "animation_26": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_8"
+            },
+            "samplers": {}
+        },
+        "animation_27": {
+            "channels": [
+                {
+                    "sampler": "animation_27_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi_L_te",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_16"
+            },
+            "samplers": {
+                "animation_27_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_28": {
+            "channels": [
+                {
+                    "sampler": "animation_28_translation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_17"
+            },
+            "samplers": {
+                "animation_28_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_29": {
+            "channels": [
+                {
+                    "sampler": "animation_29_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_18"
+            },
+            "samplers": {
+                "animation_29_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_3": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_0"
+            },
+            "samplers": {}
+        },
+        "animation_30": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_31": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_32": {
+            "channels": [
+                {
+                    "sampler": "animation_32_translation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_19"
+            },
+            "samplers": {
+                "animation_32_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_33": {
+            "channels": [
+                {
+                    "sampler": "animation_33_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_20"
+            },
+            "samplers": {
+                "animation_33_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_34": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_35": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_36": {
+            "channels": [
+                {
+                    "sampler": "animation_36_translation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza_R_ashi",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_21"
+            },
+            "samplers": {
+                "animation_36_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_37": {
+            "channels": [
+                {
+                    "sampler": "animation_37_translation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_22"
+            },
+            "samplers": {
+                "animation_37_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_38": {
+            "channels": [
+                {
+                    "sampler": "animation_38_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_23"
+            },
+            "samplers": {
+                "animation_38_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_39": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_4": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_0"
+            },
+            "samplers": {}
+        },
+        "animation_40": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_41": {
+            "channels": [
+                {
+                    "sampler": "animation_41_translation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene_L_hiza",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_24"
+            },
+            "samplers": {
+                "animation_41_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_42": {
+            "channels": [
+                {
+                    "sampler": "animation_42_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene_L_hiza",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_5",
+                "rotation": "animAccessor_25"
+            },
+            "samplers": {
+                "animation_42_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_43": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_44": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_5"
+            },
+            "samplers": {}
+        },
+        "animation_45": {
+            "channels": [
+                {
+                    "sampler": "animation_45_translation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene_L_hiza_L_ashi",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_26"
+            },
+            "samplers": {
+                "animation_45_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_5": {
+            "channels": [
+                {
+                    "sampler": "animation_5_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_neck",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_27"
+            },
+            "samplers": {
+                "animation_5_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_6": {
+            "channels": [
+                {
+                    "sampler": "animation_6_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_neck",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_28"
+            },
+            "samplers": {
+                "animation_6_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_7": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_0"
+            },
+            "samplers": {}
+        },
+        "animation_8": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_0"
+            },
+            "samplers": {}
+        },
+        "animation_9": {
+            "channels": [
+                {
+                    "sampler": "animation_9_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_neck_atama",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "translation": "animAccessor_29"
+            },
+            "samplers": {
+                "animation_9_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        }
+    },
+    "asset": {
+        "generator": "collada2gltf@bc44b82e3461dfb4da806c773dafd20559f62445",
+        "premultipliedAlpha": true,
+        "profile": {
+            "api": "WebGL",
+            "version": "1.0.2"
+        },
+        "version": "1.0"
+    },
+    "bufferViews": {
+        "bufferView_219": {
+            "buffer": "lady",
+            "byteLength": 2188,
+            "byteOffset": 0
+        },
+        "bufferView_220": {
+            "buffer": "lady",
+            "byteLength": 317388,
+            "byteOffset": 2188,
+            "target": 34963
+        },
+        "bufferView_221": {
+            "buffer": "lady",
+            "byteLength": 1633408,
+            "byteOffset": 319576,
+            "target": 34962
+        }
+    },
+    "buffers": {
+        "lady": {
+            "byteLength": 1952984,
+            "type": "arraybuffer",
+            "uri": "lady.bin"
+        }
+    },
+    "materials": {
+        "AzumaAnimeHead1_blinn-fx": {
+            "name": "AzumaAnimeHead1_blinn",
+            "technique": "technique1",
+            "values": {
+                "ambient": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "diffuse": [
+                    0.4,
+                    0.4,
+                    0.4,
+                    1
+                ],
+                "emission": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "shininess": 38.4,
+                "specular": [
+                    0.5,
+                    0.5,
+                    0.5,
+                    1
+                ],
+                "transparency": 0
+            }
+        }
+    },
+    "meshes": {
+        "AzumaAnimeHead1Shape": {
+            "name": "AzumaAnimeHead1Shape",
+            "primitives": [
+                {
+                    "attributes": {
+                        "JOINT": "accessor_216",
+                        "NORMAL": "accessor_28",
+                        "POSITION": "accessor_26",
+                        "WEIGHT": "accessor_213"
+                    },
+                    "indices": "accessor_24",
+                    "material": "AzumaAnimeHead1_blinn-fx",
+                    "mode": 4
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "_AzumaAnimeHead1": {
+            "children": [],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "meshes": [
+                "AzumaAnimeHead1Shape"
+            ],
+            "name": "AzumaAnimeHead1",
+            "skeletons": [
+                "_koshi",
+                "_koshi_L_ashi_tsukene",
+                "_koshi_L_ashi_tsukene_L_hiza",
+                "_koshi_L_ashi_tsukene_L_hiza_L_ashi",
+                "_koshi_R_ashi_tsukene",
+                "_koshi_R_ashi_tsukene_R_hiza",
+                "_koshi_R_ashi_tsukene_R_hiza_R_ashi",
+                "_koshi_sakotsu",
+                "_koshi_sakotsu_L_kata",
+                "_koshi_sakotsu_L_kata_L_kurubushi",
+                "_koshi_sakotsu_L_kata_L_kurubushi_L_te",
+                "_koshi_sakotsu_R_kata",
+                "_koshi_sakotsu_R_kata_R_kurubushi",
+                "_koshi_sakotsu_R_kata_R_kurubushi_R_te",
+                "_koshi_sakotsu_neck",
+                "_koshi_sakotsu_neck_atama"
+            ],
+            "skin": "AzumaAnimeHead1Shape-skin"
+        },
+        "_koshi": {
+            "children": [
+                "_koshi_sakotsu",
+                "_koshi_R_ashi_tsukene",
+                "_koshi_L_ashi_tsukene"
+            ],
+            "jointName": "koshi",
+            "name": "koshi",
+            "rotation": [
+                0,
+                0,
+                0.707107,
+                0.707107
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_L_ashi_tsukene": {
+            "children": [
+                "_koshi_L_ashi_tsukene_L_hiza"
+            ],
+            "jointName": "L_ashi_tsukene",
+            "name": "L_ashi_tsukene",
+            "rotation": [
+                0.0133589,
+                0.344373,
+                0.938032,
+                -0.0363886
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_L_ashi_tsukene_L_hiza": {
+            "children": [
+                "_koshi_L_ashi_tsukene_L_hiza_L_ashi"
+            ],
+            "jointName": "L_hiza",
+            "name": "L_hiza",
+            "rotation": [
+                0.88684,
+                -0.103871,
+                -0.0175771,
+                -0.449908
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_L_ashi_tsukene_L_hiza_L_ashi": {
+            "children": [],
+            "jointName": "L_ashi",
+            "name": "L_ashi",
+            "rotation": [
+                -0.72818,
+                0.0567823,
+                -0.0531004,
+                0.680963
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_R_ashi_tsukene": {
+            "children": [
+                "_koshi_R_ashi_tsukene_R_hiza"
+            ],
+            "jointName": "R_ashi_tsukene",
+            "name": "R_ashi_tsukene",
+            "rotation": [
+                0.0363886,
+                0.938032,
+                0.344373,
+                -0.0133588
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_R_ashi_tsukene_R_hiza": {
+            "children": [
+                "_koshi_R_ashi_tsukene_R_hiza_R_ashi"
+            ],
+            "jointName": "R_hiza",
+            "name": "R_hiza",
+            "rotation": [
+                0.886839,
+                -0.103871,
+                0.017577,
+                0.449909
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_R_ashi_tsukene_R_hiza_R_ashi": {
+            "children": [],
+            "jointName": "R_ashi",
+            "name": "R_ashi",
+            "rotation": [
+                0.0567822,
+                0.72818,
+                -0.680962,
+                -0.0531002
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu": {
+            "children": [
+                "_koshi_sakotsu_neck",
+                "_koshi_sakotsu_R_kata",
+                "_koshi_sakotsu_L_kata"
+            ],
+            "jointName": "sakotsu",
+            "name": "sakotsu",
+            "rotation": [
+                0,
+                0,
+                0,
+                1
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_L_kata": {
+            "children": [
+                "_koshi_sakotsu_L_kata_L_kurubushi"
+            ],
+            "jointName": "L_kata",
+            "name": "L_kata",
+            "rotation": [
+                0.433179,
+                0.901308,
+                4.04656e-11,
+                1.94483e-11
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_L_kata_L_kurubushi": {
+            "children": [
+                "_koshi_sakotsu_L_kata_L_kurubushi_L_te"
+            ],
+            "jointName": "L_kurubushi",
+            "name": "L_kurubushi",
+            "rotation": [
+                0,
+                0,
+                -0.021527,
+                0.999768
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_L_kata_L_kurubushi_L_te": {
+            "children": [],
+            "jointName": "L_te",
+            "name": "L_te",
+            "rotation": [
+                0,
+                0,
+                -0.413677,
+                0.910424
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_R_kata": {
+            "children": [
+                "_koshi_sakotsu_R_kata_R_kurubushi"
+            ],
+            "jointName": "R_kata",
+            "name": "R_kata",
+            "rotation": [
+                0,
+                0,
+                0.901303,
+                -0.433189
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_R_kata_R_kurubushi": {
+            "children": [
+                "_koshi_sakotsu_R_kata_R_kurubushi_R_te"
+            ],
+            "jointName": "R_kurubushi",
+            "name": "R_kurubushi",
+            "rotation": [
+                0,
+                0,
+                -0.0215439,
+                0.999768
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_R_kata_R_kurubushi_R_te": {
+            "children": [],
+            "jointName": "R_te",
+            "name": "R_te",
+            "rotation": [
+                0,
+                0,
+                0.910426,
+                0.413671
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_neck": {
+            "children": [
+                "_koshi_sakotsu_neck_atama"
+            ],
+            "jointName": "neck",
+            "name": "neck",
+            "rotation": [
+                0,
+                0,
+                -0.00221237,
+                0.999998
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        },
+        "_koshi_sakotsu_neck_atama": {
+            "children": [],
+            "jointName": "atama",
+            "name": "atama",
+            "rotation": [
+                0,
+                0,
+                -0.705541,
+                0.708669
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "programs": {
+        "program_0": {
+            "attributes": [
+                "a_joint",
+                "a_normal",
+                "a_position",
+                "a_weight"
+            ],
+            "fragmentShader": "lady0FS",
+            "vertexShader": "lady0VS"
+        }
+    },
+    "scene": "defaultScene",
+    "scenes": {
+        "defaultScene": {
+            "nodes": [
+                "_koshi",
+                "_AzumaAnimeHead1"
+            ]
+        }
+    },
+    "shaders": {
+        "lady0FS": {
+            "type": 35632,
+            "uri": "lady0FS.glsl"
+        },
+        "lady0VS": {
+            "type": 35633,
+            "uri": "lady0VS.glsl"
+        }
+    },
+    "skins": {
+        "AzumaAnimeHead1Shape-skin": {
+            "bindShapeMatrix": [
+                0.25,
+                0,
+                0,
+                0,
+                0,
+                0.25,
+                0,
+                0,
+                0,
+                0,
+                0.25,
+                0,
+                0,
+                1.29397,
+                0,
+                1
+            ],
+            "inverseBindMatrices": "IBM_AzumaAnimeHead1Shape-skin",
+            "jointNames": [
+                "koshi",
+                "sakotsu",
+                "neck",
+                "atama",
+                "R_kata",
+                "R_kurubushi",
+                "R_te",
+                "L_kata",
+                "L_kurubushi",
+                "L_te",
+                "R_ashi_tsukene",
+                "R_hiza",
+                "R_ashi",
+                "L_ashi_tsukene",
+                "L_hiza",
+                "L_ashi"
+            ],
+            "name": "AzumaAnimeHead1Shape-skin"
+        }
+    },
+    "techniques": {
+        "technique1": {
+            "attributes": {
+                "a_joint": "joint",
+                "a_normal": "normal",
+                "a_position": "position",
+                "a_weight": "weight"
+            },
+            "parameters": {
+                "ambient": {
+                    "type": 35666
+                },
+                "diffuse": {
+                    "type": 35666
+                },
+                "emission": {
+                    "type": 35666
+                },
+                "joint": {
+                    "semantic": "JOINT",
+                    "type": 35666
+                },
+                "jointMat": {
+                    "count": 16,
+                    "semantic": "JOINTMATRIX",
+                    "type": 35676
+                },
+                "modelViewMatrix": {
+                    "semantic": "MODELVIEW",
+                    "type": 35676
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": 35665
+                },
+                "normalMatrix": {
+                    "semantic": "MODELVIEWINVERSETRANSPOSE",
+                    "type": 35675
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": 35665
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": 35676
+                },
+                "shininess": {
+                    "type": 5126
+                },
+                "specular": {
+                    "type": 35666
+                },
+                "transparency": {
+                    "type": 5126
+                },
+                "weight": {
+                    "semantic": "WEIGHT",
+                    "type": 35666
+                }
+            },
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929,
+                    3042
+                ],
+                "functions": {
+                    "blendEquationSeparate": [
+                        32774,
+                        32774
+                    ],
+                    "blendFuncSeparate": [
+                        1,
+                        771,
+                        1,
+                        771
+                    ],
+                    "depthMask": [
+                        false
+                    ]
+                }
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_jointMat": "jointMat",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_shininess": "shininess",
+                "u_specular": "specular",
+                "u_transparency": "transparency"
+            }
+        }
+    }
+}

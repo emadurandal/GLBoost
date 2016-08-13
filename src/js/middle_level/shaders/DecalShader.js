@@ -1,6 +1,6 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
-import FragmentSimpleShaderSource from './FragmentSimpleShader';
+import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
 
 export class DecalShaderSource {
   VSDefine_DecalShaderSource(in_, out_, f) {
@@ -27,13 +27,15 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  FSDefine_DecalShaderSource(in_, f) {
+  FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += `${in_} vec4 color;\n`;
     }
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
+    }
+    if (material.diffuseTexture !== null) {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
@@ -41,16 +43,18 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  FSShade_DecalShaderSource(f, gl) {
+  FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.diffuseTexture !== null) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
+    //shaderText += '    float shadowRatio = 0.0;\n';
+
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     return shaderText;
   }
@@ -69,8 +73,8 @@ export class DecalShaderSource {
     shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'texture');
-      // サンプラーにテクスチャユニット０を指定する
+        shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'uTexture');
+      // set texture unit 0 to the sampler
       gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
     }
 

@@ -20,15 +20,15 @@ export default class DrawKickerLocal {
     return this[singleton];
   }
 
-  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN) {
+  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
     var isVAOBound = false;
     if (DrawKickerLocal._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
     }
 
     for (let i=0; i<materials.length;i++) {
-      let shaderName = materials[i].shaderInstance.toString();
-      if (shaderName !== DrawKickerLocal._lastShaderName) {
+      let materialUpdateStateString = materials[i].getUpdateStateString();
+      if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
         this._glslProgram = materials[i].shaderInstance.glslProgram;
         gl.useProgram(this._glslProgram);
       }
@@ -91,12 +91,12 @@ export default class DrawKickerLocal {
 
       let isMaterialSetupDone = true;
 
-      if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerLocal._lastShaderName) {
+      if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
         var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
         materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
-      if (shaderName !== DrawKickerLocal._lastShaderName) {
+      if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
         if (materials[i]) {
           isMaterialSetupDone = materials[i].setUp();
         }
@@ -114,14 +114,16 @@ export default class DrawKickerLocal {
       }
 
 
-      DrawKickerLocal._lastShaderName = isMaterialSetupDone ? shaderName : null;
+      DrawKickerLocal._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     DrawKickerLocal._lastGeometry = geometryName;
+    DrawKickerLocal._lastRenderPassIndex = renderPassIndex;
   }
 }
 
-DrawKickerLocal._lastShaderName = null;
+DrawKickerLocal._lastMaterialUpdateStateString = null;
 DrawKickerLocal._lastGeometry = null;
+DrawKickerLocal._lastRenderPassIndex = -1;

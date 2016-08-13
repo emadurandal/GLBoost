@@ -58,7 +58,6 @@ export default class SkeletalGeometry extends Geometry {
       //console.log(jointsHierarchy);
       let tempMatrices = [];
 
-
       let mapTable = [];
       for (let j = 0; j < jointsHierarchy.length; j++) {
         for (let k = 0; k < joints.length; k++) {
@@ -67,30 +66,44 @@ export default class SkeletalGeometry extends Geometry {
           }
         }
       }
+
+      // skip if there are incomplete joint data
+      let doContinue = false;
+      for (let j = 0; j < jointsHierarchy.length; j++) {
+        if (typeof mapTable[j] === 'undefined') {
+          doContinue = true;
+          break;
+        }
+      }
+      if (doContinue) {
+        matrices[i] = Matrix44.identity();
+        continue;
+      }
+
       for (let j = 0; j < jointsHierarchy.length; j++) {
 
-        let thisLoopMatrix = null;
-
         let pivotJoint = joints[mapTable[j]];
-        let rotateMatrix = null;
-        //let basicRotateMat = Matrix44.multiply(Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnlyRotate), (joints[mapTable[j]].inverceMatrix));
-        //let basicRotateMat = Matrix44.multiply(Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnlyRotate), Matrix44.invert(joints[mapTable[j]].inverceMatrix));
-        let basicRotateMat = Matrix44.multiply((Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnlyRotate)), Matrix44.invert(joints[mapTable[j]].inverceMatrix));
-        if (j > 0) {
-          //let parentMat = Matrix44.multiply(basicRotateMat, jointsHierarchy[j-1].parent.transformMatrixOnlyRotate);
-          let parentMat = Matrix44.multiply(Matrix44.multiply(Matrix44.invert(jointsHierarchy[j-1].parent.transformMatrixOnlyRotate), Matrix44.invert(joints[mapTable[j-1]].inverceMatrix)), (basicRotateMat));
+        let rotateMatrix = Matrix44.multiply(joints[mapTable[j]].inverseMatrix, (jointsHierarchy[j].parent.transformMatrixOnlyRotate));
 
-          rotateMatrix = Matrix44.multiply(Matrix44.multiply(jointsHierarchy[j].parent.transformMatrixOnlyRotate, joints[mapTable[j]].inverceMatrix), Matrix44.invert(parentMat));
+        let inverseBindPoseMatrix = null;
+        if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
+          inverseBindPoseMatrix = joints[mapTable[Math.max(j-1, 0)]].inverseBindPoseMatrix;
+          if (!inverseBindPoseMatrix) {
+            inverseBindPoseMatrix = Matrix44.identity();
+          }
         } else {
-          rotateMatrix = Matrix44.multiply(((jointsHierarchy[j].parent.transformMatrixOnlyRotate)), (joints[mapTable[j]].inverceMatrix));
+          inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
         }
-        //let rotateMatrix = jointsHierarchy[j].parent.transformMatrixOnlyRotate;
-        thisLoopMatrix = Matrix44.multiply(Matrix44.invert(skeletalMesh.inverseBindMatrices[mapTable[j]]), Matrix44.multiply(rotateMatrix, skeletalMesh.inverseBindMatrices[mapTable[j]]));
+
+        let thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
+
         if (j > 0) {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+
         } else {
           tempMatrices[j] = thisLoopMatrix;
         }
+
       }
       matrices[i] = tempMatrices[jointsHierarchy.length - 1];
 
@@ -99,6 +112,7 @@ export default class SkeletalGeometry extends Geometry {
     for (let i=0; i<matrices.length; i++) {
       Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
     }
+
     if (matrices.length < 4) {
       let identityMatrices = [];
       for (let i=0; i<(4 - matrices.length); i++) {
@@ -114,6 +128,7 @@ export default class SkeletalGeometry extends Geometry {
 
     for (let i=0; i<materials.length;i++) {
       var glslProgram = materials[i].shaderInstance.glslProgram;
+      gl.useProgram(glslProgram);
       gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
     }
 
@@ -150,19 +165,16 @@ export default class SkeletalGeometry extends Geometry {
     }
 
 
-
     let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
     for (let i=0; i<joints.length; i++) {
       //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
       let matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
-      joints[i].inverceMatrix = Matrix44.invert(matrix);
-      //joints[i].inverceMatrix = Matrix44.identity();
+      joints[i].inverseMatrix = Matrix44.invert(matrix);
+      //joints[i].inverseMatrix = Matrix44.identity();
     }
 
-
-    /*
     var calcParentJointsMatricesRecursively = (joint)=> {
-      let children = joint.parent.parent._children;
+      let children = joint.parent.parent._elements;
       let parentJoint = null;
       for (let i=0; i<children.length; i++) {
         if (children[i] instanceof Joint) {
@@ -185,7 +197,8 @@ export default class SkeletalGeometry extends Geometry {
       return null;
     };
 
-    var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+
+    //var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
     var matrices = [];
 
     for (let i=0; i<joints.length; i++) {
@@ -207,21 +220,56 @@ export default class SkeletalGeometry extends Geometry {
           }
         }
       }
+
+      // skip if there are incomplete joint data
+      let doContinue = false;
+      for (let j = 0; j < jointsHierarchy.length; j++) {
+        if (typeof mapTable[j] === 'undefined') {
+          doContinue = true;
+          break;
+        } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
+          doContinue = true;
+          break;
+        }
+      }
+      if (doContinue) {
+        continue;
+      }
+      /*
       for (let j = 0; j < jointsHierarchy.length; j++) {
 
         let thisLoopMatrix = null;
 
-        thisLoopMatrix = joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit;
+        //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
+
+        if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
+          thisLoopMatrix = Matrix44.identity();
+        } else {
+          thisLoopMatrix = (skeletalMesh.inverseBindMatrices[mapTable[j]].clone());
+        }
+
+        thisLoopMatrix.m03 = 0;
+        thisLoopMatrix.m13 = 0;
+        thisLoopMatrix.m23 = 0;
+        thisLoopMatrix.m30 = 0;
+        thisLoopMatrix.m31 = 0;
+        thisLoopMatrix.m32 = 0;
+
         if (j > 0) {
+//        if (false) {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
         } else {
           tempMatrices[j] = thisLoopMatrix;
         }
       }
-      joints[i].inverceMatrix = Matrix44.invert(tempMatrices[jointsHierarchy.length - 1]);
+      //joints[i].inverseRotateMatrix = (tempMatrices[tempMatrices.length - 1]);
+       */
+
+      joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
 
     }
-    */
+
+
     super.prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh);
   }
 }

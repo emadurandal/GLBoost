@@ -22,6 +22,8 @@ export default class AbstractTexture extends GLBoostObject {
     }
 
     this._name = '';
+
+    this._textureUnitIndex = 0;
   }
 
   /**
@@ -38,11 +40,13 @@ export default class AbstractTexture extends GLBoostObject {
    * [en] bind the texture. <br />
    * [ja] テクスチャをバインドします。
    */
-  setUp() {
+  setUp(textureUnitIndex) {
     var gl = this._glContext.gl;
     if (this._texture === null) {
       return false;
     }
+    var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+    gl.activeTexture(gl['TEXTURE'+index]);
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
     return true;
@@ -72,6 +76,16 @@ export default class AbstractTexture extends GLBoostObject {
   get height() {
     return this._height;
   }
+
+  set textureUnitIndex(index) {
+    this._textureUnitIndex = index;
+  }
+
+  get textureUnitIndex() {
+    return this._textureUnitIndex;
+  }
+
+
 
   /**
    * [en] check whether or not this texture size is power of two. <br />

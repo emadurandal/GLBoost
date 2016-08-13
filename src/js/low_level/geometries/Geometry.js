@@ -40,28 +40,12 @@ export default class Geometry extends GLBoostObject {
 
   /**
    * データとして利用する頂点属性を判断し、そのリストを返す
-   * 不必要な頂点属性のデータは無視する。
    */
   _decideNeededVertexAttribs(vertices, material) {
-    var _material = null;
-    if (material) {
-      _material = material;
-    } else {
-      _material = this._materials[0];
-    }
 
     var attribNameArray = [];
     for (var attribName in vertices) {
-      if (attribName === GLBoost.TEXCOORD) {
-        // texcoordの場合は、テクスチャ付きのマテリアルをちゃんと持っているときに限り、'texcoord'が有効となる
-        if ((_material !== void 0) && _material.diffuseTexture !== null) {
-          attribNameArray.push(attribName);
-        } else {
-          //delete vertices[GLBoost.TEXCOORD];
-        }
-      } else {
-        attribNameArray.push(attribName);
-      }
+      attribNameArray.push(attribName);
     }
 
     return attribNameArray;
@@ -214,7 +198,7 @@ export default class Geometry extends GLBoostObject {
 
       material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
     }
-    var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, this._extraDataForShader);
+    var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
     if (doSetupVertexAttribs) {
       this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
     }
@@ -320,7 +304,7 @@ export default class Geometry extends GLBoostObject {
     return true;
   }
 
-  draw(lights, camera, mesh, scene) {
+  draw(lights, camera, mesh, scene, renderPassIndex) {
     var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -335,7 +319,7 @@ export default class Geometry extends GLBoostObject {
 
     let thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN);
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
 
   }
 
@@ -406,6 +390,10 @@ export default class Geometry extends GLBoostObject {
 
   setExtraDataForShader(name, value) {
     this._extraDataForShader[name] = value;
+  }
+
+  getExtraDataForShader(name) {
+    return this._extraDataForShader[name];
   }
 
   static clearMaterialCache() {

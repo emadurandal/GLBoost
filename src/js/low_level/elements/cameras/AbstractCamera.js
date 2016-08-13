@@ -19,6 +19,7 @@ export default class AbstractCamera extends Element {
     this._updateCountAsCameraView = 0;
     this._mainCamera = {};
 
+    this._texture = null; // for example, depth texture
   }
 
   _needUpdateView() {
@@ -109,4 +110,11 @@ export default class AbstractCamera extends Element {
     return this._up;
   }
 
+  set texture(texture) {
+    this._texture = texture;
+  }
+
+  get texture() {
+    return this._texture;
+  }
 }

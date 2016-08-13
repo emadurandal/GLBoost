@@ -33,6 +33,7 @@ export default class Element extends GLBoostObject {
     this._activeAnimationLineName = null;
 
     this._camera = null;
+    this._customFunction = null;
   }
 
 
@@ -194,6 +195,35 @@ export default class Element extends GLBoostObject {
     return this._finalMatrix.clone();
   }
 
+  get transformMatrixOnInit() {
+    if (this._dirtyAsElement) {
+      var matrix = Matrix44.identity();
+      if (this._currentCalcMode === 'matrix') {
+        this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
+        this._dirtyAsElement = false;
+        return this._finalMatrix.clone();
+      }
+
+      var rotationMatrix = null;
+      if (this._currentCalcMode === 'quaternion') {
+        rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
+      } else {
+        rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).
+        multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).
+        multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
+      }
+
+      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
+      this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
+      this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
+      this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
+
+      this._dirtyAsElement = false;
+    }
+
+    return this._finalMatrix.clone();
+  }
+
   get transformMatrixOnlyRotate() {
 
     var rotationMatrix = null;
@@ -238,6 +268,27 @@ export default class Element extends GLBoostObject {
     return rotationMatrix;
   }
 
+  getTransformMatrixOnlyRotateOn(value) {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === 'quaternion') {
+      rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
+    } else if (this._currentCalcMode === 'matrix') {
+      rotationMatrix = this.getMatrixAt('time', value);
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', value).x).
+      multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
+      multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+    }
+
+    return rotationMatrix;
+  }
 
   get inverseTransformMatrix() {
     if (!this._calculatedInverseMatrix) {
@@ -457,5 +508,17 @@ export default class Element extends GLBoostObject {
 
   get camera() {
     return this._camera;
+  }
+
+  set customFunction(func) {
+    this._customFunction = func;
+  }
+
+  get customFunction() {
+    return this._customFunction;
+  }
+
+  prepareToRender() {
+
   }
 }

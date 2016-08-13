@@ -13,7 +13,7 @@ export default class BlendShapeShaderSource {
     return shaderText;
   }
 
-  VSTransform_BlendShapeShaderSource(existCamera_f, f, lights, extraData) {
+  VSTransform_BlendShapeShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     shaderText +=     'float sumOfWeights = 0.0;\n';
     f.forEach((attribName)=>{

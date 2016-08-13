@@ -89,27 +89,6 @@ export default class Scene extends Group {
     })(this);
     this.AABB.mergeAABB(aabb);
 
-    let collectMeshes = function(elem) {
-      if (elem instanceof Group) {
-        var children = elem.getChildren();
-        var meshes = [];
-        children.forEach(function(child) {
-          var childMeshes = collectMeshes(child);
-          meshes = meshes.concat(childMeshes);
-        });
-        return meshes;
-      } else if (elem instanceof Mesh) {
-        return [elem];
-      } else {
-        return [];
-      }
-    };
-
-    this._meshes = [];
-    this._elements.forEach((elm)=> {
-      this._meshes = this._meshes.concat(collectMeshes(elm));
-    });
-
     let collectLights = function(elem) {
       if (elem instanceof Group) {
         var children = elem.getChildren();
@@ -157,11 +136,43 @@ export default class Scene extends Group {
       this._cameras[0].setAsMainCamera(this);
     }
 
-    this._meshes.forEach((mesh)=> {
-      mesh.prepareToRender(existCamera_f, this._lights);
+
+    let collectMeshes = function(elem) {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        var meshes = [];
+        children.forEach(function(child) {
+          var childMeshes = collectMeshes(child);
+          meshes = meshes.concat(childMeshes);
+        });
+        return meshes;
+      } else if (elem instanceof Mesh) {
+        return [elem];
+      } else {
+        return [];
+      }
+    };
+
+    this._meshes = [];
+    this._elements.forEach((elm)=> {
+      this._meshes = this._meshes.concat(collectMeshes(elm));
     });
 
-
+    let callPrepareToRenderMethodOfAllElements = (elem)=> {
+      if (elem instanceof Group) {
+        var children = elem.getChildren();
+        children.forEach(function (child) {
+          callPrepareToRenderMethodOfAllElements(child);
+        });
+      } else if (elem instanceof Mesh) {
+        elem.prepareToRender(existCamera_f, this._lights);
+      } else if (elem instanceof Element) {
+        elem.prepareToRender();
+      } else {
+        return;
+      }
+    };
+    callPrepareToRenderMethodOfAllElements(this);
   }
 
   /**

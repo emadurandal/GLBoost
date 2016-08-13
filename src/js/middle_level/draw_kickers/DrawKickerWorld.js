@@ -20,15 +20,15 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN) {
+  draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
     }
 
     for (let i=0; i<materials.length;i++) {
-      let shaderName = materials[i].shaderInstance.toString();
-      if (shaderName !== DrawKickerWorld._lastShaderName) {
+      let materialUpdateStateString = materials[i].getUpdateStateString();
+      if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
         this._glslProgram = materials[i].shaderInstance.glslProgram;
         gl.useProgram(this._glslProgram);
       }
@@ -89,16 +89,18 @@ export default class DrawKickerWorld {
 
       let isMaterialSetupDone = true;
 
-      if (materials[i].shaderInstance.dirty || shaderName !== DrawKickerWorld._lastShaderName) {
-        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+      if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
+        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh, lights);
         materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
-      if (shaderName !== DrawKickerWorld._lastShaderName) {
+      if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
         if (materials[i]) {
           isMaterialSetupDone = materials[i].setUp();
         }
       }
+      this.setupOtherTextures(lights);
+
       if (!isMaterialSetupDone) {
         return;
       }
@@ -112,14 +114,24 @@ export default class DrawKickerWorld {
       }
 
 
-      DrawKickerWorld._lastShaderName = isMaterialSetupDone ? shaderName : null;
+      DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
+    DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     DrawKickerWorld._lastGeometry = geometryName;
+  }
+
+  setupOtherTextures(lights) {
+    for(let i; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        lights[i].camera.texture.setUp();
+      }
+    }
   }
 }
 
-DrawKickerWorld._lastShaderName = null;
+DrawKickerWorld._lastMaterialUpdateStateString = null;
 DrawKickerWorld._lastGeometry = null;
+DrawKickerWorld._lastRenderPassIndex = -1;

@@ -28,6 +28,7 @@ export class PhongShaderSource {
     shaderText += `    float specular = pow(max(dot(light, reflect), 0.0), power);\n`;
     shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
     shaderText += `  }\n`;
+//    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 
@@ -35,16 +36,9 @@ export class PhongShaderSource {
     return shaderText;
   }
 
-  prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, extraData, canvas) {
+  prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
-    vertexAttribs.forEach((attribName)=>{
-      if (attribName === GLBoost.NORMAL) {
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
-      }
-    });
 
     shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
     shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
