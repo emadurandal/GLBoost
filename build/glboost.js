@@ -8998,89 +8998,128 @@
           geometry = glBoostContext.createGeometry(canvas);
           mesh = glBoostContext.createMesh(geometry);
         }
-        var material = glBoostContext.createClassicMaterial(canvas);
 
-        var primitiveJson = meshJson.primitives[0];
-
-        // Geometry
-        var indicesAccessorStr = primitiveJson.indices;
-        var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-
-        var positionsAccessorStr = primitiveJson.attributes.POSITION;
-        var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
-
-        var normalsAccessorStr = primitiveJson.attributes.NORMAL;
-        var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
-
-        var additional = {};
-
-        /// if Skeletal
-        var jointAccessorStr = primitiveJson.attributes.JOINT;
-        if (jointAccessorStr) {
-          var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
-          additional['joint'] = joints;
-        }
-        var weightAccessorStr = primitiveJson.attributes.WEIGHT;
-        if (weightAccessorStr) {
-          var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
-          additional['weight'] = weights;
-        }
-
-        // Texture
-        var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-        var texcoords = null;
-
-        var materialStr = primitiveJson.material;
-        var materialJson = json.materials[materialStr];
-        var diffuseValue = materialJson.values.diffuse;
-        // Diffuse Texture
-        if (texcoords0AccessorStr) {
-          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
-          additional['texcoord'] = texcoords;
-
-          if (typeof diffuseValue === 'string') {
-            var textureStr = diffuseValue;
-            var textureJson = json.textures[textureStr];
-            var imageStr = textureJson.source;
-            var imageJson = json.images[imageStr];
-            var imageFileStr = imageJson.uri;
-
-            var texture = glBoostContext.createTexture(basePath + imageFileStr);
-            texture.name = textureStr;
-            material.diffuseTexture = texture;
-          }
-        }
-        // Diffuse
-        if (diffuseValue && typeof diffuseValue !== 'string') {
-          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-        }
-        // Ambient
-        var ambientValue = materialJson.values.ambient;
-        if (ambientValue && typeof ambientValue !== 'string') {
-          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-        }
-        // Specular
-        var specularValue = materialJson.values.specular;
-        if (specularValue && typeof specularValue !== 'string') {
-          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
-        }
-
-        var opacityValue = 1.0 - materialJson.values.transparency;
-
-        var vertexData = {
-          position: positions,
-          normal: normals
+        var _indices = [];
+        var _positions = [];
+        var _normals = [];
+        var additional = {
+          'joint': [],
+          'weight': [],
+          'texcoord': []
         };
+        var indexNSum = 0;
 
-        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+        var materials = [];
 
-        material.setVertexN(geometry, indices.length);
-        if (defaultShader) {
-          material.shaderClass = defaultShader;
-        } else {
-          material.shaderClass = PhongShader;
+        for (var i = 0; i < meshJson.primitives.length; i++) {
+          var primitiveJson = meshJson.primitives[i];
+
+          // Geometry
+          var indicesAccessorStr = primitiveJson.indices;
+          var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+          /*
+          for (let j=0; j<indices.length; j++) {
+            indices[j] = indices[j] + indexNSum;
+          } */
+          _indices.push(indices);
+
+          var positionsAccessorStr = primitiveJson.attributes.POSITION;
+          var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
+          Array.prototype.push.apply(_positions, positions);
+
+          var normalsAccessorStr = primitiveJson.attributes.NORMAL;
+          var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
+          Array.prototype.push.apply(_normals, normals);
+
+          /// if Skeletal
+          var jointAccessorStr = primitiveJson.attributes.JOINT;
+          if (jointAccessorStr) {
+            var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
+            Array.prototype.push.apply(additional['joint'], joints);
+          }
+          var weightAccessorStr = primitiveJson.attributes.WEIGHT;
+          if (weightAccessorStr) {
+            var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
+            Array.prototype.push.apply(additional['weight'], weights);
+          }
+
+          // Texture
+          var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+          var texcoords = null;
+
+          var material = glBoostContext.createClassicMaterial(canvas);
+
+          var materialStr = primitiveJson.material;
+          var materialJson = json.materials[materialStr];
+          var diffuseValue = materialJson.values.diffuse;
+          // Diffuse Texture
+          if (texcoords0AccessorStr) {
+            texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
+            Array.prototype.push.apply(additional['texcoord'], texcoords);
+
+            if (typeof diffuseValue === 'string') {
+              var textureStr = diffuseValue;
+              var textureJson = json.textures[textureStr];
+              var imageStr = textureJson.source;
+              var imageJson = json.images[imageStr];
+              var imageFileStr = imageJson.uri;
+
+              var texture = glBoostContext.createTexture(basePath + imageFileStr);
+              texture.name = textureStr;
+              material.diffuseTexture = texture;
+            }
+          } else {
+            if (additional['texcoord'].length > 0) {
+              var emptyTexcoords = [];
+              for (var k = 0; k < positions.length; k++) {
+                emptyTexcoords.push(new Vector2(0, 0));
+              }
+              Array.prototype.push.apply(additional['texcoord'], emptyTexcoords);
+            }
+          }
+
+          // Diffuse
+          if (diffuseValue && typeof diffuseValue !== 'string') {
+            material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+          }
+          // Ambient
+          var ambientValue = materialJson.values.ambient;
+          if (ambientValue && typeof ambientValue !== 'string') {
+            material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+          }
+          // Specular
+          var specularValue = materialJson.values.specular;
+          if (specularValue && typeof specularValue !== 'string') {
+            material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+          }
+
+          var opacityValue = 1.0 - materialJson.values.transparency;
+
+          material.setVertexN(geometry, indices.length);
+          if (defaultShader) {
+            material.shaderClass = defaultShader;
+          } else {
+            material.shaderClass = PhongShader;
+          }
+          materials.push(material);
+
+          indexNSum += indices.length;
         }
-        geometry.materials = [material];
+        if (additional['joint'].length === 0) {
+          delete additional['joint'];
+        }
+        if (additional['weight'].length === 0) {
+          delete additional['weight'];
+        }
+        if (additional['texcoord'].length === 0) {
+          delete additional['texcoord'];
+        }
+        var vertexData = {
+          position: _positions,
+          normal: _normals
+        };
+        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indices);
+        geometry.materials = materials;
 
         return mesh;
       }
