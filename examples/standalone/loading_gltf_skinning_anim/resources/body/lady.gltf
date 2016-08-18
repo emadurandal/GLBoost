@@ -1,14 +1,101 @@
 {
     "accessors": {
         "IBM_AzumaAnimeHead1Shape-skin": {
-            "bufferView": "bufferView_219",
+            "bufferView": "bufferView_158",
             "byteOffset": 0,
+            "byteStride": 64,
             "componentType": 5126,
             "count": 16,
+            "max": [
+                1,
+                0.760166,
+                0.997757,
+                0,
+                1,
+                1,
+                0,
+                0,
+                0.0501246,
+                0.645094,
+                1,
+                0,
+                1.01547,
+                0.560575,
+                0.060204,
+                1
+            ],
+            "min": [
+                -0.780856,
+                -1,
+                -0.647038,
+                0,
+                -1,
+                0,
+                0,
+                0,
+                -0.154666,
+                -0.985696,
+                -1,
+                0,
+                -1.45982,
+                -1.70719,
+                -0.060204,
+                1
+            ],
             "type": "MAT4"
         },
-        "accessor_213": {
-            "bufferView": "bufferView_221",
+        "accessor_25": {
+            "bufferView": "bufferView_159",
+            "byteOffset": 0,
+            "byteStride": 2,
+            "componentType": 5123,
+            "count": 158694,
+            "max": [
+                14752
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        "accessor_27": {
+            "bufferView": "bufferView_160",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                2.50683,
+                1.6565,
+                0.46288
+            ],
+            "min": [
+                -2.50683,
+                -5.23968,
+                -0.39165
+            ],
+            "type": "VEC3"
+        },
+        "accessor_29": {
+            "bufferView": "bufferView_160",
+            "byteOffset": 350016,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 29168,
+            "max": [
+                0.999999,
+                0.999981,
+                0.999996
+            ],
+            "min": [
+                -0.999999,
+                -0.999959,
+                -0.999984
+            ],
+            "type": "VEC3"
+        },
+        "accessor_30": {
+            "bufferView": "bufferView_160",
             "byteOffset": 1166720,
             "byteStride": 16,
             "componentType": 5126,
@@ -27,8 +114,8 @@
             ],
             "type": "VEC4"
         },
-        "accessor_216": {
-            "bufferView": "bufferView_221",
+        "accessor_33": {
+            "bufferView": "bufferView_160",
             "byteOffset": 700032,
             "byteStride": 16,
             "componentType": 5126,
@@ -47,264 +134,654 @@
             ],
             "type": "VEC4"
         },
-        "accessor_24": {
-            "bufferView": "bufferView_220",
-            "byteOffset": 0,
-            "byteStride": 0,
-            "componentType": 5123,
-            "count": 158694,
-            "type": "SCALAR"
-        },
-        "accessor_26": {
-            "bufferView": "bufferView_221",
-            "byteOffset": 0,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 29168,
-            "max": [
-                2.50683,
-                1.6565,
-                0.46288
-            ],
-            "min": [
-                -2.50683,
-                -5.23968,
-                -0.39165
-            ],
-            "type": "VEC3"
-        },
-        "accessor_28": {
-            "bufferView": "bufferView_221",
-            "byteOffset": 350016,
-            "byteStride": 12,
-            "componentType": 5126,
-            "count": 29168,
-            "max": [
-                0.999999,
-                0.999981,
-                0.999996
-            ],
-            "min": [
-                -0.999999,
-                -0.999959,
-                -0.999984
-            ],
-            "type": "VEC3"
-        },
         "animAccessor_0": {
-            "bufferView": "bufferView_219",
+            "bufferView": "bufferView_158",
             "byteOffset": 1024,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 6,
-            "type": "SCALAR"
+            "count": 31,
+            "max": [
+                0,
+                0,
+                0.707107,
+                0.707107
+            ],
+            "min": [
+                0,
+                0,
+                0.707107,
+                0.707107
+            ],
+            "type": "VEC4"
         },
         "animAccessor_1": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1048,
+            "bufferView": "bufferView_158",
+            "byteOffset": 1520,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 6,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_10": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1340,
+            "bufferView": "bufferView_158",
+            "byteOffset": 4868,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 2,
-            "type": "VEC3"
+            "count": 31,
+            "max": [
+                3.31143e-05,
+                0.037623,
+                -0.00221076,
+                0.999998
+            ],
+            "min": [
+                -8.32354e-05,
+                -0.0149684,
+                -0.00221523,
+                0.99929
+            ],
+            "type": "VEC4"
         },
         "animAccessor_11": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1364,
+            "bufferView": "bufferView_158",
+            "byteOffset": 5364,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_12": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1388,
+            "bufferView": "bufferView_158",
+            "byteOffset": 5736,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 6,
-            "type": "VEC4"
+            "count": 31,
+            "max": [
+                0.0700477,
+                0,
+                0
+            ],
+            "min": [
+                0.0700477,
+                0,
+                0
+            ],
+            "type": "VEC3"
         },
         "animAccessor_13": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1484,
+            "bufferView": "bufferView_158",
+            "byteOffset": 6108,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 4,
+            "count": 31,
+            "max": [
+                0.634059,
+                0.081772,
+                -0.764942,
+                0.433189
+            ],
+            "min": [
+                -0.317234,
+                -0.0782151,
+                -0.989391,
+                0.0783964
+            ],
             "type": "VEC4"
         },
         "animAccessor_14": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1548,
+            "bufferView": "bufferView_158",
+            "byteOffset": 6604,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_15": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1572,
+            "bufferView": "bufferView_158",
+            "byteOffset": 6976,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 3,
-            "type": "VEC4"
-        },
-        "animAccessor_16": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1620,
-            "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                -0.00437796,
+                -0.119494,
+                -0.010446
+            ],
+            "min": [
+                -0.00437796,
+                -0.119494,
+                -0.010446
+            ],
             "type": "VEC3"
         },
-        "animAccessor_17": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1644,
+        "animAccessor_16": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 7348,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                0,
+                0,
+                -0.0215439,
+                0.999768
+            ],
+            "min": [
+                -0.122302,
+                -0.62723,
+                -0.0956001,
+                0.765851
+            ],
+            "type": "VEC4"
+        },
+        "animAccessor_17": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 7844,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_18": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1668,
+            "bufferView": "bufferView_158",
+            "byteOffset": 8216,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 4,
-            "type": "VEC4"
-        },
-        "animAccessor_19": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1732,
-            "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                0.266311,
+                0,
+                0
+            ],
+            "min": [
+                0.266311,
+                0,
+                0
+            ],
             "type": "VEC3"
         },
-        "animAccessor_2": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1120,
+        "animAccessor_19": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 8588,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 2,
-            "type": "SCALAR"
-        },
-        "animAccessor_20": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1756,
-            "componentType": 5126,
-            "count": 4,
+            "count": 31,
+            "max": [
+                0.43318,
+                0.981497,
+                0.117947,
+                0.58601
+            ],
+            "min": [
+                0.059712,
+                0.802804,
+                0,
+                -0.294176
+            ],
             "type": "VEC4"
         },
-        "animAccessor_21": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1820,
+        "animAccessor_2": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 1892,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                0,
+                1.08879,
+                0
+            ],
+            "min": [
+                0,
+                1.04356,
+                0
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_20": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 9084,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_21": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 9456,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                -0.00437385,
+                0.119494,
+                -0.0104459
+            ],
+            "min": [
+                -0.00437385,
+                0.119494,
+                -0.0104459
+            ],
             "type": "VEC3"
         },
         "animAccessor_22": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1844,
+            "bufferView": "bufferView_158",
+            "byteOffset": 9828,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 2,
-            "type": "VEC3"
-        },
-        "animAccessor_23": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1868,
-            "componentType": 5126,
-            "count": 4,
+            "count": 31,
+            "max": [
+                0.123002,
+                0.658364,
+                0.0366704,
+                0.999768
+            ],
+            "min": [
+                0,
+                0,
+                -0.0215269,
+                0.741675
+            ],
             "type": "VEC4"
         },
-        "animAccessor_24": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1932,
+        "animAccessor_23": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 10324,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_24": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 10696,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                0.266315,
+                0,
+                0
+            ],
+            "min": [
+                0.266315,
+                0,
+                0
+            ],
             "type": "VEC3"
         },
         "animAccessor_25": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1956,
+            "bufferView": "bufferView_158",
+            "byteOffset": 11068,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 4,
+            "count": 31,
+            "max": [
+                0.0595776,
+                -0.849552,
+                -0.299126,
+                0.397683
+            ],
+            "min": [
+                -0.175021,
+                -0.938032,
+                -0.349996,
+                -0.244744
+            ],
             "type": "VEC4"
         },
         "animAccessor_26": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 2020,
+            "bufferView": "bufferView_158",
+            "byteOffset": 11564,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_27": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 2044,
+            "bufferView": "bufferView_158",
+            "byteOffset": 11936,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                -0.0995991,
+                -0.0833753,
+                0
+            ],
+            "min": [
+                -0.0995991,
+                -0.0833753,
+                0
+            ],
             "type": "VEC3"
         },
         "animAccessor_28": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 2068,
+            "bufferView": "bufferView_158",
+            "byteOffset": 12308,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 6,
+            "count": 31,
+            "max": [
+                0.892259,
+                -0.0375941,
+                0.203442,
+                0.450471
+            ],
+            "min": [
+                0.724657,
+                -0.532976,
+                -0.0105494,
+                0.386549
+            ],
             "type": "VEC4"
         },
         "animAccessor_29": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 2164,
+            "bufferView": "bufferView_158",
+            "byteOffset": 12804,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
         "animAccessor_3": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1128,
+            "bufferView": "bufferView_158",
+            "byteOffset": 2264,
+            "byteStride": 4,
             "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1
+            ],
+            "min": [
+                0
+            ],
+            "type": "SCALAR"
+        },
+        "animAccessor_30": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 13176,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                0.426192,
+                0,
+                0
+            ],
+            "min": [
+                0.426192,
+                0,
+                0
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_31": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 13548,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                0.246646,
+                -0.298683,
+                -0.848961,
+                0.175229
+            ],
+            "min": [
+                -0.399185,
+                -0.355327,
+                -0.938032,
+                -0.0602939
+            ],
+            "type": "VEC4"
+        },
+        "animAccessor_32": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 14044,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_33": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 14416,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                -0.0995991,
+                0.0833753,
+                0
+            ],
+            "min": [
+                -0.0995991,
+                0.0833753,
+                0
+            ],
             "type": "VEC3"
         },
         "animAccessor_4": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1152,
+            "bufferView": "bufferView_158",
+            "byteOffset": 2388,
+            "byteStride": 16,
             "componentType": 5126,
-            "count": 2,
-            "type": "VEC3"
+            "count": 31,
+            "max": [
+                0.0646507,
+                0,
+                0.0014325,
+                1
+            ],
+            "min": [
+                -0.024825,
+                -0.0261581,
+                -0.000649786,
+                0.997662
+            ],
+            "type": "VEC4"
         },
         "animAccessor_5": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1176,
+            "bufferView": "bufferView_158",
+            "byteOffset": 2884,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 4,
-            "type": "SCALAR"
-        },
-        "animAccessor_6": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1192,
-            "componentType": 5126,
-            "count": 4,
-            "type": "VEC4"
-        },
-        "animAccessor_7": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1256,
-            "componentType": 5126,
-            "count": 2,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
             "type": "VEC3"
         },
-        "animAccessor_8": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1280,
+        "animAccessor_6": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 3256,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 3,
-            "type": "SCALAR"
+            "count": 31,
+            "max": [
+                0.334916,
+                0,
+                0
+            ],
+            "min": [
+                0.334916,
+                0,
+                0
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_7": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 3628,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                -0.733305,
+                0.520326,
+                0.197849,
+                0.450121
+            ],
+            "min": [
+                -0.892177,
+                0.0393103,
+                -0.00982287,
+                0.390359
+            ],
+            "type": "VEC4"
+        },
+        "animAccessor_8": {
+            "bufferView": "bufferView_158",
+            "byteOffset": 4124,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 31,
+            "max": [
+                1,
+                1,
+                1
+            ],
+            "min": [
+                1,
+                1,
+                1
+            ],
+            "type": "VEC3"
         },
         "animAccessor_9": {
-            "bufferView": "bufferView_219",
-            "byteOffset": 1292,
+            "bufferView": "bufferView_158",
+            "byteOffset": 4496,
+            "byteStride": 12,
             "componentType": 5126,
-            "count": 3,
-            "type": "VEC4"
+            "count": 31,
+            "max": [
+                0.426192,
+                0,
+                0
+            ],
+            "min": [
+                0.426192,
+                0,
+                0
+            ],
+            "type": "VEC3"
         }
     },
     "animations": {
         "animation_0": {
             "channels": [
+                {
+                    "sampler": "animation_0_rotation_sampler",
+                    "target": {
+                        "id": "_koshi",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_0_scale_sampler",
+                    "target": {
+                        "id": "_koshi",
+                        "path": "scale"
+                    }
+                },
                 {
                     "sampler": "animation_0_translation_sampler",
                     "target": {
@@ -314,10 +791,22 @@
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_0",
-                "translation": "animAccessor_1"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_0",
+                "scale": "animAccessor_1",
+                "translation": "animAccessor_2"
             },
             "samplers": {
+                "animation_0_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_0_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
                 "animation_0_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
@@ -328,6 +817,20 @@
         "animation_1": {
             "channels": [
                 {
+                    "sampler": "animation_1_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_1_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu",
+                        "path": "scale"
+                    }
+                },
+                {
                     "sampler": "animation_1_translation_sampler",
                     "target": {
                         "id": "_koshi_sakotsu",
@@ -336,10 +839,22 @@
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_3"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_4",
+                "scale": "animAccessor_5",
+                "translation": "animAccessor_6"
             },
             "samplers": {
+                "animation_1_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_1_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
                 "animation_1_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
@@ -350,157 +865,45 @@
         "animation_10": {
             "channels": [
                 {
+                    "sampler": "animation_10_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene_L_hiza",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_10_scale_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene_L_hiza",
+                        "path": "scale"
+                    }
+                },
+                {
                     "sampler": "animation_10_translation_sampler",
                     "target": {
-                        "id": "_koshi_sakotsu_R_kata",
+                        "id": "_koshi_L_ashi_tsukene_L_hiza",
                         "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_4"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_7",
+                "scale": "animAccessor_8",
+                "translation": "animAccessor_9"
             },
             "samplers": {
+                "animation_10_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_10_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
                 "animation_10_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_11": {
-            "channels": [
-                {
-                    "sampler": "animation_11_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_R_kata",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_6"
-            },
-            "samplers": {
-                "animation_11_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_12": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_13": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_14": {
-            "channels": [
-                {
-                    "sampler": "animation_14_translation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_7"
-            },
-            "samplers": {
-                "animation_14_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_15": {
-            "channels": [
-                {
-                    "sampler": "animation_15_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_8",
-                "rotation": "animAccessor_9"
-            },
-            "samplers": {
-                "animation_15_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_16": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_8"
-            },
-            "samplers": {}
-        },
-        "animation_17": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_8"
-            },
-            "samplers": {}
-        },
-        "animation_18": {
-            "channels": [
-                {
-                    "sampler": "animation_18_translation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_R_kata_R_kurubushi_R_te",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_10"
-            },
-            "samplers": {
-                "animation_18_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_19": {
-            "channels": [
-                {
-                    "sampler": "animation_19_translation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_L_kata",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_11"
-            },
-            "samplers": {
-                "animation_19_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "translation"
@@ -512,423 +915,139 @@
                 {
                     "sampler": "animation_2_rotation_sampler",
                     "target": {
-                        "id": "_koshi_sakotsu",
+                        "id": "_koshi_sakotsu_neck",
                         "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_2_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_neck",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_2_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_neck",
+                        "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_0",
-                "rotation": "animAccessor_12"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_10",
+                "scale": "animAccessor_11",
+                "translation": "animAccessor_12"
             },
             "samplers": {
                 "animation_2_rotation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "rotation"
-                }
-            }
-        },
-        "animation_20": {
-            "channels": [
-                {
-                    "sampler": "animation_20_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_L_kata",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_13"
-            },
-            "samplers": {
-                "animation_20_rotation_sampler": {
+                },
+                "animation_2_scale_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_21": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_22": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_23": {
-            "channels": [
-                {
-                    "sampler": "animation_23_translation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_14"
-            },
-            "samplers": {
-                "animation_23_translation_sampler": {
+                    "output": "scale"
+                },
+                "animation_2_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "translation"
-                }
-            }
-        },
-        "animation_24": {
-            "channels": [
-                {
-                    "sampler": "animation_24_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_8",
-                "rotation": "animAccessor_15"
-            },
-            "samplers": {
-                "animation_24_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_25": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_8"
-            },
-            "samplers": {}
-        },
-        "animation_26": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_8"
-            },
-            "samplers": {}
-        },
-        "animation_27": {
-            "channels": [
-                {
-                    "sampler": "animation_27_translation_sampler",
-                    "target": {
-                        "id": "_koshi_sakotsu_L_kata_L_kurubushi_L_te",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_16"
-            },
-            "samplers": {
-                "animation_27_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_28": {
-            "channels": [
-                {
-                    "sampler": "animation_28_translation_sampler",
-                    "target": {
-                        "id": "_koshi_R_ashi_tsukene",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_17"
-            },
-            "samplers": {
-                "animation_28_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_29": {
-            "channels": [
-                {
-                    "sampler": "animation_29_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_R_ashi_tsukene",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_18"
-            },
-            "samplers": {
-                "animation_29_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
                 }
             }
         },
         "animation_3": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_0"
-            },
-            "samplers": {}
-        },
-        "animation_30": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_31": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_32": {
             "channels": [
                 {
-                    "sampler": "animation_32_translation_sampler",
+                    "sampler": "animation_3_rotation_sampler",
                     "target": {
-                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "id": "_koshi_sakotsu_R_kata",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_3_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_3_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata",
                         "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_19"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_13",
+                "scale": "animAccessor_14",
+                "translation": "animAccessor_15"
             },
             "samplers": {
-                "animation_32_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_33": {
-            "channels": [
-                {
-                    "sampler": "animation_33_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_R_ashi_tsukene_R_hiza",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_20"
-            },
-            "samplers": {
-                "animation_33_rotation_sampler": {
+                "animation_3_rotation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "rotation"
-                }
-            }
-        },
-        "animation_34": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_35": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_36": {
-            "channels": [
-                {
-                    "sampler": "animation_36_translation_sampler",
-                    "target": {
-                        "id": "_koshi_R_ashi_tsukene_R_hiza_R_ashi",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_21"
-            },
-            "samplers": {
-                "animation_36_translation_sampler": {
+                },
+                "animation_3_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_3_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "translation"
                 }
             }
-        },
-        "animation_37": {
-            "channels": [
-                {
-                    "sampler": "animation_37_translation_sampler",
-                    "target": {
-                        "id": "_koshi_L_ashi_tsukene",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_22"
-            },
-            "samplers": {
-                "animation_37_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_38": {
-            "channels": [
-                {
-                    "sampler": "animation_38_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_L_ashi_tsukene",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_23"
-            },
-            "samplers": {
-                "animation_38_rotation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "rotation"
-                }
-            }
-        },
-        "animation_39": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
         },
         "animation_4": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_0"
-            },
-            "samplers": {}
-        },
-        "animation_40": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_41": {
             "channels": [
                 {
-                    "sampler": "animation_41_translation_sampler",
+                    "sampler": "animation_4_rotation_sampler",
                     "target": {
-                        "id": "_koshi_L_ashi_tsukene_L_hiza",
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_4_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_4_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_R_kata_R_kurubushi",
                         "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_24"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_16",
+                "scale": "animAccessor_17",
+                "translation": "animAccessor_18"
             },
             "samplers": {
-                "animation_41_translation_sampler": {
-                    "input": "TIME",
-                    "interpolation": "LINEAR",
-                    "output": "translation"
-                }
-            }
-        },
-        "animation_42": {
-            "channels": [
-                {
-                    "sampler": "animation_42_rotation_sampler",
-                    "target": {
-                        "id": "_koshi_L_ashi_tsukene_L_hiza",
-                        "path": "rotation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_5",
-                "rotation": "animAccessor_25"
-            },
-            "samplers": {
-                "animation_42_rotation_sampler": {
+                "animation_4_rotation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "rotation"
-                }
-            }
-        },
-        "animation_43": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_44": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_5"
-            },
-            "samplers": {}
-        },
-        "animation_45": {
-            "channels": [
-                {
-                    "sampler": "animation_45_translation_sampler",
-                    "target": {
-                        "id": "_koshi_L_ashi_tsukene_L_hiza_L_ashi",
-                        "path": "translation"
-                    }
-                }
-            ],
-            "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_26"
-            },
-            "samplers": {
-                "animation_45_translation_sampler": {
+                },
+                "animation_4_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_4_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "translation"
@@ -938,18 +1057,44 @@
         "animation_5": {
             "channels": [
                 {
+                    "sampler": "animation_5_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_5_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata",
+                        "path": "scale"
+                    }
+                },
+                {
                     "sampler": "animation_5_translation_sampler",
                     "target": {
-                        "id": "_koshi_sakotsu_neck",
+                        "id": "_koshi_sakotsu_L_kata",
                         "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_27"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_19",
+                "scale": "animAccessor_20",
+                "translation": "animAccessor_21"
             },
             "samplers": {
+                "animation_5_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_5_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
                 "animation_5_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
@@ -962,52 +1107,186 @@
                 {
                     "sampler": "animation_6_rotation_sampler",
                     "target": {
-                        "id": "_koshi_sakotsu_neck",
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
                         "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_6_scale_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_6_translation_sampler",
+                    "target": {
+                        "id": "_koshi_sakotsu_L_kata_L_kurubushi",
+                        "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_0",
-                "rotation": "animAccessor_28"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_22",
+                "scale": "animAccessor_23",
+                "translation": "animAccessor_24"
             },
             "samplers": {
                 "animation_6_rotation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
                     "output": "rotation"
+                },
+                "animation_6_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_6_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
                 }
             }
         },
         "animation_7": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_0"
-            },
-            "samplers": {}
-        },
-        "animation_8": {
-            "channels": [],
-            "parameters": {
-                "TIME": "animAccessor_0"
-            },
-            "samplers": {}
-        },
-        "animation_9": {
             "channels": [
                 {
-                    "sampler": "animation_9_translation_sampler",
+                    "sampler": "animation_7_rotation_sampler",
                     "target": {
-                        "id": "_koshi_sakotsu_neck_atama",
+                        "id": "_koshi_R_ashi_tsukene",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_7_scale_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_7_translation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene",
                         "path": "translation"
                     }
                 }
             ],
             "parameters": {
-                "TIME": "animAccessor_2",
-                "translation": "animAccessor_29"
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_25",
+                "scale": "animAccessor_26",
+                "translation": "animAccessor_27"
             },
             "samplers": {
+                "animation_7_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_7_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_7_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_8": {
+            "channels": [
+                {
+                    "sampler": "animation_8_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_8_scale_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_8_translation_sampler",
+                    "target": {
+                        "id": "_koshi_R_ashi_tsukene_R_hiza",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_28",
+                "scale": "animAccessor_29",
+                "translation": "animAccessor_30"
+            },
+            "samplers": {
+                "animation_8_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_8_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
+                "animation_8_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_9": {
+            "channels": [
+                {
+                    "sampler": "animation_9_rotation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene",
+                        "path": "rotation"
+                    }
+                },
+                {
+                    "sampler": "animation_9_scale_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene",
+                        "path": "scale"
+                    }
+                },
+                {
+                    "sampler": "animation_9_translation_sampler",
+                    "target": {
+                        "id": "_koshi_L_ashi_tsukene",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_3",
+                "rotation": "animAccessor_31",
+                "scale": "animAccessor_32",
+                "translation": "animAccessor_33"
+            },
+            "samplers": {
+                "animation_9_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                },
+                "animation_9_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                },
                 "animation_9_translation_sampler": {
                     "input": "TIME",
                     "interpolation": "LINEAR",
@@ -1017,36 +1296,36 @@
         }
     },
     "asset": {
-        "generator": "collada2gltf@bc44b82e3461dfb4da806c773dafd20559f62445",
+        "generator": "collada2gltf@576eb6034ac2dfc94ba7ca521a102741be32e7f5",
         "premultipliedAlpha": true,
         "profile": {
             "api": "WebGL",
             "version": "1.0.2"
         },
-        "version": "1.0"
+        "version": "1.0.1"
     },
     "bufferViews": {
-        "bufferView_219": {
+        "bufferView_158": {
             "buffer": "lady",
-            "byteLength": 2188,
+            "byteLength": 14788,
             "byteOffset": 0
         },
-        "bufferView_220": {
+        "bufferView_159": {
             "buffer": "lady",
             "byteLength": 317388,
-            "byteOffset": 2188,
+            "byteOffset": 14788,
             "target": 34963
         },
-        "bufferView_221": {
+        "bufferView_160": {
             "buffer": "lady",
             "byteLength": 1633408,
-            "byteOffset": 319576,
+            "byteOffset": 332176,
             "target": 34962
         }
     },
     "buffers": {
         "lady": {
-            "byteLength": 1952984,
+            "byteLength": 1965584,
             "type": "arraybuffer",
             "uri": "lady.bin"
         }
@@ -1091,12 +1370,12 @@
             "primitives": [
                 {
                     "attributes": {
-                        "JOINT": "accessor_216",
-                        "NORMAL": "accessor_28",
-                        "POSITION": "accessor_26",
-                        "WEIGHT": "accessor_213"
+                        "JOINT": "accessor_33",
+                        "NORMAL": "accessor_29",
+                        "POSITION": "accessor_27",
+                        "WEIGHT": "accessor_30"
                     },
-                    "indices": "accessor_24",
+                    "indices": "accessor_25",
                     "material": "AzumaAnimeHead1_blinn-fx",
                     "mode": 4
                 }
@@ -1169,7 +1448,7 @@
             ],
             "translation": [
                 0,
-                0,
+                1.05487,
                 0
             ]
         },
@@ -1180,10 +1459,10 @@
             "jointName": "L_ashi_tsukene",
             "name": "L_ashi_tsukene",
             "rotation": [
-                0.0133589,
+                0.013359,
                 0.344373,
                 0.938032,
-                -0.0363886
+                -0.0363883
             ],
             "scale": [
                 1,
@@ -1191,8 +1470,8 @@
                 1
             ],
             "translation": [
-                0,
-                0,
+                -0.0995992,
+                0.0833753,
                 0
             ]
         },
@@ -1205,7 +1484,7 @@
             "rotation": [
                 0.88684,
                 -0.103871,
-                -0.0175771,
+                -0.017577,
                 -0.449908
             ],
             "scale": [
@@ -1214,7 +1493,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.426192,
                 0,
                 0
             ]
@@ -1222,23 +1501,25 @@
         "_koshi_L_ashi_tsukene_L_hiza_L_ashi": {
             "children": [],
             "jointName": "L_ashi",
-            "name": "L_ashi",
-            "rotation": [
-                -0.72818,
-                0.0567823,
-                -0.0531004,
-                0.680963
-            ],
-            "scale": [
-                1,
-                1,
+            "matrix": [
+                0.987912,
+                -0.155014,
+                0,
+                0,
+                -0.0103767,
+                -0.0661315,
+                -0.997757,
+                0,
+                0.154666,
+                0.985696,
+                -0.0669406,
+                0,
+                0.527372,
+                0,
+                0,
                 1
             ],
-            "translation": [
-                0,
-                0,
-                0
-            ]
+            "name": "L_ashi"
         },
         "_koshi_R_ashi_tsukene": {
             "children": [
@@ -1247,10 +1528,10 @@
             "jointName": "R_ashi_tsukene",
             "name": "R_ashi_tsukene",
             "rotation": [
-                0.0363886,
+                0.0363883,
                 0.938032,
                 0.344373,
-                -0.0133588
+                -0.013359
             ],
             "scale": [
                 1,
@@ -1258,8 +1539,8 @@
                 1
             ],
             "translation": [
-                0,
-                0,
+                -0.0995991,
+                -0.0833753,
                 0
             ]
         },
@@ -1272,7 +1553,7 @@
             "rotation": [
                 0.886839,
                 -0.103871,
-                0.017577,
+                0.0175771,
                 0.449909
             ],
             "scale": [
@@ -1281,7 +1562,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.426192,
                 0,
                 0
             ]
@@ -1289,23 +1570,25 @@
         "_koshi_R_ashi_tsukene_R_hiza_R_ashi": {
             "children": [],
             "jointName": "R_ashi",
-            "name": "R_ashi",
-            "rotation": [
-                0.0567822,
-                0.72818,
-                -0.680962,
-                -0.0531002
-            ],
-            "scale": [
-                1,
-                1,
+            "matrix": [
+                -0.987912,
+                0.155014,
+                0,
+                0,
+                0.0103769,
+                0.0661324,
+                -0.997757,
+                0,
+                -0.154666,
+                -0.985696,
+                -0.0669416,
+                0,
+                0.527371,
+                0,
+                0,
                 1
             ],
-            "translation": [
-                0,
-                0,
-                0
-            ]
+            "name": "R_ashi"
         },
         "_koshi_sakotsu": {
             "children": [
@@ -1327,7 +1610,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.334916,
                 0,
                 0
             ]
@@ -1339,10 +1622,10 @@
             "jointName": "L_kata",
             "name": "L_kata",
             "rotation": [
-                0.433179,
+                0.43318,
                 0.901308,
-                4.04656e-11,
-                1.94483e-11
+                0,
+                0
             ],
             "scale": [
                 1,
@@ -1350,9 +1633,9 @@
                 1
             ],
             "translation": [
-                0,
-                0,
-                0
+                -0.00437387,
+                0.119494,
+                -0.010446
             ]
         },
         "_koshi_sakotsu_L_kata_L_kurubushi": {
@@ -1373,7 +1656,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.266315,
                 0,
                 0
             ]
@@ -1381,23 +1664,25 @@
         "_koshi_sakotsu_L_kata_L_kurubushi_L_te": {
             "children": [],
             "jointName": "L_te",
-            "name": "L_te",
-            "rotation": [
+            "matrix": [
+                0.657743,
+                -0.753243,
                 0,
                 0,
-                -0.413677,
-                0.910424
-            ],
-            "scale": [
+                0.753243,
+                0.657743,
+                0,
+                0,
+                0,
+                0,
                 1,
-                1,
+                0,
+                0.309498,
+                0,
+                0,
                 1
             ],
-            "translation": [
-                0,
-                0,
-                0
-            ]
+            "name": "L_te"
         },
         "_koshi_sakotsu_R_kata": {
             "children": [
@@ -1417,9 +1702,9 @@
                 1
             ],
             "translation": [
-                0,
-                0,
-                0
+                -0.00437798,
+                -0.119494,
+                -0.0104461
             ]
         },
         "_koshi_sakotsu_R_kata_R_kurubushi": {
@@ -1440,7 +1725,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.266311,
                 0,
                 0
             ]
@@ -1448,23 +1733,25 @@
         "_koshi_sakotsu_R_kata_R_kurubushi_R_te": {
             "children": [],
             "jointName": "R_te",
-            "name": "R_te",
-            "rotation": [
+            "matrix": [
+                -0.657753,
+                0.753233,
                 0,
                 0,
-                0.910426,
-                0.413671
-            ],
-            "scale": [
+                -0.753233,
+                -0.657753,
+                0,
+                0,
+                0,
+                0,
                 1,
-                1,
+                0,
+                0.309502,
+                0,
+                0,
                 1
             ],
-            "translation": [
-                0,
-                0,
-                0
-            ]
+            "name": "R_te"
         },
         "_koshi_sakotsu_neck": {
             "children": [
@@ -1484,7 +1771,7 @@
                 1
             ],
             "translation": [
-                0,
+                0.0700477,
                 0,
                 0
             ]
@@ -1492,23 +1779,25 @@
         "_koshi_sakotsu_neck_atama": {
             "children": [],
             "jointName": "atama",
-            "name": "atama",
-            "rotation": [
+            "matrix": [
+                0.00442473,
+                -0.99999,
                 0,
                 0,
-                -0.705541,
-                0.708669
-            ],
-            "scale": [
+                0.99999,
+                0.00442473,
+                0,
+                0,
+                0,
+                0,
                 1,
-                1,
+                0,
+                0.247359,
+                0,
+                0,
                 1
             ],
-            "translation": [
-                0,
-                0,
-                0
-            ]
+            "name": "atama"
         }
     },
     "programs": {

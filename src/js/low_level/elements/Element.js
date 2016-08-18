@@ -20,6 +20,7 @@ export default class Element extends GLBoostObject {
     this._finalMatrix = Matrix44.identity();
     this._invMatrix = Matrix44.identity();
     this._dirtyAsElement = true;
+    this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
@@ -52,6 +53,9 @@ export default class Element extends GLBoostObject {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
     //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
+      if (type == 'quaternion') {
+//        return new Quaternion(0, 0, 0, 1);
+      }
       return this['_' + type];
     }
   }
@@ -80,6 +84,10 @@ export default class Element extends GLBoostObject {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
   }
 
+  getTranslateNotAnimated() {
+    return this._translate;
+  }
+
   set rotate(vec) {
     if (this._currentCalcMode !== 'euler') {
       this._currentCalcMode = 'euler';
@@ -104,6 +112,10 @@ export default class Element extends GLBoostObject {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
   }
 
+  getRotateNotAnimated() {
+    return this._rotate;
+  }
+
   set quaternion(quat) {
     if (this._currentCalcMode !== 'quaternion') {
       this._currentCalcMode = 'quaternion';
@@ -122,6 +134,10 @@ export default class Element extends GLBoostObject {
     } else {
       return this._quaternion;
     }
+  }
+
+  getQuaternionNotAnimated() {
+    return this._quaternion;
   }
 
   getQuaternionAt(lineName, value) {
@@ -148,6 +164,10 @@ export default class Element extends GLBoostObject {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
   }
 
+  getScaleNotAnimated() {
+    return this._scale;
+  }
+
   multiplyMatrix(mat) {
     this._matrix = mat;
     this._currentCalcMode = 'matrix';
@@ -166,11 +186,16 @@ export default class Element extends GLBoostObject {
     }
   }
 
+  getMatrixNotAnimated() {
+    return this._matrix;
+  }
+
   get transformMatrix() {
-    if (this._dirtyAsElement) {
+    var input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
       if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this._matrix);
+        this._finalMatrix = matrix.multiply(this.matrix);
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
@@ -190,13 +215,14 @@ export default class Element extends GLBoostObject {
       this._finalMatrix.m23 = this.translate.z;
 
       this._dirtyAsElement = false;
+      this._matrixGetMode = 'animated_' + input;
     }
 
     return this._finalMatrix.clone();
   }
 
   get transformMatrixOnInit() {
-    if (this._dirtyAsElement) {
+    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
       var matrix = Matrix44.identity();
       if (this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
@@ -219,6 +245,37 @@ export default class Element extends GLBoostObject {
       this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
 
       this._dirtyAsElement = false;
+      this._matrixGetMode = 'animated_0'
+    }
+
+    return this._finalMatrix.clone();
+  }
+
+  getTransformMatrixNotAnimated() {
+    if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
+      var matrix = Matrix44.identity();
+      if (this._currentCalcMode === 'matrix') {
+        this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
+        this._dirtyAsElement = false;
+        return this._finalMatrix.clone();
+      }
+
+      var rotationMatrix = null;
+      if (this._currentCalcMode === 'quaternion') {
+        rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+      } else {
+        rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).
+        multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).
+        multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
+      }
+
+      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
+      this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
+      this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
+      this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
+
+      this._dirtyAsElement = false;
+      this._matrixGetMode = 'notanimated';
     }
 
     return this._finalMatrix.clone();
@@ -247,25 +304,7 @@ export default class Element extends GLBoostObject {
   }
 
   get transformMatrixOnlyRotateOnInit() {
-
-    var rotationMatrix = null;
-    if (this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.getMatrixAt('time', 0);
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).
-      multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).
-      multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
-    }
-
-    return rotationMatrix;
+    return this.getTransformMatrixOnlyRotateOn(0);
   }
 
   getTransformMatrixOnlyRotateOn(value) {
@@ -282,9 +321,31 @@ export default class Element extends GLBoostObject {
       rotationMatrix.m31 = 0;
       rotationMatrix.m32 = 0;
     } else {
-      rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', value).x).
+      rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
       multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
       multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+    }
+
+    return rotationMatrix;
+  }
+
+  getTransformMatrixOnlyRotateNotAnimated() {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === 'quaternion') {
+      rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+    } else if (this._currentCalcMode === 'matrix') {
+      rotationMatrix = this.getMatrixNotAnimated();
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).
+      multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).
+      multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
     }
 
     return rotationMatrix;
