@@ -9141,7 +9141,13 @@
               var imageJson = json.images[imageStr];
               var imageFileStr = imageJson.uri;
 
-              var texture = glBoostContext.createTexture(basePath + imageFileStr);
+              var textureUri = null;
+              if (imageFileStr.match(/^data:/)) {
+                textureUri = imageFileStr;
+              } else {
+                textureUri = basePath + imageFileStr;
+              }
+              var texture = glBoostContext.createTexture(textureUri);
               texture.name = textureStr;
               material.diffuseTexture = texture;
             }

@@ -272,7 +272,13 @@ export default class GLTFLoader {
           let imageJson = json.images[imageStr];
           let imageFileStr = imageJson.uri;
 
-          var texture = glBoostContext.createTexture(basePath + imageFileStr);
+          let textureUri = null;
+          if ( imageFileStr.match(/^data:/) ) {
+            textureUri = imageFileStr;
+          } else {
+            textureUri = basePath + imageFileStr;
+          }
+          var texture = glBoostContext.createTexture(textureUri);
           texture.name = textureStr;
           material.diffuseTexture = texture;
         }
