@@ -41,8 +41,7 @@ export class LambertShaderSource {
     let textureUnitIndex = 0;
     //for (let i=0; i<lights.length; i++) {
     //  if (lights[i].camera && lights[i].camera.texture) {
-    shaderText += `uniform ${sampler2D} uDepthTexture[${lights.length}];\n`;
-    //shaderText += `uniform ${sampler2D} uDepthTexture;\n`;
+    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
 
     shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
 
@@ -72,27 +71,30 @@ export class LambertShaderSource {
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
-    //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     for (let i=0; i<lights.length; i++) {
       shaderText += '  {\n';
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
       shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w);\n`;
 
       shaderText += `    if (isShadowCasting[${i}] == 1) {\n`;
+
       shaderText += `      vec2 shadowCoord = vec2(v_shadowCoord[${i}].x, v_shadowCoord[${i}].y);\n`;
-      shaderText += `      float depth = ${textureFunc}(uDepthTexture[${i}], shadowCoord).z;\n`;
+      shaderText += `      float depth = ${textureFunc}(uDepthTexture[${i}], shadowCoord).r;\n`;
       shaderText += `      if (depth < v_shadowCoord[${i}].z - depthBias) {\n`;
       shaderText += `        light *= 0.5;\n`;
       shaderText += `      }\n`;
+
+      //shaderText += `        float visibility = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}], depthBias).x;\n`;
+      //shaderText += `        light *= visibility > 0.5 ? 1.0 : 0.0;\n`;
+
       shaderText += `    }\n`;
 
       shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
       shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += '  }\n';
     }
-//    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
-    //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+    //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
 
 
     return shaderText;

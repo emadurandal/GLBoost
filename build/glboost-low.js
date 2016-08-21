@@ -4347,12 +4347,14 @@
 
         shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
 
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        //if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[i];\n';
-        shaderText += '    v_shadowCoord[i] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0);\n';
-        //}
-        shaderText += '  }\n';
+        //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
+        for (var i = 0; i < lights.length; i++) {
+          shaderText += '  {\n';
+          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + '];\n';
+          //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
+          shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  }\n';
+        }
         return shaderText;
       }
     }, {
