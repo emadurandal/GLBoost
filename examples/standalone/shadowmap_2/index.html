@@ -81,7 +81,7 @@
 
   })();
 
-  for (let i_=0; i_<directionOfDirectionalLights.length; i_++) {
+  for (var i_=0; i_<directionOfDirectionalLights.length; i_++) {
     (function shadowMapPass(i){
       (function() {
         let depthTexture = glBoostContext.createDepthTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
