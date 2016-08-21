@@ -9650,7 +9650,7 @@
           shaderText += '      vec2 shadowCoord = vec2(v_shadowCoord[' + i + '].x, v_shadowCoord[' + i + '].y);\n';
           shaderText += '      float depth = ' + textureFunc + '(uDepthTexture[' + i + '], shadowCoord).z;\n';
           shaderText += '      if (depth < v_shadowCoord[' + i + '].z - depthBias) {\n';
-          shaderText += '        light *= 0.8;\n';
+          shaderText += '        light *= 0.5;\n';
           shaderText += '      }\n';
           shaderText += '    }\n';
 
