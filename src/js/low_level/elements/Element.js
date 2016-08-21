@@ -191,8 +191,11 @@ export default class Element extends GLBoostObject {
   }
 
   get transformMatrix() {
-    var input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
+    var input = null;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+    if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
       if (this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.matrix);
@@ -245,7 +248,7 @@ export default class Element extends GLBoostObject {
       this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
 
       this._dirtyAsElement = false;
-      this._matrixGetMode = 'animated_0'
+      this._matrixGetMode = 'animated_0';
     }
 
     return this._finalMatrix.clone();
