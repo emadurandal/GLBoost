@@ -84,7 +84,7 @@
   for (var i_=0; i_<directionOfDirectionalLights.length; i_++) {
     (function shadowMapPass(i){
       (function() {
-        let depthTexture = glBoostContext.createDepthTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
+        var depthTexture = glBoostContext.createDepthTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
 
         var scene = glBoostContext.createScene();
         scene.addChild(planeForDepth);
@@ -124,7 +124,7 @@
           var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCameras[i].zNear)));
           var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
 
-          let depthCamera = depthCameras[i];
+          var depthCamera = depthCameras[i];
           depthCamera.eye = cameraEye;
           depthCamera.center = cameraCenter;
           //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
@@ -153,8 +153,8 @@
     scene.addChild( plane );
     scene.addChild( cube );
 
-    for (let i=0; i<directionOfDirectionalLights.length; i++) {
-      let directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(0.75, 0.75, 0.75), directionOfDirectionalLights[i]);
+    for (var i=0; i<directionOfDirectionalLights.length; i++) {
+      var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(0.75, 0.75, 0.75), directionOfDirectionalLights[i]);
       directionalLight.camera = depthCameras[i];
       scene.addChild( directionalLight );
       directionalLights.push(directionalLight);
@@ -210,7 +210,7 @@
     var rotateMatrixForCamera = GLBoost.Matrix33.rotateY(-1.0);
     camera.eye = rotateMatrixForCamera.multiplyVector(camera.eye);
     var rotateMatrix = GLBoost.Matrix33.rotateY(1.0);
-    for (let i=0; i<directionOfDirectionalLights.length; i++) {
+    for (var i=0; i<directionOfDirectionalLights.length; i++) {
       directionalLights[i].direction = rotateMatrix.multiplyVector(directionalLights[i].direction);
     }
     requestAnimationFrame(render);
