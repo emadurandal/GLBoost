@@ -2792,8 +2792,11 @@
     }, {
       key: 'transformMatrix',
       get: function get() {
-        var input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-        if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
+        var input = null;
+        if (this._activeAnimationLineName !== null) {
+          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+        }
+        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
           var matrix = Matrix44.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
@@ -4317,6 +4320,100 @@
 
   GLBoost['SimpleShader'] = SimpleShader;
 
+  var VertexWorldShadowShaderSource = function () {
+    function VertexWorldShadowShaderSource() {
+      babelHelpers.classCallCheck(this, VertexWorldShadowShaderSource);
+    }
+
+    babelHelpers.createClass(VertexWorldShadowShaderSource, [{
+      key: 'VSDefine_VertexWorldShadowShaderSource',
+      value: function VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = '';
+        var textureUnitIndex = 0;
+        //for (let i=0; i<lights.length; i++) {
+        //if (lights[i].camera && lights[i].camera.texture) {
+        shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
+        shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
+        textureUnitIndex++;
+        //}
+        //}
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexWorldShadowShaderSource',
+      value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        //if (lights[i].camera && lights[i].camera.texture) {
+        shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[i];\n';
+        shaderText += '    v_shadowCoord[i] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0);\n';
+        //}
+        shaderText += '  }\n';
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexWorldShadowShaderSource',
+      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_VertexWorldShadowShaderSource',
+      value: function FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
+        var shaderText = '';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexWorldShadowShaderSource',
+      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        if (existCamera_f) {
+          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        var textureUnitIndex = 0;
+        for (var i = 0; i < lights.length; i++) {
+          //if (lights[i].camera && lights[i].camera.texture) {
+
+          // matrices
+          shaderProgram['depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
+
+          textureUnitIndex++;
+          //}
+          //shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexWorldShadowShaderSource;
+  }();
+
+  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
+
   var DecalShaderSource = function () {
     function DecalShaderSource() {
       babelHelpers.classCallCheck(this, DecalShaderSource);
@@ -4419,6 +4516,9 @@
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DecalShader).call(this, glBoostContext));
 
       DecalShader.mixin(basicShader);
+      if (basicShader === VertexWorldShaderSource) {
+        DecalShader.mixin(VertexWorldShadowShaderSource);
+      }
       DecalShader.mixin(FragmentSimpleShaderSource);
       DecalShader.mixin(DecalShaderSource);
       return _this;
@@ -4982,11 +5082,12 @@
               isMaterialSetupDone = materials[i].setUp();
             }
           }
-          this.setupOtherTextures(lights);
 
           if (!isMaterialSetupDone) {
             return;
           }
+
+          this._setupOtherTextures(lights);
 
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
@@ -4995,6 +5096,8 @@
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
+
+          this._tearDownOtherTextures(lights);
 
           DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
         }
@@ -5005,11 +5108,20 @@
         DrawKickerWorld._lastGeometry = geometryName;
       }
     }, {
-      key: 'setupOtherTextures',
-      value: function setupOtherTextures(lights) {
-        for (var i; i < lights.length; i++) {
+      key: '_setupOtherTextures',
+      value: function _setupOtherTextures(lights) {
+        for (var i = 0; i < lights.length; i++) {
           if (lights[i].camera && lights[i].camera.texture) {
             lights[i].camera.texture.setUp();
+          }
+        }
+      }
+    }, {
+      key: '_tearDownOtherTextures',
+      value: function _tearDownOtherTextures(lights) {
+        for (var i = 0; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.tearDown();
           }
         }
       }

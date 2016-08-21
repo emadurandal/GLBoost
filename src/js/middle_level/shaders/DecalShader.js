@@ -1,5 +1,6 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
+import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
 
 export class DecalShaderSource {
@@ -88,6 +89,9 @@ export default class DecalShader extends Shader {
     super(glBoostContext);
 
     DecalShader.mixin(basicShader);
+    if (basicShader === VertexWorldShaderSource) {
+      DecalShader.mixin(VertexWorldShadowShaderSource);
+    }
     DecalShader.mixin(FragmentSimpleShaderSource);
     DecalShader.mixin(DecalShaderSource);
   }

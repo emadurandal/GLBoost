@@ -1,6 +1,7 @@
 import PointLight from '../../low_level/lights/PointLight';
 import DirectionalLight from '../../low_level/lights/DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
+import Matrix44 from '../../low_level/math/Matrix44';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -99,11 +100,12 @@ export default class DrawKickerWorld {
           isMaterialSetupDone = materials[i].setUp();
         }
       }
-      this.setupOtherTextures(lights);
 
       if (!isMaterialSetupDone) {
         return;
       }
+
+      this._setupOtherTextures(lights);
 
       if (iboArrayDic[geometryName].length > 0) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
@@ -113,6 +115,7 @@ export default class DrawKickerWorld {
         gl.drawArrays(gl[primitiveType], 0, vertexN);
       }
 
+      this._tearDownOtherTextures(lights);
 
       DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
@@ -123,10 +126,18 @@ export default class DrawKickerWorld {
     DrawKickerWorld._lastGeometry = geometryName;
   }
 
-  setupOtherTextures(lights) {
-    for(let i; i<lights.length; i++) {
+  _setupOtherTextures(lights) {
+    for(let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         lights[i].camera.texture.setUp();
+      }
+    }
+  }
+
+  _tearDownOtherTextures(lights) {
+    for(let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        lights[i].camera.texture.tearDown();
       }
     }
   }
