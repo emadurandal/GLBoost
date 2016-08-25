@@ -3714,13 +3714,15 @@
         /// define variables
         // start defining variables. first, sub class Shader, ...
         // seconds, define variables as mixin shaders
+        var vsDefineShaderText = '';
         this._classNamesOfVSDefine.forEach(function (className) {
           var method = _this2['VSDefine_' + className];
           if (method) {
-            shaderText += '//                                                            VSDefine_' + className + ' //\n';
-            shaderText += method.bind(_this2, in_, out_, f, lights, material, extraData)();
+            vsDefineShaderText += '//                                                            VSDefine_' + className + ' //\n';
+            vsDefineShaderText += method.bind(_this2, in_, out_, f, lights, material, extraData)();
           }
         });
+        shaderText += this._removeDuplicatedLine(vsDefineShaderText);
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -3750,8 +3752,6 @@
         // end of main function
         shaderText += '}\n';
 
-        shaderText = this._removeDuplicatedLine(shaderText);
-
         return shaderText;
       }
     }, {
@@ -3778,13 +3778,15 @@
         /// define variables
         // start defining variables. first, sub class Shader, ...
         // seconds, define variables as mixin shaders
+        var fsDefineShaderText = '';
         this._classNamesOfFSDefine.forEach(function (className) {
           var method = _this3['FSDefine_' + className];
           if (method) {
-            shaderText += '//                                                            FSDefine_' + className + ' //\n';
-            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
+            fsDefineShaderText += '//                                                            FSDefine_' + className + ' //\n';
+            fsDefineShaderText += method.bind(_this3, in_, f, lights, material, extraData)();
           }
         });
+        shaderText += this._removeDuplicatedLine(fsDefineShaderText);
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -3809,8 +3811,6 @@
           shaderText += Shader._set_glFragColor_inGLVer1(gl);
         }
         shaderText += '}\n';
-
-        shaderText = this._removeDuplicatedLine(shaderText);
 
         return shaderText;
       }

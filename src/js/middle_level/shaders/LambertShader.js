@@ -72,25 +72,25 @@ export class LambertShaderSource {
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
     for (let i=0; i<lights.length; i++) {
-      shaderText += `  { // ${i}\n`;
+      shaderText += `  {\n`;
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-      shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w); // ${i}\n`;
+      shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w);\n`;
 
       shaderText += `    if (isShadowCasting[${i}] == 1) {// ${i}\n`;
 
-      shaderText += `      float depth = ${textureProjFunc}(uDepthTexture[${i}], v_shadowCoord[${i}]).r; // ${i}\n`;
-      shaderText += `      if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) { // ${i}\n`;
-      shaderText += `        light *= 0.5; // ${i}\n`;
-      shaderText += `      } // ${i}\n`;
+      shaderText += `      float depth = ${textureProjFunc}(uDepthTexture[${i}], v_shadowCoord[${i}]).r;\n`;
+      shaderText += `      if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) {\n`;
+      shaderText += `        light *= 0.5;\n`;
+      shaderText += `      }\n`;
 
       //shaderText += `        float visibility = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}], depthBias).x;\n`;
       //shaderText += `        light *= visibility > 0.5 ? 1.0 : 0.0;\n`;
 
-      shaderText += `    } // ${i}\n`;
+      shaderText += `    }\n`;
 
-      shaderText += `    float diffuse = max(dot(light, normal), 0.0); // ${i}\n`;
-      shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor; // ${i}\n`;
-      shaderText += `  } // ${i}\n`;
+      shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
+      shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `  }\n`;
     }
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';

@@ -147,14 +147,15 @@ export default class Shader extends GLBoostObject {
     /// define variables
     // start defining variables. first, sub class Shader, ...
     // seconds, define variables as mixin shaders
+    let vsDefineShaderText = '';
     this._classNamesOfVSDefine.forEach((className)=> {
       var method = this['VSDefine_' + className];
       if (method) {
-        shaderText += '//                                                            VSDefine_' + className + ' //\n';
-        shaderText += method.bind(this, in_, out_, f, lights, material, extraData)();
+        vsDefineShaderText += '//                                                            VSDefine_' + className + ' //\n';
+        vsDefineShaderText += method.bind(this, in_, out_, f, lights, material, extraData)();
       }
     });
-
+    shaderText += this._removeDuplicatedLine(vsDefineShaderText);
 
     // begin of main function
     shaderText +=   'void main(void) {\n';
@@ -186,8 +187,6 @@ export default class Shader extends GLBoostObject {
     // end of main function
     shaderText +=   '}\n';
 
-    shaderText = this._removeDuplicatedLine(shaderText);
-
     return shaderText;
   }
 
@@ -212,13 +211,15 @@ export default class Shader extends GLBoostObject {
     /// define variables
     // start defining variables. first, sub class Shader, ...
     // seconds, define variables as mixin shaders
+    let fsDefineShaderText = '';
     this._classNamesOfFSDefine.forEach((className)=> {
       var method = this['FSDefine_' + className];
       if (method) {
-        shaderText += '//                                                            FSDefine_' + className + ' //\n';
-        shaderText += method.bind(this, in_, f, lights, material, extraData)();
+        fsDefineShaderText += '//                                                            FSDefine_' + className + ' //\n';
+        fsDefineShaderText += method.bind(this, in_, f, lights, material, extraData)();
       }
     });
+    shaderText += this._removeDuplicatedLine(fsDefineShaderText);
 
 
     // begin of main function
@@ -245,8 +246,6 @@ export default class Shader extends GLBoostObject {
       shaderText += Shader._set_glFragColor_inGLVer1(gl);
     }
     shaderText +=   '}\n';
-
-    shaderText = this._removeDuplicatedLine(shaderText);
 
     return shaderText;
   }
