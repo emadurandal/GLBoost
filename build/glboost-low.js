@@ -4152,6 +4152,11 @@
         return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
       }
     }, {
+      key: '_textureProj_func',
+      value: function _textureProj_func(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+      }
+    }, {
       key: '_set_outColor_onFrag',
       value: function _set_outColor_onFrag(gl, i) {
         return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = ' + i + ') out vec4 rt' + i + ';\n' : 'vec4 rt' + i + ';\n';

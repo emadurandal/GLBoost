@@ -57,7 +57,7 @@ export class LambertShaderSource {
   FSShade_LambertShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    var textureFunc = Shader._texture_func(gl);
+    var textureProjFunc = Shader._textureProj_func(gl);
 
     let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
@@ -78,9 +78,8 @@ export class LambertShaderSource {
 
       shaderText += `    if (isShadowCasting[${i}] == 1) {// ${i}\n`;
 
-      shaderText += `      vec2 shadowCoord = vec2(v_shadowCoord[${i}].x, v_shadowCoord[${i}].y); // ${i}\n`;
-      shaderText += `      float depth = ${textureFunc}(uDepthTexture[${i}], shadowCoord).r; // ${i}\n`;
-      shaderText += `      if (depth < v_shadowCoord[${i}].z - depthBias) { // ${i}\n`;
+      shaderText += `      float depth = ${textureProjFunc}(uDepthTexture[${i}], v_shadowCoord[${i}]).r; // ${i}\n`;
+      shaderText += `      if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) { // ${i}\n`;
       shaderText += `        light *= 0.5; // ${i}\n`;
       shaderText += `      } // ${i}\n`;
 

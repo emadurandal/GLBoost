@@ -3845,6 +3845,11 @@
         return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
       }
     }, {
+      key: '_textureProj_func',
+      value: function _textureProj_func(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+      }
+    }, {
       key: '_set_outColor_onFrag',
       value: function _set_outColor_onFrag(gl, i) {
         return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = ' + i + ') out vec4 rt' + i + ';\n' : 'vec4 rt' + i + ';\n';
@@ -9627,7 +9632,7 @@
       value: function FSShade_LambertShaderSource(f, gl, lights) {
         var shaderText = '';
 
-        var textureFunc = Shader._texture_func(gl);
+        var textureProjFunc = Shader._textureProj_func(gl);
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
@@ -9648,9 +9653,8 @@
 
           shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
 
-          shaderText += '      vec2 shadowCoord = vec2(v_shadowCoord[' + i + '].x, v_shadowCoord[' + i + '].y); // ' + i + '\n';
-          shaderText += '      float depth = ' + textureFunc + '(uDepthTexture[' + i + '], shadowCoord).r; // ' + i + '\n';
-          shaderText += '      if (depth < v_shadowCoord[' + i + '].z - depthBias) { // ' + i + '\n';
+          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r; // ' + i + '\n';
+          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) { // ' + i + '\n';
           shaderText += '        light *= 0.5; // ' + i + '\n';
           shaderText += '      } // ' + i + '\n';
 

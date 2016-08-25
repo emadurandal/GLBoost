@@ -445,6 +445,10 @@ export default class Shader extends GLBoostObject {
     return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
   }
 
+  static _textureProj_func(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+  }
+
   _sampler2DShadow_func() {
     var gl = this._glContext.gl;
     return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
