@@ -68,12 +68,7 @@
 
     var materialForDepth = glBoostContext.createClassicMaterial();
     materialForDepth.shaderClass = GLBoost.PassThroughShader;
-    //materialForDepth.diffuseTexture = texture;
-    /*
-    materialForDepth.shaderClass = GLBoost.LambertShader;
-    texture = glBoostContext.createTexture('resources/texture.png');
-    materialForDepth.diffuseTexture = texture;
-      */
+
     planeForDepth = glBoostContext.createMesh(planeGeometry, materialForDepth);
     cubeForDepth = glBoostContext.createMesh(cubeGeometry, materialForDepth);
     cubeForDepth.translate = new GLBoost.Vector3(0,2,0);

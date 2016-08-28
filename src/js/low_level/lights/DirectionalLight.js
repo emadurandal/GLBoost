@@ -17,7 +17,6 @@ export default class DirectionalLight extends AbstractLight {
   constructor(glBoostContext, intensity, direction) {
     super(glBoostContext);
 
-    this._name = "";
     this._intensity = intensity;
     this._direction = direction;
   }
