@@ -37,7 +37,9 @@ export default class Texture extends AbstractTexture {
 
   generateTextureFromUri(imageUri) {
     this._img = new Image();
-    this._img.crossOrigin = 'Anonymous';
+    if ( !imageUri.match(/^data:/) ) {
+      this._img.crossOrigin = 'Anonymous';
+    }
     this._img.onload = ()=> {
       var gl = this._glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);

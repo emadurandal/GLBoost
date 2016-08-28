@@ -3112,7 +3112,6 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, glBoostContext));
 
-      _this._name = "";
       _this._intensity = intensity;
       _this._direction = direction;
       return _this;
@@ -3189,7 +3188,9 @@
         var _this2 = this;
 
         this._img = new Image();
-        this._img.crossOrigin = 'Anonymous';
+        if (!imageUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
+        }
         this._img.onload = function () {
           var gl = _this2._glContext.gl;
           var glem = GLExtensionsManager.getInstance(_this2._glContext);

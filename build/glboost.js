@@ -4201,7 +4201,6 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, glBoostContext));
 
-      _this._name = "";
       _this._intensity = intensity;
       _this._direction = direction;
       return _this;
@@ -6402,7 +6401,9 @@
         var _this2 = this;
 
         this._img = new Image();
-        this._img.crossOrigin = 'Anonymous';
+        if (!imageUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
+        }
         this._img.onload = function () {
           var gl = _this2._glContext.gl;
           var glem = GLExtensionsManager.getInstance(_this2._glContext);
@@ -8984,6 +8985,28 @@
   GLBoost$1['WEBGL_ONE_USE_EXTENSIONS'] = true;
   GLBoost$1['CONSOLE_OUT_FOR_DEBUGGING'] = true;
 
+  var DataUtil = function () {
+    function DataUtil() {
+      babelHelpers.classCallCheck(this, DataUtil);
+    }
+
+    babelHelpers.createClass(DataUtil, null, [{
+      key: 'base64ToArrayBuffer',
+      value: function base64ToArrayBuffer(dataUri) {
+        var type = dataUri[0].split(':')[1].split(';')[0];
+        var byteString = atob(dataUri[1]);
+        var byteStringLength = byteString.length;
+        var arrayBuffer = new ArrayBuffer(byteStringLength);
+        var uint8Array = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < byteStringLength; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return arrayBuffer;
+      }
+    }]);
+    return DataUtil;
+  }();
+
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
@@ -9070,16 +9093,9 @@
       }
     }, {
       key: '_loadBinaryFile',
-      value: function _loadBinaryFile(glBoostContext, dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
-        dataUrI = dataUrI.split(',');
-        var type = dataUrI[0].split(':')[1].split(';')[0];
-        var byteString = atob(dataUrI[1]);
-        var byteStringLength = byteString.length;
-        var arrayBuffer = new ArrayBuffer(byteStringLength);
-        var intArray = new Uint8Array(arrayBuffer);
-        for (var i = 0; i < byteStringLength; i++) {
-          intArray[i] = byteString.charCodeAt(i);
-        }
+      value: function _loadBinaryFile(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
+        dataUri = dataUri.split(',');
+        var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
         if (arrayBuffer) {
           this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
