@@ -10060,7 +10060,9 @@
           // set texture unit i+1 to the sampler
           gl.uniform1i(shaderProgram['uniformDepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
 
-          lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
+          }
         }
 
         return vertexAttribsAsResult;
