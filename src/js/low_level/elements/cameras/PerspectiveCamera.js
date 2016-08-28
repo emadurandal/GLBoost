@@ -3,8 +3,8 @@ import AbstractCamera from './AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
 export default class PerspectiveCamera extends AbstractCamera {
-  constructor(glBoostContext, lookat, perspective) {
-    super(glBoostContext, lookat);
+  constructor(glBoostContext, toRegister, lookat, perspective) {
+    super(glBoostContext, toRegister, lookat);
 
     this._fovy = perspective.fovy;
     this._aspect = perspective.aspect;

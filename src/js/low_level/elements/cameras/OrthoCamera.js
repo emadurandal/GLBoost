@@ -2,8 +2,8 @@ import AbstractCamera from './AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
 export default class OrthoCamera extends AbstractCamera {
-  constructor(glBoostContext, lookat, ortho) {
-    super(glBoostContext, lookat);
+  constructor(glBoostContext, toRegister, lookat, ortho) {
+    super(glBoostContext, toRegister, lookat);
 
     this._left = ortho.left;
     this._right = ortho.right;

@@ -3,39 +3,22 @@ import Element from '../Element';
 import Matrix44 from '../../math/Matrix44';
 
 export default class AbstractCamera extends Element {
-  constructor(glBoostContext, lookat) {
-    super(glBoostContext);
+  constructor(glBoostContext, toRegister, lookat) {
+    super(glBoostContext, toRegister);
 
     if (this.constructor === AbstractCamera) {
       throw new TypeError('Cannot construct AbstractCamera instances directly.');
     }
-
 
     this._translate = lookat.eye;
     this._center = lookat.center;
     this._up = lookat.up;
 
     this._dirtyView = true;
-    this._updateCountAsCameraView = 0;
-    this._mainCamera = {};
-
-    this._texture = null; // for example, depth texture
   }
 
   _needUpdateView() {
     this._dirtyView = true;
-    this._updateCountAsCameraView++;
-  }
-
-  get updateCountAsCameraView() {
-    return this._updateCountAsCameraView;
-  }
-
-  get latestViewStateInfoString() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
-
-    return tempString;
   }
 
   lookAtRHMatrix() {

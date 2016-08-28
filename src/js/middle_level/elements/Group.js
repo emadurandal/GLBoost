@@ -1,8 +1,8 @@
-import Element from '../../low_level/elements/Element';
+import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import Mesh from './meshes/Mesh';
 
-export default class Group extends Element {
+export default class Group extends M_Element {
   constructor(glBoostContext) {
     super(glBoostContext);
     this._elements = [];

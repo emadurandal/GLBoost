@@ -151,6 +151,55 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
+  var Vector2 = function Vector2(x, y) {
+    babelHelpers.classCallCheck(this, Vector2);
+
+    this.x = x;
+    this.y = y;
+  };
+
+  GLBoost$1["Vector2"] = Vector2;
+
+  var Vector4 = function () {
+    function Vector4(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Vector4);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Vector4, [{
+      key: 'isEqual',
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      /**
+       * Zero Vector
+       */
+
+    }, {
+      key: 'toVector3',
+      value: function toVector3() {
+        return new Vector3(this.x, this.y, this.z);
+      }
+    }], [{
+      key: 'zero',
+      value: function zero() {
+        return new Vector4(0, 0, 0, 1);
+      }
+    }]);
+    return Vector4;
+  }();
+
+  GLBoost$1["Vector4"] = Vector4;
+
   var Vector3 = function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -419,55 +468,6 @@
   }();
 
   GLBoost$1['Vector3'] = Vector3;
-
-  var Vector4 = function () {
-    function Vector4(x, y, z, w) {
-      babelHelpers.classCallCheck(this, Vector4);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    babelHelpers.createClass(Vector4, [{
-      key: 'isEqual',
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
-      /**
-       * Zero Vector
-       */
-
-    }, {
-      key: 'toVector3',
-      value: function toVector3() {
-        return new Vector3(this.x, this.y, this.z);
-      }
-    }], [{
-      key: 'zero',
-      value: function zero() {
-        return new Vector4(0, 0, 0, 1);
-      }
-    }]);
-    return Vector4;
-  }();
-
-  GLBoost$1["Vector4"] = Vector4;
-
-  var Vector2 = function Vector2(x, y) {
-    babelHelpers.classCallCheck(this, Vector2);
-
-    this.x = x;
-    this.y = y;
-  };
-
-  GLBoost$1["Vector2"] = Vector2;
 
   var MathUtil = function () {
     function MathUtil() {
@@ -1458,102 +1458,6 @@
 
   GLBoost$1["Matrix44"] = Matrix44;
 
-  var AABB = function () {
-    function AABB() {
-      babelHelpers.classCallCheck(this, AABB);
-
-      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
-      this._centerPoint = null;
-      this._lengthCenterToCorner = null;
-    }
-
-    babelHelpers.createClass(AABB, [{
-      key: 'addPosition',
-      value: function addPosition(positionVector) {
-        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
-        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
-        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
-
-        return positionVector;
-      }
-    }, {
-      key: 'updateAllInfo',
-      value: function updateAllInfo() {
-        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
-      }
-    }, {
-      key: 'mergeAABB',
-      value: function mergeAABB(aabb) {
-        var isUpdated = false;
-        if (aabb.minPoint.x < this._AABB_min.x) {
-          this._AABB_min.x = aabb.minPoint.x;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.y < this._AABB_min.y) {
-          this._AABB_min.y = aabb.minPoint.y;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.z < this._AABB_min.z) {
-          this._AABB_min.z = aabb.minPoint.z;
-          isUpdated = true;
-        }
-        if (this._AABB_max.x < aabb.maxPoint.x) {
-          this._AABB_max.x = aabb.maxPoint.x;
-          isUpdated = true;
-        }
-        if (this._AABB_max.y < aabb.maxPoint.y) {
-          this._AABB_max.y = aabb.maxPoint.y;
-          isUpdated = true;
-        }
-        if (this._AABB_max.z < aabb.maxPoint.z) {
-          this._AABB_max.z = aabb.maxPoint.z;
-          isUpdated = true;
-        }
-        this.updateAllInfo();
-
-        return isUpdated;
-      }
-    }, {
-      key: 'minPoint',
-      get: function get() {
-        return this._AABB_min;
-      }
-    }, {
-      key: 'maxPoint',
-      get: function get() {
-        return this._AABB_max;
-      }
-    }, {
-      key: 'centerPoint',
-      get: function get() {
-        return this._centerPoint;
-      }
-    }, {
-      key: 'lengthCenterToCorner',
-      get: function get() {
-        return this._lengthCenterToCorner;
-      }
-    }], [{
-      key: 'multiplyMatrix',
-      value: function multiplyMatrix(matrix, aabb) {
-        var newAabb = new AABB();
-        newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
-        newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
-        newAabb.updateAllInfo();
-
-        return newAabb;
-      }
-    }]);
-    return AABB;
-  }();
-
-  GLBoost$1['AABB'] = AABB;
-
   var Quaternion = function () {
     function Quaternion(x, y, z, w) {
       babelHelpers.classCallCheck(this, Quaternion);
@@ -1922,6 +1826,7 @@
 
   var GLBoostObject = function () {
     function GLBoostObject(glBoostContext) {
+      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
       babelHelpers.classCallCheck(this, GLBoostObject);
 
       if (this.constructor === GLBoostObject) {
@@ -1931,7 +1836,10 @@
       this._glBoostContext = glBoostContext;
       this._glContext = glBoostContext.glContext;
       this._glBoostMonitor = GLBoostMonitor.getInstance();
-      this._glBoostMonitor.registerGLBoostObject(this);
+      this._toRegister = toRegister;
+      if (this._toRegister) {
+        this._glBoostMonitor.registerGLBoostObject(this);
+      }
       this._userFlavorName = '';
       this._readyForDiscard = false;
     }
@@ -1958,7 +1866,9 @@
       key: 'readyForDiscard',
       value: function readyForDiscard() {
         this._readyForDiscard = true;
-        this._glBoostMonitor.deregisterGLBoostObject(this);
+        if (this._toRegister) {
+          this._glBoostMonitor.deregisterGLBoostObject(this);
+        }
       }
     }, {
       key: 'belongingCanvasId',
@@ -1991,21 +1901,145 @@
     babelHelpers.inherits(Element, _GLBoostObject);
 
     function Element(glBoostContext) {
+      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
       babelHelpers.classCallCheck(this, Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext, toRegister));
 
-      _this._parent = null;
       _this._translate = Vector3.zero();
+      _this._scale = new Vector3(1, 1, 1);
+
       _this._rotate = Vector3.zero();
       _this._quaternion = new Quaternion(0, 0, 0, 1);
-      _this._scale = new Vector3(1, 1, 1);
       _this._matrix = Matrix44.identity();
+
       _this._finalMatrix = Matrix44.identity();
-      _this._invMatrix = Matrix44.identity();
+
       _this._dirtyAsElement = true;
-      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
       _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
+
+      return _this;
+    }
+
+    babelHelpers.createClass(Element, [{
+      key: '_needUpdate',
+      value: function _needUpdate() {
+        this._dirtyAsElement = true;
+      }
+    }, {
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(mat) {
+        this._matrix = mat;
+        this._currentCalcMode = 'matrix';
+        this._needUpdate();
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        this._translate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._translate;
+      }
+    }, {
+      key: 'rotate',
+      set: function set(vec) {
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
+          this._needUpdate();
+        }
+        if (this._rotate.isEqual(vec)) {
+          return;
+        }
+        this._rotate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._rotate;
+      }
+    }, {
+      key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
+        }
+        this._scale = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._scale;
+      }
+    }, {
+      key: 'quaternion',
+      set: function set(quat) {
+        if (this._currentCalcMode !== 'quaternion') {
+          this._currentCalcMode = 'quaternion';
+          this._needUpdate();
+        }
+        if (this._quaternion.isEqual(quat)) {
+          return;
+        }
+        this._quaternion = quat;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._quaternion;
+      }
+    }, {
+      key: 'transformMatrix',
+      get: function get() {
+        if (this._dirtyAsElement) {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+
+          this._dirtyAsElement = false;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'currentCalcMode',
+      set: function set(mode) {
+        this._currentCalcMode = mode;
+      },
+      get: function get() {
+        return this._currentCalcMode;
+      }
+    }]);
+    return Element;
+  }(GLBoostObject);
+
+  var M_Element = function (_Element) {
+    babelHelpers.inherits(M_Element, _Element);
+
+    function M_Element(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Element);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Element).call(this, glBoostContext));
+
+      _this._parent = null;
+      _this._invMatrix = Matrix44.identity();
+      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
       _this._calculatedInverseMatrix = false;
       _this._updateCountAsElement = 0;
       _this._accumulatedAncestryNameWithUpdateInfoString = '';
@@ -2022,7 +2056,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Element, [{
+    babelHelpers.createClass(M_Element, [{
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
@@ -2528,16 +2562,16 @@
       key: 'rotateMatrixAccumulatedAncestry',
       get: function get() {
         /*
-        var mat = this._multiplyMyAndParentTransformMatrices(this);
-        var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
-        var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
-        var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
-         return new Matrix44(
-          mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
-          mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
-          mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
-          0, 0, 0, 1
-        );*/
+         var mat = this._multiplyMyAndParentTransformMatrices(this);
+         var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
+         var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
+         var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
+          return new Matrix44(
+         mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
+         mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
+         mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
+         0, 0, 0, 1
+         );*/
         return this._multiplyMyAndParentRotateMatrices(this, true);
       }
     }, {
@@ -2577,14 +2611,6 @@
         return this._parent;
       }
     }, {
-      key: 'currentCalcMode',
-      set: function set(mode) {
-        this._currentCalcMode = mode;
-      },
-      get: function get() {
-        return this._currentCalcMode;
-      }
-    }, {
       key: 'camera',
       set: function set(camera) {
         this._camera = camera;
@@ -2601,11 +2627,825 @@
         return this._customFunction;
       }
     }]);
-    return Element;
-  }(GLBoostObject);
+    return M_Element;
+  }(Element);
 
-  var Mesh = function (_Element) {
-    babelHelpers.inherits(Mesh, _Element);
+  var M_Joint = function (_M_Element) {
+    babelHelpers.inherits(M_Joint, _M_Element);
+
+    function M_Joint(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Joint);
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Joint).call(this, glBoostContext));
+    }
+
+    return M_Joint;
+  }(M_Element);
+
+  /**
+   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
+   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
+  var M_AbstractLight = function (_M_Element) {
+    babelHelpers.inherits(M_AbstractLight, _M_Element);
+
+    function M_AbstractLight(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_AbstractLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_AbstractLight).call(this, glBoostContext));
+
+      if (_this.constructor === M_AbstractLight) {
+        throw new TypeError('Cannot construct AbstractLight instances directly.');
+      }
+
+      _this._gl = _this._glContext.gl;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_AbstractLight, [{
+      key: 'prepareToRender',
+      value: function prepareToRender() {
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      }
+    }]);
+    return M_AbstractLight;
+  }(M_Element);
+
+  /**
+   * [en] This is a Point Light class.<br>
+   * [ja] 点光源クラスです。
+   */
+
+  var M_PointLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_PointLight, _M_AbstractLight);
+
+
+    /**
+     * [en] The constructor of PointLight class. <br>
+     * [ja] PointLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+
+    function M_PointLight(glBoostContext, intensity) {
+      babelHelpers.classCallCheck(this, M_PointLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PointLight).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(M_PointLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }]);
+    return M_PointLight;
+  }(M_AbstractLight);
+
+  /**
+   * [en] This is a Directional Light class.<br>
+   * [ja] 平行光源クラスです。
+   */
+
+  var M_DirectionalLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_DirectionalLight, _M_AbstractLight);
+
+
+    /**
+     * [en] The constructor of DirectionalLight class. <br>
+     * [ja] DirectionalLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+     */
+
+    function M_DirectionalLight(glBoostContext, intensity, direction) {
+      babelHelpers.classCallCheck(this, M_DirectionalLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_DirectionalLight).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+      _this._direction = direction;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_DirectionalLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }, {
+      key: 'direction',
+      set: function set(vec) {
+        this._direction = vec;
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      },
+      get: function get() {
+        return this._direction;
+      }
+    }]);
+    return M_DirectionalLight;
+  }(M_AbstractLight);
+
+  var AbstractCamera = function (_Element) {
+    babelHelpers.inherits(AbstractCamera, _Element);
+
+    function AbstractCamera(glBoostContext, toRegister, lookat) {
+      babelHelpers.classCallCheck(this, AbstractCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext, toRegister));
+
+      if (_this.constructor === AbstractCamera) {
+        throw new TypeError('Cannot construct AbstractCamera instances directly.');
+      }
+
+      _this._translate = lookat.eye;
+      _this._center = lookat.center;
+      _this._up = lookat.up;
+
+      _this._dirtyView = true;
+      return _this;
+    }
+
+    babelHelpers.createClass(AbstractCamera, [{
+      key: '_needUpdateView',
+      value: function _needUpdateView() {
+        this._dirtyView = true;
+      }
+    }, {
+      key: 'lookAtRHMatrix',
+      value: function lookAtRHMatrix() {
+        if (this._dirtyView) {
+          this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._dirtyView = false;
+          return this._viewMatrix.clone();
+        } else {
+          return this._viewMatrix.clone();
+        }
+      }
+    }, {
+      key: 'setAsMainCamera',
+      value: function setAsMainCamera(scene) {
+        this._mainCamera[scene.toString()] = this;
+      }
+    }, {
+      key: 'isMainCamera',
+      value: function isMainCamera(scene) {
+        return this._mainCamera[scene.toString()] === this;
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        this._needUpdateView();
+      },
+      get: function get() {
+        return babelHelpers.get(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', this);
+      }
+    }, {
+      key: 'eye',
+      set: function set(vec) {
+        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        this._needUpdateView();
+      },
+      get: function get() {
+        return this._translate;
+      }
+    }, {
+      key: 'center',
+      set: function set(vec) {
+        if (this._center.isEqual(vec)) {
+          return;
+        }
+        this._center = vec;
+        this._needUpdateView();
+      },
+      get: function get() {
+        return this._center;
+      }
+    }, {
+      key: 'up',
+      set: function set(vec) {
+        if (this._up.isEqual(vec)) {
+          return;
+        }
+        this._up = vec;
+        this._needUpdateView();
+      },
+      get: function get() {
+        return this._up;
+      }
+    }, {
+      key: 'texture',
+      set: function set(texture) {
+        this._texture = texture;
+      },
+      get: function get() {
+        return this._texture;
+      }
+    }], [{
+      key: 'lookAtRHMatrix',
+      value: function lookAtRHMatrix(eye, center, up) {
+
+        var f = Vector3.normalize(Vector3.subtract(center, eye));
+        var s = Vector3.normalize(Vector3.cross(f, up));
+        var u = Vector3.cross(s, f);
+
+        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
+      }
+    }]);
+    return AbstractCamera;
+  }(Element);
+
+  var OrthoCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
+
+    function OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
+      babelHelpers.classCallCheck(this, OrthoCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, toRegister, lookat));
+
+      _this._left = ortho.left;
+      _this._right = ortho.right;
+      _this._bottom = ortho.bottom;
+      _this._top = ortho.top;
+      _this._zNear = ortho.zNear;
+      _this._zFar = ortho.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(OrthoCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        if (this._left === value) {
+          return;
+        }
+        this._left = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        if (this._right === value) {
+          return;
+        }
+        this._right = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._right;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        if (this._bottom === value) {
+          return;
+        }
+        this._bottom = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._bottom;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        if (this._top === value) {
+          return;
+        }
+        this._top = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._top;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }], [{
+      key: 'orthoRHMatrix',
+      value: function orthoRHMatrix(left, right, bottom, top, near, far) {
+
+        return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+      }
+    }]);
+    return OrthoCamera;
+  }(AbstractCamera);
+
+  var M_AbstractCamera = function (_M_Element) {
+    babelHelpers.inherits(M_AbstractCamera, _M_Element);
+
+    function M_AbstractCamera(glBoostContext, toRegister) {
+      babelHelpers.classCallCheck(this, M_AbstractCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_AbstractCamera).call(this, glBoostContext, toRegister));
+
+      if (_this.constructor === M_AbstractCamera) {
+        throw new TypeError('Cannot construct M_AbstractCamera instances directly.');
+      }
+
+      _this._lowLevelCamera = null;
+
+      _this._updateCountAsCameraView = 0;
+      _this._mainCamera = {};
+
+      _this._texture = null; // for example, depth texture
+      return _this;
+    }
+
+    babelHelpers.createClass(M_AbstractCamera, [{
+      key: '_needUpdateView',
+      value: function _needUpdateView() {
+        this._lowLevelCamera._needUpdateView();
+        this._updateCountAsCameraView++;
+      }
+    }, {
+      key: 'setAsMainCamera',
+      value: function setAsMainCamera(scene) {
+        this._mainCamera[scene.toString()] = this;
+      }
+    }, {
+      key: 'isMainCamera',
+      value: function isMainCamera(scene) {
+        return this._mainCamera[scene.toString()] === this;
+      }
+    }, {
+      key: 'lookAtRHMatrix',
+
+
+      // ===================== delegate to low level class ========================
+
+      value: function lookAtRHMatrix() {
+        return this._lowLevelCamera.lookAtRHMatrix();
+      }
+    }, {
+      key: 'updateCountAsCameraView',
+      get: function get() {
+        return this._updateCountAsCameraView;
+      }
+    }, {
+      key: 'latestViewStateInfoString',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
+
+        return tempString;
+      }
+    }, {
+      key: 'texture',
+      set: function set(texture) {
+        this._texture = texture;
+      },
+      get: function get() {
+        return this._texture;
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        this._lowLevelCamera.translate = vec;
+      },
+      get: function get() {
+        return this._lowLevelCamera.translate;
+      }
+    }, {
+      key: 'eye',
+      set: function set(vec) {
+        this._lowLevelCamera.eye = vec;
+      },
+      get: function get() {
+        return this._lowLevelCamera.eye;
+      }
+    }, {
+      key: 'center',
+      set: function set(vec) {
+        this._lowLevelCamera.center = vec;
+      },
+      get: function get() {
+        return this._lowLevelCamera.center;
+      }
+    }, {
+      key: 'up',
+      set: function set(vec) {
+        this._lowLevelCamera.up = vec;
+      },
+      get: function get() {
+        return this._lowLevelCamera.up;
+      }
+    }]);
+    return M_AbstractCamera;
+  }(M_Element);
+
+  var M_OrthoCamera = function (_M_AbstractCamera) {
+    babelHelpers.inherits(M_OrthoCamera, _M_AbstractCamera);
+
+    function M_OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
+      babelHelpers.classCallCheck(this, M_OrthoCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_OrthoCamera).call(this, glBoostContext, toRegister));
+
+      _this._lowLevelCamera = new OrthoCamera(_this, false, lookat, ortho);
+      return _this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    babelHelpers.createClass(M_OrthoCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._lowLevelCamera._needUpdateProjection();
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        return this._lowLevelCamera.projectionRHMatrix();
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._lowLevelCamera.updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        this._lowLevelCamera.left = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        this._lowLevelCamera.right = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.right;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        this._lowLevelCamera.bottom = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.bottom;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        this._lowLevelCamera.top = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.top;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        this._lowLevelCamera.zNear = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        this._lowLevelCamera.zFar = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zFar;
+      }
+    }]);
+    return M_OrthoCamera;
+  }(M_AbstractCamera);
+
+  var PerspectiveCamera = function (_AbstractCamera) {
+    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
+
+    function PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
+      babelHelpers.classCallCheck(this, PerspectiveCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
+
+      _this._fovy = perspective.fovy;
+      _this._aspect = perspective.aspect;
+      _this._zNear = perspective.zNear;
+      _this._zFar = perspective.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(PerspectiveCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'fovy',
+      set: function set(value) {
+        if (this._fovy === value) {
+          return;
+        }
+        this._fovy = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._fovy;
+      }
+    }, {
+      key: 'aspect',
+      set: function set(value) {
+        if (this._aspect === value) {
+          return;
+        }
+        this._aspect = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._aspect;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }], [{
+      key: 'perspectiveRHMatrix',
+      value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+
+        var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
+        var xscale = yscale / aspect;
+
+        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+      }
+    }]);
+    return PerspectiveCamera;
+  }(AbstractCamera);
+
+  var M_PerspectiveCamera = function (_M_AbstractCamera) {
+    babelHelpers.inherits(M_PerspectiveCamera, _M_AbstractCamera);
+
+    function M_PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
+      babelHelpers.classCallCheck(this, M_PerspectiveCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PerspectiveCamera).call(this, glBoostContext, toRegister));
+
+      _this._lowLevelCamera = new PerspectiveCamera(_this, false, lookat, perspective);
+      return _this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    babelHelpers.createClass(M_PerspectiveCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._lowLevelCamera._needUpdateProjection();
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        return this._lowLevelCamera.projectionRHMatrix();
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._lowLevelCamera.updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'fovy',
+      set: function set(value) {
+        this._lowLevelCamera.fovy = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.fovy;
+      }
+    }, {
+      key: 'aspect',
+      set: function set(value) {
+        this._lowLevelCamera.aspect = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.aspect;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        this._lowLevelCamera.zNear = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        this._lowLevelCamera.zFar = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zFar;
+      }
+    }]);
+    return M_PerspectiveCamera;
+  }(M_AbstractCamera);
+
+  var AABB = function () {
+    function AABB() {
+      babelHelpers.classCallCheck(this, AABB);
+
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+    }
+
+    babelHelpers.createClass(AABB, [{
+      key: 'addPosition',
+      value: function addPosition(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: 'updateAllInfo',
+      value: function updateAllInfo() {
+        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      }
+    }, {
+      key: 'mergeAABB',
+      value: function mergeAABB(aabb) {
+        var isUpdated = false;
+        if (aabb.minPoint.x < this._AABB_min.x) {
+          this._AABB_min.x = aabb.minPoint.x;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.y < this._AABB_min.y) {
+          this._AABB_min.y = aabb.minPoint.y;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.z < this._AABB_min.z) {
+          this._AABB_min.z = aabb.minPoint.z;
+          isUpdated = true;
+        }
+        if (this._AABB_max.x < aabb.maxPoint.x) {
+          this._AABB_max.x = aabb.maxPoint.x;
+          isUpdated = true;
+        }
+        if (this._AABB_max.y < aabb.maxPoint.y) {
+          this._AABB_max.y = aabb.maxPoint.y;
+          isUpdated = true;
+        }
+        if (this._AABB_max.z < aabb.maxPoint.z) {
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+        }
+        this.updateAllInfo();
+
+        return isUpdated;
+      }
+    }, {
+      key: 'minPoint',
+      get: function get() {
+        return this._AABB_min;
+      }
+    }, {
+      key: 'maxPoint',
+      get: function get() {
+        return this._AABB_max;
+      }
+    }, {
+      key: 'centerPoint',
+      get: function get() {
+        return this._centerPoint;
+      }
+    }, {
+      key: 'lengthCenterToCorner',
+      get: function get() {
+        return this._lengthCenterToCorner;
+      }
+    }], [{
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(matrix, aabb) {
+        var newAabb = new AABB();
+        newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
+        newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
+        newAabb.updateAllInfo();
+
+        return newAabb;
+      }
+    }]);
+    return AABB;
+  }();
+
+  GLBoost$1['AABB'] = AABB;
+
+  var Mesh = function (_M_Element) {
+    babelHelpers.inherits(Mesh, _M_Element);
 
     function Mesh(glBoostContext, geometry, material) {
       babelHelpers.classCallCheck(this, Mesh);
@@ -2789,14 +3629,14 @@
       }
     }]);
     return Mesh;
-  }(Element);
+  }(M_Element);
 
   Mesh._geometries = {};
 
   GLBoost$1['Mesh'] = Mesh;
 
-  var Group = function (_Element) {
-    babelHelpers.inherits(Group, _Element);
+  var Group = function (_M_Element) {
+    babelHelpers.inherits(Group, _M_Element);
 
     function Group(glBoostContext) {
       babelHelpers.classCallCheck(this, Group);
@@ -2932,7 +3772,7 @@
       }
     }]);
     return Group;
-  }(Element);
+  }(M_Element);
 
   var RenderPass = function (_GLBoostObject) {
     babelHelpers.inherits(RenderPass, _GLBoostObject);
@@ -3952,324 +4792,6 @@
 
   GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
-  /**
-   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
-   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var AbstractLight = function (_Element) {
-    babelHelpers.inherits(AbstractLight, _Element);
-
-    function AbstractLight(glBoostContext) {
-      babelHelpers.classCallCheck(this, AbstractLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, glBoostContext));
-
-      if (_this.constructor === AbstractLight) {
-        throw new TypeError('Cannot construct AbstractLight instances directly.');
-      }
-
-      _this._gl = _this._glContext.gl;
-      return _this;
-    }
-
-    babelHelpers.createClass(AbstractLight, [{
-      key: 'prepareToRender',
-      value: function prepareToRender() {
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      }
-    }]);
-    return AbstractLight;
-  }(Element);
-
-  var GLContextImpl = function () {
-    function GLContextImpl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextImpl);
-
-      //    if (new.target === GLContextImpl) {
-      if (this.constructor === GLContextImpl) {
-        throw new TypeError("Cannot construct GLContextImpl instances directly");
-      }
-
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
-
-      if (canvas === void 0) {
-        throw new Error("Failed to create WebGL Context due to no canvas object.");
-      }
-
-      this._canvas = canvas;
-    }
-
-    babelHelpers.createClass(GLContextImpl, [{
-      key: "init",
-      value: function init(glVersionString, ContextType) {
-
-        var gl = this._canvas.getContext(glVersionString);
-
-        if (!gl) {
-          gl = this._canvas.getContext('experimental-' + glVersionString);
-          if (!gl) {
-            throw new Error("This platform doesn't support WebGL.");
-          }
-        }
-
-        if (!gl instanceof ContextType) {
-          throw new Error("Unexpected rendering context.");
-        }
-
-        this._gl = gl;
-      }
-    }, {
-      key: "gl",
-      get: function get() {
-        return this._gl;
-      }
-    }, {
-      key: "canvas",
-      get: function get() {
-        return this._canvas;
-      }
-    }]);
-    return GLContextImpl;
-  }();
-
-  var GLContextWebGL2Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
-
-    function GLContextWebGL2Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
-
-      return _this;
-    }
-
-    return GLContextWebGL2Impl;
-  }(GLContextImpl);
-
-  var GLContextWebGL1Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
-
-    function GLContextWebGL1Impl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
-
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
-
-      return _this;
-    }
-
-    return GLContextWebGL1Impl;
-  }(GLContextImpl);
-
-  var GLContext = function () {
-    function GLContext(canvas) {
-      babelHelpers.classCallCheck(this, GLContext);
-
-      if (GLContext._instances[canvas.id] instanceof GLContext) {
-        return GLContext._instances[canvas.id];
-      }
-
-      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
-      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
-      }
-
-      GLContext._instances[canvas.id] = this;
-      this._monitor = GLBoostMonitor.getInstance();
-    }
-
-    babelHelpers.createClass(GLContext, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(glBoostObject) {
-        var gl = this.gl;
-        var glem = GLExtensionsManager.getInstance(this);
-        var glResource = glem.createVertexArray(gl);
-        if (glResource) {
-          this._monitor.registerWebGLResource(glBoostObject, glResource);
-        }
-
-        return glResource;
-      }
-    }, {
-      key: 'createBuffer',
-      value: function createBuffer(glBoostObject) {
-        var glResource = this.gl.createBuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createFramebuffer',
-      value: function createFramebuffer(glBoostObject) {
-        var glResource = this.gl.createFramebuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createRenderbuffer',
-      value: function createRenderbuffer(glBoostObject) {
-        var glResource = this.gl.createRenderbuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createShader',
-      value: function createShader(glBoostObject, shaderType) {
-        var glResource = this.gl.createShader(shaderType);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteShader',
-      value: function deleteShader(glBoostObject, shader) {
-        this._monitor.deregisterWebGLResource(glBoostObject, shader);
-        this.gl.deleteShader(shader);
-        shader = null;
-      }
-    }, {
-      key: 'createProgram',
-      value: function createProgram(glBoostObject) {
-        var glResource = this.gl.createProgram();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteProgram',
-      value: function deleteProgram(glBoostObject, program) {
-        this._monitor.deregisterWebGLResource(glBoostObject, program);
-        this.gl.deleteProgram(program);
-      }
-    }, {
-      key: 'createTexture',
-      value: function createTexture(glBoostObject) {
-        var glResource = this.gl.createTexture();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'gl',
-      get: function get() {
-        return this.impl.gl;
-      }
-    }, {
-      key: 'canvas',
-      get: function get() {
-        return this.impl.canvas;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(canvas) {
-        if (typeof canvas === 'string') {
-          canvas = window.document.querySelector(canvas);
-        }
-        return new GLContext(canvas);
-      }
-    }]);
-    return GLContext;
-  }();
-
-  GLContext._instances = new Object();
-
-  /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
-   */
-
-  var DirectionalLight = function (_AbstractLight) {
-    babelHelpers.inherits(DirectionalLight, _AbstractLight);
-
-
-    /**
-     * [en] The constructor of DirectionalLight class. <br>
-     * [ja] DirectionalLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
-     */
-
-    function DirectionalLight(glBoostContext, intensity, direction) {
-      babelHelpers.classCallCheck(this, DirectionalLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, glBoostContext));
-
-      _this._intensity = intensity;
-      _this._direction = direction;
-      return _this;
-    }
-
-    babelHelpers.createClass(DirectionalLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }, {
-      key: 'direction',
-      set: function set(vec) {
-        this._direction = vec;
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      },
-      get: function get() {
-        return this._direction;
-      }
-    }]);
-    return DirectionalLight;
-  }(AbstractLight);
-
-  /**
-   * [en] This is a Point Light class.<br>
-   * [ja] 点光源クラスです。
-   */
-
-  var PointLight = function (_AbstractLight) {
-    babelHelpers.inherits(PointLight, _AbstractLight);
-
-
-    /**
-     * [en] The constructor of PointLight class. <br>
-     * [ja] PointLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-
-    function PointLight(glBoostContext, intensity) {
-      babelHelpers.classCallCheck(this, PointLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PointLight).call(this, glBoostContext));
-
-      _this._name = "";
-      _this._intensity = intensity;
-
-      return _this;
-    }
-
-    babelHelpers.createClass(PointLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }]);
-    return PointLight;
-  }(AbstractLight);
-
   var singleton$2 = Symbol();
   var singletonEnforcer$2 = Symbol();
 
@@ -4335,11 +4857,11 @@
               if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
-                if (lights[j] instanceof PointLight) {
+                if (lights[j] instanceof M_PointLight) {
                   lightVec = new Vector4(0, 0, 0, 1);
                   lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   isPointLight = 1.0;
-                } else if (lights[j] instanceof DirectionalLight) {
+                } else if (lights[j] instanceof M_DirectionalLight) {
                   lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
                   lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   lightVec.w = 0.0;
@@ -4563,11 +5085,11 @@
               if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
-                if (lights[j] instanceof PointLight) {
+                if (lights[j] instanceof M_PointLight) {
                   lightVec = new Vector4(0, 0, 0, 1);
                   lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   isPointLight = 1.0;
-                } else if (lights[j] instanceof DirectionalLight) {
+                } else if (lights[j] instanceof M_DirectionalLight) {
                   lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
                   lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   lightVec.w = 0.0;
@@ -4680,6 +5202,200 @@
     }]);
     return ArrayUtil;
   }();
+
+  var GLContextImpl = function () {
+    function GLContextImpl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextImpl);
+
+      //    if (new.target === GLContextImpl) {
+      if (this.constructor === GLContextImpl) {
+        throw new TypeError("Cannot construct GLContextImpl instances directly");
+      }
+
+      if (!(parent instanceof GLContext)) {
+        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+      }
+
+      if (canvas === void 0) {
+        throw new Error("Failed to create WebGL Context due to no canvas object.");
+      }
+
+      this._canvas = canvas;
+    }
+
+    babelHelpers.createClass(GLContextImpl, [{
+      key: "init",
+      value: function init(glVersionString, ContextType) {
+
+        var gl = this._canvas.getContext(glVersionString);
+
+        if (!gl) {
+          gl = this._canvas.getContext('experimental-' + glVersionString);
+          if (!gl) {
+            throw new Error("This platform doesn't support WebGL.");
+          }
+        }
+
+        if (!gl instanceof ContextType) {
+          throw new Error("Unexpected rendering context.");
+        }
+
+        this._gl = gl;
+      }
+    }, {
+      key: "gl",
+      get: function get() {
+        return this._gl;
+      }
+    }, {
+      key: "canvas",
+      get: function get() {
+        return this._canvas;
+      }
+    }]);
+    return GLContextImpl;
+  }();
+
+  var GLContextWebGL2Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+    function GLContextWebGL2Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
+
+      return _this;
+    }
+
+    return GLContextWebGL2Impl;
+  }(GLContextImpl);
+
+  var GLContextWebGL1Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+
+    function GLContextWebGL1Impl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
+
+      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
+
+      return _this;
+    }
+
+    return GLContextWebGL1Impl;
+  }(GLContextImpl);
+
+  var GLContext = function () {
+    function GLContext(canvas) {
+      babelHelpers.classCallCheck(this, GLContext);
+
+      if (GLContext._instances[canvas.id] instanceof GLContext) {
+        return GLContext._instances[canvas.id];
+      }
+
+      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+        this.impl = new GLContextWebGL1Impl(canvas, this);
+      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+        this.impl = new GLContextWebGL2Impl(canvas, this);
+      }
+
+      GLContext._instances[canvas.id] = this;
+      this._monitor = GLBoostMonitor.getInstance();
+    }
+
+    babelHelpers.createClass(GLContext, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(glBoostObject) {
+        var gl = this.gl;
+        var glem = GLExtensionsManager.getInstance(this);
+        var glResource = glem.createVertexArray(gl);
+        if (glResource) {
+          this._monitor.registerWebGLResource(glBoostObject, glResource);
+        }
+
+        return glResource;
+      }
+    }, {
+      key: 'createBuffer',
+      value: function createBuffer(glBoostObject) {
+        var glResource = this.gl.createBuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createFramebuffer',
+      value: function createFramebuffer(glBoostObject) {
+        var glResource = this.gl.createFramebuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createRenderbuffer',
+      value: function createRenderbuffer(glBoostObject) {
+        var glResource = this.gl.createRenderbuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createShader',
+      value: function createShader(glBoostObject, shaderType) {
+        var glResource = this.gl.createShader(shaderType);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteShader',
+      value: function deleteShader(glBoostObject, shader) {
+        this._monitor.deregisterWebGLResource(glBoostObject, shader);
+        this.gl.deleteShader(shader);
+        shader = null;
+      }
+    }, {
+      key: 'createProgram',
+      value: function createProgram(glBoostObject) {
+        var glResource = this.gl.createProgram();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteProgram',
+      value: function deleteProgram(glBoostObject, program) {
+        this._monitor.deregisterWebGLResource(glBoostObject, program);
+        this.gl.deleteProgram(program);
+      }
+    }, {
+      key: 'createTexture',
+      value: function createTexture(glBoostObject) {
+        var glResource = this.gl.createTexture();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'gl',
+      get: function get() {
+        return this.impl.gl;
+      }
+    }, {
+      key: 'canvas',
+      get: function get() {
+        return this.impl.canvas;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(canvas) {
+        if (typeof canvas === 'string') {
+          canvas = window.document.querySelector(canvas);
+        }
+        return new GLContext(canvas);
+      }
+    }]);
+    return GLContext;
+  }();
+
+  GLContext._instances = new Object();
 
   var FragmentSimpleShaderSource = function () {
     function FragmentSimpleShaderSource() {
@@ -5726,6 +6442,343 @@
     return Renderer;
   }(GLBoostObject);
 
+  var SkeletalShaderSource = function () {
+    function SkeletalShaderSource() {
+      babelHelpers.classCallCheck(this, SkeletalShaderSource);
+    }
+
+    babelHelpers.createClass(SkeletalShaderSource, [{
+      key: 'VSDefine_SkeletalShaderSource',
+      value: function VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = '';
+        shaderText += in_ + ' vec4 aVertex_joint;\n';
+        shaderText += in_ + ' vec4 aVertex_weight;\n';
+        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN + '];\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_SkeletalShaderSource',
+      value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+        shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
+
+        shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+        shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+        shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+        shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+
+        if (existCamera_f) {
+          shaderText += '  gl_Position = pvwMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
+        } else {
+          shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_SkeletalShaderSource',
+      value: function prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.JOINT || attribName === GLBoost.WEIGHT) {
+            vertexAttribsAsResult.push(attribName);
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          }
+        });
+
+        shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+        // とりあえず単位行列で初期化
+        var identityMatrices = [];
+        for (var i = 0; i < extraData.jointN; i++) {
+          Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+        }
+        gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return SkeletalShaderSource;
+  }();
+
+  var M_SkeletalGeometry = function (_Geometry) {
+    babelHelpers.inherits(M_SkeletalGeometry, _Geometry);
+
+    function M_SkeletalGeometry(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_SkeletalGeometry);
+      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_SkeletalGeometry).call(this, glBoostContext));
+    }
+
+    babelHelpers.createClass(M_SkeletalGeometry, [{
+      key: 'draw',
+      value: function draw(lights, camera, skeletalMesh, scene, renderPass_index) {
+        var gl = this._glContext.gl;
+        if (this._materials.length > 0) {
+          var materials = this._materials;
+        } else if (skeletalMesh.material) {
+          var materials = [skeletalMesh.material];
+        } else {
+          var materials = [];
+        }
+
+        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
+          var children = joint.parent.parent.getChildren();
+          var parentJoint = null;
+          for (var i = 0; i < children.length; i++) {
+            if (children[i] instanceof M_Joint) {
+              parentJoint = children[i];
+            }
+          }
+
+          var results = [];
+          if (parentJoint) {
+            var result = calcParentJointsMatricesRecursively(parentJoint);
+            if (Array.isArray(result)) {
+              Array.prototype.push.apply(results, result);
+            }
+
+            results.push(parentJoint);
+
+            return results;
+          }
+
+          return null;
+        };
+
+        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
+        var matrices = [];
+
+        for (var i = 0; i < joints.length; i++) {
+
+          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+          if (jointsHierarchy == null) {
+            jointsHierarchy = [];
+          }
+          jointsHierarchy.push(joints[i]);
+          //console.log(jointsHierarchy);
+          var tempMatrices = [];
+
+          var mapTable = [];
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            for (var k = 0; k < joints.length; k++) {
+              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
+                mapTable[j] = k;
+              }
+            }
+          }
+
+          // skip if there are incomplete joint data
+          var doContinue = false;
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            if (typeof mapTable[j] === 'undefined') {
+              doContinue = true;
+              break;
+            }
+          }
+          if (doContinue) {
+            matrices[i] = Matrix44.identity();
+            continue;
+          }
+
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+
+            var pivotJoint = joints[mapTable[j]];
+
+            var inverseBindPoseMatrix = null;
+            if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
+              inverseBindPoseMatrix = joints[mapTable[Math.max(j - 1, 0)]].inverseBindPoseMatrix;
+              if (!inverseBindPoseMatrix) {
+                inverseBindPoseMatrix = Matrix44.identity();
+              }
+            } else {
+              inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
+            }
+
+            var rotateMatrix = Matrix44.multiply(Matrix44.invert(jointsHierarchy[j].parent.getTransformMatrixOnlyRotateNotAnimated()), jointsHierarchy[j].parent.transformMatrixOnlyRotate);
+            //let rotateMatrix = (jointsHierarchy[j].parent.transformMatrixOnlyRotate);
+
+            var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
+
+            if (j > 0) {
+              tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+            } else {
+              tempMatrices[j] = thisLoopMatrix;
+            }
+          }
+          matrices[i] = tempMatrices[jointsHierarchy.length - 1];
+        }
+        var flatMatrices = [];
+        for (var i = 0; i < matrices.length; i++) {
+          Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
+        }
+
+        if (matrices.length < 4) {
+          var identityMatrices = [];
+          for (var i = 0; i < 4 - matrices.length; i++) {
+            Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+          }
+          Array.prototype.push.apply(flatMatrices, identityMatrices);
+        }
+
+        for (var i = 0; i < materials.length; i++) {
+          var glslProgram = materials[i].shaderInstance.glslProgram;
+          gl.useProgram(glslProgram);
+          gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+        }
+
+        babelHelpers.get(Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
+      }
+    }, {
+      key: 'prepareToRender',
+      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
+        // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
+
+        if (this._materials.length > 0) {
+          this._materialForSkeletal = this._materials[0];
+        } else if (meshMaterial) {
+          this._materialForSkeletal = meshMaterial;
+        } else {
+          this._materialForSkeletal = this._defaultMaterial;
+        }
+
+        var SkeletalShader = function (_materialForSkeletal$) {
+          babelHelpers.inherits(SkeletalShader, _materialForSkeletal$);
+
+          function SkeletalShader(glBoostContext, basicShader) {
+            babelHelpers.classCallCheck(this, SkeletalShader);
+
+            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, glBoostContext, basicShader));
+
+            SkeletalShader.mixin(SkeletalShaderSource);
+            return _this2;
+          }
+
+          return SkeletalShader;
+        }(this._materialForSkeletal.shaderClass);
+
+        if (this._materials.length > 0) {
+          for (var i = 0; i < this._materials.length; i++) {
+            this._materials[i].shaderClass = SkeletalShader;
+          }
+        } else if (meshMaterial) {
+          meshMaterial.shaderClass = SkeletalShader;
+        } else {
+          this._defaultMaterial.shaderClass = SkeletalShader;
+        }
+
+        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
+        for (var i = 0; i < joints.length; i++) {
+          //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+          var matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
+          joints[i].inverseMatrix = Matrix44.invert(matrix);
+          //joints[i].inverseMatrix = Matrix44.identity();
+        }
+
+        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
+          var children = joint.parent.parent._elements;
+          var parentJoint = null;
+          for (var i = 0; i < children.length; i++) {
+            if (children[i] instanceof M_Joint) {
+              parentJoint = children[i];
+            }
+          }
+
+          var results = [];
+          if (parentJoint) {
+            var result = calcParentJointsMatricesRecursively(parentJoint);
+            if (Array.isArray(result)) {
+              Array.prototype.push.apply(results, result);
+            }
+
+            results.push(parentJoint);
+
+            return results;
+          }
+
+          return null;
+        };
+
+        for (var i = 0; i < joints.length; i++) {
+
+          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+          if (jointsHierarchy == null) {
+            jointsHierarchy = [];
+          }
+          jointsHierarchy.push(joints[i]);
+          //console.log(jointsHierarchy);
+          var tempMatrices = [];
+
+          var mapTable = [];
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            for (var k = 0; k < joints.length; k++) {
+              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
+                mapTable[j] = k;
+              }
+            }
+          }
+
+          // skip if there are incomplete joint data
+          var doContinue = false;
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+            if (typeof mapTable[j] === 'undefined') {
+              doContinue = true;
+              break;
+            } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
+              doContinue = true;
+              break;
+            }
+          }
+          if (doContinue) {
+            continue;
+          }
+
+          for (var j = 0; j < jointsHierarchy.length; j++) {
+
+            var thisLoopMatrix = null;
+
+            //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
+
+            //if (j==0) {
+            if (false) {} else if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
+              thisLoopMatrix = Matrix44.identity();
+            } else {
+              thisLoopMatrix = skeletalMesh.inverseBindMatrices[mapTable[j]].clone();
+            }
+
+            thisLoopMatrix.m03 = 0;
+            thisLoopMatrix.m13 = 0;
+            thisLoopMatrix.m23 = 0;
+            thisLoopMatrix.m30 = 0;
+            thisLoopMatrix.m31 = 0;
+            thisLoopMatrix.m32 = 0;
+
+            if (j > 0) {
+              //        if (false) {
+              //tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+            } else {
+                tempMatrices[j] = thisLoopMatrix;
+                //tempMatrices[j] = Matrix44.identity();
+              }
+          }
+          joints[i].inverseRotateMatrix = Matrix44.invert(tempMatrices[tempMatrices.length - 1]);
+
+          joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
+          /*
+          joints[i].inverseBindPoseMatrix.m03 = 10;
+          joints[i].inverseBindPoseMatrix.m13 = 10;
+          joints[i].inverseBindPoseMatrix.m23 = 10;
+          joints[i].inverseBindPoseMatrix.m30 *= 0.01;
+          joints[i].inverseBindPoseMatrix.m31 *= 0.01;
+          joints[i].inverseBindPoseMatrix.m32 *= 0.01;
+          */
+        }
+
+        babelHelpers.get(Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
+      }
+    }]);
+    return M_SkeletalGeometry;
+  }(Geometry);
+
   var SkeletalMesh = function (_Mesh) {
     babelHelpers.inherits(SkeletalMesh, _Mesh);
 
@@ -5774,134 +6827,6 @@
   }(Mesh);
 
   GLBoost$1['SkeletalMesh'] = SkeletalMesh;
-
-  var AbstractCamera = function (_Element) {
-    babelHelpers.inherits(AbstractCamera, _Element);
-
-    function AbstractCamera(glBoostContext, lookat) {
-      babelHelpers.classCallCheck(this, AbstractCamera);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext));
-
-      if (_this.constructor === AbstractCamera) {
-        throw new TypeError('Cannot construct AbstractCamera instances directly.');
-      }
-
-      _this._translate = lookat.eye;
-      _this._center = lookat.center;
-      _this._up = lookat.up;
-
-      _this._dirtyView = true;
-      _this._updateCountAsCameraView = 0;
-      _this._mainCamera = {};
-
-      _this._texture = null; // for example, depth texture
-      return _this;
-    }
-
-    babelHelpers.createClass(AbstractCamera, [{
-      key: '_needUpdateView',
-      value: function _needUpdateView() {
-        this._dirtyView = true;
-        this._updateCountAsCameraView++;
-      }
-    }, {
-      key: 'lookAtRHMatrix',
-      value: function lookAtRHMatrix() {
-        if (this._dirtyView) {
-          this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
-          this._dirtyView = false;
-          return this._viewMatrix.clone();
-        } else {
-          return this._viewMatrix.clone();
-        }
-      }
-    }, {
-      key: 'setAsMainCamera',
-      value: function setAsMainCamera(scene) {
-        this._mainCamera[scene.toString()] = this;
-      }
-    }, {
-      key: 'isMainCamera',
-      value: function isMainCamera(scene) {
-        return this._mainCamera[scene.toString()] === this;
-      }
-    }, {
-      key: 'updateCountAsCameraView',
-      get: function get() {
-        return this._updateCountAsCameraView;
-      }
-    }, {
-      key: 'latestViewStateInfoString',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
-
-        return tempString;
-      }
-    }, {
-      key: 'translate',
-      set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
-        this._needUpdateView();
-      },
-      get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', this);
-      }
-    }, {
-      key: 'eye',
-      set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
-        this._needUpdateView();
-      },
-      get: function get() {
-        return this._translate;
-      }
-    }, {
-      key: 'center',
-      set: function set(vec) {
-        if (this._center.isEqual(vec)) {
-          return;
-        }
-        this._center = vec;
-        this._needUpdateView();
-      },
-      get: function get() {
-        return this._center;
-      }
-    }, {
-      key: 'up',
-      set: function set(vec) {
-        if (this._up.isEqual(vec)) {
-          return;
-        }
-        this._up = vec;
-        this._needUpdateView();
-      },
-      get: function get() {
-        return this._up;
-      }
-    }, {
-      key: 'texture',
-      set: function set(texture) {
-        this._texture = texture;
-      },
-      get: function get() {
-        return this._texture;
-      }
-    }], [{
-      key: 'lookAtRHMatrix',
-      value: function lookAtRHMatrix(eye, center, up) {
-
-        var f = Vector3.normalize(Vector3.subtract(center, eye));
-        var s = Vector3.normalize(Vector3.cross(f, up));
-        var u = Vector3.cross(s, f);
-
-        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
-      }
-    }]);
-    return AbstractCamera;
-  }(Element);
 
   /**
    * [en] This Scene class is the top level element of scene graph hierarchy.
@@ -6017,7 +6942,7 @@
               lights = lights.concat(childLights);
             });
             return lights;
-          } else if (elem instanceof AbstractLight) {
+          } else if (elem instanceof M_AbstractLight) {
             return [elem];
           } else {
             return [];
@@ -6039,7 +6964,7 @@
               cameras = cameras.concat(childCameras);
             });
             return cameras;
-          } else if (elem instanceof AbstractCamera) {
+          } else if (elem instanceof M_AbstractCamera) {
             existCamera_f = true;
             return [elem];
           } else {
@@ -6084,7 +7009,7 @@
             });
           } else if (elem instanceof Mesh) {
             elem.prepareToRender(existCamera_f, _this2._lights);
-          } else if (elem instanceof Element) {
+          } else if (elem instanceof M_Element) {
             elem.prepareToRender();
           } else {
             return;
@@ -6132,7 +7057,7 @@
       /**
        * [en] Get child lights which belong to this scene.<br>
        * [ja] このシーンに属していた子供のLight要素の配列を返します。
-       * @return {Array<AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
+       * @return {Array<M_AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
        */
 
     }, {
@@ -6344,17 +7269,6 @@
     return MutableTexture;
   }(AbstractTexture);
 
-  var Joint = function (_Element) {
-    babelHelpers.inherits(Joint, _Element);
-
-    function Joint(glBoostContext) {
-      babelHelpers.classCallCheck(this, Joint);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this, glBoostContext));
-    }
-
-    return Joint;
-  }(Element);
-
   var Texture = function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
@@ -6496,231 +7410,6 @@
     }]);
     return Texture;
   }(AbstractTexture);
-
-  var OrthoCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
-
-    function OrthoCamera(glBoostContext, lookat, ortho) {
-      babelHelpers.classCallCheck(this, OrthoCamera);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, lookat));
-
-      _this._left = ortho.left;
-      _this._right = ortho.right;
-      _this._bottom = ortho.bottom;
-      _this._top = ortho.top;
-      _this._zNear = ortho.zNear;
-      _this._zFar = ortho.zFar;
-
-      _this._dirtyProjection = true;
-      _this._updateCountAsCameraProjection = 0;
-      return _this;
-    }
-
-    babelHelpers.createClass(OrthoCamera, [{
-      key: '_needUpdateProjection',
-      value: function _needUpdateProjection() {
-        this._dirtyProjection = true;
-        this._updateCountAsCameraProjection++;
-      }
-    }, {
-      key: 'projectionRHMatrix',
-      value: function projectionRHMatrix() {
-        if (this._dirtyProjection) {
-          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
-          this._dirtyProjection = false;
-          return this._projectionMatrix.clone();
-        } else {
-          return this._projectionMatrix.clone();
-        }
-      }
-    }, {
-      key: 'updateCountAsCameraProjection',
-      get: function get() {
-        return this._updateCountAsCameraProjection;
-      }
-    }, {
-      key: 'left',
-      set: function set(value) {
-        if (this._left === value) {
-          return;
-        }
-        this._left = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._left;
-      }
-    }, {
-      key: 'right',
-      set: function set(value) {
-        if (this._right === value) {
-          return;
-        }
-        this._right = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._right;
-      }
-    }, {
-      key: 'bottom',
-      set: function set(value) {
-        if (this._bottom === value) {
-          return;
-        }
-        this._bottom = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._bottom;
-      }
-    }, {
-      key: 'top',
-      set: function set(value) {
-        if (this._top === value) {
-          return;
-        }
-        this._top = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._top;
-      }
-    }, {
-      key: 'zNear',
-      set: function set(value) {
-        if (this._zNear === value) {
-          return;
-        }
-        this._zNear = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zNear;
-      }
-    }, {
-      key: 'zFar',
-      set: function set(value) {
-        if (this._zFar === value) {
-          return;
-        }
-        this._zFar = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zFar;
-      }
-    }], [{
-      key: 'orthoRHMatrix',
-      value: function orthoRHMatrix(left, right, bottom, top, near, far) {
-
-        return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
-      }
-    }]);
-    return OrthoCamera;
-  }(AbstractCamera);
-
-  var PerspectiveCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
-
-    function PerspectiveCamera(glBoostContext, lookat, perspective) {
-      babelHelpers.classCallCheck(this, PerspectiveCamera);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, lookat));
-
-      _this._fovy = perspective.fovy;
-      _this._aspect = perspective.aspect;
-      _this._zNear = perspective.zNear;
-      _this._zFar = perspective.zFar;
-
-      _this._dirtyProjection = true;
-      _this._updateCountAsCameraProjection = 0;
-      return _this;
-    }
-
-    babelHelpers.createClass(PerspectiveCamera, [{
-      key: '_needUpdateProjection',
-      value: function _needUpdateProjection() {
-        this._dirtyProjection = true;
-        this._updateCountAsCameraProjection++;
-      }
-    }, {
-      key: 'projectionRHMatrix',
-      value: function projectionRHMatrix() {
-        if (this._dirtyProjection) {
-          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
-          this._dirtyProjection = false;
-          return this._projectionMatrix.clone();
-        } else {
-          return this._projectionMatrix.clone();
-        }
-      }
-    }, {
-      key: 'updateCountAsCameraProjection',
-      get: function get() {
-        return this._updateCountAsCameraProjection;
-      }
-    }, {
-      key: 'fovy',
-      set: function set(value) {
-        if (this._fovy === value) {
-          return;
-        }
-        this._fovy = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._fovy;
-      }
-    }, {
-      key: 'aspect',
-      set: function set(value) {
-        if (this._aspect === value) {
-          return;
-        }
-        this._aspect = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._aspect;
-      }
-    }, {
-      key: 'zNear',
-      set: function set(value) {
-        if (this._zNear === value) {
-          return;
-        }
-        this._zNear = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zNear;
-      }
-    }, {
-      key: 'zFar',
-      set: function set(value) {
-        if (this._zFar === value) {
-          return;
-        }
-        this._zFar = value;
-        this._needUpdateProjection();
-      },
-      get: function get() {
-        return this._zFar;
-      }
-    }], [{
-      key: 'perspectiveRHMatrix',
-      value: function perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
-
-        var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
-        var xscale = yscale / aspect;
-
-        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
-      }
-    }]);
-    return PerspectiveCamera;
-  }(AbstractCamera);
 
   var ParticleShaderSource = function () {
     function ParticleShaderSource() {
@@ -7295,349 +7984,6 @@
 
   GLBoost$1["Cube"] = Cube;
 
-  var SkeletalShaderSource = function () {
-    function SkeletalShaderSource() {
-      babelHelpers.classCallCheck(this, SkeletalShaderSource);
-    }
-
-    babelHelpers.createClass(SkeletalShaderSource, [{
-      key: 'VSDefine_SkeletalShaderSource',
-      value: function VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = '';
-        shaderText += in_ + ' vec4 aVertex_joint;\n';
-        shaderText += in_ + ' vec4 aVertex_weight;\n';
-        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN + '];\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_SkeletalShaderSource',
-      value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-        shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
-
-        shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-        shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-        shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-        shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-
-        if (existCamera_f) {
-          shaderText += '  gl_Position = pvwMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-        } else {
-          shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_SkeletalShaderSource',
-      value: function prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.JOINT || attribName === GLBoost.WEIGHT) {
-            vertexAttribsAsResult.push(attribName);
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-          }
-        });
-
-        shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-        // とりあえず単位行列で初期化
-        var identityMatrices = [];
-        for (var i = 0; i < extraData.jointN; i++) {
-          Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-        }
-        gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return SkeletalShaderSource;
-  }();
-
-  var SkeletalGeometry = function (_Geometry) {
-    babelHelpers.inherits(SkeletalGeometry, _Geometry);
-
-    function SkeletalGeometry(glBoostContext) {
-      babelHelpers.classCallCheck(this, SkeletalGeometry);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalGeometry).call(this, glBoostContext));
-    }
-
-    babelHelpers.createClass(SkeletalGeometry, [{
-      key: 'draw',
-      value: function draw(lights, camera, skeletalMesh, scene, renderPass_index) {
-        var gl = this._glContext.gl;
-        if (this._materials.length > 0) {
-          var materials = this._materials;
-        } else if (skeletalMesh.material) {
-          var materials = [skeletalMesh.material];
-        } else {
-          var materials = [];
-        }
-
-        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
-          var children = joint.parent.parent.getChildren();
-          var parentJoint = null;
-          for (var i = 0; i < children.length; i++) {
-            if (children[i] instanceof Joint) {
-              parentJoint = children[i];
-            }
-          }
-
-          var results = [];
-          if (parentJoint) {
-            var result = calcParentJointsMatricesRecursively(parentJoint);
-            if (Array.isArray(result)) {
-              Array.prototype.push.apply(results, result);
-            }
-
-            results.push(parentJoint);
-
-            return results;
-          }
-
-          return null;
-        };
-
-        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        var matrices = [];
-
-        for (var i = 0; i < joints.length; i++) {
-
-          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          if (jointsHierarchy == null) {
-            jointsHierarchy = [];
-          }
-          jointsHierarchy.push(joints[i]);
-          //console.log(jointsHierarchy);
-          var tempMatrices = [];
-
-          var mapTable = [];
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            for (var k = 0; k < joints.length; k++) {
-              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
-                mapTable[j] = k;
-              }
-            }
-          }
-
-          // skip if there are incomplete joint data
-          var doContinue = false;
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            if (typeof mapTable[j] === 'undefined') {
-              doContinue = true;
-              break;
-            }
-          }
-          if (doContinue) {
-            matrices[i] = Matrix44.identity();
-            continue;
-          }
-
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-
-            var pivotJoint = joints[mapTable[j]];
-
-            var inverseBindPoseMatrix = null;
-            if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
-              inverseBindPoseMatrix = joints[mapTable[Math.max(j - 1, 0)]].inverseBindPoseMatrix;
-              if (!inverseBindPoseMatrix) {
-                inverseBindPoseMatrix = Matrix44.identity();
-              }
-            } else {
-              inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
-            }
-
-            var rotateMatrix = Matrix44.multiply(Matrix44.invert(jointsHierarchy[j].parent.getTransformMatrixOnlyRotateNotAnimated()), jointsHierarchy[j].parent.transformMatrixOnlyRotate);
-            //let rotateMatrix = (jointsHierarchy[j].parent.transformMatrixOnlyRotate);
-
-            var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
-
-            if (j > 0) {
-              tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            } else {
-              tempMatrices[j] = thisLoopMatrix;
-            }
-          }
-          matrices[i] = tempMatrices[jointsHierarchy.length - 1];
-        }
-        var flatMatrices = [];
-        for (var i = 0; i < matrices.length; i++) {
-          Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
-        }
-
-        if (matrices.length < 4) {
-          var identityMatrices = [];
-          for (var i = 0; i < 4 - matrices.length; i++) {
-            Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-          }
-          Array.prototype.push.apply(flatMatrices, identityMatrices);
-        }
-
-        for (var i = 0; i < materials.length; i++) {
-          var glslProgram = materials[i].shaderInstance.glslProgram;
-          gl.useProgram(glslProgram);
-          gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
-        }
-
-        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
-      }
-    }, {
-      key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
-        // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
-
-        if (this._materials.length > 0) {
-          this._materialForSkeletal = this._materials[0];
-        } else if (meshMaterial) {
-          this._materialForSkeletal = meshMaterial;
-        } else {
-          this._materialForSkeletal = this._defaultMaterial;
-        }
-
-        var SkeletalShader = function (_materialForSkeletal$) {
-          babelHelpers.inherits(SkeletalShader, _materialForSkeletal$);
-
-          function SkeletalShader(glBoostContext, basicShader) {
-            babelHelpers.classCallCheck(this, SkeletalShader);
-
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, glBoostContext, basicShader));
-
-            SkeletalShader.mixin(SkeletalShaderSource);
-            return _this2;
-          }
-
-          return SkeletalShader;
-        }(this._materialForSkeletal.shaderClass);
-
-        if (this._materials.length > 0) {
-          for (var i = 0; i < this._materials.length; i++) {
-            this._materials[i].shaderClass = SkeletalShader;
-          }
-        } else if (meshMaterial) {
-          meshMaterial.shaderClass = SkeletalShader;
-        } else {
-          this._defaultMaterial.shaderClass = SkeletalShader;
-        }
-
-        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        for (var i = 0; i < joints.length; i++) {
-          //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
-          var matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
-          joints[i].inverseMatrix = Matrix44.invert(matrix);
-          //joints[i].inverseMatrix = Matrix44.identity();
-        }
-
-        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
-          var children = joint.parent.parent._elements;
-          var parentJoint = null;
-          for (var i = 0; i < children.length; i++) {
-            if (children[i] instanceof Joint) {
-              parentJoint = children[i];
-            }
-          }
-
-          var results = [];
-          if (parentJoint) {
-            var result = calcParentJointsMatricesRecursively(parentJoint);
-            if (Array.isArray(result)) {
-              Array.prototype.push.apply(results, result);
-            }
-
-            results.push(parentJoint);
-
-            return results;
-          }
-
-          return null;
-        };
-
-        //var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        var matrices = [];
-
-        for (var i = 0; i < joints.length; i++) {
-
-          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          if (jointsHierarchy == null) {
-            jointsHierarchy = [];
-          }
-          jointsHierarchy.push(joints[i]);
-          //console.log(jointsHierarchy);
-          var tempMatrices = [];
-
-          var mapTable = [];
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            for (var k = 0; k < joints.length; k++) {
-              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
-                mapTable[j] = k;
-              }
-            }
-          }
-
-          // skip if there are incomplete joint data
-          var doContinue = false;
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            if (typeof mapTable[j] === 'undefined') {
-              doContinue = true;
-              break;
-            } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
-              doContinue = true;
-              break;
-            }
-          }
-          if (doContinue) {
-            continue;
-          }
-
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-
-            var thisLoopMatrix = null;
-
-            //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
-
-            //if (j==0) {
-            if (false) {} else if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
-              thisLoopMatrix = Matrix44.identity();
-            } else {
-              thisLoopMatrix = skeletalMesh.inverseBindMatrices[mapTable[j]].clone();
-            }
-
-            thisLoopMatrix.m03 = 0;
-            thisLoopMatrix.m13 = 0;
-            thisLoopMatrix.m23 = 0;
-            thisLoopMatrix.m30 = 0;
-            thisLoopMatrix.m31 = 0;
-            thisLoopMatrix.m32 = 0;
-
-            if (j > 0) {
-              //        if (false) {
-              //tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            } else {
-                tempMatrices[j] = thisLoopMatrix;
-                //tempMatrices[j] = Matrix44.identity();
-              }
-          }
-          joints[i].inverseRotateMatrix = Matrix44.invert(tempMatrices[tempMatrices.length - 1]);
-
-          joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
-          /*
-          joints[i].inverseBindPoseMatrix.m03 = 10;
-          joints[i].inverseBindPoseMatrix.m13 = 10;
-          joints[i].inverseBindPoseMatrix.m23 = 10;
-          joints[i].inverseBindPoseMatrix.m30 *= 0.01;
-          joints[i].inverseBindPoseMatrix.m31 *= 0.01;
-          joints[i].inverseBindPoseMatrix.m32 *= 0.01;
-          */
-        }
-
-        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
-      }
-    }]);
-    return SkeletalGeometry;
-  }(Geometry);
-
-  GLBoost$1['SkeletalGeometry'] = SkeletalGeometry;
-
   var BlendShapeShaderSource = function () {
     function BlendShapeShaderSource() {
       babelHelpers.classCallCheck(this, BlendShapeShaderSource);
@@ -7967,11 +8313,6 @@
         return new BlendShapeGeometry(this);
       }
     }, {
-      key: 'createSkeletalGeometry',
-      value: function createSkeletalGeometry() {
-        return new SkeletalGeometry(this);
-      }
-    }, {
       key: 'createCube',
       value: function createCube(widthVector, vertexColor) {
         return new Cube(this, widthVector, vertexColor);
@@ -7999,12 +8340,12 @@
     }, {
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
-        return new PerspectiveCamera(this, lookat, perspective);
+        return new PerspectiveCamera(this, true, lookat, perspective);
       }
     }, {
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
-        return new OrthoCamera(this, lookat, ortho);
+        return new OrthoCamera(this, true, lookat, ortho);
       }
     }, {
       key: 'createTexture',
@@ -8012,21 +8353,6 @@
         var parameters = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
         return new Texture(this, src, parameters);
-      }
-    }, {
-      key: 'createDirectionalLight',
-      value: function createDirectionalLight(intensity, direction) {
-        return new DirectionalLight(this, intensity, direction);
-      }
-    }, {
-      key: 'createPointLight',
-      value: function createPointLight(intensity) {
-        return new PointLight(this, intensity);
-      }
-    }, {
-      key: 'createJoint',
-      value: function createJoint() {
-        return new Joint(this);
       }
 
       /**
@@ -8134,8 +8460,8 @@
 
   GLBoost['GLBoostLowContext'] = GLBoostLowContext;
 
-  var GLBoostMiddleContext = function (_GLBoostContext) {
-    babelHelpers.inherits(GLBoostMiddleContext, _GLBoostContext);
+  var GLBoostMiddleContext = function (_GLBoostLowContext) {
+    babelHelpers.inherits(GLBoostMiddleContext, _GLBoostLowContext);
 
     function GLBoostMiddleContext(canvas) {
       babelHelpers.classCallCheck(this, GLBoostMiddleContext);
@@ -8161,6 +8487,11 @@
       key: 'createSkeletalMesh',
       value: function createSkeletalMesh(geometry, material, rootJointName) {
         return new SkeletalMesh(this, geometry, material, rootJointName);
+      }
+    }, {
+      key: 'createSkeletalGeometry',
+      value: function createSkeletalGeometry() {
+        return new M_SkeletalGeometry(this);
       }
     }, {
       key: 'createRenderer',
@@ -8190,6 +8521,31 @@
         }
 
         return renderPasses;
+      }
+    }, {
+      key: 'createPerspectiveCamera',
+      value: function createPerspectiveCamera(lookat, perspective) {
+        return new M_PerspectiveCamera(this, true, lookat, perspective);
+      }
+    }, {
+      key: 'createOrthoCamera',
+      value: function createOrthoCamera(lookat, ortho) {
+        return new M_OrthoCamera(this, true, lookat, ortho);
+      }
+    }, {
+      key: 'createDirectionalLight',
+      value: function createDirectionalLight(intensity, direction) {
+        return new M_DirectionalLight(this, intensity, direction);
+      }
+    }, {
+      key: 'createPointLight',
+      value: function createPointLight(intensity) {
+        return new M_PointLight(this, intensity);
+      }
+    }, {
+      key: 'createJoint',
+      value: function createJoint() {
+        return new M_Joint(this);
       }
     }]);
     return GLBoostMiddleContext;

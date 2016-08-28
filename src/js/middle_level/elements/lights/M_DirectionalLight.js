@@ -1,12 +1,10 @@
-import GLBoost from '../../globals';
-import GLContext from '../core/GLContext';
-import AbstractLight from './AbstractLight';
+import M_AbstractLight from './M_AbstractLight';
 
 /**
  * [en] This is a Directional Light class.<br>
  * [ja] 平行光源クラスです。
  */
-export default class DirectionalLight extends AbstractLight {
+export default class M_DirectionalLight extends M_AbstractLight {
 
   /**
    * [en] The constructor of DirectionalLight class. <br>
