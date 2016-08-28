@@ -8,7 +8,7 @@ import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
-
+import DataUtil from '../../low_level/misc/DataUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -86,16 +86,9 @@ export default class GLTFLoader {
     }
   }
 
-  _loadBinaryFile(glBoostContext, dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
-    dataUrI = dataUrI.split(',');
-    var type = dataUrI[0].split(':')[1].split(';')[0];
-    var byteString = atob(dataUrI[1]);
-    var byteStringLength = byteString.length;
-    var arrayBuffer = new ArrayBuffer(byteStringLength);
-    var intArray = new Uint8Array(arrayBuffer);
-    for (var i = 0; i < byteStringLength; i++) {
-      intArray[i] = byteString.charCodeAt(i);
-    }
+  _loadBinaryFile(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
+    dataUri = dataUri.split(',');
+    var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
     if (arrayBuffer) {
       this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
