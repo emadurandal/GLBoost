@@ -8,8 +8,8 @@ import AnimationUtil from '../misc/AnimationUtil';
 import GLBoostObject from '../core/GLBoostObject';
 
 export default class Element extends GLBoostObject {
-  constructor(glBoostContext) {
-    super(glBoostContext);
+  constructor(glBoostContext, toRegister = true) {
+    super(glBoostContext, toRegister);
 
     this._translate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);

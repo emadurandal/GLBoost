@@ -646,6 +646,7 @@
 
   var GLBoostObject = function () {
     function GLBoostObject(glBoostContext) {
+      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
       babelHelpers.classCallCheck(this, GLBoostObject);
 
       if (this.constructor === GLBoostObject) {
@@ -655,7 +656,10 @@
       this._glBoostContext = glBoostContext;
       this._glContext = glBoostContext.glContext;
       this._glBoostMonitor = GLBoostMonitor.getInstance();
-      this._glBoostMonitor.registerGLBoostObject(this);
+      this._toRegister = toRegister;
+      if (this._toRegister) {
+        this._glBoostMonitor.registerGLBoostObject(this);
+      }
       this._userFlavorName = '';
       this._readyForDiscard = false;
     }
@@ -682,7 +686,9 @@
       key: 'readyForDiscard',
       value: function readyForDiscard() {
         this._readyForDiscard = true;
-        this._glBoostMonitor.deregisterGLBoostObject(this);
+        if (this._toRegister) {
+          this._glBoostMonitor.deregisterGLBoostObject(this);
+        }
       }
     }, {
       key: 'belongingCanvasId',
@@ -1208,6 +1214,148 @@
       }
     }]);
     return MutableTexture;
+  }(AbstractTexture);
+
+  var Texture = function (_AbstractTexture) {
+    babelHelpers.inherits(Texture, _AbstractTexture);
+
+    function Texture(glBoostContext, src) {
+      var parameters = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+      babelHelpers.classCallCheck(this, Texture);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, glBoostContext));
+
+      _this._isTextureReady = false;
+      _this._texture = null;
+
+      _this._parameters = parameters;
+
+      if (typeof src === 'string') {
+        _this.generateTextureFromUri(src);
+      } else {
+        _this.generateTextureFromImageData(src);
+      }
+      return _this;
+    }
+
+    babelHelpers.createClass(Texture, [{
+      key: '_getParameter',
+      value: function _getParameter(paramName) {
+        var isParametersExist = false;
+        if (this._parameters != null) {
+          isParametersExist = true;
+        }
+        var params = this._parameters;
+
+        switch (paramName) {
+          case 'flipY':
+            if (isParametersExist && params[paramName]) {
+              return params[paramName];
+            } else {
+              return false;
+            }
+        }
+      }
+    }, {
+      key: 'generateTextureFromUri',
+      value: function generateTextureFromUri(imageUri) {
+        var _this2 = this;
+
+        this._img = new Image();
+        if (!imageUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
+        }
+        this._img.onload = function () {
+          var gl = _this2._glContext.gl;
+          var glem = GLExtensionsManager.getInstance(_this2._glContext);
+
+          _this2._width = _this2._img.width;
+          _this2._height = _this2._img.height;
+
+          var texture = _this2._glContext.createTexture(_this2);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParameter('flipY'));
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
+
+          if (_this2._isPowerOfTwo(_this2._width) && _this2._isPowerOfTwo(_this2._height)) {
+            if (glem.extTFA) {
+              gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+            }
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+            gl.generateMipmap(gl.TEXTURE_2D);
+          } else {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          }
+          gl.bindTexture(gl.TEXTURE_2D, null);
+
+          _this2._texture = texture;
+          _this2._isTextureReady = true;
+        };
+
+        this._img.src = imageUri;
+      }
+    }, {
+      key: 'generateTextureFromImageData',
+      value: function generateTextureFromImageData(imageData) {
+        var gl = this.this._glContext.gl;
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+
+        this._width = imageData.width;
+        this._height = imageData.height;
+        var texture = this._glContext.createTexture(this);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+        if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {
+          if (glem.extTFA) {
+            gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+          }
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+          gl.generateMipmap(gl.TEXTURE_2D);
+        } else {
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        }
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        this._texture = texture;
+        this._isTextureReady = true;
+
+        this._img = imageData;
+      }
+    }, {
+      key: 'isTextureReady',
+      get: function get() {
+        return this._isTextureReady;
+      }
+    }, {
+      key: 'isImageAssignedForTexture',
+      get: function get() {
+        return typeof this._img == 'undefined';
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      }
+    }]);
+    return Texture;
   }(AbstractTexture);
 
   var MathUtil = function () {
@@ -2394,34 +2542,23 @@
     babelHelpers.inherits(Element, _GLBoostObject);
 
     function Element(glBoostContext) {
+      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
       babelHelpers.classCallCheck(this, Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext, toRegister));
 
-      _this._parent = null;
       _this._translate = Vector3.zero();
+      _this._scale = new Vector3(1, 1, 1);
+
       _this._rotate = Vector3.zero();
       _this._quaternion = new Quaternion(0, 0, 0, 1);
-      _this._scale = new Vector3(1, 1, 1);
       _this._matrix = Matrix44.identity();
+
       _this._finalMatrix = Matrix44.identity();
-      _this._invMatrix = Matrix44.identity();
+
       _this._dirtyAsElement = true;
-      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
       _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
-      _this._calculatedInverseMatrix = false;
-      _this._updateCountAsElement = 0;
-      _this._accumulatedAncestryNameWithUpdateInfoString = '';
-      _this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
-      _this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
-      _this._animationLine = {};
-      _this._transparentByUser = false;
-      _this.opacity = 1.0;
 
-      _this._activeAnimationLineName = null;
-
-      _this._camera = null;
-      _this._customFunction = null;
       return _this;
     }
 
@@ -2429,66 +2566,6 @@
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
-        this._calculatedInverseMatrix = false;
-        this._updateCountAsElement++;
-      }
-    }, {
-      key: '_getAnimatedTransformValue',
-      value: function _getAnimatedTransformValue(value, animation, type) {
-        if (typeof animation !== 'undefined' && animation[type]) {
-          return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
-        } else {
-          //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
-          if (type == 'quaternion') {
-            //        return new Quaternion(0, 0, 0, 1);
-          }
-          return this['_' + type];
-        }
-      }
-    }, {
-      key: '_getCurrentAnimationInputValue',
-      value: function _getCurrentAnimationInputValue(inputName) {
-        return this._parent._getCurrentAnimationInputValue(inputName);
-      }
-    }, {
-      key: 'getTranslateAt',
-      value: function getTranslateAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
-      }
-    }, {
-      key: 'getTranslateNotAnimated',
-      value: function getTranslateNotAnimated() {
-        return this._translate;
-      }
-    }, {
-      key: 'getRotateAt',
-      value: function getRotateAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
-      }
-    }, {
-      key: 'getRotateNotAnimated',
-      value: function getRotateNotAnimated() {
-        return this._rotate;
-      }
-    }, {
-      key: 'getQuaternionNotAnimated',
-      value: function getQuaternionNotAnimated() {
-        return this._quaternion;
-      }
-    }, {
-      key: 'getQuaternionAt',
-      value: function getQuaternionAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
-      }
-    }, {
-      key: 'getScaleAt',
-      value: function getScaleAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
-      }
-    }, {
-      key: 'getScaleNotAnimated',
-      value: function getScaleNotAnimated() {
-        return this._scale;
       }
     }, {
       key: 'multiplyMatrix',
@@ -2496,217 +2573,6 @@
         this._matrix = mat;
         this._currentCalcMode = 'matrix';
         this._needUpdate();
-      }
-    }, {
-      key: 'getMatrixAt',
-      value: function getMatrixAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
-      }
-    }, {
-      key: 'getMatrixNotAnimated',
-      value: function getMatrixNotAnimated() {
-        return this._matrix;
-      }
-    }, {
-      key: 'getTransformMatrixNotAnimated',
-      value: function getTransformMatrixNotAnimated() {
-        if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
-          var matrix = Matrix44.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
-          this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
-          this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'notanimated';
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'getTransformMatrixOnlyRotateOn',
-      value: function getTransformMatrixOnlyRotateOn(value) {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.getMatrixAt('time', value);
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
-        }
-
-        return rotationMatrix;
-      }
-    }, {
-      key: 'getTransformMatrixOnlyRotateNotAnimated',
-      value: function getTransformMatrixOnlyRotateNotAnimated() {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.getMatrixNotAnimated();
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
-        }
-
-        return rotationMatrix;
-      }
-    }, {
-      key: '_accumulateMyAndParentNameWithUpdateInfo',
-      value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
-        if (currentElem._parent === null) {
-          return currentElem.toStringWithUpdateInfo();
-        } else {
-          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentTransformMatrices',
-      value: function _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrix;
-          } else {
-            return Matrix44.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrix;
-          }
-          return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentTransformMatricesInInverseOrder',
-      value: function _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrix;
-          } else {
-            return Matrix44.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrix;
-          }
-          return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentRotateMatrices',
-      value: function _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrixOnlyRotate;
-          } else {
-            return Matrix44.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrixOnlyRotate;
-          }
-          return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
-        }
-      }
-    }, {
-      key: '_accumulateMyAndParentOpacity',
-      value: function _accumulateMyAndParentOpacity(currentElem) {
-        if (currentElem._parent === null) {
-          return currentElem.opacity;
-        } else {
-          return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
-        }
-      }
-    }, {
-      key: 'isTransparent',
-      value: function isTransparent() {
-        return this._opacity < 1.0 || this._transparentByUser ? true : false;
-      }
-    }, {
-      key: 'toStringWithUpdateInfo',
-
-
-      // used by library (not Application)
-      value: function toStringWithUpdateInfo() {
-        //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
-        return this._instanceName + this._updateCountAsElement; // faster
-      }
-    }, {
-      key: 'setAnimationAtLine',
-      value: function setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
-        var outputComponentN = 0;
-        if (outputArray[0] instanceof Vector2) {
-          outputComponentN = 2;
-        } else if (outputArray[0] instanceof Vector3) {
-          outputComponentN = 3;
-        } else if (outputArray[0] instanceof Vector4) {
-          outputComponentN = 4;
-        } else if (outputArray[0] instanceof Quaternion) {
-          outputComponentN = 4;
-        } else {
-          outputComponentN = 1;
-        }
-        if (!this._animationLine[lineName]) {
-          this._animationLine[lineName] = {};
-        }
-        this._animationLine[lineName][attributeName] = {
-          input: inputArray,
-          output: outputArray,
-          outputAttribute: attributeName,
-          outputComponentN: outputComponentN
-        };
-      }
-    }, {
-      key: 'setActiveAnimationLine',
-      value: function setActiveAnimationLine(lineName) {
-        this._activeAnimationLineName = lineName;
-      }
-    }, {
-      key: 'hasAnimation',
-      value: function hasAnimation(lineName) {
-        if (this._animationLine[lineName]) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'prepareToRender',
-      value: function prepareToRender() {}
-    }, {
-      key: 'updateCountAsElement',
-      get: function get() {
-        return this._updateCountAsElement;
       }
     }, {
       key: 'translate',
@@ -2718,11 +2584,7 @@
         this._needUpdate();
       },
       get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._translate;
-        }
+        return this._translate;
       }
     }, {
       key: 'rotate',
@@ -2738,11 +2600,19 @@
         this._needUpdate();
       },
       get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._rotate;
+        return this._rotate;
+      }
+    }, {
+      key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
         }
+        this._scale = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._scale;
       }
     }, {
       key: 'quaternion',
@@ -2758,45 +2628,12 @@
         this._needUpdate();
       },
       get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._quaternion;
-        }
-      }
-    }, {
-      key: 'scale',
-      set: function set(vec) {
-        if (this._scale.isEqual(vec)) {
-          return;
-        }
-        this._scale = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._scale;
-        }
-      }
-    }, {
-      key: 'matrix',
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._matrix;
-        }
+        return this._quaternion;
       }
     }, {
       key: 'transformMatrix',
       get: function get() {
-        var input = null;
-        if (this._activeAnimationLineName !== null) {
-          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-        }
-        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+        if (this._dirtyAsElement) {
           var matrix = Matrix44.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
@@ -2817,167 +2654,9 @@
           this._finalMatrix.m23 = this.translate.z;
 
           this._dirtyAsElement = false;
-          this._matrixGetMode = 'animated_' + input;
         }
 
         return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixOnInit',
-      get: function get() {
-        if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
-          var matrix = Matrix44.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
-          this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
-          this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'animated_0';
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixOnlyRotate',
-      get: function get() {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.quaternion.rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.matrix;
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
-        }
-
-        return rotationMatrix;
-      }
-    }, {
-      key: 'transformMatrixOnlyRotateOnInit',
-      get: function get() {
-        return this.getTransformMatrixOnlyRotateOn(0);
-      }
-    }, {
-      key: 'inverseTransformMatrix',
-      get: function get() {
-        if (!this._calculatedInverseMatrix) {
-          this._invMatrix = this.transformMatrix.invert();
-          this._calculatedInverseMatrix = true;
-        }
-        return this._invMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixAccumulatedAncestry',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
-          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
-        }
-
-        return this._matrixAccumulatedAncestry;
-      }
-    }, {
-      key: 'normalMatrixAccumulatedAncestry',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
-          var world_m = this._multiplyMyAndParentTransformMatrices(this, true);
-          this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
-          this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
-        }
-
-        return this._normalMatrixAccumulatedAncestry;
-      }
-    }, {
-      key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
-      get: function get() {
-        if (this._parent === null) {
-          return Matrix44.identity();
-        }
-
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
-          this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-          this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
-        }
-
-        return this._invMatrixAccumulatedAncestry;
-      }
-    }, {
-      key: 'rotateMatrixAccumulatedAncestry',
-      get: function get() {
-        /*
-        var mat = this._multiplyMyAndParentTransformMatrices(this);
-        var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
-        var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
-        var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
-         return new Matrix44(
-          mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
-          mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
-          mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
-          0, 0, 0, 1
-        );*/
-        return this._multiplyMyAndParentRotateMatrices(this, true);
-      }
-    }, {
-      key: 'inverseTransformMatrixAccumulatedAncestry',
-      get: function get() {
-        return this._multiplyMyAndParentTransformMatrices(this, true).invert();
-      }
-    }, {
-      key: 'opacityAccumulatedAncestry',
-      get: function get() {
-        return this._accumulateMyAndParentOpacity(this);
-      }
-    }, {
-      key: 'opacity',
-      set: function set(opacity) {
-        this._opacity = opacity;
-      },
-      get: function get() {
-        return this._opacity;
-      }
-    }, {
-      key: 'transparent',
-      set: function set(flg) {
-        this._transparentByUser = flg;
-      }
-    }, {
-      key: 'dirty',
-      set: function set(flg) {
-        this._dirtyAsElement = flg;
-        if (flg) {
-          this._needUpdate();
-        }
-      }
-    }, {
-      key: 'parent',
-      get: function get() {
-        return this._parent;
       }
     }, {
       key: 'currentCalcMode',
@@ -2987,310 +2666,17 @@
       get: function get() {
         return this._currentCalcMode;
       }
-    }, {
-      key: 'camera',
-      set: function set(camera) {
-        this._camera = camera;
-      },
-      get: function get() {
-        return this._camera;
-      }
-    }, {
-      key: 'customFunction',
-      set: function set(func) {
-        this._customFunction = func;
-      },
-      get: function get() {
-        return this._customFunction;
-      }
     }]);
     return Element;
   }(GLBoostObject);
 
-  var Joint = function (_Element) {
-    babelHelpers.inherits(Joint, _Element);
-
-    function Joint(glBoostContext) {
-      babelHelpers.classCallCheck(this, Joint);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Joint).call(this, glBoostContext));
-    }
-
-    return Joint;
-  }(Element);
-
-  /**
-   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
-   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var AbstractLight = function (_Element) {
-    babelHelpers.inherits(AbstractLight, _Element);
-
-    function AbstractLight(glBoostContext) {
-      babelHelpers.classCallCheck(this, AbstractLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractLight).call(this, glBoostContext));
-
-      if (_this.constructor === AbstractLight) {
-        throw new TypeError('Cannot construct AbstractLight instances directly.');
-      }
-
-      _this._gl = _this._glContext.gl;
-      return _this;
-    }
-
-    babelHelpers.createClass(AbstractLight, [{
-      key: 'prepareToRender',
-      value: function prepareToRender() {
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      }
-    }]);
-    return AbstractLight;
-  }(Element);
-
-  /**
-   * [en] This is a Point Light class.<br>
-   * [ja] 点光源クラスです。
-   */
-
-  var PointLight = function (_AbstractLight) {
-    babelHelpers.inherits(PointLight, _AbstractLight);
-
-
-    /**
-     * [en] The constructor of PointLight class. <br>
-     * [ja] PointLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-
-    function PointLight(glBoostContext, intensity) {
-      babelHelpers.classCallCheck(this, PointLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PointLight).call(this, glBoostContext));
-
-      _this._name = "";
-      _this._intensity = intensity;
-
-      return _this;
-    }
-
-    babelHelpers.createClass(PointLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }]);
-    return PointLight;
-  }(AbstractLight);
-
-  /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
-   */
-
-  var DirectionalLight = function (_AbstractLight) {
-    babelHelpers.inherits(DirectionalLight, _AbstractLight);
-
-
-    /**
-     * [en] The constructor of DirectionalLight class. <br>
-     * [ja] DirectionalLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
-     */
-
-    function DirectionalLight(glBoostContext, intensity, direction) {
-      babelHelpers.classCallCheck(this, DirectionalLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DirectionalLight).call(this, glBoostContext));
-
-      _this._intensity = intensity;
-      _this._direction = direction;
-      return _this;
-    }
-
-    babelHelpers.createClass(DirectionalLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }, {
-      key: 'direction',
-      set: function set(vec) {
-        this._direction = vec;
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      },
-      get: function get() {
-        return this._direction;
-      }
-    }]);
-    return DirectionalLight;
-  }(AbstractLight);
-
-  var Texture = function (_AbstractTexture) {
-    babelHelpers.inherits(Texture, _AbstractTexture);
-
-    function Texture(glBoostContext, src) {
-      var parameters = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-      babelHelpers.classCallCheck(this, Texture);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, glBoostContext));
-
-      _this._isTextureReady = false;
-      _this._texture = null;
-
-      _this._parameters = parameters;
-
-      if (typeof src === 'string') {
-        _this.generateTextureFromUri(src);
-      } else {
-        _this.generateTextureFromImageData(src);
-      }
-      return _this;
-    }
-
-    babelHelpers.createClass(Texture, [{
-      key: '_getParameter',
-      value: function _getParameter(paramName) {
-        var isParametersExist = false;
-        if (this._parameters != null) {
-          isParametersExist = true;
-        }
-        var params = this._parameters;
-
-        switch (paramName) {
-          case 'flipY':
-            if (isParametersExist && params[paramName]) {
-              return params[paramName];
-            } else {
-              return false;
-            }
-        }
-      }
-    }, {
-      key: 'generateTextureFromUri',
-      value: function generateTextureFromUri(imageUri) {
-        var _this2 = this;
-
-        this._img = new Image();
-        if (!imageUri.match(/^data:/)) {
-          this._img.crossOrigin = 'Anonymous';
-        }
-        this._img.onload = function () {
-          var gl = _this2._glContext.gl;
-          var glem = GLExtensionsManager.getInstance(_this2._glContext);
-
-          _this2._width = _this2._img.width;
-          _this2._height = _this2._img.height;
-
-          var texture = _this2._glContext.createTexture(_this2);
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-
-          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParameter('flipY'));
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
-
-          if (_this2._isPowerOfTwo(_this2._width) && _this2._isPowerOfTwo(_this2._height)) {
-            if (glem.extTFA) {
-              gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
-            }
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-            gl.generateMipmap(gl.TEXTURE_2D);
-          } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-          }
-          gl.bindTexture(gl.TEXTURE_2D, null);
-
-          _this2._texture = texture;
-          _this2._isTextureReady = true;
-        };
-
-        this._img.src = imageUri;
-      }
-    }, {
-      key: 'generateTextureFromImageData',
-      value: function generateTextureFromImageData(imageData) {
-        var gl = this.this._glContext.gl;
-        var glem = GLExtensionsManager.getInstance(this._glContext);
-
-        this._width = imageData.width;
-        this._height = imageData.height;
-        var texture = this._glContext.createTexture(this);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-        if (this._isPowerOfTwo(this._width) && this._isPowerOfTwo(this._height)) {
-          if (glem.extTFA) {
-            gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
-          }
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-          gl.generateMipmap(gl.TEXTURE_2D);
-        } else {
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        }
-        gl.bindTexture(gl.TEXTURE_2D, null);
-
-        this._texture = texture;
-        this._isTextureReady = true;
-
-        this._img = imageData;
-      }
-    }, {
-      key: 'isTextureReady',
-      get: function get() {
-        return this._isTextureReady;
-      }
-    }, {
-      key: 'isImageAssignedForTexture',
-      get: function get() {
-        return typeof this._img == 'undefined';
-      }
-    }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      }
-    }]);
-    return Texture;
-  }(AbstractTexture);
-
   var AbstractCamera = function (_Element) {
     babelHelpers.inherits(AbstractCamera, _Element);
 
-    function AbstractCamera(glBoostContext, lookat) {
+    function AbstractCamera(glBoostContext, toRegister, lookat) {
       babelHelpers.classCallCheck(this, AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext, toRegister));
 
       if (_this.constructor === AbstractCamera) {
         throw new TypeError('Cannot construct AbstractCamera instances directly.');
@@ -3301,10 +2687,6 @@
       _this._up = lookat.up;
 
       _this._dirtyView = true;
-      _this._updateCountAsCameraView = 0;
-      _this._mainCamera = {};
-
-      _this._texture = null; // for example, depth texture
       return _this;
     }
 
@@ -3312,7 +2694,6 @@
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
-        this._updateCountAsCameraView++;
       }
     }, {
       key: 'lookAtRHMatrix',
@@ -3334,19 +2715,6 @@
       key: 'isMainCamera',
       value: function isMainCamera(scene) {
         return this._mainCamera[scene.toString()] === this;
-      }
-    }, {
-      key: 'updateCountAsCameraView',
-      get: function get() {
-        return this._updateCountAsCameraView;
-      }
-    }, {
-      key: 'latestViewStateInfoString',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
-
-        return tempString;
       }
     }, {
       key: 'translate',
@@ -3415,10 +2783,10 @@
   var OrthoCamera = function (_AbstractCamera) {
     babelHelpers.inherits(OrthoCamera, _AbstractCamera);
 
-    function OrthoCamera(glBoostContext, lookat, ortho) {
+    function OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
       babelHelpers.classCallCheck(this, OrthoCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._left = ortho.left;
       _this._right = ortho.right;
@@ -3539,10 +2907,10 @@
   var PerspectiveCamera = function (_AbstractCamera) {
     babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
 
-    function PerspectiveCamera(glBoostContext, lookat, perspective) {
+    function PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
       babelHelpers.classCallCheck(this, PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._fovy = perspective.fovy;
       _this._aspect = perspective.aspect;
@@ -4864,6 +4232,730 @@
 
   GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
+  var M_Element = function (_Element) {
+    babelHelpers.inherits(M_Element, _Element);
+
+    function M_Element(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Element);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Element).call(this, glBoostContext));
+
+      _this._parent = null;
+      _this._invMatrix = Matrix44.identity();
+      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
+      _this._calculatedInverseMatrix = false;
+      _this._updateCountAsElement = 0;
+      _this._accumulatedAncestryNameWithUpdateInfoString = '';
+      _this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
+      _this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+      _this._animationLine = {};
+      _this._transparentByUser = false;
+      _this.opacity = 1.0;
+
+      _this._activeAnimationLineName = null;
+
+      _this._camera = null;
+      _this._customFunction = null;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_Element, [{
+      key: '_needUpdate',
+      value: function _needUpdate() {
+        this._dirtyAsElement = true;
+        this._calculatedInverseMatrix = false;
+        this._updateCountAsElement++;
+      }
+    }, {
+      key: '_getAnimatedTransformValue',
+      value: function _getAnimatedTransformValue(value, animation, type) {
+        if (typeof animation !== 'undefined' && animation[type]) {
+          return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+        } else {
+          //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
+          if (type == 'quaternion') {
+            //        return new Quaternion(0, 0, 0, 1);
+          }
+          return this['_' + type];
+        }
+      }
+    }, {
+      key: '_getCurrentAnimationInputValue',
+      value: function _getCurrentAnimationInputValue(inputName) {
+        return this._parent._getCurrentAnimationInputValue(inputName);
+      }
+    }, {
+      key: 'getTranslateAt',
+      value: function getTranslateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
+      }
+    }, {
+      key: 'getTranslateNotAnimated',
+      value: function getTranslateNotAnimated() {
+        return this._translate;
+      }
+    }, {
+      key: 'getRotateAt',
+      value: function getRotateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
+      }
+    }, {
+      key: 'getRotateNotAnimated',
+      value: function getRotateNotAnimated() {
+        return this._rotate;
+      }
+    }, {
+      key: 'getQuaternionNotAnimated',
+      value: function getQuaternionNotAnimated() {
+        return this._quaternion;
+      }
+    }, {
+      key: 'getQuaternionAt',
+      value: function getQuaternionAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
+      }
+    }, {
+      key: 'getScaleAt',
+      value: function getScaleAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
+      }
+    }, {
+      key: 'getScaleNotAnimated',
+      value: function getScaleNotAnimated() {
+        return this._scale;
+      }
+    }, {
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(mat) {
+        this._matrix = mat;
+        this._currentCalcMode = 'matrix';
+        this._needUpdate();
+      }
+    }, {
+      key: 'getMatrixAt',
+      value: function getMatrixAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
+      }
+    }, {
+      key: 'getMatrixNotAnimated',
+      value: function getMatrixNotAnimated() {
+        return this._matrix;
+      }
+    }, {
+      key: 'getTransformMatrixNotAnimated',
+      value: function getTransformMatrixNotAnimated() {
+        if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
+          this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
+          this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'notanimated';
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'getTransformMatrixOnlyRotateOn',
+      value: function getTransformMatrixOnlyRotateOn(value) {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.getMatrixAt('time', value);
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
+      key: 'getTransformMatrixOnlyRotateNotAnimated',
+      value: function getTransformMatrixOnlyRotateNotAnimated() {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.getMatrixNotAnimated();
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
+      key: '_accumulateMyAndParentNameWithUpdateInfo',
+      value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.toStringWithUpdateInfo();
+        } else {
+          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentTransformMatrices',
+      value: function _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentTransformMatricesInInverseOrder',
+      value: function _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentRotateMatrices',
+      value: function _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrixOnlyRotate;
+          } else {
+            return Matrix44.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrixOnlyRotate;
+          }
+          return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
+      key: '_accumulateMyAndParentOpacity',
+      value: function _accumulateMyAndParentOpacity(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.opacity;
+        } else {
+          return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
+        }
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent() {
+        return this._opacity < 1.0 || this._transparentByUser ? true : false;
+      }
+    }, {
+      key: 'toStringWithUpdateInfo',
+
+
+      // used by library (not Application)
+      value: function toStringWithUpdateInfo() {
+        //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
+        return this._instanceName + this._updateCountAsElement; // faster
+      }
+    }, {
+      key: 'setAnimationAtLine',
+      value: function setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+        var outputComponentN = 0;
+        if (outputArray[0] instanceof Vector2) {
+          outputComponentN = 2;
+        } else if (outputArray[0] instanceof Vector3) {
+          outputComponentN = 3;
+        } else if (outputArray[0] instanceof Vector4) {
+          outputComponentN = 4;
+        } else if (outputArray[0] instanceof Quaternion) {
+          outputComponentN = 4;
+        } else {
+          outputComponentN = 1;
+        }
+        if (!this._animationLine[lineName]) {
+          this._animationLine[lineName] = {};
+        }
+        this._animationLine[lineName][attributeName] = {
+          input: inputArray,
+          output: outputArray,
+          outputAttribute: attributeName,
+          outputComponentN: outputComponentN
+        };
+      }
+    }, {
+      key: 'setActiveAnimationLine',
+      value: function setActiveAnimationLine(lineName) {
+        this._activeAnimationLineName = lineName;
+      }
+    }, {
+      key: 'hasAnimation',
+      value: function hasAnimation(lineName) {
+        if (this._animationLine[lineName]) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'prepareToRender',
+      value: function prepareToRender() {}
+    }, {
+      key: 'updateCountAsElement',
+      get: function get() {
+        return this._updateCountAsElement;
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        this._translate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._translate;
+        }
+      }
+    }, {
+      key: 'rotate',
+      set: function set(vec) {
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
+          this._needUpdate();
+        }
+        if (this._rotate.isEqual(vec)) {
+          return;
+        }
+        this._rotate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._rotate;
+        }
+      }
+    }, {
+      key: 'quaternion',
+      set: function set(quat) {
+        if (this._currentCalcMode !== 'quaternion') {
+          this._currentCalcMode = 'quaternion';
+          this._needUpdate();
+        }
+        if (this._quaternion.isEqual(quat)) {
+          return;
+        }
+        this._quaternion = quat;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._quaternion;
+        }
+      }
+    }, {
+      key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
+        }
+        this._scale = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._scale;
+        }
+      }
+    }, {
+      key: 'matrix',
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._matrix;
+        }
+      }
+    }, {
+      key: 'transformMatrix',
+      get: function get() {
+        var input = null;
+        if (this._activeAnimationLineName !== null) {
+          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+        }
+        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'animated_' + input;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixOnInit',
+      get: function get() {
+        if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
+          this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
+          this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'animated_0';
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixOnlyRotate',
+      get: function get() {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.quaternion.rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.matrix;
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+        }
+
+        return rotationMatrix;
+      }
+    }, {
+      key: 'transformMatrixOnlyRotateOnInit',
+      get: function get() {
+        return this.getTransformMatrixOnlyRotateOn(0);
+      }
+    }, {
+      key: 'inverseTransformMatrix',
+      get: function get() {
+        if (!this._calculatedInverseMatrix) {
+          this._invMatrix = this.transformMatrix.invert();
+          this._calculatedInverseMatrix = true;
+        }
+        return this._invMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixAccumulatedAncestry',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._matrixAccumulatedAncestry;
+      }
+    }, {
+      key: 'normalMatrixAccumulatedAncestry',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+          var world_m = this._multiplyMyAndParentTransformMatrices(this, true);
+          this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
+          this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
+        }
+
+        return this._normalMatrixAccumulatedAncestry;
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
+      get: function get() {
+        if (this._parent === null) {
+          return Matrix44.identity();
+        }
+
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
+          this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
+          this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
+        }
+
+        return this._invMatrixAccumulatedAncestry;
+      }
+    }, {
+      key: 'rotateMatrixAccumulatedAncestry',
+      get: function get() {
+        /*
+         var mat = this._multiplyMyAndParentTransformMatrices(this);
+         var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
+         var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
+         var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
+          return new Matrix44(
+         mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
+         mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
+         mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
+         0, 0, 0, 1
+         );*/
+        return this._multiplyMyAndParentRotateMatrices(this, true);
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestry',
+      get: function get() {
+        return this._multiplyMyAndParentTransformMatrices(this, true).invert();
+      }
+    }, {
+      key: 'opacityAccumulatedAncestry',
+      get: function get() {
+        return this._accumulateMyAndParentOpacity(this);
+      }
+    }, {
+      key: 'opacity',
+      set: function set(opacity) {
+        this._opacity = opacity;
+      },
+      get: function get() {
+        return this._opacity;
+      }
+    }, {
+      key: 'transparent',
+      set: function set(flg) {
+        this._transparentByUser = flg;
+      }
+    }, {
+      key: 'dirty',
+      set: function set(flg) {
+        this._dirtyAsElement = flg;
+        if (flg) {
+          this._needUpdate();
+        }
+      }
+    }, {
+      key: 'parent',
+      get: function get() {
+        return this._parent;
+      }
+    }, {
+      key: 'camera',
+      set: function set(camera) {
+        this._camera = camera;
+      },
+      get: function get() {
+        return this._camera;
+      }
+    }, {
+      key: 'customFunction',
+      set: function set(func) {
+        this._customFunction = func;
+      },
+      get: function get() {
+        return this._customFunction;
+      }
+    }]);
+    return M_Element;
+  }(Element);
+
+  /**
+   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
+   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
+  var M_AbstractLight = function (_M_Element) {
+    babelHelpers.inherits(M_AbstractLight, _M_Element);
+
+    function M_AbstractLight(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_AbstractLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_AbstractLight).call(this, glBoostContext));
+
+      if (_this.constructor === M_AbstractLight) {
+        throw new TypeError('Cannot construct AbstractLight instances directly.');
+      }
+
+      _this._gl = _this._glContext.gl;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_AbstractLight, [{
+      key: 'prepareToRender',
+      value: function prepareToRender() {
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      }
+    }]);
+    return M_AbstractLight;
+  }(M_Element);
+
+  /**
+   * [en] This is a Directional Light class.<br>
+   * [ja] 平行光源クラスです。
+   */
+
+  var M_DirectionalLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_DirectionalLight, _M_AbstractLight);
+
+
+    /**
+     * [en] The constructor of DirectionalLight class. <br>
+     * [ja] DirectionalLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+     */
+
+    function M_DirectionalLight(glBoostContext, intensity, direction) {
+      babelHelpers.classCallCheck(this, M_DirectionalLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_DirectionalLight).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+      _this._direction = direction;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_DirectionalLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }, {
+      key: 'direction',
+      set: function set(vec) {
+        this._direction = vec;
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      },
+      get: function get() {
+        return this._direction;
+      }
+    }]);
+    return M_DirectionalLight;
+  }(M_AbstractLight);
+
+  /**
+   * [en] This is a Point Light class.<br>
+   * [ja] 点光源クラスです。
+   */
+
+  var M_PointLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_PointLight, _M_AbstractLight);
+
+
+    /**
+     * [en] The constructor of PointLight class. <br>
+     * [ja] PointLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+
+    function M_PointLight(glBoostContext, intensity) {
+      babelHelpers.classCallCheck(this, M_PointLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PointLight).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(M_PointLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }]);
+    return M_PointLight;
+  }(M_AbstractLight);
+
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();
 
@@ -4929,11 +5021,11 @@
               if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
-                if (lights[j] instanceof PointLight) {
+                if (lights[j] instanceof M_PointLight) {
                   lightVec = new Vector4(0, 0, 0, 1);
                   lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   isPointLight = 1.0;
-                } else if (lights[j] instanceof DirectionalLight) {
+                } else if (lights[j] instanceof M_DirectionalLight) {
                   lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
                   lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   lightVec.w = 0.0;
@@ -5061,11 +5153,11 @@
               if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
-                if (lights[j] instanceof PointLight) {
+                if (lights[j] instanceof M_PointLight) {
                   lightVec = new Vector4(0, 0, 0, 1);
                   lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   isPointLight = 1.0;
-                } else if (lights[j] instanceof DirectionalLight) {
+                } else if (lights[j] instanceof M_DirectionalLight) {
                   lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
                   lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
                   lightVec.w = 0.0;
@@ -6211,349 +6303,6 @@
 
   GLBoost$1["Cube"] = Cube;
 
-  var SkeletalShaderSource = function () {
-    function SkeletalShaderSource() {
-      babelHelpers.classCallCheck(this, SkeletalShaderSource);
-    }
-
-    babelHelpers.createClass(SkeletalShaderSource, [{
-      key: 'VSDefine_SkeletalShaderSource',
-      value: function VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = '';
-        shaderText += in_ + ' vec4 aVertex_joint;\n';
-        shaderText += in_ + ' vec4 aVertex_weight;\n';
-        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN + '];\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_SkeletalShaderSource',
-      value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-        shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
-
-        shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-        shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-        shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-        shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-
-        if (existCamera_f) {
-          shaderText += '  gl_Position = pvwMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-        } else {
-          shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_SkeletalShaderSource',
-      value: function prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.JOINT || attribName === GLBoost.WEIGHT) {
-            vertexAttribsAsResult.push(attribName);
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-          }
-        });
-
-        shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-        // とりあえず単位行列で初期化
-        var identityMatrices = [];
-        for (var i = 0; i < extraData.jointN; i++) {
-          Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-        }
-        gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return SkeletalShaderSource;
-  }();
-
-  var SkeletalGeometry = function (_Geometry) {
-    babelHelpers.inherits(SkeletalGeometry, _Geometry);
-
-    function SkeletalGeometry(glBoostContext) {
-      babelHelpers.classCallCheck(this, SkeletalGeometry);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalGeometry).call(this, glBoostContext));
-    }
-
-    babelHelpers.createClass(SkeletalGeometry, [{
-      key: 'draw',
-      value: function draw(lights, camera, skeletalMesh, scene, renderPass_index) {
-        var gl = this._glContext.gl;
-        if (this._materials.length > 0) {
-          var materials = this._materials;
-        } else if (skeletalMesh.material) {
-          var materials = [skeletalMesh.material];
-        } else {
-          var materials = [];
-        }
-
-        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
-          var children = joint.parent.parent.getChildren();
-          var parentJoint = null;
-          for (var i = 0; i < children.length; i++) {
-            if (children[i] instanceof Joint) {
-              parentJoint = children[i];
-            }
-          }
-
-          var results = [];
-          if (parentJoint) {
-            var result = calcParentJointsMatricesRecursively(parentJoint);
-            if (Array.isArray(result)) {
-              Array.prototype.push.apply(results, result);
-            }
-
-            results.push(parentJoint);
-
-            return results;
-          }
-
-          return null;
-        };
-
-        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        var matrices = [];
-
-        for (var i = 0; i < joints.length; i++) {
-
-          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          if (jointsHierarchy == null) {
-            jointsHierarchy = [];
-          }
-          jointsHierarchy.push(joints[i]);
-          //console.log(jointsHierarchy);
-          var tempMatrices = [];
-
-          var mapTable = [];
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            for (var k = 0; k < joints.length; k++) {
-              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
-                mapTable[j] = k;
-              }
-            }
-          }
-
-          // skip if there are incomplete joint data
-          var doContinue = false;
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            if (typeof mapTable[j] === 'undefined') {
-              doContinue = true;
-              break;
-            }
-          }
-          if (doContinue) {
-            matrices[i] = Matrix44.identity();
-            continue;
-          }
-
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-
-            var pivotJoint = joints[mapTable[j]];
-
-            var inverseBindPoseMatrix = null;
-            if (typeof pivotJoint.inverseBindPoseMatrix === 'undefined') {
-              inverseBindPoseMatrix = joints[mapTable[Math.max(j - 1, 0)]].inverseBindPoseMatrix;
-              if (!inverseBindPoseMatrix) {
-                inverseBindPoseMatrix = Matrix44.identity();
-              }
-            } else {
-              inverseBindPoseMatrix = pivotJoint.inverseBindPoseMatrix;
-            }
-
-            var rotateMatrix = Matrix44.multiply(Matrix44.invert(jointsHierarchy[j].parent.getTransformMatrixOnlyRotateNotAnimated()), jointsHierarchy[j].parent.transformMatrixOnlyRotate);
-            //let rotateMatrix = (jointsHierarchy[j].parent.transformMatrixOnlyRotate);
-
-            var thisLoopMatrix = Matrix44.multiply(Matrix44.invert(inverseBindPoseMatrix), Matrix44.multiply(rotateMatrix, inverseBindPoseMatrix));
-
-            if (j > 0) {
-              tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            } else {
-              tempMatrices[j] = thisLoopMatrix;
-            }
-          }
-          matrices[i] = tempMatrices[jointsHierarchy.length - 1];
-        }
-        var flatMatrices = [];
-        for (var i = 0; i < matrices.length; i++) {
-          Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
-        }
-
-        if (matrices.length < 4) {
-          var identityMatrices = [];
-          for (var i = 0; i < 4 - matrices.length; i++) {
-            Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-          }
-          Array.prototype.push.apply(flatMatrices, identityMatrices);
-        }
-
-        for (var i = 0; i < materials.length; i++) {
-          var glslProgram = materials[i].shaderInstance.glslProgram;
-          gl.useProgram(glslProgram);
-          gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
-        }
-
-        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
-      }
-    }, {
-      key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
-        // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
-
-        if (this._materials.length > 0) {
-          this._materialForSkeletal = this._materials[0];
-        } else if (meshMaterial) {
-          this._materialForSkeletal = meshMaterial;
-        } else {
-          this._materialForSkeletal = this._defaultMaterial;
-        }
-
-        var SkeletalShader = function (_materialForSkeletal$) {
-          babelHelpers.inherits(SkeletalShader, _materialForSkeletal$);
-
-          function SkeletalShader(glBoostContext, basicShader) {
-            babelHelpers.classCallCheck(this, SkeletalShader);
-
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, glBoostContext, basicShader));
-
-            SkeletalShader.mixin(SkeletalShaderSource);
-            return _this2;
-          }
-
-          return SkeletalShader;
-        }(this._materialForSkeletal.shaderClass);
-
-        if (this._materials.length > 0) {
-          for (var i = 0; i < this._materials.length; i++) {
-            this._materials[i].shaderClass = SkeletalShader;
-          }
-        } else if (meshMaterial) {
-          meshMaterial.shaderClass = SkeletalShader;
-        } else {
-          this._defaultMaterial.shaderClass = SkeletalShader;
-        }
-
-        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        for (var i = 0; i < joints.length; i++) {
-          //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
-          var matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
-          joints[i].inverseMatrix = Matrix44.invert(matrix);
-          //joints[i].inverseMatrix = Matrix44.identity();
-        }
-
-        var calcParentJointsMatricesRecursively = function calcParentJointsMatricesRecursively(joint) {
-          var children = joint.parent.parent._elements;
-          var parentJoint = null;
-          for (var i = 0; i < children.length; i++) {
-            if (children[i] instanceof Joint) {
-              parentJoint = children[i];
-            }
-          }
-
-          var results = [];
-          if (parentJoint) {
-            var result = calcParentJointsMatricesRecursively(parentJoint);
-            if (Array.isArray(result)) {
-              Array.prototype.push.apply(results, result);
-            }
-
-            results.push(parentJoint);
-
-            return results;
-          }
-
-          return null;
-        };
-
-        //var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-        var matrices = [];
-
-        for (var i = 0; i < joints.length; i++) {
-
-          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          if (jointsHierarchy == null) {
-            jointsHierarchy = [];
-          }
-          jointsHierarchy.push(joints[i]);
-          //console.log(jointsHierarchy);
-          var tempMatrices = [];
-
-          var mapTable = [];
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            for (var k = 0; k < joints.length; k++) {
-              if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
-                mapTable[j] = k;
-              }
-            }
-          }
-
-          // skip if there are incomplete joint data
-          var doContinue = false;
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            if (typeof mapTable[j] === 'undefined') {
-              doContinue = true;
-              break;
-            } else if (mapTable[j] >= skeletalMesh.inverseBindMatrices.length) {
-              doContinue = true;
-              break;
-            }
-          }
-          if (doContinue) {
-            continue;
-          }
-
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-
-            var thisLoopMatrix = null;
-
-            //thisLoopMatrix = Matrix44.invert(joints[mapTable[j]].parent.transformMatrixOnlyRotateOnInit);
-
-            //if (j==0) {
-            if (false) {} else if (typeof skeletalMesh.inverseBindMatrices[mapTable[j]] === 'undefined') {
-              thisLoopMatrix = Matrix44.identity();
-            } else {
-              thisLoopMatrix = skeletalMesh.inverseBindMatrices[mapTable[j]].clone();
-            }
-
-            thisLoopMatrix.m03 = 0;
-            thisLoopMatrix.m13 = 0;
-            thisLoopMatrix.m23 = 0;
-            thisLoopMatrix.m30 = 0;
-            thisLoopMatrix.m31 = 0;
-            thisLoopMatrix.m32 = 0;
-
-            if (j > 0) {
-              //        if (false) {
-              //tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            } else {
-                tempMatrices[j] = thisLoopMatrix;
-                //tempMatrices[j] = Matrix44.identity();
-              }
-          }
-          joints[i].inverseRotateMatrix = Matrix44.invert(tempMatrices[tempMatrices.length - 1]);
-
-          joints[i].inverseBindPoseMatrix = skeletalMesh.inverseBindMatrices[mapTable[jointsHierarchy.length - 1]];
-          /*
-          joints[i].inverseBindPoseMatrix.m03 = 10;
-          joints[i].inverseBindPoseMatrix.m13 = 10;
-          joints[i].inverseBindPoseMatrix.m23 = 10;
-          joints[i].inverseBindPoseMatrix.m30 *= 0.01;
-          joints[i].inverseBindPoseMatrix.m31 *= 0.01;
-          joints[i].inverseBindPoseMatrix.m32 *= 0.01;
-          */
-        }
-
-        babelHelpers.get(Object.getPrototypeOf(SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
-      }
-    }]);
-    return SkeletalGeometry;
-  }(Geometry);
-
-  GLBoost$1['SkeletalGeometry'] = SkeletalGeometry;
-
   var BlendShapeShaderSource = function () {
     function BlendShapeShaderSource() {
       babelHelpers.classCallCheck(this, BlendShapeShaderSource);
@@ -6883,11 +6632,6 @@
         return new BlendShapeGeometry(this);
       }
     }, {
-      key: 'createSkeletalGeometry',
-      value: function createSkeletalGeometry() {
-        return new SkeletalGeometry(this);
-      }
-    }, {
       key: 'createCube',
       value: function createCube(widthVector, vertexColor) {
         return new Cube(this, widthVector, vertexColor);
@@ -6915,12 +6659,12 @@
     }, {
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
-        return new PerspectiveCamera(this, lookat, perspective);
+        return new PerspectiveCamera(this, true, lookat, perspective);
       }
     }, {
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
-        return new OrthoCamera(this, lookat, ortho);
+        return new OrthoCamera(this, true, lookat, ortho);
       }
     }, {
       key: 'createTexture',
@@ -6928,21 +6672,6 @@
         var parameters = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
 
         return new Texture(this, src, parameters);
-      }
-    }, {
-      key: 'createDirectionalLight',
-      value: function createDirectionalLight(intensity, direction) {
-        return new DirectionalLight(this, intensity, direction);
-      }
-    }, {
-      key: 'createPointLight',
-      value: function createPointLight(intensity) {
-        return new PointLight(this, intensity);
-      }
-    }, {
-      key: 'createJoint',
-      value: function createJoint() {
-        return new Joint(this);
       }
 
       /**

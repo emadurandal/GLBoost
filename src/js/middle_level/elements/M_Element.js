@@ -1,9 +1,9 @@
-import Vector2 from '../math/Vector2';
-import Vector3 from '../math/Vector3';
-import Vector4 from '../math/Vector4';
-import Quaternion from '../math/Quaternion';
-import Matrix44 from '../math/Matrix44';
-import AnimationUtil from '../misc/AnimationUtil';
+import Vector2 from '../../low_level/math/Vector2';
+import Vector3 from '../../low_level/math/Vector3';
+import Vector4 from '../../low_level/math/Vector4';
+import Quaternion from '../../low_level/math/Quaternion';
+import Matrix44 from '../../low_level/math/Matrix44';
+import AnimationUtil from '../../low_level/misc/AnimationUtil';
 import Element from '../../low_level/elements/Element';
 
 export default class M_Element extends Element {

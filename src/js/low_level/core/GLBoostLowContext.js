@@ -2,7 +2,6 @@ import GLContext from './GLContext';
 import GLExtensionsManager from './GLExtensionsManager';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
-import SkeletalGeometry from '../geometries/SkeletalGeometry';
 import ClassicMaterial from '../ClassicMaterial';
 import PerspectiveCamera from '../elements/cameras/PerspectiveCamera';
 import OrthoCamera from '../elements/cameras/OrthoCamera';
@@ -12,9 +11,6 @@ import Cube from '../primitives/Cube';
 import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
 import Particle from '../primitives/Particle';
-import DirectionalLight from '../lights/DirectionalLight';
-import PointLight from '../lights/PointLight';
-import Joint from '../skeletons/Joint';
 
 export default class GLBoostLowContext {
   constructor(canvas) {
@@ -43,10 +39,6 @@ export default class GLBoostLowContext {
     return new BlendShapeGeometry(this);
   }
 
-  createSkeletalGeometry() {
-    return new SkeletalGeometry(this);
-  }
-
   createCube(widthVector, vertexColor) {
     return new Cube(this, widthVector, vertexColor);
   }
@@ -68,27 +60,15 @@ export default class GLBoostLowContext {
   }
 
   createPerspectiveCamera(lookat, perspective) {
-    return new PerspectiveCamera(this, lookat, perspective);
+    return new PerspectiveCamera(this, true, lookat, perspective);
   }
 
   createOrthoCamera(lookat, ortho) {
-    return new OrthoCamera(this, lookat, ortho);
+    return new OrthoCamera(this, true, lookat, ortho);
   }
 
   createTexture(src, parameters = null) {
     return new Texture(this, src, parameters);
-  }
-
-  createDirectionalLight(intensity, direction) {
-    return new DirectionalLight(this, intensity, direction);
-  }
-
-  createPointLight(intensity) {
-    return new PointLight(this, intensity);
-  }
-
-  createJoint() {
-    return new Joint(this);
   }
 
   /**

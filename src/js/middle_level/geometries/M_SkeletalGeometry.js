@@ -1,10 +1,10 @@
 import GLBoost from '../../globals';
-import SkeletalShaderSource from '../../middle_level/shaders/SkeletalShader';
-import Geometry from './Geometry';
-import Joint from '../skeletons/Joint';
+import SkeletalShaderSource from '../shaders/SkeletalShader';
+import Geometry from '../../low_level/geometries/Geometry';
+import M_Joint from '../elements/skeletons/M_Joint';
 import Matrix44 from '../../low_level/math/Matrix44';
 
-export default class SkeletalGeometry extends Geometry {
+export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -25,7 +25,7 @@ export default class SkeletalGeometry extends Geometry {
       let children = joint.parent.parent.getChildren();
       let parentJoint = null;
       for (let i=0; i<children.length; i++) {
-        if (children[i] instanceof Joint) {
+        if (children[i] instanceof M_Joint) {
           parentJoint = children[i];
         }
       }
@@ -45,7 +45,7 @@ export default class SkeletalGeometry extends Geometry {
       return null;
     };
 
-    var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+    var joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
     var matrices = [];
 
     for (let i=0; i<joints.length; i++) {
@@ -139,7 +139,6 @@ export default class SkeletalGeometry extends Geometry {
 
   prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-    var canvas = this._canvas;
 
     if (this._materials.length > 0) {
       this._materialForSkeletal = this._materials[0];
@@ -167,7 +166,7 @@ export default class SkeletalGeometry extends Geometry {
     }
 
 
-    let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
+    let joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
     for (let i=0; i<joints.length; i++) {
       //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
       let matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
@@ -179,7 +178,7 @@ export default class SkeletalGeometry extends Geometry {
       let children = joint.parent.parent._elements;
       let parentJoint = null;
       for (let i=0; i<children.length; i++) {
-        if (children[i] instanceof Joint) {
+        if (children[i] instanceof M_Joint) {
           parentJoint = children[i];
         }
       }
@@ -198,10 +197,6 @@ export default class SkeletalGeometry extends Geometry {
 
       return null;
     };
-
-
-    //var joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
-    var matrices = [];
 
     for (let i=0; i<joints.length; i++) {
 
@@ -286,5 +281,3 @@ export default class SkeletalGeometry extends Geometry {
     super.prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh);
   }
 }
-
-GLBoost['SkeletalGeometry'] = SkeletalGeometry;

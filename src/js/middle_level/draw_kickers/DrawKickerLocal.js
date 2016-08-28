@@ -1,5 +1,5 @@
-import PointLight from '../../low_level/lights/PointLight';
-import DirectionalLight from '../../low_level/lights/DirectionalLight';
+import M_PointLight from '../elements/lights/M_PointLight';
+import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
 
 let singleton = Symbol();
@@ -70,11 +70,11 @@ export default class DrawKickerLocal {
           if (glslProgram[`lightPosition_${j}`] && glslProgram[`lightDiffuse_${j}`]) {
             let lightVec = null;
             let isPointLight = -9999;
-            if (lights[j] instanceof PointLight) {
+            if (lights[j] instanceof M_PointLight) {
               lightVec = new Vector4(0, 0, 0, 1);
               lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
               isPointLight = 1.0;
-            } else if (lights[j] instanceof DirectionalLight) {
+            } else if (lights[j] instanceof M_DirectionalLight) {
               lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;

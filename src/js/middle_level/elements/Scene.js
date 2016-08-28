@@ -1,6 +1,6 @@
-import Element from '../../low_level/elements/Element';
-import AbstractCamera from '../../low_level/elements/cameras/AbstractCamera';
-import AbstractLight from '../../low_level/lights/AbstractLight';
+import M_Element from './M_Element';
+import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
+import M_AbstractLight from './lights/M_AbstractLight';
 import Mesh from './meshes/Mesh';
 import Group from './Group';
 import AABB from '../../low_level/math/AABB';
@@ -98,7 +98,7 @@ export default class Scene extends Group {
           lights = lights.concat(childLights);
         });
         return lights;
-      } else if (elem instanceof AbstractLight) {
+      } else if (elem instanceof M_AbstractLight) {
         return [elem];
       } else {
         return [];
@@ -120,7 +120,7 @@ export default class Scene extends Group {
           cameras = cameras.concat(childCameras);
         });
         return cameras;
-      } else if (elem instanceof AbstractCamera) {
+      } else if (elem instanceof M_AbstractCamera) {
         existCamera_f = true;
         return [elem];
       } else {
@@ -166,7 +166,7 @@ export default class Scene extends Group {
         });
       } else if (elem instanceof Mesh) {
         elem.prepareToRender(existCamera_f, this._lights);
-      } else if (elem instanceof Element) {
+      } else if (elem instanceof M_Element) {
         elem.prepareToRender();
       } else {
         return;
@@ -205,7 +205,7 @@ export default class Scene extends Group {
   /**
    * [en] Get child lights which belong to this scene.<br>
    * [ja] このシーンに属していた子供のLight要素の配列を返します。
-   * @return {Array<AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
+   * @return {Array<M_AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
    */
   get lights() {
     return this._lights;

@@ -1,12 +1,10 @@
-import GLBoost from '../../globals';
-import GLContext from '../core/GLContext';
-import AbstractLight from './AbstractLight';
+import M_AbstractLight from './M_AbstractLight';
 
 /**
  * [en] This is a Point Light class.<br>
  * [ja] 点光源クラスです。
  */
-export default class PointLight extends AbstractLight {
+export default class M_PointLight extends M_AbstractLight {
 
   /**
    * [en] The constructor of PointLight class. <br>
@@ -17,7 +15,6 @@ export default class PointLight extends AbstractLight {
   constructor(glBoostContext, intensity) {
     super(glBoostContext);
 
-    this._name = "";
     this._intensity = intensity;
 
   }

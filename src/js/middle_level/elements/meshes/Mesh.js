@@ -1,11 +1,11 @@
 import GLBoost from '../../../globals';
-import Element from '../../../low_level/elements/Element';
+import M_Element from '../M_Element';
 import Vector3 from '../../../low_level/math/Vector3';
 import Vector4 from '../../../low_level/math/Vector4';
 import Matrix44 from '../../../low_level/math/Matrix44';
 import AABB from '../../../low_level/math/AABB';
 
-export default class Mesh extends Element {
+export default class Mesh extends M_Element {
   constructor(glBoostContext, geometry, material) {
     super(glBoostContext);
     this.geometry = geometry;
