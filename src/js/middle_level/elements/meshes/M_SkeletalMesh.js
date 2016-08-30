@@ -2,7 +2,7 @@ import GLBoost from '../../../globals';
 import M_Mesh from './M_Mesh';
 import Matrix44 from '../../../low_level/math/Matrix44';
 
-export default class SkeletalMesh extends M_Mesh {
+export default class M_SkeletalMesh extends M_Mesh {
   constructor(glBoostContext, geometry, material, rootJointName) {
     super(glBoostContext, geometry, material, rootJointName);
     this._rootJointName = rootJointName;
@@ -38,4 +38,4 @@ export default class SkeletalMesh extends M_Mesh {
   }
 }
 
-GLBoost['SkeletalMesh'] = SkeletalMesh;
+GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;

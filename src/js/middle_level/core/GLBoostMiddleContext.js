@@ -5,7 +5,7 @@ import Renderer from '../Renderer';
 import Group from '../elements/Group';
 import Scene from '../elements/Scene';
 import M_Mesh from '../elements/meshes/M_Mesh';
-import SkeletalMesh from '../elements/meshes/SkeletalMesh';
+import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_SkeletalGeometry from '../geometries/M_SkeletalGeometry';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
@@ -31,7 +31,7 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createSkeletalMesh(geometry, material, rootJointName) {
-    return new SkeletalMesh(this, geometry, material, rootJointName);
+    return new M_SkeletalMesh(this, geometry, material, rootJointName);
   }
 
   createSkeletalGeometry() {

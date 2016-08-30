@@ -6773,13 +6773,13 @@
     return M_SkeletalGeometry;
   }(Geometry);
 
-  var SkeletalMesh = function (_M_Mesh) {
-    babelHelpers.inherits(SkeletalMesh, _M_Mesh);
+  var M_SkeletalMesh = function (_M_Mesh) {
+    babelHelpers.inherits(M_SkeletalMesh, _M_Mesh);
 
-    function SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
-      babelHelpers.classCallCheck(this, SkeletalMesh);
+    function M_SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
+      babelHelpers.classCallCheck(this, M_SkeletalMesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalMesh).call(this, glBoostContext, geometry, material, rootJointName));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_SkeletalMesh).call(this, glBoostContext, geometry, material, rootJointName));
 
       _this._rootJointName = rootJointName;
       _this._jointsHierarchy = null;
@@ -6787,12 +6787,12 @@
       return _this;
     }
 
-    babelHelpers.createClass(SkeletalMesh, [{
+    babelHelpers.createClass(M_SkeletalMesh, [{
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights, renderPasses) {
         this.bakeTransformToGeometry();
         this.multiplyMatrix(Matrix44.identity());
-        babelHelpers.get(Object.getPrototypeOf(SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
+        babelHelpers.get(Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
       }
     }, {
       key: 'jointsHierarchy',
@@ -6817,10 +6817,10 @@
         return this._inverseBindMatrices;
       }
     }]);
-    return SkeletalMesh;
+    return M_SkeletalMesh;
   }(M_Mesh);
 
-  GLBoost$1['SkeletalMesh'] = SkeletalMesh;
+  GLBoost$1['M_SkeletalMesh'] = M_SkeletalMesh;
 
   /**
    * [en] This Scene class is the top level element of scene graph hierarchy.
@@ -8480,7 +8480,7 @@
     }, {
       key: 'createSkeletalMesh',
       value: function createSkeletalMesh(geometry, material, rootJointName) {
-        return new SkeletalMesh(this, geometry, material, rootJointName);
+        return new M_SkeletalMesh(this, geometry, material, rootJointName);
       }
     }, {
       key: 'createSkeletalGeometry',
@@ -9487,7 +9487,7 @@
         }
 
         // register joints hierarchy to skeletal mesh
-        var skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+        var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
         skeletalMeshes.forEach(function (skeletalMesh) {
           var rootJoint = group.searchElement(skeletalMesh.rootJointName);
           skeletalMesh.jointsHierarchy = rootJoint;
