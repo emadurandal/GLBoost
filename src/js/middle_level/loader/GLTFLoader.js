@@ -1,6 +1,6 @@
 import GLBoost from '../../globals';
 import GLContext from '../../low_level/core/GLContext';
-import SkeletalMesh from '../elements/meshes/SkeletalMesh';
+import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import PhongShader from '../shaders/PhongShader';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
@@ -127,7 +127,7 @@ export default class GLTFLoader {
     }
 
     // register joints hierarchy to skeletal mesh
-    let skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+    let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
     skeletalMeshes.forEach((skeletalMesh)=>{
       var rootJoint = group.searchElement(skeletalMesh.rootJointName);
       skeletalMesh.jointsHierarchy = rootJoint;

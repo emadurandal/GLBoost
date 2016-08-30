@@ -4,9 +4,9 @@ import Vector4 from '../../low_level/math/Vector4';
 import Quaternion from '../../low_level/math/Quaternion';
 import Matrix44 from '../../low_level/math/Matrix44';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
-import Element from '../../low_level/elements/Element';
+import L_Element from '../../low_level/elements/L_Element';
 
-export default class M_Element extends Element {
+export default class M_Element extends L_Element {
   constructor(glBoostContext) {
     super(glBoostContext);
 

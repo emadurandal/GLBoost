@@ -1,5 +1,5 @@
-import Mesh from '../elements/meshes/Mesh';
-import Group from '../elements/Group';
+import M_Mesh from '../elements/meshes/M_Mesh';
+import M_Group from '../elements/M_Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 import Vector4 from '../../low_level/math/Vector4';
 
@@ -143,7 +143,7 @@ export default class RenderPass extends GLBoostObject {
 
   prepareToRender() {
     let collectMeshes = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var meshes = [];
         children.forEach(function(child) {
@@ -151,7 +151,7 @@ export default class RenderPass extends GLBoostObject {
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         return [elem];
       } else {
         return [];

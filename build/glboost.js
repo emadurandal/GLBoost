@@ -1897,14 +1897,14 @@
     return GLBoostObject;
   }();
 
-  var Element = function (_GLBoostObject) {
-    babelHelpers.inherits(Element, _GLBoostObject);
+  var L_Element = function (_GLBoostObject) {
+    babelHelpers.inherits(L_Element, _GLBoostObject);
 
-    function Element(glBoostContext) {
+    function L_Element(glBoostContext) {
       var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-      babelHelpers.classCallCheck(this, Element);
+      babelHelpers.classCallCheck(this, L_Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_Element).call(this, glBoostContext, toRegister));
 
       _this._translate = Vector3.zero();
       _this._scale = new Vector3(1, 1, 1);
@@ -1921,7 +1921,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Element, [{
+    babelHelpers.createClass(L_Element, [{
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
@@ -2026,11 +2026,11 @@
         return this._currentCalcMode;
       }
     }]);
-    return Element;
+    return L_Element;
   }(GLBoostObject);
 
-  var M_Element = function (_Element) {
-    babelHelpers.inherits(M_Element, _Element);
+  var M_Element = function (_L_Element) {
+    babelHelpers.inherits(M_Element, _L_Element);
 
     function M_Element(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Element);
@@ -2628,7 +2628,7 @@
       }
     }]);
     return M_Element;
-  }(Element);
+  }(L_Element);
 
   var M_Joint = function (_M_Element) {
     babelHelpers.inherits(M_Joint, _M_Element);
@@ -2764,15 +2764,15 @@
     return M_DirectionalLight;
   }(M_AbstractLight);
 
-  var AbstractCamera = function (_Element) {
-    babelHelpers.inherits(AbstractCamera, _Element);
+  var L_AbstractCamera = function (_L_Element) {
+    babelHelpers.inherits(L_AbstractCamera, _L_Element);
 
-    function AbstractCamera(glBoostContext, toRegister, lookat) {
-      babelHelpers.classCallCheck(this, AbstractCamera);
+    function L_AbstractCamera(glBoostContext, toRegister, lookat) {
+      babelHelpers.classCallCheck(this, L_AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_AbstractCamera).call(this, glBoostContext, toRegister));
 
-      if (_this.constructor === AbstractCamera) {
+      if (_this.constructor === L_AbstractCamera) {
         throw new TypeError('Cannot construct AbstractCamera instances directly.');
       }
 
@@ -2784,7 +2784,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(AbstractCamera, [{
+    babelHelpers.createClass(L_AbstractCamera, [{
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
@@ -2793,7 +2793,7 @@
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
-          this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
@@ -2813,16 +2813,16 @@
     }, {
       key: 'translate',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', this);
+        return babelHelpers.get(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
@@ -2871,16 +2871,16 @@
         return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
       }
     }]);
-    return AbstractCamera;
-  }(Element);
+    return L_AbstractCamera;
+  }(L_Element);
 
-  var OrthoCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
+  var L_OrthoCamera = function (_L_AbstractCamera) {
+    babelHelpers.inherits(L_OrthoCamera, _L_AbstractCamera);
 
-    function OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
-      babelHelpers.classCallCheck(this, OrthoCamera);
+    function L_OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
+      babelHelpers.classCallCheck(this, L_OrthoCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_OrthoCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._left = ortho.left;
       _this._right = ortho.right;
@@ -2894,7 +2894,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(OrthoCamera, [{
+    babelHelpers.createClass(L_OrthoCamera, [{
       key: '_needUpdateProjection',
       value: function _needUpdateProjection() {
         this._dirtyProjection = true;
@@ -2904,7 +2904,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -2995,8 +2995,8 @@
         return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
       }
     }]);
-    return OrthoCamera;
-  }(AbstractCamera);
+    return L_OrthoCamera;
+  }(L_AbstractCamera);
 
   var M_AbstractCamera = function (_M_Element) {
     babelHelpers.inherits(M_AbstractCamera, _M_Element);
@@ -3109,7 +3109,7 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_OrthoCamera).call(this, glBoostContext, toRegister));
 
-      _this._lowLevelCamera = new OrthoCamera(_this, false, lookat, ortho);
+      _this._lowLevelCamera = new L_OrthoCamera(_this, false, lookat, ortho);
       return _this;
     }
 
@@ -3182,13 +3182,13 @@
     return M_OrthoCamera;
   }(M_AbstractCamera);
 
-  var PerspectiveCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
+  var L_PerspectiveCamera = function (_L_AbstractCamera) {
+    babelHelpers.inherits(L_PerspectiveCamera, _L_AbstractCamera);
 
-    function PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
-      babelHelpers.classCallCheck(this, PerspectiveCamera);
+    function L_PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
+      babelHelpers.classCallCheck(this, L_PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._fovy = perspective.fovy;
       _this._aspect = perspective.aspect;
@@ -3200,7 +3200,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(PerspectiveCamera, [{
+    babelHelpers.createClass(L_PerspectiveCamera, [{
       key: '_needUpdateProjection',
       value: function _needUpdateProjection() {
         this._dirtyProjection = true;
@@ -3210,7 +3210,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -3280,8 +3280,8 @@
         return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
     }]);
-    return PerspectiveCamera;
-  }(AbstractCamera);
+    return L_PerspectiveCamera;
+  }(L_AbstractCamera);
 
   var M_PerspectiveCamera = function (_M_AbstractCamera) {
     babelHelpers.inherits(M_PerspectiveCamera, _M_AbstractCamera);
@@ -3291,7 +3291,7 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PerspectiveCamera).call(this, glBoostContext, toRegister));
 
-      _this._lowLevelCamera = new PerspectiveCamera(_this, false, lookat, perspective);
+      _this._lowLevelCamera = new L_PerspectiveCamera(_this, false, lookat, perspective);
       return _this;
     }
 
@@ -3444,27 +3444,21 @@
 
   GLBoost$1['AABB'] = AABB;
 
-  var Mesh = function (_M_Element) {
-    babelHelpers.inherits(Mesh, _M_Element);
+  var M_Mesh = function (_M_Element) {
+    babelHelpers.inherits(M_Mesh, _M_Element);
 
-    function Mesh(glBoostContext, geometry, material) {
-      babelHelpers.classCallCheck(this, Mesh);
+    function M_Mesh(glBoostContext, geometry, material) {
+      babelHelpers.classCallCheck(this, M_Mesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mesh).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Mesh).call(this, glBoostContext));
 
       _this.geometry = geometry;
       _this.material = material;
       _this._transformedDepth = 0;
-
-      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
-        // this code for tmlib
-        Mesh._instanceCount = typeof Mesh._instanceCount === 'undefined' ? 0 : Mesh._instanceCount + 1;
-        _this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
-      }
       return _this;
     }
 
-    babelHelpers.createClass(Mesh, [{
+    babelHelpers.createClass(M_Mesh, [{
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights) {
         this._geometry.prepareToRender(existCamera_f, lights, this._material, this);
@@ -3603,7 +3597,7 @@
       set: function set(geometry) {
         this._geometry = geometry;
         geometry._parent = this;
-        Mesh._geometries[geometry.toString()] = geometry;
+        M_Mesh._geometries[geometry.toString()] = geometry;
       },
       get: function get() {
         return this._geometry;
@@ -3628,20 +3622,20 @@
         return AABB.multiplyMatrix(world_m, this._geometry.AABB);
       }
     }]);
-    return Mesh;
+    return M_Mesh;
   }(M_Element);
 
-  Mesh._geometries = {};
+  M_Mesh._geometries = {};
 
-  GLBoost$1['Mesh'] = Mesh;
+  GLBoost$1['M_Mesh'] = M_Mesh;
 
-  var Group = function (_M_Element) {
-    babelHelpers.inherits(Group, _M_Element);
+  var M_Group = function (_M_Element) {
+    babelHelpers.inherits(M_Group, _M_Element);
 
-    function Group(glBoostContext) {
-      babelHelpers.classCallCheck(this, Group);
+    function M_Group(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Group);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Group).call(this, glBoostContext));
 
       _this._elements = [];
       _this._AABB = new AABB();
@@ -3655,7 +3649,7 @@
      */
 
 
-    babelHelpers.createClass(Group, [{
+    babelHelpers.createClass(M_Group, [{
       key: 'addChild',
       value: function addChild(element) {
         this.removeChild(element);
@@ -3706,7 +3700,7 @@
           return element;
         }
 
-        if (element instanceof Group) {
+        if (element instanceof M_Group) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             var hitChild = this.searchElement(userflavorName, children[i]);
@@ -3726,7 +3720,7 @@
           return element;
         }
 
-        if (element instanceof Group) {
+        if (element instanceof M_Group) {
           var children = element.getChildren();
           var results = [];
           for (var i = 0; i < children.length; i++) {
@@ -3745,7 +3739,7 @@
       key: 'updateAABB',
       value: function updateAABB() {
         var aabb = function mergeAABBRecursively(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             for (var i = 0; i < children.length; i++) {
               var aabb = mergeAABBRecursively(children[i]);
@@ -3757,7 +3751,7 @@
             }
             return elem.AABB;
           }
-          if (elem instanceof Mesh) {
+          if (elem instanceof M_Mesh) {
             return elem.AABB;
           }
 
@@ -3771,7 +3765,7 @@
         return this._AABB;
       }
     }]);
-    return Group;
+    return M_Group;
   }(M_Element);
 
   var RenderPass = function (_GLBoostObject) {
@@ -3850,7 +3844,7 @@
         var _this3 = this;
 
         var collectMeshes = function collectMeshes(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var meshes = [];
             children.forEach(function (child) {
@@ -3858,7 +3852,7 @@
               meshes = meshes.concat(childMeshes);
             });
             return meshes;
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             return [elem];
           } else {
             return [];
@@ -6779,13 +6773,13 @@
     return M_SkeletalGeometry;
   }(Geometry);
 
-  var SkeletalMesh = function (_Mesh) {
-    babelHelpers.inherits(SkeletalMesh, _Mesh);
+  var M_SkeletalMesh = function (_M_Mesh) {
+    babelHelpers.inherits(M_SkeletalMesh, _M_Mesh);
 
-    function SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
-      babelHelpers.classCallCheck(this, SkeletalMesh);
+    function M_SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
+      babelHelpers.classCallCheck(this, M_SkeletalMesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalMesh).call(this, glBoostContext, geometry, material, rootJointName));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_SkeletalMesh).call(this, glBoostContext, geometry, material, rootJointName));
 
       _this._rootJointName = rootJointName;
       _this._jointsHierarchy = null;
@@ -6793,12 +6787,12 @@
       return _this;
     }
 
-    babelHelpers.createClass(SkeletalMesh, [{
+    babelHelpers.createClass(M_SkeletalMesh, [{
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights, renderPasses) {
         this.bakeTransformToGeometry();
         this.multiplyMatrix(Matrix44.identity());
-        babelHelpers.get(Object.getPrototypeOf(SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
+        babelHelpers.get(Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
       }
     }, {
       key: 'jointsHierarchy',
@@ -6823,20 +6817,20 @@
         return this._inverseBindMatrices;
       }
     }]);
-    return SkeletalMesh;
-  }(Mesh);
+    return M_SkeletalMesh;
+  }(M_Mesh);
 
-  GLBoost$1['SkeletalMesh'] = SkeletalMesh;
+  GLBoost$1['M_SkeletalMesh'] = M_SkeletalMesh;
 
   /**
-   * [en] This Scene class is the top level element of scene graph hierarchy.
+   * [en] This M_Scene class is the top level element of scene graph hierarchy.
    *       To render scene, pass this scene element to Renderer.draw method.<br>
    * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
    *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
    */
 
-  var Scene = function (_Group) {
-    babelHelpers.inherits(Scene, _Group);
+  var M_Scene = function (_M_Group) {
+    babelHelpers.inherits(M_Scene, _M_Group);
 
 
     /**
@@ -6845,10 +6839,10 @@
      * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
      */
 
-    function Scene(glBoostContext) {
-      babelHelpers.classCallCheck(this, Scene);
+    function M_Scene(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Scene);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Scene).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Scene).call(this, glBoostContext));
 
       _this._gl = _this._glContext.gl;
       _this._currentAnimationInputValues = {};
@@ -6856,7 +6850,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Scene, [{
+    babelHelpers.createClass(M_Scene, [{
       key: '_reset',
       value: function _reset() {
         this._meshes = [];
@@ -6872,7 +6866,7 @@
           element._needUpdate();
         }
 
-        if (element instanceof Group || element instanceof Scene) {
+        if (element instanceof M_Group || element instanceof M_Scene) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             this._setDirtyToAnimatedElement(inputName, children[i]);
@@ -6912,7 +6906,7 @@
         this._reset();
 
         var aabb = function setParentAndMergeAABBRecursively(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             for (var i = 0; i < children.length; i++) {
               children[i]._parent = elem;
@@ -6925,7 +6919,7 @@
             }
             return elem.AABB;
           }
-          if (elem instanceof Mesh) {
+          if (elem instanceof M_Mesh) {
             return elem.AABB;
           }
 
@@ -6934,7 +6928,7 @@
         this.AABB.mergeAABB(aabb);
 
         var collectLights = function collectLights(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var lights = [];
             children.forEach(function (child) {
@@ -6956,7 +6950,7 @@
 
         var existCamera_f = false;
         var collectCameras = function collectCameras(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var cameras = [];
             children.forEach(function (child) {
@@ -6981,7 +6975,7 @@
         }
 
         var collectMeshes = function collectMeshes(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var meshes = [];
             children.forEach(function (child) {
@@ -6989,7 +6983,7 @@
               meshes = meshes.concat(childMeshes);
             });
             return meshes;
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             return [elem];
           } else {
             return [];
@@ -7002,12 +6996,12 @@
         });
 
         var callPrepareToRenderMethodOfAllElements = function callPrepareToRenderMethodOfAllElements(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             children.forEach(function (child) {
               callPrepareToRenderMethodOfAllElements(child);
             });
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             elem.prepareToRender(existCamera_f, _this2._lights);
           } else if (elem instanceof M_Element) {
             elem.prepareToRender();
@@ -7045,7 +7039,7 @@
       /**
        * [en] Get child meshes which belong to this scene.<br>
        * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-       * @return {Array<Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+       * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
        */
 
     }, {
@@ -7078,8 +7072,8 @@
         return this._cameras;
       }
     }]);
-    return Scene;
-  }(Group);
+    return M_Scene;
+  }(M_Group);
 
   /**
    * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -8340,12 +8334,12 @@
     }, {
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
-        return new PerspectiveCamera(this, true, lookat, perspective);
+        return new L_PerspectiveCamera(this, true, lookat, perspective);
       }
     }, {
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
-        return new OrthoCamera(this, true, lookat, ortho);
+        return new L_OrthoCamera(this, true, lookat, ortho);
       }
     }, {
       key: 'createTexture',
@@ -8471,22 +8465,22 @@
     babelHelpers.createClass(GLBoostMiddleContext, [{
       key: 'createScene',
       value: function createScene() {
-        return new Scene(this);
+        return new M_Scene(this);
       }
     }, {
       key: 'createGroup',
       value: function createGroup() {
-        return new Group(this);
+        return new M_Group(this);
       }
     }, {
       key: 'createMesh',
       value: function createMesh(geometry, material) {
-        return new Mesh(this, geometry, material);
+        return new M_Mesh(this, geometry, material);
       }
     }, {
       key: 'createSkeletalMesh',
       value: function createSkeletalMesh(geometry, material, rootJointName) {
-        return new SkeletalMesh(this, geometry, material, rootJointName);
+        return new M_SkeletalMesh(this, geometry, material, rootJointName);
       }
     }, {
       key: 'createSkeletalGeometry',
@@ -9493,7 +9487,7 @@
         }
 
         // register joints hierarchy to skeletal mesh
-        var skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+        var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
         skeletalMeshes.forEach(function (skeletalMesh) {
           var rootJoint = group.searchElement(skeletalMesh.rootJointName);
           skeletalMesh.jointsHierarchy = rootJoint;

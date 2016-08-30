@@ -1,18 +1,18 @@
 import M_Element from './M_Element';
 import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
 import M_AbstractLight from './lights/M_AbstractLight';
-import Mesh from './meshes/Mesh';
-import Group from './Group';
+import M_Mesh from './meshes/M_Mesh';
+import M_Group from './M_Group';
 import AABB from '../../low_level/math/AABB';
 
 
 /**
- * [en] This Scene class is the top level element of scene graph hierarchy.
+ * [en] This M_Scene class is the top level element of scene graph hierarchy.
  *       To render scene, pass this scene element to Renderer.draw method.<br>
  * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
-export default class Scene extends Group {
+export default class M_Scene extends M_Group {
 
   /**
    * [en] constructor
@@ -37,7 +37,7 @@ export default class Scene extends Group {
       element._needUpdate();
     }
 
-    if (element instanceof Group || element instanceof Scene) {
+    if (element instanceof M_Group || element instanceof M_Scene) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         this._setDirtyToAnimatedElement(inputName, children[i]);
@@ -68,7 +68,7 @@ export default class Scene extends Group {
     this._reset();
 
     var aabb = (function setParentAndMergeAABBRecursively(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
@@ -81,7 +81,7 @@ export default class Scene extends Group {
         }
         return elem.AABB;
       }
-      if (elem instanceof Mesh) {
+      if (elem instanceof M_Mesh) {
         return elem.AABB;
       }
 
@@ -90,7 +90,7 @@ export default class Scene extends Group {
     this.AABB.mergeAABB(aabb);
 
     let collectLights = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var lights = [];
         children.forEach(function(child) {
@@ -112,7 +112,7 @@ export default class Scene extends Group {
 
     let existCamera_f = false;
     let collectCameras = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var cameras = [];
         children.forEach(function(child) {
@@ -138,7 +138,7 @@ export default class Scene extends Group {
 
 
     let collectMeshes = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var meshes = [];
         children.forEach(function(child) {
@@ -146,7 +146,7 @@ export default class Scene extends Group {
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         return [elem];
       } else {
         return [];
@@ -159,12 +159,12 @@ export default class Scene extends Group {
     });
 
     let callPrepareToRenderMethodOfAllElements = (elem)=> {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         children.forEach(function (child) {
           callPrepareToRenderMethodOfAllElements(child);
         });
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(existCamera_f, this._lights);
       } else if (elem instanceof M_Element) {
         elem.prepareToRender();
@@ -196,7 +196,7 @@ export default class Scene extends Group {
   /**
    * [en] Get child meshes which belong to this scene.<br>
    * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-   * @return {Array<Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+   * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
    */
   get meshes() {
     return this._meshes;

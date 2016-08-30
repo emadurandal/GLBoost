@@ -1,8 +1,8 @@
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
-import Mesh from './meshes/Mesh';
+import M_Mesh from './meshes/M_Mesh';
 
-export default class Group extends M_Element {
+export default class M_Group extends M_Element {
   constructor(glBoostContext) {
     super(glBoostContext);
     this._elements = [];
@@ -53,7 +53,7 @@ export default class Group extends M_Element {
       return element;
     }
 
-    if (element instanceof Group) {
+    if (element instanceof M_Group) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         let hitChild = this.searchElement(userflavorName, children[i]);
@@ -70,7 +70,7 @@ export default class Group extends M_Element {
       return element;
     }
 
-    if (element instanceof Group) {
+    if (element instanceof M_Group) {
       let children = element.getChildren();
       let results = [];
       for (let i = 0; i < children.length; i++) {
@@ -89,7 +89,7 @@ export default class Group extends M_Element {
 
   updateAABB() {
     var aabb = (function mergeAABBRecursively(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           var aabb = mergeAABBRecursively(children[i]);
@@ -101,7 +101,7 @@ export default class Group extends M_Element {
         }
         return elem.AABB;
       }
-      if (elem instanceof Mesh) {
+      if (elem instanceof M_Mesh) {
         return elem.AABB;
       }
 

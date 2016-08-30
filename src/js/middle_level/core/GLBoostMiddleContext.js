@@ -2,10 +2,10 @@ import GLBoostLowContext from '../../low_level/core/GLBoostLowContext';
 import Expression from '../expressions/Expression';
 import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
-import Group from '../elements/Group';
-import Scene from '../elements/Scene';
-import Mesh from '../elements/meshes/Mesh';
-import SkeletalMesh from '../elements/meshes/SkeletalMesh';
+import M_Group from '../elements/M_Group';
+import M_Scene from '../elements/M_Scene';
+import M_Mesh from '../elements/meshes/M_Mesh';
+import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_SkeletalGeometry from '../geometries/M_SkeletalGeometry';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
@@ -19,19 +19,19 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createScene() {
-    return new Scene(this);
+    return new M_Scene(this);
   }
 
   createGroup() {
-    return new Group(this);
+    return new M_Group(this);
   }
 
   createMesh(geometry, material) {
-    return new Mesh(this, geometry, material);
+    return new M_Mesh(this, geometry, material);
   }
 
   createSkeletalMesh(geometry, material, rootJointName) {
-    return new SkeletalMesh(this, geometry, material, rootJointName);
+    return new M_SkeletalMesh(this, geometry, material, rootJointName);
   }
 
   createSkeletalGeometry() {

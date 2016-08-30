@@ -3,8 +3,8 @@ import GLExtensionsManager from './GLExtensionsManager';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import ClassicMaterial from '../ClassicMaterial';
-import PerspectiveCamera from '../elements/cameras/PerspectiveCamera';
-import OrthoCamera from '../elements/cameras/OrthoCamera';
+import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
+import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import Cube from '../primitives/Cube';
@@ -60,11 +60,11 @@ export default class GLBoostLowContext {
   }
 
   createPerspectiveCamera(lookat, perspective) {
-    return new PerspectiveCamera(this, true, lookat, perspective);
+    return new L_PerspectiveCamera(this, true, lookat, perspective);
   }
 
   createOrthoCamera(lookat, ortho) {
-    return new OrthoCamera(this, true, lookat, ortho);
+    return new L_OrthoCamera(this, true, lookat, ortho);
   }
 
   createTexture(src, parameters = null) {

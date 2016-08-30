@@ -1,13 +1,9 @@
-import GLBoost from '../../globals';
-import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
-import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
 import Matrix44 from '../math/Matrix44';
-import AnimationUtil from '../misc/AnimationUtil';
 import GLBoostObject from '../core/GLBoostObject';
 
-export default class Element extends GLBoostObject {
+export default class L_Element extends GLBoostObject {
   constructor(glBoostContext, toRegister = true) {
     super(glBoostContext, toRegister);
 

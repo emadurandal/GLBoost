@@ -1,7 +1,7 @@
-import AbstractCamera from './AbstractCamera';
+import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
-export default class OrthoCamera extends AbstractCamera {
+export default class L_OrthoCamera extends L_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, ortho) {
     super(glBoostContext, toRegister, lookat);
 
@@ -27,7 +27,7 @@ export default class OrthoCamera extends AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+      this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {

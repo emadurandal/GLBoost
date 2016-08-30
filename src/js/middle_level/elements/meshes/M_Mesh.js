@@ -5,17 +5,12 @@ import Vector4 from '../../../low_level/math/Vector4';
 import Matrix44 from '../../../low_level/math/Matrix44';
 import AABB from '../../../low_level/math/AABB';
 
-export default class Mesh extends M_Element {
+export default class M_Mesh extends M_Element {
   constructor(glBoostContext, geometry, material) {
     super(glBoostContext);
     this.geometry = geometry;
     this.material = material;
     this._transformedDepth = 0;
-
-    if (this.__proto__.__proto__ && this.__proto__.__proto__.constructor == Mesh) {  // this code for tmlib
-      Mesh._instanceCount = (typeof Mesh._instanceCount === 'undefined') ? 0 : (Mesh._instanceCount + 1);
-      this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
-    }
   }
 
   prepareToRender(existCamera_f, lights) {
@@ -32,7 +27,7 @@ export default class Mesh extends M_Element {
   set geometry(geometry) {
     this._geometry = geometry;
     geometry._parent = this;
-    Mesh._geometries[geometry.toString()] = geometry;
+    M_Mesh._geometries[geometry.toString()] = geometry;
   }
 
   get geometry() {
@@ -175,6 +170,6 @@ export default class Mesh extends M_Element {
   }
 
 }
-Mesh._geometries = {};
+M_Mesh._geometries = {};
 
-GLBoost['Mesh'] = Mesh;
+GLBoost['M_Mesh'] = M_Mesh;

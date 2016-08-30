@@ -71,8 +71,6 @@ promise.then(function(group) {
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
 
-  var meshes = group.searchElementsByType(GLBoost.Mesh);
-
   var render = function(){
     scene.setCurrentAnimationValue('time', gtime);
     renderer.clearCanvas();

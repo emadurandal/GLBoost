@@ -1,12 +1,12 @@
 import Vector3 from '../../math/Vector3';
-import Element from '../Element';
+import L_Element from '../L_Element';
 import Matrix44 from '../../math/Matrix44';
 
-export default class AbstractCamera extends Element {
+export default class L_AbstractCamera extends L_Element {
   constructor(glBoostContext, toRegister, lookat) {
     super(glBoostContext, toRegister);
 
-    if (this.constructor === AbstractCamera) {
+    if (this.constructor === L_AbstractCamera) {
       throw new TypeError('Cannot construct AbstractCamera instances directly.');
     }
 
@@ -23,7 +23,7 @@ export default class AbstractCamera extends Element {
 
   lookAtRHMatrix() {
     if (this._dirtyView) {
-      this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+      this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
       this._dirtyView = false;
       return this._viewMatrix.clone();
     } else {
