@@ -2494,58 +2494,14 @@
 
   GLBoost$1["Quaternion"] = Quaternion;
 
-  var AnimationUtil = function () {
-    function AnimationUtil() {
-      babelHelpers.classCallCheck(this, AnimationUtil);
-    }
+  var L_Element = function (_GLBoostObject) {
+    babelHelpers.inherits(L_Element, _GLBoostObject);
 
-    babelHelpers.createClass(AnimationUtil, null, [{
-      key: "lerp",
-      value: function lerp(start, end, ratio, componentN) {
-        if (componentN === 1) {
-          return start * (1 - ratio) + end * ratio;
-        } else {
-          if (start instanceof Quaternion) {
-            return Quaternion.qlerp(start, end, ratio);
-          } else {
-            return start.multiply(1 - ratio).add(end.multiply(ratio));
-          }
-        }
-      }
-    }, {
-      key: "interpolate",
-      value: function interpolate(inputArray, outputArray, input, componentN) {
-        if (input < inputArray[0]) {
-          return outputArray[0].clone(); // out of range!
-        }
-        if (inputArray[inputArray.length - 1] <= input) {
-          return outputArray[outputArray.length - 1].clone(); // out of range!
-        }
-
-        for (var i = 0; i < inputArray.length; i++) {
-          if (typeof inputArray[i + 1] === "undefined") {
-            break;
-          }
-          if (inputArray[i] <= input && input < inputArray[i + 1]) {
-            var ratio = (input - inputArray[i]) / (inputArray[i + 1] - inputArray[i]);
-            var resultValue = this.lerp(outputArray[i].clone(), outputArray[i + 1].clone(), ratio, componentN);
-            return resultValue;
-          }
-        }
-        return outputArray[0].clone(); // out of range!
-      }
-    }]);
-    return AnimationUtil;
-  }();
-
-  var Element = function (_GLBoostObject) {
-    babelHelpers.inherits(Element, _GLBoostObject);
-
-    function Element(glBoostContext) {
+    function L_Element(glBoostContext) {
       var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-      babelHelpers.classCallCheck(this, Element);
+      babelHelpers.classCallCheck(this, L_Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_Element).call(this, glBoostContext, toRegister));
 
       _this._translate = Vector3.zero();
       _this._scale = new Vector3(1, 1, 1);
@@ -2562,7 +2518,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Element, [{
+    babelHelpers.createClass(L_Element, [{
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
@@ -2667,11 +2623,11 @@
         return this._currentCalcMode;
       }
     }]);
-    return Element;
+    return L_Element;
   }(GLBoostObject);
 
-  var L_AbstractCamera = function (_Element) {
-    babelHelpers.inherits(L_AbstractCamera, _Element);
+  var L_AbstractCamera = function (_L_Element) {
+    babelHelpers.inherits(L_AbstractCamera, _L_Element);
 
     function L_AbstractCamera(glBoostContext, toRegister, lookat) {
       babelHelpers.classCallCheck(this, L_AbstractCamera);
@@ -2778,7 +2734,7 @@
       }
     }]);
     return L_AbstractCamera;
-  }(Element);
+  }(L_Element);
 
   var L_OrthoCamera = function (_L_AbstractCamera) {
     babelHelpers.inherits(L_OrthoCamera, _L_AbstractCamera);
@@ -4232,8 +4188,52 @@
 
   GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
-  var M_Element = function (_Element) {
-    babelHelpers.inherits(M_Element, _Element);
+  var AnimationUtil = function () {
+    function AnimationUtil() {
+      babelHelpers.classCallCheck(this, AnimationUtil);
+    }
+
+    babelHelpers.createClass(AnimationUtil, null, [{
+      key: "lerp",
+      value: function lerp(start, end, ratio, componentN) {
+        if (componentN === 1) {
+          return start * (1 - ratio) + end * ratio;
+        } else {
+          if (start instanceof Quaternion) {
+            return Quaternion.qlerp(start, end, ratio);
+          } else {
+            return start.multiply(1 - ratio).add(end.multiply(ratio));
+          }
+        }
+      }
+    }, {
+      key: "interpolate",
+      value: function interpolate(inputArray, outputArray, input, componentN) {
+        if (input < inputArray[0]) {
+          return outputArray[0].clone(); // out of range!
+        }
+        if (inputArray[inputArray.length - 1] <= input) {
+          return outputArray[outputArray.length - 1].clone(); // out of range!
+        }
+
+        for (var i = 0; i < inputArray.length; i++) {
+          if (typeof inputArray[i + 1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i + 1]) {
+            var ratio = (input - inputArray[i]) / (inputArray[i + 1] - inputArray[i]);
+            var resultValue = this.lerp(outputArray[i].clone(), outputArray[i + 1].clone(), ratio, componentN);
+            return resultValue;
+          }
+        }
+        return outputArray[0].clone(); // out of range!
+      }
+    }]);
+    return AnimationUtil;
+  }();
+
+  var M_Element = function (_L_Element) {
+    babelHelpers.inherits(M_Element, _L_Element);
 
     function M_Element(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Element);
@@ -4831,7 +4831,7 @@
       }
     }]);
     return M_Element;
-  }(Element);
+  }(L_Element);
 
   /**
    * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>

@@ -1897,14 +1897,14 @@
     return GLBoostObject;
   }();
 
-  var Element = function (_GLBoostObject) {
-    babelHelpers.inherits(Element, _GLBoostObject);
+  var L_Element = function (_GLBoostObject) {
+    babelHelpers.inherits(L_Element, _GLBoostObject);
 
-    function Element(glBoostContext) {
+    function L_Element(glBoostContext) {
       var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
-      babelHelpers.classCallCheck(this, Element);
+      babelHelpers.classCallCheck(this, L_Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Element).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_Element).call(this, glBoostContext, toRegister));
 
       _this._translate = Vector3.zero();
       _this._scale = new Vector3(1, 1, 1);
@@ -1921,7 +1921,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Element, [{
+    babelHelpers.createClass(L_Element, [{
       key: '_needUpdate',
       value: function _needUpdate() {
         this._dirtyAsElement = true;
@@ -2026,11 +2026,11 @@
         return this._currentCalcMode;
       }
     }]);
-    return Element;
+    return L_Element;
   }(GLBoostObject);
 
-  var M_Element = function (_Element) {
-    babelHelpers.inherits(M_Element, _Element);
+  var M_Element = function (_L_Element) {
+    babelHelpers.inherits(M_Element, _L_Element);
 
     function M_Element(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Element);
@@ -2628,7 +2628,7 @@
       }
     }]);
     return M_Element;
-  }(Element);
+  }(L_Element);
 
   var M_Joint = function (_M_Element) {
     babelHelpers.inherits(M_Joint, _M_Element);
@@ -2764,8 +2764,8 @@
     return M_DirectionalLight;
   }(M_AbstractLight);
 
-  var L_AbstractCamera = function (_Element) {
-    babelHelpers.inherits(L_AbstractCamera, _Element);
+  var L_AbstractCamera = function (_L_Element) {
+    babelHelpers.inherits(L_AbstractCamera, _L_Element);
 
     function L_AbstractCamera(glBoostContext, toRegister, lookat) {
       babelHelpers.classCallCheck(this, L_AbstractCamera);
@@ -2872,7 +2872,7 @@
       }
     }]);
     return L_AbstractCamera;
-  }(Element);
+  }(L_Element);
 
   var L_OrthoCamera = function (_L_AbstractCamera) {
     babelHelpers.inherits(L_OrthoCamera, _L_AbstractCamera);

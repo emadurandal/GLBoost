@@ -1,8 +1,8 @@
 import Vector3 from '../../math/Vector3';
-import Element from '../Element';
+import L_Element from '../L_Element';
 import Matrix44 from '../../math/Matrix44';
 
-export default class L_AbstractCamera extends Element {
+export default class L_AbstractCamera extends L_Element {
   constructor(glBoostContext, toRegister, lookat) {
     super(glBoostContext, toRegister);
 
