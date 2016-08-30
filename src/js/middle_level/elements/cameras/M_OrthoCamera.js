@@ -1,11 +1,11 @@
 import M_AbstractCamera from './M_AbstractCamera';
-import OrthoCamera from '../../../low_level/elements/cameras/OrthoCamera';
+import L_OrthoCamera from '../../../low_level/elements/cameras/L_OrthoCamera';
 
 export default class M_OrthoCamera extends M_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, ortho) {
     super(glBoostContext, toRegister);
 
-    this._lowLevelCamera = new OrthoCamera(this, false, lookat, ortho);
+    this._lowLevelCamera = new L_OrthoCamera(this, false, lookat, ortho);
   }
 
   // ===================== delegate to low level class ========================

@@ -1,8 +1,7 @@
-import Vector3 from '../../math/Vector3';
-import AbstractCamera from './AbstractCamera';
+import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
-export default class PerspectiveCamera extends AbstractCamera {
+export default class L_PerspectiveCamera extends L_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, perspective) {
     super(glBoostContext, toRegister, lookat);
 
@@ -26,7 +25,7 @@ export default class PerspectiveCamera extends AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+      this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {

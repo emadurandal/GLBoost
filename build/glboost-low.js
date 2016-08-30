@@ -2670,15 +2670,15 @@
     return Element;
   }(GLBoostObject);
 
-  var AbstractCamera = function (_Element) {
-    babelHelpers.inherits(AbstractCamera, _Element);
+  var L_AbstractCamera = function (_Element) {
+    babelHelpers.inherits(L_AbstractCamera, _Element);
 
-    function AbstractCamera(glBoostContext, toRegister, lookat) {
-      babelHelpers.classCallCheck(this, AbstractCamera);
+    function L_AbstractCamera(glBoostContext, toRegister, lookat) {
+      babelHelpers.classCallCheck(this, L_AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_AbstractCamera).call(this, glBoostContext, toRegister));
 
-      if (_this.constructor === AbstractCamera) {
+      if (_this.constructor === L_AbstractCamera) {
         throw new TypeError('Cannot construct AbstractCamera instances directly.');
       }
 
@@ -2690,7 +2690,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(AbstractCamera, [{
+    babelHelpers.createClass(L_AbstractCamera, [{
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
@@ -2699,7 +2699,7 @@
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
-          this._viewMatrix = AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
@@ -2719,16 +2719,16 @@
     }, {
       key: 'translate',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', this);
+        return babelHelpers.get(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
@@ -2777,16 +2777,16 @@
         return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
       }
     }]);
-    return AbstractCamera;
+    return L_AbstractCamera;
   }(Element);
 
-  var OrthoCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(OrthoCamera, _AbstractCamera);
+  var L_OrthoCamera = function (_L_AbstractCamera) {
+    babelHelpers.inherits(L_OrthoCamera, _L_AbstractCamera);
 
-    function OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
-      babelHelpers.classCallCheck(this, OrthoCamera);
+    function L_OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
+      babelHelpers.classCallCheck(this, L_OrthoCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(OrthoCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_OrthoCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._left = ortho.left;
       _this._right = ortho.right;
@@ -2800,7 +2800,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(OrthoCamera, [{
+    babelHelpers.createClass(L_OrthoCamera, [{
       key: '_needUpdateProjection',
       value: function _needUpdateProjection() {
         this._dirtyProjection = true;
@@ -2810,7 +2810,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -2901,16 +2901,16 @@
         return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
       }
     }]);
-    return OrthoCamera;
-  }(AbstractCamera);
+    return L_OrthoCamera;
+  }(L_AbstractCamera);
 
-  var PerspectiveCamera = function (_AbstractCamera) {
-    babelHelpers.inherits(PerspectiveCamera, _AbstractCamera);
+  var L_PerspectiveCamera = function (_L_AbstractCamera) {
+    babelHelpers.inherits(L_PerspectiveCamera, _L_AbstractCamera);
 
-    function PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
-      babelHelpers.classCallCheck(this, PerspectiveCamera);
+    function L_PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
+      babelHelpers.classCallCheck(this, L_PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
 
       _this._fovy = perspective.fovy;
       _this._aspect = perspective.aspect;
@@ -2922,7 +2922,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(PerspectiveCamera, [{
+    babelHelpers.createClass(L_PerspectiveCamera, [{
       key: '_needUpdateProjection',
       value: function _needUpdateProjection() {
         this._dirtyProjection = true;
@@ -2932,7 +2932,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -3002,8 +3002,8 @@
         return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
     }]);
-    return PerspectiveCamera;
-  }(AbstractCamera);
+    return L_PerspectiveCamera;
+  }(L_AbstractCamera);
 
   var Hash = function () {
     function Hash() {
@@ -6659,12 +6659,12 @@
     }, {
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
-        return new PerspectiveCamera(this, true, lookat, perspective);
+        return new L_PerspectiveCamera(this, true, lookat, perspective);
       }
     }, {
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
-        return new OrthoCamera(this, true, lookat, ortho);
+        return new L_OrthoCamera(this, true, lookat, ortho);
       }
     }, {
       key: 'createTexture',

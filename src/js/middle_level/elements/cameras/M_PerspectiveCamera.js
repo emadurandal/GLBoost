@@ -1,11 +1,11 @@
 import M_AbstractCamera from './M_AbstractCamera';
-import PerspectiveCamera from '../../../low_level/elements/cameras/PerspectiveCamera';
+import L_PerspectiveCamera from '../../../low_level/elements/cameras/L_PerspectiveCamera';
 
 export default class M_PerspectiveCamera extends M_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, perspective) {
     super(glBoostContext, toRegister);
 
-    this._lowLevelCamera = new PerspectiveCamera(this, false, lookat, perspective);
+    this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
   }
 
   // ===================== delegate to low level class ========================
