@@ -14,7 +14,7 @@ import Plane from '../low_level/primitives/Plane';
 import Cube from '../low_level/primitives/Cube';
 import Sphere from '../low_level/primitives/Sphere';
 import Particle from '../low_level/primitives/Particle';
-import Group from './elements/Group';
+import M_Group from './elements/M_Group';
 import GLTFLoader from './loader/GLTFLoader';
 import GLBoost from './plugins/phina.glboost';
 import SimpleShader from './shaders/FragmentSimpleShader';

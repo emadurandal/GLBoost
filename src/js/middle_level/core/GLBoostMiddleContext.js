@@ -2,7 +2,7 @@ import GLBoostLowContext from '../../low_level/core/GLBoostLowContext';
 import Expression from '../expressions/Expression';
 import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
-import Group from '../elements/Group';
+import M_Group from '../elements/M_Group';
 import Scene from '../elements/Scene';
 import M_Mesh from '../elements/meshes/M_Mesh';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
@@ -23,7 +23,7 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createGroup() {
-    return new Group(this);
+    return new M_Group(this);
   }
 
   createMesh(geometry, material) {

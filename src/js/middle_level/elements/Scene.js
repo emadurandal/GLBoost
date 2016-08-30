@@ -2,7 +2,7 @@ import M_Element from './M_Element';
 import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
 import M_AbstractLight from './lights/M_AbstractLight';
 import M_Mesh from './meshes/M_Mesh';
-import Group from './Group';
+import M_Group from './M_Group';
 import AABB from '../../low_level/math/AABB';
 
 
@@ -12,7 +12,7 @@ import AABB from '../../low_level/math/AABB';
  * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
-export default class Scene extends Group {
+export default class Scene extends M_Group {
 
   /**
    * [en] constructor
@@ -37,7 +37,7 @@ export default class Scene extends Group {
       element._needUpdate();
     }
 
-    if (element instanceof Group || element instanceof Scene) {
+    if (element instanceof M_Group || element instanceof Scene) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         this._setDirtyToAnimatedElement(inputName, children[i]);
@@ -68,7 +68,7 @@ export default class Scene extends Group {
     this._reset();
 
     var aabb = (function setParentAndMergeAABBRecursively(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
@@ -90,7 +90,7 @@ export default class Scene extends Group {
     this.AABB.mergeAABB(aabb);
 
     let collectLights = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var lights = [];
         children.forEach(function(child) {
@@ -112,7 +112,7 @@ export default class Scene extends Group {
 
     let existCamera_f = false;
     let collectCameras = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var cameras = [];
         children.forEach(function(child) {
@@ -138,7 +138,7 @@ export default class Scene extends Group {
 
 
     let collectMeshes = function(elem) {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var meshes = [];
         children.forEach(function(child) {
@@ -159,7 +159,7 @@ export default class Scene extends Group {
     });
 
     let callPrepareToRenderMethodOfAllElements = (elem)=> {
-      if (elem instanceof Group) {
+      if (elem instanceof M_Group) {
         var children = elem.getChildren();
         children.forEach(function (child) {
           callPrepareToRenderMethodOfAllElements(child);

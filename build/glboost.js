@@ -3629,13 +3629,13 @@
 
   GLBoost$1['M_Mesh'] = M_Mesh;
 
-  var Group = function (_M_Element) {
-    babelHelpers.inherits(Group, _M_Element);
+  var M_Group = function (_M_Element) {
+    babelHelpers.inherits(M_Group, _M_Element);
 
-    function Group(glBoostContext) {
-      babelHelpers.classCallCheck(this, Group);
+    function M_Group(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Group);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Group).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Group).call(this, glBoostContext));
 
       _this._elements = [];
       _this._AABB = new AABB();
@@ -3649,7 +3649,7 @@
      */
 
 
-    babelHelpers.createClass(Group, [{
+    babelHelpers.createClass(M_Group, [{
       key: 'addChild',
       value: function addChild(element) {
         this.removeChild(element);
@@ -3700,7 +3700,7 @@
           return element;
         }
 
-        if (element instanceof Group) {
+        if (element instanceof M_Group) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             var hitChild = this.searchElement(userflavorName, children[i]);
@@ -3720,7 +3720,7 @@
           return element;
         }
 
-        if (element instanceof Group) {
+        if (element instanceof M_Group) {
           var children = element.getChildren();
           var results = [];
           for (var i = 0; i < children.length; i++) {
@@ -3739,7 +3739,7 @@
       key: 'updateAABB',
       value: function updateAABB() {
         var aabb = function mergeAABBRecursively(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             for (var i = 0; i < children.length; i++) {
               var aabb = mergeAABBRecursively(children[i]);
@@ -3765,7 +3765,7 @@
         return this._AABB;
       }
     }]);
-    return Group;
+    return M_Group;
   }(M_Element);
 
   var RenderPass = function (_GLBoostObject) {
@@ -3844,7 +3844,7 @@
         var _this3 = this;
 
         var collectMeshes = function collectMeshes(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var meshes = [];
             children.forEach(function (child) {
@@ -6829,8 +6829,8 @@
    *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
    */
 
-  var Scene = function (_Group) {
-    babelHelpers.inherits(Scene, _Group);
+  var Scene = function (_M_Group) {
+    babelHelpers.inherits(Scene, _M_Group);
 
 
     /**
@@ -6866,7 +6866,7 @@
           element._needUpdate();
         }
 
-        if (element instanceof Group || element instanceof Scene) {
+        if (element instanceof M_Group || element instanceof Scene) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             this._setDirtyToAnimatedElement(inputName, children[i]);
@@ -6906,7 +6906,7 @@
         this._reset();
 
         var aabb = function setParentAndMergeAABBRecursively(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             for (var i = 0; i < children.length; i++) {
               children[i]._parent = elem;
@@ -6928,7 +6928,7 @@
         this.AABB.mergeAABB(aabb);
 
         var collectLights = function collectLights(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var lights = [];
             children.forEach(function (child) {
@@ -6950,7 +6950,7 @@
 
         var existCamera_f = false;
         var collectCameras = function collectCameras(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var cameras = [];
             children.forEach(function (child) {
@@ -6975,7 +6975,7 @@
         }
 
         var collectMeshes = function collectMeshes(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             var meshes = [];
             children.forEach(function (child) {
@@ -6996,7 +6996,7 @@
         });
 
         var callPrepareToRenderMethodOfAllElements = function callPrepareToRenderMethodOfAllElements(elem) {
-          if (elem instanceof Group) {
+          if (elem instanceof M_Group) {
             var children = elem.getChildren();
             children.forEach(function (child) {
               callPrepareToRenderMethodOfAllElements(child);
@@ -7073,7 +7073,7 @@
       }
     }]);
     return Scene;
-  }(Group);
+  }(M_Group);
 
   /**
    * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -8470,7 +8470,7 @@
     }, {
       key: 'createGroup',
       value: function createGroup() {
-        return new Group(this);
+        return new M_Group(this);
       }
     }, {
       key: 'createMesh',
