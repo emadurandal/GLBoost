@@ -6823,14 +6823,14 @@
   GLBoost$1['M_SkeletalMesh'] = M_SkeletalMesh;
 
   /**
-   * [en] This Scene class is the top level element of scene graph hierarchy.
+   * [en] This M_Scene class is the top level element of scene graph hierarchy.
    *       To render scene, pass this scene element to Renderer.draw method.<br>
    * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
    *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
    */
 
-  var Scene = function (_M_Group) {
-    babelHelpers.inherits(Scene, _M_Group);
+  var M_Scene = function (_M_Group) {
+    babelHelpers.inherits(M_Scene, _M_Group);
 
 
     /**
@@ -6839,10 +6839,10 @@
      * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
      */
 
-    function Scene(glBoostContext) {
-      babelHelpers.classCallCheck(this, Scene);
+    function M_Scene(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Scene);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Scene).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Scene).call(this, glBoostContext));
 
       _this._gl = _this._glContext.gl;
       _this._currentAnimationInputValues = {};
@@ -6850,7 +6850,7 @@
       return _this;
     }
 
-    babelHelpers.createClass(Scene, [{
+    babelHelpers.createClass(M_Scene, [{
       key: '_reset',
       value: function _reset() {
         this._meshes = [];
@@ -6866,7 +6866,7 @@
           element._needUpdate();
         }
 
-        if (element instanceof M_Group || element instanceof Scene) {
+        if (element instanceof M_Group || element instanceof M_Scene) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             this._setDirtyToAnimatedElement(inputName, children[i]);
@@ -7072,7 +7072,7 @@
         return this._cameras;
       }
     }]);
-    return Scene;
+    return M_Scene;
   }(M_Group);
 
   /**
@@ -8465,7 +8465,7 @@
     babelHelpers.createClass(GLBoostMiddleContext, [{
       key: 'createScene',
       value: function createScene() {
-        return new Scene(this);
+        return new M_Scene(this);
       }
     }, {
       key: 'createGroup',

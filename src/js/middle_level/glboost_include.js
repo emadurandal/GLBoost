@@ -1,6 +1,6 @@
 import GLBoostMiddleContext from './core/GLBoostMiddleContext';
 import Renderer from './Renderer';
-import Scene from './elements/Scene';
+import M_Scene from './elements/M_Scene';
 import Vector2 from '../low_level/math/Vector2';
 import Vector3 from '../low_level/math/Vector3';
 import Vector4 from '../low_level/math/Vector4';

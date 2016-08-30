@@ -7,12 +7,12 @@ import AABB from '../../low_level/math/AABB';
 
 
 /**
- * [en] This Scene class is the top level element of scene graph hierarchy.
+ * [en] This M_Scene class is the top level element of scene graph hierarchy.
  *       To render scene, pass this scene element to Renderer.draw method.<br>
  * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
-export default class Scene extends M_Group {
+export default class M_Scene extends M_Group {
 
   /**
    * [en] constructor
@@ -37,7 +37,7 @@ export default class Scene extends M_Group {
       element._needUpdate();
     }
 
-    if (element instanceof M_Group || element instanceof Scene) {
+    if (element instanceof M_Group || element instanceof M_Scene) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         this._setDirtyToAnimatedElement(inputName, children[i]);

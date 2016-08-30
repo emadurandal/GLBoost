@@ -3,7 +3,7 @@ import Expression from '../expressions/Expression';
 import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
 import M_Group from '../elements/M_Group';
-import Scene from '../elements/Scene';
+import M_Scene from '../elements/M_Scene';
 import M_Mesh from '../elements/meshes/M_Mesh';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_SkeletalGeometry from '../geometries/M_SkeletalGeometry';
@@ -19,7 +19,7 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createScene() {
-    return new Scene(this);
+    return new M_Scene(this);
   }
 
   createGroup() {
