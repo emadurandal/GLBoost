@@ -3444,27 +3444,21 @@
 
   GLBoost$1['AABB'] = AABB;
 
-  var Mesh = function (_M_Element) {
-    babelHelpers.inherits(Mesh, _M_Element);
+  var M_Mesh = function (_M_Element) {
+    babelHelpers.inherits(M_Mesh, _M_Element);
 
-    function Mesh(glBoostContext, geometry, material) {
-      babelHelpers.classCallCheck(this, Mesh);
+    function M_Mesh(glBoostContext, geometry, material) {
+      babelHelpers.classCallCheck(this, M_Mesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Mesh).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Mesh).call(this, glBoostContext));
 
       _this.geometry = geometry;
       _this.material = material;
       _this._transformedDepth = 0;
-
-      if (_this.__proto__.__proto__ && _this.__proto__.__proto__.constructor == Mesh) {
-        // this code for tmlib
-        Mesh._instanceCount = typeof Mesh._instanceCount === 'undefined' ? 0 : Mesh._instanceCount + 1;
-        _this._instanceName = Mesh.name + '_' + Mesh._instanceCount;
-      }
       return _this;
     }
 
-    babelHelpers.createClass(Mesh, [{
+    babelHelpers.createClass(M_Mesh, [{
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights) {
         this._geometry.prepareToRender(existCamera_f, lights, this._material, this);
@@ -3603,7 +3597,7 @@
       set: function set(geometry) {
         this._geometry = geometry;
         geometry._parent = this;
-        Mesh._geometries[geometry.toString()] = geometry;
+        M_Mesh._geometries[geometry.toString()] = geometry;
       },
       get: function get() {
         return this._geometry;
@@ -3628,12 +3622,12 @@
         return AABB.multiplyMatrix(world_m, this._geometry.AABB);
       }
     }]);
-    return Mesh;
+    return M_Mesh;
   }(M_Element);
 
-  Mesh._geometries = {};
+  M_Mesh._geometries = {};
 
-  GLBoost$1['Mesh'] = Mesh;
+  GLBoost$1['M_Mesh'] = M_Mesh;
 
   var Group = function (_M_Element) {
     babelHelpers.inherits(Group, _M_Element);
@@ -3757,7 +3751,7 @@
             }
             return elem.AABB;
           }
-          if (elem instanceof Mesh) {
+          if (elem instanceof M_Mesh) {
             return elem.AABB;
           }
 
@@ -3858,7 +3852,7 @@
               meshes = meshes.concat(childMeshes);
             });
             return meshes;
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             return [elem];
           } else {
             return [];
@@ -6779,8 +6773,8 @@
     return M_SkeletalGeometry;
   }(Geometry);
 
-  var SkeletalMesh = function (_Mesh) {
-    babelHelpers.inherits(SkeletalMesh, _Mesh);
+  var SkeletalMesh = function (_M_Mesh) {
+    babelHelpers.inherits(SkeletalMesh, _M_Mesh);
 
     function SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
       babelHelpers.classCallCheck(this, SkeletalMesh);
@@ -6824,7 +6818,7 @@
       }
     }]);
     return SkeletalMesh;
-  }(Mesh);
+  }(M_Mesh);
 
   GLBoost$1['SkeletalMesh'] = SkeletalMesh;
 
@@ -6925,7 +6919,7 @@
             }
             return elem.AABB;
           }
-          if (elem instanceof Mesh) {
+          if (elem instanceof M_Mesh) {
             return elem.AABB;
           }
 
@@ -6989,7 +6983,7 @@
               meshes = meshes.concat(childMeshes);
             });
             return meshes;
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             return [elem];
           } else {
             return [];
@@ -7007,7 +7001,7 @@
             children.forEach(function (child) {
               callPrepareToRenderMethodOfAllElements(child);
             });
-          } else if (elem instanceof Mesh) {
+          } else if (elem instanceof M_Mesh) {
             elem.prepareToRender(existCamera_f, _this2._lights);
           } else if (elem instanceof M_Element) {
             elem.prepareToRender();
@@ -7045,7 +7039,7 @@
       /**
        * [en] Get child meshes which belong to this scene.<br>
        * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-       * @return {Array<Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+       * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
        */
 
     }, {
@@ -8481,7 +8475,7 @@
     }, {
       key: 'createMesh',
       value: function createMesh(geometry, material) {
-        return new Mesh(this, geometry, material);
+        return new M_Mesh(this, geometry, material);
       }
     }, {
       key: 'createSkeletalMesh',

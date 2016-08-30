@@ -1,6 +1,6 @@
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
-import Mesh from './meshes/Mesh';
+import M_Mesh from './meshes/M_Mesh';
 
 export default class Group extends M_Element {
   constructor(glBoostContext) {
@@ -101,7 +101,7 @@ export default class Group extends M_Element {
         }
         return elem.AABB;
       }
-      if (elem instanceof Mesh) {
+      if (elem instanceof M_Mesh) {
         return elem.AABB;
       }
 

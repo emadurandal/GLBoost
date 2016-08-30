@@ -4,7 +4,7 @@ import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
 import Group from '../elements/Group';
 import Scene from '../elements/Scene';
-import Mesh from '../elements/meshes/Mesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 import SkeletalMesh from '../elements/meshes/SkeletalMesh';
 import M_SkeletalGeometry from '../geometries/M_SkeletalGeometry';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
@@ -27,7 +27,7 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createMesh(geometry, material) {
-    return new Mesh(this, geometry, material);
+    return new M_Mesh(this, geometry, material);
   }
 
   createSkeletalMesh(geometry, material, rootJointName) {

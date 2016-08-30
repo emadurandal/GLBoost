@@ -1,7 +1,7 @@
 import M_Element from './M_Element';
 import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
 import M_AbstractLight from './lights/M_AbstractLight';
-import Mesh from './meshes/Mesh';
+import M_Mesh from './meshes/M_Mesh';
 import Group from './Group';
 import AABB from '../../low_level/math/AABB';
 
@@ -81,7 +81,7 @@ export default class Scene extends Group {
         }
         return elem.AABB;
       }
-      if (elem instanceof Mesh) {
+      if (elem instanceof M_Mesh) {
         return elem.AABB;
       }
 
@@ -146,7 +146,7 @@ export default class Scene extends Group {
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         return [elem];
       } else {
         return [];
@@ -164,7 +164,7 @@ export default class Scene extends Group {
         children.forEach(function (child) {
           callPrepareToRenderMethodOfAllElements(child);
         });
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(existCamera_f, this._lights);
       } else if (elem instanceof M_Element) {
         elem.prepareToRender();
@@ -196,7 +196,7 @@ export default class Scene extends Group {
   /**
    * [en] Get child meshes which belong to this scene.<br>
    * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-   * @return {Array<Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+   * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
    */
   get meshes() {
     return this._meshes;

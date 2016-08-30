@@ -1,4 +1,4 @@
-import Mesh from '../elements/meshes/Mesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 import Group from '../elements/Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 import Vector4 from '../../low_level/math/Vector4';
@@ -151,7 +151,7 @@ export default class RenderPass extends GLBoostObject {
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof Mesh) {
+      } else if (elem instanceof M_Mesh) {
         return [elem];
       } else {
         return [];
