@@ -6532,7 +6532,7 @@
           return null;
         };
 
-        var joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
+        var joints = skeletalMesh._joints; //skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
         var matrices = [];
         var globalJointTransform = [];
         var inverseBindPoseMatrices = [];
@@ -6580,10 +6580,12 @@
           }
           globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
 
-          matrices[i] = Matrix44.multiply(globalJointTransform[i], inverseBindPoseMatrices[i]);
+          //matrices[i] = Matrix44.multiply(globalJointTransform[i], inverseBindPoseMatrices[i]);
         }
         for (var i = 0; i < joints.length; i++) {
-          //matrices[i] = Matrix44.multiply(globalJointTransform[i], joints[i].inverseBindPoseMatrix);
+
+          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
+          matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.inverseBindMatrices[i]);
           matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
         }
 
@@ -6664,6 +6666,8 @@
       _this._jointsHierarchy = null;
       _this._inverseBindMatrices = [];
       _this._bindShapeMatrix = Matrix44.identity();
+      _this._jointNames = [];
+      _this._joints = [];
       return _this;
     }
 
@@ -6672,6 +6676,20 @@
       value: function prepareToRender(existCamera_f, lights, renderPasses) {
         this.bakeTransformToGeometry();
         this.multiplyMatrix(Matrix44.identity());
+        var joints = this.jointsHierarchy.searchElementsByType(M_Joint);
+
+        this._joints = [];
+
+        for (var i = 0; i < this._jointNames.length; i++) {
+          for (var j = 0; j < joints.length; j++) {
+            if (this._jointNames[i] === joints[j]._userFlavorName) {
+              this._joints.push(joints[j]);
+              //this._inverseBindMatrices.push(this._rawInverseBindMatrices[j]);
+            }
+          }
+        }
+        //this._joints = joints;
+
         babelHelpers.get(Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
       }
     }, {
@@ -6703,6 +6721,14 @@
       },
       get: function get() {
         return this._bindShapeMatrix;
+      }
+    }, {
+      key: 'jointNames',
+      set: function set(names) {
+        this._jointNames = names;
+      },
+      get: function get() {
+        return this._jointNames;
       }
     }]);
     return M_SkeletalMesh;
@@ -9446,6 +9472,7 @@
           var skin = json.skins[skinStr];
 
           mesh.bindShapeMatrix = new Matrix44(skin.bindShapeMatrix, true);
+          mesh.jointNames = skin.jointNames;
 
           var inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
           mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
@@ -9601,12 +9628,13 @@
 
               var gl = GLContext.getInstance(canvas).gl;
               var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+              var animOutputArray = null;
               if (animOutputStr === 'translation') {
-                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
               } else if (animOutputStr === 'rotation') {
-                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
               } else {
-                var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
               }
 
               var animationAttributeName = '';

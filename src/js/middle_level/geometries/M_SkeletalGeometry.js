@@ -46,7 +46,7 @@ export default class M_SkeletalGeometry extends Geometry {
       return null;
     };
 
-    var joints = skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
+    var joints = skeletalMesh._joints;//skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
     var matrices = [];
     var globalJointTransform = [];
     var inverseBindPoseMatrices = [];
@@ -94,10 +94,12 @@ export default class M_SkeletalGeometry extends Geometry {
       }
       globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
 
-      matrices[i] = Matrix44.multiply(globalJointTransform[i], inverseBindPoseMatrices[i]);
+      //matrices[i] = Matrix44.multiply(globalJointTransform[i], inverseBindPoseMatrices[i]);
     }
     for (let i=0; i<joints.length; i++) {
-      //matrices[i] = Matrix44.multiply(globalJointTransform[i], joints[i].inverseBindPoseMatrix);
+
+      matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
+      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.inverseBindMatrices[i]);
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
     }
 

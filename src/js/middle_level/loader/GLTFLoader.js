@@ -196,6 +196,7 @@ export default class GLTFLoader {
       let skin = json.skins[skinStr];
 
       mesh.bindShapeMatrix = new Matrix44(skin.bindShapeMatrix, true);
+      mesh.jointNames = skin.jointNames;
 
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
       mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
@@ -352,12 +353,13 @@ export default class GLTFLoader {
 
           let gl = GLContext.getInstance(canvas).gl;
           var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+          let animOutputArray = null;
           if (animOutputStr === 'translation') {
-            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
           } else if (animOutputStr === 'rotation') {
-            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
           } else {
-            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
           }
 
           let animationAttributeName = '';
