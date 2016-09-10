@@ -159,12 +159,6 @@ export default class M_Element extends L_Element {
     return this._scale;
   }
 
-  multiplyMatrix(mat) {
-    this._matrix = mat;
-    this._currentCalcMode = 'matrix';
-    this._needUpdate();
-  }
-
   getMatrixAt(lineName, value) {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
   }

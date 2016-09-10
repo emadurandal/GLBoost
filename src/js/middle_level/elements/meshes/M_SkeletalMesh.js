@@ -8,6 +8,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     this._rootJointName = rootJointName;
     this._jointsHierarchy = null;
     this._inverseBindMatrices = [];
+    this._bindShapeMatrix = Matrix44.identity();
   }
 
   prepareToRender(existCamera_f, lights, renderPasses) {
@@ -35,6 +36,13 @@ export default class M_SkeletalMesh extends M_Mesh {
 
   get inverseBindMatrices() {
     return this._inverseBindMatrices;
+  }
+
+  set bindShapeMatrix(matrix) {
+    this._bindShapeMatrix = matrix;
+  }
+  get bindShapeMatrix() {
+    return this._bindShapeMatrix;
   }
 }
 

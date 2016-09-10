@@ -67,11 +67,10 @@ export default class L_Element extends GLBoostObject {
   }
 
   multiplyMatrix(mat) {
-    this._matrix = mat;
+    this._matrix = mat.clone();
     this._currentCalcMode = 'matrix';
     this._needUpdate();
   }
-
 
   set quaternion(quat) {
     if (this._currentCalcMode !== 'quaternion') {

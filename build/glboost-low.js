@@ -2526,7 +2526,7 @@
     }, {
       key: 'multiplyMatrix',
       value: function multiplyMatrix(mat) {
-        this._matrix = mat;
+        this._matrix = mat.clone();
         this._currentCalcMode = 'matrix';
         this._needUpdate();
       }
@@ -4323,13 +4323,6 @@
       key: 'getScaleNotAnimated',
       value: function getScaleNotAnimated() {
         return this._scale;
-      }
-    }, {
-      key: 'multiplyMatrix',
-      value: function multiplyMatrix(mat) {
-        this._matrix = mat;
-        this._currentCalcMode = 'matrix';
-        this._needUpdate();
       }
     }, {
       key: 'getMatrixAt',

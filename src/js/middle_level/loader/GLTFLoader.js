@@ -195,7 +195,7 @@ export default class GLTFLoader {
       mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
       let skin = json.skins[skinStr];
 
-      mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix, true));
+      mesh.bindShapeMatrix = new Matrix44(skin.bindShapeMatrix, true);
 
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
       mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
