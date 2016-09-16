@@ -1,3 +1,3 @@
 [submodule "phina.js"]
 	path = phina.js
-	url = git@github.com:emadurandal/phina.js.git
+	url = https://github.com/emadurandal/phina.js.git
