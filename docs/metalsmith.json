@@ -9,9 +9,6 @@
     "metalsmith-watch": "*.md",
     "metalsmith-drafts": true,
     "metalsmith-markdown": true,
-    "metalsmith-sass": {
-        "outputStyle": "expanded"
-    },
     "metalsmith-collections": {
       "blogPosts": {
         "pattern":"*.md",
