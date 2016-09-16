@@ -1,0 +1,40 @@
+{
+  "source": "./_posts",
+  "destination": "./_build",
+  "metadata": {
+    "title": "GLBoost Official Page",
+    "description": "GLBoost Official Page"
+  },
+  "plugins": {
+    "metalsmith-watch": "*.md",
+    "metalsmith-drafts": true,
+    "metalsmith-markdown": true,
+    "metalsmith-sass": {
+        "outputStyle": "expanded"
+    },
+    "metalsmith-collections": {
+      "blogPosts": {
+        "pattern":"*.md",
+        "sortBy": "date",
+        "reverse": true
+      }
+    },
+    "metalsmith-permalinks": {
+      "linksets": [{
+          "match": { "collection": "blogPosts" },
+          "pattern": "blog/:date/:filename",
+          "date": "YYYY-MM-DD"
+      },{
+          "match": { "collection": "blogIndex" },
+          "pattern": "blog"
+      },{
+          "match": { "collection": "rootFiles" },
+          "pattern": ""
+      }]
+    },
+    "metalsmith-templates": {
+      "engine": "swig",
+      "directory": "_layouts"
+    }
+  }
+}

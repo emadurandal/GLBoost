@@ -1,4 +1,4 @@
 {
   "source": "./src/js",
-  "destination": "./documents/api"
+  "destination": "./docs/documents/api"
 }

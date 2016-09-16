@@ -1,0 +1,10 @@
+.glboostLogo {
+  width: 80px;
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+}
+.glboostLogoHidden {
+  width: 80px;
+  visibility: hidden;
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>{{ title }}</title>
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/assets/styles/semantic/dist/semantic.min.css">
+<link rel="stylesheet" href="/assets/styles/main.css">
+<script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+<script src="/assets/styles/semantic/dist/semantic.min.js"></script>
+</head>
+<body>
+  {% include "./_navHeader.html" with {activeLink: 'home'} only %}
+  <a href="https://github.com/emadurandal/GLBoost"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+  <div class="ui masthead vertical segment">
+    <div class="ui container">
+      <h1 class="ui header">
+        {{ title }}
+        <div class="sub header">
+        {{ subtitle }}
+        </div>
+      </h1>
+      <div class="ui divider"></div>
+      <div class="main ui intro container">
+        {{ contents | safe }}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
