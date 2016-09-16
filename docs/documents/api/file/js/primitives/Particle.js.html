@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">js/primitives/Particle.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/primitives/Particle.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;./../globals&apos;
+import Geometry from &apos;./../geometries/Geometry&apos;
+import Vector4 from &apos;./../math/Vector4&apos;
+import Vector3 from &apos;./../math/Vector3&apos;
+import Vector2 from &apos;./../math/Vector2&apos;
+import ArrayUtil from &apos;.././misc/ArrayUtil&apos;
+import ParticleShaderSource from &apos;../shaders/ParticleShader&apos;
+
+/**
+ * This Particle class handles particles expressions.
+ * You can define particles behaviors in a custom vertex shader.
+ * These particles are processed in GPU, so this is a very fast solution of particles expressions.
+ */
+export default class Particle extends Geometry {
+
+  /**
+   * This is Particle class&apos;s constructor
+   *
+   * @param {Array} centerPointData position array and the other data
+   * @param {Number} particleWidth Width of each particle
+   * @param {Number} particleHeight Height of each particle
+   * @param {Object} JSON which has other vertex attribute arrays you want
+   * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
+   */
+  constructor(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint, canvas = GLBoost.CURRENT_CANVAS_ID) {
+    super(canvas);
+
+    this._setupVertexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, performanceHint);
+  }
+
+  _setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
+    let indices = this.indices;
+    indices = [];
+    const positionArray = centerPointData.position;
+
+    for (let i=0; i&lt;positionArray.length; i++) {
+      var offset = i*4;
+      indices.push(offset);   // start Quad
+      indices.push(offset+1); //
+      indices.push(offset+2); // end Quad
+      indices.push(offset+3); //
+      if (i === positionArray.length - 1) {
+        break;
+      }
+      indices.push(offset+3); // degenerated
+      indices.push(offset+4); // move another Particle
+    }
+
+    this.positions = [];
+    let positions = this.positions;
+
+    for (let i=0; i&lt;positionArray.length; i++) {
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+    }
+    this.centerPositions = [];
+    let centerPositions = this.centerPositions;
+
+    for (let i=0; i&lt;positionArray.length; i++) {
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+    }
+    this.texcoords = [];
+    let texcoords = this.texcoords;
+    for (let i=0; i&lt;positionArray.length; i++) {
+      texcoords.push(new Vector2(0, 0));
+      texcoords.push(new Vector2(0, 1));
+      texcoords.push(new Vector2(1, 0));
+      texcoords.push(new Vector2(1, 1));
+    }
+
+    this.normals = [];
+    let normals = this.normals;
+    var normal = new Vector3(0, 0, 1);
+    for (let i=0; i&lt;positionArray.length; i++) {
+      for (let j=0; j&lt;4; j++) {
+        normals.push(normal);
+      }
+    }
+    this.pointData = {};
+    let pointData = this.pointData;
+
+    for (let type in centerPointData) {
+      if (type !== &apos;position&apos;) {
+        pointData[type] = [];
+        for (let i=0; i&lt;positionArray.length; i++) {
+          for (let j=0; j&lt;4; j++) {
+            pointData[type].push(centerPointData[type][i]);
+          }
+        }
+      }
+    }
+
+    var object = {
+      position: positions,
+      texcoord: texcoords,
+      normal: normals,
+      particleCenterPos: centerPositions
+    };
+
+    if (needDefaultWhiteColor) {
+      this.colors = [];
+      let colors = this.colors;
+      var vertexColor = new Vector4(1, 1, 1, 1);
+      for (let i=0; i&lt;positionArray.length; i++) {
+        for (let j=0; j&lt;4; j++) {
+          colors.push(vertexColor);
+        }
+      }
+      object.color = colors;
+    }
+
+    var tempAttributes = ArrayUtil.merge(object, pointData);
+    var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
+
+    return {
+      vertexAttributes: completeAttributes,
+      indexArray: [indices]
+    }
+  }
+
+  _updateVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, needDefaultWhiteColor) {
+    let positionArray = centerPointData.position;
+    let idx=0;
+    let positions = this.positions;
+    for (let i=0; i&lt;positionArray.length; i++) {
+      positions[idx+0].x = positionArray[i].x - pHalfWidth;
+      positions[idx+0].y = positionArray[i].y + pHalfHeight;
+      positions[idx+0].z = positionArray[i].z;
+      positions[idx+1].x = positionArray[i].x - pHalfWidth;
+      positions[idx+1].y = positionArray[i].y - pHalfHeight;
+      positions[idx+1].z = positionArray[i].z;
+      positions[idx+2].x = positionArray[i].x + pHalfWidth;
+      positions[idx+2].y = positionArray[i].y + pHalfHeight;
+      positions[idx+2].z = positionArray[i].z;
+      positions[idx+3].x = positionArray[i].x + pHalfWidth;
+      positions[idx+3].y = positionArray[i].y - pHalfHeight;
+      positions[idx+3].z = positionArray[i].z;
+      idx+=4;
+    }
+
+    let centerPositions = this.centerPositions;
+    idx = 0;
+    for (let i=0; i&lt;positionArray.length; i++) {
+      centerPositions[idx].x = positionArray[i].x;
+      centerPositions[idx].y = positionArray[i].y;
+      centerPositions[idx].z = positionArray[i].z;
+      centerPositions[idx+1].x = positionArray[i].x;
+      centerPositions[idx+1].y = positionArray[i].y;
+      centerPositions[idx+1].z = positionArray[i].z;
+      centerPositions[idx+2].x = positionArray[i].x;
+      centerPositions[idx+2].y = positionArray[i].y;
+      centerPositions[idx+2].z = positionArray[i].z;
+      centerPositions[idx+3].x = positionArray[i].x;
+      centerPositions[idx+3].y = positionArray[i].y;
+      centerPositions[idx+3].z = positionArray[i].z;
+      idx+=4;
+    }
+    idx = 0;
+    let pointData = this.pointData;
+    for (let type in centerPointData) {
+      if (type !== &apos;position&apos;) {
+        pointData[type] = [];
+        for (let i=0; i&lt;positionArray.length; i++) {
+          for (let j=0; j&lt;4; j++) {
+            pointData[type][idx].x = centerPointData[type][i].x;
+            pointData[type][idx].y = centerPointData[type][i].y;
+            pointData[type][idx].z = centerPointData[type][i].z;
+            idx++;
+          }
+        }
+      }
+    }
+
+    var object = {
+      position: positions,
+      texcoord: this.texcoords,
+      normal: this.normals,
+      particleCenterPos: centerPositions
+    };
+
+    if (needDefaultWhiteColor) {
+      object.color = this.colors;
+    }
+
+    var tempAttributes = ArrayUtil.merge(object, pointData);
+    var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
+
+    return {
+      vertexAttributes: completeAttributes,
+      indexArray: [this.indices]
+    }
+  }
+  _setupVertexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, performanceHint) {
+    var result = this._setupVertexAndIndexData(centerPointData, pHalfWidth, pHalfHeight, customVertexAttributes, true);
+
+    this.setVerticesData(result.vertexAttributes, result.indexArray, GLBoost.TRIANGLE_STRIP, performanceHint);
+  }
+
+  updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
+    //var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
+const result = this._updateVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
+    super.updateVerticesData(result.vertexAttributes);
+  }
+
+  prepareForRender(existCamera_f, pointLight, meshMaterial) {
+    // before prepareForRender of &apos;Geometry&apos; class, a new &apos;BlendShapeShader&apos;(which extends default shader) is assigned.
+    var canvas = this._canvas;
+
+    if (meshMaterial) {
+      this._materialForBillboard = meshMaterial;
+    } else {
+      this._materialForBillboard = this._defaultMaterial;
+    }
+
+    class ParticleShader extends this._materialForBillboard.shader.constructor {
+      constructor(canvas) {
+        super(canvas, ParticleShaderSource);
+        ParticleShader.mixin(ParticleShaderSource);
+
+        this._meshTransformUpdateCount = -9999;
+        this._cameraViewUpdateCount = -9999;
+        this._cameraProjectionUpdateCount = -9999;
+      }
+
+      setUniforms(gl, glslProgram, material, camera, mesh) {
+        super.setUniforms(gl, glslProgram, material, camera, mesh);
+
+        if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
+          gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, new Float32Array(camera.perspectiveRHMatrix().flatten()));
+        }
+
+        if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, new Float32Array(camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten()));
+        }
+
+        this._meshTransformUpdateCount = mesh.updateCountAsElement;
+        this._cameraViewUpdateCount = camera.updateCountAsCameraView;
+        this._cameraProjectionUpdateCount = camera.updateCountAsCameraProjection;
+
+        return true; // still dirty
+      }
+    }
+
+    if (meshMaterial) {
+      meshMaterial.shader = new ParticleShader(canvas);
+    } else {
+      this._defaultMaterial.shader = new ParticleShader(canvas);
+    }
+
+    /*
+     let materials = this._materials;
+     if (materials) {
+     for (let i=0; i&lt;materials.length;i++) {
+     materials[i].shader = new BlendShapeShader(this._canvas);
+     }
+     }
+     */
+
+    super.prepareForRender(existCamera_f, pointLight, meshMaterial);
+  }
+
+}
+
+GLBoost[&quot;Particle&quot;] = Particle;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

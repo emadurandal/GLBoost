@@ -1,0 +1,48 @@
+{
+  "name": "glboost",
+  "version": "0.0.1",
+  "description": "A New WebGL Rendering Library for 3D Graphics Geeks",
+  "main": "glboost.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "npm run build-low && npm run build-middle",
+    "build-middle": "rollup -c src/js/middle_level/rollup.config.js",
+    "build-low": "rollup -c src/js/low_level/rollup.config.js",
+    "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
+    "esdoc": "esdoc -c esdoc.json",
+    "build-examples": "npm run standalone",
+    "standalone": "npm run standalone:custom_shader && npm run standalone:custom_shader_2 && npm run standalone:particles && npm run standalone:multiple_render_targets",
+    "standalone:custom_shader": "rollup -c examples/standalone/custom_shader/rollup.config.js",
+    "standalone:custom_shader_2": "rollup -c examples/standalone/custom_shader_2/rollup.config.js",
+    "standalone:particles": "rollup -c examples/standalone/particles/rollup.config.js",
+    "standalone:multiple_render_targets": "rollup -c examples/for_phina/multiple_render_targets/rollup.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emadurandal/GLBoost.git"
+  },
+  "author": "emadurandal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/emadurandal/GLBoost/issues"
+  },
+  "homepage": "https://github.com/emadurandal/GLBoost#readme",
+  "devDependencies": {
+    "babel-core": "6.7.2",
+    "babel-preset-es2015": "6.6.0",
+    "babel-preset-es2015-rollup": "1.0.0",
+    "babel-register": "6.7.2",
+    "chai": "^3.5.0",
+    "esdoc": "^0.4.3",
+    "eslint": "^2.4.0",
+    "eslint-config-standard": "^5.1.0",
+    "eslint-plugin-promise": "^1.1.0",
+    "eslint-plugin-standard": "^1.3.2",
+    "mocha": "^2.4.5",
+    "rollup": "0.21.2",
+    "rollup-plugin-babel": "2.2.0",
+    "selenium-webdriver": "^2.53.1"
+  }
+}

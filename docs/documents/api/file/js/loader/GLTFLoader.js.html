@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">js/loader/GLTFLoader.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/loader/GLTFLoader.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../globals&apos;;
+import GLContext from &apos;../GLContext&apos;;
+import Geometry from &apos;../geometries/Geometry&apos;;
+import SkeletalGeometry from &apos;../geometries/SkeletalGeometry&apos;;
+import ClassicMaterial from &apos;../ClassicMaterial&apos;;
+import Mesh from &apos;../meshes/Mesh&apos;;
+import SkeletalMesh from &apos;../meshes/SkeletalMesh&apos;;
+import PhongShader from &apos;../shaders/PhongShader&apos;;
+import Texture from &apos;../textures/Texture&apos;;
+import Vector3 from &apos;../math/Vector3&apos;;
+import Vector2 from &apos;../math/Vector2&apos;;
+import Vector4 from &apos;../math/Vector4&apos;;
+import Matrix44 from &apos;../math/Matrix44&apos;;
+import Quaternion from &apos;../math/Quaternion&apos;;
+import ArrayUtil from &apos;../misc/ArrayUtil&apos;;
+import Group from &apos;../Group&apos;;
+import Joint from &apos;../skeletons/Joint&apos;;
+
+
+let singleton = Symbol();
+let singletonEnforcer = Symbol();
+
+/**
+ * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .&lt;br&gt;
+ * [ja] glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x3092;&#x8AAD;&#x307F;&#x8FBC;&#x3080;&#x305F;&#x3081;&#x306E;&#x30ED;&#x30FC;&#x30C0;&#x30FC;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x30D5;&#x30A9;&#x30FC;&#x30DE;&#x30C3;&#x30C8;&#x306B;&#x3064;&#x3044;&#x3066;&#x306E;&#x8A73;&#x7D30;&#x306F; https://github.com/KhronosGroup/glTF &#x3092;&#x3054;&#x89A7;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+ */
+export default class GLTFLoader {
+
+  /**
+   * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.&lt;br&gt;
+   * [ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x3067;&#x3059;&#x3002;&#x3057;&#x304B;&#x3057;&#x672C;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x3067;&#x3042;&#x308B;&#x305F;&#x3081;&#x3001;&#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306F;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x305B;&#x307E;&#x305B;&#x3093;&#x3002;getInstance()&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3092;&#x4F7F;&#x3063;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] &#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306E;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x3057;&#x3092;&#x7981;&#x6B62;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30B7;&#x30F3;&#x30DC;&#x30EB;
+   */
+  constructor(enforcer) {
+    if (enforcer !== singletonEnforcer) {
+      throw new Error(&quot;This is a Singleton class. get the instance using &apos;getInstance&apos; static method.&quot;);
+    }
+  }
+
+  /**
+   * [en] The static method to get singleton instance of this class.&lt;br&gt;
+   * [ja] &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x3092;&#x53D6;&#x5F97;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002;
+   * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;
+   */
+  static getInstance() {
+    if (!this[singleton]) {
+      this[singleton] = new GLTFLoader(singletonEnforcer);
+    }
+    return this[singleton];
+  }
+
+  /**
+   * [en] the method to load glTF file.&lt;br&gt;
+   * [ja] glTF file&#x3092;&#x30ED;&#x30FC;&#x30C9;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002;
+   * @param {string} url [en] url of glTF file [ja] glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x306E;url
+   * @param {number} scale [en] scale of size of loaded models [ja] &#x8AAD;&#x307F;&#x8FBC;&#x3093;&#x3060;&#x30E2;&#x30C7;&#x30EB;&#x306E;&#x30B5;&#x30A4;&#x30BA;&#x306E;&#x30B9;&#x30B1;&#x30FC;&#x30EB;
+   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] &#x8AAD;&#x307F;&#x8FBC;&#x3093;&#x3060;&#x30B8;&#x30AA;&#x30E1;&#x30C8;&#x30EA;&#x306B;&#x9069;&#x7528;&#x3059;&#x308B;&#x30B7;&#x30A7;&#x30FC;&#x30C0;&#x30FC;
+   * @param {HTMLCanvas|string} canvas [en] canvas or canvas&apos; id string. [ja] canvas&#x307E;&#x305F;&#x306F;canvas&#x306E;id&#x6587;&#x5B57;&#x5217;
+   * @return {Promise} [en] a promise object [ja] Promise&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;
+   */
+  loadGLTF(url, scale = 1.0, defaultShader = null, canvas = GLBoost.CURRENT_CANVAS_ID) {
+    return new Promise((resolve, reject)=&gt; {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = ()=&gt; {
+        if (xmlHttp.readyState == 4 &amp;&amp; xmlHttp.status == 200){
+          var gotText = xmlHttp.responseText;
+          var partsOfPath = url.split(&apos;/&apos;);
+          var basePath = &apos;&apos;;
+          for(var i=0; i&lt;partsOfPath.length-1; i++) {
+            basePath += partsOfPath[i] + &apos;/&apos;;
+          }
+          console.log(basePath);
+          this._constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve);
+        }
+      };
+
+      xmlHttp.open(&quot;GET&quot;, url, true);
+      xmlHttp.send(null);
+    });
+  }
+
+  _constructMesh(gotText, basePath, canvas, scale, defaultShader, resolve) {
+    var json = JSON.parse(gotText);
+
+    for (let bufferName in json.buffers) {
+      //console.log(&quot;name: &quot; + bufferName + &quot; data:&quot; + );
+      let bufferInfo = json.buffers[bufferName];
+
+      if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
+        this._loadBinaryFile(bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+      } else {
+        this._loadBinaryFileUsingXHR(basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+      }
+    }
+  }
+
+  _loadBinaryFile(dataUrI, basePath, json, canvas, scale, defaultShader, resolve) {
+    dataUrI = dataUrI.split(&apos;,&apos;);
+    var type = dataUrI[0].split(&apos;:&apos;)[1].split(&apos;;&apos;)[0];
+    var byteString = atob(dataUrI[1]);
+    var byteStringLength = byteString.length;
+    var arrayBuffer = new ArrayBuffer(byteStringLength);
+    var intArray = new Uint8Array(arrayBuffer);
+    for (var i = 0; i &lt; byteStringLength; i++) {
+      intArray[i] = byteString.charCodeAt(i);
+    }
+
+    if (arrayBuffer) {
+      this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+    }
+  }
+
+  _loadBinaryFileUsingXHR(binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+    var oReq = new XMLHttpRequest();
+    oReq.open(&quot;GET&quot;, binaryFilePath, true);
+    oReq.responseType = &quot;arraybuffer&quot;;
+
+
+    oReq.onload = (oEvent)=&gt; {
+      var arrayBuffer = oReq.response; // Note: not oReq.responseText
+
+      if (arrayBuffer) {
+        this._IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+      }
+    };
+
+    oReq.send(null);
+  }
+
+  _IterateNodeOfScene(arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+    let sceneJson = json.scenes.defaultScene;
+
+    let group = new Group();
+    group.userFlavorName = &apos;TopGroup&apos;;
+    let nodeStr = null;
+    for (let i=0; i&lt;sceneJson.nodes.length; i++) {
+      nodeStr = sceneJson.nodes[i];
+
+      // iterate nodes and load meshes
+      let element = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
+      group.addChild(element);
+    }
+
+    // register joints hierarchy to skeletal mesh
+    let skeletalMeshes = group.searchElementsByType(SkeletalMesh);
+    skeletalMeshes.forEach((skeletalMesh)=&gt;{
+      var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+      skeletalMesh.jointsHierarchy = rootJoint;
+    });
+
+    // Animation
+    this._loadAnimation(group, arrayBuffer, json, canvas, scale);
+
+    resolve(group);
+  }
+
+  _recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+    var nodeJson = json.nodes[nodeStr];
+    var group = new Group();
+    group.userFlavorName = nodeStr;
+
+    if (nodeJson.translation) {
+      group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+    }
+    if (nodeJson.scale) {
+      group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+    }
+    if (nodeJson.rotation) {
+      group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+    }
+    if (nodeJson.matrix) {
+      group.multiplyMatrix(new Matrix44(nodeJson.matrix));
+    }
+
+    if (nodeJson.meshes) {
+      // this node has mashes...
+      let meshStr = nodeJson.meshes[0];
+      let meshJson = json.meshes[meshStr];
+
+      let rootJointStr = null;
+      let skinStr = null;
+      if (nodeJson.skeletons) {
+        rootJointStr = nodeJson.skeletons[0];
+        skinStr = nodeJson.skin;
+      }
+      let mesh = this._loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+      mesh.userFlavorName = meshStr;
+      group.addChild(mesh);
+    } else if (nodeJson.jointName) {
+      let joint = new Joint();
+      joint.userFlavorName = nodeJson.jointName;
+      group.addChild(joint);
+    }
+
+    for (let i=0; i&lt;nodeJson.children.length; i++) {
+      let nodeStr = nodeJson.children[i];
+      let childElement = this._recursiveIterateNode(nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      group.addChild(childElement);
+    }
+
+    return group;
+  }
+
+  _loadMesh(meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
+    var mesh = null;
+    var geometry = null;
+    let gl = GLContext.getInstance(canvas).gl;
+    if (rootJointStr) {
+      geometry = new SkeletalGeometry(canvas);
+      mesh = new SkeletalMesh(geometry, null, rootJointStr);
+      let skin = json.skins[skinStr];
+
+      mesh.multiplyMatrix(new Matrix44(skin.bindShapeMatrix));
+
+      let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
+      mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
+    } else {
+      geometry = new Geometry(canvas);
+      mesh = new Mesh(geometry);
+    }
+    var material = new ClassicMaterial(canvas);
+
+    let primitiveJson = meshJson.primitives[0];
+
+    // Geometry
+    let indicesAccessorStr = primitiveJson.indices;
+    var indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+
+    let positionsAccessorStr = primitiveJson.attributes.POSITION;
+    let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
+
+    let normalsAccessorStr = primitiveJson.attributes.NORMAL;
+    let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
+
+    var additional = {};
+
+    /// if Skeletal
+    let jointAccessorStr = primitiveJson.attributes.JOINT;
+    if (jointAccessorStr) {
+      let joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
+      additional[&apos;joint&apos;] = joints;
+    }
+    let weightAccessorStr = primitiveJson.attributes.WEIGHT;
+    if (weightAccessorStr) {
+      let weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
+      additional[&apos;weight&apos;] = weights;
+    }
+
+    // Texture
+    let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
+    var texcoords = null;
+
+    let materialStr = primitiveJson.material;
+    let materialJson = json.materials[materialStr];
+    let diffuseValue = materialJson.values.diffuse;
+    // Diffuse Texture
+    if (texcoords0AccessorStr) {
+      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
+      additional[&apos;texcoord&apos;] = texcoords;
+
+      if (typeof diffuseValue === &apos;string&apos;) {
+        let textureStr = diffuseValue;
+        let textureJson = json.textures[textureStr];
+        let imageStr = textureJson.source;
+        let imageJson = json.images[imageStr];
+        let imageFileStr = imageJson.uri;
+
+        var texture = new Texture(basePath + imageFileStr, canvas);
+        texture.name = textureStr;
+        material.diffuseTexture = texture;
+      }
+    }
+    // Diffuse
+    if (diffuseValue &amp;&amp; typeof diffuseValue !== &apos;string&apos;) {
+      material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+    }
+    // Ambient
+    let ambientValue = materialJson.values.ambient;
+    if (ambientValue &amp;&amp; typeof ambientValue !== &apos;string&apos;) {
+      material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+    }
+    // Specular
+    let specularValue = materialJson.values.specular;
+    if (specularValue &amp;&amp; typeof specularValue !== &apos;string&apos;) {
+      material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+    }
+
+    let opacityValue = 1.0 - materialJson.values.transparency;
+
+    var vertexData = {
+      position: positions,
+      normal: normals
+    };
+
+    geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), [indices]);
+
+    material.setVertexN(geometry, indices.length);
+    if (defaultShader) {
+      material.shader = defaultShader;
+    } else {
+      material.shader = new PhongShader(canvas);
+    }
+    geometry.materials = [material];
+
+    return mesh;
+  }
+
+  _loadAnimation(element, arrayBuffer, json, canvas, scale) {
+    let animationJson = null;
+    for (let anim in json.animations) {
+      animationJson = json.animations[anim];
+      if (animationJson) {
+        for (let i=0; i&lt;animationJson.channels.length; i++) {
+          let channelJson = animationJson.channels[i];
+          if (!channelJson) {
+            continue;
+          }
+
+          let targetMeshStr = channelJson.target.id;
+          let targetPathStr = channelJson.target.path;
+          let samplerStr = channelJson.sampler;
+          let samplerJson = animationJson.samplers[samplerStr];
+          let animInputStr = samplerJson.input;
+          var animOutputStr = samplerJson.output;
+          let animInputAccessorStr = animationJson.parameters[animInputStr];
+          let animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+          let gl = GLContext.getInstance(canvas).gl;
+          var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+          if (animOutputStr === &apos;translation&apos;) {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+          } else if (animOutputStr === &apos;rotation&apos;) {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+          } else {
+            var animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+          }
+
+          let animationAttributeName = &apos;&apos;;
+          if (animOutputStr === &apos;translation&apos;) {
+            animationAttributeName = &apos;translate&apos;;
+          } else if (animOutputStr === &apos;rotation&apos;) {
+            animationAttributeName = &apos;quaternion&apos;;
+          } else {
+            animationAttributeName = animOutputStr;
+          }
+
+          let hitElement = element.searchElement(targetMeshStr);
+          if (hitElement) {
+            hitElement.setAnimationAtLine(&apos;time&apos;, animationAttributeName, animInputArray, animOutputArray);
+            hitElement.setActiveAnimationLine(&apos;time&apos;);
+            hitElement.currentCalcMode = &apos;quaternion&apos;;
+          }
+        }
+      }
+    }
+  }
+
+  _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false) {
+    var accessorJson = json.accessors[accessorStr];
+    var bufferViewStr = accessorJson.bufferView;
+    var bufferViewJson = json.bufferViews[bufferViewStr];
+    var byteOffset = bufferViewJson.byteOffset + accessorJson.byteOffset;
+
+    var componentN = 0;
+    switch (accessorJson.type) {
+      case &apos;SCALAR&apos;:
+        componentN = 1;
+        break;
+      case &apos;VEC2&apos;:
+        componentN = 2;
+        break;
+      case &apos;VEC3&apos;:
+        componentN = 3;
+        break;
+      case &apos;VEC4&apos;:
+        componentN = 4;
+        break;
+      case &apos;MAT4&apos;:
+        componentN = 16;
+        break;
+    }
+
+    var bytesPerComponent = 0;
+    var dataViewMethod = &apos;&apos;;
+    switch (accessorJson.componentType) {
+      case gl.UNSIGNED_SHORT:
+        bytesPerComponent = 2;
+        dataViewMethod = &apos;getUint16&apos;;
+        break;
+      case gl.FLOAT:
+        bytesPerComponent = 4;
+        dataViewMethod = &apos;getFloat32&apos;;
+        break;
+    }
+
+    var byteLength = bytesPerComponent * componentN * accessorJson.count;
+
+    var vertexAttributeArray = [];
+    let dataView = new DataView(arrayBuffer, byteOffset, byteLength);
+    let byteDelta = bytesPerComponent * componentN;
+    let littleEndian = true;
+    for (let pos = 0; pos &lt; byteLength; pos += byteDelta) {
+
+      switch (accessorJson.type) {
+        case &apos;SCALAR&apos;:
+          vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+          break;
+        case &apos;VEC2&apos;:
+          vertexAttributeArray.push(new Vector2(
+            dataView[dataViewMethod](pos, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale
+          ));
+          break;
+        case &apos;VEC3&apos;:
+          vertexAttributeArray.push(new Vector3(
+            dataView[dataViewMethod](pos, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
+            dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale
+          ));
+          break;
+        case &apos;VEC4&apos;:
+          if (quaternionIfVec4) {
+            vertexAttributeArray.push(new Quaternion(
+              dataView[dataViewMethod](pos, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
+            ));
+          } else {
+            vertexAttributeArray.push(new Vector4(
+              dataView[dataViewMethod](pos, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale,
+              dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
+            ));
+          }
+          break;
+        case &apos;MAT4&apos;:
+          let matrixComponents = [];
+          for (let i=0; i&lt;16; i++) {
+            matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian)*scale;
+          }
+          vertexAttributeArray.push(new Matrix44(matrixComponents));
+          break;
+      }
+
+    }
+
+    return vertexAttributeArray;
+  }
+
+}
+
+
+
+GLBoost[&quot;GLTFLoader&quot;] = GLTFLoader;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

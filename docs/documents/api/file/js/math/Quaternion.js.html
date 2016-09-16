@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">js/math/Quaternion.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/math/Quaternion.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;./../globals&apos;
+import Matrix44 from &apos;./Matrix44&apos;
+import Vector3 from &apos;./Vector3&apos;
+import MathUtil from &apos;./MathUtil&apos;
+
+export default class Quaternion {
+
+  constructor(x, y, z, w) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.w = w;
+  }
+
+  isEqual(vec) {
+    if (this.x === vec.x &amp;&amp; this.y === vec.y &amp;&amp; this.z === vec.z &amp;&amp; this.w === vec.w) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  clone() {
+    return new Quaternion(this.x, this.y, this.z, this.w);
+  }
+
+  static invert(quat) {
+    return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+  }
+
+  static qlerp(lhq, rhq, ratio) {
+
+    var q = new Quaternion(0, 0, 0, 1);
+    var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+    var ss = 1.0 - qr * qr;
+
+    if (ss === 0.0) {
+      q.w = lhq.w;
+      q.x = lhq.x;
+      q.y = lhq.y;
+      q.z = lhq.z;
+
+      return q;
+    } else {
+
+      if (qr &gt; 1) {
+        qr = 0.999;
+      } else if (qr &lt; -1) {
+        qr = -0.999;
+      }
+
+      let ph = Math.acos(qr);
+      let s2;
+      if(qr &lt; 0.0 &amp;&amp; ph &gt; Math.PI / 2.0){
+        qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+        ph = Math.acos(qr);
+        s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+      } else {
+        s2 = Math.sin(ph * ratio) / Math.sin(ph);
+      }
+      let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+      q.x = lhq.x * s1 + rhq.x * s2;
+      q.y = lhq.y * s1 + rhq.y * s2;
+      q.z = lhq.z * s1 + rhq.z * s2;
+      q.w = lhq.w * s1 + rhq.w * s2;
+
+      return q;
+    }
+  }
+
+  get rotationMatrix() {
+    var sx = this.x * this.x;
+    var sy = this.y * this.y;
+    var sz = this.z * this.z;
+    var cx = this.y * this.z;
+    var cy = this.x * this.z;
+    var cz = this.x * this.y;
+    var wx = this.w * this.x;
+    var wy = this.w * this.y;
+    var wz = this.w * this.z;
+
+    return new Matrix44(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+      0.0, 0.0, 0.0, 1.0
+    );
+  }
+
+  axisAngle(axisVec3, angle) {
+    var radian = 0;
+    if (GLBoost[&quot;ANGLE_UNIT&quot;] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+    var halfAngle = 0.5 * radian;
+    var sin = Math.sin(halfAngle);
+
+    var axis = Vector3.normalize(axisVec3);
+    this.w = Math.cos(halfAngle);
+    this.x = sin * axis.x;
+    this.y = sin * axis.y;
+    this.z = sin * axis.z;
+
+    return this;
+  }
+
+  static axisAngle(axisVec3, angle) {
+    var radian = 0;
+    if (GLBoost[&quot;ANGLE_UNIT&quot;] === GLBoost.DEGREE) {
+      radian = MathUtil.degreeToRadian(angle);
+    } else {
+      radian = angle;
+    }
+    var halfAngle = 0.5 * radian;
+    var sin = Math.sin(halfAngle);
+
+    var axis = Vector3.normalize(axisVec3);
+    return new Quaternion(
+      sin * axis.x,
+      sin * axis.y,
+      sin * axis.z,
+      Math.cos(halfAngle));
+  }
+
+  add(q) {
+    this.x += q.x;
+    this.y += q.y;
+    this.z += q.z;
+    this.w += q.w;
+
+    return this;
+  }
+
+  multiply(val) {
+    this.x *= val;
+    this.y *= val;
+    this.z *= val;
+    this.w *= val;
+
+    return this;
+  }
+}
+
+GLBoost[&quot;Quaternion&quot;] = Quaternion;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">js/Element.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/Element.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;./globals&apos;;
+import Vector2 from &apos;./math/Vector2&apos;;
+import Vector3 from &apos;./math/Vector3&apos;;
+import Vector4 from &apos;./math/Vector4&apos;;
+import Quaternion from &apos;./math/Quaternion&apos;;
+import Matrix44 from &apos;./math/Matrix44&apos;;
+import AnimationUtil from &apos;./misc/AnimationUtil&apos;;
+
+
+export default class Element {
+  constructor() {
+    this._parent = null;
+    this._translate = Vector3.zero();
+    this._rotate = Vector3.zero();
+    this._quaternion = new Quaternion(0, 0, 0, 1);
+    this._scale = new Vector3(1, 1, 1);
+    this._matrix = Matrix44.identity();
+    this._finalMatrix = Matrix44.identity();
+    this._invMatrix = Matrix44.identity();
+    this._dirtyAsElement = false;
+    this._currentCalcMode = &apos;euler&apos;; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
+    this._calculatedInverseMatrix = false;
+    this._updateCountAsElement = 0;
+    this._accumulatedAncestryNameWithUpdateInfoString = &apos;&apos;;
+    this._accumulatedAncestryNameWithUpdateInfoStringInv = &apos;&apos;;
+    this._animationLine = {};
+    this._userFlavorName = &apos;&apos;;
+    this.opacity = 1.0;
+
+    this._activeAnimationLineName = null;
+
+    this._setName();
+  }
+
+  _setName() {
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === &apos;undefined&apos;) ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + &apos;_&apos; + this.constructor._instanceCount;
+  }
+
+  _needUpdate() {
+    this._dirtyAsElement = true;
+    this._calculatedInverseMatrix = false;
+    this._updateCountAsElement++;
+  }
+
+  get updateCountAsElement() {
+    return this._updateCountAsElement;
+  }
+
+  _getAnimatedTransformValue(value, animation, type) {
+    if (typeof animation !== &apos;undefined&apos; &amp;&amp; animation[type]) {
+      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+    } else {
+    //  console.warn(this._instanceName + &apos;doesn&apos;t have &apos; + type + &apos; animation data. GLBoost returned default &apos; + type + &apos; value.&apos;);
+      return this[&apos;_&apos; + type];
+    }
+  }
+
+  set translate(vec) {
+    if (this._translate.isEqual(vec)) {
+      return;
+    }
+    this._translate = vec;
+    this._needUpdate();
+  }
+
+  _getCurrentAnimationInputValue(inputName) {
+    return this._parent._getCurrentAnimationInputValue(inputName);
+  }
+
+  get translate() {
+    if (this._activeAnimationLineName) {
+      return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._translate;
+    }
+  }
+
+  getTranslateAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], &apos;translate&apos;);
+  }
+
+  set rotate(vec) {
+    if (this._currentCalcMode !== &apos;euler&apos;) {
+      this._currentCalcMode = &apos;euler&apos;;
+      this._needUpdate();
+    }
+    if (this._rotate.isEqual(vec)) {
+      return;
+    }
+    this._rotate = vec;
+    this._needUpdate();
+  }
+
+  get rotate() {
+    if (this._activeAnimationLineName) {
+      return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._rotate;
+    }
+  }
+
+  getRotateAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], &apos;rotate&apos;);
+  }
+
+  set quaternion(quat) {
+    if (this._currentCalcMode !== &apos;quaternion&apos;) {
+      this._currentCalcMode = &apos;quaternion&apos;;
+      this._needUpdate();
+    }
+    if (this._quaternion.isEqual(quat)) {
+      return;
+    }
+    this._quaternion = quat;
+    this._needUpdate();
+  }
+
+  get quaternion() {
+    if (this._activeAnimationLineName) {
+      return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._quaternion;
+    }
+  }
+
+  getQuaternionAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], &apos;quaternion&apos;);
+  }
+
+  set scale(vec) {
+    if (this._scale.isEqual(vec)) {
+      return;
+    }
+    this._scale = vec;
+    this._needUpdate();
+  }
+
+  get scale() {
+    if (this._activeAnimationLineName) {
+      return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._scale;
+    }
+  }
+
+  getScaleAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], &apos;scale&apos;);
+  }
+
+  multiplyMatrix(mat) {
+    this._matrix = mat;
+    this._currentCalcMode = &apos;matrix&apos;;
+    this._needUpdate();
+  }
+
+  getMatrixAt(lineName, value) {
+    return this._getAnimatedTransformValue(value, this._animationLine[lineName], &apos;matrix&apos;);
+  }
+
+  get matrix() {
+    if (this._activeAnimationLineName) {
+      return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+    } else {
+      return this._matrix;
+    }
+  }
+
+  get transformMatrix() {
+    if (this._dirtyAsElement) {
+      var matrix = Matrix44.identity();
+      if (this._currentCalcMode === &apos;matrix&apos;) {
+        this._finalMatrix = matrix.multiply(this._matrix);
+        this._dirtyAsElement = false;
+        return this._finalMatrix.clone();
+      }
+
+      var rotationMatrix = null;
+      if (this._currentCalcMode === &apos;quaternion&apos;) {
+        rotationMatrix = this.quaternion.rotationMatrix;
+      } else {
+        rotationMatrix = Matrix44.rotateX(this.rotate.x).
+        multiply(Matrix44.rotateY(this.rotate.y)).
+        multiply(Matrix44.rotateZ(this.rotate.z));
+      }
+
+      this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+      this._finalMatrix.m03 = this.translate.x;
+      this._finalMatrix.m13 = this.translate.y;
+      this._finalMatrix.m23 = this.translate.z;
+
+      this._dirtyAsElement = false;
+    }
+
+    return this._finalMatrix.clone();
+  }
+
+  get transformMatrixOnlyRotate() {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === &apos;quaternion&apos;) {
+      rotationMatrix = this.quaternion.rotationMatrix;
+    } else if (this._currentCalcMode === &apos;matrix&apos;) {
+      rotationMatrix = this.matrix;
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this.rotate.x).
+      multiply(Matrix44.rotateY(this.rotate.y)).
+      multiply(Matrix44.rotateZ(this.rotate.z));
+    }
+
+    return rotationMatrix;
+  }
+
+  get transformMatrixOnlyRotateOnInit() {
+
+    var rotationMatrix = null;
+    if (this._currentCalcMode === &apos;quaternion&apos;) {
+      rotationMatrix = this.getQuaternionAt(&apos;time&apos;, 0).rotationMatrix;
+    } else if (this._currentCalcMode === &apos;matrix&apos;) {
+      rotationMatrix = this.getMatrixAt(&apos;time&apos;, 0);
+      rotationMatrix.m03 = 0;
+      rotationMatrix.m13 = 0;
+      rotationMatrix.m23 = 0;
+      rotationMatrix.m30 = 0;
+      rotationMatrix.m31 = 0;
+      rotationMatrix.m32 = 0;
+    } else {
+      rotationMatrix = Matrix44.rotateX(this.getRotateAt(&apos;time&apos;, 0).x).
+      multiply(Matrix44.rotateY(this.getRotateAt(&apos;time&apos;, 0).y)).
+      multiply(Matrix44.rotateZ(this.getRotateAt(&apos;time&apos;, 0).z));
+    }
+
+    return rotationMatrix;
+  }
+
+
+  get inverseTransformMatrix() {
+    if (!this._calculatedInverseMatrix) {
+      this._invMatrix = this.transformMatrix.invert();
+      this._calculatedInverseMatrix = true;
+    }
+    return this._invMatrix.clone();
+  }
+
+  _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.toStringWithUpdateInfo();
+    } else {
+      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
+    }
+  }
+
+  _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
+    if (currentElem._parent === null) {
+      if (withMySelf) {
+        return currentElem.transformMatrix;
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrix;
+      }
+      return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+    }
+  }
+
+  _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
+    if (currentElem._parent === null) {
+      if (withMySelf) {
+        return currentElem.transformMatrix;
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrix;
+      }
+      return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
+    }
+  }
+
+  get transformMatrixAccumulatedAncestry() {
+    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempString);
+    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === &apos;undefined&apos;) {
+      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
+      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+    }
+
+    return this._matrixAccumulatedAncestry;
+  }
+
+  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+    if (this._parent === null) {
+      return Matrix44.identity();
+    }
+
+    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempString);
+    if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === &apos;undefined&apos;) {
+      this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
+      this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
+    }
+
+    return this._invMatrixAccumulatedAncestry;
+  }
+
+  _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+    if (currentElem._parent === null) {
+      if (withMySelf) {
+        return currentElem.transformMatrixOnlyRotate;
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = currentElem.transformMatrixOnlyRotate;
+      }
+      return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+    }
+  }
+
+  get rotateMatrixAccumulatedAncestry() {
+    /*
+    var mat = this._multiplyMyAndParentTransformMatrices(this);
+    var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
+    var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
+    var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
+
+    return new Matrix44(
+      mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
+      mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
+      mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
+      0, 0, 0, 1
+    );*/
+    return this._multiplyMyAndParentRotateMatrices(this, true);
+  }
+
+  get inverseTransformMatrixAccumulatedAncestry() {
+    return this._multiplyMyAndParentTransformMatrices(this, true).invert();
+  }
+
+  _accumulateMyAndParentOpacity(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.opacity;
+    } else {
+      return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
+    }
+  }
+
+  get opacityAccumulatedAncestry() {
+    return this._accumulateMyAndParentOpacity(this);
+  }
+
+  set opacity(opacity) {
+    this._opacity = opacity;
+  }
+
+  get opacity() {
+    return this._opacity;
+  }
+
+  set dirty(flg) {
+    this._dirtyAsElement = flg;
+    if (flg) {
+      this._needUpdate();
+    }
+  }
+
+  get parent() {
+    return this._parent;
+  }
+
+  toString() {
+    return this._instanceName;
+  }
+
+  set userFlavorName(name) {
+    this._userFlavorName = name;
+  }
+
+  get userFlavorName() {
+    return this._userFlavorName;
+  }
+
+  get instanceNameWithUserFlavor() {
+    this._instanceName + &apos;_&apos; + this._userFlavorName;
+  }
+
+  // used by library (not Application)
+  toStringWithUpdateInfo() {
+  //  return &apos;&amp;&apos; + this._instanceName + &apos;#&apos; + this._updateCountAsElement;  // human readable
+    return this._instanceName + this._updateCountAsElement;                // faster
+  }
+
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    var outputComponentN = 0;
+    if (outputArray[0] instanceof Vector2) {
+      outputComponentN = 2;
+    } else if (outputArray[0] instanceof Vector3) {
+      outputComponentN = 3;
+    } else if (outputArray[0] instanceof Vector4) {
+      outputComponentN = 4;
+    } else if (outputArray[0] instanceof Quaternion) {
+      outputComponentN = 4;
+    } else {
+      outputComponentN = 1;
+    }
+    if (!this._animationLine[lineName]) {
+      this._animationLine[lineName] = {};
+    }
+    this._animationLine[lineName][attributeName] = {
+      input: inputArray,
+      output: outputArray,
+      outputAttribute: attributeName,
+      outputComponentN: outputComponentN
+    };
+  }
+
+  setActiveAnimationLine(lineName) {
+    this._activeAnimationLineName = lineName;
+  }
+
+  hasAnimation(lineName) {
+    if (this._animationLine[lineName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  set currentCalcMode(mode) {
+    this._currentCalcMode = mode;
+  }
+
+  get currentCalcMode() {
+    return this._currentCalcMode;
+  }
+}
+
+GLBoost[&apos;Element&apos;] = Element;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

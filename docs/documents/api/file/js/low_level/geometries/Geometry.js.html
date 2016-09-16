@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">js/low_level/geometries/Geometry.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html">GLBoostLowContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostMonitor.js~GLBoostMonitor.html">GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/L_Element.js~L_Element.html">L_Element</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html">L_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html">L_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html">L_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/AABB.js~AABB.html">AABB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/DataUtil.js~DataUtil.html">DataUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/MiscUtil.js~MiscUtil.html">MiscUtil</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/core/GLBoostMiddleContext.js~GLBoostMiddleContext.html">GLBoostMiddleContext</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/draw_kickers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerLocal.js~DrawKickerLocal.html">DrawKickerLocal</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerWorld.js~DrawKickerWorld.html">DrawKickerWorld</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Scene.js~M_Scene.html">M_Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html">M_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html">M_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html">M_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html">M_AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html">M_DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_PointLight.js~M_PointLight.html">M_PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html">M_SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/expressions</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShader.html">DecalShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShaderSource.html">DecalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShader.html">DepthDisplayShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShaderSource.html">DepthDisplayShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShaderSource.html">FragmentSimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShader.html">PassThroughShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShaderSource.html">PassThroughShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexLocalShader.js~VertexLocalShaderSource.html">VertexLocalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShader.js~VertexWorldShaderSource.html">VertexWorldShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShadowShader.js~VertexWorldShadowShaderSource.html">VertexWorldShadowShaderSource</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/low_level/geometries/Geometry.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+import GLBoostObject from &apos;../core/GLBoostObject&apos;;
+import Vector3 from &apos;../../low_level/math/Vector3&apos;;
+import GLContext from &apos;../core/GLContext&apos;;
+import GLExtensionsManager from &apos;../core/GLExtensionsManager&apos;;
+import ClassicMaterial from &apos;./../ClassicMaterial&apos;;
+import ArrayUtil from &apos;../../low_level/misc/ArrayUtil&apos;;
+import MathUtil from &apos;../../low_level/math/MathUtil&apos;;
+import DrawKickerLocal from &apos;../../middle_level/draw_kickers/DrawKickerLocal&apos;;
+import DrawKickerWorld from &apos;../../middle_level/draw_kickers/DrawKickerWorld&apos;;
+import VertexLocalShaderSource from &apos;../../middle_level/shaders/VertexLocalShader&apos;;
+import VertexWorldShaderSource from &apos;../../middle_level/shaders/VertexWorldShader&apos;;
+import AABB from &apos;../../low_level/math/AABB&apos;;
+
+
+export default class Geometry extends GLBoostObject {
+  constructor(glBoostContext) {
+    super(glBoostContext);
+
+    this._canvas = this._glContext.canvas;
+
+    this._materials = [];
+    this._vertexN = 0;
+    this._vertices = null;
+    this._indicesArray = null;
+    this._performanceHint = null;
+    this._vertexAttribComponentNDic = {};
+    this._defaultMaterial = glBoostContext.createClassicMaterial();
+    this._vertexData = [];
+    this._extraDataForShader = {};
+    this._AABB = new AABB();
+    this._drawKicker = DrawKickerWorld.getInstance();
+
+    if (this._drawKicker instanceof DrawKickerWorld) {
+
+    } else if (this._drawKicker instanceof DrawKickerLocal) {
+
+    }
+  }
+
+  /**
+   * &#x30C7;&#x30FC;&#x30BF;&#x3068;&#x3057;&#x3066;&#x5229;&#x7528;&#x3059;&#x308B;&#x9802;&#x70B9;&#x5C5E;&#x6027;&#x3092;&#x5224;&#x65AD;&#x3057;&#x3001;&#x305D;&#x306E;&#x30EA;&#x30B9;&#x30C8;&#x3092;&#x8FD4;&#x3059;
+   */
+  _decideNeededVertexAttribs(vertices, material) {
+
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      attribNameArray.push(attribName);
+    }
+
+    return attribNameArray;
+  }
+
+  /**
+   * &#x5168;&#x3066;&#x306E;&#x9802;&#x70B9;&#x5C5E;&#x6027;&#x306E;&#x30EA;&#x30B9;&#x30C8;&#x3092;&#x8FD4;&#x3059;
+   */
+  _allVertexAttribs(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      attribNameArray.push(attribName);
+    }
+
+    return attribNameArray;
+  }
+
+  setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
+    this._vertices = vertices;
+
+    var allVertexAttribs = this._allVertexAttribs(this._vertices);
+
+    // if array, convert to vector[2/3/4]
+    this._vertices.position.forEach((elem, index) =&gt; {
+      allVertexAttribs.forEach((attribName)=&gt; {
+        var element = this._vertices[attribName][index];
+        this._vertices[attribName][index] = MathUtil.arrayToVector(element);
+
+        if (attribName === &apos;position&apos;) {
+          this._AABB.addPosition(this._vertices[attribName][index]);
+        }
+      });
+    });
+
+    this._AABB.updateAllInfo();
+
+    this._indicesArray = indicesArray;
+    this._primitiveType = primitiveType;
+
+    var gl = this._glContext.gl;
+    var hint = null;
+    switch (performanceHint) {
+      case GLBoost.STATIC_DRAW:
+        hint = gl.STATIC_DRAW;
+        break;
+      case GLBoost.STREAM_DRAW:
+        hint = gl.STREAM_DRAW;
+        break;
+      case GLBoost.DYNAMIC_DRAW:
+        hint = gl.DYNAMIC_DRAW;
+        break;
+    }
+    this._performanceHint = hint;
+  }
+
+  updateVerticesData(vertices, isAlreadyInterleaved = false) {
+    var gl = this._glContext.gl;
+    let vertexData = this._vertexData;
+    //var vertexData = [];
+    if (isAlreadyInterleaved) {
+      vertexData = vertices;
+    } else {
+      this._vertices = ArrayUtil.merge(this._vertices, vertices);
+      var allVertexAttribs = this._allVertexAttribs(this._vertices);
+      const isCached = vertexData.length == 0 ? false : true;
+
+      let idx = 0;
+      this._vertices.position.forEach((elem, index) =&gt; {
+        allVertexAttribs.forEach((attribName)=&gt; {
+          var element = this._vertices[attribName][index];
+          // if array, convert to vector[2/3/4]
+          this._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
+
+          if (attribName === &apos;position&apos;) {
+            this._AABB.addPosition(this._vertices[attribName][index]);
+          }
+
+          vertexData[idx++] = element.x;
+          vertexData[idx++] = element.y;
+          if (element.z !== void 0) {
+            vertexData[idx++] = element.z;
+          }
+          if (element.w !== void 0) {
+            vertexData[idx++] = element.w;
+          }
+        });
+      });
+
+      this._AABB.updateAllInfo();
+
+
+      if(!isCached) {
+        this.Float32AryVertexData = new Float32Array(vertexData);
+      }
+      let float32AryVertexData = this.Float32AryVertexData;
+      for(let i = 0; i &lt; float32AryVertexData.length; i++) {
+        float32AryVertexData[i] = vertexData[i];
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+  }
+
+  setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    var stride = 0;
+    _allVertexAttribs.forEach((attribName)=&gt; {
+      stride += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+
+    // &#x9802;&#x70B9;&#x30EC;&#x30A4;&#x30A2;&#x30A6;&#x30C8;&#x8A2D;&#x5B9A;
+    var offset = 0;
+    _allVertexAttribs.forEach((attribName)=&gt; {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.vertexAttribPointer(glslProgram[&apos;vertexAttribute_&apos; + attribName],
+          this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+      }
+      offset += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+  }
+
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, doSetupVertexAttribs = true) {
+    var gl = this._glContext.gl;
+    var vertices = this._vertices;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+    var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+
+    if (doSetupVertexAttribs) {
+      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+    }
+
+    var allVertexAttribs = this._allVertexAttribs(vertices);
+    allVertexAttribs.forEach((attribName)=&gt; {
+      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
+    });
+
+    if (material.shaderInstance === null) {
+      let shaderClass = material.shaderClass;
+
+      let basicShaderSource = null;
+      if (this._drawKicker instanceof DrawKickerWorld) {
+        basicShaderSource = VertexWorldShaderSource;
+      } else if (this._drawKicker instanceof DrawKickerLocal) {
+        basicShaderSource = VertexLocalShaderSource;
+      }
+
+      material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
+    }
+    var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+    if (doSetupVertexAttribs) {
+      this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+    }
+
+    if (doSetupVertexAttribs) {
+      glem.bindVertexArray(gl, null);
+    }
+    this._setVertexNtoSingleMaterial(material, index);
+
+    return material;
+  }
+
+  _setVertexNtoSingleMaterial(material, index) {
+    // if this mesh has only one material...
+    if (material.getVertexN(this) === 0) {
+      if (this._indicesArray &amp;&amp; this._indicesArray.length &gt; 0) {
+        material.setVertexN(this, this._indicesArray[index].length);
+      } else {
+        material.setVertexN(this, this._vertexN);
+      }
+    }
+  }
+
+  prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
+
+    var vertices = this._vertices;
+    var gl = this._glContext.gl;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    this._vertexN = vertices.position.length;
+
+    // create VAO
+    if (Geometry._vaoDic[this.toString()]) {
+    } else {
+      var vao = this._glContext.createVertexArray(this);
+      Geometry._vaoDic[this.toString()] = vao;
+    }
+    glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+
+    var doAfter = true;
+
+    // create VBO
+    if (Geometry._vboDic[this.toString()]) {
+      doAfter = false;
+    } else {
+      var vbo = this._glContext.createBuffer(this);
+      Geometry._vboDic[this.toString()] = vbo;
+    }
+    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+    var materials = null;
+    if (this._materials.length &gt; 0) {
+      materials = this._materials;
+    } else if (mesh.material){
+      materials = [mesh.material];
+    } else {
+      materials = [this._defaultMaterial];
+    }
+
+
+    for (let i=0; i&lt;materials.length;i++) {
+      this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
+    }
+
+    if (doAfter) {
+
+      var vertexData = [];
+      var allVertexAttribs = this._allVertexAttribs(vertices);
+      vertices.position.forEach((elem, index, array) =&gt; {
+        allVertexAttribs.forEach((attribName)=&gt; {
+          var element = vertices[attribName][index];
+          vertexData.push(element.x);
+          vertexData.push(element.y);
+          if (element.z !== void 0) {
+            vertexData.push(element.z);
+          }
+          if (element.w !== void 0) {
+            vertexData.push(element.w);
+          }
+        });
+      });
+
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      Geometry._iboArrayDic[this.toString()] = [];
+      if (this._indicesArray) {
+        // create Index Buffer
+        for (let i=0; i&lt;this._indicesArray.length; i++) {
+          var ibo = this._glContext.createBuffer(this);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
+          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+          Geometry._iboArrayDic[this.toString()][i] = ibo;
+          this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+        }
+      }
+      glem.bindVertexArray(gl, null);
+    }
+
+
+    return true;
+  }
+
+  draw(lights, camera, mesh, scene, renderPassIndex) {
+    var gl = this._glContext.gl;
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    var materials = null;
+    if (this._materials.length &gt; 0) {
+      materials = this._materials;
+    } else if (mesh.material){
+      materials = [mesh.material];
+    } else {
+      materials = [this._defaultMaterial];
+    }
+
+    let thisName = this.toString();
+
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+
+  }
+
+  /**
+   *
+   * @param geometry
+   */
+  merge(geometry) {
+    var baseLen = this._vertices.position.length;
+
+    if (this === geometry) {
+      console.assert(&apos;don\&apos;t merge same geometry!&apos;);
+    }
+    for (var attribName in this._vertices) {
+      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+    }
+    let geometryIndicesN = geometry._indicesArray.length;
+    for (let i = 0; i &lt; geometryIndicesN; i++) {
+      for (let j = 0; j &lt; geometry._indicesArray[i].length; j++) {
+        geometry._indicesArray[i][j] += baseLen;
+      }
+      this._indicesArray.push(geometry._indicesArray[i]);
+      if (geometry._materials[i]) {
+        this._materials.push(geometry._materials[i]);
+      }
+    }
+    this._vertexN += geometry._vertexN;
+  }
+
+  /**
+   * take no thought geometry&apos;s materials
+   *
+   * @param geometry
+   */
+  mergeHarder(geometry) {
+    var baseLen = this._vertices.position.length;
+    if (this === geometry) {
+      console.assert(&apos;don\&apos;t merge same geometry!&apos;);
+    }
+    for (var attribName in this._vertices) {
+      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+    }
+    for (let i = 0; i &lt; this._indicesArray.length; i++) {
+      let len = geometry._indicesArray[i].length;
+      for (let j = 0; j &lt; len; j++) {
+        var idx = geometry._indicesArray[i][j];
+        this._indicesArray[i].push(baseLen + idx);
+      }
+      if (this._materials[i]) {
+        this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+      }
+    }
+    this._vertexN += geometry._vertexN;
+  }
+
+
+  set materials(materials) {
+    this._materials = materials;
+  }
+
+  get materials() {
+    return this._materials;
+  }
+
+  get centerPosition() {
+    return this._AABB.centerPoint;
+  }
+
+  setExtraDataForShader(name, value) {
+    this._extraDataForShader[name] = value;
+  }
+
+  getExtraDataForShader(name) {
+    return this._extraDataForShader[name];
+  }
+
+  static clearMaterialCache() {
+    Geometry._lastMaterial = null;
+  }
+
+  get AABB() {
+    return this._AABB;
+  }
+
+}
+Geometry._vaoDic = {};
+Geometry._vboDic = {};
+Geometry._iboArrayDic = {};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

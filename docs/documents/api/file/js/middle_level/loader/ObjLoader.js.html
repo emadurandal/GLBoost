@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">js/middle_level/loader/ObjLoader.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html">GLBoostLowContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostMonitor.js~GLBoostMonitor.html">GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/L_Element.js~L_Element.html">L_Element</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html">L_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html">L_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html">L_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/AABB.js~AABB.html">AABB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/DataUtil.js~DataUtil.html">DataUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/MiscUtil.js~MiscUtil.html">MiscUtil</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/core/GLBoostMiddleContext.js~GLBoostMiddleContext.html">GLBoostMiddleContext</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/draw_kickers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerLocal.js~DrawKickerLocal.html">DrawKickerLocal</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerWorld.js~DrawKickerWorld.html">DrawKickerWorld</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Scene.js~M_Scene.html">M_Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html">M_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html">M_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html">M_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html">M_AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html">M_DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_PointLight.js~M_PointLight.html">M_PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html">M_SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/expressions</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShader.html">DecalShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShaderSource.html">DecalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShader.html">DepthDisplayShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShaderSource.html">DepthDisplayShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShaderSource.html">FragmentSimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShader.html">PassThroughShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShaderSource.html">PassThroughShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexLocalShader.js~VertexLocalShaderSource.html">VertexLocalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShader.js~VertexWorldShaderSource.html">VertexWorldShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShadowShader.js~VertexWorldShadowShaderSource.html">VertexWorldShadowShaderSource</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/middle_level/loader/ObjLoader.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+import Vector3 from &apos;../../low_level/math/Vector3&apos;;
+import Vector2 from &apos;../../low_level/math/Vector2&apos;;
+import PhongShader from &apos;../../middle_level/shaders/PhongShader&apos;;
+import Hash from &apos;../../low_level/misc/Hash&apos;;
+
+let singleton = Symbol();
+let singletonEnforcer = Symbol();
+
+/**
+ * [en] This is a loader class of Obj file format.&lt;br&gt;
+ * [ja] Obj&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x3092;&#x8AAD;&#x307F;&#x8FBC;&#x3080;&#x305F;&#x3081;&#x306E;&#x30ED;&#x30FC;&#x30C0;&#x30FC;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;
+ */
+export default class ObjLoader {
+
+  /**
+   * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.&lt;br&gt;
+   * [ja] ObjLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x3067;&#x3059;&#x3002;&#x3057;&#x304B;&#x3057;&#x672C;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x3067;&#x3042;&#x308B;&#x305F;&#x3081;&#x3001;&#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306F;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x305B;&#x307E;&#x305B;&#x3093;&#x3002;getInstance()&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3092;&#x4F7F;&#x3063;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] &#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306E;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x3057;&#x3092;&#x7981;&#x6B62;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30B7;&#x30F3;&#x30DC;&#x30EB;
+   */
+  constructor(enforcer) {
+    if (enforcer !== singletonEnforcer) {
+      throw new Error(&quot;This is a Singleton class. get the instance using &apos;getInstance&apos; static method.&quot;);
+    }
+  }
+
+  /**
+   * [en] The static method to get singleton instance of this class.&lt;br&gt;
+   * [ja] &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x3092;&#x53D6;&#x5F97;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002;
+   * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;
+   */
+  static getInstance() {
+    if (!this[singleton]) {
+      this[singleton] = new ObjLoader(singletonEnforcer);
+    }
+    return this[singleton];
+  }
+
+  /**
+   * [en] the method to load Obj file.&lt;br&gt;
+   * [ja] Obj file&#x3092;&#x30ED;&#x30FC;&#x30C9;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002;
+   * @param {string} url [en] url of glTF file [ja] Obj&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x306E;url
+   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] &#x8AAD;&#x307F;&#x8FBC;&#x3093;&#x3060;&#x30B8;&#x30AA;&#x30E1;&#x30C8;&#x30EA;&#x306B;&#x9069;&#x7528;&#x3059;&#x308B;&#x30B7;&#x30A7;&#x30FC;&#x30C0;&#x30FC;
+   * @param {string} mtlString [en] string of mtl file (optional) [ja] mtl&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x306E;&#x5185;&#x5BB9;&#x306E;&#x6587;&#x5B57;&#x5217;&#x60C5;&#x5831;&#xFF08;&#x30AA;&#x30D7;&#x30B7;&#x30E7;&#x30CA;&#x30EB;&#x3002;mtl&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x306E;&#x8AAD;&#x307F;&#x8FBC;&#x307F;&#x304C;&#x4F55;&#x3089;&#x304B;&#x306E;&#x4E8B;&#x60C5;&#x3067;&#x3067;&#x304D;&#x306A;&#x3044;&#x5834;&#x5408;&#x306B;&#x4F7F;&#x3044;&#x307E;&#x3059;&#xFF09;
+   * @param {HTMLCanvas|string} canvas [en] canvas or canvas&apos; id string. [ja] canvas&#x307E;&#x305F;&#x306F;canvas&#x306E;id&#x6587;&#x5B57;&#x5217;
+   * @return {Promise} [en] a promise object [ja] Promise&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;
+   */
+  loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
+    return new Promise((resolve, reject)=&gt; {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = ()=&gt; {
+        if (xmlHttp.readyState === 4 &amp;&amp; (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
+          var gotText = xmlHttp.responseText;
+          var partsOfPath = url.split(&apos;/&apos;);
+          var basePath = &apos;&apos;;
+          for(var i=0; i&lt;partsOfPath.length-1; i++) {
+            basePath += partsOfPath[i] + &apos;/&apos;;
+          }
+          this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
+        }
+      };
+
+      xmlHttp.open(&quot;GET&quot;, url, true);
+      xmlHttp.send(null);
+    });
+  }
+
+  _loadMaterialsFromString(glBoostContext, mtlString, defaultShader, basePath = &apos;&apos;) {
+
+    var mtlTextRows = mtlString.split(&apos;\n&apos;);
+
+    var numMaterial = 0;
+    // checking the number of material
+    for (let i=0; i&lt;mtlTextRows.length; i++) {
+      let matchArray = mtlTextRows[i].match(/^(\w+) (\w+)/);
+      if (matchArray === null) {
+        continue;
+      }
+
+      if (matchArray[1] === &quot;newmtl&quot;)
+      {
+        numMaterial++;
+      }
+    }
+
+    var materials = new Array(numMaterial);
+    var iMCount = -1;
+
+    // main loading
+    for (let i=0; i&lt;mtlTextRows.length; i++) {
+      let matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
+
+      if (matchArray === null) {
+        continue;
+      }
+
+      if (matchArray[1] === &quot;newmtl&quot;)
+      {
+        iMCount++;
+        materials[iMCount] = glBoostContext.createClassicMaterial();
+        if (defaultShader) {
+          materials[iMCount].shaderClass = defaultShader;
+        } else {
+          materials[iMCount].shaderClass = PhongShader;
+        }
+        materials[iMCount].name = matchArray[2];
+      }
+
+      if (matchArray[1].toLowerCase() === &quot;ka&quot;)
+      {
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
+        materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
+        materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
+      }
+
+      if (matchArray[1].toLowerCase() === &quot;kd&quot;)
+      {
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
+        materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
+        materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
+      }
+
+      if (matchArray[1].toLowerCase() === &quot;ks&quot;)
+      {
+        matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+        materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
+        materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
+        materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
+      }
+
+      if (matchArray[1].toLowerCase() === &quot;map_kd&quot;)
+      {
+        matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
+        var texture = glBoostContext.createTexture(basePath + matchArray[2], {flipY: true});
+        texture.name = matchArray[2];
+        materials[iMCount].diffuseTexture = texture;
+      }
+    }
+    return materials;
+  }
+
+  _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
+    return new Promise((resolve, reject)=&gt; {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = ()=&gt; {
+        if (xmlHttp.readyState === 4 &amp;&amp; (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
+          resolve(this._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, defaultShader, basePath));
+        }
+      };
+
+      xmlHttp.open(&quot;GET&quot;, basePath + fileName, true);
+      xmlHttp.send(null);
+    });
+  }
+
+  _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {
+
+    console.log(basePath);
+
+    var objTextRows = objText.split(&apos;\n&apos;);
+    var promise = null;
+    let vCount = 0;
+    let fCount = 0;
+    let vnCount = 0;
+    let vtCount = 0;
+
+    if (mtlString) {
+      promise = (()=&gt;{
+        return new Promise((resolve, reject)=&gt; {
+          resolve(this._loadMaterialsFromString(glBoostContext, mtlString, defaultShader));
+        });
+      })();
+    }
+
+    for (let i=0; i&lt;objTextRows.length; i++) {
+      let matchArray = objTextRows[i].match(/^(\w+) (\w+)/);
+      if (matchArray === null) {
+        continue;
+      }
+
+      // material file
+      if (matchArray[1] === &quot;mtllib&quot; &amp;&amp; mtlString === null) {
+        promise = this._loadMaterialsFromFile(glBoostContext, basePath, matchArray[2] + &apos;.mtl&apos;, defaultShader);
+      }
+    }
+
+    promise.then((materials)=&gt;{
+      for (let i=0; i&lt;objTextRows.length; i++) {
+        let matchArray = objTextRows[i].match(/^(\w+) +(\w+)/);
+        if (matchArray === null) {
+          continue;
+        }
+
+        // Vertex
+        if (matchArray[1] === &quot;v&quot;)
+        {
+          vCount++;
+        }
+        // Vertex Normal
+        if (matchArray[1] === &quot;vn&quot;)
+        {
+          vnCount++;
+        }
+        // Texcoord
+        if (matchArray[1] === &quot;vt&quot;)
+        {
+          vtCount++;
+        }
+        // Face
+        if (matchArray[1] === &quot;f&quot;)
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          if (matchArray !== null) { // if this is a Quad Polygon
+            fCount += 2;
+          } else {
+            fCount++;
+          }
+        }
+      }
+
+      var pvCoord=new Array(vCount);
+      var pvNormal=new Array(vnCount);
+      var pvTexture=new Array(vtCount);
+
+      vCount = 0;
+      vnCount = 0;
+      vtCount = 0;
+
+      for (let i=0; i&lt;objTextRows.length; i++) {
+        //&#x30AD;&#x30FC;&#x30EF;&#x30FC;&#x30C9; &#x8AAD;&#x307F;&#x8FBC;&#x307F;
+        let matchArray = objTextRows[i].match(/^(\w+) /);
+
+        if (matchArray === null) {
+          continue;
+        }
+
+        //&#x9802;&#x70B9; &#x8AAD;&#x307F;&#x8FBC;&#x307F;
+        if (matchArray[1] === &quot;v&quot;)
+        {
+          matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+//          pvCoord[vCount].x=-x;//OBJ&#x306F;&#x53F3;&#x624B;&#x3001;Direct3D&#x306F;&#x5DE6;&#x624B;&#x5EA7;&#x6A19;&#x7CFB;&#x3002;
+          pvCoord[vCount] = new Vector3();
+          pvCoord[vCount].x = parseFloat(matchArray[2]);
+          pvCoord[vCount].y = parseFloat(matchArray[3]);
+          pvCoord[vCount].z = parseFloat(matchArray[4]);
+          vCount++;
+        }
+
+        //&#x6CD5;&#x7DDA; &#x8AAD;&#x307F;&#x8FBC;&#x307F;
+        if (matchArray[1] === &quot;vn&quot;)
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+//          pvNormal[vnCount].x=-x;//OBJ&#x306F;&#x53F3;&#x624B;&#x3001;Direct3D&#x306F;&#x5DE6;&#x624B;&#x5EA7;&#x6A19;&#x7CFB;&#x3002;
+          pvNormal[vnCount] = new Vector3();
+          pvNormal[vnCount].x = parseFloat(matchArray[2]);
+          pvNormal[vnCount].y = parseFloat(matchArray[3]);
+          pvNormal[vnCount].z = parseFloat(matchArray[4]);
+          vnCount++;
+        }
+
+        //&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30FC;&#x5EA7;&#x6A19; &#x8AAD;&#x307F;&#x8FBC;&#x307F;
+        if (matchArray[1] === &quot;vt&quot;)
+        {
+          matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+          pvTexture[vtCount] = new Vector2();
+          pvTexture[vtCount].x = parseFloat(matchArray[2]);
+          pvTexture[vtCount].y = parseFloat(matchArray[3]);
+          //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y&#x6210;&#x5206;&#x304C;&#x9006;&#x306A;&#x306E;&#x3067;&#x5408;&#x308F;&#x305B;&#x308B;
+
+          vtCount++;
+        }
+      }
+
+      var positions = new Array();
+      var texcoords = new Array();
+      var normals = new Array();
+      var indices = [];
+
+      var boFlag = false;
+
+      var FaceN = fCount;
+      fCount = 0;
+      var partFCount = 0;
+
+      var geometry = glBoostContext.createGeometry();
+
+      for(let i=0; i&lt;materials.length; i++) {
+        partFCount = 0;
+        let matIndices = new Array();
+        let tmpIndices = new Array();
+        let tmpPositions = new Array();
+        let tmpTexcoords = new Array();
+        let tmpNormals = new Array();
+
+        let _i = 0;
+        for (let j=0; (j&lt;objTextRows.length) &amp;&amp; (fCount &lt; FaceN); j++) {
+          let matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
+
+          if (matchArray === null) {
+            continue;
+          }
+
+          if (matchArray[1] === &quot;usemtl&quot;) {
+            if (matchArray[2] === materials[i].name) {
+              boFlag = true;
+            } else {
+              boFlag = false;
+            }
+          }
+
+          if (matchArray[1] === &quot;f&quot; &amp;&amp; boFlag) {
+            let isQuad = true;
+            let matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);   if (matchArray === null) {
+              matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+            }
+            if (matchArray === null) {
+              isQuad = false;
+            }
+
+
+
+
+            if(materials[i].diffuseTexture) {
+              if (isQuad) {
+                this._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              } else {
+                this._addTriangleDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              }
+            } else {
+              if (isQuad) {
+                this._addQuadDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              } else {
+                this._addTriangleDataToArraysWithoutTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
+              }
+            }
+
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3, matIndices, tmpIndices, _i);
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+1, matIndices, tmpIndices, _i);
+            _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+2, matIndices, tmpIndices, _i);
+
+            /*
+            iFaceBufferArray[partFCount*3]=fCount*3;
+            iFaceBufferArray[partFCount*3+1]=fCount*3+1;
+            iFaceBufferArray[partFCount*3+2]=fCount*3+2;
+            */
+            if (isQuad) {
+              /*
+              iFaceBufferArray[partFCount*3+3]=fCount*3+3;
+              iFaceBufferArray[partFCount*3+4]=fCount*3+4;
+              iFaceBufferArray[partFCount*3+5]=fCount*3+5;
+              */
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+3, matIndices, tmpIndices, _i);
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+4, matIndices, tmpIndices, _i);
+              _i = this._reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, fCount*3+5, matIndices, tmpIndices, _i);
+
+              partFCount += 2;
+              fCount += 2;
+            } else {
+              partFCount++;
+              fCount++;
+            }
+
+          }
+        }
+
+        if (fCount === 0)//&#x4F7F;&#x7528;&#x3055;&#x308C;&#x3066;&#x3044;&#x306A;&#x3044;&#x30DE;&#x30C6;&#x30EA;&#x30A2;&#x30EB;&#x5BFE;&#x7B56;
+        {
+          continue;
+        }
+
+//        materials[i].setVertexN(geometry, partFCount*3);
+        materials[i].setVertexN(geometry, matIndices.length);
+
+        //indices[i] = iFaceBufferArray.concat();
+        indices[i] = matIndices.concat();
+
+      }
+
+      var mesh = glBoostContext.createMesh(geometry, null);
+      geometry.materials = materials;
+      geometry.setVerticesData({
+        position: positions,
+        texcoord: texcoords,
+        normal: normals
+      }, indices);
+
+      resolve(mesh);
+    }).catch(function onRejected(error){
+      console.error(error);
+    });
+
+  }
+
+  _reductionVertices(positions, normals, texcoords, tmpPositions, tmpNormals, tmpTexcoords, vCount, matIndices, tmpIndices, _i) {
+    var str = &apos;&apos; + tmpPositions[vCount].x + &apos;,&apos; + tmpPositions[vCount].y + &apos;,&apos; + tmpPositions[vCount].z +
+      &apos;,&apos; + tmpNormals[vCount].x + &apos;,&apos; + tmpNormals[vCount].y + &apos;,&apos; + tmpNormals[vCount].z +
+      &apos;,&apos; + tmpTexcoords[vCount].x + &apos;,&apos; + tmpTexcoords[vCount].y;
+
+    var hashCode = Hash.toCRC32(str);
+    if (typeof tmpIndices[hashCode] === &apos;undefined&apos;) {
+      tmpIndices[hashCode] = _i;
+      _i++;
+      positions.push(tmpPositions[vCount]);
+      normals.push(tmpNormals[vCount]);
+      texcoords.push(tmpTexcoords[vCount]);
+    }
+
+    matIndices.push(tmpIndices[hashCode]);
+
+    return _i;
+  }
+
+  _addTriangleDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
+  {
+    var v1=0,v2=0,v3=0;
+    var vn1=0,vn2=0,vn3=0;
+    var vt1=0,vt2=0,vt3=0;
+    let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
+      positions[fCount*3] = pvCoord[v1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+      texcoords[fCount*3] = pvTexture[vt1-1];
+      texcoords[fCount*3+1] = pvTexture[vt2-1];
+      texcoords[fCount*3+2] = pvTexture[vt3-1];
+    } else {
+      let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+      positions[fCount*3] = pvCoord[v1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+    }
+  }
+
+  _addTriangleDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
+  {
+    var v1=0,v2=0,v3=0;
+    var vn1=0,vn2=0,vn3=0;
+    var vt1=0,vt2=0,vt3=0;
+    let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+
+      positions[fCount*3] = pvCoord[v1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+    } else {
+      let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
+
+      positions[fCount*3] = pvCoord[v1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+      texcoords[fCount*3] = pvTexture[vt1-1];
+      texcoords[fCount*3+1] = pvTexture[vt2-1];
+      texcoords[fCount*3+2] = pvTexture[vt3-1];
+    }
+  }
+
+  _addQuadDataToArraysWithTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
+  {
+    var v1=0,v2=0,v3=0,v4=0;
+    var vn1=0,vn2=0,vn3=0,vn4=0;
+    var vt1=0,vt2=0,vt3=0,vt4=0;
+    let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
+      v4 = matchArray[11];
+      vt4 = matchArray[12];
+      vn4 = matchArray[13];
+
+      positions[fCount*3] = pvCoord[v1-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      texcoords[fCount*3] = pvTexture[vt1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      texcoords[fCount*3+1] = pvTexture[vt2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+      texcoords[fCount*3+2] = pvTexture[vt3-1];
+
+      positions[fCount*3+3] = pvCoord[v3-1];
+      normals[fCount*3+3] = pvNormal[vn3-1];
+      texcoords[fCount*3+3] = pvTexture[vt3-1];
+      positions[fCount*3+4] = pvCoord[v4-1];
+      normals[fCount*3+4] = pvNormal[vn4-1];
+      texcoords[fCount*3+4] = pvTexture[vt4-1];
+      positions[fCount*3+5] = pvCoord[v1-1];
+      normals[fCount*3+5] = pvNormal[vn1-1];
+      texcoords[fCount*3+5] = pvTexture[vt1-1];
+
+    } else {
+      let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+      v4 = matchArray[8];
+      vn4 = matchArray[9];
+
+      positions[fCount*3] = pvCoord[v1-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+
+      positions[fCount*3+3] = pvCoord[v3-1];
+      normals[fCount*3+3] = pvNormal[vn3-1];
+      positions[fCount*3+4] = pvCoord[v4-1];
+      normals[fCount*3+4] = pvNormal[vn4-1];
+      positions[fCount*3+5] = pvCoord[v1-1];
+      normals[fCount*3+5] = pvNormal[vn1-1];
+    }
+  }
+
+  _addQuadDataToArraysWithoutTexture(positions, normals, texcoords, pvCoord, pvNormal, pvTexture, stringToScan, fCount)
+  {
+    var v1=0,v2=0,v3=0,v4=0;
+    var vn1=0,vn2=0,vn3=0,vn4=0;
+    var vt1=0,vt2=0,vt3=0,vt4=0;
+    let matchArray = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+    if(matchArray !== null) {
+      v1 = matchArray[2];
+      vn1 = matchArray[3];
+      v2 = matchArray[4];
+      vn2 = matchArray[5];
+      v3 = matchArray[6];
+      vn3 = matchArray[7];
+      v4 = matchArray[8];
+      vn4 = matchArray[9];
+      positions[fCount*3] = pvCoord[v1-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+
+      positions[fCount*3+3] = pvCoord[v3-1];
+      normals[fCount*3+3] = pvNormal[vn3-1];
+      positions[fCount*3+4] = pvCoord[v4-1];
+      normals[fCount*3+4] = pvNormal[vn4-1];
+      positions[fCount*3+5] = pvCoord[v1-1];
+      normals[fCount*3+5] = pvNormal[vn1-1];
+    } else {
+      let matchArray = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+      v1 = matchArray[2];
+      vt1 = matchArray[3];
+      vn1 = matchArray[4];
+      v2 = matchArray[5];
+      vt2 = matchArray[6];
+      vn2 = matchArray[7];
+      v3 = matchArray[8];
+      vt3 = matchArray[9];
+      vn3 = matchArray[10];
+      v4 = matchArray[11];
+      vt4 = matchArray[12];
+      vn4 = matchArray[13];
+
+      positions[fCount*3] = pvCoord[v1-1];
+      normals[fCount*3] = pvNormal[vn1-1];
+      texcoords[fCount*3] = pvTexture[vt1-1];
+      positions[fCount*3+1] = pvCoord[v2-1];
+      normals[fCount*3+1] = pvNormal[vn2-1];
+      texcoords[fCount*3+1] = pvTexture[vt2-1];
+      positions[fCount*3+2] = pvCoord[v3-1];
+      normals[fCount*3+2] = pvNormal[vn3-1];
+      texcoords[fCount*3+2] = pvTexture[vt3-1];
+
+      positions[fCount*3+3] = pvCoord[v3-1];
+      normals[fCount*3+3] = pvNormal[vn3-1];
+      texcoords[fCount*3+3] = pvTexture[vt3-1];
+      positions[fCount*3+4] = pvCoord[v4-1];
+      normals[fCount*3+4] = pvNormal[vn4-1];
+      texcoords[fCount*3+4] = pvTexture[vt4-1];
+      positions[fCount*3+5] = pvCoord[v1-1];
+      normals[fCount*3+5] = pvNormal[vn1-1];
+      texcoords[fCount*3+5] = pvTexture[vt1-1];
+    }
+  }
+}
+
+
+
+GLBoost[&quot;ObjLoader&quot;] = ObjLoader;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

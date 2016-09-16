@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">js/geometries/Geometry.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/geometries/Geometry.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;./../globals&apos;;
+import Vector4 from &apos;./../math/Vector4&apos;;
+import GLContext from &apos;./../GLContext&apos;;
+import GLExtensionsManager from &apos;./../GLExtensionsManager&apos;;
+import Shader from &apos;./../shaders/Shader&apos;;
+import ClassicMaterial from &apos;./../ClassicMaterial&apos;;
+import PointLight from &apos;./../lights/PointLight&apos;;
+import DirectionalLight from &apos;./../lights/DirectionalLight&apos;;
+import ArrayUtil from &apos;./../misc/ArrayUtil&apos;;
+
+export default class Geometry {
+  constructor(canvas = GLBoost.CURRENT_CANVAS_ID) {
+    this._glContext = GLContext.getInstance(canvas);
+    this._canvas = canvas;
+    this._materials = [];
+    this._vertexN = 0;
+    this._glslProgram = null;
+    this._vertices = null;
+    this._indicesArray = null;
+    this._performanceHint = null;
+    this._vertexAttribComponentNDic = {};
+    this._defaultMaterial = new ClassicMaterial(this._canvas);
+    this.vertexData = [];
+    this._extraDataForShader = {};
+    this._setName();
+  }
+
+  _setName() {
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === &apos;undefined&apos;) ? 0 : (this.constructor._instanceCount + 1);
+    this._instanceName = this.constructor.name + &apos;_&apos; + this.constructor._instanceCount;
+  }
+
+  /**
+   * &#x30C7;&#x30FC;&#x30BF;&#x3068;&#x3057;&#x3066;&#x5229;&#x7528;&#x3059;&#x308B;&#x9802;&#x70B9;&#x5C5E;&#x6027;&#x3092;&#x5224;&#x65AD;&#x3057;&#x3001;&#x305D;&#x306E;&#x30EA;&#x30B9;&#x30C8;&#x3092;&#x8FD4;&#x3059;
+   * &#x4E0D;&#x5FC5;&#x8981;&#x306A;&#x9802;&#x70B9;&#x5C5E;&#x6027;&#x306E;&#x30C7;&#x30FC;&#x30BF;&#x306F;&#x7121;&#x8996;&#x3059;&#x308B;&#x3002;
+   */
+  _decideNeededVertexAttribs(vertices, material) {
+    if (material) {
+      var _material = material;
+    } else {
+      var _material = this._materials[0];
+    }
+
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      if (attribName === GLBoost.TEXCOORD) {
+        // texcoord&#x306E;&#x5834;&#x5408;&#x306F;&#x3001;&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x4ED8;&#x304D;&#x306E;&#x30DE;&#x30C6;&#x30EA;&#x30A2;&#x30EB;&#x3092;&#x3061;&#x3083;&#x3093;&#x3068;&#x6301;&#x3063;&#x3066;&#x3044;&#x308B;&#x3068;&#x304D;&#x306B;&#x9650;&#x308A;&#x3001;&apos;texcoord&apos;&#x304C;&#x6709;&#x52B9;&#x3068;&#x306A;&#x308B;
+        if ((_material !== void 0) &amp;&amp; _material.diffuseTexture !== null) {
+          attribNameArray.push(attribName);
+        } else {
+          //delete vertices[GLBoost.TEXCOORD];
+        }
+      } else {
+        attribNameArray.push(attribName);
+      }
+    }
+
+    return attribNameArray;
+  }
+
+  /**
+   * &#x5168;&#x3066;&#x306E;&#x9802;&#x70B9;&#x5C5E;&#x6027;&#x306E;&#x30EA;&#x30B9;&#x30C8;&#x3092;&#x8FD4;&#x3059;
+   */
+  _allVertexAttribs(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      attribNameArray.push(attribName);
+    }
+
+    return attribNameArray;
+  }
+
+  setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
+    this._vertices = vertices;
+    this._indicesArray = indicesArray;
+    this._primitiveType = primitiveType;
+
+    var gl = this._glContext.gl;
+    var hint = null;
+    switch (performanceHint) {
+      case GLBoost.STATIC_DRAW:
+        hint = gl.STATIC_DRAW;
+        break;
+      case GLBoost.STREAM_DRAW:
+        hint = gl.STREAM_DRAW;
+        break;
+      case GLBoost.DYNAMIC_DRAW:
+        hint = gl.DYNAMIC_DRAW;
+        break;
+    }
+    this._performanceHint = hint;
+  }
+
+  updateVerticesData(vertices, isAlreadyInterleaved = false) {
+    var gl = this._glContext.gl;
+    let vertexData = this.vertexData;
+    //var vertexData = [];
+    if (isAlreadyInterleaved) {
+      vertexData = vertices;
+    } else {
+      this._vertices = ArrayUtil.merge(this._vertices, vertices);
+      var allVertexAttribs = this._allVertexAttribs(this._vertices);
+      const isCached = vertexData.length == 0 ? false : true;
+/*
+      if(vertexData.length == 0) {
+        this._vertices.position.forEach((elem, index, array) =&gt; {
+          allVertexAttribs.forEach((attribName)=&gt; {
+            var element = this._vertices[attribName][index];
+            vertexData.push(element.x);
+            vertexData.push(element.y);
+            if (element.z !== void 0) {
+              vertexData.push(element.z);
+            }
+            if (element.w !== void 0) {
+              vertexData.push(element.w);
+            }
+          });
+        });
+        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        this.Float32AryVertexData =  new Float32Array(vertexData);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.Float32AryVertexData);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+      } else {
+*/
+        let idx = 0;
+        this._vertices.position.forEach((elem, index, array) =&gt; {
+          allVertexAttribs.forEach((attribName)=&gt; {
+            var element = this._vertices[attribName][index];
+	          vertexData[idx++] = element.x;
+            vertexData[idx++] = element.y;
+            if (element.z !== void 0) {
+              vertexData[idx++] = element.z;
+            }
+            if (element.w !== void 0) {
+              vertexData[idx++] = element.w;
+            }
+          });
+        });
+      //}
+      if(!isCached) {
+        this.Float32AryVertexData = new Float32Array(vertexData);
+      }
+      let float32AryVertexData = this.Float32AryVertexData;
+      for(let i = 0; i &lt; float32AryVertexData.length; i++) {
+        float32AryVertexData[i] = vertexData[i];
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    }
+  }
+
+  setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    var stride = 0;
+    _allVertexAttribs.forEach((attribName)=&gt; {
+      stride += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+
+    // &#x9802;&#x70B9;&#x30EC;&#x30A4;&#x30A2;&#x30A6;&#x30C8;&#x8A2D;&#x5B9A;
+    var offset = 0;
+    _allVertexAttribs.forEach((attribName)=&gt; {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.enableVertexAttribArray(glslProgram[&apos;vertexAttribute_&apos; + attribName]);
+        gl.vertexAttribPointer(glslProgram[&apos;vertexAttribute_&apos; + attribName],
+          this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+      }
+      offset += this._vertexAttribComponentNDic[attribName] * 4;
+    });
+  }
+
+  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, renderPasses, mesh) {
+    var gl = this._glContext.gl;
+    var vertices = this._vertices;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+    var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+    glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+
+    var allVertexAttribs = this._allVertexAttribs(vertices);
+    allVertexAttribs.forEach((attribName)=&gt; {
+      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
+    });
+
+    let glslProgramOfPasses = [];
+    for (let i=0; i&lt;renderPasses.length; i++) {
+      if (renderPasses[i].containsMeshAfterPrepareForRender(mesh)) {
+        var glslProgram = material.shader.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, renderPasses[i], this._extraDataForShader);
+        this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+        glslProgramOfPasses.push(glslProgram);
+      } else {
+        glslProgramOfPasses.push(null);
+      }
+    }
+    glem.bindVertexArray(gl, null);
+
+    this._setVertexNtoSingleMaterial(material, index);
+    material.glslProgramOfPasses = glslProgramOfPasses;
+
+    return material;
+  }
+
+  _setVertexNtoSingleMaterial(material, index) {
+    // if this mesh has only one material...
+    if (material.getVertexN(this) === 0) {
+      if (this._indicesArray &amp;&amp; this._indicesArray.length &gt; 0) {
+        material.setVertexN(this, this._indicesArray[index].length);
+      } else {
+        material.setVertexN(this, this._vertexN);
+      }
+    }
+  }
+
+  prepareForRender(existCamera_f, lights, meshMaterial, renderPasses, mesh) {
+
+    var vertices = this._vertices;
+    var gl = this._glContext.gl;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    this._vertexN = vertices.position.length;
+
+    // create VAO
+    if (Geometry._vaoDic[this.toString()]) {
+      return;
+    }
+    var vao = glem.createVertexArray(gl);
+    glem.bindVertexArray(gl, vao);
+    Geometry._vaoDic[this.toString()] = vao;
+
+    // create VBO
+    if (Geometry._vboDic[this.toString()]) {
+      return;
+    }
+    var vbo = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    Geometry._vboDic[this.toString()] = vbo;
+
+    var materials = this._materials;
+    var optimizedVertexAttribs = null;
+
+    if (materials.length &gt; 0) {
+      for (let i=0; i&lt;materials.length;i++) {
+        var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, renderPasses, mesh);
+        materials[i].glslProgramOfPasses = material.glslProgramOfPasses;
+        optimizedVertexAttribs = materials[i].glslProgramOfPasses[0].optimizedVertexAttribs;
+
+      }
+    } else if (!meshMaterial) {
+      var material = this.prepareGLSLProgramAndSetVertexNtoMaterial(this._defaultMaterial, 0, existCamera_f, lights, renderPasses, mesh);
+      this.glslProgramOfPasses = material.glslProgramOfPasses;
+      optimizedVertexAttribs = material.glslProgramOfPasses[0].optimizedVertexAttribs;
+    }
+
+
+
+    var vertexData = [];
+    var allVertexAttribs = this._allVertexAttribs(vertices);
+    vertices.position.forEach((elem, index, array) =&gt; {
+      allVertexAttribs.forEach((attribName)=&gt; {
+        var element = vertices[attribName][index];
+        vertexData.push(element.x);
+        vertexData.push(element.y);
+        if (element.z !== void 0) {
+          vertexData.push(element.z);
+        }
+        if (element.w !== void 0) {
+          vertexData.push(element.w);
+        }
+      });
+    });
+
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
+
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    Geometry._iboArrayDic[this.toString()] = [];
+    Geometry._idxNArrayDic[this.toString()] = [];
+    if (this._indicesArray) {
+      // create Index Buffer
+      for (let i=0; i&lt;this._indicesArray.length; i++) {
+        var ibo = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        Geometry._iboArrayDic[this.toString()][i] = ibo;
+        Geometry._idxNArrayDic[this.toString()][i] = this._indicesArray[i].length;
+      }
+    }
+    glem.bindVertexArray(gl, null);
+
+
+    return true;
+  }
+
+  draw(lights, camera, mesh, scene, renderPass_index) {
+    var gl = this._glContext.gl;
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    if (this._materials.length &gt; 0) {
+      var materials = this._materials;
+    } else if (mesh.material){
+      var materials = [mesh.material];
+    } else {
+      var materials = [];
+    }
+
+    let thisName = this.toString();
+
+    var isVAOBound = false;
+    if (Geometry._lastGeometry !== thisName) {
+      isVAOBound = glem.bindVertexArray(gl, Geometry._vaoDic[thisName]);
+    }
+
+    if (materials.length &gt; 0) {
+      for (let i=0; i&lt;materials.length;i++) {
+        let materialName = materials[i].toString();
+        if (materialName !== Geometry._lastMaterial) {
+          this._glslProgram = materials[i].glslProgramOfPasses[renderPass_index];
+          gl.useProgram(this._glslProgram);
+        }
+        let glslProgram = this._glslProgram;
+
+        if (!isVAOBound) {
+          if (Geometry._lastGeometry !== thisName) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
+            this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
+          }
+        }
+
+        let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+        gl.uniform1f(glslProgram.opacity, opacity);
+
+        if (camera) {
+          var viewMatrix = camera.lookAtRHMatrix();
+          var projectionMatrix = camera.perspectiveRHMatrix();
+          var m_m = mesh.transformMatrixAccumulatedAncestry;
+          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+          gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
+        }
+
+        if (glslProgram[&apos;lightPosition_0&apos;]) {
+          lights = Shader.getDefaultPointLightIfNotExsist(gl, lights, this._glContext.canvas);
+          if (glslProgram[&apos;viewPosition&apos;]) {
+            if (camera) {
+              let cameraPos = new Vector4(0, 0, 0, 1);
+              cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+            } else {
+              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
+            }
+            gl.uniform3f(glslProgram[&apos;viewPosition&apos;], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+          }
+
+          for(let j=0; j&lt;lights.length; j++) {
+            if (glslProgram[`lightPosition_${j}`] &amp;&amp; glslProgram[`lightDiffuse_${j}`]) {
+              let lightVec = null;
+              let isPointLight = -9999;
+              if (lights[j] instanceof PointLight) {
+                lightVec = new Vector4(0, 0, 0, 1);
+                lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                isPointLight = 1.0;
+              } else if (lights[j] instanceof DirectionalLight) {
+                lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                lightVec.w = 0.0;
+                isPointLight = 0.0;
+              }
+
+              let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+              gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+
+              gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            }
+          }
+        }
+
+        let isMaterialSetupDone = true;
+
+        if (materials[i].shader.dirty || materialName !== Geometry._lastMaterial) {
+          var needTobeStillDirty = materials[i].shader.setUniforms(gl, glslProgram, materials[i], camera, mesh);
+          materials[i].shader.dirty = needTobeStillDirty ? true : false;
+        }
+
+        if (materialName !== Geometry._lastMaterial) {
+          if (materials[i]) {
+            isMaterialSetupDone = materials[i].setUp();
+          }
+        }
+        if (!isMaterialSetupDone) {
+          return;
+        }
+
+        //if (this._ibo.length &gt; 0) {
+        if (Geometry._iboArrayDic[thisName].length &gt; 0) {
+          //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._ibo[i] );
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][i] );
+          gl.drawElements(gl[this._primitiveType], materials[i].getVertexN(this), glem.elementIndexBitSize(gl), 0);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        } else {
+          gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
+        }
+
+        /*
+        if (materials[i].toString() !== Geometry._lastMaterial) {
+          if (materials[i]) {
+            materials[i].tearDown();
+          }
+        }
+        */
+
+        Geometry._lastMaterial = isMaterialSetupDone ? materialName : null;
+      }
+    } else {
+      let glslProgram = this.glslProgramOfPasses[renderPass_index];
+      gl.useProgram(glslProgram);
+
+      if (!isVAOBound) {
+        if (Geometry._lastGeometry !== thisName) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[thisName]);
+          this.setUpVertexAttribs(gl, glslProgram, this._allVertexAttribs(this._vertices));
+        }
+      }
+
+      let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+      gl.uniform1f(glslProgram.opacity, opacity);
+
+      if (camera) {
+        var viewMatrix = camera.lookAtRHMatrix();
+        var projectionMatrix = camera.perspectiveRHMatrix();
+        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
+        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
+
+      }
+
+      if (typeof this._defaultMaterial.shader.setUniforms !== &apos;undefined&apos;) {
+        this._defaultMaterial.shader.setUniforms(gl, glslProgram, this._defaultMaterial, camera, mesh);
+      }
+
+      //if (this._ibo.length &gt; 0) {
+      if (Geometry._iboArrayDic[thisName].length &gt; 0) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[thisName][0] );
+        gl.drawElements(gl[this._primitiveType], Geometry._idxNArrayDic[thisName][0], glem.elementIndexBitSize(gl), 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+      } else {
+        gl.drawArrays(gl[this._primitiveType], 0, this._vertexN);
+      }
+
+      Geometry._lastMaterial = null;
+    }
+
+    //glem.bindVertexArray(gl, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    Geometry._lastGeometry = thisName;
+
+  }
+
+  /**
+   *
+   * @param geometry
+   */
+  merge(geometry) {
+    var baseLen = this._vertices.position.length;
+
+    if (this === geometry) {
+      console.assert(&apos;don\&apos;t merge same geometry!&apos;);
+    }
+    for (var attribName in this._vertices) {
+      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+    }
+    let geometryIndicesN = geometry._indicesArray.length;
+    for (let i = 0; i &lt; geometryIndicesN; i++) {
+      for (let j = 0; j &lt; geometry._indicesArray[i].length; j++) {
+        geometry._indicesArray[i][j] += baseLen;
+      }
+      this._indicesArray.push(geometry._indicesArray[i]);
+      if (geometry._materials[i]) {
+        this._materials.push(geometry._materials[i]);
+      }
+    }
+    this._vertexN += geometry._vertexN;
+  }
+
+  /**
+   * take no thought geometry&apos;s materials
+   *
+   * @param geometry
+   */
+  mergeHarder(geometry) {
+    var baseLen = this._vertices.position.length;
+    if (this === geometry) {
+      console.assert(&apos;don\&apos;t merge same geometry!&apos;);
+    }
+    for (var attribName in this._vertices) {
+      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
+    }
+    for (let i = 0; i &lt; this._indicesArray.length; i++) {
+      let len = geometry._indicesArray[i].length;
+      for (let j = 0; j &lt; len; j++) {
+        var idx = geometry._indicesArray[i][j];
+        this._indicesArray[i].push(baseLen + idx);
+      }
+      if (this._materials[i]) {
+        this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+      }
+    }
+    this._vertexN += geometry._vertexN;
+  }
+
+
+  set materials(materials) {
+    this._materials = materials;
+  }
+
+  setExtraDataForShader(name, value) {
+    this._extraDataForShader[name] = value;
+  }
+
+  static clearMaterialCache() {
+    Geometry._lastMaterial = null;
+  }
+
+  toString() {
+    return this._instanceName;
+  }
+}
+Geometry._vaoDic = {};
+Geometry._vboDic = {};
+Geometry._iboArrayDic = {};
+Geometry._idxNArrayDic = {};
+Geometry._lastGeometry = null;
+Geometry._lastMaterial = null;
+
+GLBoost[&apos;Geometry&apos;] = Geometry;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

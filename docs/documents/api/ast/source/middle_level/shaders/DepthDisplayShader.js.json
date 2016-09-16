@@ -1,0 +1,1180 @@
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "ImportDeclaration",
+      "specifiers": [
+        {
+          "type": "ImportDefaultSpecifier",
+          "local": {
+            "type": "Identifier",
+            "name": "DecalShader",
+            "range": [
+              7,
+              18
+            ],
+            "loc": {
+              "start": {
+                "line": 1,
+                "column": 7
+              },
+              "end": {
+                "line": 1,
+                "column": 18
+              }
+            }
+          },
+          "range": [
+            7,
+            18
+          ],
+          "loc": {
+            "start": {
+              "line": 1,
+              "column": 7
+            },
+            "end": {
+              "line": 1,
+              "column": 18
+            }
+          }
+        }
+      ],
+      "source": {
+        "type": "Literal",
+        "value": "./DecalShader",
+        "raw": "'./DecalShader'",
+        "range": [
+          24,
+          39
+        ],
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 24
+          },
+          "end": {
+            "line": 1,
+            "column": 39
+          }
+        }
+      },
+      "range": [
+        0,
+        40
+      ],
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 40
+        }
+      }
+    },
+    {
+      "type": "ExportNamedDeclaration",
+      "declaration": {
+        "type": "ClassDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "DepthDisplayShaderSource",
+          "range": [
+            55,
+            79
+          ],
+          "loc": {
+            "start": {
+              "line": 3,
+              "column": 13
+            },
+            "end": {
+              "line": 3,
+              "column": 37
+            }
+          }
+        },
+        "superClass": null,
+        "body": {
+          "type": "ClassBody",
+          "body": [
+            {
+              "type": "MethodDefinition",
+              "key": {
+                "type": "Identifier",
+                "name": "FSShade_DepthDisplayShaderSource",
+                "range": [
+                  85,
+                  117
+                ],
+                "loc": {
+                  "start": {
+                    "line": 5,
+                    "column": 2
+                  },
+                  "end": {
+                    "line": 5,
+                    "column": 34
+                  }
+                }
+              },
+              "value": {
+                "type": "FunctionExpression",
+                "id": null,
+                "params": [
+                  {
+                    "type": "Identifier",
+                    "name": "f",
+                    "range": [
+                      118,
+                      119
+                    ],
+                    "loc": {
+                      "start": {
+                        "line": 5,
+                        "column": 35
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 36
+                      }
+                    }
+                  },
+                  {
+                    "type": "Identifier",
+                    "name": "gl",
+                    "range": [
+                      121,
+                      123
+                    ],
+                    "loc": {
+                      "start": {
+                        "line": 5,
+                        "column": 38
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 40
+                      }
+                    }
+                  },
+                  {
+                    "type": "Identifier",
+                    "name": "lights",
+                    "range": [
+                      125,
+                      131
+                    ],
+                    "loc": {
+                      "start": {
+                        "line": 5,
+                        "column": 42
+                      },
+                      "end": {
+                        "line": 5,
+                        "column": 48
+                      }
+                    }
+                  }
+                ],
+                "body": {
+                  "type": "BlockStatement",
+                  "body": [
+                    {
+                      "type": "VariableDeclaration",
+                      "declarations": [
+                        {
+                          "type": "VariableDeclarator",
+                          "id": {
+                            "type": "Identifier",
+                            "name": "shaderText",
+                            "range": [
+                              143,
+                              153
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 6,
+                                "column": 8
+                              },
+                              "end": {
+                                "line": 6,
+                                "column": 18
+                              }
+                            }
+                          },
+                          "init": {
+                            "type": "Literal",
+                            "value": "",
+                            "raw": "''",
+                            "range": [
+                              156,
+                              158
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 6,
+                                "column": 21
+                              },
+                              "end": {
+                                "line": 6,
+                                "column": 23
+                              }
+                            }
+                          },
+                          "range": [
+                            143,
+                            158
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 6,
+                              "column": 8
+                            },
+                            "end": {
+                              "line": 6,
+                              "column": 23
+                            }
+                          }
+                        }
+                      ],
+                      "kind": "var",
+                      "range": [
+                        139,
+                        159
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 6,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 6,
+                          "column": 24
+                        }
+                      }
+                    },
+                    {
+                      "type": "ExpressionStatement",
+                      "expression": {
+                        "type": "AssignmentExpression",
+                        "operator": "+=",
+                        "left": {
+                          "type": "Identifier",
+                          "name": "shaderText",
+                          "range": [
+                            165,
+                            175
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 8,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 8,
+                              "column": 14
+                            }
+                          }
+                        },
+                        "right": {
+                          "type": "Literal",
+                          "value": "  vec4 surfaceColor = rt0;\n",
+                          "raw": "'  vec4 surfaceColor = rt0;\\n'",
+                          "range": [
+                            179,
+                            209
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 8,
+                              "column": 18
+                            },
+                            "end": {
+                              "line": 8,
+                              "column": 48
+                            }
+                          }
+                        },
+                        "range": [
+                          165,
+                          209
+                        ],
+                        "loc": {
+                          "start": {
+                            "line": 8,
+                            "column": 4
+                          },
+                          "end": {
+                            "line": 8,
+                            "column": 48
+                          }
+                        }
+                      },
+                      "range": [
+                        165,
+                        210
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 8,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 8,
+                          "column": 49
+                        }
+                      }
+                    },
+                    {
+                      "type": "ExpressionStatement",
+                      "expression": {
+                        "type": "AssignmentExpression",
+                        "operator": "+=",
+                        "left": {
+                          "type": "Identifier",
+                          "name": "shaderText",
+                          "range": [
+                            215,
+                            225
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 9,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 9,
+                              "column": 14
+                            }
+                          }
+                        },
+                        "right": {
+                          "type": "Literal",
+                          "value": "  rt0 = vec4(surfaceColor.r, surfaceColor.r, surfaceColor.r, 1.0);\n",
+                          "raw": "'  rt0 = vec4(surfaceColor.r, surfaceColor.r, surfaceColor.r, 1.0);\\n'",
+                          "range": [
+                            229,
+                            299
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 9,
+                              "column": 18
+                            },
+                            "end": {
+                              "line": 9,
+                              "column": 88
+                            }
+                          }
+                        },
+                        "range": [
+                          215,
+                          299
+                        ],
+                        "loc": {
+                          "start": {
+                            "line": 9,
+                            "column": 4
+                          },
+                          "end": {
+                            "line": 9,
+                            "column": 88
+                          }
+                        }
+                      },
+                      "range": [
+                        215,
+                        300
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 9,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 9,
+                          "column": 89
+                        }
+                      },
+                      "trailingComments": [
+                        {
+                          "type": "Line",
+                          "value": "shaderText += '  rt0.a = 1.0;\\n';",
+                          "range": [
+                            306,
+                            341
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 11,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 11,
+                              "column": 39
+                            }
+                          }
+                        },
+                        {
+                          "type": "Line",
+                          "value": "shaderText += '  rt0 = vec4(position.xyz, 1.0);\\n';",
+                          "range": [
+                            346,
+                            399
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 12,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 12,
+                              "column": 57
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ReturnStatement",
+                      "argument": {
+                        "type": "Identifier",
+                        "name": "shaderText",
+                        "range": [
+                          413,
+                          423
+                        ],
+                        "loc": {
+                          "start": {
+                            "line": 15,
+                            "column": 11
+                          },
+                          "end": {
+                            "line": 15,
+                            "column": 21
+                          }
+                        }
+                      },
+                      "range": [
+                        406,
+                        424
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 15,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 15,
+                          "column": 22
+                        }
+                      },
+                      "leadingComments": [
+                        {
+                          "type": "Line",
+                          "value": "shaderText += '  rt0.a = 1.0;\\n';",
+                          "range": [
+                            306,
+                            341
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 11,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 11,
+                              "column": 39
+                            }
+                          }
+                        },
+                        {
+                          "type": "Line",
+                          "value": "shaderText += '  rt0 = vec4(position.xyz, 1.0);\\n';",
+                          "range": [
+                            346,
+                            399
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 12,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 12,
+                              "column": 57
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ],
+                  "range": [
+                    133,
+                    428
+                  ],
+                  "loc": {
+                    "start": {
+                      "line": 5,
+                      "column": 50
+                    },
+                    "end": {
+                      "line": 16,
+                      "column": 3
+                    }
+                  }
+                },
+                "generator": false,
+                "expression": false,
+                "range": [
+                  117,
+                  428
+                ],
+                "loc": {
+                  "start": {
+                    "line": 5,
+                    "column": 34
+                  },
+                  "end": {
+                    "line": 16,
+                    "column": 3
+                  }
+                }
+              },
+              "kind": "method",
+              "computed": false,
+              "range": [
+                85,
+                428
+              ],
+              "loc": {
+                "start": {
+                  "line": 5,
+                  "column": 2
+                },
+                "end": {
+                  "line": 16,
+                  "column": 3
+                }
+              },
+              "static": false
+            }
+          ],
+          "range": [
+            80,
+            430
+          ],
+          "loc": {
+            "start": {
+              "line": 3,
+              "column": 38
+            },
+            "end": {
+              "line": 17,
+              "column": 1
+            }
+          }
+        },
+        "range": [
+          49,
+          430
+        ],
+        "loc": {
+          "start": {
+            "line": 3,
+            "column": 7
+          },
+          "end": {
+            "line": 17,
+            "column": 1
+          }
+        },
+        "leadingComments": [],
+        "trailingComments": []
+      },
+      "specifiers": [],
+      "source": null,
+      "range": [
+        42,
+        430
+      ],
+      "loc": {
+        "start": {
+          "line": 3,
+          "column": 0
+        },
+        "end": {
+          "line": 17,
+          "column": 1
+        }
+      }
+    },
+    {
+      "type": "ExportDefaultDeclaration",
+      "declaration": {
+        "type": "ClassDeclaration",
+        "id": {
+          "type": "Identifier",
+          "name": "DepthDisplayShader",
+          "range": [
+            455,
+            473
+          ],
+          "loc": {
+            "start": {
+              "line": 21,
+              "column": 21
+            },
+            "end": {
+              "line": 21,
+              "column": 39
+            }
+          }
+        },
+        "superClass": {
+          "type": "Identifier",
+          "name": "DecalShader",
+          "range": [
+            482,
+            493
+          ],
+          "loc": {
+            "start": {
+              "line": 21,
+              "column": 48
+            },
+            "end": {
+              "line": 21,
+              "column": 59
+            }
+          }
+        },
+        "body": {
+          "type": "ClassBody",
+          "body": [
+            {
+              "type": "MethodDefinition",
+              "key": {
+                "type": "Identifier",
+                "name": "constructor",
+                "range": [
+                  498,
+                  509
+                ],
+                "loc": {
+                  "start": {
+                    "line": 22,
+                    "column": 2
+                  },
+                  "end": {
+                    "line": 22,
+                    "column": 13
+                  }
+                }
+              },
+              "value": {
+                "type": "FunctionExpression",
+                "id": null,
+                "params": [
+                  {
+                    "type": "Identifier",
+                    "name": "glBoostContext",
+                    "range": [
+                      510,
+                      524
+                    ],
+                    "loc": {
+                      "start": {
+                        "line": 22,
+                        "column": 14
+                      },
+                      "end": {
+                        "line": 22,
+                        "column": 28
+                      }
+                    }
+                  },
+                  {
+                    "type": "Identifier",
+                    "name": "basicShader",
+                    "range": [
+                      526,
+                      537
+                    ],
+                    "loc": {
+                      "start": {
+                        "line": 22,
+                        "column": 30
+                      },
+                      "end": {
+                        "line": 22,
+                        "column": 41
+                      }
+                    }
+                  }
+                ],
+                "body": {
+                  "type": "BlockStatement",
+                  "body": [
+                    {
+                      "type": "ExpressionStatement",
+                      "expression": {
+                        "type": "CallExpression",
+                        "callee": {
+                          "type": "Super",
+                          "range": [
+                            546,
+                            551
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 24,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 24,
+                              "column": 9
+                            }
+                          }
+                        },
+                        "arguments": [
+                          {
+                            "type": "Identifier",
+                            "name": "glBoostContext",
+                            "range": [
+                              552,
+                              566
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 24,
+                                "column": 10
+                              },
+                              "end": {
+                                "line": 24,
+                                "column": 24
+                              }
+                            }
+                          },
+                          {
+                            "type": "Identifier",
+                            "name": "basicShader",
+                            "range": [
+                              568,
+                              579
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 24,
+                                "column": 26
+                              },
+                              "end": {
+                                "line": 24,
+                                "column": 37
+                              }
+                            }
+                          }
+                        ],
+                        "range": [
+                          546,
+                          580
+                        ],
+                        "loc": {
+                          "start": {
+                            "line": 24,
+                            "column": 4
+                          },
+                          "end": {
+                            "line": 24,
+                            "column": 38
+                          }
+                        }
+                      },
+                      "range": [
+                        546,
+                        581
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 24,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 24,
+                          "column": 39
+                        }
+                      }
+                    },
+                    {
+                      "type": "ExpressionStatement",
+                      "expression": {
+                        "type": "CallExpression",
+                        "callee": {
+                          "type": "MemberExpression",
+                          "computed": false,
+                          "object": {
+                            "type": "Identifier",
+                            "name": "DepthDisplayShader",
+                            "range": [
+                              586,
+                              604
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 25,
+                                "column": 4
+                              },
+                              "end": {
+                                "line": 25,
+                                "column": 22
+                              }
+                            }
+                          },
+                          "property": {
+                            "type": "Identifier",
+                            "name": "mixin",
+                            "range": [
+                              605,
+                              610
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 25,
+                                "column": 23
+                              },
+                              "end": {
+                                "line": 25,
+                                "column": 28
+                              }
+                            }
+                          },
+                          "range": [
+                            586,
+                            610
+                          ],
+                          "loc": {
+                            "start": {
+                              "line": 25,
+                              "column": 4
+                            },
+                            "end": {
+                              "line": 25,
+                              "column": 28
+                            }
+                          }
+                        },
+                        "arguments": [
+                          {
+                            "type": "Identifier",
+                            "name": "DepthDisplayShaderSource",
+                            "range": [
+                              611,
+                              635
+                            ],
+                            "loc": {
+                              "start": {
+                                "line": 25,
+                                "column": 29
+                              },
+                              "end": {
+                                "line": 25,
+                                "column": 53
+                              }
+                            }
+                          }
+                        ],
+                        "range": [
+                          586,
+                          636
+                        ],
+                        "loc": {
+                          "start": {
+                            "line": 25,
+                            "column": 4
+                          },
+                          "end": {
+                            "line": 25,
+                            "column": 54
+                          }
+                        }
+                      },
+                      "range": [
+                        586,
+                        637
+                      ],
+                      "loc": {
+                        "start": {
+                          "line": 25,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 25,
+                          "column": 55
+                        }
+                      }
+                    }
+                  ],
+                  "range": [
+                    539,
+                    641
+                  ],
+                  "loc": {
+                    "start": {
+                      "line": 22,
+                      "column": 43
+                    },
+                    "end": {
+                      "line": 26,
+                      "column": 3
+                    }
+                  }
+                },
+                "generator": false,
+                "expression": false,
+                "range": [
+                  509,
+                  641
+                ],
+                "loc": {
+                  "start": {
+                    "line": 22,
+                    "column": 13
+                  },
+                  "end": {
+                    "line": 26,
+                    "column": 3
+                  }
+                }
+              },
+              "kind": "constructor",
+              "computed": false,
+              "range": [
+                498,
+                641
+              ],
+              "loc": {
+                "start": {
+                  "line": 22,
+                  "column": 2
+                },
+                "end": {
+                  "line": 26,
+                  "column": 3
+                }
+              },
+              "static": false
+            }
+          ],
+          "range": [
+            494,
+            643
+          ],
+          "loc": {
+            "start": {
+              "line": 21,
+              "column": 60
+            },
+            "end": {
+              "line": 27,
+              "column": 1
+            }
+          }
+        },
+        "range": [
+          449,
+          643
+        ],
+        "loc": {
+          "start": {
+            "line": 21,
+            "column": 15
+          },
+          "end": {
+            "line": 27,
+            "column": 1
+          }
+        },
+        "leadingComments": [],
+        "trailingComments": []
+      },
+      "range": [
+        434,
+        643
+      ],
+      "loc": {
+        "start": {
+          "line": 21,
+          "column": 0
+        },
+        "end": {
+          "line": 27,
+          "column": 1
+        }
+      }
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "AssignmentExpression",
+        "operator": "=",
+        "left": {
+          "type": "MemberExpression",
+          "computed": true,
+          "object": {
+            "type": "Identifier",
+            "name": "GLBoost",
+            "range": [
+              645,
+              652
+            ],
+            "loc": {
+              "start": {
+                "line": 29,
+                "column": 0
+              },
+              "end": {
+                "line": 29,
+                "column": 7
+              }
+            }
+          },
+          "property": {
+            "type": "Literal",
+            "value": "DepthDisplayShader",
+            "raw": "'DepthDisplayShader'",
+            "range": [
+              653,
+              673
+            ],
+            "loc": {
+              "start": {
+                "line": 29,
+                "column": 8
+              },
+              "end": {
+                "line": 29,
+                "column": 28
+              }
+            }
+          },
+          "range": [
+            645,
+            674
+          ],
+          "loc": {
+            "start": {
+              "line": 29,
+              "column": 0
+            },
+            "end": {
+              "line": 29,
+              "column": 29
+            }
+          }
+        },
+        "right": {
+          "type": "Identifier",
+          "name": "DepthDisplayShader",
+          "range": [
+            677,
+            695
+          ],
+          "loc": {
+            "start": {
+              "line": 29,
+              "column": 32
+            },
+            "end": {
+              "line": 29,
+              "column": 50
+            }
+          }
+        },
+        "range": [
+          645,
+          695
+        ],
+        "loc": {
+          "start": {
+            "line": 29,
+            "column": 0
+          },
+          "end": {
+            "line": 29,
+            "column": 50
+          }
+        }
+      },
+      "range": [
+        645,
+        696
+      ],
+      "loc": {
+        "start": {
+          "line": 29,
+          "column": 0
+        },
+        "end": {
+          "line": 29,
+          "column": 51
+        }
+      }
+    }
+  ],
+  "sourceType": "module",
+  "range": [
+    0,
+    696
+  ],
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 29,
+      "column": 51
+    }
+  },
+  "comments": [
+    {
+      "type": "Line",
+      "value": "shaderText += '  rt0.a = 1.0;\\n';",
+      "range": [
+        306,
+        341
+      ],
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 4
+        },
+        "end": {
+          "line": 11,
+          "column": 39
+        }
+      }
+    },
+    {
+      "type": "Line",
+      "value": "shaderText += '  rt0 = vec4(position.xyz, 1.0);\\n';",
+      "range": [
+        346,
+        399
+      ],
+      "loc": {
+        "start": {
+          "line": 12,
+          "column": 4
+        },
+        "end": {
+          "line": 12,
+          "column": 57
+        }
+      }
+    }
+  ]
+}

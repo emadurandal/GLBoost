@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">js/low_level/shaders/Shader.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html">GLBoostLowContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostMonitor.js~GLBoostMonitor.html">GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/L_Element.js~L_Element.html">L_Element</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html">L_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html">L_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html">L_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/AABB.js~AABB.html">AABB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/DataUtil.js~DataUtil.html">DataUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/misc/MiscUtil.js~MiscUtil.html">MiscUtil</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">low_level/textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/low_level/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/core</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/core/GLBoostMiddleContext.js~GLBoostMiddleContext.html">GLBoostMiddleContext</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/draw_kickers</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerLocal.js~DrawKickerLocal.html">DrawKickerLocal</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/draw_kickers/DrawKickerWorld.js~DrawKickerWorld.html">DrawKickerWorld</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/M_Scene.js~M_Scene.html">M_Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/cameras</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html">M_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html">M_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html">M_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html">M_AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html">M_DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/lights/M_PointLight.js~M_PointLight.html">M_PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html">M_SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/elements/skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/expressions</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">middle_level/shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShader.html">DecalShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DecalShader.js~DecalShaderSource.html">DecalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShader.html">DepthDisplayShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShaderSource.html">DepthDisplayShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShaderSource.html">FragmentSimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/FragmentSimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShader.html">PassThroughShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PassThroughShader.js~PassThroughShaderSource.html">PassThroughShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexLocalShader.js~VertexLocalShaderSource.html">VertexLocalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShader.js~VertexWorldShaderSource.html">VertexWorldShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/middle_level/shaders/VertexWorldShadowShader.js~VertexWorldShadowShaderSource.html">VertexWorldShadowShaderSource</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/low_level/shaders/Shader.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Hash from &apos;../misc/Hash&apos;;
+import GLBoostObject from &apos;../core/GLBoostObject&apos;;
+import MiscUtil from &apos;../misc/MiscUtil&apos;;
+import GLExtensionsManager from &apos;../core/GLExtensionsManager&apos;;
+
+export default class Shader extends GLBoostObject {
+  constructor(glBoostContext) {
+    super(glBoostContext);
+
+    this._glslProgram = null;
+    this._dirty = true;
+  }
+
+  static initMixinMethodArray() {
+    this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
+    this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
+    this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
+
+    this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
+    this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
+
+    this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
+  }
+
+  static mixin(source) {
+
+    // create mixin method Array
+    this.initMixinMethodArray();
+
+    // register mixin methods to Array
+    if(this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1){
+      this.prototype._classNamesOfVSDefine.push(source.name);
+    }
+    if(this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1){
+      this.prototype._classNamesOfVSTransform.push(source.name);
+    }
+    if(this.prototype._classNamesOfVSShade.indexOf(source.name) === -1){
+      this.prototype._classNamesOfVSShade.push(source.name);
+    }
+    if(this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSDefine.push(source.name);
+    }
+    if(this.prototype._classNamesOfFSShade.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSShade.push(source.name);
+    }
+    if(this.prototype._classNamesOfPrepare.indexOf(source.name) === -1){
+      this.prototype._classNamesOfPrepare.push(source.name);
+    }
+
+    // mixin
+    var target = this.prototype; source = source.prototype;
+    Object.getOwnPropertyNames(source).forEach(function (name) {
+      if (name !== &apos;constructor&apos;) Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(source, name));
+    });
+  }
+
+  static swapMixin(current, newone) {
+    // register mixin methods to Array
+    let matchIdx = this.prototype._classNamesOfVSDefine.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfVSShade.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSShade[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSShade[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
+    }
+
+    // mixin
+    var target = this.prototype; newone = newone.prototype;
+    Object.getOwnPropertyNames(newone).forEach(function (name) {
+      if (name !== &apos;constructor&apos;) Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(newone, name));
+    });
+  }
+
+  static removeMixin(source) {
+    let matchIdx = this.prototype._classNamesOfVSDefine.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfVSShade.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSShade.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSShade.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfPrepare.splice(matchIdx, 1);
+    }
+  }
+
+  _removeDuplicatedLine(shaderString) {
+    var splittedShaderLines = shaderString.split(&apos;\n&apos;);
+    for (let i=0; i&lt;splittedShaderLines.length; i++) {
+      splittedShaderLines[i] += &apos;\n&apos;;
+      for (let j=0; j&lt;i; j++) {
+        if (splittedShaderLines[j] === splittedShaderLines[i]) {
+          splittedShaderLines[j] = &apos;//                                                            commented out because of duplicated: &apos; + splittedShaderLines[i];
+        }
+      }
+    }
+
+    let processedShaderString = &apos;&apos;;
+    for (let i=0; i&lt;splittedShaderLines.length; i++) {
+      processedShaderString += splittedShaderLines[i];
+    }
+
+    return processedShaderString;
+  }
+
+  _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
+    var f = functions;
+    var shaderText = &apos;&apos;;
+
+    var in_ = Shader._in_onVert(gl);
+    var out_ = Shader._out_onVert(gl);
+
+    shaderText +=   Shader._glslVer(gl);
+    shaderText +=   &apos;precision highp float;\n&apos;;
+
+    /// define variables
+    // start defining variables. first, sub class Shader, ...
+    // seconds, define variables as mixin shaders
+    let vsDefineShaderText = &apos;&apos;;
+    this._classNamesOfVSDefine.forEach((className)=&gt; {
+      var method = this[&apos;VSDefine_&apos; + className];
+      if (method) {
+        vsDefineShaderText += &apos;//                                                            VSDefine_&apos; + className + &apos; //\n&apos;;
+        vsDefineShaderText += method.bind(this, in_, out_, f, lights, material, extraData)();
+      }
+    });
+    shaderText += this._removeDuplicatedLine(vsDefineShaderText);
+
+    // begin of main function
+    shaderText +=   &apos;void main(void) {\n&apos;;
+
+
+    /// Transform
+    // start transforming. first, sub class Shader, ...
+    // seconds, transform as mixin Shaders
+    this._classNamesOfVSTransform.forEach((className)=&gt; {
+      var method = this[&apos;VSTransform_&apos; + className];
+      if (method) {
+        shaderText += &apos;//                                                            VSTransform_&apos; + className + &apos; //\n&apos;;
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
+      }
+    });
+
+    /// Shading
+    // start shading. first, sub class Shader, ...
+    // seconds, shade as mixin Shaders
+    this._classNamesOfVSShade.forEach((className)=&gt; {
+      var method = this[&apos;VSShade_&apos; + className];
+      if (method) {
+        shaderText += &apos;//                                                            VSShade_&apos; + className + &apos; //\n&apos;;
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
+      }
+    });
+
+
+    // end of main function
+    shaderText +=   &apos;}\n&apos;;
+
+    return shaderText;
+  }
+
+
+  _getFragmentShaderString(gl, functions, lights, material, extraData) {
+    var f = functions;
+    var shaderText = &apos;&apos;;
+
+    var in_ = Shader._in_onFrag(gl);
+
+    shaderText +=   Shader._glslVer(gl);
+    var maxDrawBuffers = this._getMaxDrawBuffers();
+    if (maxDrawBuffers &gt; 1) {
+      shaderText += Shader._glsl1DrawBufferExt(gl);
+    }
+    shaderText +=   &apos;precision mediump float;\n&apos;;
+
+    for (let i=0; i&lt;maxDrawBuffers; i++) {
+      shaderText +=   Shader._set_outColor_onFrag(gl, i);
+    }
+
+    /// define variables
+    // start defining variables. first, sub class Shader, ...
+    // seconds, define variables as mixin shaders
+    let fsDefineShaderText = &apos;&apos;;
+    this._classNamesOfFSDefine.forEach((className)=&gt; {
+      var method = this[&apos;FSDefine_&apos; + className];
+      if (method) {
+        fsDefineShaderText += &apos;//                                                            FSDefine_&apos; + className + &apos; //\n&apos;;
+        fsDefineShaderText += method.bind(this, in_, f, lights, material, extraData)();
+      }
+    });
+    shaderText += this._removeDuplicatedLine(fsDefineShaderText);
+
+
+    // begin of main function
+    shaderText +=   &apos;void main(void) {\n&apos;;
+
+
+    /// Shading
+    // start shading. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
+    this._classNamesOfFSShade.forEach((className)=&gt; {
+      var method = this[&apos;FSShade_&apos; + className];
+      if (method) {
+        shaderText += &apos;//                                                            FSShade_&apos; + className + &apos; //\n&apos;;
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
+      }
+    });
+
+    // end of main function
+    if (maxDrawBuffers &gt; 1) {
+      for (let i=0; i&lt;maxDrawBuffers; i++) {
+        shaderText += Shader._set_glFragData_inGLVer1(gl, i);
+      }
+    } else {
+      shaderText += Shader._set_glFragColor_inGLVer1(gl);
+    }
+    shaderText +=   &apos;}\n&apos;;
+
+    return shaderText;
+  }
+
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+    var vertexAttribsAsResult = [];
+
+    // and shade as mixin Prepare Functions
+    this._classNamesOfPrepare.forEach((className)=&gt; {
+      var method = this[&apos;prepare_&apos; + className];
+      if (method) {
+        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
+        vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
+      }
+    });
+
+    return vertexAttribsAsResult;
+  }
+
+  get dirty() {
+    return this._dirty;
+  }
+
+  set dirty(flg) {
+    this._dirty = flg;
+  }
+
+  setUniforms() {
+
+  }
+
+  _getShader(gl, theSource, type) {
+    var shader;
+
+    if (type == &apos;x-shader/x-fragment&apos;) {
+      shader = this._glContext.createShader(this, gl.FRAGMENT_SHADER);
+    } else if (type == &apos;x-shader/x-vertex&apos;) {
+      shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
+    } else {
+      // Unknown shader type
+      return null;
+    }
+
+    gl.shaderSource(shader, theSource);
+
+    // Compile the shader program
+    gl.compileShader(shader);
+
+    // See if it compiled successfully
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(&apos;An error occurred compiling the shaders: &apos; + gl.getShaderInfoLog(shader));
+      return null;
+    }
+
+    return shader;
+  }
+
+  _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
+    MiscUtil.consoleLog(&apos;Vertex Shader:&apos;);
+    MiscUtil.consoleLog(vertexShaderStr);
+    MiscUtil.consoleLog(&apos;Fragment Shader:&apos;);
+    MiscUtil.consoleLog(fragmentShaderStr);
+
+    var vertexShader = this._getShader(gl, vertexShaderStr, &apos;x-shader/x-vertex&apos;);
+    var fragmentShader = this._getShader(gl, fragmentShaderStr, &apos;x-shader/x-fragment&apos;);
+
+    // Create the shader program
+    var shaderProgram = this._glContext.createProgram(this);
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    this._glContext.deleteShader(this, vertexShader);
+    this._glContext.deleteShader(this, fragmentShader);
+
+    // If creating the shader program failed, alert
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+      alert(&apos;Unable to initialize the shader program.&apos;);
+    }
+
+    gl.useProgram(shaderProgram);
+
+    return shaderProgram;
+  }
+
+  getShaderProgram(vertexAttribs, existCamera_f, lights, material, extraData = {}) {
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
+
+    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
+
+    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
+    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
+
+    // lookup shaderHashTable
+    var baseText = vertexShaderText + &apos;\n###SPLIT###\n&apos; + fragmentShaderText;
+    var hash = Hash.toCRC32(baseText);
+    if (!Shader._shaderHashTable[canvas.id]) {
+      Shader._shaderHashTable[canvas.id] = {};
+    }
+    let programToReturn = null;
+    var hashTable = Shader._shaderHashTable[canvas.id];
+    if (hash in hashTable) {
+      if (hashTable[hash].code === baseText) {
+        programToReturn = hashTable[hash].program;
+      } else {
+        for (let i=0; i&lt;hashTable[hash].collisionN; i++) {
+          if (hashTable[hash + &apos;_&apos; + i].code === baseText) {
+            programToReturn = hashTable[hash + &apos;_&apos; + i].program;
+            break;
+          }
+        }
+        hashTable[hash].collisionN++;
+      }
+    }
+
+    if (programToReturn === null || !gl.isProgram(programToReturn)) {
+    // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
+      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+
+      // register it to shaderHashTable.
+      var indexStr = null;
+      if (typeof hashTable[hash] !== &apos;undefined&apos; &amp;&amp; hashTable[hash].collisionN &gt; 0) {
+        indexStr = hash + &apos;_&apos; + hashTable[hash].collisionN;
+      } else {
+        indexStr = hash;
+      }
+      hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
+      Shader._shaderHashTable[canvas.id] = hashTable;
+
+    } else {
+      //gl.useProgram(programToReturn);
+    }
+    this._glslProgram = programToReturn;
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
+
+    return programToReturn;
+  }
+
+  getDefaultPointLightIfNotExist(gl, lights, canvas) {
+
+    if (lights.length === 0) {
+      if (Shader._defaultLight === null) {
+        Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY);
+      }
+      return [Shader._defaultLight];
+    } else {
+      return lights;
+    }
+  }
+
+  static _exist(functions, attribute) {
+    return functions.indexOf(attribute) &gt;= 0;
+  }
+
+  _getMaxDrawBuffers() {
+    var gl = this._glContext.gl;
+    var isWebGL2 = Shader.isThisGLVersion_2(gl);
+    if (isWebGL2) {
+      return gl.getParameter(gl.MAX_DRAW_BUFFERS);
+    }
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+    if (glem.extDBs) {
+      return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
+    } else {
+      return 1;
+    }
+  }
+
+  static isThisGLVersion_2(gl) {
+    if (typeof WebGL2RenderingContext === &apos;undefined&apos;) {
+      return false;
+    }
+    return gl instanceof WebGL2RenderingContext;
+  }
+
+  static _glslVer(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;#version 300 es\n&apos; : &apos;&apos;;
+  }
+
+  static _glsl1DrawBufferExt(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? &apos;#extension GL_EXT_draw_buffers : require\n&apos; : &apos;&apos;;
+  }
+
+  static _in_onVert(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;in&apos; : &apos;attribute&apos;;
+  }
+  static _out_onVert(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;out&apos; : &apos;varying&apos;;
+  }
+  static _in_onFrag(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;in&apos; : &apos;varying&apos;;
+  }
+
+  static _texture_func(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;texture&apos; : &apos;texture2D&apos;;
+  }
+
+  static _textureProj_func(gl) {
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;textureProj&apos; : &apos;texture2DProj&apos;;
+  }
+
+  _sampler2DShadow_func() {
+    var gl = this._glContext.gl;
+    return GLBoost.isThisGLVersion_2(gl) ? &apos;sampler2DShadow&apos; : &apos;sampler2D&apos;;
+  }
+
+  static _set_outColor_onFrag(gl, i) {
+    return GLBoost.isThisGLVersion_2(gl) ? `layout(location = ${i}) out vec4 rt${i};\n` : `vec4 rt${i};\n`;
+  }
+
+  static _set_glFragColor_inGLVer1(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? &apos;  gl_FragColor = rt0;\n&apos; : &apos;&apos;;
+  }
+  static _set_glFragData_inGLVer1(gl, i) {
+    return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : &apos;&apos;;
+  }
+
+  get glslProgram() {
+    return this._glslProgram;
+  }
+
+  readyForDiscard() {
+    super.readyForDiscard();
+    this._glContext.deleteProgram(this, this._glslProgram);
+  }
+
+}
+
+Shader._instances = new Object();
+Shader._shaderHashTable = {};
+Shader._defaultLight = null;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

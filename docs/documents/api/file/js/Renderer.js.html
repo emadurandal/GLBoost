@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">js/Renderer.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="git+https://github.com/emadurandal/GLBoost.git">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Camera.js~Camera.html">PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Element.js~Element.html">Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Group.js~Group.html">Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/InitialSettings.js~InitialSettings.html">InitialSettings</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/Scene.js~Scene.html">Scene</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">geometries</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/geometries/SkeletalGeometry.js~SkeletalGeometry.html">SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">impl</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lights</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/AbstractLight.js~AbstractLight.html">AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/DirectionalLight.js~DirectionalLight.html">DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/lights/PointLight.js~PointLight.html">PointLight</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">loader</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">math</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">meshes</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/Mesh.js~Mesh.html">Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/meshes/SkeletalMesh.js~SkeletalMesh.html">SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">misc</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">primitives</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">shaders</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShader.html">SimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SimpleShader.js~SimpleShaderSource.html">SimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">skeletons</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/skeletons/Joint.js~Joint.html">Joint</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">textures</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/js/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">js/Renderer.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;./globals&apos;;
+import GLContext from &apos;./GLContext&apos;;
+import GLExtensionsManager from &apos;./GLExtensionsManager&apos;;
+import MutableTexture from &apos;./textures/MutableTexture&apos;;
+import RenderPass from &apos;./RenderPass&apos;;
+import Geometry from &apos;./geometries/Geometry&apos;;
+
+/**
+ * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements&apos; data, decides a plan of drawing process, and then just execute it.&lt;br&gt;
+ * ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x5236;&#x5FA1;&#x3092;&#x53F8;&#x308A;&#x307E;&#x3059;&#x3002;Canvas&#x306B;&#x30A4;&#x30E1;&#x30FC;&#x30B8;&#x3092;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x3059;&#x308B;&#x305F;&#x3081;&#x306B;&#x3001;&#x3053;&#x306E;Renderer&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x4ED6;&#x306E;&#x8981;&#x7D20;&#x306E;&#x30C7;&#x30FC;&#x30BF;&#x3092;&#x96C6;&#x3081;&#x3001;&#x63CF;&#x753B;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x8A08;&#x753B;&#x3092;&#x6C7A;&#x5B9A;&#x3057;&#x3001;&#x5B9F;&#x884C;&#x3057;&#x307E;&#x3059;&#x3002;
+ */
+export default class Renderer {
+  constructor(parameters) {
+    var _canvas = parameters.canvas;
+    var _clearColor = parameters.clearColor;
+
+    GLBoost.CURRENT_CANVAS_ID = &apos;#&apos; + parameters.canvas.id;
+
+    this._glContext = GLContext.getInstance(_canvas);
+
+    var gl = this._glContext.gl;
+
+    var setDefaultGLStates = function setDefaultGLStates() {
+
+      gl.enable( gl.DEPTH_TEST );
+      gl.depthFunc( gl.LEQUAL );
+
+      gl.enable( gl.BLEND );
+      gl.blendEquation( gl.FUNC_ADD );
+      gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
+      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+      gl.clearDepth( 1 );
+      gl.clearStencil( 0 );
+    };
+
+    setDefaultGLStates();
+
+  }
+
+  /**
+   * en: draw elements of the scene.&lt;br&gt;
+   * ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3092;&#x63CF;&#x753B;&#x3057;&#x307E;&#x3059;
+   * @param {Scene} scene a instance of Scene class
+   */
+  draw(scene) {
+    var camera = false;
+    scene.cameras.forEach((elm)=&gt; {
+      if (elm.isMainCamera(scene)) {
+        camera = elm;
+      }
+    });
+
+    var gl = this._glContext.gl;
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    let lights = scene.lights;
+
+    scene.renderPasses.forEach((renderPass, index)=&gt;{
+
+      var meshes = renderPass.meshes;
+
+      if (renderPass.fboOfRenderTargetTextures) {
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        Geometry.clearMaterialCache();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fboOfRenderTargetTextures);
+      }
+      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+
+      if (renderPass.clearColor) {
+        var color = renderPass.clearColor;
+        gl.clearColor(color[0], color[1], color[2], color[3]);
+        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
+
+      meshes.forEach((mesh)=&gt; {
+        mesh.draw(lights, camera, scene, index);
+      });
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      glem.drawBuffers(gl, [gl.BACK]);
+
+    });
+  }
+
+  /**
+   * en: clear color/depth/stencil of canvas.&lt;br&gt;
+   * ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x3001;&#x30B9;&#x30C6;&#x30F3;&#x30B7;&#x30EB;&#x306E;&#x3044;&#x305A;&#x308C;&#x304B;&#x53C8;&#x306F;&#x5168;&#x3066;&#x3092;&#x30AF;&#x30EA;&#x30A2;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @param {boolean} color_flg true: clear color, false: don&apos;t clear color
+   * @param {boolean} depth_flg true: clear depth, false: don&apos;t clear depth
+   * @param {boolean} stencil_flg  true: clear stencil, false: don&apos;t clear stencil
+   */
+  clearCanvas( color_flg, depth_flg, stencil_flg ) {
+
+    var gl = this._glContext.gl;
+
+    var bufferBits = 0;
+
+    if ( color_flg === void 0 || color_flg ) bufferBits |= gl.COLOR_BUFFER_BIT;
+    if ( depth_flg === void 0 || depth_flg ) bufferBits |= gl.DEPTH_BUFFER_BIT;
+    if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= gl.STENCIL_BUFFER_BIT;
+
+    gl.clear( bufferBits );
+
+  }
+
+  /**
+   * en: create textures as render target. (and attach it to framebuffer object internally.)&lt;br&gt;
+   * ja:&#x30EC;&#x30F3;&#x30C0;&#x30FC;&#x30BF;&#x30FC;&#x30B2;&#x30C3;&#x30C8;&#x3068;&#x3057;&#x3066;&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x4F5C;&#x6210;&#x3057;&#x307E;&#x3059;&#xFF08;&#x5185;&#x90E8;&#x7684;&#x306B;framebuffer object&#x306B;&#x30A2;&#x30BF;&#x30C3;&#x30C1;&#x3055;&#x308C;&#x307E;&#x3059;&#xFF09;&#x3002;
+   * @param {number} width en: width of texture. ja: &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x306E;&#x5E45;
+   * @param {number} height en: height of texture. ja: &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x306E;&#x9AD8;&#x3055;
+   * @param {number} textureNum en: the number of creation. ja:&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x4F5C;&#x308B;&#x500B;&#x6570;
+   * @returns {Array} en: an array of created textures. ja:&#x4F5C;&#x6210;&#x3055;&#x308C;&#x305F;&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x306E;&#x914D;&#x5217;
+   */
+  createTexturesForRenderTarget(width, height, textureNum) {
+
+    var gl = this._glContext.gl;
+    var canvas = this._glContext.canvas;
+
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+
+    // Create FBO
+    var fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    fbo.width = width ? width : canvas.width;
+    fbo.height = height ? height : canvas.height;
+
+    var renderTargetTextures = [];
+    for(let i=0; i&lt;textureNum; i++) {
+      let texture = new MutableTexture(fbo.width, fbo.height, canvas);
+      texture.fbo = fbo;
+      renderTargetTextures.push(texture);
+    }
+
+    // Create RenderBuffer
+    var renderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+
+    // Attach Buffers
+    renderTargetTextures.forEach((texture, i)=&gt;{
+      var glTexture = texture.glTextureResource;
+      var attachimentId = glem.colorAttachiment(gl, i);
+      texture.colorAttachiment = attachimentId;
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+    });
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return renderTargetTextures;
+  }
+
+  createRenderPaths(number) {
+    var renderPasses = [];
+    for (let i=0; i&lt;number; i++) {
+      renderPasses.push(new RenderPass(this._glContext.gl));
+    }
+
+    return renderPasses;
+  }
+
+  /**
+   * en: Get WebGL context.&lt;br&gt;
+   * ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @returns {webglcontext} a context of WebGL
+   */
+  get glContext() {
+    return this._glContext.gl;
+  }
+
+
+  /**
+   * en: resize canvas and viewport.&lt;br&gt;
+   * ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @param {number} width en: width to resize, ja: &#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x5E45;
+   * @param {number} height en: height to resize, ja:&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x9AD8;&#x3055;
+   */
+  resize(width, height) {
+    this._glContext.canvas.width = width;
+    this._glContext.canvas.height = height;
+
+    this._glContext.gl.viewport(0, 0, width, height);
+  }
+
+}
+
+GLBoost[&apos;Renderer&apos;] = Renderer;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.5)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
