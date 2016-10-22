@@ -44,7 +44,7 @@ export default class GLBoostObject {
   }
 
   get instanceNameWithUserFlavor() {
-    this._instanceName + '_' + this._userFlavorName;
+    return this._instanceName + '_' + this._userFlavorName;
   }
 
   readyForDiscard() {
