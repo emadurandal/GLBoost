@@ -292,7 +292,9 @@
         var y = this.z * v.x - this.x * v.z;
         var z = this.x * v.y - this.y * v.x;
 
-        this.setComponents(x, y, z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
         return this;
       }
@@ -1886,7 +1888,7 @@
     }, {
       key: 'instanceNameWithUserFlavor',
       get: function get() {
-        this._instanceName + '_' + this._userFlavorName;
+        return this._instanceName + '_' + this._userFlavorName;
       }
     }, {
       key: 'isReadyForDiscard',
