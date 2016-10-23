@@ -5,8 +5,8 @@ export default class SkeletalShaderSource {
     var shaderText = '';
     shaderText += `${in_} vec4 aVertex_joint;\n`;
     shaderText += `${in_} vec4 aVertex_weight;\n`;
-    shaderText+='uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-//    shaderText += `${out_} vec4 aVertex_color;\n`;
+    shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
+    shaderText += `uniform mat4 invWorldMatrix;\n`;
     return shaderText;
   }
 
@@ -16,47 +16,19 @@ export default class SkeletalShaderSource {
   VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
-    shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-    shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-    shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-    shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-    /*
-    shaderText += `mat4 scaleMatrix = mat4(
-      100.0, 0.0, 0.0, 0.0,
-      0.0, 100.0, 0.0, 0.0,
-      0.0, 0.0, 100.0, 0.0,
-      0.0, 0.0, 0.0, 1.0
-    );\n`;
+    shaderText += 'vec4 weightVec = normalize(aVertex_weight);\n';
+    shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+    shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+    shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+    shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
 
-    shaderText += `mat4 scaleMatrix2 = mat4(
-      0.01, 0.0, 0.0, 0.0,
-      0.0, 0.01, 0.0, 0.0,
-      0.0, 0.0, 0.01, 0.0,
-      0.0, 0.0, 0.0, 1.0
-    );\n`;
-*/
-    /*
-    shaderText += '  skinMat[3][0] /= 100.0;';
-    shaderText += '  skinMat[3][1] /= 100.0;';
-    shaderText += '  skinMat[3][2] /= 100.0;';
-
-    shaderText += '  skinMat[0][3] /= 100.0;';
-    shaderText += '  skinMat[1][3] /= 100.0;';
-    shaderText += '  skinMat[2][3] /= 100.0;';
-  */
-
-//    shaderText += '  vec3 newVec = vec3(aVertex_position.x, aVertex_position.y, -aVertex_position.z);';
+    shaderText += '  vec4 position = invWorldMatrix * vec4(aVertex_position.x, aVertex_position.y, aVertex_position.z, 1.0);';
 
     if (existCamera_f) {
-//      shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-      shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
+      shaderText += '  gl_Position = pvwMatrix * skinMat * position;\n';
     } else {
       shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
     }
-
-//    shaderText += 'aVertex_color = vec4(aVertex_joint.x/18.0, aVertex_joint.y/18.0, aVertex_joint.z/18.0, 1.0);\n';
-    //shaderText += 'aVertex_color = vec4((int(aVertex_joint.x)%3)/6.0, (int(aVertex_joint.y)%3)/6.0, (int(aVertex_joint.z)%3)/6.0, 1.0);\n';
-
 
     return shaderText;
   }
@@ -84,6 +56,8 @@ export default class SkeletalShaderSource {
       );
     }
     gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
+
+    shaderProgram['invWorldMatrix'] = gl.getUniformLocation(shaderProgram, 'invWorldMatrix');
 
     return vertexAttribsAsResult;
   }
