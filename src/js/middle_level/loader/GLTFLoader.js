@@ -158,19 +158,21 @@ export default class GLTFLoader {
     }
 
     if (nodeJson.meshes) {
-      // this node has mashes...
-      let meshStr = nodeJson.meshes[0];
-      let meshJson = json.meshes[meshStr];
+      for (let i = 0; i < nodeJson.meshes.length; i++) {
+        // this node has mashes...
+        let meshStr = nodeJson.meshes[i];
+        let meshJson = json.meshes[meshStr];
 
-      let rootJointStr = null;
-      let skinStr = null;
-      if (nodeJson.skeletons) {
-        rootJointStr = nodeJson.skeletons[0];
-        skinStr = nodeJson.skin;
+        let rootJointStr = null;
+        let skinStr = null;
+        if (nodeJson.skeletons) {
+          rootJointStr = nodeJson.skeletons[0];
+          skinStr = nodeJson.skin;
+        }
+        let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+        mesh.userFlavorName = meshStr;
+        group.addChild(mesh);
       }
-      let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
-      mesh.userFlavorName = meshStr;
-      group.addChild(mesh);
     } else if (nodeJson.jointName) {
       let joint = glBoostContext.createJoint();
       joint.userFlavorName = nodeJson.jointName;
