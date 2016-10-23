@@ -563,12 +563,17 @@
        */
 
     }, {
-      key: 'rotateX',
-
+      key: 'clone',
+      value: function clone() {
+        return new Matrix33(this.m[0], this.m[3], this.m[6], this.m[1], this.m[4], this.m[7], this.m[2], this.m[5], this.m[8]);
+      }
 
       /**
        * Create X oriented Rotation Matrix
        */
+
+    }, {
+      key: 'rotateX',
       value: function rotateX(angle) {
         var radian = 0;
         if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
@@ -2181,7 +2186,7 @@
           rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: 'getTransformMatrixOnlyRotateNotAnimated',
@@ -2202,7 +2207,7 @@
           rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -2449,6 +2454,41 @@
         return this._finalMatrix.clone();
       }
     }, {
+      key: 'transformMatrixGLTFStyle',
+      get: function get() {
+        var input = null;
+        if (this._activeAnimationLineName !== null) {
+          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+        }
+        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            //let quaternion = new Quaternion(this.quaternion.w, this.quaternion.z, this.quaternion.y, this.quaternion.x);
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = Matrix44.identity();
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+          this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44.scale(this.scale));
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'animated_' + input;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
       key: 'transformMatrixOnInit',
       get: function get() {
         if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
@@ -2496,7 +2536,7 @@
           rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: 'transformMatrixOnlyRotateOnInit',
@@ -2522,7 +2562,7 @@
           this._accumulatedAncestryNameWithUpdateInfoString = tempString;
         }
 
-        return this._matrixAccumulatedAncestry;
+        return this._matrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'normalMatrixAccumulatedAncestry',
@@ -2535,7 +2575,7 @@
           this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
         }
 
-        return this._normalMatrixAccumulatedAncestry;
+        return this._normalMatrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
@@ -2551,7 +2591,7 @@
           this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
         }
 
-        return this._invMatrixAccumulatedAncestry;
+        return this._invMatrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'rotateMatrixAccumulatedAncestry',
@@ -6443,24 +6483,58 @@
         shaderText += in_ + ' vec4 aVertex_joint;\n';
         shaderText += in_ + ' vec4 aVertex_weight;\n';
         shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN + '];\n';
+        //    shaderText += `${out_} vec4 aVertex_color;\n`;
         return shaderText;
       }
+
+      /**
+       * @return {string}
+       */
+
     }, {
       key: 'VSTransform_SkeletalShaderSource',
       value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
         var shaderText = '';
-        shaderText += 'gl_Position = aVertex_joint + aVertex_weight;\n';
 
         shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
         shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
         shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
         shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+        /*
+        shaderText += `mat4 scaleMatrix = mat4(
+          100.0, 0.0, 0.0, 0.0,
+          0.0, 100.0, 0.0, 0.0,
+          0.0, 0.0, 100.0, 0.0,
+          0.0, 0.0, 0.0, 1.0
+        );\n`;
+         shaderText += `mat4 scaleMatrix2 = mat4(
+          0.01, 0.0, 0.0, 0.0,
+          0.0, 0.01, 0.0, 0.0,
+          0.0, 0.0, 0.01, 0.0,
+          0.0, 0.0, 0.0, 1.0
+        );\n`;
+        */
+        /*
+        shaderText += '  skinMat[3][0] /= 100.0;';
+        shaderText += '  skinMat[3][1] /= 100.0;';
+        shaderText += '  skinMat[3][2] /= 100.0;';
+         shaderText += '  skinMat[0][3] /= 100.0;';
+        shaderText += '  skinMat[1][3] /= 100.0;';
+        shaderText += '  skinMat[2][3] /= 100.0;';
+        */
+
+        //    shaderText += '  vec3 newVec = vec3(aVertex_position.x, aVertex_position.y, -aVertex_position.z);';
 
         if (existCamera_f) {
-          shaderText += '  gl_Position = pvwMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
+          //      shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
         } else {
           shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
         }
+
+        //    shaderText += 'aVertex_color = vec4(aVertex_joint.x/18.0, aVertex_joint.y/18.0, aVertex_joint.z/18.0, 1.0);\n';
+        //shaderText += 'aVertex_color = vec4((int(aVertex_joint.x)%3)/6.0, (int(aVertex_joint.y)%3)/6.0, (int(aVertex_joint.z)%3)/6.0, 1.0);\n';
+
         return shaderText;
       }
     }, {
@@ -6572,12 +6646,17 @@
           }
 
           for (var j = 0; j < jointsHierarchy.length; j++) {
-            var thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
+            var thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
             inverseBindPoseMatrices[mapTable[j]] = skeletalMesh.inverseBindMatrices[mapTable[j]]; //joints[mapTable[j]].inverseBindPoseMatrix;
             if (j > 0) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
             } else {
-              tempMatrices[j] = thisLoopMatrix;
+              var upperGroupsAccumulatedMatrix = Matrix44.identity();
+              if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
+                // if there are group hierarchies above the root joint ...
+                upperGroupsAccumulatedMatrix = jointsHierarchy[0].parent.parent.transformMatrixAccumulatedAncestry;
+              }
+              tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
             }
           }
           globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
@@ -8476,6 +8555,7 @@
         shaderText += 'uniform vec4 Kd;\n';
         shaderText += 'uniform vec4 Ks;\n';
         shaderText += 'uniform float power;\n';
+        //    shaderText += `${in_} vec4 aVertex_color;\n`;
 
         return shaderText;
       }
@@ -8499,7 +8579,7 @@
         shaderText += '  }\n';
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
         //shaderText += '  rt0.a = 1.0;\n';
-        //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+        //    shaderText += '  rt0 = aVertex_color;\n';
 
         return shaderText;
       }
