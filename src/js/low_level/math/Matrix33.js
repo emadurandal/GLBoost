@@ -70,6 +70,14 @@ export default class Matrix33 {
     );
   }
 
+  clone() {
+    return new Matrix33(
+      this.m[0], this.m[3], this.m[6],
+      this.m[1], this.m[4], this.m[7],
+      this.m[2], this.m[5], this.m[8]
+    );
+  }
+
   /**
    * Create X oriented Rotation Matrix
    */

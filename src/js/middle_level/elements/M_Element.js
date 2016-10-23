@@ -288,7 +288,7 @@ export default class M_Element extends L_Element {
       multiply(Matrix44.rotateZ(this.rotate.z));
     }
 
-    return rotationMatrix;
+    return rotationMatrix.clone();
   }
 
   get transformMatrixOnlyRotateOnInit() {
@@ -314,7 +314,7 @@ export default class M_Element extends L_Element {
       multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
     }
 
-    return rotationMatrix;
+    return rotationMatrix.clone();
   }
 
   getTransformMatrixOnlyRotateNotAnimated() {
@@ -336,7 +336,7 @@ export default class M_Element extends L_Element {
       multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
     }
 
-    return rotationMatrix;
+    return rotationMatrix.clone();
   }
 
   get inverseTransformMatrix() {
@@ -395,7 +395,7 @@ export default class M_Element extends L_Element {
       this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     }
 
-    return this._matrixAccumulatedAncestry;
+    return this._matrixAccumulatedAncestry.clone();
   }
 
   get normalMatrixAccumulatedAncestry() {
@@ -407,7 +407,7 @@ export default class M_Element extends L_Element {
       this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
     }
 
-    return this._normalMatrixAccumulatedAncestry;
+    return this._normalMatrixAccumulatedAncestry.clone();
   }
 
 
@@ -423,7 +423,7 @@ export default class M_Element extends L_Element {
       this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
     }
 
-    return this._invMatrixAccumulatedAncestry;
+    return this._invMatrixAccumulatedAncestry.clone();
   }
 
   _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
