@@ -8,6 +8,7 @@ export class PhongShaderSource {
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec4 Ks;\n`;
     shaderText += `uniform float power;\n`;
+//    shaderText += `${in_} vec4 aVertex_color;\n`;
 
     return shaderText;
   }
@@ -30,7 +31,7 @@ export class PhongShaderSource {
     shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
-    //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+//    shaderText += '  rt0 = aVertex_color;\n';
 
 
     return shaderText;

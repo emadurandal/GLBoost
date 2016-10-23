@@ -84,12 +84,17 @@ export default class M_SkeletalGeometry extends Geometry {
       }
 
       for (let j = 0; j < jointsHierarchy.length; j++) {
-        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
+        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
         inverseBindPoseMatrices[mapTable[j]] = skeletalMesh.inverseBindMatrices[mapTable[j]];//joints[mapTable[j]].inverseBindPoseMatrix;
         if (j > 0) {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
         } else {
-          tempMatrices[j] = thisLoopMatrix;
+          let upperGroupsAccumulatedMatrix = Matrix44.identity();
+          if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
+            // if there are group hierarchies above the root joint ...
+            upperGroupsAccumulatedMatrix = jointsHierarchy[0].parent.parent.transformMatrixAccumulatedAncestry
+          }
+          tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
         }
       }
       globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
