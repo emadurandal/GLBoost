@@ -1452,12 +1452,17 @@
        */
 
     }, {
-      key: 'rotateX',
-
+      key: 'clone',
+      value: function clone() {
+        return new Matrix33(this.m[0], this.m[3], this.m[6], this.m[1], this.m[4], this.m[7], this.m[2], this.m[5], this.m[8]);
+      }
 
       /**
        * Create X oriented Rotation Matrix
        */
+
+    }, {
+      key: 'rotateX',
       value: function rotateX(angle) {
         var radian = 0;
         if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
@@ -4384,7 +4389,7 @@
           rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: 'getTransformMatrixOnlyRotateNotAnimated',
@@ -4405,7 +4410,7 @@
           rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: '_accumulateMyAndParentNameWithUpdateInfo',
@@ -4652,6 +4657,41 @@
         return this._finalMatrix.clone();
       }
     }, {
+      key: 'transformMatrixGLTFStyle',
+      get: function get() {
+        var input = null;
+        if (this._activeAnimationLineName !== null) {
+          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+        }
+        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+          var matrix = Matrix44.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            //let quaternion = new Quaternion(this.quaternion.w, this.quaternion.z, this.quaternion.y, this.quaternion.x);
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = Matrix44.identity();
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+          this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44.scale(this.scale));
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'animated_' + input;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
       key: 'transformMatrixOnInit',
       get: function get() {
         if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
@@ -4699,7 +4739,7 @@
           rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
         }
 
-        return rotationMatrix;
+        return rotationMatrix.clone();
       }
     }, {
       key: 'transformMatrixOnlyRotateOnInit',
@@ -4725,7 +4765,7 @@
           this._accumulatedAncestryNameWithUpdateInfoString = tempString;
         }
 
-        return this._matrixAccumulatedAncestry;
+        return this._matrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'normalMatrixAccumulatedAncestry',
@@ -4738,7 +4778,7 @@
           this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
         }
 
-        return this._normalMatrixAccumulatedAncestry;
+        return this._normalMatrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
@@ -4754,7 +4794,7 @@
           this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
         }
 
-        return this._invMatrixAccumulatedAncestry;
+        return this._invMatrixAccumulatedAncestry.clone();
       }
     }, {
       key: 'rotateMatrixAccumulatedAncestry',

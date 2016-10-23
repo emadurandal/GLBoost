@@ -30,7 +30,7 @@ export class PhongShaderSource {
     shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
-    //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
+
 
 
     return shaderText;
