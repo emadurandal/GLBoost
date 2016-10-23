@@ -9488,19 +9488,21 @@
         }
 
         if (nodeJson.meshes) {
-          // this node has mashes...
-          var meshStr = nodeJson.meshes[0];
-          var meshJson = json.meshes[meshStr];
+          for (var i = 0; i < nodeJson.meshes.length; i++) {
+            // this node has mashes...
+            var meshStr = nodeJson.meshes[i];
+            var meshJson = json.meshes[meshStr];
 
-          var rootJointStr = null;
-          var skinStr = null;
-          if (nodeJson.skeletons) {
-            rootJointStr = nodeJson.skeletons[0];
-            skinStr = nodeJson.skin;
+            var rootJointStr = null;
+            var skinStr = null;
+            if (nodeJson.skeletons) {
+              rootJointStr = nodeJson.skeletons[0];
+              skinStr = nodeJson.skin;
+            }
+            var mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+            mesh.userFlavorName = meshStr;
+            group.addChild(mesh);
           }
-          var mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
-          mesh.userFlavorName = meshStr;
-          group.addChild(mesh);
         } else if (nodeJson.jointName) {
           var joint = glBoostContext.createJoint();
           joint.userFlavorName = nodeJson.jointName;
