@@ -6483,7 +6483,7 @@
         shaderText += in_ + ' vec4 aVertex_joint;\n';
         shaderText += in_ + ' vec4 aVertex_weight;\n';
         shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN + '];\n';
-        //    shaderText += `${out_} vec4 aVertex_color;\n`;
+        shaderText += 'uniform mat4 invWorldMatrix;\n';
         return shaderText;
       }
 
@@ -6496,44 +6496,19 @@
       value: function VSTransform_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
         var shaderText = '';
 
-        shaderText += 'mat4 skinMat = aVertex_weight.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-        shaderText += 'skinMat += aVertex_weight.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-        shaderText += 'skinMat += aVertex_weight.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-        shaderText += 'skinMat += aVertex_weight.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-        /*
-        shaderText += `mat4 scaleMatrix = mat4(
-          100.0, 0.0, 0.0, 0.0,
-          0.0, 100.0, 0.0, 0.0,
-          0.0, 0.0, 100.0, 0.0,
-          0.0, 0.0, 0.0, 1.0
-        );\n`;
-         shaderText += `mat4 scaleMatrix2 = mat4(
-          0.01, 0.0, 0.0, 0.0,
-          0.0, 0.01, 0.0, 0.0,
-          0.0, 0.0, 0.01, 0.0,
-          0.0, 0.0, 0.0, 1.0
-        );\n`;
-        */
-        /*
-        shaderText += '  skinMat[3][0] /= 100.0;';
-        shaderText += '  skinMat[3][1] /= 100.0;';
-        shaderText += '  skinMat[3][2] /= 100.0;';
-         shaderText += '  skinMat[0][3] /= 100.0;';
-        shaderText += '  skinMat[1][3] /= 100.0;';
-        shaderText += '  skinMat[2][3] /= 100.0;';
-        */
+        shaderText += 'vec4 weightVec = normalize(aVertex_weight);\n';
+        shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+        shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+        shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+        shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
 
-        //    shaderText += '  vec3 newVec = vec3(aVertex_position.x, aVertex_position.y, -aVertex_position.z);';
+        shaderText += '  vec4 position = invWorldMatrix * vec4(aVertex_position.x, aVertex_position.y, aVertex_position.z, 1.0);';
 
         if (existCamera_f) {
-          //      shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
-          shaderText += '  gl_Position = projectionMatrix * viewMatrix * skinMat * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  gl_Position = pvwMatrix * skinMat * position;\n';
         } else {
           shaderText += '  gl_Position = skinMat * vec4(aVertex_position, 1.0);\n';
         }
-
-        //    shaderText += 'aVertex_color = vec4(aVertex_joint.x/18.0, aVertex_joint.y/18.0, aVertex_joint.z/18.0, 1.0);\n';
-        //shaderText += 'aVertex_color = vec4((int(aVertex_joint.x)%3)/6.0, (int(aVertex_joint.y)%3)/6.0, (int(aVertex_joint.z)%3)/6.0, 1.0);\n';
 
         return shaderText;
       }
@@ -6557,6 +6532,8 @@
           Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
         }
         gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
+
+        shaderProgram['invWorldMatrix'] = gl.getUniformLocation(shaderProgram, 'invWorldMatrix');
 
         return vertexAttribsAsResult;
       }
@@ -6647,21 +6624,18 @@
 
           for (var j = 0; j < jointsHierarchy.length; j++) {
             var thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
-            inverseBindPoseMatrices[mapTable[j]] = skeletalMesh.inverseBindMatrices[mapTable[j]]; //joints[mapTable[j]].inverseBindPoseMatrix;
             if (j > 0) {
               tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
             } else {
               var upperGroupsAccumulatedMatrix = Matrix44.identity();
               if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
                 // if there are group hierarchies above the root joint ...
-                upperGroupsAccumulatedMatrix = jointsHierarchy[0].parent.parent.transformMatrixAccumulatedAncestry;
+                upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
               }
               tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
             }
           }
           globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
-
-          //matrices[i] = Matrix44.multiply(globalJointTransform[i], inverseBindPoseMatrices[i]);
         }
         for (var i = 0; i < joints.length; i++) {
 
@@ -6687,6 +6661,7 @@
           var glslProgram = materials[i].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
           gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+          gl.uniformMatrix4fv(glslProgram.invWorldMatrix, false, Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry).flatten());
         }
 
         babelHelpers.get(Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
@@ -8555,7 +8530,6 @@
         shaderText += 'uniform vec4 Kd;\n';
         shaderText += 'uniform vec4 Ks;\n';
         shaderText += 'uniform float power;\n';
-        //    shaderText += `${in_} vec4 aVertex_color;\n`;
 
         return shaderText;
       }
@@ -8579,7 +8553,6 @@
         shaderText += '  }\n';
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
         //shaderText += '  rt0.a = 1.0;\n';
-        //    shaderText += '  rt0 = aVertex_color;\n';
 
         return shaderText;
       }
