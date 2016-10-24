@@ -60,29 +60,6 @@ export default class M_SkeletalGeometry extends Geometry {
       //console.log(jointsHierarchy);
       let tempMatrices = [];
 
-      let mapTable = [];
-      for (let j = 0; j < jointsHierarchy.length; j++) {
-        for (let k = 0; k < joints.length; k++) {
-          if (jointsHierarchy[j].userFlavorName === joints[k].userFlavorName) {
-            mapTable[j] = k;
-          }
-        }
-      }
-
-      // skip if there are incomplete joint data
-      let doContinue = false;
-      for (let j = 0; j < jointsHierarchy.length; j++) {
-        if (typeof mapTable[j] === 'undefined') {
-          doContinue = true;
-          break;
-        }
-      }
-      if (doContinue) {
-        matrices[i] = Matrix44.identity();
-        globalJointTransform[i] = Matrix44.identity();
-        continue;
-      }
-
       for (let j = 0; j < jointsHierarchy.length; j++) {
         let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
         if (j > 0) {
@@ -102,7 +79,8 @@ export default class M_SkeletalGeometry extends Geometry {
     for (let i=0; i<joints.length; i++) {
 
       matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
-      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.inverseBindMatrices[i]);
+      let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
+      matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
     }
 
