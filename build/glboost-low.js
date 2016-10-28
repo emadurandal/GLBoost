@@ -141,6 +141,17 @@
   global.GLBoost['DEGREE'] = 'degree';
   global.GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
   global.GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
+  global.GLBoost['UNPACK_FLIP_Y_WEBGL'] = 'UNPACK_FLIP_Y_WEBGL';
+  global.GLBoost['TEXTURE_MAG_FILTER'] = 'TEXTURE_MAG_FILTER';
+  global.GLBoost['TEXTURE_MIN_FILTER'] = 'TEXTURE_MIN_FILTER';
+  global.GLBoost['LINEAR'] = 'LINEAR';
+  global.GLBoost['LINEAR_MIPMAP_LINEAR'] = 'LINEAR_MIPMAP_LINEAR';
+  global.GLBoost['NEAREST'] = 'NEAREST';
+  global.GLBoost['TEXTURE_WRAP_S'] = 'TEXTURE_WRAP_S';
+  global.GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
+  global.GLBoost['REPEAT'] = 'REPEAT';
+  global.GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
+  global.GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
 
   var GLBoost$1 = global.GLBoost;
 
@@ -479,10 +490,15 @@
     babelHelpers.createClass(MiscUtil, null, [{
       key: 'isDefinedAndTrue',
       value: function isDefinedAndTrue(value) {
-        if (typeof value !== 'undefined' && value) {
-          return true;
+        return !!(typeof value !== 'undefined' && value);
+      }
+    }, {
+      key: 'getTheValueOrAlternative',
+      value: function getTheValueOrAlternative(value, alternativeIfTheValueIsNullOrUndefined) {
+        if (typeof value !== 'undefined' && value != null) {
+          return value;
         } else {
-          return false;
+          return alternativeIfTheValueIsNullOrUndefined;
         }
       }
     }, {
@@ -1249,14 +1265,25 @@
         }
         var params = this._parameters;
 
+        var gl = this._glContext.gl;
+        var ret = null;
         switch (paramName) {
-          case 'flipY':
+          case GLBoost$1['UNPACK_FLIP_Y_WEBGL']:
+          case GLBoost$1['TEXTURE_MAG_FILTER']:
+          case GLBoost$1['TEXTURE_MIN_FILTER']:
+          case GLBoost$1['TEXTURE_WRAP_S']:
+          case GLBoost$1['TEXTURE_WRAP_T']:
             if (isParametersExist && params[paramName]) {
-              return params[paramName];
-            } else {
-              return false;
+              ret = params[paramName];
             }
+            break;
         }
+        return ret;
+      }
+    }, {
+      key: '_getParamWithAlternative',
+      value: function _getParamWithAlternative(param, alternative) {
+        return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost$1[param], alternative));
       }
     }, {
       key: 'generateTextureFromUri',
@@ -1277,23 +1304,23 @@
           var texture = _this2._glContext.createTexture(_this2);
           gl.bindTexture(gl.TEXTURE_2D, texture);
 
-          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParameter('flipY'));
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, _this2._getParamWithAlternative('UNPACK_FLIP_Y_WEBGL', false));
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, _this2._img);
 
           if (_this2._isPowerOfTwo(_this2._width) && _this2._isPowerOfTwo(_this2._height)) {
             if (glem.extTFA) {
               gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
             }
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, _this2._getParamWithAlternative('TEXTURE_MAG_FILTER', gl.LINEAR));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, _this2._getParamWithAlternative('TEXTURE_MIN_FILTER', gl.LINEAR_MIPMAP_LINEAR));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, _this2._getParamWithAlternative('TEXTURE_WRAP_S', gl.REPEAT));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, _this2._getParamWithAlternative('TEXTURE_WRAP_T', gl.REPEAT));
             gl.generateMipmap(gl.TEXTURE_2D);
           } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, _this2._getParamWithAlternative('TEXTURE_MAG_FILTER', gl.LINEAR));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, _this2._getParamWithAlternative('TEXTURE_MIN_FILTER', gl.LINEAR));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, _this2._getParamWithAlternative('TEXTURE_WRAP_S', gl.CLAMP_TO_EDGE));
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, _this2._getParamWithAlternative('TEXTURE_WRAP_T', gl.CLAMP_TO_EDGE));
           }
           gl.bindTexture(gl.TEXTURE_2D, null);
 
