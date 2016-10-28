@@ -6,7 +6,7 @@ import Vector2 from '../../low_level/math/Vector2';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 
 export default class Plane extends Geometry {
-  constructor(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes) {
+  constructor(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat = false) {
     super(glBoostContext);
 
     this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
@@ -50,7 +50,11 @@ export default class Plane extends Geometry {
     var texcoords = [];
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
-        texcoords.push(new Vector2(j/uSpan, 1.0-i/vSpan));
+        if (isUVRepeat) {
+          texcoords.push(new Vector2(j, 1.0-i));
+        } else {
+          texcoords.push(new Vector2(j/uSpan, 1.0-i/vSpan));
+        }
       }
     }
 

@@ -43,8 +43,8 @@ export default class GLBoostLowContext {
     return new Cube(this, widthVector, vertexColor);
   }
 
-  createPlane(width, height, uSpan, vSpan, customVertexAttributes) {
-    return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes);
+  createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+    return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
   }
 
   createSphere(radius, widthSegments, heightSegments, vertexColor) {
