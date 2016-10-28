@@ -7811,6 +7811,7 @@
     babelHelpers.inherits(Plane, _Geometry);
 
     function Plane(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes) {
+      var isUVRepeat = arguments.length <= 6 || arguments[6] === undefined ? false : arguments[6];
       babelHelpers.classCallCheck(this, Plane);
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, glBoostContext));
@@ -7859,7 +7860,11 @@
         var texcoords = [];
         for (var i = 0; i <= vSpan; i++) {
           for (var j = 0; j <= uSpan; j++) {
-            texcoords.push(new Vector2(j / uSpan, 1.0 - i / vSpan));
+            if (isUVRepeat) {
+              texcoords.push(new Vector2(j, 1.0 - i));
+            } else {
+              texcoords.push(new Vector2(j / uSpan, 1.0 - i / vSpan));
+            }
           }
         }
 
@@ -8288,8 +8293,8 @@
       }
     }, {
       key: 'createPlane',
-      value: function createPlane(width, height, uSpan, vSpan, customVertexAttributes) {
-        return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes);
+      value: function createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+        return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
       }
     }, {
       key: 'createSphere',
