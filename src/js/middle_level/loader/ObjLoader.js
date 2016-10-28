@@ -133,7 +133,7 @@ export default class ObjLoader {
       if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-        var texture = glBoostContext.createTexture(basePath + matchArray[2], {flipY: true});
+        var texture = glBoostContext.createTexture(basePath + matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
         texture.name = matchArray[2];
         materials[iMCount].diffuseTexture = texture;
       }

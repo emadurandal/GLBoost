@@ -31,6 +31,17 @@ global.GLBoost['RADIAN'] = 'radian';
 global.GLBoost['DEGREE'] = 'degree';
 global.GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
 global.GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
+global.GLBoost['UNPACK_FLIP_Y_WEBGL'] = 'UNPACK_FLIP_Y_WEBGL';
+global.GLBoost['TEXTURE_MAG_FILTER'] = 'TEXTURE_MAG_FILTER';
+global.GLBoost['TEXTURE_MIN_FILTER'] = 'TEXTURE_MIN_FILTER';
+global.GLBoost['LINEAR'] = 'LINEAR';
+global.GLBoost['LINEAR_MIPMAP_LINEAR'] = 'LINEAR_MIPMAP_LINEAR';
+global.GLBoost['NEAREST'] = 'NEAREST';
+global.GLBoost['TEXTURE_WRAP_S'] = 'TEXTURE_WRAP_S';
+global.GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
+global.GLBoost['REPEAT'] = 'REPEAT';
+global.GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
+global.GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
 
 export default global.GLBoost;
 

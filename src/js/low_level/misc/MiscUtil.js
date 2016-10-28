@@ -7,10 +7,14 @@ export default class MiscUtil {
   }
 
   static isDefinedAndTrue(value) {
-    if (typeof value !== 'undefined' && value) {
-      return true;
+    return !!(typeof value !== 'undefined' && value);
+  }
+
+  static getTheValueOrAlternative(value, alternativeIfTheValueIsNullOrUndefined) {
+    if (typeof value !== 'undefined' && value != null) {
+      return value;
     } else {
-      return false;
+      return alternativeIfTheValueIsNullOrUndefined;
     }
   }
   
