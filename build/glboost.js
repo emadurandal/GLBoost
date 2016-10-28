@@ -7816,13 +7816,13 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, glBoostContext));
 
-      _this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
+      _this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
       return _this;
     }
 
     babelHelpers.createClass(Plane, [{
       key: '_setupVertexData',
-      value: function _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes) {
+      value: function _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
 
         var positions = [];
 
