@@ -9,10 +9,10 @@ export default class Plane extends Geometry {
   constructor(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat = false) {
     super(glBoostContext);
 
-    this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes);
+    this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
   }
 
-  _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes) {
+  _setupVertexData(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
 
     var positions = [];
 
