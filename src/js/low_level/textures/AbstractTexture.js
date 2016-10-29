@@ -86,7 +86,16 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
 
+  _getResizedCanvas(image) {
+    var canvas = document.createElement("canvas");
+    canvas.width = this._getNearestPowerOfTwo(image.width);
+    canvas.height = this._getNearestPowerOfTwo(image.height);
 
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    return canvas;
+  }
   /**
    * [en] check whether or not this texture size is power of two. <br />
    * [ja] テクスチャサイズが２の累乗かどうかを返します
@@ -98,4 +107,14 @@ export default class AbstractTexture extends GLBoostObject {
     return (x & (x - 1)) == 0;
   }
 
+  /**
+   * [en] get a value nearest power of two. <br />
+   * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+   *
+   * @param {number} x [en] texture size. [ja] テクスチャサイズ
+   * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+   */
+  _getNearestPowerOfTwo(x) {
+    return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
+  }
 }
