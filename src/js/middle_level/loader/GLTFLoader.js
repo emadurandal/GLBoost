@@ -274,7 +274,15 @@ export default class GLTFLoader {
           } else {
             textureUri = basePath + imageFileStr;
           }
-          var texture = glBoostContext.createTexture(textureUri);
+          let samplerStr = textureJson.sampler;
+          let samplerJson = json.samplers[samplerStr];
+
+          var texture = glBoostContext.createTexture(textureUri, {
+            'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+            'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+            'TEXTURE_WRAP_S': samplerJson.wrapS,
+            'TEXTURE_WRAP_T': samplerJson.wrapT
+          });
           texture.name = textureStr;
           material.diffuseTexture = texture;
         }
