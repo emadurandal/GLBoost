@@ -58,21 +58,21 @@
       {
         fovy: 45.0,
         aspect: 1.0,
-        zNear: 0.001,
-        zFar: 300000.0
+        zNear: 1,
+        zFar: 30000.0
       }
   );
   scene.addChild( camera );
 
-  var gtime = 1/30;
-  var gtimeDelta = 0.018;
+  var gtime = 0/30;
+  var gtimeDelta = 1/60;
 
   var glTFLoader = GLBoost.GLTFLoader.getInstance();
   var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', 1, null);
+
   promise.then(function(group) {
     console.log(group);
 
-    //mesh.scale = new GLBoost.Vector3(50,50,50);
     group.scale = new GLBoost.Vector3(1,1,1);
 
     scene.addChild( group );
@@ -90,10 +90,10 @@
 
       gtime += gtimeDelta;
 
-      if (gtime > 1.00) {
-          gtime = 1/30;
+      if (gtime > 1.0) {
+          gtime = 0;
       }
-      var rotateMatrix = GLBoost.Matrix33.rotateY(0.5);
+      var rotateMatrix = GLBoost.Matrix33.rotateY(0.75);
       var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
       camera.eye = rotatedVector;
 
