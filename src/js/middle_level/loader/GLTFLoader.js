@@ -207,7 +207,7 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
 
-    let _indices = [];
+    let _indicesArray = [];
     let _positions = [];
     let _normals = [];
     let additional = {
@@ -222,9 +222,12 @@ export default class GLTFLoader {
       let primitiveJson = meshJson.primitives[i];
 
       // Geometry
-      let indicesAccessorStr = primitiveJson.indices;
-      let indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-      _indices.push(indices);
+      let indices = null;
+      if (typeof primitiveJson.indices !== 'undefined') {
+        let indicesAccessorStr = primitiveJson.indices;
+        indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+        _indicesArray.push(indices);
+      }
 
       let positionsAccessorStr = primitiveJson.attributes.POSITION;
       let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
@@ -313,7 +316,9 @@ export default class GLTFLoader {
 
       let opacityValue = 1.0 - materialJson.values.transparency;
 
-      material.setVertexN(geometry, indices.length);
+      if (indices !== null) {
+        material.setVertexN(geometry, indices.length);
+      }
       if (defaultShader) {
         material.shaderClass = defaultShader;
       } else {
@@ -335,7 +340,12 @@ export default class GLTFLoader {
       position: _positions,
       normal: _normals
     };
-    geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indices);
+
+    if (_indicesArray.length === 0) {
+      _indicesArray = null;
+    }
+
+    geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
     geometry.materials = materials;
 
     return mesh;
