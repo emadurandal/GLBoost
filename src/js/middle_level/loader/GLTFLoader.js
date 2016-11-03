@@ -113,7 +113,8 @@ export default class GLTFLoader {
   }
 
   _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
-    let sceneJson = json.scenes.defaultScene;
+    let sceneStr = json.scene;
+    let sceneJson = json.scenes[sceneStr];
 
     let group = glBoostContext.createGroup();
     group.userFlavorName = 'TopGroup';
