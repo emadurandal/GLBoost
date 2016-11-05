@@ -431,13 +431,35 @@ export default class GLTFLoader {
     var bytesPerComponent = 0;
     var dataViewMethod = '';
     switch (accessorJson.componentType) {
+      case gl.BYTE:
+        bytesPerComponent = 1;
+        dataViewMethod = 'getInt8';
+        break;
+      case gl.UNSIGNED_BYTE:
+        bytesPerComponent = 1;
+        dataViewMethod = 'getUint8';
+        break;
+      case gl.SHORT:
+        bytesPerComponent = 2;
+        dataViewMethod = 'getInt16';
+        break;
       case gl.UNSIGNED_SHORT:
         bytesPerComponent = 2;
         dataViewMethod = 'getUint16';
         break;
+      case gl.INT:
+        bytesPerComponent = 4;
+        dataViewMethod = 'getInt33';
+        break;
+      case gl.UNSIGNED_INT:
+        bytesPerComponent = 4;
+        dataViewMethod = 'getUint33';
+        break;
       case gl.FLOAT:
         bytesPerComponent = 4;
         dataViewMethod = 'getFloat32';
+        break;
+      default:
         break;
     }
 
