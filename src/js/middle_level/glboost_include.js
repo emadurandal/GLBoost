@@ -21,5 +21,6 @@ import SimpleShader from './shaders/FragmentSimpleShader';
 import PhongShader from './shaders/PhongShader';
 import LambertShader from './shaders/LambertShader';
 import HalfLambertShader from './shaders/HalfLambertShader';
+import HalfLambertAndWrapLightingShader from './shaders/HalfLambertAndWrapLightingShader';
 import DepthDisplayShader from './shaders/DepthDisplayShader';
 import PassThroughShader from './shaders/PassThroughShader';
