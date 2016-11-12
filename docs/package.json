@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "node node_modules/.bin/metalsmith",
-    "deploy": "rsync -a _build/ ./ && rm -rf _build/"
+    "deploy": "npm run clean && rsync -a _build/ ./ && rm -rf _build/",
+    "clean": "rm -rf ./api ./blog"
   },
   "repository": {
     "type": "git",
