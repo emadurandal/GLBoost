@@ -174,6 +174,7 @@
       }
 
     </style>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
   </head>
   <body>
 
@@ -189,7 +190,7 @@
       </div>
       <div id="content"></div>
     </div>
-    <iframe id="viewer" allowfullscreen onmousewheel=""></iframe>
+    <iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
     <script>
     var webgl2Str = '?webglver=2';
@@ -234,7 +235,7 @@
 
     var files = {
       "for_phina": [
-        "basic",	// [new] tmlib -> phina
+        "basic",
         "blendshape",
         "camera",	// [new] tmlib -> phina
         "canvas_texture",
@@ -340,14 +341,17 @@
           var name = key + '/' + file;
 
           var div = document.createElement( 'div' );
-          div.className = 'link';
-          div.textContent = name;
-          div.addEventListener( 'click', function () {
+          var alink = document.createElement( 'a' );
+          alink.textContent = file;
+          alink.name = name;
+          alink.href = './' + name;
+          $(alink).attr('target', 'viewer');
 
-            panel.classList.toggle( 'collapsed' );
-            load( name );
+          alink.addEventListener("click", function(){
+            window.location.hash = name;
+          });
 
-          } );
+          div.appendChild(alink);
           container.appendChild( div );
 
           divs[ key + '/' + file ] = div;
@@ -358,7 +362,7 @@
 
     }
 
-    var load = function ( file ) {
+    var loadNormal = function ( file ) {
 
       if ( selected !== null ) divs[ selected ].className = 'link';
 
@@ -389,7 +393,7 @@
 
     if ( window.location.hash !== '' ) {
 
-      load( window.location.hash.substring(1).split('?')[0]);
+      loadNormal( window.location.hash.substring(1).split('?')[0]);
 
     }
 
