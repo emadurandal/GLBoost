@@ -34,7 +34,7 @@ WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の
 
 ## Demo
 
-[Check our examples page!](https://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
+[Check our examples page!](http://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
 
 If you want to watch examples in local. Go to GLBoost top directory by terminal and start local web server up.
 
