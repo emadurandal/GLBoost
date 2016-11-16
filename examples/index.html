@@ -239,21 +239,21 @@
         var splitted = $(element).attr("href").split('/');
         var category = splitted[splitted.length-1].split('-')[0];
         var example = splitted[splitted.length-1].split('-')[1];
-        $(element).attr("href", "./" + category + '/' + example);
+        $(element).attr("href", "./" + category + '/' + example + '/index.html');
       });
 
       splitted = window.location.href.split('#');
       var splitted2 = splitted[splitted.length-1].split('/');
       category = splitted2[0];
       example = splitted2[1];
-      document.getElementById('viewer').contentWindow.location.replace("./" + category + '/' + example);
+      document.getElementById('viewer').contentWindow.location.replace("./" + category + '/' + example + '/index.html');
 
       borderEnv_file();
     });
     button_env_runstant.addEventListener('click', function(){
       $('a.example').each(function(index, element){
         var splitted = $(element).attr("href").split('/');
-        $(element).attr("href", "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-2] + '-' + splitted[splitted.length-1]);
+        $(element).attr("href", "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
       });
 
       splitted = document.getElementById('viewer').contentWindow.location.href.split('/');
@@ -393,7 +393,7 @@
           alink.textContent = file;
           alink.name = name;
           $(alink).addClass('example');
-          alink.href = './' + name;
+          alink.href = './' + name + '/index.html';
           $(alink).attr('target', 'viewer');
 
           alink.addEventListener("click", function(){
