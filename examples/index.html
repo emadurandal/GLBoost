@@ -44,7 +44,7 @@
         color: #2194CE;
         text-decoration: none;
       }
-      #webgl-version-selector a, #webgl-version-selector span {
+      #webgl-version-selector a, #webgl-version-selector span, #environment-selector a, #environment-selector span {
         display: block;
         float: left;
         padding: 2px;
@@ -62,7 +62,7 @@
         background: #fafafa;
       }
 
-        #panel #content, #panel #webgl-version-selector {
+        #panel #content, #panel #webgl-version-selector, #environment-selector {
           padding: 0px 20px;
         }
 
@@ -188,6 +188,9 @@
       <div id="webgl-version-selector" class="clearfix">
         <a href="javascript:void(0)" id="button-webgl-1">WebGL 1</a><span>&nbsp;/&nbsp;</span><a id="button-webgl-2" href="javascript:void(0)">WebGL 2</a>
       </div>
+      <div id="environment-selector" class="clearfix">
+        <a href="javascript:void(0)" id="button-env-file">File-based</a><span>&nbsp;/&nbsp;</span><a id="button-env-runstant" href="javascript:void(0)">Runstant</a>
+      </div>
       <div id="content"></div>
     </div>
     <iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
@@ -198,6 +201,7 @@
     var button_webgl_1 = document.getElementById('button-webgl-1');
     var button_webgl_2 = document.getElementById('button-webgl-2');
 
+    // WebGL version buttons
     var borderWebgl_1 = function() {
       button_webgl_1.style.borderColor = "rgba(0,0,0,0.5)";
       button_webgl_2.style.borderColor = "rgba(0,0,0,0)";
@@ -215,6 +219,50 @@
       window.location.href = window.location.protocol + '//' + window.location.host + window.location.pathname + webgl2Str + window.location.hash;
       borderWebgl_2();
     });
+
+    //
+    // Environment buttons
+    var button_env_file = document.getElementById('button-env-file');
+    var button_env_runstant = document.getElementById('button-env-runstant');
+
+    var borderEnv_file = function() {
+      button_env_file.style.borderColor = "rgba(0,0,0,0.5)";
+      button_env_runstant.style.borderColor = "rgba(0,0,0,0)";
+    };
+    var borderEnv_runstant = function() {
+      button_env_file.style.borderColor = "rgba(0,0,0,0)";
+      button_env_runstant.style.borderColor = "rgba(0,0,0,0.5)";
+    };
+
+    button_env_file.addEventListener('click', function(){
+      $('a.example').each(function(index, element){
+        var splitted = $(element).attr("href").split('/');
+        var category = splitted[splitted.length-1].split('-')[0];
+        var example = splitted[splitted.length-1].split('-')[1];
+        $(element).attr("href", "./" + category + '/' + example);
+      });
+
+      splitted = window.location.href.split('#');
+      var splitted2 = splitted[splitted.length-1].split('/');
+      category = splitted2[0];
+      example = splitted2[1];
+      document.getElementById('viewer').contentWindow.location.replace("./" + category + '/' + example);
+
+      borderEnv_file();
+    });
+    button_env_runstant.addEventListener('click', function(){
+      $('a.example').each(function(index, element){
+        var splitted = $(element).attr("href").split('/');
+        $(element).attr("href", "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-2] + '-' + splitted[splitted.length-1]);
+      });
+
+      splitted = document.getElementById('viewer').contentWindow.location.href.split('/');
+      document.getElementById('viewer').contentWindow.location.replace( "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
+
+      borderEnv_runstant();
+    });
+
+    borderEnv_file();
 
     var arg = new Object;
     var argStr = location.href.split('?')[1];
@@ -344,6 +392,7 @@
           var alink = document.createElement( 'a' );
           alink.textContent = file;
           alink.name = name;
+          $(alink).addClass('example');
           alink.href = './' + name;
           $(alink).attr('target', 'viewer');
 
