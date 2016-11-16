@@ -253,11 +253,11 @@
     button_env_runstant.addEventListener('click', function(){
       $('a.example').each(function(index, element){
         var splitted = $(element).attr("href").split('/');
-        $(element).attr("href", "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
+        $(element).attr("href", "//runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
       });
 
       splitted = document.getElementById('viewer').contentWindow.location.href.split('/');
-      document.getElementById('viewer').contentWindow.location.replace( "http://runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
+      document.getElementById('viewer').contentWindow.location.replace( "//runstant.com/GLBoost/projects/" + splitted[splitted.length-3] + '-' + splitted[splitted.length-2]);
 
       borderEnv_runstant();
     });
