@@ -58,6 +58,7 @@ Then, access http://localhost:3000/examples by your web browser.
 * Firefox (even WebGL 2.0 mode)
 * Safari
 * iOS Safari
+* Android Chrome
 * Microsoft Edge (Xbox One included)
 * Internet Explorer 11 (note that [browser-polyfill.min.js](https://cdnjs.com/libraries/babel-core/5.8.34) is required)
 
