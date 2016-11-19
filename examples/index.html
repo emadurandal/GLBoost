@@ -281,49 +281,16 @@
           redirect();
         });
 
-        var files = {
-          "for_phina": [
-            "basic",
-            "blendshape",
-            "camera",	// [new] tmlib -> phina
-            "canvas_texture",
-            "index_buffer",	// [new] tmlib -> phina
-            "multiple_render_passes",	// [new] tmlib -> phina
-            "multiple_render_targets",	// [new] tmlib -> phina
-            "obj_mesh",
-            "obj_mesh_two_objects",	// [new] tmlib -> phina
-            "obj_mesh_with_light",	// [new] tmlib -> phina
-            "obj_mesh_with_mtl_string",	// [new] tmlib -> phina
-            "primitives",
-            "primitives_2",
-            "primitives_3",
-            "primitives_4_geometry_merged",
-            "texture",	// [new] tmlib -> phina
-            "triangle_strip"
-          ],
-
-          "standalone": [
-            "custom_shader",
-            "custom_shader_2",
-            //"geometry_merge",
-            "loading_gltf",
-            "loading_gltf_head",
-            "loading_gltf_anim",
-            "loading_gltf_hierarchical_anim",
-            "loading_gltf_skinning_anim",
-            "multiple_contexts",	// [new] tmlib -> standalone
-            "obj_mesh_changing_scene_graph",
-            "obj_mesh_changing_shader",
-            "opacity",
-            "particles",
-            "quaternion",
-            "scene_graph",
-            "shadowmap",
-            "shadowmap_2",
-            "update_geometry",
-            "update_particles"
-          ]
-        };
+        var files = null;
+        $.ajax({
+          type: "GET",
+          url: "./example-list.json",
+          async: false,
+          dataType: 'json',
+          success: function(data){
+            files = data;
+          }
+        });
 
         var panel = document.getElementById( 'panel' );
         var content = document.getElementById( 'content' );

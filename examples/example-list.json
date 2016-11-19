@@ -1,0 +1,42 @@
+{
+  "for_phina": [
+    "basic",
+    "blendshape",
+    "camera",
+    "canvas_texture",
+    "index_buffer",
+    "multiple_render_passes",
+    "multiple_render_targets",
+    "obj_mesh",
+    "obj_mesh_two_objects",
+    "obj_mesh_with_light",
+    "obj_mesh_with_mtl_string",
+    "primitives",
+    "primitives_2",
+    "primitives_3",
+    "primitives_4_geometry_merged",
+    "texture",
+    "triangle_strip"
+  ],
+
+  "standalone": [
+    "custom_shader",
+    "custom_shader_2",
+    "loading_gltf",
+    "loading_gltf_head",
+    "loading_gltf_anim",
+    "loading_gltf_hierarchical_anim",
+    "loading_gltf_skinning_anim",
+    "multiple_contexts",
+    "obj_mesh_changing_scene_graph",
+    "obj_mesh_changing_shader",
+    "opacity",
+    "particles",
+    "quaternion",
+    "scene_graph",
+    "shadowmap",
+    "shadowmap_2",
+    "update_geometry",
+    "update_particles"
+  ]
+}
