@@ -8,7 +8,7 @@
   babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
   } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
   };
 
   babelHelpers.classCallCheck = function (instance, Constructor) {
@@ -107,7 +107,6 @@
   };
 
   babelHelpers;
-
   var global = ('global', eval)('this');
 
   global.GLBoost = global.GLBoost || { REVISION: '1' };
@@ -520,7 +519,7 @@
 
   var Matrix33 = function () {
     function Matrix33(m) {
-      var isColumnMajor = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       babelHelpers.classCallCheck(this, Matrix33);
 
       this.m = new Float32Array(9);
@@ -532,20 +531,20 @@
           this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values if isColumnMajor is false
         }
       } else if (Array.isArray(m)) {
-          if (isColumnMajor === true) {
-            this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
-          } else {
-            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-          }
-        } else if (m instanceof Float32Array) {
-            if (isColumnMajor === true) {
-              this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
-            } else {
-              this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-            }
-          } else {
-              this.identity();
-            }
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else {
+        this.identity();
+      }
     }
 
     babelHelpers.createClass(Matrix33, [{
@@ -928,7 +927,7 @@
 
   var Matrix44 = function () {
     function Matrix44(m) {
-      var isColumnMajor = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       babelHelpers.classCallCheck(this, Matrix44);
 
       this.m = new Float32Array(16);
@@ -940,20 +939,20 @@
           this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values if isColumnMajor is false
         }
       } else if (Array.isArray(m)) {
-          if (isColumnMajor === true) {
-            this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
-          } else {
-            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-          }
-        } else if (m instanceof Float32Array) {
-            if (isColumnMajor === true) {
-              this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
-            } else {
-              this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-            }
-          } else {
-              this.identity();
-            }
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else {
+        this.identity();
+      }
     }
 
     babelHelpers.createClass(Matrix44, [{
@@ -1584,7 +1583,7 @@
           }
 
           var ph = Math.acos(qr);
-          var s2 = undefined;
+          var s2 = void 0;
           if (qr < 0.0 && ph > Math.PI / 2.0) {
             qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
             ph = Math.acos(qr);
@@ -1849,7 +1848,7 @@
 
   var GLBoostObject = function () {
     function GLBoostObject(glBoostContext) {
-      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var toRegister = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       babelHelpers.classCallCheck(this, GLBoostObject);
 
       if (this.constructor === GLBoostObject) {
@@ -1924,10 +1923,10 @@
     babelHelpers.inherits(L_Element, _GLBoostObject);
 
     function L_Element(glBoostContext) {
-      var toRegister = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
+      var toRegister = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       babelHelpers.classCallCheck(this, L_Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_Element).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_Element.__proto__ || Object.getPrototypeOf(L_Element)).call(this, glBoostContext, toRegister));
 
       _this._translate = Vector3.zero();
       _this._scale = new Vector3(1, 1, 1);
@@ -2058,7 +2057,7 @@
     function M_Element(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Element);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Element).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_Element.__proto__ || Object.getPrototypeOf(M_Element)).call(this, glBoostContext));
 
       _this._parent = null;
       _this._invMatrix = Matrix44.identity();
@@ -2686,7 +2685,7 @@
 
     function M_Joint(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Joint);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Joint).call(this, glBoostContext));
+      return babelHelpers.possibleConstructorReturn(this, (M_Joint.__proto__ || Object.getPrototypeOf(M_Joint)).call(this, glBoostContext));
     }
 
     return M_Joint;
@@ -2703,7 +2702,7 @@
     function M_AbstractLight(glBoostContext) {
       babelHelpers.classCallCheck(this, M_AbstractLight);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_AbstractLight).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_AbstractLight.__proto__ || Object.getPrototypeOf(M_AbstractLight)).call(this, glBoostContext));
 
       if (_this.constructor === M_AbstractLight) {
         throw new TypeError('Cannot construct AbstractLight instances directly.');
@@ -2734,18 +2733,16 @@
   var M_PointLight = function (_M_AbstractLight) {
     babelHelpers.inherits(M_PointLight, _M_AbstractLight);
 
-
     /**
      * [en] The constructor of PointLight class. <br>
      * [ja] PointLightクラスのコンストラクタ
      * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
      * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
      */
-
     function M_PointLight(glBoostContext, intensity) {
       babelHelpers.classCallCheck(this, M_PointLight);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PointLight).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_PointLight.__proto__ || Object.getPrototypeOf(M_PointLight)).call(this, glBoostContext));
 
       _this._intensity = intensity;
 
@@ -2772,18 +2769,16 @@
   var M_DirectionalLight = function (_M_AbstractLight) {
     babelHelpers.inherits(M_DirectionalLight, _M_AbstractLight);
 
-
     /**
      * [en] The constructor of DirectionalLight class. <br>
      * [ja] DirectionalLightクラスのコンストラクタ
      * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
      * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
      */
-
     function M_DirectionalLight(glBoostContext, intensity, direction) {
       babelHelpers.classCallCheck(this, M_DirectionalLight);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_DirectionalLight).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_DirectionalLight.__proto__ || Object.getPrototypeOf(M_DirectionalLight)).call(this, glBoostContext));
 
       _this._intensity = intensity;
       _this._direction = direction;
@@ -2821,7 +2816,7 @@
     function L_AbstractCamera(glBoostContext, toRegister, lookat) {
       babelHelpers.classCallCheck(this, L_AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_AbstractCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_AbstractCamera.__proto__ || Object.getPrototypeOf(L_AbstractCamera)).call(this, glBoostContext, toRegister));
 
       if (_this.constructor === L_AbstractCamera) {
         throw new TypeError('Cannot construct AbstractCamera instances directly.');
@@ -2864,16 +2859,16 @@
     }, {
       key: 'translate',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this);
+        return babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this);
       }
     }, {
       key: 'eye',
       set: function set(vec) {
-        babelHelpers.set(Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
+        babelHelpers.set(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
@@ -2931,7 +2926,7 @@
     function L_OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
       babelHelpers.classCallCheck(this, L_OrthoCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_OrthoCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_OrthoCamera.__proto__ || Object.getPrototypeOf(L_OrthoCamera)).call(this, glBoostContext, toRegister, lookat));
 
       _this._left = ortho.left;
       _this._right = ortho.right;
@@ -3055,7 +3050,7 @@
     function M_AbstractCamera(glBoostContext, toRegister) {
       babelHelpers.classCallCheck(this, M_AbstractCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_AbstractCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_AbstractCamera.__proto__ || Object.getPrototypeOf(M_AbstractCamera)).call(this, glBoostContext, toRegister));
 
       if (_this.constructor === M_AbstractCamera) {
         throw new TypeError('Cannot construct M_AbstractCamera instances directly.');
@@ -3158,7 +3153,7 @@
     function M_OrthoCamera(glBoostContext, toRegister, lookat, ortho) {
       babelHelpers.classCallCheck(this, M_OrthoCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_OrthoCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_OrthoCamera.__proto__ || Object.getPrototypeOf(M_OrthoCamera)).call(this, glBoostContext, toRegister));
 
       _this._lowLevelCamera = new L_OrthoCamera(_this, false, lookat, ortho);
       return _this;
@@ -3239,7 +3234,7 @@
     function L_PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
       babelHelpers.classCallCheck(this, L_PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(L_PerspectiveCamera).call(this, glBoostContext, toRegister, lookat));
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_PerspectiveCamera.__proto__ || Object.getPrototypeOf(L_PerspectiveCamera)).call(this, glBoostContext, toRegister, lookat));
 
       _this._fovy = perspective.fovy;
       _this._aspect = perspective.aspect;
@@ -3340,7 +3335,7 @@
     function M_PerspectiveCamera(glBoostContext, toRegister, lookat, perspective) {
       babelHelpers.classCallCheck(this, M_PerspectiveCamera);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_PerspectiveCamera).call(this, glBoostContext, toRegister));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_PerspectiveCamera.__proto__ || Object.getPrototypeOf(M_PerspectiveCamera)).call(this, glBoostContext, toRegister));
 
       _this._lowLevelCamera = new L_PerspectiveCamera(_this, false, lookat, perspective);
       return _this;
@@ -3501,7 +3496,7 @@
     function M_Mesh(glBoostContext, geometry, material) {
       babelHelpers.classCallCheck(this, M_Mesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Mesh).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_Mesh.__proto__ || Object.getPrototypeOf(M_Mesh)).call(this, glBoostContext));
 
       _this.geometry = geometry;
       _this.material = material;
@@ -3536,10 +3531,10 @@
 
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (var i = 0; i < normals.length; i++) {
-            var normalVector3 = normals[i];
+          for (var _i = 0; _i < normals.length; _i++) {
+            var normalVector3 = normals[_i];
             var transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+            normals[_i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
@@ -3559,10 +3554,10 @@
         var mat = this.transformMatrixAccumulatedAncestry;
         if (this._geometry._vertices.normal) {
           var normals = this._geometry._vertices.normal;
-          for (var i = 0; i < normals.length; i++) {
-            var normalVector3 = normals[i];
+          for (var _i2 = 0; _i2 < normals.length; _i2++) {
+            var normalVector3 = normals[_i2];
             var transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
-            normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+            normals[_i2] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
           }
           this._geometry._vertices.normal = normals;
         }
@@ -3686,7 +3681,7 @@
     function M_Group(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Group);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Group).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_Group.__proto__ || Object.getPrototypeOf(M_Group)).call(this, glBoostContext));
 
       _this._elements = [];
       _this._AABB = new AABB();
@@ -3745,7 +3740,7 @@
     }, {
       key: 'searchElement',
       value: function searchElement(userflavorName) {
-        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this;
 
         if (element.userFlavorName === userflavorName) {
           return element;
@@ -3765,7 +3760,7 @@
     }, {
       key: 'searchElementsByType',
       value: function searchElementsByType(type) {
-        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this;
 
         if (element instanceof type) {
           return element;
@@ -3779,8 +3774,8 @@
             if (Array.isArray(hitChildOrChildren)) {
               Array.prototype.push.apply(results, hitChildOrChildren); // concat
             } else if (hitChildOrChildren != null) {
-                results.push(hitChildOrChildren);
-              }
+              results.push(hitChildOrChildren);
+            }
           }
           return results;
         }
@@ -3825,7 +3820,7 @@
     function RenderPass(glBoostContext) {
       babelHelpers.classCallCheck(this, RenderPass);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(RenderPass).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (RenderPass.__proto__ || Object.getPrototypeOf(RenderPass)).call(this, glBoostContext));
 
       _this._scene = null;
       _this._meshes = [];
@@ -4048,7 +4043,7 @@
     function Expression(glBoostContext) {
       babelHelpers.classCallCheck(this, Expression);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Expression).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Expression.__proto__ || Object.getPrototypeOf(Expression)).call(this, glBoostContext));
 
       _this._renderPasses = [];
       return _this;
@@ -4248,7 +4243,7 @@
     function Shader(glBoostContext) {
       babelHelpers.classCallCheck(this, Shader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Shader).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Shader.__proto__ || Object.getPrototypeOf(Shader)).call(this, glBoostContext));
 
       _this._glslProgram = null;
       _this._dirty = true;
@@ -4269,8 +4264,8 @@
         }
 
         var processedShaderString = '';
-        for (var i = 0; i < splittedShaderLines.length; i++) {
-          processedShaderString += splittedShaderLines[i];
+        for (var _i = 0; _i < splittedShaderLines.length; _i++) {
+          processedShaderString += splittedShaderLines[_i];
         }
 
         return processedShaderString;
@@ -4382,8 +4377,8 @@
 
         // end of main function
         if (maxDrawBuffers > 1) {
-          for (var i = 0; i < maxDrawBuffers; i++) {
-            shaderText += Shader._set_glFragData_inGLVer1(gl, i);
+          for (var _i2 = 0; _i2 < maxDrawBuffers; _i2++) {
+            shaderText += Shader._set_glFragData_inGLVer1(gl, _i2);
           }
         } else {
           shaderText += Shader._set_glFragColor_inGLVer1(gl);
@@ -4471,7 +4466,7 @@
     }, {
       key: 'getShaderProgram',
       value: function getShaderProgram(vertexAttribs, existCamera_f, lights, material) {
-        var extraData = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+        var extraData = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
         var gl = this._glContext.gl;
         var canvas = this._glContext.canvas;
@@ -4562,7 +4557,7 @@
     }, {
       key: 'readyForDiscard',
       value: function readyForDiscard() {
-        babelHelpers.get(Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
+        babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
         this._glContext.deleteProgram(this, this._glslProgram);
       }
     }, {
@@ -5307,9 +5302,9 @@
     function GLContextWebGL2Impl(canvas, parent) {
       babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL2Impl).call(this, canvas, parent));
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
 
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
+      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
 
       return _this;
     }
@@ -5323,9 +5318,9 @@
     function GLContextWebGL1Impl(canvas, parent) {
       babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLContextWebGL1Impl).call(this, canvas, parent));
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
 
-      babelHelpers.get(Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
+      babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
 
       return _this;
     }
@@ -5477,10 +5472,10 @@
     babelHelpers.inherits(SimpleShader, _Shader);
 
     function SimpleShader(glBoostContext) {
-      var basicShader = arguments.length <= 1 || arguments[1] === undefined ? VertexWorldShaderSource : arguments[1];
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
       babelHelpers.classCallCheck(this, SimpleShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SimpleShader).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (SimpleShader.__proto__ || Object.getPrototypeOf(SimpleShader)).call(this, glBoostContext));
 
       SimpleShader.mixin(basicShader);
       SimpleShader.mixin(FragmentSimpleShaderSource);
@@ -5569,7 +5564,7 @@
         }
 
         var textureUnitIndex = 0;
-        for (var i = 0; i < lights.length; i++) {
+        for (var _i = 0; _i < lights.length; _i++) {
           //if (lights[i].camera && lights[i].camera.texture) {
 
           // matrices
@@ -5684,10 +5679,10 @@
     babelHelpers.inherits(DecalShader, _Shader);
 
     function DecalShader(glBoostContext) {
-      var basicShader = arguments.length <= 1 || arguments[1] === undefined ? VertexWorldShaderSource : arguments[1];
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
       babelHelpers.classCallCheck(this, DecalShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DecalShader).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
 
       DecalShader.mixin(basicShader);
       if (basicShader === VertexWorldShaderSource) {
@@ -5717,7 +5712,7 @@
     function ClassicMaterial(glBoostContext) {
       babelHelpers.classCallCheck(this, ClassicMaterial);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(ClassicMaterial).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
 
       _this._diffuseTexture = null;
       _this._gl = _this._glContext.gl;
@@ -5882,7 +5877,7 @@
     function Geometry(glBoostContext) {
       babelHelpers.classCallCheck(this, Geometry);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Geometry).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Geometry.__proto__ || Object.getPrototypeOf(Geometry)).call(this, glBoostContext));
 
       _this._canvas = _this._glContext.canvas;
 
@@ -5938,8 +5933,8 @@
       value: function setVerticesData(vertices, indicesArray) {
         var _this2 = this;
 
-        var primitiveType = arguments.length <= 2 || arguments[2] === undefined ? GLBoost$1.TRIANGLES : arguments[2];
-        var performanceHint = arguments.length <= 3 || arguments[3] === undefined ? GLBoost$1.STATIC_DRAW : arguments[3];
+        var primitiveType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : GLBoost$1.TRIANGLES;
+        var performanceHint = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : GLBoost$1.STATIC_DRAW;
 
         this._vertices = vertices;
 
@@ -5982,7 +5977,7 @@
       value: function updateVerticesData(vertices) {
         var _this3 = this;
 
-        var isAlreadyInterleaved = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+        var isAlreadyInterleaved = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         var gl = this._glContext.gl;
         var vertexData = this._vertexData;
@@ -6061,7 +6056,7 @@
       value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
         var _this5 = this;
 
-        var doSetupVertexAttribs = arguments.length <= 4 || arguments[4] === undefined ? true : arguments[4];
+        var doSetupVertexAttribs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
         var gl = this._glContext.gl;
         var vertices = this._vertices;
@@ -6181,13 +6176,13 @@
           Geometry._iboArrayDic[this.toString()] = [];
           if (this._indicesArray) {
             // create Index Buffer
-            for (var i = 0; i < this._indicesArray.length; i++) {
+            for (var _i = 0; _i < this._indicesArray.length; _i++) {
               var ibo = this._glContext.createBuffer(this);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i]), gl.STATIC_DRAW);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-              Geometry._iboArrayDic[this.toString()][i] = ibo;
-              this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+              Geometry._iboArrayDic[this.toString()][_i] = ibo;
+              this._defaultMaterial.setVertexN(this._indicesArray[_i].length);
             }
           }
           glem.bindVertexArray(gl, null);
@@ -6324,7 +6319,7 @@
     function Renderer(glBoostContext, parameters) {
       babelHelpers.classCallCheck(this, Renderer);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Renderer).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Renderer.__proto__ || Object.getPrototypeOf(Renderer)).call(this, glBoostContext));
 
       var _clearColor = parameters.clearColor;
 
@@ -6562,7 +6557,7 @@
 
     function M_SkeletalGeometry(glBoostContext) {
       babelHelpers.classCallCheck(this, M_SkeletalGeometry);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_SkeletalGeometry).call(this, glBoostContext));
+      return babelHelpers.possibleConstructorReturn(this, (M_SkeletalGeometry.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry)).call(this, glBoostContext));
     }
 
     babelHelpers.createClass(M_SkeletalGeometry, [{
@@ -6630,35 +6625,35 @@
           }
           globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
         }
-        for (var i = 0; i < joints.length; i++) {
+        for (var _i = 0; _i < joints.length; _i++) {
 
-          matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
-          var inverseBindMatrix = typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined' ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
-          matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
-          matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+          matrices[_i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[_i]);
+          var inverseBindMatrix = typeof skeletalMesh.inverseBindMatrices[_i] !== 'undefined' ? skeletalMesh.inverseBindMatrices[_i] : Matrix44.identity();
+          matrices[_i] = Matrix44.multiply(matrices[_i], inverseBindMatrix);
+          matrices[_i] = Matrix44.multiply(matrices[_i], skeletalMesh.bindShapeMatrix);
         }
 
         var flatMatrices = [];
-        for (var i = 0; i < matrices.length; i++) {
-          Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
+        for (var _i2 = 0; _i2 < matrices.length; _i2++) {
+          Array.prototype.push.apply(flatMatrices, matrices[_i2].flattenAsArray());
         }
 
         if (matrices.length < 4) {
           var identityMatrices = [];
-          for (var i = 0; i < 4 - matrices.length; i++) {
+          for (var _i3 = 0; _i3 < 4 - matrices.length; _i3++) {
             Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
           }
           Array.prototype.push.apply(flatMatrices, identityMatrices);
         }
 
-        for (var i = 0; i < materials.length; i++) {
-          var glslProgram = materials[i].shaderInstance.glslProgram;
+        for (var _i4 = 0; _i4 < materials.length; _i4++) {
+          var glslProgram = materials[_i4].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
           gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
           gl.uniformMatrix4fv(glslProgram.invWorldMatrix, false, Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry).flatten());
         }
 
-        babelHelpers.get(Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
+        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
       }
     }, {
       key: 'prepareToRender',
@@ -6679,7 +6674,7 @@
           function SkeletalShader(glBoostContext, basicShader) {
             babelHelpers.classCallCheck(this, SkeletalShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(SkeletalShader).call(this, glBoostContext, basicShader));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, (SkeletalShader.__proto__ || Object.getPrototypeOf(SkeletalShader)).call(this, glBoostContext, basicShader));
 
             SkeletalShader.mixin(SkeletalShaderSource);
             return _this2;
@@ -6698,7 +6693,7 @@
           this._defaultMaterial.shaderClass = SkeletalShader;
         }
 
-        babelHelpers.get(Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
+        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
       }
     }]);
     return M_SkeletalGeometry;
@@ -6710,7 +6705,7 @@
     function M_SkeletalMesh(glBoostContext, geometry, material, rootJointName) {
       babelHelpers.classCallCheck(this, M_SkeletalMesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_SkeletalMesh).call(this, glBoostContext, geometry, material, rootJointName));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_SkeletalMesh.__proto__ || Object.getPrototypeOf(M_SkeletalMesh)).call(this, glBoostContext, geometry, material, rootJointName));
 
       _this._rootJointName = rootJointName;
       _this._jointsHierarchy = null;
@@ -6740,7 +6735,7 @@
         }
         //this._joints = joints;
 
-        babelHelpers.get(Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
+        babelHelpers.get(M_SkeletalMesh.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
       }
     }, {
       key: 'jointsHierarchy',
@@ -6796,17 +6791,15 @@
   var M_Scene = function (_M_Group) {
     babelHelpers.inherits(M_Scene, _M_Group);
 
-
     /**
      * [en] constructor
      * [ja] コンストラクタ
      * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
      */
-
     function M_Scene(glBoostContext) {
       babelHelpers.classCallCheck(this, M_Scene);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(M_Scene).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_Scene.__proto__ || Object.getPrototypeOf(M_Scene)).call(this, glBoostContext));
 
       _this._gl = _this._glContext.gl;
       _this._currentAnimationInputValues = {};
@@ -6824,7 +6817,7 @@
     }, {
       key: '_setDirtyToAnimatedElement',
       value: function _setDirtyToAnimatedElement(inputName) {
-        var element = arguments.length <= 1 || arguments[1] === undefined ? this : arguments[1];
+        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this;
 
         if (element.hasAnimation(inputName)) {
           element._needUpdate();
@@ -7047,18 +7040,16 @@
   var AbstractTexture = function (_GLBoostObject) {
     babelHelpers.inherits(AbstractTexture, _GLBoostObject);
 
-
     /**
      * [en] The constructor of PointLight class. Do not construct this class directly.<br>
      * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
      *
      * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
      */
-
     function AbstractTexture(glBoostContext) {
       babelHelpers.classCallCheck(this, AbstractTexture);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(AbstractTexture).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (AbstractTexture.__proto__ || Object.getPrototypeOf(AbstractTexture)).call(this, glBoostContext));
 
       if (_this.constructor === AbstractTexture) {
         throw new TypeError('Cannot construct AbstractTexture instances directly.');
@@ -7187,17 +7178,17 @@
     babelHelpers.inherits(MutableTexture, _AbstractTexture);
 
     function MutableTexture(glBoostContext, width, height) {
-      var level = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
-      var internalFormat = arguments.length <= 4 || arguments[4] === undefined ? 0x1908 : arguments[4];
-      var format = arguments.length <= 5 || arguments[5] === undefined ? 0x1908 : arguments[5];
-      var type = arguments.length <= 6 || arguments[6] === undefined ? 0x1401 : arguments[6];
-      var magFileter = arguments.length <= 7 || arguments[7] === undefined ? 0x2601 : arguments[7];
-      var minFilter = arguments.length <= 8 || arguments[8] === undefined ? 0x2601 : arguments[8];
-      var wrapS = arguments.length <= 9 || arguments[9] === undefined ? 0x812F : arguments[9];
-      var wrapT = arguments.length <= 10 || arguments[10] === undefined ? 0x812F : arguments[10];
+      var level = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+      var internalFormat = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0x1908;
+      var format = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0x1908;
+      var type = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : 0x1401;
+      var magFileter = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0x2601;
+      var minFilter = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0x2601;
+      var wrapS = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0x812F;
+      var wrapT = arguments.length > 10 && arguments[10] !== undefined ? arguments[10] : 0x812F;
       babelHelpers.classCallCheck(this, MutableTexture);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MutableTexture).call(this, glBoostContext)); // gl.CLAMP_TO_EDGE
+      var _this = babelHelpers.possibleConstructorReturn(this, (MutableTexture.__proto__ || Object.getPrototypeOf(MutableTexture)).call(this, glBoostContext)); // gl.CLAMP_TO_EDGE
 
 
       _this._isTextureReady = false;
@@ -7256,10 +7247,10 @@
     babelHelpers.inherits(Texture, _AbstractTexture);
 
     function Texture(glBoostContext, src) {
-      var parameters = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
+      var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       babelHelpers.classCallCheck(this, Texture);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Texture).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Texture.__proto__ || Object.getPrototypeOf(Texture)).call(this, glBoostContext));
 
       _this._isTextureReady = false;
       _this._texture = null;
@@ -7450,7 +7441,6 @@
   var Particle = function (_Geometry) {
     babelHelpers.inherits(Particle, _Geometry);
 
-
     /**
      * This is Particle class's constructor
      *
@@ -7460,11 +7450,10 @@
      * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
      * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
-
     function Particle(glBoostContext, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
       babelHelpers.classCallCheck(this, Particle);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Particle).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Particle.__proto__ || Object.getPrototypeOf(Particle)).call(this, glBoostContext));
 
       _this._setupVertexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes, performanceHint);
       return _this;
@@ -7494,28 +7483,28 @@
         var positions = this.positions;
 
         // if array, convert to vector[2/3/4]
-        for (var i = 0; i < positionArray.length; i++) {
-          positionArray[i] = MathUtil.arrayToVector(positionArray[i]);
+        for (var _i = 0; _i < positionArray.length; _i++) {
+          positionArray[_i] = MathUtil.arrayToVector(positionArray[_i]);
         }
 
-        for (var i = 0; i < positionArray.length; i++) {
-          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-          positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
-          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-          positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+        for (var _i2 = 0; _i2 < positionArray.length; _i2++) {
+          positions.push(new Vector3(positionArray[_i2].x - pHalfWidth, positionArray[_i2].y + pHalfHeight, positionArray[_i2].z));
+          positions.push(new Vector3(positionArray[_i2].x - pHalfWidth, positionArray[_i2].y - pHalfHeight, positionArray[_i2].z));
+          positions.push(new Vector3(positionArray[_i2].x + pHalfWidth, positionArray[_i2].y + pHalfHeight, positionArray[_i2].z));
+          positions.push(new Vector3(positionArray[_i2].x + pHalfWidth, positionArray[_i2].y - pHalfHeight, positionArray[_i2].z));
         }
         this.centerPositions = [];
         var centerPositions = this.centerPositions;
 
-        for (var i = 0; i < positionArray.length; i++) {
-          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-          centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+        for (var _i3 = 0; _i3 < positionArray.length; _i3++) {
+          centerPositions.push(new Vector3(positionArray[_i3].x, positionArray[_i3].y, positionArray[_i3].z));
+          centerPositions.push(new Vector3(positionArray[_i3].x, positionArray[_i3].y, positionArray[_i3].z));
+          centerPositions.push(new Vector3(positionArray[_i3].x, positionArray[_i3].y, positionArray[_i3].z));
+          centerPositions.push(new Vector3(positionArray[_i3].x, positionArray[_i3].y, positionArray[_i3].z));
         }
         this.texcoords = [];
         var texcoords = this.texcoords;
-        for (var i = 0; i < positionArray.length; i++) {
+        for (var _i4 = 0; _i4 < positionArray.length; _i4++) {
           texcoords.push(new Vector2(0, 0));
           texcoords.push(new Vector2(0, 1));
           texcoords.push(new Vector2(1, 0));
@@ -7525,7 +7514,7 @@
         this.normals = [];
         var normals = this.normals;
         var normal = new Vector3(0, 0, 1);
-        for (var i = 0; i < positionArray.length; i++) {
+        for (var _i5 = 0; _i5 < positionArray.length; _i5++) {
           for (var j = 0; j < 4; j++) {
             normals.push(normal);
           }
@@ -7536,9 +7525,9 @@
         for (var type in centerPointData) {
           if (type !== 'position') {
             pointData[type] = [];
-            for (var i = 0; i < positionArray.length; i++) {
-              for (var j = 0; j < 4; j++) {
-                pointData[type].push(centerPointData[type][i]);
+            for (var _i6 = 0; _i6 < positionArray.length; _i6++) {
+              for (var _j = 0; _j < 4; _j++) {
+                pointData[type].push(centerPointData[type][_i6]);
               }
             }
           }
@@ -7555,8 +7544,8 @@
           this.colors = [];
           var colors = this.colors;
           var vertexColor = new Vector4(1, 1, 1, 1);
-          for (var i = 0; i < positionArray.length; i++) {
-            for (var j = 0; j < 4; j++) {
+          for (var _i7 = 0; _i7 < positionArray.length; _i7++) {
+            for (var _j2 = 0; _j2 < 4; _j2++) {
               colors.push(vertexColor);
             }
           }
@@ -7595,19 +7584,19 @@
 
         var centerPositions = this.centerPositions;
         idx = 0;
-        for (var i = 0; i < positionArray.length; i++) {
-          centerPositions[idx].x = positionArray[i].x;
-          centerPositions[idx].y = positionArray[i].y;
-          centerPositions[idx].z = positionArray[i].z;
-          centerPositions[idx + 1].x = positionArray[i].x;
-          centerPositions[idx + 1].y = positionArray[i].y;
-          centerPositions[idx + 1].z = positionArray[i].z;
-          centerPositions[idx + 2].x = positionArray[i].x;
-          centerPositions[idx + 2].y = positionArray[i].y;
-          centerPositions[idx + 2].z = positionArray[i].z;
-          centerPositions[idx + 3].x = positionArray[i].x;
-          centerPositions[idx + 3].y = positionArray[i].y;
-          centerPositions[idx + 3].z = positionArray[i].z;
+        for (var _i8 = 0; _i8 < positionArray.length; _i8++) {
+          centerPositions[idx].x = positionArray[_i8].x;
+          centerPositions[idx].y = positionArray[_i8].y;
+          centerPositions[idx].z = positionArray[_i8].z;
+          centerPositions[idx + 1].x = positionArray[_i8].x;
+          centerPositions[idx + 1].y = positionArray[_i8].y;
+          centerPositions[idx + 1].z = positionArray[_i8].z;
+          centerPositions[idx + 2].x = positionArray[_i8].x;
+          centerPositions[idx + 2].y = positionArray[_i8].y;
+          centerPositions[idx + 2].z = positionArray[_i8].z;
+          centerPositions[idx + 3].x = positionArray[_i8].x;
+          centerPositions[idx + 3].y = positionArray[_i8].y;
+          centerPositions[idx + 3].z = positionArray[_i8].z;
           idx += 4;
         }
         idx = 0;
@@ -7615,11 +7604,11 @@
         for (var type in centerPointData) {
           if (type !== 'position') {
             pointData[type] = [];
-            for (var i = 0; i < positionArray.length; i++) {
+            for (var _i9 = 0; _i9 < positionArray.length; _i9++) {
               for (var j = 0; j < 4; j++) {
-                pointData[type][idx].x = centerPointData[type][i].x;
-                pointData[type][idx].y = centerPointData[type][i].y;
-                pointData[type][idx].z = centerPointData[type][i].z;
+                pointData[type][idx].x = centerPointData[type][_i9].x;
+                pointData[type][idx].y = centerPointData[type][_i9].y;
+                pointData[type][idx].z = centerPointData[type][_i9].z;
                 idx++;
               }
             }
@@ -7657,7 +7646,7 @@
       value: function updateVerticesData(centerPointData, particleWidth, particleHeight, customVertexAttributes) {
         //var result = this._setupVertexAndIndexData(centerPointData, particleWidth/2.0, particleHeight/2.0, customVertexAttributes, false);
         var result = this._updateVertexAndIndexData(centerPointData, particleWidth / 2.0, particleHeight / 2.0, customVertexAttributes, false);
-        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'updateVerticesData', this).call(this, result.vertexAttributes);
+        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'updateVerticesData', this).call(this, result.vertexAttributes);
       }
     }, {
       key: 'prepareToRender',
@@ -7677,7 +7666,7 @@
           function ParticleShader(glBoostContext, basicShader) {
             babelHelpers.classCallCheck(this, ParticleShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(ParticleShader).call(this, glBoostContext, basicShader, ParticleShaderSource));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, (ParticleShader.__proto__ || Object.getPrototypeOf(ParticleShader)).call(this, glBoostContext, basicShader, ParticleShaderSource));
 
             ParticleShader.mixin(ParticleShaderSource);
 
@@ -7690,7 +7679,7 @@
           babelHelpers.createClass(ParticleShader, [{
             key: 'setUniforms',
             value: function setUniforms(gl, glslProgram, material, camera, mesh) {
-              babelHelpers.get(Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
+              babelHelpers.get(ParticleShader.prototype.__proto__ || Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
                 gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.projectionRHMatrix().flatten());
@@ -7725,7 +7714,7 @@
          }
          */
 
-        babelHelpers.get(Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
       }
     }]);
     return Particle;
@@ -7739,7 +7728,7 @@
     function Sphere(glBoostContext, radius, widthSegments, heightSegments, vertexColor) {
       babelHelpers.classCallCheck(this, Sphere);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Sphere).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Sphere.__proto__ || Object.getPrototypeOf(Sphere)).call(this, glBoostContext));
 
       _this._setupVertexData(radius, widthSegments, heightSegments, vertexColor);
       return _this;
@@ -7828,10 +7817,10 @@
     babelHelpers.inherits(Plane, _Geometry);
 
     function Plane(glBoostContext, width, height, uSpan, vSpan, customVertexAttributes) {
-      var isUVRepeat = arguments.length <= 6 || arguments[6] === undefined ? false : arguments[6];
+      var isUVRepeat = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
       babelHelpers.classCallCheck(this, Plane);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Plane).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Plane.__proto__ || Object.getPrototypeOf(Plane)).call(this, glBoostContext));
 
       _this._setupVertexData(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
       return _this;
@@ -7850,16 +7839,16 @@
         }
 
         var indices = [];
-        for (var i = 0; i < vSpan; i++) {
+        for (var _i = 0; _i < vSpan; _i++) {
           var degenerate_left_index = 0;
           var degenerate_right_index = 0;
-          for (var j = 0; j <= uSpan; j++) {
-            indices.push(i * (uSpan + 1) + j);
-            indices.push((i + 1) * (uSpan + 1) + j);
-            if (j === 0) {
-              degenerate_left_index = (i + 1) * (uSpan + 1) + j;
-            } else if (j === uSpan) {
-              degenerate_right_index = (i + 1) * (uSpan + 1) + j;
+          for (var _j = 0; _j <= uSpan; _j++) {
+            indices.push(_i * (uSpan + 1) + _j);
+            indices.push((_i + 1) * (uSpan + 1) + _j);
+            if (_j === 0) {
+              degenerate_left_index = (_i + 1) * (uSpan + 1) + _j;
+            } else if (_j === uSpan) {
+              degenerate_right_index = (_i + 1) * (uSpan + 1) + _j;
             }
           }
           indices.push(degenerate_right_index);
@@ -7868,27 +7857,27 @@
 
         var colors = [];
         var vertexColor = new Vector4(1, 1, 1, 1);
-        for (var i = 0; i <= vSpan; i++) {
-          for (var j = 0; j <= uSpan; j++) {
+        for (var _i2 = 0; _i2 <= vSpan; _i2++) {
+          for (var _j2 = 0; _j2 <= uSpan; _j2++) {
             colors.push(vertexColor);
           }
         }
 
         var texcoords = [];
-        for (var i = 0; i <= vSpan; i++) {
-          for (var j = 0; j <= uSpan; j++) {
+        for (var _i3 = 0; _i3 <= vSpan; _i3++) {
+          for (var _j3 = 0; _j3 <= uSpan; _j3++) {
             if (isUVRepeat) {
-              texcoords.push(new Vector2(j, 1.0 - i));
+              texcoords.push(new Vector2(_j3, 1.0 - _i3));
             } else {
-              texcoords.push(new Vector2(j / uSpan, 1.0 - i / vSpan));
+              texcoords.push(new Vector2(_j3 / uSpan, 1.0 - _i3 / vSpan));
             }
           }
         }
 
         var normal = new Vector3(0, 1, 0);
         var normals = [];
-        for (var i = 0; i <= vSpan; i++) {
-          for (var j = 0; j <= uSpan; j++) {
+        for (var _i4 = 0; _i4 <= vSpan; _i4++) {
+          for (var _j4 = 0; _j4 <= uSpan; _j4++) {
             normals.push(normal);
           }
         }
@@ -7915,10 +7904,8 @@
     function Cube(glBoostContext, widthVector, vertexColor) {
       babelHelpers.classCallCheck(this, Cube);
 
-
       // if array, convert to vector[2/3/4]
-
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(Cube).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (Cube.__proto__ || Object.getPrototypeOf(Cube)).call(this, glBoostContext));
 
       widthVector = MathUtil.arrayToVector(widthVector);
       vertexColor = MathUtil.arrayToVector(vertexColor);
@@ -8073,7 +8060,7 @@
     function BlendShapeGeometry(glBoostContext) {
       babelHelpers.classCallCheck(this, BlendShapeGeometry);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeGeometry).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (BlendShapeGeometry.__proto__ || Object.getPrototypeOf(BlendShapeGeometry)).call(this, glBoostContext));
 
       _this._blendWeight_1 = 0.0;
       _this._blendWeight_2 = 0.0;
@@ -8095,7 +8082,7 @@
       key: 'draw',
       value: function draw(lights, camera, mesh, scene, renderPass_index) {
         this._currentRenderPassIndex = renderPass_index;
-        babelHelpers.get(Object.getPrototypeOf(BlendShapeGeometry.prototype), 'draw', this).call(this, lights, camera, mesh, scene, renderPass_index);
+        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'draw', this).call(this, lights, camera, mesh, scene, renderPass_index);
       }
     }, {
       key: 'prepareToRender',
@@ -8115,7 +8102,7 @@
           function BlendShapeShader(glBoostContext, basicShader) {
             babelHelpers.classCallCheck(this, BlendShapeShader);
 
-            var _this2 = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(BlendShapeShader).call(this, glBoostContext, basicShader));
+            var _this2 = babelHelpers.possibleConstructorReturn(this, (BlendShapeShader.__proto__ || Object.getPrototypeOf(BlendShapeShader)).call(this, glBoostContext, basicShader));
 
             BlendShapeShader.mixin(BlendShapeShaderSource);
             return _this2;
@@ -8126,7 +8113,7 @@
 
         this._materialForBlend.shaderClass = BlendShapeShader;
 
-        babelHelpers.get(Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, mesh);
+        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, mesh);
       }
     }, {
       key: '_setBlendWeightToGlslProgram',
@@ -8341,7 +8328,7 @@
     }, {
       key: 'createTexture',
       value: function createTexture(src) {
-        var parameters = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+        var parameters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
         return new Texture(this, src, parameters);
       }
@@ -8456,7 +8443,7 @@
 
     function GLBoostMiddleContext(canvas) {
       babelHelpers.classCallCheck(this, GLBoostMiddleContext);
-      return babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(GLBoostMiddleContext).call(this, canvas));
+      return babelHelpers.possibleConstructorReturn(this, (GLBoostMiddleContext.__proto__ || Object.getPrototypeOf(GLBoostMiddleContext)).call(this, canvas));
     }
 
     babelHelpers.createClass(GLBoostMiddleContext, [{
@@ -8581,6 +8568,7 @@
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
         //shaderText += '  rt0.a = 1.0;\n';
 
+
         return shaderText;
       }
     }, {
@@ -8607,7 +8595,7 @@
     function PhongShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, PhongShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PhongShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (PhongShader.__proto__ || Object.getPrototypeOf(PhongShader)).call(this, glBoostContext, basicShader));
 
       PhongShader.mixin(PhongShaderSource);
 
@@ -8619,7 +8607,7 @@
     babelHelpers.createClass(PhongShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(PhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(PhongShader.prototype.__proto__ || Object.getPrototypeOf(PhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
         var Ks = material.specularColor;
@@ -8672,7 +8660,6 @@
      * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
      * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
      */
-
     function ObjLoader(enforcer) {
       babelHelpers.classCallCheck(this, ObjLoader);
 
@@ -8704,8 +8691,8 @@
       value: function loadObj(glBoostContext, url) {
         var _this = this;
 
-        var defaultShader = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
-        var mtlString = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+        var defaultShader = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var mtlString = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -8728,7 +8715,7 @@
     }, {
       key: '_loadMaterialsFromString',
       value: function _loadMaterialsFromString(glBoostContext, mtlString, defaultShader) {
-        var basePath = arguments.length <= 3 || arguments[3] === undefined ? '' : arguments[3];
+        var basePath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
 
 
         var mtlTextRows = mtlString.split('\n');
@@ -8750,14 +8737,14 @@
         var iMCount = -1;
 
         // main loading
-        for (var i = 0; i < mtlTextRows.length; i++) {
-          var matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
+        for (var _i2 = 0; _i2 < mtlTextRows.length; _i2++) {
+          var _matchArray = mtlTextRows[_i2].match(/(\w+) ([\w:\/\-\.]+)/);
 
-          if (matchArray === null) {
+          if (_matchArray === null) {
             continue;
           }
 
-          if (matchArray[1] === "newmtl") {
+          if (_matchArray[1] === "newmtl") {
             iMCount++;
             materials[iMCount] = glBoostContext.createClassicMaterial();
             if (defaultShader) {
@@ -8765,34 +8752,34 @@
             } else {
               materials[iMCount].shaderClass = PhongShader;
             }
-            materials[iMCount].name = matchArray[2];
+            materials[iMCount].name = _matchArray[2];
           }
 
-          if (matchArray[1].toLowerCase() === "ka") {
-            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].ambientColor.x = parseFloat(matchArray[2]);
-            materials[iMCount].ambientColor.y = parseFloat(matchArray[3]);
-            materials[iMCount].ambientColor.z = parseFloat(matchArray[4]);
+          if (_matchArray[1].toLowerCase() === "ka") {
+            _matchArray = mtlTextRows[_i2].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].ambientColor.x = parseFloat(_matchArray[2]);
+            materials[iMCount].ambientColor.y = parseFloat(_matchArray[3]);
+            materials[iMCount].ambientColor.z = parseFloat(_matchArray[4]);
           }
 
-          if (matchArray[1].toLowerCase() === "kd") {
-            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].diffuseColor.x = parseFloat(matchArray[2]);
-            materials[iMCount].diffuseColor.y = parseFloat(matchArray[3]);
-            materials[iMCount].diffuseColor.z = parseFloat(matchArray[4]);
+          if (_matchArray[1].toLowerCase() === "kd") {
+            _matchArray = mtlTextRows[_i2].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].diffuseColor.x = parseFloat(_matchArray[2]);
+            materials[iMCount].diffuseColor.y = parseFloat(_matchArray[3]);
+            materials[iMCount].diffuseColor.z = parseFloat(_matchArray[4]);
           }
 
-          if (matchArray[1].toLowerCase() === "ks") {
-            matchArray = mtlTextRows[i].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
-            materials[iMCount].specularColor.x = parseFloat(matchArray[2]);
-            materials[iMCount].specularColor.y = parseFloat(matchArray[3]);
-            materials[iMCount].specularColor.z = parseFloat(matchArray[4]);
+          if (_matchArray[1].toLowerCase() === "ks") {
+            _matchArray = mtlTextRows[_i2].match(/(\w+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+) ([0-9]+\.[0-9]+)/);
+            materials[iMCount].specularColor.x = parseFloat(_matchArray[2]);
+            materials[iMCount].specularColor.y = parseFloat(_matchArray[3]);
+            materials[iMCount].specularColor.z = parseFloat(_matchArray[4]);
           }
 
-          if (matchArray[1].toLowerCase() === "map_kd") {
-            matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-            var texture = glBoostContext.createTexture(basePath + matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
-            texture.name = matchArray[2];
+          if (_matchArray[1].toLowerCase() === "map_kd") {
+            _matchArray = mtlTextRows[_i2].match(/(\w+) ([\w:\/\-\.]+)/);
+            var texture = glBoostContext.createTexture(basePath + _matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
+            texture.name = _matchArray[2];
             materials[iMCount].diffuseTexture = texture;
           }
         }
@@ -8850,28 +8837,28 @@
         }
 
         promise.then(function (materials) {
-          for (var i = 0; i < objTextRows.length; i++) {
-            var matchArray = objTextRows[i].match(/^(\w+) +(\w+)/);
-            if (matchArray === null) {
+          for (var _i3 = 0; _i3 < objTextRows.length; _i3++) {
+            var _matchArray2 = objTextRows[_i3].match(/^(\w+) +(\w+)/);
+            if (_matchArray2 === null) {
               continue;
             }
 
             // Vertex
-            if (matchArray[1] === "v") {
+            if (_matchArray2[1] === "v") {
               vCount++;
             }
             // Vertex Normal
-            if (matchArray[1] === "vn") {
+            if (_matchArray2[1] === "vn") {
               vnCount++;
             }
             // Texcoord
-            if (matchArray[1] === "vt") {
+            if (_matchArray2[1] === "vt") {
               vtCount++;
             }
             // Face
-            if (matchArray[1] === "f") {
-              matchArray = objTextRows[i].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-              if (matchArray !== null) {
+            if (_matchArray2[1] === "f") {
+              _matchArray2 = objTextRows[_i3].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+              if (_matchArray2 !== null) {
                 // if this is a Quad Polygon
                 fCount += 2;
               } else {
@@ -8888,42 +8875,42 @@
           vnCount = 0;
           vtCount = 0;
 
-          for (var i = 0; i < objTextRows.length; i++) {
+          for (var _i4 = 0; _i4 < objTextRows.length; _i4++) {
             //キーワード 読み込み
-            var matchArray = objTextRows[i].match(/^(\w+) /);
+            var _matchArray3 = objTextRows[_i4].match(/^(\w+) /);
 
-            if (matchArray === null) {
+            if (_matchArray3 === null) {
               continue;
             }
 
             //頂点 読み込み
-            if (matchArray[1] === "v") {
-              matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (_matchArray3[1] === "v") {
+              _matchArray3 = objTextRows[_i4].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvCoord[vCount] = new Vector3();
-              pvCoord[vCount].x = parseFloat(matchArray[2]);
-              pvCoord[vCount].y = parseFloat(matchArray[3]);
-              pvCoord[vCount].z = parseFloat(matchArray[4]);
+              pvCoord[vCount].x = parseFloat(_matchArray3[2]);
+              pvCoord[vCount].y = parseFloat(_matchArray3[3]);
+              pvCoord[vCount].z = parseFloat(_matchArray3[4]);
               vCount++;
             }
 
             //法線 読み込み
-            if (matchArray[1] === "vn") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (_matchArray3[1] === "vn") {
+              _matchArray3 = objTextRows[_i4].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
               pvNormal[vnCount] = new Vector3();
-              pvNormal[vnCount].x = parseFloat(matchArray[2]);
-              pvNormal[vnCount].y = parseFloat(matchArray[3]);
-              pvNormal[vnCount].z = parseFloat(matchArray[4]);
+              pvNormal[vnCount].x = parseFloat(_matchArray3[2]);
+              pvNormal[vnCount].y = parseFloat(_matchArray3[3]);
+              pvNormal[vnCount].z = parseFloat(_matchArray3[4]);
               vnCount++;
             }
 
             //テクスチャー座標 読み込み
-            if (matchArray[1] === "vt") {
-              matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
+            if (_matchArray3[1] === "vt") {
+              _matchArray3 = objTextRows[_i4].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
               pvTexture[vtCount] = new Vector2();
-              pvTexture[vtCount].x = parseFloat(matchArray[2]);
-              pvTexture[vtCount].y = parseFloat(matchArray[3]);
+              pvTexture[vtCount].x = parseFloat(_matchArray3[2]);
+              pvTexture[vtCount].y = parseFloat(_matchArray3[3]);
               //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
 
               vtCount++;
@@ -8943,7 +8930,7 @@
 
           var geometry = glBoostContext.createGeometry();
 
-          for (var i = 0; i < materials.length; i++) {
+          for (var _i5 = 0; _i5 < materials.length; _i5++) {
             partFCount = 0;
             var matIndices = new Array();
             var tmpIndices = new Array();
@@ -8953,30 +8940,30 @@
 
             var _i = 0;
             for (var j = 0; j < objTextRows.length && fCount < FaceN; j++) {
-              var matchArray = objTextRows[j].match(/^(\w+) (\w+)/);
+              var _matchArray4 = objTextRows[j].match(/^(\w+) (\w+)/);
 
-              if (matchArray === null) {
+              if (_matchArray4 === null) {
                 continue;
               }
 
-              if (matchArray[1] === "usemtl") {
-                if (matchArray[2] === materials[i].name) {
+              if (_matchArray4[1] === "usemtl") {
+                if (_matchArray4[2] === materials[_i5].name) {
                   boFlag = true;
                 } else {
                   boFlag = false;
                 }
               }
 
-              if (matchArray[1] === "f" && boFlag) {
+              if (_matchArray4[1] === "f" && boFlag) {
                 var isQuad = true;
-                var _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);if (_matchArray === null) {
-                  _matchArray = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+                var _matchArray5 = objTextRows[j].match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);if (_matchArray5 === null) {
+                  _matchArray5 = objTextRows[j].match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
                 }
-                if (_matchArray === null) {
+                if (_matchArray5 === null) {
                   isQuad = false;
                 }
 
-                if (materials[i].diffuseTexture) {
+                if (materials[_i5].diffuseTexture) {
                   if (isQuad) {
                     _this3._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   } else {
@@ -9024,10 +9011,10 @@
               }
 
             //        materials[i].setVertexN(geometry, partFCount*3);
-            materials[i].setVertexN(geometry, matIndices.length);
+            materials[_i5].setVertexN(geometry, matIndices.length);
 
             //indices[i] = iFaceBufferArray.concat();
-            indices[i] = matIndices.concat();
+            indices[_i5] = matIndices.concat();
           }
 
           var mesh = glBoostContext.createMesh(geometry, null);
@@ -9095,13 +9082,13 @@
           texcoords[fCount * 3 + 1] = pvTexture[vt2 - 1];
           texcoords[fCount * 3 + 2] = pvTexture[vt3 - 1];
         } else {
-          var _matchArray2 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-          v1 = _matchArray2[2];
-          vn1 = _matchArray2[3];
-          v2 = _matchArray2[4];
-          vn2 = _matchArray2[5];
-          v3 = _matchArray2[6];
-          vn3 = _matchArray2[7];
+          var _matchArray6 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+          v1 = _matchArray6[2];
+          vn1 = _matchArray6[3];
+          v2 = _matchArray6[4];
+          vn2 = _matchArray6[5];
+          v3 = _matchArray6[6];
+          vn3 = _matchArray6[7];
           positions[fCount * 3] = pvCoord[v1 - 1];
           positions[fCount * 3 + 1] = pvCoord[v2 - 1];
           positions[fCount * 3 + 2] = pvCoord[v3 - 1];
@@ -9139,16 +9126,16 @@
           normals[fCount * 3 + 1] = pvNormal[vn2 - 1];
           normals[fCount * 3 + 2] = pvNormal[vn3 - 1];
         } else {
-          var _matchArray3 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-          v1 = _matchArray3[2];
-          vt1 = _matchArray3[3];
-          vn1 = _matchArray3[4];
-          v2 = _matchArray3[5];
-          vt2 = _matchArray3[6];
-          vn2 = _matchArray3[7];
-          v3 = _matchArray3[8];
-          vt3 = _matchArray3[9];
-          vn3 = _matchArray3[10];
+          var _matchArray7 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          v1 = _matchArray7[2];
+          vt1 = _matchArray7[3];
+          vn1 = _matchArray7[4];
+          v2 = _matchArray7[5];
+          vt2 = _matchArray7[6];
+          vn2 = _matchArray7[7];
+          v3 = _matchArray7[8];
+          vt3 = _matchArray7[9];
+          vn3 = _matchArray7[10];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           positions[fCount * 3 + 1] = pvCoord[v2 - 1];
@@ -9212,15 +9199,15 @@
           normals[fCount * 3 + 5] = pvNormal[vn1 - 1];
           texcoords[fCount * 3 + 5] = pvTexture[vt1 - 1];
         } else {
-          var _matchArray4 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
-          v1 = _matchArray4[2];
-          vn1 = _matchArray4[3];
-          v2 = _matchArray4[4];
-          vn2 = _matchArray4[5];
-          v3 = _matchArray4[6];
-          vn3 = _matchArray4[7];
-          v4 = _matchArray4[8];
-          vn4 = _matchArray4[9];
+          var _matchArray8 = stringToScan.match(/^(\w+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+) (\d+)\/\/(\d+)/);
+          v1 = _matchArray8[2];
+          vn1 = _matchArray8[3];
+          v2 = _matchArray8[4];
+          vn2 = _matchArray8[5];
+          v3 = _matchArray8[6];
+          vn3 = _matchArray8[7];
+          v4 = _matchArray8[8];
+          vn4 = _matchArray8[9];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           normals[fCount * 3] = pvNormal[vn1 - 1];
@@ -9276,19 +9263,19 @@
           positions[fCount * 3 + 5] = pvCoord[v1 - 1];
           normals[fCount * 3 + 5] = pvNormal[vn1 - 1];
         } else {
-          var _matchArray5 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
-          v1 = _matchArray5[2];
-          vt1 = _matchArray5[3];
-          vn1 = _matchArray5[4];
-          v2 = _matchArray5[5];
-          vt2 = _matchArray5[6];
-          vn2 = _matchArray5[7];
-          v3 = _matchArray5[8];
-          vt3 = _matchArray5[9];
-          vn3 = _matchArray5[10];
-          v4 = _matchArray5[11];
-          vt4 = _matchArray5[12];
-          vn4 = _matchArray5[13];
+          var _matchArray9 = stringToScan.match(/^(\w+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+) (\d+)\/(\d*)\/(\d+)/);
+          v1 = _matchArray9[2];
+          vt1 = _matchArray9[3];
+          vn1 = _matchArray9[4];
+          v2 = _matchArray9[5];
+          vt2 = _matchArray9[6];
+          vn2 = _matchArray9[7];
+          v3 = _matchArray9[8];
+          vt3 = _matchArray9[9];
+          vn3 = _matchArray9[10];
+          v4 = _matchArray9[11];
+          vt4 = _matchArray9[12];
+          vn4 = _matchArray9[13];
 
           positions[fCount * 3] = pvCoord[v1 - 1];
           normals[fCount * 3] = pvNormal[vn1 - 1];
@@ -9368,7 +9355,6 @@
      * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
      * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
      */
-
     function GLTFLoader(enforcer) {
       babelHelpers.classCallCheck(this, GLTFLoader);
 
@@ -9399,8 +9385,8 @@
       value: function loadGLTF(glBoostContext, url) {
         var _this = this;
 
-        var scale = arguments.length <= 2 || arguments[2] === undefined ? 1.0 : arguments[2];
-        var defaultShader = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+        var scale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
+        var defaultShader = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         return new Promise(function (resolve, reject) {
           var xmlHttp = new XMLHttpRequest();
@@ -9537,8 +9523,8 @@
           group.addChild(joint);
         }
 
-        for (var i = 0; i < nodeJson.children.length; i++) {
-          var _nodeStr = nodeJson.children[i];
+        for (var _i = 0; _i < nodeJson.children.length; _i++) {
+          var _nodeStr = nodeJson.children[_i];
           var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
           group.addChild(childElement);
         }
@@ -9762,7 +9748,7 @@
     }, {
       key: '_accessBinary',
       value: function _accessBinary(accessorStr, json, arrayBuffer, scale, gl) {
-        var quaternionIfVec4 = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
+        var quaternionIfVec4 = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
         var accessorJson = json.accessors[accessorStr];
         var bufferViewStr = accessorJson.bufferView;
@@ -10053,15 +10039,15 @@
         shaderText += '  vec4 surfaceColor = rt0;\n';
         shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
         shaderText += '  vec3 normal = normalize(v_normal);\n';
-        for (var i = 0; i < lights.length; i++) {
+        for (var _i = 0; _i < lights.length; _i++) {
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-          shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
+          shaderText += '    vec3 light = normalize(lightPosition[' + _i + '].xyz - position.xyz * lightPosition[' + _i + '].w);\n';
 
-          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
+          shaderText += '    if (isShadowCasting[' + _i + '] == 1) {// ' + _i + '\n';
 
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
+          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + _i + '], v_shadowCoord[' + _i + ']).r;\n';
+          shaderText += '      if (depth < (v_shadowCoord[' + _i + '].z - depthBias) / v_shadowCoord[' + _i + '].w) {\n';
           shaderText += '        light *= 0.5;\n';
           shaderText += '      }\n';
 
@@ -10071,11 +10057,12 @@
           shaderText += '    }\n';
 
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-          shaderText += '    rt0 += Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '    rt0 += Kd * lightDiffuse[' + _i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '  }\n';
         }
         //shaderText += '  rt0.a = 1.0;\n';
         //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
+
 
         return shaderText;
       }
@@ -10112,7 +10099,7 @@
     function LambertShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, LambertShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(LambertShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (LambertShader.__proto__ || Object.getPrototypeOf(LambertShader)).call(this, glBoostContext, basicShader));
 
       LambertShader.mixin(LambertShaderSource);
       return _this;
@@ -10121,7 +10108,7 @@
     babelHelpers.createClass(LambertShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material, camera, mesh, lights) {
-        babelHelpers.get(Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(LambertShader.prototype.__proto__ || Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
         gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
@@ -10181,6 +10168,7 @@
         //shaderText += '  rt0.a = 1.0;\n';
         //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 
+
         return shaderText;
       }
     }, {
@@ -10203,7 +10191,7 @@
     function HalfLambertShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, HalfLambertShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (HalfLambertShader.__proto__ || Object.getPrototypeOf(HalfLambertShader)).call(this, glBoostContext, basicShader));
 
       HalfLambertShader.mixin(HalfLambertShaderSource);
       return _this;
@@ -10212,7 +10200,7 @@
     babelHelpers.createClass(HalfLambertShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(HalfLambertShader.prototype.__proto__ || Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
         gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
@@ -10279,7 +10267,7 @@
     function HalfLambertAndWrapLightingShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, HalfLambertAndWrapLightingShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(HalfLambertAndWrapLightingShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (HalfLambertAndWrapLightingShader.__proto__ || Object.getPrototypeOf(HalfLambertAndWrapLightingShader)).call(this, glBoostContext, basicShader));
 
       HalfLambertAndWrapLightingShader.mixin(HalfLambertAndWrapLightingShaderSource);
 
@@ -10290,7 +10278,7 @@
     babelHelpers.createClass(HalfLambertAndWrapLightingShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(HalfLambertAndWrapLightingShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(HalfLambertAndWrapLightingShader.prototype.__proto__ || Object.getPrototypeOf(HalfLambertAndWrapLightingShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
         gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
@@ -10326,6 +10314,7 @@
         //shaderText += '  rt0.a = 1.0;\n';
         //shaderText += '  rt0 = vec4(position.xyz, 1.0);\n';
 
+
         return shaderText;
       }
     }]);
@@ -10338,7 +10327,7 @@
     function DepthDisplayShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, DepthDisplayShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(DepthDisplayShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (DepthDisplayShader.__proto__ || Object.getPrototypeOf(DepthDisplayShader)).call(this, glBoostContext, basicShader));
 
       DepthDisplayShader.mixin(DepthDisplayShaderSource);
       return _this;
@@ -10424,10 +10413,10 @@
     babelHelpers.inherits(PassThroughShader, _Shader);
 
     function PassThroughShader(glBoostContext) {
-      var basicShader = arguments.length <= 1 || arguments[1] === undefined ? VertexWorldShaderSource : arguments[1];
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
       babelHelpers.classCallCheck(this, PassThroughShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(PassThroughShader).call(this, glBoostContext));
+      var _this = babelHelpers.possibleConstructorReturn(this, (PassThroughShader.__proto__ || Object.getPrototypeOf(PassThroughShader)).call(this, glBoostContext));
 
       PassThroughShader.mixin(basicShader);
       PassThroughShader.mixin(PassThroughShaderSource);
