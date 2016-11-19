@@ -196,6 +196,11 @@
     <iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
 
     <script>
+      if (window.location.protocol === 'https:') {
+        // because Runstant doesn't support https
+        window.location.href = 'http:' + window.location.href.replace( /^https:/g , '' );
+      }
+
       var webgl2Str = '?webglver=2';
 
       var button_webgl_1 = document.getElementById('button-webgl-1');
