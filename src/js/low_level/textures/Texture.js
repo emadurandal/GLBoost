@@ -10,18 +10,20 @@ export default class Texture extends AbstractTexture {
     this._isTextureReady = false;
     this._texture = null;
 
-    this._parameters = parameters;
+    this._parameters = (parameters) ? parameters : {};
 
-    if (typeof src === 'string') {
-      this.generateTextureFromUri(src);
+    if (typeof src === 'undefined' || src === null) {
+      // do nothing
+    } else if (typeof src === 'string') {
+        this._generateTextureFromUri(src);
     } else {
-      this.generateTextureFromImageData(src);
+        this._generateTextureFromImageData(src);
     }
   }
 
   _getParameter(paramName) {
     var isParametersExist = false;
-    if (this._parameters != null) {
+    if (this._parameters) {
       isParametersExist = true;
     }
     var params = this._parameters;
@@ -46,7 +48,7 @@ export default class Texture extends AbstractTexture {
     return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost[param], alternative));
   }
 
-  generateTextureFromUri(imageUri) {
+  _generateTextureFromUri(imageUri) {
     this._img = new Image();
     if ( !imageUri.match(/^data:/) ) {
       this._img.crossOrigin = 'Anonymous';
@@ -78,13 +80,15 @@ export default class Texture extends AbstractTexture {
 
       this._texture = texture;
       this._isTextureReady = true;
+
+      this._onLoad();
     };
 
     this._img.src = imageUri;
   }
 
-  generateTextureFromImageData(imageData) {
-    var gl = this.this._glContext.gl;
+  _generateTextureFromImageData(imageData) {
+    var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
     var imgCanvas = this._getResizedCanvas(imageData);
@@ -110,6 +114,12 @@ export default class Texture extends AbstractTexture {
     this._isTextureReady = true;
 
     this._img = imageData;
+
+    this._onLoad();
+  }
+
+  _onLoad() {
+
   }
 
   get isTextureReady() {
@@ -120,12 +130,5 @@ export default class Texture extends AbstractTexture {
     return typeof this._img == 'undefined';
   }
 
-  get width() {
-    return this._width;
-  }
-
-  get height() {
-    return this._height;
-  }
 
 }

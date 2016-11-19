@@ -7,6 +7,7 @@ import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
+import PhinaTexture from '../textures/PhinaTexture';
 import Cube from '../primitives/Cube';
 import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
@@ -69,6 +70,10 @@ export default class GLBoostLowContext {
 
   createTexture(src, parameters = null) {
     return new Texture(this, src, parameters);
+  }
+
+  createPhinaTexture(width, height, parameters = null) {
+    return new PhinaTexture(this, width, height, parameters);
   }
 
   /**
