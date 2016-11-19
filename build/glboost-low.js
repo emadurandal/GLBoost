@@ -981,6 +981,13 @@
         return glResource;
       }
     }, {
+      key: 'deleteFramebuffer',
+      value: function deleteFramebuffer(glBoostObject, frameBuffer) {
+        this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
+        this.gl.deleteFramebuffer(frameBuffer);
+        frameBuffer = null;
+      }
+    }, {
       key: 'createRenderbuffer',
       value: function createRenderbuffer(glBoostObject) {
         var glResource = this.gl.createRenderbuffer();
@@ -1020,6 +1027,13 @@
         var glResource = this.gl.createTexture();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
         return glResource;
+      }
+    }, {
+      key: 'deleteTexture',
+      value: function deleteTexture(glBoostObject, texture) {
+        this._monitor.deregisterWebGLResource(glBoostObject, texture);
+        this.gl.deleteTexture(texture);
+        texture = null;
       }
     }, {
       key: 'gl',
@@ -1112,6 +1126,22 @@
       value: function tearDown() {
         var gl = this._glContext.gl;
         gl.bindTexture(gl.TEXTURE_2D, null);
+      }
+    }, {
+      key: 'getTexturePixelData',
+      value: function getTexturePixelData() {
+        // Create a framebuffer backed by the texture
+        var framebuffer = this._glContext.createFramebuffer(this);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
+
+        // Read the contents of the framebuffer (data stores the pixel data)
+        var data = new Uint8Array(this.width * this.height * 4);
+        gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+        this._glContext.deleteFramebuffer(this, framebuffer);
+
+        return data;
       }
     }, {
       key: '_getResizedCanvas',
@@ -1268,12 +1298,14 @@
       _this._isTextureReady = false;
       _this._texture = null;
 
-      _this._parameters = parameters;
+      _this._parameters = parameters ? parameters : {};
 
-      if (typeof src === 'string') {
-        _this.generateTextureFromUri(src);
+      if (typeof src === 'undefined' || src === null) {
+        // do nothing
+      } else if (typeof src === 'string') {
+        _this._generateTextureFromUri(src);
       } else {
-        _this.generateTextureFromImageData(src);
+        _this._generateTextureFromImageData(src);
       }
       return _this;
     }
@@ -1282,7 +1314,7 @@
       key: '_getParameter',
       value: function _getParameter(paramName) {
         var isParametersExist = false;
-        if (this._parameters != null) {
+        if (this._parameters) {
           isParametersExist = true;
         }
         var params = this._parameters;
@@ -1308,8 +1340,8 @@
         return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost$1[param], alternative));
       }
     }, {
-      key: 'generateTextureFromUri',
-      value: function generateTextureFromUri(imageUri) {
+      key: '_generateTextureFromUri',
+      value: function _generateTextureFromUri(imageUri) {
         var _this2 = this;
 
         this._img = new Image();
@@ -1343,14 +1375,16 @@
 
           _this2._texture = texture;
           _this2._isTextureReady = true;
+
+          _this2._onLoad();
         };
 
         this._img.src = imageUri;
       }
     }, {
-      key: 'generateTextureFromImageData',
-      value: function generateTextureFromImageData(imageData) {
-        var gl = this.this._glContext.gl;
+      key: '_generateTextureFromImageData',
+      value: function _generateTextureFromImageData(imageData) {
+        var gl = this._glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
         var imgCanvas = this._getResizedCanvas(imageData);
@@ -1376,7 +1410,12 @@
         this._isTextureReady = true;
 
         this._img = imageData;
+
+        this._onLoad();
       }
+    }, {
+      key: '_onLoad',
+      value: function _onLoad() {}
     }, {
       key: 'isTextureReady',
       get: function get() {
@@ -1387,19 +1426,83 @@
       get: function get() {
         return typeof this._img == 'undefined';
       }
-    }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      }
     }]);
     return Texture;
   }(AbstractTexture);
+
+  var PhinaTexture = function (_Texture) {
+    babelHelpers.inherits(PhinaTexture, _Texture);
+
+    function PhinaTexture(glBoostContext, width, height) {
+      var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      babelHelpers.classCallCheck(this, PhinaTexture);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (PhinaTexture.__proto__ || Object.getPrototypeOf(PhinaTexture)).call(this, glBoostContext, null, parameters));
+
+      _this._parameters['UNPACK_FLIP_Y_WEBGL'] = true;
+
+      _this._width = width;
+      _this._height = height;
+
+      _this._phinaObjects = [];
+      _this._setUpOffscreen();
+      return _this;
+    }
+
+    babelHelpers.createClass(PhinaTexture, [{
+      key: '_setUpOffscreen',
+      value: function _setUpOffscreen() {
+        this._offscreen = phina.display.OffScreenLayer({
+          width: this.width,
+          height: this.height
+        });
+
+        this._offscreen.reset();
+      }
+    }, {
+      key: 'addPhinaObject',
+      value: function addPhinaObject(object) {
+        this._phinaObjects.push(object);
+        return this;
+      }
+    }, {
+      key: 'addPhinaObjects',
+      value: function addPhinaObjects(objects) {
+        this._phinaObjects = this._phinaObjects.concat(objects);
+        return this;
+      }
+    }, {
+      key: 'setPhinaObjects',
+      value: function setPhinaObjects(objects) {
+        this._phinaObjects = objects.concat();
+        return this;
+      }
+    }, {
+      key: 'clearPhinaObjects',
+      value: function clearPhinaObjects() {
+        this._phinaObjects.length = 0;
+        return this;
+      }
+    }, {
+      key: 'renderPhinaObjects',
+      value: function renderPhinaObjects() {
+        for (var i = 0; i < this._phinaObjects.length; i++) {
+          this._offscreen.renderObject(this._phinaObjects[i]);
+        }
+
+        this._recreateTexture(this._offscreen.getImageDataURL());
+      }
+    }, {
+      key: '_recreateTexture',
+      value: function _recreateTexture(imageDataUri) {
+        if (this._texture !== null) {
+          this._glContext.deleteTexture(this, this._texture);
+        }
+        this._generateTextureFromUri(imageDataUri);
+      }
+    }]);
+    return PhinaTexture;
+  }(Texture);
 
   var MathUtil = function () {
     function MathUtil() {
@@ -6745,6 +6848,13 @@
         var parameters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
         return new Texture(this, src, parameters);
+      }
+    }, {
+      key: 'createPhinaTexture',
+      value: function createPhinaTexture(width, height) {
+        var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+        return new PhinaTexture(this, width, height, parameters);
       }
 
       /**
