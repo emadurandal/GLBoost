@@ -1,12 +1,22 @@
 
 var arg = new Object;
-var pair = location.search.substring(1).split('&');
+var g_location = window.location;
+if (window.parent.location.href !== window.location.href) {
+  g_location = window.parent.location;
+}
+
+console.log("###" + window.parent.location.href)
+
+var pair = g_location.search.substring(1).split('&');
 for(var i = 0; pair[i] ; i++) {
   var kv = pair[i].split('=');
   arg[kv[0]] = kv[1];
 }
 
 GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+
+console.log("###" + GLBoost.TARGET_WEBGL_VERSION)
+
 
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 640;
@@ -75,3 +85,4 @@ phina.main(function() {
 
   app.run();
 });
+

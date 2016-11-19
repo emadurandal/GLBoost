@@ -12,6 +12,7 @@
     "build-low": "rollup -c src/js/low_level/rollup.config.js",
     "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
     "esdoc": "esdoc -c esdoc.json",
+    "sync-examples": "node scripts/sync-example-codes.js",
     "build-examples": "npm run standalone",
     "standalone": "npm run standalone:custom_shader && npm run standalone:custom_shader_2 && npm run standalone:particles && npm run standalone:multiple_render_targets",
     "standalone:custom_shader": "rollup -c examples/standalone/custom_shader/rollup.config.js",
