@@ -52,26 +52,87 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, scale = 1.0, defaultShader = null) {
     return new Promise((resolve, reject)=> {
-      var xmlHttp = new XMLHttpRequest();
-      xmlHttp.onreadystatechange = ()=> {
-        if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-          var gotText = xmlHttp.responseText;
-          var partsOfPath = url.split('/');
-          var basePath = '';
-          for(var i=0; i<partsOfPath.length-1; i++) {
-            basePath += partsOfPath[i] + '/';
-          }
-          //console.log(basePath);
-          this._constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
-        }
-      };
-
-      xmlHttp.open("GET", url, true);
-      xmlHttp.send(null);
+      var partsOfPath = url.split('/');
+      let ext = partsOfPath[partsOfPath.length-1].split('.');
+      ext = ext[ext.length-1];
+      if (ext === 'glb') {
+        this._loadGLBInner(glBoostContext, url, scale, defaultShader, resolve, reject);
+      } else {
+        this._loadGLTFInner(glBoostContext, url, scale, defaultShader, resolve);
+      }
     });
   }
 
-  _constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
+  _loadGLTFInner(glBoostContext, url, scale, defaultShader, resolve) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = ()=> {
+      if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
+        var gotText = xmlHttp.responseText;
+        var partsOfPath = url.split('/');
+        var basePath = '';
+        for(var i=0; i<partsOfPath.length-1; i++) {
+          basePath += partsOfPath[i] + '/';
+        }
+        //console.log(basePath);
+
+        this._readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
+      }
+    };
+
+    xmlHttp.open("GET", url, true);
+    xmlHttp.send(null);
+  }
+
+  _loadGLBInner(glBoostContext, url, scale, defaultShader, resolve, reject) {
+    var oReq = new XMLHttpRequest();
+    oReq.open("GET", url, true);
+    oReq.responseType = "arraybuffer";
+
+
+    oReq.onload = (oEvent)=> {
+      var arrayBuffer = oReq.response;
+
+      let dataView = new DataView(arrayBuffer, 0, 20);
+      let isLittleEndian = true;
+
+      // Magic field
+      let magicStr = '';
+      magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
+      magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
+      magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
+      magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
+
+      if (magicStr !== 'glTF') {
+        reject('invalid Magic field in this binary glTF file.');
+      }
+
+      let gltfVer = dataView.getUint32(4, isLittleEndian);
+      if (gltfVer !== 1) {
+        reject('invalid version field in this binary glTF file.');
+      }
+
+      let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+      let lengthOfContent = dataView.getUint32(12, isLittleEndian);
+      let contentFormat = dataView.getUint32(16, isLittleEndian);
+
+      if (contentFormat !== 0) { // 0 means JSON format
+        reject('invalid contentFormat field in this binary glTF file.');
+      }
+
+
+      var text_decoder = new TextDecoder();
+      let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent+20);
+      let gotText = text_decoder.decode(arrayBufferContent);
+      var json = JSON.parse(gotText);
+      let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
+
+      this._IterateNodeOfScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+    };
+
+    oReq.send(null);
+  }
+
+  _readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
     var json = JSON.parse(gotText);
 
     for (let bufferName in json.buffers) {
@@ -79,14 +140,14 @@ export default class GLTFLoader {
       let bufferInfo = json.buffers[bufferName];
 
       if ( bufferInfo.uri.match(/^data:application\/octet-stream;base64,/) ){
-        this._loadBinaryFile(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadInternalBase64Binary(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       } else {
-        this._loadBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadExternalBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
       }
     }
   }
 
-  _loadBinaryFile(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
     dataUri = dataUri.split(',');
     var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
@@ -95,14 +156,14 @@ export default class GLTFLoader {
     }
   }
 
-  _loadBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadExternalBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
 
 
     oReq.onload = (oEvent)=> {
-      var arrayBuffer = oReq.response; // Note: not oReq.responseText
+      var arrayBuffer = oReq.response;
 
       if (arrayBuffer) {
         this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
@@ -275,14 +336,20 @@ export default class GLTFLoader {
           let textureJson = json.textures[textureStr];
           let imageStr = textureJson.source;
           let imageJson = json.images[imageStr];
-          let imageFileStr = imageJson.uri;
 
           let textureUri = null;
-          if ( imageFileStr.match(/^data:/) ) {
-            textureUri = imageFileStr;
+
+          if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
           } else {
-            textureUri = basePath + imageFileStr;
+            let imageFileStr = imageJson.uri;
+            if (imageFileStr.match(/^data:/)) {
+              textureUri = imageFileStr;
+            } else {
+              textureUri = basePath + imageFileStr;
+            }
           }
+
           let samplerStr = textureJson.sampler;
           let samplerJson = json.samplers[samplerStr];
 
@@ -406,6 +473,35 @@ export default class GLTFLoader {
         }
       }
     }
+  }
+
+  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+    let bufferViewJson = json.bufferViews[bufferViewStr];
+    let byteOffset = bufferViewJson.byteOffset;
+    let byteLength = bufferViewJson.byteLength;
+
+
+    let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset+byteLength);
+    let bytes = new Uint8Array(arrayBufferSliced);
+    let binaryData = '';
+    for (let i = 0, len = bytes.byteLength; i < len; i++) {
+      binaryData += String.fromCharCode(bytes[i]);
+    }
+    let imgSrc = '';
+    if (mimeType == 'image/jpeg') {
+      imgSrc = "data:image/jpeg;base64,";
+    } else if (mimeType == 'image/png') {
+      imgSrc = "data:image/png;base64,";
+    } else if (mimeType == 'image/gif') {
+      imgSrc = "data:image/gif;base64,";
+    } else if (mimeType == 'image/bmp') {
+      imgSrc = "data:image/bmp;base64,";
+    } else {
+      imgSrc = "data:image/unknown;base64,";
+    }
+    let dataUrl = imgSrc + window.btoa(binaryData);
+
+    return dataUrl;
   }
 
   _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false) {

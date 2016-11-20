@@ -9512,27 +9512,93 @@
         var defaultShader = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
         return new Promise(function (resolve, reject) {
-          var xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-              var gotText = xmlHttp.responseText;
-              var partsOfPath = url.split('/');
-              var basePath = '';
-              for (var i = 0; i < partsOfPath.length - 1; i++) {
-                basePath += partsOfPath[i] + '/';
-              }
-              //console.log(basePath);
-              _this._constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
-            }
-          };
-
-          xmlHttp.open("GET", url, true);
-          xmlHttp.send(null);
+          var partsOfPath = url.split('/');
+          var ext = partsOfPath[partsOfPath.length - 1].split('.');
+          ext = ext[ext.length - 1];
+          if (ext === 'glb') {
+            _this._loadGLBInner(glBoostContext, url, scale, defaultShader, resolve, reject);
+          } else {
+            _this._loadGLTFInner(glBoostContext, url, scale, defaultShader, resolve);
+          }
         });
       }
     }, {
-      key: '_constructMesh',
-      value: function _constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
+      key: '_loadGLTFInner',
+      value: function _loadGLTFInner(glBoostContext, url, scale, defaultShader, resolve) {
+        var _this2 = this;
+
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+            var gotText = xmlHttp.responseText;
+            var partsOfPath = url.split('/');
+            var basePath = '';
+            for (var i = 0; i < partsOfPath.length - 1; i++) {
+              basePath += partsOfPath[i] + '/';
+            }
+            //console.log(basePath);
+
+            _this2._readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
+          }
+        };
+
+        xmlHttp.open("GET", url, true);
+        xmlHttp.send(null);
+      }
+    }, {
+      key: '_loadGLBInner',
+      value: function _loadGLBInner(glBoostContext, url, scale, defaultShader, resolve, reject) {
+        var _this3 = this;
+
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", url, true);
+        oReq.responseType = "arraybuffer";
+
+        oReq.onload = function (oEvent) {
+          var arrayBuffer = oReq.response;
+
+          var dataView = new DataView(arrayBuffer, 0, 20);
+          var isLittleEndian = true;
+
+          // Magic field
+          var magicStr = '';
+          magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
+
+          if (magicStr !== 'glTF') {
+            reject('invalid Magic field in this binary glTF file.');
+          }
+
+          var gltfVer = dataView.getUint32(4, isLittleEndian);
+          if (gltfVer !== 1) {
+            reject('invalid version field in this binary glTF file.');
+          }
+
+          var lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+          var lengthOfContent = dataView.getUint32(12, isLittleEndian);
+          var contentFormat = dataView.getUint32(16, isLittleEndian);
+
+          if (contentFormat !== 0) {
+            // 0 means JSON format
+            reject('invalid contentFormat field in this binary glTF file.');
+          }
+
+          var text_decoder = new TextDecoder();
+          var arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
+          var gotText = text_decoder.decode(arrayBufferContent);
+          var json = JSON.parse(gotText);
+          var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
+
+          _this3._IterateNodeOfScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+        };
+
+        oReq.send(null);
+      }
+    }, {
+      key: '_readBuffers',
+      value: function _readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
         var json = JSON.parse(gotText);
 
         for (var bufferName in json.buffers) {
@@ -9540,15 +9606,15 @@
           var bufferInfo = json.buffers[bufferName];
 
           if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
-            this._loadBinaryFile(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+            this._loadInternalBase64Binary(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           } else {
-            this._loadBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+            this._loadExternalBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
           }
         }
       }
     }, {
-      key: '_loadBinaryFile',
-      value: function _loadBinaryFile(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
+      key: '_loadInternalBase64Binary',
+      value: function _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
         dataUri = dataUri.split(',');
         var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
@@ -9557,19 +9623,19 @@
         }
       }
     }, {
-      key: '_loadBinaryFileUsingXHR',
-      value: function _loadBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
-        var _this2 = this;
+      key: '_loadExternalBinaryFileUsingXHR',
+      value: function _loadExternalBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+        var _this4 = this;
 
         var oReq = new XMLHttpRequest();
         oReq.open("GET", binaryFilePath, true);
         oReq.responseType = "arraybuffer";
 
         oReq.onload = function (oEvent) {
-          var arrayBuffer = oReq.response; // Note: not oReq.responseText
+          var arrayBuffer = oReq.response;
 
           if (arrayBuffer) {
-            _this2._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+            _this4._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
           }
         };
 
@@ -9741,14 +9807,20 @@
               var textureJson = json.textures[textureStr];
               var imageStr = textureJson.source;
               var imageJson = json.images[imageStr];
-              var imageFileStr = imageJson.uri;
 
               var textureUri = null;
-              if (imageFileStr.match(/^data:/)) {
-                textureUri = imageFileStr;
+
+              if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
               } else {
-                textureUri = basePath + imageFileStr;
+                var imageFileStr = imageJson.uri;
+                if (imageFileStr.match(/^data:/)) {
+                  textureUri = imageFileStr;
+                } else {
+                  textureUri = basePath + imageFileStr;
+                }
               }
+
               var samplerStr = textureJson.sampler;
               var samplerJson = json.samplers[samplerStr];
 
@@ -9872,6 +9944,35 @@
             }
           }
         }
+      }
+    }, {
+      key: '_accessBinaryAsImage',
+      value: function _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+        var bufferViewJson = json.bufferViews[bufferViewStr];
+        var byteOffset = bufferViewJson.byteOffset;
+        var byteLength = bufferViewJson.byteLength;
+
+        var arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+        var bytes = new Uint8Array(arrayBufferSliced);
+        var binaryData = '';
+        for (var i = 0, len = bytes.byteLength; i < len; i++) {
+          binaryData += String.fromCharCode(bytes[i]);
+        }
+        var imgSrc = '';
+        if (mimeType == 'image/jpeg') {
+          imgSrc = "data:image/jpeg;base64,";
+        } else if (mimeType == 'image/png') {
+          imgSrc = "data:image/png;base64,";
+        } else if (mimeType == 'image/gif') {
+          imgSrc = "data:image/gif;base64,";
+        } else if (mimeType == 'image/bmp') {
+          imgSrc = "data:image/bmp;base64,";
+        } else {
+          imgSrc = "data:image/unknown;base64,";
+        }
+        var dataUrl = imgSrc + window.btoa(binaryData);
+
+        return dataUrl;
       }
     }, {
       key: '_accessBinary',
