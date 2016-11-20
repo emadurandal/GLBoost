@@ -7324,12 +7324,14 @@
     }, {
       key: '_getParamWithAlternative',
       value: function _getParamWithAlternative(param, alternative) {
-        return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost$1[param], alternative));
+        return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost$1[param]), alternative);
       }
     }, {
       key: '_generateTextureFromUri',
       value: function _generateTextureFromUri(imageUri) {
         var _this2 = this;
+
+        var isKeepBound = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         this._img = new Image();
         if (!imageUri.match(/^data:/)) {
@@ -7358,7 +7360,9 @@
           gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, _this2._getParamWithAlternative('TEXTURE_WRAP_T', gl.REPEAT));
           gl.generateMipmap(gl.TEXTURE_2D);
 
-          gl.bindTexture(gl.TEXTURE_2D, null);
+          if (!isKeepBound) {
+            gl.bindTexture(gl.TEXTURE_2D, null);
+          }
 
           _this2._texture = texture;
           _this2._isTextureReady = true;
@@ -7480,14 +7484,16 @@
         }
 
         this._recreateTexture(this._offscreen.getImageDataURL());
+        this._offscreen.reset();
       }
     }, {
       key: '_recreateTexture',
       value: function _recreateTexture(imageDataUri) {
-        if (this._texture !== null) {
-          this._glContext.deleteTexture(this, this._texture);
+        var oldTexture = this.texture;
+        this._generateTextureFromUri(imageDataUri, true);
+        if (typeof oldTexture !== 'undefined' && oldTexture !== null) {
+          this._glContext.deleteTexture(this, oldTexture);
         }
-        this._generateTextureFromUri(imageDataUri);
       }
     }]);
     return PhinaTexture;
@@ -10061,6 +10067,7 @@
         },
 
         reset: function reset() {
+          this.canvas2d.clearColor('white', 0, 0, this.width, this.height);
           this.canvas2d.clearColor(this.fillStyle, 0, 0, this.width, this.height);
           // this.canvas2d.clear(0, 0, this.width, this.height);
           /*
