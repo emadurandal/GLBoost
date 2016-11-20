@@ -61,7 +61,7 @@ export default class GLTFLoader {
           for(var i=0; i<partsOfPath.length-1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          console.log(basePath);
+          //console.log(basePath);
           this._constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
         }
       };

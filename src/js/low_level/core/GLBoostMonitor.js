@@ -22,23 +22,23 @@ export default class GLBoostMonitor {
 
   registerGLBoostObject(glBoostObject) {
     this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
   }
 
   deregisterGLBoostObject(glBoostObject) {
     delete this._glBoostObjects[glBoostObject.toString()];
-    MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
   }
 
   printGLBoostObjects() {
     var objects = this._glBoostObjects;
-    MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');
     for (var key in objects) {
       if (objects.hasOwnProperty(key)) {
         MiscUtil.consoleLog(key + '(' + objects[key].belongingCanvasId + ')');
       }
     }
-    MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
   }
 
   printGLBoostObjectsOrderByName() {
@@ -56,17 +56,17 @@ export default class GLBoostMonitor {
         return 0;
       }
     );
-    MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');
     objectArray.forEach((object)=>{
       MiscUtil.consoleLog(object.toString() + ' (' + object.belongingCanvasId + ')');
     });
-    MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
   }
 
   registerWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
     this._glResources.push([glBoostObject, glResourceName]);
-    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
+    MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
   deregisterWebGLResource(glBoostObject, glResource) {
@@ -76,7 +76,7 @@ export default class GLBoostMonitor {
         this._glResources.splice(i,1);
       }
     });
-    MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
+    MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
   printWebGLResources() {
@@ -88,11 +88,11 @@ export default class GLBoostMonitor {
         return 0;
       }
     );
-    MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, '========== WebGL Resource Lists [begin] ==========');
     glResources.forEach((glResource, i)=>{
       MiscUtil.consoleLog(i+1 +': ' + glResource[0].toString() + ' (' + glResource[0].belongingCanvasId + ') created ' + glResource[1]);
     });
-    MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, '========== WebGL Resource Lists [end] ==========');
   }
 
   printHierarchy() {
@@ -114,7 +114,7 @@ export default class GLBoostMonitor {
       return str;
     }
 
-    MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
     scenes.forEach((scene)=> {
       var outputText = (function searchRecursively(element, level) {
         var outputText = '';
@@ -132,7 +132,7 @@ export default class GLBoostMonitor {
       outputText = outputText.replace( /\n+/g , '\n');
       MiscUtil.consoleLog(outputText);
     });
-    MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
+    MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Objects Hierarchy of Scenes [end] ==========');
 
   }
 

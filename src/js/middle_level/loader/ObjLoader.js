@@ -157,7 +157,7 @@ export default class ObjLoader {
 
   _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {
 
-    console.log(basePath);
+    //console.log(basePath);
 
     var objTextRows = objText.split('\n');
     var promise = null;

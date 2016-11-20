@@ -42,7 +42,9 @@ global.GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
 global.GLBoost['REPEAT'] = 'REPEAT';
 global.GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
 global.GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
-
+global.GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
+global.GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
+global.GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
 export default global.GLBoost;
 
 global.GLBoost.isThisGLVersion_2 = function(gl) {

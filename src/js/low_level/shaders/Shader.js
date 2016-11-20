@@ -304,10 +304,10 @@ export default class Shader extends GLBoostObject {
   }
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-    MiscUtil.consoleLog('Vertex Shader:');
-    MiscUtil.consoleLog(vertexShaderStr);
-    MiscUtil.consoleLog('Fragment Shader:');
-    MiscUtil.consoleLog(fragmentShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
