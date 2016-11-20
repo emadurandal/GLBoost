@@ -45,10 +45,10 @@ export default class Texture extends AbstractTexture {
   }
 
   _getParamWithAlternative(param, alternative) {
-    return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost[param], alternative));
+    return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost[param]), alternative);
   }
 
-  _generateTextureFromUri(imageUri) {
+  _generateTextureFromUri(imageUri, isKeepBound = false) {
     this._img = new Image();
     if ( !imageUri.match(/^data:/) ) {
       this._img.crossOrigin = 'Anonymous';
@@ -76,7 +76,9 @@ export default class Texture extends AbstractTexture {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative('TEXTURE_WRAP_T', gl.REPEAT));
       gl.generateMipmap(gl.TEXTURE_2D);
 
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      if (!isKeepBound) {
+        gl.bindTexture(gl.TEXTURE_2D, null);
+      }
 
       this._texture = texture;
       this._isTextureReady = true;

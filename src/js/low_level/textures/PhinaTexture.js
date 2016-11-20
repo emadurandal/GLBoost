@@ -52,12 +52,14 @@ export default class PhinaTexture extends Texture {
     }
 
     this._recreateTexture(this._offscreen.getImageDataURL());
+    this._offscreen.reset();
   }
 
   _recreateTexture(imageDataUri) {
-    if (this._texture !== null) {
-      this._glContext.deleteTexture(this, this._texture);
+    var oldTexture = this.texture;
+    this._generateTextureFromUri(imageDataUri, true);
+    if (typeof oldTexture !== 'undefined' && oldTexture !== null) {
+      this._glContext.deleteTexture(this, oldTexture);
     }
-    this._generateTextureFromUri(imageDataUri);
   }
 }

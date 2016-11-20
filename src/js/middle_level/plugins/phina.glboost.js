@@ -95,6 +95,7 @@ phina.namespace(function() {
     },
 
     reset: function() {
+      this.canvas2d.clearColor('white', 0, 0, this.width, this.height);
       this.canvas2d.clearColor(this.fillStyle, 0, 0, this.width, this.height);
       // this.canvas2d.clear(0, 0, this.width, this.height);
       /*
