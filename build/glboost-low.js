@@ -1433,8 +1433,8 @@
   var PhinaTexture = function (_Texture) {
     babelHelpers.inherits(PhinaTexture, _Texture);
 
-    function PhinaTexture(glBoostContext, width, height) {
-      var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    function PhinaTexture(glBoostContext, width, height, fillStyle) {
+      var parameters = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
       babelHelpers.classCallCheck(this, PhinaTexture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (PhinaTexture.__proto__ || Object.getPrototypeOf(PhinaTexture)).call(this, glBoostContext, null, parameters));
@@ -1443,6 +1443,7 @@
 
       _this._width = width;
       _this._height = height;
+      _this._fillStyle = fillStyle;
 
       _this._phinaObjects = [];
       _this._setUpOffscreen();
@@ -1454,7 +1455,8 @@
       value: function _setUpOffscreen() {
         this._offscreen = phina.display.OffScreenLayer({
           width: this.width,
-          height: this.height
+          height: this.height,
+          fillStyle: this._fillStyle
         });
 
         this._offscreen.reset();
@@ -6851,10 +6853,10 @@
       }
     }, {
       key: 'createPhinaTexture',
-      value: function createPhinaTexture(width, height) {
-        var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      value: function createPhinaTexture(width, height, fillStyle) {
+        var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-        return new PhinaTexture(this, width, height, parameters);
+        return new PhinaTexture(this, width, height, fillStyle, parameters);
       }
 
       /**

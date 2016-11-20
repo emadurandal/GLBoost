@@ -7420,8 +7420,8 @@
   var PhinaTexture = function (_Texture) {
     babelHelpers.inherits(PhinaTexture, _Texture);
 
-    function PhinaTexture(glBoostContext, width, height) {
-      var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+    function PhinaTexture(glBoostContext, width, height, fillStyle) {
+      var parameters = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
       babelHelpers.classCallCheck(this, PhinaTexture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (PhinaTexture.__proto__ || Object.getPrototypeOf(PhinaTexture)).call(this, glBoostContext, null, parameters));
@@ -7430,6 +7430,7 @@
 
       _this._width = width;
       _this._height = height;
+      _this._fillStyle = fillStyle;
 
       _this._phinaObjects = [];
       _this._setUpOffscreen();
@@ -7441,7 +7442,8 @@
       value: function _setUpOffscreen() {
         this._offscreen = phina.display.OffScreenLayer({
           width: this.width,
-          height: this.height
+          height: this.height,
+          fillStyle: this._fillStyle
         });
 
         this._offscreen.reset();
@@ -8437,10 +8439,10 @@
       }
     }, {
       key: 'createPhinaTexture',
-      value: function createPhinaTexture(width, height) {
-        var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      value: function createPhinaTexture(width, height, fillStyle) {
+        var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-        return new PhinaTexture(this, width, height, parameters);
+        return new PhinaTexture(this, width, height, fillStyle, parameters);
       }
 
       /**
@@ -10044,6 +10046,14 @@
           this.width = params.width;
           this.height = params.height;
 
+          if (params.fillStyle instanceof Vector3) {
+            this.fillStyle = 'rgb(' + params.fillStyle.x * 255 + ',' + params.fillStyle.y * 255 + ',' + params.fillStyle.z * 255 + ',1)';
+          } else if (params.fillStyle instanceof Vector4) {
+            this.fillStyle = 'rgba(' + params.fillStyle.x * 255 + ',' + params.fillStyle.y * 255 + ',' + params.fillStyle.z * 255 + ',' + params.fillStyle.w + ')';
+          } else {
+            this.fillStyle = params.fillStyle;
+          }
+
           this.canvas2d = phina.graphics.Canvas();
           this.canvas2d.setSize(this.width, this.height);
 
@@ -10051,7 +10061,7 @@
         },
 
         reset: function reset() {
-          this.canvas2d.clearColor('red', 0, 0, this.width, this.height);
+          this.canvas2d.clearColor(this.fillStyle, 0, 0, this.width, this.height);
           // this.canvas2d.clear(0, 0, this.width, this.height);
           /*
            this.canvas2d.init();
