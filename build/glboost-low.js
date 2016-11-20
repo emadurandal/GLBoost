@@ -1502,7 +1502,7 @@
     }, {
       key: '_recreateTexture',
       value: function _recreateTexture(imageDataUri) {
-        var oldTexture = this.texture;
+        var oldTexture = this._texture;
         this._generateTextureFromUri(imageDataUri, true);
         if (typeof oldTexture !== 'undefined' && oldTexture !== null) {
           this._glContext.deleteTexture(this, oldTexture);
