@@ -735,7 +735,7 @@
                           },
                           "property": {
                             "type": "Identifier",
-                            "name": "TARGET_WEBGL_VERSION",
+                            "name": "VALUE_TARGET_WEBGL_VERSION",
                             "range": [
                               422,
                               442
@@ -1007,7 +1007,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "TARGET_WEBGL_VERSION",
+                              "name": "VALUE_TARGET_WEBGL_VERSION",
                               "range": [
                                 532,
                                 552

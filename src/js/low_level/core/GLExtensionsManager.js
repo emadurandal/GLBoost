@@ -8,7 +8,7 @@ export default class GLExtensionsManager {
       return GLExtensionsManager._instances[glContext.canvas.id];
     }
 
-    if (GLBoost.WEBGL_ONE_USE_EXTENSIONS) {
+    if (GLBoost.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
       this._extVAO = gl.getExtension('OES_vertex_array_object');
 
       this._extDBs = gl.getExtension('WEBGL_draw_buffers');

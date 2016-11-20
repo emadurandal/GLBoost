@@ -326,8 +326,8 @@
           },
           "property": {
             "type": "Literal",
-            "value": "TARGET_WEBGL_VERSION",
-            "raw": "'TARGET_WEBGL_VERSION'",
+            "value": "VALUE_TARGET_WEBGL_VERSION",
+            "raw": "'VALUE_TARGET_WEBGL_VERSION'",
             "range": [
               155,
               177

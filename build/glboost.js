@@ -588,7 +588,7 @@
       key: 'rotateX',
       value: function rotateX(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -611,7 +611,7 @@
        */
       value: function rotateY(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -635,7 +635,7 @@
        */
       value: function rotateZ(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -832,7 +832,7 @@
       key: 'rotateX',
       value: function rotateX(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -846,7 +846,7 @@
       key: 'rotateY',
       value: function rotateY(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -860,7 +860,7 @@
       key: 'rotateZ',
       value: function rotateZ(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1007,7 +1007,7 @@
        */
       value: function rotateX(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1030,7 +1030,7 @@
        */
       value: function rotateY(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1053,7 +1053,7 @@
        */
       value: function rotateZ(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1362,7 +1362,7 @@
       key: 'rotateX',
       value: function rotateX(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1376,7 +1376,7 @@
       key: 'rotateY',
       value: function rotateY(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1390,7 +1390,7 @@
       key: 'rotateZ',
       value: function rotateZ(angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1505,7 +1505,7 @@
       key: 'axisAngle',
       value: function axisAngle(axisVec3, angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -1607,7 +1607,7 @@
       key: 'axisAngle',
       value: function axisAngle(axisVec3, angle) {
         var radian = 0;
-        if (GLBoost$1["ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
           radian = MathUtil.degreeToRadian(angle);
         } else {
           radian = angle;
@@ -4103,7 +4103,7 @@
         return GLExtensionsManager._instances[glContext.canvas.id];
       }
 
-      if (GLBoost$1.WEBGL_ONE_USE_EXTENSIONS) {
+      if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
         this._extVAO = gl.getExtension('OES_vertex_array_object');
 
         this._extDBs = gl.getExtension('WEBGL_draw_buffers');
@@ -4527,7 +4527,7 @@
 
         if (lights.length === 0) {
           if (Shader._defaultLight === null) {
-            Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.DEFAULT_POINTLIGHT_INTENSITY);
+            Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
           }
           return [Shader._defaultLight];
         } else {
@@ -5338,9 +5338,9 @@
         return GLContext._instances[canvas.id];
       }
 
-      if (GLBoost.TARGET_WEBGL_VERSION === 1) {
+      if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
         this.impl = new GLContextWebGL1Impl(canvas, this);
-      } else if (GLBoost.TARGET_WEBGL_VERSION === 2) {
+      } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
         this.impl = new GLContextWebGL2Impl(canvas, this);
       }
 
@@ -9432,10 +9432,10 @@
 
   GLBoost$1["ObjLoader"] = ObjLoader;
 
-  GLBoost$1['TARGET_WEBGL_VERSION'] = 1;
-  GLBoost$1['DEFAULT_POINTLIGHT_INTENSITY'] = new Vector3(1, 1, 1);
-  GLBoost$1['ANGLE_UNIT'] = GLBoost$1.DEGREE;
-  GLBoost$1['WEBGL_ONE_USE_EXTENSIONS'] = true;
+  GLBoost$1['VALUE_TARGET_WEBGL_VERSION'] = 1;
+  GLBoost$1['VALUE_DEFAULT_POINTLIGHT_INTENSITY'] = new Vector3(1, 1, 1);
+  GLBoost$1['VALUE_ANGLE_UNIT'] = GLBoost$1.DEGREE;
+  GLBoost$1['VALUE_WEBGL_ONE_USE_EXTENSIONS'] = true;
   GLBoost$1['VALUE_CONSOLE_OUT_FOR_DEBUGGING'] = false;
   GLBoost$1['VALUE_LOG_SHADER_CODE'] = true;
   GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;

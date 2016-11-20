@@ -90,7 +90,7 @@ export default class Quaternion {
 
   axisAngle(axisVec3, angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -109,7 +109,7 @@ export default class Quaternion {
 
   static axisAngle(axisVec3, angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;

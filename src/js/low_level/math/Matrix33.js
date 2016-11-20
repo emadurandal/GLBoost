@@ -83,7 +83,7 @@ export default class Matrix33 {
    */
   rotateX(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -102,7 +102,7 @@ export default class Matrix33 {
    */
   static rotateX(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -122,7 +122,7 @@ export default class Matrix33 {
    */
   rotateY(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -142,7 +142,7 @@ export default class Matrix33 {
    */
   static rotateY(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -162,7 +162,7 @@ export default class Matrix33 {
    */
   rotateZ(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;
@@ -181,7 +181,7 @@ export default class Matrix33 {
    */
   static rotateZ(angle) {
     var radian = 0;
-    if (GLBoost["ANGLE_UNIT"] === GLBoost.DEGREE) {
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
       radian = MathUtil.degreeToRadian(angle);
     } else {
       radian = angle;

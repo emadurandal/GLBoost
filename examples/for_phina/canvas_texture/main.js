@@ -5,9 +5,14 @@ for(var i = 0; pair[i] ; i++) {
   arg[kv[0]] = kv[1];
 }
 
-GLBoost.TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 640;
+
+GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING = true;
+GLBoost.VALUE_LOG_SHADER_CODE = true;
+GLBoost.VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE = true;
+GLBoost.VALUE_LOG_GL_RESOURCE_LIFECYCLE = false;
 
 phina.globalize();
 
