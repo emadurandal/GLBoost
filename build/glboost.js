@@ -9725,6 +9725,11 @@
 
           var materialStr = primitiveJson.material;
           var materialJson = json.materials[materialStr];
+
+          if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
+            materialJson = materialJson.extensions.KHR_materials_common;
+          }
+
           var diffuseValue = materialJson.values.diffuse;
           // Diffuse Texture
           if (texcoords0AccessorStr) {

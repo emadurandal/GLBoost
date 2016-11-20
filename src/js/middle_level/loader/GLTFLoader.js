@@ -259,6 +259,11 @@ export default class GLTFLoader {
 
       let materialStr = primitiveJson.material;
       let materialJson = json.materials[materialStr];
+
+      if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
+        materialJson = materialJson.extensions.KHR_materials_common;
+      }
+
       let diffuseValue = materialJson.values.diffuse;
       // Diffuse Texture
       if (texcoords0AccessorStr) {
