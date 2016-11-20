@@ -151,7 +151,9 @@
   global.GLBoost['REPEAT'] = 'REPEAT';
   global.GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
   global.GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
-
+  global.GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
+  global.GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
+  global.GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
   var GLBoost$1 = global.GLBoost;
 
   global.GLBoost.isThisGLVersion_2 = function (gl) {
@@ -1687,8 +1689,8 @@
       }
     }, {
       key: 'consoleLog',
-      value: function consoleLog(text) {
-        if (GLBoost$1.CONSOLE_OUT_FOR_DEBUGGING) {
+      value: function consoleLog(logType, text) {
+        if (GLBoost$1.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost$1['VALUE_' + logType]) {
           console.log(text);
         }
       }
@@ -1715,25 +1717,25 @@
       key: 'registerGLBoostObject',
       value: function registerGLBoostObject(glBoostObject) {
         this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
       }
     }, {
       key: 'deregisterGLBoostObject',
       value: function deregisterGLBoostObject(glBoostObject) {
         delete this._glBoostObjects[glBoostObject.toString()];
-        MiscUtil.consoleLog('GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
       }
     }, {
       key: 'printGLBoostObjects',
       value: function printGLBoostObjects() {
         var objects = this._glBoostObjects;
-        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');
         for (var key in objects) {
           if (objects.hasOwnProperty(key)) {
             MiscUtil.consoleLog(key + '(' + objects[key].belongingCanvasId + ')');
           }
         }
-        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
       }
     }, {
       key: 'printGLBoostObjectsOrderByName',
@@ -1750,18 +1752,18 @@
           if (a > b) return 1;
           return 0;
         });
-        MiscUtil.consoleLog('========== GLBoost Object Lists [begin] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');
         objectArray.forEach(function (object) {
           MiscUtil.consoleLog(object.toString() + ' (' + object.belongingCanvasId + ')');
         });
-        MiscUtil.consoleLog('========== GLBoost Object Lists [end] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
       }
     }, {
       key: 'registerWebGLResource',
       value: function registerWebGLResource(glBoostObject, glResource) {
         var glResourceName = glResource.constructor.name;
         this._glResources.push([glBoostObject, glResourceName]);
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
+        MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
       }
     }, {
       key: 'deregisterWebGLResource',
@@ -1774,7 +1776,7 @@
             _this._glResources.splice(i, 1);
           }
         });
-        MiscUtil.consoleLog('WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
+        MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
       }
     }, {
       key: 'printWebGLResources',
@@ -1785,11 +1787,11 @@
           if (a[0] > b[0]) return 1;
           return 0;
         });
-        MiscUtil.consoleLog('========== WebGL Resource Lists [begin] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, '========== WebGL Resource Lists [begin] ==========');
         glResources.forEach(function (glResource, i) {
           MiscUtil.consoleLog(i + 1 + ': ' + glResource[0].toString() + ' (' + glResource[0].belongingCanvasId + ') created ' + glResource[1]);
         });
-        MiscUtil.consoleLog('========== WebGL Resource Lists [end] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, '========== WebGL Resource Lists [end] ==========');
       }
     }, {
       key: 'printHierarchy',
@@ -1812,7 +1814,7 @@
           return str;
         }
 
-        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Objects Hierarchy of Scenes [begin] ==========');
         scenes.forEach(function (scene) {
           var outputText = function searchRecursively(element, level) {
             var outputText = '';
@@ -1830,7 +1832,7 @@
           outputText = outputText.replace(/\n+/g, '\n');
           MiscUtil.consoleLog(outputText);
         });
-        MiscUtil.consoleLog('========== GLBoost Objects Hierarchy of Scenes [end] ==========');
+        MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Objects Hierarchy of Scenes [end] ==========');
       }
     }], [{
       key: 'getInstance',
@@ -4438,10 +4440,10 @@
     }, {
       key: '_initShaders',
       value: function _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-        MiscUtil.consoleLog('Vertex Shader:');
-        MiscUtil.consoleLog(vertexShaderStr);
-        MiscUtil.consoleLog('Fragment Shader:');
-        MiscUtil.consoleLog(fragmentShaderStr);
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
 
         var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
         var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
@@ -8925,7 +8927,7 @@
       value: function _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {
         var _this3 = this;
 
-        console.log(basePath);
+        //console.log(basePath);
 
         var objTextRows = objText.split('\n');
         var promise = null;
@@ -9434,7 +9436,10 @@
   GLBoost$1['DEFAULT_POINTLIGHT_INTENSITY'] = new Vector3(1, 1, 1);
   GLBoost$1['ANGLE_UNIT'] = GLBoost$1.DEGREE;
   GLBoost$1['WEBGL_ONE_USE_EXTENSIONS'] = true;
-  GLBoost$1['CONSOLE_OUT_FOR_DEBUGGING'] = true;
+  GLBoost$1['VALUE_CONSOLE_OUT_FOR_DEBUGGING'] = false;
+  GLBoost$1['VALUE_LOG_SHADER_CODE'] = true;
+  GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;
+  GLBoost$1['VALUE_LOG_GL_RESOURCE_LIFECYCLE'] = true;
 
   var DataUtil = function () {
     function DataUtil() {
@@ -9516,7 +9521,7 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              console.log(basePath);
+              //console.log(basePath);
               _this._constructMesh(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
             }
           };
