@@ -45,13 +45,13 @@ phina.define('MainScene', {
 
     ];
     var texcoords = [
+      new GLBoost.Vector2(0.0, 0.0),
+      new GLBoost.Vector2(1.0, 0.0),
       new GLBoost.Vector2(0.0, 1.0),
-      new GLBoost.Vector2(1.0, 1.0),
-      new GLBoost.Vector2(0.0, 0.0),
 
-      new GLBoost.Vector2(0.0, 0.0),
-      new GLBoost.Vector2(1.0, 1.0),
-      new GLBoost.Vector2(1.0, 0.0)
+      new GLBoost.Vector2(0.0, 1.0),
+      new GLBoost.Vector2(1.0, 0.0),
+      new GLBoost.Vector2(1.0, 1.0)
     ];
 
     var geometry = glBoostContext.createGeometry();
@@ -61,13 +61,8 @@ phina.define('MainScene', {
       texcoord: texcoords
     });
 
-    var offscreen = phina.display.OffScreenLayer({
-      width: 512,
-      height: 512
-    });
-
-    offscreen.reset();
-
+    var texture = glBoostContext.createPhinaTexture(512, 512);
+    
     var label = Label('phina.jsとGLBoostの夢の共演！');
     label.fill = 'white';
     label.stroke = 'black';
@@ -76,20 +71,14 @@ phina.define('MainScene', {
     label.x = label.calcCanvasWidth()/2;
     label.y = label.calcCanvasHeight()/2;
     label.y += 100;
-
-    offscreen.renderObject(label);
-
+    
     var heart = HeartShape({radius: 86});
     heart.x = heart.calcCanvasWidth()/2;
     heart.y = heart.calcCanvasHeight()/2;
     heart.x += 130;
     heart.y += 150;
-
-
-    offscreen.renderObject(heart);
-    var imageData = offscreen.getImageDataURL();
-
-    var texture = glBoostContext.createTexture(imageData);
+    
+    texture.addPhinaObject(label).addPhinaObject(heart).renderPhinaObjects();
 
     var material = glBoostContext.createClassicMaterial();
     material.diffuseTexture = texture;
