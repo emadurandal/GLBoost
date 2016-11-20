@@ -61,7 +61,7 @@ phina.define('MainScene', {
       texcoord: texcoords
     });
 
-    var texture = glBoostContext.createPhinaTexture(512, 512);
+    var texture = glBoostContext.createPhinaTexture(512, 512, new GLBoost.Vector4(1, 0, 1, 0.2));
     
     var label = Label('phina.jsとGLBoostの夢の共演！');
     label.fill = 'white';

@@ -1,5 +1,7 @@
 import GLBoost from '../../globals';
 import GLBoostMiddleContext from '../core/GLBoostMiddleContext';
+import Vector3 from '../../low_level/math/Vector3';
+import Vector4 from '../../low_level/math/Vector4';
 
 if (typeof phina !== 'undefined') {
 
@@ -77,6 +79,14 @@ phina.namespace(function() {
       this.width = params.width;
       this.height = params.height;
 
+      if (params.fillStyle instanceof Vector3) {
+        this.fillStyle = `rgb(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},1)`;
+      } else if (params.fillStyle instanceof Vector4) {
+        this.fillStyle = `rgba(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},${params.fillStyle.w})`;
+      } else {
+        this.fillStyle = params.fillStyle;
+      }
+
       this.canvas2d = phina.graphics.Canvas();
       this.canvas2d.setSize(this.width, this.height);
 
@@ -85,7 +95,7 @@ phina.namespace(function() {
     },
 
     reset: function() {
-      this.canvas2d.clearColor('red', 0, 0, this.width, this.height);
+      this.canvas2d.clearColor(this.fillStyle, 0, 0, this.width, this.height);
       // this.canvas2d.clear(0, 0, this.width, this.height);
       /*
        this.canvas2d.init();

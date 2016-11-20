@@ -72,8 +72,8 @@ export default class GLBoostLowContext {
     return new Texture(this, src, parameters);
   }
 
-  createPhinaTexture(width, height, parameters = null) {
-    return new PhinaTexture(this, width, height, parameters);
+  createPhinaTexture(width, height, fillStyle, parameters = null) {
+    return new PhinaTexture(this, width, height, fillStyle, parameters);
   }
 
   /**

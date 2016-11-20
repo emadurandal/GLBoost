@@ -4,12 +4,13 @@ import GLExtensionsManager from '../core/GLExtensionsManager';
 import MiscUtil from '../misc/MiscUtil';
 
 export default class PhinaTexture extends Texture {
-  constructor(glBoostContext, width, height, parameters = null) {
+  constructor(glBoostContext, width, height, fillStyle, parameters = null) {
     super(glBoostContext, null, parameters);
     this._parameters['UNPACK_FLIP_Y_WEBGL'] = true;
 
     this._width = width;
     this._height = height;
+    this._fillStyle = fillStyle;
 
     this._phinaObjects = [];
     this._setUpOffscreen();
@@ -18,7 +19,8 @@ export default class PhinaTexture extends Texture {
   _setUpOffscreen() {
     this._offscreen = phina.display.OffScreenLayer({
       width: this.width,
-      height: this.height
+      height: this.height,
+      fillStyle: this._fillStyle
     });
 
     this._offscreen.reset();
