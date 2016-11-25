@@ -191,6 +191,11 @@
           return false;
         }
       }
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Vector4(this.x, this.y, this.z, this.w);
+      }
 
       /**
        * Zero Vector
@@ -704,10 +709,10 @@
     }, {
       key: 'readyForDiscard',
       value: function readyForDiscard() {
-        this._readyForDiscard = true;
         if (this._toRegister) {
           this._glBoostMonitor.deregisterGLBoostObject(this);
         }
+        this._readyForDiscard = true;
       }
     }, {
       key: 'belongingCanvasId',
@@ -1958,6 +1963,98 @@
 
   GLBoost$1['Matrix33'] = Matrix33;
 
+  var L_CameraController = function (_GLBoostObject) {
+    babelHelpers.inherits(L_CameraController, _GLBoostObject);
+
+    function L_CameraController(glBoostContext) {
+      var efficiency = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
+      babelHelpers.classCallCheck(this, L_CameraController);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_CameraController.__proto__ || Object.getPrototypeOf(L_CameraController)).call(this, glBoostContext));
+
+      _this._rot_x = 0;
+      _this._rot_y = 0;
+
+      _this._bgn_x = 0;
+      _this._bgn_y = 0;
+      _this._clickedMouseXOnCanvas = 0;
+      _this._clickedMouseYOnCanvas = 0;
+
+      _this._camaras = new Set();
+
+      _this._isKeyDown = false;
+
+      _this._efficiency = 0.5 * efficiency;
+
+      _this._onMouseDown = function (evt) {
+        var rect = evt.target.getBoundingClientRect();
+        _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+
+        _this._bgn_x = _this._rot_x;
+        _this._bgn_y = _this._rot_y;
+
+        _this._isKeyDown = true;
+      };
+
+      _this._onMouseUp = function (evt) {
+        _this._isKeyDown = false;
+      };
+
+      _this._onMouseMove = function (evt) {
+        if (!_this._isKeyDown) {
+          return;
+        }
+
+        var rect = evt.target.getBoundingClientRect();
+        var movedMouseXOnCanvas = evt.clientX - rect.left;
+        var movedMouseYOnCanvas = evt.clientY - rect.top;
+
+        // 回転角度を求める
+        _this._rot_y = _this._bgn_y - (movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
+        _this._rot_x = _this._bgn_x - (movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
+
+        // 回転角度が範囲内かチェック
+        if (90 < _this._rot_y) {
+          _this._rot_y = 90;
+        }
+        if (_this._rot_y < -90) {
+          _this._rot_y = -90;
+        }
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView();
+        });
+      };
+
+      _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
+      _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
+      _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
+      return _this;
+    }
+
+    babelHelpers.createClass(L_CameraController, [{
+      key: 'convert',
+      value: function convert(eyeVec, centerVec, upVec) {
+        var centerToEyeVec = Vector3.subtract(eyeVec, centerVec);
+        var rotateM_Y = Matrix33.rotateY(this._rot_x);
+        var rotateM_X = Matrix33.rotateX(this._rot_y);
+        var rotateM = rotateM_Y.multiply(rotateM_X);
+
+        var newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(centerVec);
+        var newCenterVec = centerVec;
+        var newUpVec = rotateM.multiplyVector(upVec);
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: 'addCamera',
+      value: function addCamera(camera) {
+        this._camaras.add(camera);
+      }
+    }]);
+    return L_CameraController;
+  }(GLBoostObject);
+
   var Matrix44 = function () {
     function Matrix44(m) {
       var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2803,11 +2900,27 @@
       _this._center = lookat.center;
       _this._up = lookat.up;
 
+      _this._cameraController = null;
+
       _this._dirtyView = true;
       return _this;
     }
 
     babelHelpers.createClass(L_AbstractCamera, [{
+      key: '_affectedByCameraController',
+      value: function _affectedByCameraController() {
+        if (this._cameraController !== null) {
+          var results = this._cameraController.convert(babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this), this._center, this._up);
+          this._translateInner = results[0];
+          this._centerInner = results[1];
+          this._upInner = results[2];
+        } else {
+          this._translateInner = babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this).clone();
+          this._centerInner = this._center.clone();
+          this._upInner = this._up.clone();
+        }
+      }
+    }, {
       key: '_needUpdateView',
       value: function _needUpdateView() {
         this._dirtyView = true;
@@ -2816,7 +2929,8 @@
       key: 'lookAtRHMatrix',
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
-          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this._translate, this._center, this._up);
+          this._affectedByCameraController();
+          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translate, this.center, this.up);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
@@ -2834,13 +2948,19 @@
         return this._mainCamera[scene.toString()] === this;
       }
     }, {
+      key: 'cameraController',
+      set: function set(controller) {
+        this._cameraController = controller;
+        controller.addCamera(this);
+      }
+    }, {
       key: 'translate',
       set: function set(vec) {
         babelHelpers.set(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
       get: function get() {
-        return babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this);
+        return this._translateInner;
       }
     }, {
       key: 'eye',
@@ -2849,7 +2969,7 @@
         this._needUpdateView();
       },
       get: function get() {
-        return this._translate;
+        return this._translateInner;
       }
     }, {
       key: 'center',
@@ -2861,7 +2981,7 @@
         this._needUpdateView();
       },
       get: function get() {
-        return this._center;
+        return this._centerInner;
       }
     }, {
       key: 'up',
@@ -2873,7 +2993,7 @@
         this._needUpdateView();
       },
       get: function get() {
-        return this._up;
+        return this._upInner;
       }
     }, {
       key: 'texture',
@@ -3470,8 +3590,8 @@
     }, {
       key: 'readyForDiscard',
       value: function readyForDiscard() {
-        babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
         this._glContext.deleteProgram(this, this._glslProgram);
+        babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
       }
     }, {
       key: 'dirty',
@@ -6851,6 +6971,11 @@
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
         return new L_OrthoCamera(this, true, lookat, ortho);
+      }
+    }, {
+      key: 'createCameraController',
+      value: function createCameraController(efficiency) {
+        return new L_CameraController(this, efficiency);
       }
     }, {
       key: 'createTexture',
