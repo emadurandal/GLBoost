@@ -18,6 +18,10 @@ export default class Vector4 {
     }
   }
 
+  clone() {
+    return new Vector4(this.x, this.y, this.z, this.w);
+  }
+
   /**
    * Zero Vector
    */

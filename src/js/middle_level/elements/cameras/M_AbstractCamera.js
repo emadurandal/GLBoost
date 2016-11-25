@@ -16,6 +16,10 @@ export default class M_AbstractCamera extends M_Element {
     this._texture = null; // for example, depth texture
   }
 
+  set cameraController(controller) {
+    this._lowLevelCamera.cameraController = controller;
+  }
+
   _needUpdateView() {
     this._lowLevelCamera._needUpdateView();
     this._updateCountAsCameraView++;

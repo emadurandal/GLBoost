@@ -5,6 +5,7 @@ import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import ClassicMaterial from '../ClassicMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
+import L_CameraController from '../aux/camera_controllers/L_CameraController'
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import PhinaTexture from '../textures/PhinaTexture';
@@ -66,6 +67,10 @@ export default class GLBoostLowContext {
 
   createOrthoCamera(lookat, ortho) {
     return new L_OrthoCamera(this, true, lookat, ortho);
+  }
+
+  createCameraController(efficiency) {
+    return new L_CameraController(this, efficiency);
   }
 
   createTexture(src, parameters = null) {

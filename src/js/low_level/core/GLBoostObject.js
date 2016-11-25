@@ -48,10 +48,10 @@ export default class GLBoostObject {
   }
 
   readyForDiscard() {
-    this._readyForDiscard = true;
     if (this._toRegister) {
       this._glBoostMonitor.deregisterGLBoostObject(this);
     }
+    this._readyForDiscard = true;
   }
 
   get isReadyForDiscard() {
