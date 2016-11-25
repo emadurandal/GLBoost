@@ -469,8 +469,8 @@ export default class Shader extends GLBoostObject {
   }
 
   readyForDiscard() {
-    super.readyForDiscard();
     this._glContext.deleteProgram(this, this._glslProgram);
+    super.readyForDiscard();
   }
 
 }
