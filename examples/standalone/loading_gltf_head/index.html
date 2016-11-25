@@ -59,6 +59,7 @@ var camera = glBoostContext.createPerspectiveCamera(
       zFar: 300.0
     }
 );
+camera.cameraController = glBoostContext.createCameraController();
 scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
@@ -84,7 +85,7 @@ promise.then(function(mesh) {
 
     var rotateMatrix = GLBoost.Matrix33.rotateY(-0.3);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+    //camera.eye = rotatedVector;
 
     requestAnimationFrame(render);
   };
