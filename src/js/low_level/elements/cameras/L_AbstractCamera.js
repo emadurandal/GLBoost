@@ -27,7 +27,7 @@ export default class L_AbstractCamera extends L_Element {
 
   _affectedByCameraController() {
     if (this._cameraController !== null) {
-      let results = this._cameraController.convert(super.translate,  this._center, this._up);
+      let results = this._cameraController.convert(this._translate, this._center, this._up);
       this._translateInner = results[0];
       this._centerInner = results[1];
       this._upInner = results[2];
@@ -38,14 +38,17 @@ export default class L_AbstractCamera extends L_Element {
     }
   }
 
-  _needUpdateView() {
+  _needUpdateView(withTryingResetOfCameraController = true) {
+    if (this._cameraController !== null && withTryingResetOfCameraController) {
+      this._cameraController.tryReset();
+    }
     this._dirtyView = true;
   }
 
   lookAtRHMatrix() {
     if (this._dirtyView) {
       this._affectedByCameraController();
-      this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translate, this.center, this.up);
+      this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translateInner, this.centerInner, this.upInner);
       this._dirtyView = false;
       return this._viewMatrix.clone();
     } else {
@@ -79,6 +82,10 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   get translate() {
+    return this._translate;
+  }
+
+  get translateInner() {
     return this._translateInner;
   }
 
@@ -88,6 +95,10 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   get eye() {
+    return this._translate;
+  }
+
+  get eyeInner() {
     return this._translateInner;
   }
 
@@ -100,6 +111,10 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   get center() {
+    return this._center;
+  }
+
+  get centerInner() {
     return this._centerInner;
   }
 
@@ -112,6 +127,10 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   get up() {
+    return this._up;
+  }
+
+  get upInner() {
     return this._upInner;
   }
 

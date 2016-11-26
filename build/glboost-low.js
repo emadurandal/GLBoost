@@ -217,6 +217,42 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
+  var MathUtil = function () {
+    function MathUtil() {
+      babelHelpers.classCallCheck(this, MathUtil);
+    }
+
+    babelHelpers.createClass(MathUtil, null, [{
+      key: 'radianToDegree',
+      value: function radianToDegree(rad) {
+        return rad * 180 / Math.PI;
+      }
+    }, {
+      key: 'degreeToRadian',
+      value: function degreeToRadian(deg) {
+        return deg * Math.PI / 180;
+      }
+    }, {
+      key: 'arrayToVector',
+      value: function arrayToVector(element) {
+        if (Array.isArray(element)) {
+          if (typeof element[3] !== 'undefined') {
+            return new Vector4(element[0], element[1], element[2], element[3]);
+          } else if (typeof element[2] !== 'undefined') {
+            return new Vector3(element[0], element[1], element[2]);
+          } else {
+            return new Vector2(element[0], element[1]);
+          }
+        } else {
+          return element;
+        }
+      }
+    }]);
+    return MathUtil;
+  }();
+
+  GLBoost$1["MathUtil"] = MathUtil;
+
   var Vector3 = function () {
     function Vector3(x, y, z) {
       babelHelpers.classCallCheck(this, Vector3);
@@ -481,6 +517,19 @@
       key: 'multiply',
       value: function multiply(vec3, val) {
         return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
+      }
+    }, {
+      key: 'angleOfVectors',
+      value: function angleOfVectors(lhv, rhv) {
+        var cos_sita = Vector3.dotProduct(lhv, rhv) / (lhv.length() * rhv.length());
+
+        var sita = Math.acos(cos_sita);
+
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          sita = MathUtil.radianToDegree(sita);
+        }
+
+        return sita;
       }
     }]);
     return Vector3;
@@ -1519,42 +1568,6 @@
     return PhinaTexture;
   }(Texture);
 
-  var MathUtil = function () {
-    function MathUtil() {
-      babelHelpers.classCallCheck(this, MathUtil);
-    }
-
-    babelHelpers.createClass(MathUtil, null, [{
-      key: 'radianToDegree',
-      value: function radianToDegree(rad) {
-        return rad * 180 / Math.PI;
-      }
-    }, {
-      key: 'degreeToRadian',
-      value: function degreeToRadian(deg) {
-        return deg * Math.PI / 180;
-      }
-    }, {
-      key: 'arrayToVector',
-      value: function arrayToVector(element) {
-        if (Array.isArray(element)) {
-          if (typeof element[3] !== 'undefined') {
-            return new Vector4(element[0], element[1], element[2], element[3]);
-          } else if (typeof element[2] !== 'undefined') {
-            return new Vector3(element[0], element[1], element[2]);
-          } else {
-            return new Vector2(element[0], element[1]);
-          }
-        } else {
-          return element;
-        }
-      }
-    }]);
-    return MathUtil;
-  }();
-
-  GLBoost$1["MathUtil"] = MathUtil;
-
   var Matrix33 = function () {
     function Matrix33(m) {
       var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -1967,64 +1980,83 @@
     babelHelpers.inherits(L_CameraController, _GLBoostObject);
 
     function L_CameraController(glBoostContext) {
-      var efficiency = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1.0;
+      var isSymmetryMode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var doResetWhenCameraSettingChanged = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var isForceGrab = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var efficiency = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1.0;
       babelHelpers.classCallCheck(this, L_CameraController);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (L_CameraController.__proto__ || Object.getPrototypeOf(L_CameraController)).call(this, glBoostContext));
 
-      _this._rot_x = 0;
-      _this._rot_y = 0;
+      _this._camaras = new Set();
+
+      _this._isKeyUp = true;
+      _this._isForceGrab = isForceGrab;
+      _this._isSymmetryMode = isSymmetryMode;
+
+      _this._efficiency = 0.5 * efficiency;
 
       _this._bgn_x = 0;
       _this._bgn_y = 0;
-      _this._clickedMouseXOnCanvas = 0;
+      _this._rot_x = 0;
+      _this._rot_y = 0;
       _this._clickedMouseYOnCanvas = 0;
+      _this._clickedMouseXOnCanvas = 0;
 
-      _this._camaras = new Set();
+      _this._verticalAngleOfVectors = 0;
 
-      _this._isKeyDown = false;
+      _this._verticalAngleThrethold = 90;
 
-      _this._efficiency = 0.5 * efficiency;
+      _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
       _this._onMouseDown = function (evt) {
         var rect = evt.target.getBoundingClientRect();
         _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
         _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
-
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
         _this._bgn_x = _this._rot_x;
         _this._bgn_y = _this._rot_y;
 
-        _this._isKeyDown = true;
+        _this._isKeyUp = false;
       };
 
       _this._onMouseUp = function (evt) {
-        _this._isKeyDown = false;
+        _this._isKeyUp = true;
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
       };
 
       _this._onMouseMove = function (evt) {
-        if (!_this._isKeyDown) {
+        if (_this._isKeyUp) {
           return;
         }
+        _this._isMouseMoving = true;
 
         var rect = evt.target.getBoundingClientRect();
-        var movedMouseXOnCanvas = evt.clientX - rect.left;
-        var movedMouseYOnCanvas = evt.clientY - rect.top;
+        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
-        // 回転角度を求める
-        _this._rot_y = _this._bgn_y - (movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
-        _this._rot_x = _this._bgn_x - (movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
+        // calc rotation angle
+        var delta_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
+        var delta_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
+        _this._rot_y = _this._bgn_y - delta_y;
+        _this._rot_x = _this._bgn_x - delta_x;
 
-        // 回転角度が範囲内かチェック
-        if (90 < _this._rot_y) {
-          _this._rot_y = 90;
+        // check if rotation angle is within range
+        if (_this._verticalAngleThrethold - _this._verticalAngleOfVectors < _this._rot_y) {
+          _this._rot_y = _this._verticalAngleThrethold + _this._verticalAngleOfVectors;
         }
-        if (_this._rot_y < -90) {
-          _this._rot_y = -90;
+
+        if (_this._rot_y < -_this._verticalAngleThrethold + _this._verticalAngleOfVectors) {
+          _this._rot_y = -_this._verticalAngleThrethold - _this._verticalAngleOfVectors;
         }
 
         _this._camaras.forEach(function (camera) {
-          camera._needUpdateView();
+          camera._needUpdateView(false);
         });
+
+        _this._isMouseMoving = false;
       };
 
       _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
@@ -2036,15 +2068,66 @@
     babelHelpers.createClass(L_CameraController, [{
       key: 'convert',
       value: function convert(eyeVec, centerVec, upVec) {
-        var centerToEyeVec = Vector3.subtract(eyeVec, centerVec);
-        var rotateM_Y = Matrix33.rotateY(this._rot_x);
-        var rotateM_X = Matrix33.rotateX(this._rot_y);
-        var rotateM = rotateM_Y.multiply(rotateM_X);
+        var newEyeVec = null;
+        var newCenterVec = null;
+        var newUpVec = null;
+        if (this._isKeyUp || !this._isForceGrab) {
+          this._eyeVec = eyeVec;
+          this._centerVec = centerVec;
+          this._upVec = upVec;
+        }
+        if (this._isSymmetryMode) {
+          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+          var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
+          var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
+          if (horizontalSign >= 0) {
+            horizontalSign = 1;
+          } else {
+            horizontalSign = -1;
+          }
+          horizontalAngleOfVectors *= horizontalSign;
+          var rotateM_Reset = Matrix33.rotateY(horizontalAngleOfVectors);
+          var rotateM_X = Matrix33.rotateX(this._rot_y);
+          var rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
+          var rotateM = rotateM_Revert.multiply(rotateM_Y.multiply(rotateM_X.multiply(rotateM_Reset)));
 
-        var newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(centerVec);
-        var newCenterVec = centerVec;
-        var newUpVec = rotateM.multiplyVector(upVec);
+          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec;
+          newUpVec = rotateM.multiplyVector(this._upVec);
+
+          var horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
+          this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
+          var verticalSign = Vector3.cross(horizonResetVec, new Vector3(0, 0, 1)).x;
+          if (verticalSign >= 0) {
+            verticalSign = 1;
+          } else {
+            verticalSign = -1;
+          }
+          this._verticalAngleOfVectors *= verticalSign;
+        } else {
+          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+          var _rotateM_X = Matrix33.rotateX(this._rot_y);
+          var _rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var _rotateM = _rotateM_Y.multiply(_rotateM_X);
+
+          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(centerVec);
+          newCenterVec = centerVec;
+          newUpVec = _rotateM.multiplyVector(this._upVec);
+        }
         return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: 'tryReset',
+      value: function tryReset() {
+        if (this._doResetWhenCameraSettingChanged) {
+          if (this._isKeyUp) {
+            this._rot_y = 0;
+            this._rot_x = 0;
+            this._bgn_y = 0;
+            this._bgn_x = 0;
+          }
+        }
       }
     }, {
       key: 'addCamera',
@@ -2910,7 +2993,7 @@
       key: '_affectedByCameraController',
       value: function _affectedByCameraController() {
         if (this._cameraController !== null) {
-          var results = this._cameraController.convert(babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this), this._center, this._up);
+          var results = this._cameraController.convert(this._translate, this._center, this._up);
           this._translateInner = results[0];
           this._centerInner = results[1];
           this._upInner = results[2];
@@ -2923,6 +3006,11 @@
     }, {
       key: '_needUpdateView',
       value: function _needUpdateView() {
+        var withTryingResetOfCameraController = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+        if (this._cameraController !== null && withTryingResetOfCameraController) {
+          this._cameraController.tryReset();
+        }
         this._dirtyView = true;
       }
     }, {
@@ -2930,7 +3018,7 @@
       value: function lookAtRHMatrix() {
         if (this._dirtyView) {
           this._affectedByCameraController();
-          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translate, this.center, this.up);
+          this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translateInner, this.centerInner, this.upInner);
           this._dirtyView = false;
           return this._viewMatrix.clone();
         } else {
@@ -2960,6 +3048,11 @@
         this._needUpdateView();
       },
       get: function get() {
+        return this._translate;
+      }
+    }, {
+      key: 'translateInner',
+      get: function get() {
         return this._translateInner;
       }
     }, {
@@ -2968,6 +3061,11 @@
         babelHelpers.set(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', vec, this);
         this._needUpdateView();
       },
+      get: function get() {
+        return this._translate;
+      }
+    }, {
+      key: 'eyeInner',
       get: function get() {
         return this._translateInner;
       }
@@ -2981,6 +3079,11 @@
         this._needUpdateView();
       },
       get: function get() {
+        return this._center;
+      }
+    }, {
+      key: 'centerInner',
+      get: function get() {
         return this._centerInner;
       }
     }, {
@@ -2992,6 +3095,11 @@
         this._up = vec;
         this._needUpdateView();
       },
+      get: function get() {
+        return this._up;
+      }
+    }, {
+      key: 'upInner',
       get: function get() {
         return this._upInner;
       }
@@ -6974,8 +7082,8 @@
       }
     }, {
       key: 'createCameraController',
-      value: function createCameraController(efficiency) {
-        return new L_CameraController(this, efficiency);
+      value: function createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
+        return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
       }
     }, {
       key: 'createTexture',

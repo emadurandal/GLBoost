@@ -1,5 +1,6 @@
 import GLBoost from './../../globals';
 import Vector4 from './Vector4';
+import MathUtil from './MathUtil';
 
 export default class Vector3 {
 
@@ -199,6 +200,18 @@ export default class Vector3 {
    */
   static multiply(vec3, val) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
+  }
+
+  static angleOfVectors(lhv, rhv) {
+    let cos_sita = Vector3.dotProduct(lhv, rhv) / ( lhv.length() * rhv.length() );
+
+    let sita = Math.acos(cos_sita);
+
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
+      sita = MathUtil.radianToDegree(sita);
+    }
+
+    return sita;
   }
 
   toVector4() {
