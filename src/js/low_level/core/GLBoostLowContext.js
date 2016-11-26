@@ -5,7 +5,7 @@ import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import ClassicMaterial from '../ClassicMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
-import L_CameraController from '../aux/camera_controllers/L_CameraController'
+import L_CameraController from '../auxiliaries/camera_controllers/L_CameraController'
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import PhinaTexture from '../textures/PhinaTexture';
