@@ -25,10 +25,12 @@ export default class L_CameraController extends GLBoostObject {
 
     this._verticalAngleThrethold = 90;
 
+    this._wheel_y = 1;
+
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
     this._onMouseDown = (evt)=>{
-      var rect = evt.target.getBoundingClientRect();
+      let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
       this._clickedMouseYOnCanvas = evt.clientY - rect.top;
       this._movedMouseYOnCanvas = -1;
@@ -37,6 +39,14 @@ export default class L_CameraController extends GLBoostObject {
       this._bgn_y = this._rot_y;
 
       this._isKeyUp = false;
+
+      if(typeof evt.buttons !== 'undefined'){
+        let data = evt.buttons;
+        let button_c = ((data & 0x0004) ? true : false);
+        if (button_c) {
+          this._wheel_y = 1;
+        }
+      }
     };
 
     this._onMouseUp = (evt)=>{
@@ -49,9 +59,16 @@ export default class L_CameraController extends GLBoostObject {
       if (this._isKeyUp) {
         return;
       }
-      this._isMouseMoving = true;
 
-      var rect = evt.target.getBoundingClientRect();
+      if(typeof evt.buttons !== 'undefined'){
+        let data = evt.buttons;
+        let button_l = ((data & 0x0001) ? true : false);
+        if (!button_l) {
+          return;
+        }
+      }
+
+      let rect = evt.target.getBoundingClientRect();
       this._movedMouseXOnCanvas = evt.clientX - rect.left;
       this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
@@ -74,12 +91,25 @@ export default class L_CameraController extends GLBoostObject {
         camera._needUpdateView(false);
       });
 
-      this._isMouseMoving = false;
+    };
+
+    this._onMouseWheel = (evt)=> {
+      evt.preventDefault();
+      this._wheel_y -= evt.deltaY/200;
+      this._wheel_y = Math.min(this._wheel_y, 3);
+      this._wheel_y = Math.max(this._wheel_y, 0.1);
+
+      this._camaras.forEach(function(camera) {
+        camera._needUpdateView(false);
+      });
     };
 
     this._glContext.canvas.addEventListener('mousedown', this._onMouseDown);
     this._glContext.canvas.addEventListener('mouseup', this._onMouseUp);
     this._glContext.canvas.addEventListener('mousemove', this._onMouseMove);
+    if(window.WheelEvent){
+      this._glContext.canvas.addEventListener("wheel" , this._onMouseWheel);
+    }
   }
 
   convert(eyeVec, centerVec, upVec) {
@@ -92,7 +122,7 @@ export default class L_CameraController extends GLBoostObject {
       this._upVec = upVec;
     }
     if (this._isSymmetryMode) {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
       let horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
       let horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
       if (horizontalSign >= 0) {
@@ -122,7 +152,7 @@ export default class L_CameraController extends GLBoostObject {
       this._verticalAngleOfVectors *= verticalSign;
 
     } else {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
       let rotateM_X = Matrix33.rotateX(this._rot_y);
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM = rotateM_Y.multiply(rotateM_X);

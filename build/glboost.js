@@ -7623,6 +7623,8 @@
 
       _this._verticalAngleThrethold = 90;
 
+      _this._wheel_y = 1;
+
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
       _this._onMouseDown = function (evt) {
@@ -7635,6 +7637,14 @@
         _this._bgn_y = _this._rot_y;
 
         _this._isKeyUp = false;
+
+        if (typeof evt.buttons !== 'undefined') {
+          var data = evt.buttons;
+          var button_c = data & 0x0004 ? true : false;
+          if (button_c) {
+            _this._wheel_y = 1;
+          }
+        }
       };
 
       _this._onMouseUp = function (evt) {
@@ -7647,7 +7657,14 @@
         if (_this._isKeyUp) {
           return;
         }
-        _this._isMouseMoving = true;
+
+        if (typeof evt.buttons !== 'undefined') {
+          var data = evt.buttons;
+          var button_l = data & 0x0001 ? true : false;
+          if (!button_l) {
+            return;
+          }
+        }
 
         var rect = evt.target.getBoundingClientRect();
         _this._movedMouseXOnCanvas = evt.clientX - rect.left;
@@ -7671,13 +7688,25 @@
         _this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);
         });
+      };
 
-        _this._isMouseMoving = false;
+      _this._onMouseWheel = function (evt) {
+        evt.preventDefault();
+        _this._wheel_y -= evt.deltaY / 200;
+        _this._wheel_y = Math.min(_this._wheel_y, 3);
+        _this._wheel_y = Math.max(_this._wheel_y, 0.1);
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
       };
 
       _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
       _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
       _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
+      if (window.WheelEvent) {
+        _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
+      }
       return _this;
     }
 
@@ -7693,7 +7722,7 @@
           this._upVec = upVec;
         }
         if (this._isSymmetryMode) {
-          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
           var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
           var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
           if (horizontalSign >= 0) {
@@ -7722,7 +7751,7 @@
           }
           this._verticalAngleOfVectors *= verticalSign;
         } else {
-          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec);
+          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
           var _rotateM_X = Matrix33.rotateX(this._rot_y);
           var _rotateM_Y = Matrix33.rotateY(this._rot_x);
           var _rotateM = _rotateM_Y.multiply(_rotateM_X);
