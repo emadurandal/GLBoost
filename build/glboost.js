@@ -770,6 +770,28 @@
         return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
       }
     }, {
+      key: 'toString',
+      value: function toString() {
+        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + '\n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + '\n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + '\n';
+      }
+    }, {
+      key: 'nearZeroToZero',
+      value: function nearZeroToZero(value) {
+        if (Math.abs(value) < 0.00001) {
+          value = 0;
+        } else if (0.99999 < value && value < 1.00001) {
+          value = 1;
+        } else if (-1.00001 < value && value < -0.99999) {
+          value = -1;
+        }
+        return value;
+      }
+    }, {
+      key: 'toStringApproximately',
+      value: function toStringApproximately() {
+        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + '\n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
+      }
+    }, {
       key: 'm00',
       set: function set(val) {
         this.m[0] = val;
@@ -7612,8 +7634,8 @@
 
       _this._efficiency = 0.5 * efficiency;
 
-      _this._bgn_x = 0;
-      _this._bgn_y = 0;
+      _this._rot_bgn_x = 0;
+      _this._rot_bgn_y = 0;
       _this._rot_x = 0;
       _this._rot_y = 0;
       _this._clickedMouseYOnCanvas = 0;
@@ -7624,6 +7646,15 @@
       _this._verticalAngleThrethold = 90;
 
       _this._wheel_y = 1;
+      _this._mouse_translate_y = 0;
+      _this._mouse_translate_x = 0;
+
+      _this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+      _this._rotateM_for_mouseTranslate_x = Matrix33.identity();
+      _this._rotateM_for_mouseTranslate_y = Matrix33.identity();
+
+      _this._newUpVec = new Vector3(0, 0, 0);
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -7633,8 +7664,8 @@
         _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
         _this._movedMouseYOnCanvas = -1;
         _this._movedMouseXOnCanvas = -1;
-        _this._bgn_x = _this._rot_x;
-        _this._bgn_y = _this._rot_y;
+        _this._rot_bgn_x = _this._rot_x;
+        _this._rot_bgn_y = _this._rot_y;
 
         _this._isKeyUp = false;
 
@@ -7644,7 +7675,11 @@
           if (button_c) {
             _this._wheel_y = 1;
           }
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
         }
+        return false;
       };
 
       _this._onMouseUp = function (evt) {
@@ -7658,23 +7693,43 @@
           return;
         }
 
+        var rect = evt.target.getBoundingClientRect();
+        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
+
         if (typeof evt.buttons !== 'undefined') {
           var data = evt.buttons;
           var button_l = data & 0x0001 ? true : false;
+          var button_r = data & 0x0002 ? true : false;
+          if (button_r) {
+            _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
+            _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
+
+            if (evt.shiftKey) {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y));
+            } else {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y));
+            }
+            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x));
+
+            _this._clickedMouseYOnCanvas = _this._movedMouseYOnCanvas;
+            _this._clickedMouseXOnCanvas = _this._movedMouseXOnCanvas;
+          }
+
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
+
           if (!button_l) {
             return;
           }
         }
 
-        var rect = evt.target.getBoundingClientRect();
-        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
-        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
-
         // calc rotation angle
         var delta_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
         var delta_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
-        _this._rot_y = _this._bgn_y - delta_y;
-        _this._rot_x = _this._bgn_x - delta_x;
+        _this._rot_y = _this._rot_bgn_y - delta_y;
+        _this._rot_x = _this._rot_bgn_x - delta_x;
 
         // check if rotation angle is within range
         if (_this._verticalAngleThrethold - _this._verticalAngleOfVectors < _this._rot_y) {
@@ -7701,12 +7756,36 @@
         });
       };
 
+      _this._onContexMenu = function (evt) {
+        if (evt.preventDefault) {
+          evt.preventDefault();
+        } else {
+          event.returnValue = false;
+        }
+      };
+
+      _this._onMouseDblClick = function (evt) {
+        if (evt.shiftKey) {
+          _this._mouseTranslateVec = new Vector3(0, 0, 0);
+        } else {
+          _this._rot_y = 0;
+          _this._rot_x = 0;
+          _this._rot_bgn_y = 0;
+          _this._rot_bgn_x = 0;
+        }
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
       _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
       _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
       _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
       if (window.WheelEvent) {
         _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
       }
+      _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
+      _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
       return _this;
     }
 
@@ -7735,11 +7814,17 @@
           var rotateM_X = Matrix33.rotateX(this._rot_y);
           var rotateM_Y = Matrix33.rotateY(this._rot_x);
           var rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
-          var rotateM = rotateM_Revert.multiply(rotateM_Y.multiply(rotateM_X.multiply(rotateM_Reset)));
+          var rotateM = Matrix33.multiply(rotateM_Revert, Matrix33.multiply(rotateM_Y, Matrix33.multiply(rotateM_X, rotateM_Reset)));
 
-          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
-          newCenterVec = this._centerVec;
           newUpVec = rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
 
           var horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
           this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
@@ -7756,9 +7841,15 @@
           var _rotateM_Y = Matrix33.rotateY(this._rot_x);
           var _rotateM = _rotateM_Y.multiply(_rotateM_X);
 
-          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(centerVec);
-          newCenterVec = centerVec;
           newUpVec = _rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
         }
         return [newEyeVec, newCenterVec, newUpVec];
       }
@@ -7769,8 +7860,8 @@
           if (this._isKeyUp) {
             this._rot_y = 0;
             this._rot_x = 0;
-            this._bgn_y = 0;
-            this._bgn_x = 0;
+            this._rot_bgn_y = 0;
+            this._rot_bgn_x = 0;
           }
         }
       }

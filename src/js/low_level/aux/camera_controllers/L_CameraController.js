@@ -3,7 +3,7 @@ import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 
 export default class L_CameraController extends GLBoostObject {
-  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0)  {
+  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
     super(glBoostContext);
 
     this._camaras = new Set();
@@ -14,8 +14,8 @@ export default class L_CameraController extends GLBoostObject {
 
     this._efficiency = 0.5 * efficiency;
 
-    this._bgn_x = 0;
-    this._bgn_y = 0;
+    this._rot_bgn_x = 0;
+    this._rot_bgn_y = 0;
     this._rot_x = 0;
     this._rot_y = 0;
     this._clickedMouseYOnCanvas = 0;
@@ -26,80 +26,136 @@ export default class L_CameraController extends GLBoostObject {
     this._verticalAngleThrethold = 90;
 
     this._wheel_y = 1;
+    this._mouse_translate_y = 0;
+    this._mouse_translate_x = 0;
+
+    this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+    this._rotateM_for_mouseTranslate_x = Matrix33.identity();
+    this._rotateM_for_mouseTranslate_y = Matrix33.identity();
+
+    this._newUpVec = new Vector3(0, 0, 0);
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
-    this._onMouseDown = (evt)=>{
+    this._onMouseDown = (evt) => {
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
       this._clickedMouseYOnCanvas = evt.clientY - rect.top;
       this._movedMouseYOnCanvas = -1;
       this._movedMouseXOnCanvas = -1;
-      this._bgn_x = this._rot_x;
-      this._bgn_y = this._rot_y;
+      this._rot_bgn_x = this._rot_x;
+      this._rot_bgn_y = this._rot_y;
 
       this._isKeyUp = false;
 
-      if(typeof evt.buttons !== 'undefined'){
+      if (typeof evt.buttons !== 'undefined') {
         let data = evt.buttons;
         let button_c = ((data & 0x0004) ? true : false);
         if (button_c) {
           this._wheel_y = 1;
         }
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
       }
+      return false;
     };
 
-    this._onMouseUp = (evt)=>{
+    this._onMouseUp = (evt) => {
       this._isKeyUp = true;
       this._movedMouseYOnCanvas = -1;
       this._movedMouseXOnCanvas = -1;
     };
 
-    this._onMouseMove = (evt)=>{
+    this._onMouseMove = (evt) => {
       if (this._isKeyUp) {
         return;
-      }
-
-      if(typeof evt.buttons !== 'undefined'){
-        let data = evt.buttons;
-        let button_l = ((data & 0x0001) ? true : false);
-        if (!button_l) {
-          return;
-        }
       }
 
       let rect = evt.target.getBoundingClientRect();
       this._movedMouseXOnCanvas = evt.clientX - rect.left;
       this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
+      if (typeof evt.buttons !== 'undefined') {
+        let data = evt.buttons;
+        let button_l = ((data & 0x0001) ? true : false);
+        let button_r = ((data & 0x0002) ? true : false);
+        if (button_r) {
+          this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
+          this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
+
+          if (evt.shiftKey) {
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y));
+          } else {
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y));
+          }
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x));
+
+          this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
+          this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
+        }
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+
+        if (!button_l) {
+          return;
+        }
+      }
+
+
       // calc rotation angle
       let delta_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) * this._efficiency;
       let delta_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) * this._efficiency;
-      this._rot_y = this._bgn_y - delta_y;
-      this._rot_x = this._bgn_x - delta_x;
+      this._rot_y = this._rot_bgn_y - delta_y;
+      this._rot_x = this._rot_bgn_x - delta_x;
 
       // check if rotation angle is within range
       if (this._verticalAngleThrethold - this._verticalAngleOfVectors < this._rot_y) {
         this._rot_y = this._verticalAngleThrethold + this._verticalAngleOfVectors;
       }
 
-      if (this._rot_y < -this._verticalAngleThrethold + this._verticalAngleOfVectors){
-        this._rot_y = - this._verticalAngleThrethold - this._verticalAngleOfVectors;
+      if (this._rot_y < -this._verticalAngleThrethold + this._verticalAngleOfVectors) {
+        this._rot_y = -this._verticalAngleThrethold - this._verticalAngleOfVectors;
       }
 
-      this._camaras.forEach(function(camera) {
+      this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
       });
 
     };
 
-    this._onMouseWheel = (evt)=> {
+    this._onMouseWheel = (evt) => {
       evt.preventDefault();
-      this._wheel_y -= evt.deltaY/200;
+      this._wheel_y -= evt.deltaY / 200;
       this._wheel_y = Math.min(this._wheel_y, 3);
       this._wheel_y = Math.max(this._wheel_y, 0.1);
 
-      this._camaras.forEach(function(camera) {
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+      });
+    };
+
+    this._onContexMenu = (evt) => {
+      if (evt.preventDefault) {
+        evt.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
+    };
+
+    this._onMouseDblClick = (evt) => {
+      if (evt.shiftKey) {
+          this._mouseTranslateVec = new Vector3(0, 0, 0);
+      } else {
+        this._rot_y = 0;
+        this._rot_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
+      }
+      this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
       });
     };
@@ -107,10 +163,14 @@ export default class L_CameraController extends GLBoostObject {
     this._glContext.canvas.addEventListener('mousedown', this._onMouseDown);
     this._glContext.canvas.addEventListener('mouseup', this._onMouseUp);
     this._glContext.canvas.addEventListener('mousemove', this._onMouseMove);
-    if(window.WheelEvent){
-      this._glContext.canvas.addEventListener("wheel" , this._onMouseWheel);
+    if (window.WheelEvent) {
+      this._glContext.canvas.addEventListener("wheel", this._onMouseWheel);
     }
+    this._glContext.canvas.addEventListener('contextmenu', this._onContexMenu, false);
+    this._glContext.canvas.addEventListener("dblclick", this._onMouseDblClick);
   }
+
+
 
   convert(eyeVec, centerVec, upVec) {
     let newEyeVec = null;
@@ -135,11 +195,17 @@ export default class L_CameraController extends GLBoostObject {
       let rotateM_X = Matrix33.rotateX(this._rot_y);
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
-      let rotateM = rotateM_Revert.multiply(rotateM_Y.multiply(rotateM_X.multiply(rotateM_Reset)));
+      let rotateM = Matrix33.multiply(rotateM_Revert, Matrix33.multiply(rotateM_Y, Matrix33.multiply(rotateM_X, rotateM_Reset)));
 
-      newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
-      newCenterVec = this._centerVec ;
       newUpVec = rotateM.multiplyVector(this._upVec);
+      this._newUpVec = newUpVec;
+      newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+      newCenterVec = this._centerVec.clone();
+      this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+      this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+      newEyeVec.add(this._mouseTranslateVec);
+      newCenterVec.add(this._mouseTranslateVec);
 
       let horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
       this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
@@ -157,9 +223,16 @@ export default class L_CameraController extends GLBoostObject {
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM = rotateM_Y.multiply(rotateM_X);
 
-      newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(centerVec);
-      newCenterVec = centerVec;
       newUpVec = rotateM.multiplyVector(this._upVec);
+      this._newUpVec = newUpVec;
+      newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+      newCenterVec = this._centerVec.clone();
+      this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+      this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+      newEyeVec.add(this._mouseTranslateVec);
+      newCenterVec.add(this._mouseTranslateVec);
+
     }
     return [newEyeVec, newCenterVec, newUpVec];
   }
@@ -169,8 +242,8 @@ export default class L_CameraController extends GLBoostObject {
       if (this._isKeyUp) {
         this._rot_y = 0;
         this._rot_x = 0;
-        this._bgn_y = 0;
-        this._bgn_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
       }
     }
 
