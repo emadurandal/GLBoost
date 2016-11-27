@@ -80,7 +80,6 @@
   };
 
   babelHelpers;
-
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -154,6 +153,7 @@
 
         //    shaderText += '  rt0 = vec4(1.0 - rt0.x, 1.0 - rt0.y, 1.0 - rt0.z, 1.0);\n';
 
+
         return shaderText;
       }
     }, {
@@ -181,7 +181,7 @@
     function MyCustomShader(glBoostContext, basicShader, ParticleShaderSource) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (MyCustomShader.__proto__ || Object.getPrototypeOf(MyCustomShader)).call(this, glBoostContext, basicShader));
 
       if (ParticleShaderSource) {
         MyCustomShader.mixin(ParticleShaderSource);
@@ -195,7 +195,7 @@
     babelHelpers.createClass(MyCustomShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         gl.uniform1f(glslProgram.time, this._time);
         gl.uniform1f(glslProgram.endHeight, -3.5);

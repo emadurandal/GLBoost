@@ -80,7 +80,6 @@
   };
 
   babelHelpers;
-
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -164,7 +163,7 @@
     function MyCustomShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (MyCustomShader.__proto__ || Object.getPrototypeOf(MyCustomShader)).call(this, glBoostContext, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
 
@@ -175,7 +174,7 @@
     babelHelpers.createClass(MyCustomShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         gl.uniform1f(glslProgram.time, this._time);
       }

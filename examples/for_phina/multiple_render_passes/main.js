@@ -12,30 +12,6 @@ var SCREEN_HEIGHT = 512;
 
 phina.globalize();
 
-
-class MyCustomShaderSource {
-
-  FSShade_MyCustomShaderSource(f, gl, lights) {
-    var shaderText = '';
-
-    shaderText += '  rt0 = vec4(rt0.x, rt0.y, rt0.z, 1.0);\n';
-    shaderText += '  rt1 = vec4(1.0 - rt0.x, 1.0 - rt0.y, 1.0 - rt0.z, 1.0);\n';
-
-    return shaderText;
-  }
-
-}
-
-
-class MyCustomShader extends GLBoost.DecalShader {
-  constructor(glBoostContext, basicShader) {
-    super(glBoostContext, basicShader);
-    MyCustomShader.mixin(MyCustomShaderSource);
-  }
-
-}
-
-
 phina.define('MainScene', {
   superClass: 'DisplayScene',
 
@@ -48,7 +24,7 @@ phina.define('MainScene', {
     }).addChildTo(this);
 
     var glBoostContext = layer.glBoostContext;
-    var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 2);
+    var renderTextures = glBoostContext.createTexturesForRenderTarget(SCREEN_WIDTH, SCREEN_HEIGHT, 1);
     var renderPasses = glBoostContext.createRenderPasses(2);
 
     var positions = [
@@ -88,21 +64,9 @@ phina.define('MainScene', {
       new GLBoost.Vector2(1.0, 0.0)
     ];
 
-    var camera = glBoostContext.createPerspectiveCamera({
-      eye: new GLBoost.Vector3(0.0, 0, 5.0),
-      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
-      up: new GLBoost.Vector3(0.0, 1.0, 0.0)
-    }, {
-      fovy: 45.0,
-      aspect: 1.0,
-      zNear: 0.1,
-      zFar: 1000.0
-    });
-
     var geometry = glBoostContext.createBlendShapeGeometry();
-    var texture = glBoostContext.createTexture('resources/texture.png');
+    var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/multiple_render_passes/resources/texture.png');
     var material = glBoostContext.createClassicMaterial();
-    material.shaderClass = MyCustomShader;
     material.diffuseTexture = texture;
     var mesh = glBoostContext.createMesh(geometry, material);
     geometry.setVerticesData({
@@ -112,29 +76,22 @@ phina.define('MainScene', {
       shapetarget_2: shapetarget_2
     });
     var scene = glBoostContext.createScene();
-    scene.addChild( camera );
     scene.addChild( mesh );
 
     renderPasses[0].setClearColor(new GLBoost.Vector4(0, 0, 0, 1));
     renderPasses[0].specifyRenderTargetTextures(renderTextures);
     renderPasses[0].scene = scene;
 
+    var geometry2 = glBoostContext.createGeometry();
+    var material2 = glBoostContext.createClassicMaterial();
+    material2.diffuseTexture = renderTextures[0];
+    var mesh2 = glBoostContext.createMesh(geometry2, material2);
+    geometry2.setVerticesData({
+      position: positions,
+      texcoord: texcoords
+    });
     var scene2 = glBoostContext.createScene();
-    scene2.addChild( camera );
-    var geometry2_1 = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
-    var material2_1 = glBoostContext.createClassicMaterial();
-    material2_1.diffuseTexture = renderTextures[0];
-    var mesh2_1 = glBoostContext.createMesh(geometry2_1, material2_1);
-    scene2.addChild( mesh2_1 );
-    mesh2_1.translate = new GLBoost.Vector3(-1, 0, 0);
-
-    var geometry2_2 = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
-    var material2_2 = glBoostContext.createClassicMaterial();
-    material2_2.diffuseTexture = renderTextures[1];
-    var mesh2_2 = glBoostContext.createMesh(geometry2_2, material2_2);
-    scene2.addChild( mesh2_2 );
-
-    mesh2_2.translate = new GLBoost.Vector3(1, 0, 0);
+    scene2.addChild( mesh2 );
 
     renderPasses[1].setClearColor(new GLBoost.Vector4(1, 0, 0, 1));
     renderPasses[1].scene = scene2;
@@ -142,7 +99,6 @@ phina.define('MainScene', {
     layer.expression.clearRenderPasses();
     layer.expression.addRenderPasses(renderPasses);
     layer.expression.prepareToRender();
-
 
     var label = Label('phina.jsとGLBoostの\n夢の共演！').addChildTo(this);
     label.fill = 'white';
@@ -160,14 +116,9 @@ phina.define('MainScene', {
       .to({blendWeight_1: 0.0}, 500, 'easeInOutBack')
       .to({blendWeight_2: 0.0}, 500, 'easeOutCirc')
       .setLoop(true);
-
-    let angleDelta = 0;
-    layer.update = function(app){
+    
+    layer.update= function(app){
       tweener.update(app);
-      mesh2_1.rotate = new GLBoost.Vector3(0, angleDelta, 0);
-      mesh2_2.rotate = new GLBoost.Vector3(0, angleDelta, 0);
-
-      angleDelta += 1.0;
     };
   }
 });
@@ -181,3 +132,4 @@ phina.main(function() {
 
   app.run();
 });
+

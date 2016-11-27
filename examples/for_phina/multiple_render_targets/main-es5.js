@@ -55,7 +55,6 @@
   };
 
   babelHelpers;
-
   var arg = new Object();
   var pair = location.search.substring(1).split('&');
   for (var i = 0; pair[i]; i++) {
@@ -95,7 +94,7 @@
     function MyCustomShader(glBoostContext, basicShader) {
       babelHelpers.classCallCheck(this, MyCustomShader);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, Object.getPrototypeOf(MyCustomShader).call(this, glBoostContext, basicShader));
+      var _this = babelHelpers.possibleConstructorReturn(this, (MyCustomShader.__proto__ || Object.getPrototypeOf(MyCustomShader)).call(this, glBoostContext, basicShader));
 
       MyCustomShader.mixin(MyCustomShaderSource);
       return _this;
@@ -136,7 +135,7 @@
       });
 
       var geometry = glBoostContext.createBlendShapeGeometry();
-      var texture = glBoostContext.createTexture('resources/texture.png');
+      var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/multiple_render_targets/resources/texture.png');
       var material = glBoostContext.createClassicMaterial();
       material.shaderClass = MyCustomShader;
       material.diffuseTexture = texture;
