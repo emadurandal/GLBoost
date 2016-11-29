@@ -45,20 +45,29 @@ export default class M_Mesh extends M_Element {
   bakeTransformToGeometry() {
     var positions = this._geometry._vertices.position;
     var mat = this.transformMatrixAccumulatedAncestry;
-    for (let i=0; i<positions.length; i++) {
-      let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
+    let componentN = this._geometry._vertices.components.position;
+    let length = positions.length / componentN;
+    for (let i=0; i<length; i++) {
+      let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
       let transformedPosVec = mat.multiplyVector(posVector4);
-      positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
+      positions[i*componentN] = transformedPosVec.x;
+      positions[i*componentN+1] = transformedPosVec.y;
+      positions[i*componentN+2] = transformedPosVec.z;
+      if (componentN > 3) {
+        positions[i * componentN+3] = transformedPosVec.w;
+      }
     }
     this._geometry._vertices.position = positions;
 
-
     if (this._geometry._vertices.normal) {
       var normals = this._geometry._vertices.normal;
-      for (let i=0; i<normals.length; i++) {
-        let normalVector3 = normals[i];
+      length = normals.length / 3;
+      for (let i=0; i<length; i++) {
+        let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
         let transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
-        normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+        normals[i*3] = transformedNormalVec.x;
+        normals[i*3+1] = transformedNormalVec.y;
+        normals[i*3+2] = transformedNormalVec.z;
       }
       this._geometry._vertices.normal = normals;
     }
@@ -68,20 +77,30 @@ export default class M_Mesh extends M_Element {
   bakeInverseTransformToGeometry() {
     var positions = this._geometry._vertices.position;
     var invMat = this.inverseTransformMatrixAccumulatedAncestry;
-    for (let i=0; i<positions.length; i++) {
-      let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
+    let componentN = this._geometry._vertices.components.position;
+    let length = positions.length / componentN;
+    for (let i=0; i<length; i++) {
+      let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
       let transformedPosVec = invMat.multiplyVector(posVector4);
-      positions[i] = new Vector3(transformedPosVec.x, transformedPosVec.y, transformedPosVec.z);
+      positions[i*componentN] = transformedPosVec.x;
+      positions[i*componentN+1] = transformedPosVec.y;
+      positions[i*componentN+2] = transformedPosVec.z;
+      if (componentN > 3) {
+        positions[i * componentN+3] = transformedPosVec.w;
+      }
     }
     this._geometry._vertices.position = positions;
 
     let mat = this.transformMatrixAccumulatedAncestry;
     if (this._geometry._vertices.normal) {
       var normals = this._geometry._vertices.normal;
-      for (let i=0; i<normals.length; i++) {
-        let normalVector3 = normals[i];
+      length = normals.length / 3;
+      for (let i=0; i<length; i++) {
+        let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
         let transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
-        normals[i] = new Vector3(transformedNormalVec.x, transformedNormalVec.y, transformedNormalVec.z);
+        normals[i*3] = transformedNormalVec.x;
+        normals[i*3+1] = transformedNormalVec.y;
+        normals[i*3+2] = transformedNormalVec.z;
       }
       this._geometry._vertices.normal = normals;
     }
@@ -102,9 +121,15 @@ export default class M_Mesh extends M_Element {
       this.bakeTransformToGeometry();
 
       let meshes = meshOrMeshes;
+      let geometries = [];
       for (let i=0; i<meshes.length; i++) {
         meshes[i].bakeTransformToGeometry();
-        this.geometry.merge(meshes[i].geometry);
+        geometries.push(meshes[i].geometry);
+      }
+
+      this.geometry.merge(geometries);
+
+      for (let i=0; i<meshes.length; i++) {
         delete meshes[i];
       }
 
@@ -131,9 +156,15 @@ export default class M_Mesh extends M_Element {
       this.bakeTransformToGeometry();
 
       let meshes = meshOrMeshes;
+      let geometries = [];
       for (let i=0; i<meshes.length; i++) {
         meshes[i].bakeTransformToGeometry();
-        this.geometry.mergeHarder(meshes[i].geometry);
+        geometries.push(meshes[i].geometry);
+      }
+
+      this.geometry.mergeHarder(geometries);
+
+      for (let i=0; i<meshes.length; i++) {
         delete meshes[i];
       }
 

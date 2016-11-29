@@ -36,8 +36,10 @@ export default class DrawKickerWorld {
 
       if (!isVAOBound) {
         if (DrawKickerWorld._lastGeometry !== geometryName) {
-          gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[geometryName]);
-          geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+          for (let attribName in vboDic) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
+            geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+          }
         }
       }
 
@@ -119,7 +121,7 @@ export default class DrawKickerWorld {
       DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+  //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     DrawKickerWorld._lastGeometry = geometryName;

@@ -172,6 +172,436 @@
 
   GLBoost$1["Vector2"] = Vector2;
 
+  var Matrix33 = function () {
+    function Matrix33(m) {
+      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      babelHelpers.classCallCheck(this, Matrix33);
+
+      this.m = new Float32Array(9);
+      if (arguments.length >= 9) {
+        if (isColumnMajor === true) {
+          var _m = arguments;
+          this.setComponents(_m[0], _m[3], _m[6], _m[1], _m[4], _m[7], _m[2], _m[5], _m[8]);
+        } else {
+          this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else {
+        this.identity();
+      }
+    }
+
+    babelHelpers.createClass(Matrix33, [{
+      key: 'setComponents',
+      value: function setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
+        this.m00 = m00;this.m01 = m01;this.m02 = m02;
+        this.m10 = m10;this.m11 = m11;this.m12 = m12;
+        this.m20 = m20;this.m21 = m21;this.m22 = m22;
+
+        return this;
+      }
+
+      /**
+       * 単位行列にする
+       */
+
+    }, {
+      key: 'identity',
+      value: function identity() {
+        this.setComponents(1, 0, 0, 0, 1, 0, 0, 0, 1);
+        return this;
+      }
+
+      /**
+       * 単位行列にする（static版）
+       */
+
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Matrix33(this.m[0], this.m[3], this.m[6], this.m[1], this.m[4], this.m[7], this.m[2], this.m[5], this.m[8]);
+      }
+
+      /**
+       * Create X oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'rotateX',
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(1, 0, 0, 0, cos, -sin, 0, sin, cos);
+      }
+      /**
+       * Create X oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'rotateY',
+
+
+      /**
+       * Create Y oriented Rotation Matrix
+       */
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        this.setComponents(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
+        return this;
+      }
+      /**
+       * Create Y oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'rotateZ',
+
+
+      /**
+       * Create Z oriented Rotation Matrix
+       */
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+      }
+      /**
+       * Create Z oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'zero',
+
+
+      /**
+       * ゼロ行列
+       */
+      value: function zero() {
+        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        return this;
+      }
+    }, {
+      key: 'flatten',
+      value: function flatten() {
+        return this.m;
+      }
+    }, {
+      key: 'flattenAsArray',
+      value: function flattenAsArray() {
+        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8]];
+      }
+    }, {
+      key: '_swap',
+      value: function _swap(l, r) {
+        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
+      }
+
+      /**
+       * 転置
+       */
+
+    }, {
+      key: 'transpose',
+      value: function transpose() {
+        this._swap(1, 3);
+        this._swap(2, 6);
+        this._swap(5, 8);
+
+        return this;
+      }
+
+      /**
+       * 転置（static版）
+       */
+
+    }, {
+      key: 'multiplyVector',
+      value: function multiplyVector(vec) {
+        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z;
+        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z;
+        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z;
+
+        return new Vector3(x, y, z);
+      }
+
+      /**
+       * 行列同士の乗算
+       */
+
+    }, {
+      key: 'multiply',
+      value: function multiply(mat) {
+        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20;
+        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21;
+        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22;
+
+        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20;
+        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21;
+        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22;
+
+        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20;
+        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21;
+        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22;
+
+        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+      }
+
+      /**
+       * 行列同士の乗算（static版）
+       */
+
+    }, {
+      key: 'determinant',
+      value: function determinant() {
+        return this.m00 * this.m11 * this.m22 + this.m10 * this.m21 * this.m02 + this.m20 * this.m01 * this.m12 - this.m00 * this.m21 * this.m12 - this.m20 * this.m11 * this.m02 - this.m10 * this.m01 * this.m22;
+      }
+    }, {
+      key: 'invert',
+      value: function invert() {
+        var det = this.determinant();
+        var m00 = (this.m11 * this.m22 - this.m12 * this.m21) / det;
+        var m01 = (this.m02 * this.m21 - this.m01 * this.m22) / det;
+        var m02 = (this.m01 * this.m12 - this.m02 * this.m11) / det;
+        var m10 = (this.m12 * this.m20 - this.m10 * this.m22) / det;
+        var m11 = (this.m00 * this.m22 - this.m02 * this.m20) / det;
+        var m12 = (this.m02 * this.m10 - this.m00 * this.m12) / det;
+        var m20 = (this.m10 * this.m21 - this.m11 * this.m20) / det;
+        var m21 = (this.m01 * this.m20 - this.m00 * this.m21) / det;
+        var m22 = (this.m00 * this.m11 - this.m01 * this.m10) / det;
+
+        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + '\n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + '\n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + '\n';
+      }
+    }, {
+      key: 'nearZeroToZero',
+      value: function nearZeroToZero(value) {
+        if (Math.abs(value) < 0.00001) {
+          value = 0;
+        } else if (0.99999 < value && value < 1.00001) {
+          value = 1;
+        } else if (-1.00001 < value && value < -0.99999) {
+          value = -1;
+        }
+        return value;
+      }
+    }, {
+      key: 'toStringApproximately',
+      value: function toStringApproximately() {
+        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + '\n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
+      }
+    }, {
+      key: 'm00',
+      set: function set(val) {
+        this.m[0] = val;
+      },
+      get: function get() {
+        return this.m[0];
+      }
+    }, {
+      key: 'm10',
+      set: function set(val) {
+        this.m[1] = val;
+      },
+      get: function get() {
+        return this.m[1];
+      }
+    }, {
+      key: 'm20',
+      set: function set(val) {
+        this.m[2] = val;
+      },
+      get: function get() {
+        return this.m[2];
+      }
+    }, {
+      key: 'm01',
+      set: function set(val) {
+        this.m[3] = val;
+      },
+      get: function get() {
+        return this.m[3];
+      }
+    }, {
+      key: 'm11',
+      set: function set(val) {
+        this.m[4] = val;
+      },
+      get: function get() {
+        return this.m[4];
+      }
+    }, {
+      key: 'm21',
+      set: function set(val) {
+        this.m[5] = val;
+      },
+      get: function get() {
+        return this.m[5];
+      }
+    }, {
+      key: 'm02',
+      set: function set(val) {
+        this.m[6] = val;
+      },
+      get: function get() {
+        return this.m[6];
+      }
+    }, {
+      key: 'm12',
+      set: function set(val) {
+        this.m[7] = val;
+      },
+      get: function get() {
+        return this.m[7];
+      }
+    }, {
+      key: 'm22',
+      set: function set(val) {
+        this.m[8] = val;
+      },
+      get: function get() {
+        return this.m[8];
+      }
+    }], [{
+      key: 'identity',
+      value: function identity() {
+        return new Matrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'rotateX',
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix33(1, 0, 0, 0, cos, -sin, 0, sin, cos);
+      }
+    }, {
+      key: 'rotateY',
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix33(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
+      }
+    }, {
+      key: 'rotateZ',
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix33(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'zero',
+      value: function zero() {
+        return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
+      }
+    }, {
+      key: 'transpose',
+      value: function transpose(mat) {
+
+        var mat_t = new Matrix33(mat.m00, mat.m10, mat.m20, mat.m01, mat.m11, mat.m21, mat.m02, mat.m12, mat.m22);
+
+        return mat_t;
+      }
+    }, {
+      key: 'multiply',
+      value: function multiply(l_m, r_m) {
+        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20;
+        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20;
+        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20;
+
+        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21;
+        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21;
+        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21;
+
+        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22;
+        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22;
+        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22;
+
+        return new Matrix33(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+      }
+    }, {
+      key: 'determinant',
+      value: function determinant(mat) {
+        return mat.m00 * mat.m11 * mat.m22 + mat.m10 * mat.m21 * mat.m02 + mat.m20 * mat.m01 * mat.m12 - mat.m00 * mat.m21 * mat.m12 - mat.m20 * mat.m11 * mat.m02 - mat.m10 * mat.m01 * mat.m22;
+      }
+    }, {
+      key: 'invert',
+      value: function invert(mat) {
+        var det = mat.determinant();
+        var m00 = (mat.m11 * mat.m22 - mat.m12 * mat.m21) / det;
+        var m01 = (mat.m02 * mat.m21 - mat.m01 * mat.m22) / det;
+        var m02 = (mat.m01 * mat.m12 - mat.m02 * mat.m11) / det;
+        var m10 = (mat.m12 * mat.m20 - mat.m10 * mat.m22) / det;
+        var m11 = (mat.m00 * mat.m22 - mat.m02 * mat.m20) / det;
+        var m12 = (mat.m02 * mat.m10 - mat.m00 * mat.m12) / det;
+        var m20 = (mat.m10 * mat.m21 - mat.m11 * mat.m20) / det;
+        var m21 = (mat.m01 * mat.m20 - mat.m00 * mat.m21) / det;
+        var m22 = (mat.m00 * mat.m11 - mat.m01 * mat.m10) / det;
+
+        return new Matrix33(m00, m01, m02, m10, m11, m12, m20, m21, m22);
+      }
+    }]);
+    return Matrix33;
+  }();
+
+  GLBoost$1['Matrix33'] = Matrix33;
+
   var Vector4 = function () {
     function Vector4(x, y, z, w) {
       babelHelpers.classCallCheck(this, Vector4);
@@ -217,6 +647,703 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
+  var Matrix44 = function () {
+    function Matrix44(m) {
+      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      babelHelpers.classCallCheck(this, Matrix44);
+
+      this.m = new Float32Array(16);
+      if (arguments.length >= 16) {
+        if (isColumnMajor === true) {
+          var _m = arguments;
+          this.setComponents(_m[0], _m[4], _m[8], _m[12], _m[1], _m[5], _m[9], _m[13], _m[2], _m[6], _m[10], _m[14], _m[3], _m[7], _m[11], _m[15]);
+        } else {
+          this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        if (isColumnMajor === true) {
+          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else {
+        this.identity();
+      }
+    }
+
+    babelHelpers.createClass(Matrix44, [{
+      key: 'setComponents',
+      value: function setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+        this.m00 = m00;this.m01 = m01;this.m02 = m02;this.m03 = m03;
+        this.m10 = m10;this.m11 = m11;this.m12 = m12;this.m13 = m13;
+        this.m20 = m20;this.m21 = m21;this.m22 = m22;this.m23 = m23;
+        this.m30 = m30;this.m31 = m31;this.m32 = m32;this.m33 = m33;
+
+        return this;
+      }
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Matrix44(this.m[0], this.m[4], this.m[8], this.m[12], this.m[1], this.m[5], this.m[9], this.m[13], this.m[2], this.m[6], this.m[10], this.m[14], this.m[3], this.m[7], this.m[11], this.m[15]);
+      }
+
+      /**
+       * 単位行列にする
+       */
+
+    }, {
+      key: 'identity',
+      value: function identity() {
+        this.setComponents(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        return this;
+      }
+
+      /**
+       * 単位行列にする（static版）
+       */
+
+    }, {
+      key: 'translate',
+      value: function translate(vec) {
+        return this.setComponents(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'scale',
+      value: function scale(vec) {
+        return this.setComponents(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'rotateX',
+
+
+      /**
+       * Create X oriented Rotation Matrix
+       */
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
+      }
+      /**
+       * Create X oriented Rotation Matrix
+      */
+
+    }, {
+      key: 'rotateY',
+
+
+      /**
+       * Create Y oriented Rotation Matrix
+       */
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
+      }
+      /**
+       * Create Y oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'rotateZ',
+
+
+      /**
+       * Create Z oriented Rotation Matrix
+       */
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return this.setComponents(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+      }
+      /**
+       * Create Z oriented Rotation Matrix
+       */
+
+    }, {
+      key: 'zero',
+
+
+      /**
+       * ゼロ行列
+       */
+      value: function zero() {
+        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        return this;
+      }
+    }, {
+      key: 'flatten',
+      value: function flatten() {
+        return this.m;
+      }
+    }, {
+      key: 'flattenAsArray',
+      value: function flattenAsArray() {
+        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8], this.m[9], this.m[10], this.m[11], this.m[12], this.m[13], this.m[14], this.m[15]];
+      }
+    }, {
+      key: '_swap',
+      value: function _swap(l, r) {
+        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
+      }
+
+      /**
+       * 転置
+       */
+
+    }, {
+      key: 'transpose',
+      value: function transpose() {
+        this._swap(1, 4);
+        this._swap(2, 8);
+        this._swap(3, 12);
+        this._swap(6, 9);
+        this._swap(7, 13);
+        this._swap(11, 14);
+
+        return this;
+      }
+
+      /**
+       * 転置（static版）
+       */
+
+    }, {
+      key: 'multiplyVector',
+      value: function multiplyVector(vec) {
+        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z + this.m03 * vec.w;
+        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z + this.m13 * vec.w;
+        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
+        var w = this.m30 * vec.x + this.m31 * vec.y + this.m32 * vec.z + this.m33 * vec.w;
+
+        return new Vector4(x, y, z, w);
+      }
+
+      /**
+       * 行列同士の乗算
+       */
+
+    }, {
+      key: 'multiply',
+      value: function multiply(mat) {
+        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20 + this.m03 * mat.m30;
+        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21 + this.m03 * mat.m31;
+        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22 + this.m03 * mat.m32;
+        var m03 = this.m00 * mat.m03 + this.m01 * mat.m13 + this.m02 * mat.m23 + this.m03 * mat.m33;
+
+        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20 + this.m13 * mat.m30;
+        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21 + this.m13 * mat.m31;
+        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22 + this.m13 * mat.m32;
+        var m13 = this.m10 * mat.m03 + this.m11 * mat.m13 + this.m12 * mat.m23 + this.m13 * mat.m33;
+
+        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20 + this.m23 * mat.m30;
+        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21 + this.m23 * mat.m31;
+        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22 + this.m23 * mat.m32;
+        var m23 = this.m20 * mat.m03 + this.m21 * mat.m13 + this.m22 * mat.m23 + this.m23 * mat.m33;
+
+        var m30 = this.m30 * mat.m00 + this.m31 * mat.m10 + this.m32 * mat.m20 + this.m33 * mat.m30;
+        var m31 = this.m30 * mat.m01 + this.m31 * mat.m11 + this.m32 * mat.m21 + this.m33 * mat.m31;
+        var m32 = this.m30 * mat.m02 + this.m31 * mat.m12 + this.m32 * mat.m22 + this.m33 * mat.m32;
+        var m33 = this.m30 * mat.m03 + this.m31 * mat.m13 + this.m32 * mat.m23 + this.m33 * mat.m33;
+
+        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
+
+      /**
+       * 行列同士の乗算（static版）
+       */
+
+    }, {
+      key: 'toMatrix33',
+      value: function toMatrix33() {
+        return new Matrix33(this.m00, this.m01, this.m02, this.m10, this.m11, this.m12, this.m20, this.m21, this.m22);
+      }
+    }, {
+      key: 'determinant',
+      value: function determinant() {
+        return this.m00 * this.m11 * this.m22 * this.m33 + this.m00 * this.m12 * this.m23 * this.m31 + this.m00 * this.m13 * this.m21 * this.m32 + this.m01 * this.m10 * this.m23 * this.m32 + this.m01 * this.m12 * this.m20 * this.m33 + this.m01 * this.m13 * this.m22 * this.m30 + this.m02 * this.m10 * this.m21 * this.m33 + this.m02 * this.m11 * this.m23 * this.m30 + this.m02 * this.m13 * this.m20 * this.m31 + this.m03 * this.m10 * this.m22 * this.m31 + this.m03 * this.m11 * this.m20 * this.m32 + this.m03 * this.m12 * this.m21 * this.m30 - this.m00 * this.m11 * this.m23 * this.m32 - this.m00 * this.m12 * this.m21 * this.m33 - this.m00 * this.m13 * this.m22 * this.m31 - this.m01 * this.m10 * this.m22 * this.m33 - this.m01 * this.m12 * this.m23 * this.m30 - this.m01 * this.m13 * this.m20 * this.m32 - this.m02 * this.m10 * this.m23 * this.m31 - this.m02 * this.m11 * this.m20 * this.m33 - this.m02 * this.m13 * this.m21 * this.m30 - this.m03 * this.m10 * this.m21 * this.m32 - this.m03 * this.m11 * this.m22 * this.m30 - this.m03 * this.m12 * this.m20 * this.m31;
+      }
+    }, {
+      key: 'invert',
+      value: function invert() {
+        var det = this.determinant();
+        var m00 = (this.m11 * this.m22 * this.m33 + this.m12 * this.m23 * this.m31 + this.m13 * this.m21 * this.m32 - this.m11 * this.m23 * this.m32 - this.m12 * this.m21 * this.m33 - this.m13 * this.m22 * this.m31) / det;
+        var m01 = (this.m01 * this.m23 * this.m32 + this.m02 * this.m21 * this.m33 + this.m03 * this.m22 * this.m31 - this.m01 * this.m22 * this.m33 - this.m02 * this.m23 * this.m31 - this.m03 * this.m21 * this.m32) / det;
+        var m02 = (this.m01 * this.m12 * this.m33 + this.m02 * this.m13 * this.m31 + this.m03 * this.m11 * this.m32 - this.m01 * this.m13 * this.m32 - this.m02 * this.m11 * this.m33 - this.m03 * this.m12 * this.m31) / det;
+        var m03 = (this.m01 * this.m13 * this.m22 + this.m02 * this.m11 * this.m23 + this.m03 * this.m12 * this.m21 - this.m01 * this.m12 * this.m23 - this.m02 * this.m13 * this.m21 - this.m03 * this.m11 * this.m22) / det;
+        var m10 = (this.m10 * this.m23 * this.m32 + this.m12 * this.m20 * this.m33 + this.m13 * this.m22 * this.m30 - this.m10 * this.m22 * this.m33 - this.m12 * this.m23 * this.m30 - this.m13 * this.m20 * this.m32) / det;
+        var m11 = (this.m00 * this.m22 * this.m33 + this.m02 * this.m23 * this.m30 + this.m03 * this.m20 * this.m32 - this.m00 * this.m23 * this.m32 - this.m02 * this.m20 * this.m33 - this.m03 * this.m22 * this.m30) / det;
+        var m12 = (this.m00 * this.m13 * this.m32 + this.m02 * this.m10 * this.m33 + this.m03 * this.m12 * this.m30 - this.m00 * this.m12 * this.m33 - this.m02 * this.m13 * this.m30 - this.m03 * this.m10 * this.m32) / det;
+        var m13 = (this.m00 * this.m12 * this.m23 + this.m02 * this.m13 * this.m20 + this.m03 * this.m10 * this.m22 - this.m00 * this.m13 * this.m22 - this.m02 * this.m10 * this.m23 - this.m03 * this.m12 * this.m20) / det;
+        var m20 = (this.m10 * this.m21 * this.m33 + this.m11 * this.m23 * this.m30 + this.m13 * this.m20 * this.m31 - this.m10 * this.m23 * this.m31 - this.m11 * this.m20 * this.m33 - this.m13 * this.m21 * this.m30) / det;
+        var m21 = (this.m00 * this.m23 * this.m31 + this.m01 * this.m20 * this.m33 + this.m03 * this.m21 * this.m30 - this.m00 * this.m21 * this.m33 - this.m01 * this.m23 * this.m30 - this.m03 * this.m20 * this.m31) / det;
+        var m22 = (this.m00 * this.m11 * this.m33 + this.m01 * this.m13 * this.m30 + this.m03 * this.m10 * this.m31 - this.m00 * this.m13 * this.m31 - this.m01 * this.m10 * this.m33 - this.m03 * this.m11 * this.m30) / det;
+        var m23 = (this.m00 * this.m13 * this.m21 + this.m01 * this.m10 * this.m23 + this.m03 * this.m11 * this.m20 - this.m00 * this.m11 * this.m23 - this.m01 * this.m13 * this.m20 - this.m03 * this.m10 * this.m21) / det;
+        var m30 = (this.m10 * this.m22 * this.m31 + this.m11 * this.m20 * this.m32 + this.m12 * this.m21 * this.m30 - this.m10 * this.m21 * this.m32 - this.m11 * this.m22 * this.m30 - this.m12 * this.m20 * this.m31) / det;
+        var m31 = (this.m00 * this.m21 * this.m32 + this.m01 * this.m22 * this.m30 + this.m02 * this.m20 * this.m31 - this.m00 * this.m22 * this.m31 - this.m01 * this.m20 * this.m32 - this.m02 * this.m21 * this.m30) / det;
+        var m32 = (this.m00 * this.m12 * this.m31 + this.m01 * this.m10 * this.m32 + this.m02 * this.m11 * this.m30 - this.m00 * this.m11 * this.m32 - this.m01 * this.m12 * this.m30 - this.m02 * this.m10 * this.m31) / det;
+        var m33 = (this.m00 * this.m11 * this.m22 + this.m01 * this.m12 * this.m20 + this.m02 * this.m10 * this.m21 - this.m00 * this.m12 * this.m21 - this.m01 * this.m10 * this.m22 - this.m02 * this.m11 * this.m20) / det;
+
+        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' + this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
+      }
+    }, {
+      key: 'nearZeroToZero',
+      value: function nearZeroToZero(value) {
+        if (Math.abs(value) < 0.00001) {
+          value = 0;
+        } else if (0.99999 < value && value < 1.00001) {
+          value = 1;
+        } else if (-1.00001 < value && value < -0.99999) {
+          value = -1;
+        }
+        return value;
+      }
+    }, {
+      key: 'toStringApproximately',
+      value: function toStringApproximately() {
+        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' + this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+      }
+    }, {
+      key: 'm00',
+      set: function set(val) {
+        this.m[0] = val;
+      },
+      get: function get() {
+        return this.m[0];
+      }
+    }, {
+      key: 'm10',
+      set: function set(val) {
+        this.m[1] = val;
+      },
+      get: function get() {
+        return this.m[1];
+      }
+    }, {
+      key: 'm20',
+      set: function set(val) {
+        this.m[2] = val;
+      },
+      get: function get() {
+        return this.m[2];
+      }
+    }, {
+      key: 'm30',
+      set: function set(val) {
+        this.m[3] = val;
+      },
+      get: function get() {
+        return this.m[3];
+      }
+    }, {
+      key: 'm01',
+      set: function set(val) {
+        this.m[4] = val;
+      },
+      get: function get() {
+        return this.m[4];
+      }
+    }, {
+      key: 'm11',
+      set: function set(val) {
+        this.m[5] = val;
+      },
+      get: function get() {
+        return this.m[5];
+      }
+    }, {
+      key: 'm21',
+      set: function set(val) {
+        this.m[6] = val;
+      },
+      get: function get() {
+        return this.m[6];
+      }
+    }, {
+      key: 'm31',
+      set: function set(val) {
+        this.m[7] = val;
+      },
+      get: function get() {
+        return this.m[7];
+      }
+    }, {
+      key: 'm02',
+      set: function set(val) {
+        this.m[8] = val;
+      },
+      get: function get() {
+        return this.m[8];
+      }
+    }, {
+      key: 'm12',
+      set: function set(val) {
+        this.m[9] = val;
+      },
+      get: function get() {
+        return this.m[9];
+      }
+    }, {
+      key: 'm22',
+      set: function set(val) {
+        this.m[10] = val;
+      },
+      get: function get() {
+        return this.m[10];
+      }
+    }, {
+      key: 'm32',
+      set: function set(val) {
+        this.m[11] = val;
+      },
+      get: function get() {
+        return this.m[11];
+      }
+    }, {
+      key: 'm03',
+      set: function set(val) {
+        this.m[12] = val;
+      },
+      get: function get() {
+        return this.m[12];
+      }
+    }, {
+      key: 'm13',
+      set: function set(val) {
+        this.m[13] = val;
+      },
+      get: function get() {
+        return this.m[13];
+      }
+    }, {
+      key: 'm23',
+      set: function set(val) {
+        this.m[14] = val;
+      },
+      get: function get() {
+        return this.m[14];
+      }
+    }, {
+      key: 'm33',
+      set: function set(val) {
+        this.m[15] = val;
+      },
+      get: function get() {
+        return this.m[15];
+      }
+    }], [{
+      key: 'identity',
+      value: function identity() {
+        return new Matrix44(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'translate',
+      value: function translate(vec) {
+        return new Matrix44(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'scale',
+      value: function scale(vec) {
+        return new Matrix44(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'rotateX',
+      value: function rotateX(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix44(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'rotateY',
+      value: function rotateY(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix44(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'rotateZ',
+      value: function rotateZ(angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+
+        var cos = Math.cos(radian);
+        var sin = Math.sin(radian);
+        return new Matrix44(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+      }
+    }, {
+      key: 'zero',
+      value: function zero() {
+        return new Matrix44(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      }
+    }, {
+      key: 'transpose',
+      value: function transpose(mat) {
+
+        var mat_t = new Matrix44(mat.m00, mat.m10, mat.m20, mat.m30, mat.m01, mat.m11, mat.m21, mat.m31, mat.m02, mat.m12, mat.m22, mat.m32, mat.m03, mat.m13, mat.m23, mat.m33);
+
+        return mat_t;
+      }
+    }, {
+      key: 'multiply',
+      value: function multiply(l_m, r_m) {
+        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20 + l_m.m03 * r_m.m30;
+        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20 + l_m.m13 * r_m.m30;
+        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20 + l_m.m23 * r_m.m30;
+        var m30 = l_m.m30 * r_m.m00 + l_m.m31 * r_m.m10 + l_m.m32 * r_m.m20 + l_m.m33 * r_m.m30;
+
+        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21 + l_m.m03 * r_m.m31;
+        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21 + l_m.m13 * r_m.m31;
+        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21 + l_m.m23 * r_m.m31;
+        var m31 = l_m.m30 * r_m.m01 + l_m.m31 * r_m.m11 + l_m.m32 * r_m.m21 + l_m.m33 * r_m.m31;
+
+        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22 + l_m.m03 * r_m.m32;
+        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22 + l_m.m13 * r_m.m32;
+        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22 + l_m.m23 * r_m.m32;
+        var m32 = l_m.m30 * r_m.m02 + l_m.m31 * r_m.m12 + l_m.m32 * r_m.m22 + l_m.m33 * r_m.m32;
+
+        var m03 = l_m.m00 * r_m.m03 + l_m.m01 * r_m.m13 + l_m.m02 * r_m.m23 + l_m.m03 * r_m.m33;
+        var m13 = l_m.m10 * r_m.m03 + l_m.m11 * r_m.m13 + l_m.m12 * r_m.m23 + l_m.m13 * r_m.m33;
+        var m23 = l_m.m20 * r_m.m03 + l_m.m21 * r_m.m13 + l_m.m22 * r_m.m23 + l_m.m23 * r_m.m33;
+        var m33 = l_m.m30 * r_m.m03 + l_m.m31 * r_m.m13 + l_m.m32 * r_m.m23 + l_m.m33 * r_m.m33;
+
+        return new Matrix44(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
+    }, {
+      key: 'toMatrix33',
+      value: function toMatrix33(mat) {
+        return new Matrix33(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22);
+      }
+    }, {
+      key: 'determinant',
+      value: function determinant(mat) {
+        return mat.m00 * mat.m11 * mat.m22 * mat.m33 + mat.m00 * mat.m12 * mat.m23 * mat.m31 + mat.m00 * mat.m13 * mat.m21 * mat.m32 + mat.m01 * mat.m10 * mat.m23 * mat.m32 + mat.m01 * mat.m12 * mat.m20 * mat.m33 + mat.m01 * mat.m13 * mat.m22 * mat.m30 + mat.m02 * mat.m10 * mat.m21 * mat.m33 + mat.m02 * mat.m11 * mat.m23 * mat.m30 + mat.m02 * mat.m13 * mat.m20 * mat.m31 + mat.m03 * mat.m10 * mat.m22 * mat.m31 + mat.m03 * mat.m11 * mat.m20 * mat.m32 + mat.m03 * mat.m12 * mat.m21 * mat.m30 - mat.m00 * mat.m11 * mat.m23 * mat.m32 - mat.m00 * mat.m12 * mat.m21 * mat.m33 - mat.m00 * mat.m13 * mat.m22 * mat.m31 - mat.m01 * mat.m10 * mat.m22 * mat.m33 - mat.m01 * mat.m12 * mat.m23 * mat.m30 - mat.m01 * mat.m13 * mat.m20 * mat.m32 - mat.m02 * mat.m10 * mat.m23 * mat.m31 - mat.m02 * mat.m11 * mat.m20 * mat.m33 - mat.m02 * mat.m13 * mat.m21 * mat.m30 - mat.m03 * mat.m10 * mat.m21 * mat.m32 - mat.m03 * mat.m11 * mat.m22 * mat.m30 - mat.m03 * mat.m12 * mat.m20 * mat.m31;
+      }
+    }, {
+      key: 'invert',
+      value: function invert(mat) {
+        var det = mat.determinant();
+        var m00 = (mat.m11 * mat.m22 * mat.m33 + mat.m12 * mat.m23 * mat.m31 + mat.m13 * mat.m21 * mat.m32 - mat.m11 * mat.m23 * mat.m32 - mat.m12 * mat.m21 * mat.m33 - mat.m13 * mat.m22 * mat.m31) / det;
+        var m01 = (mat.m01 * mat.m23 * mat.m32 + mat.m02 * mat.m21 * mat.m33 + mat.m03 * mat.m22 * mat.m31 - mat.m01 * mat.m22 * mat.m33 - mat.m02 * mat.m23 * mat.m31 - mat.m03 * mat.m21 * mat.m32) / det;
+        var m02 = (mat.m01 * mat.m12 * mat.m33 + mat.m02 * mat.m13 * mat.m31 + mat.m03 * mat.m11 * mat.m32 - mat.m01 * mat.m13 * mat.m32 - mat.m02 * mat.m11 * mat.m33 - mat.m03 * mat.m12 * mat.m31) / det;
+        var m03 = (mat.m01 * mat.m13 * mat.m22 + mat.m02 * mat.m11 * mat.m23 + mat.m03 * mat.m12 * mat.m21 - mat.m01 * mat.m12 * mat.m23 - mat.m02 * mat.m13 * mat.m21 - mat.m03 * mat.m11 * mat.m22) / det;
+        var m10 = (mat.m10 * mat.m23 * mat.m32 + mat.m12 * mat.m20 * mat.m33 + mat.m13 * mat.m22 * mat.m30 - mat.m10 * mat.m22 * mat.m33 - mat.m12 * mat.m23 * mat.m30 - mat.m13 * mat.m20 * mat.m32) / det;
+        var m11 = (mat.m00 * mat.m22 * mat.m33 + mat.m02 * mat.m23 * mat.m30 + mat.m03 * mat.m20 * mat.m32 - mat.m00 * mat.m23 * mat.m32 - mat.m02 * mat.m20 * mat.m33 - mat.m03 * mat.m22 * mat.m30) / det;
+        var m12 = (mat.m00 * mat.m13 * mat.m32 + mat.m02 * mat.m10 * mat.m33 + mat.m03 * mat.m12 * mat.m30 - mat.m00 * mat.m12 * mat.m33 - mat.m02 * mat.m13 * mat.m30 - mat.m03 * mat.m10 * mat.m32) / det;
+        var m13 = (mat.m00 * mat.m12 * mat.m23 + mat.m02 * mat.m13 * mat.m20 + mat.m03 * mat.m10 * mat.m22 - mat.m00 * mat.m13 * mat.m22 - mat.m02 * mat.m10 * mat.m23 - mat.m03 * mat.m12 * mat.m20) / det;
+        var m20 = (mat.m10 * mat.m21 * mat.m33 + mat.m11 * mat.m23 * mat.m30 + mat.m13 * mat.m20 * mat.m31 - mat.m10 * mat.m23 * mat.m31 - mat.m11 * mat.m20 * mat.m33 - mat.m13 * mat.m21 * mat.m30) / det;
+        var m21 = (mat.m00 * mat.m23 * mat.m31 + mat.m01 * mat.m20 * mat.m33 + mat.m03 * mat.m21 * mat.m30 - mat.m00 * mat.m21 * mat.m33 - mat.m01 * mat.m23 * mat.m30 - mat.m03 * mat.m20 * mat.m31) / det;
+        var m22 = (mat.m00 * mat.m11 * mat.m33 + mat.m01 * mat.m13 * mat.m30 + mat.m03 * mat.m10 * mat.m31 - mat.m00 * mat.m13 * mat.m31 - mat.m01 * mat.m10 * mat.m33 - mat.m03 * mat.m11 * mat.m30) / det;
+        var m23 = (mat.m00 * mat.m13 * mat.m21 + mat.m01 * mat.m10 * mat.m23 + mat.m03 * mat.m11 * mat.m20 - mat.m00 * mat.m11 * mat.m23 - mat.m01 * mat.m13 * mat.m20 - mat.m03 * mat.m10 * mat.m21) / det;
+        var m30 = (mat.m10 * mat.m22 * mat.m31 + mat.m11 * mat.m20 * mat.m32 + mat.m12 * mat.m21 * mat.m30 - mat.m10 * mat.m21 * mat.m32 - mat.m11 * mat.m22 * mat.m30 - mat.m12 * mat.m20 * mat.m31) / det;
+        var m31 = (mat.m00 * mat.m21 * mat.m32 + mat.m01 * mat.m22 * mat.m30 + mat.m02 * mat.m20 * mat.m31 - mat.m00 * mat.m22 * mat.m31 - mat.m01 * mat.m20 * mat.m32 - mat.m02 * mat.m21 * mat.m30) / det;
+        var m32 = (mat.m00 * mat.m12 * mat.m31 + mat.m01 * mat.m10 * mat.m32 + mat.m02 * mat.m11 * mat.m30 - mat.m00 * mat.m11 * mat.m32 - mat.m01 * mat.m12 * mat.m30 - mat.m02 * mat.m10 * mat.m31) / det;
+        var m33 = (mat.m00 * mat.m11 * mat.m22 + mat.m01 * mat.m12 * mat.m20 + mat.m02 * mat.m10 * mat.m21 - mat.m00 * mat.m12 * mat.m21 - mat.m01 * mat.m10 * mat.m22 - mat.m02 * mat.m11 * mat.m20) / det;
+
+        return new Matrix44(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
+      }
+    }]);
+    return Matrix44;
+  }();
+
+  GLBoost$1["Matrix44"] = Matrix44;
+
+  var Quaternion = function () {
+    function Quaternion(x, y, z, w) {
+      babelHelpers.classCallCheck(this, Quaternion);
+
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    babelHelpers.createClass(Quaternion, [{
+      key: 'isEqual',
+      value: function isEqual(vec) {
+        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'clone',
+      value: function clone() {
+        return new Quaternion(this.x, this.y, this.z, this.w);
+      }
+    }, {
+      key: 'axisAngle',
+      value: function axisAngle(axisVec3, angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+        var halfAngle = 0.5 * radian;
+        var sin = Math.sin(halfAngle);
+
+        var axis = Vector3.normalize(axisVec3);
+        this.w = Math.cos(halfAngle);
+        this.x = sin * axis.x;
+        this.y = sin * axis.y;
+        this.z = sin * axis.z;
+
+        return this;
+      }
+    }, {
+      key: 'add',
+      value: function add(q) {
+        this.x += q.x;
+        this.y += q.y;
+        this.z += q.z;
+        this.w += q.w;
+
+        return this;
+      }
+    }, {
+      key: 'multiply',
+      value: function multiply(val) {
+        this.x *= val;
+        this.y *= val;
+        this.z *= val;
+        this.w *= val;
+
+        return this;
+      }
+    }, {
+      key: 'rotationMatrix',
+      get: function get() {
+        var sx = this.x * this.x;
+        var sy = this.y * this.y;
+        var sz = this.z * this.z;
+        var cx = this.y * this.z;
+        var cy = this.x * this.z;
+        var cz = this.x * this.y;
+        var wx = this.w * this.x;
+        var wy = this.w * this.y;
+        var wz = this.w * this.z;
+
+        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0, 2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0, 2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
+      }
+    }], [{
+      key: 'invert',
+      value: function invert(quat) {
+        return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0 / (quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w));
+      }
+    }, {
+      key: 'qlerp',
+      value: function qlerp(lhq, rhq, ratio) {
+
+        var q = new Quaternion(0, 0, 0, 1);
+        var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+        var ss = 1.0 - qr * qr;
+
+        if (ss === 0.0) {
+          q.w = lhq.w;
+          q.x = lhq.x;
+          q.y = lhq.y;
+          q.z = lhq.z;
+
+          return q;
+        } else {
+
+          if (qr > 1) {
+            qr = 0.999;
+          } else if (qr < -1) {
+            qr = -0.999;
+          }
+
+          var ph = Math.acos(qr);
+          var s2 = void 0;
+          if (qr < 0.0 && ph > Math.PI / 2.0) {
+            qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+            ph = Math.acos(qr);
+            s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+          } else {
+            s2 = Math.sin(ph * ratio) / Math.sin(ph);
+          }
+          var s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+          q.x = lhq.x * s1 + rhq.x * s2;
+          q.y = lhq.y * s1 + rhq.y * s2;
+          q.z = lhq.z * s1 + rhq.z * s2;
+          q.w = lhq.w * s1 + rhq.w * s2;
+
+          return q;
+        }
+      }
+    }, {
+      key: 'axisAngle',
+      value: function axisAngle(axisVec3, angle) {
+        var radian = 0;
+        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+          radian = MathUtil.degreeToRadian(angle);
+        } else {
+          radian = angle;
+        }
+        var halfAngle = 0.5 * radian;
+        var sin = Math.sin(halfAngle);
+
+        var axis = Vector3.normalize(axisVec3);
+        return new Quaternion(sin * axis.x, sin * axis.y, sin * axis.z, Math.cos(halfAngle));
+      }
+    }]);
+    return Quaternion;
+  }();
+
+  GLBoost$1["Quaternion"] = Quaternion;
+
   var MathUtil = function () {
     function MathUtil() {
       babelHelpers.classCallCheck(this, MathUtil);
@@ -245,6 +1372,45 @@
           }
         } else {
           return element;
+        }
+      }
+    }, {
+      key: 'makeSubArray',
+      value: function makeSubArray(array, componentN) {
+        if (componentN === 4) {
+          return [array[0], array[1], array[2], array[3]];
+        } else if (componentN === 3) {
+          return [array[0], array[1], array[2]];
+        } else if (componentN === 2) {
+          return [array[0], array[1]];
+        } else {
+          return array[0];
+        }
+      }
+    }, {
+      key: 'vectorToArray',
+      value: function vectorToArray(element) {
+        if (element instanceof Vector2) {
+          return [element.x, element.y];
+        } else if (element instanceof Vector3) {
+          return [element.x, element.y, element.z];
+        } else if (element instanceof Vector4 || element instanceof Quaternion) {
+          return [element.x, element.y, element.z, element.w];
+        } else {
+          return element;
+        }
+      }
+    }, {
+      key: 'compomentNumberOfVector',
+      value: function compomentNumberOfVector(element) {
+        if (element instanceof Vector2) {
+          return 2;
+        } else if (element instanceof Vector3) {
+          return 3;
+        } else if (element instanceof Vector4 || element instanceof Quaternion) {
+          return 4;
+        } else {
+          return 0;
         }
       }
     }]);
@@ -1568,436 +2734,6 @@
     return PhinaTexture;
   }(Texture);
 
-  var Matrix33 = function () {
-    function Matrix33(m) {
-      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      babelHelpers.classCallCheck(this, Matrix33);
-
-      this.m = new Float32Array(9);
-      if (arguments.length >= 9) {
-        if (isColumnMajor === true) {
-          var _m = arguments;
-          this.setComponents(_m[0], _m[3], _m[6], _m[1], _m[4], _m[7], _m[2], _m[5], _m[8]);
-        } else {
-          this.setComponents.apply(this, arguments); // arguments[0-8] must be row major values if isColumnMajor is false
-        }
-      } else if (Array.isArray(m)) {
-        if (isColumnMajor === true) {
-          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else if (m instanceof Float32Array) {
-        if (isColumnMajor === true) {
-          this.setComponents(m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else {
-        this.identity();
-      }
-    }
-
-    babelHelpers.createClass(Matrix33, [{
-      key: 'setComponents',
-      value: function setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22) {
-        this.m00 = m00;this.m01 = m01;this.m02 = m02;
-        this.m10 = m10;this.m11 = m11;this.m12 = m12;
-        this.m20 = m20;this.m21 = m21;this.m22 = m22;
-
-        return this;
-      }
-
-      /**
-       * 単位行列にする
-       */
-
-    }, {
-      key: 'identity',
-      value: function identity() {
-        this.setComponents(1, 0, 0, 0, 1, 0, 0, 0, 1);
-        return this;
-      }
-
-      /**
-       * 単位行列にする（static版）
-       */
-
-    }, {
-      key: 'clone',
-      value: function clone() {
-        return new Matrix33(this.m[0], this.m[3], this.m[6], this.m[1], this.m[4], this.m[7], this.m[2], this.m[5], this.m[8]);
-      }
-
-      /**
-       * Create X oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'rotateX',
-      value: function rotateX(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(1, 0, 0, 0, cos, -sin, 0, sin, cos);
-      }
-      /**
-       * Create X oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'rotateY',
-
-
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-      value: function rotateY(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        this.setComponents(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
-        return this;
-      }
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'rotateZ',
-
-
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-      value: function rotateZ(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
-      }
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'zero',
-
-
-      /**
-       * ゼロ行列
-       */
-      value: function zero() {
-        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
-        return this;
-      }
-    }, {
-      key: 'flatten',
-      value: function flatten() {
-        return this.m;
-      }
-    }, {
-      key: 'flattenAsArray',
-      value: function flattenAsArray() {
-        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8]];
-      }
-    }, {
-      key: '_swap',
-      value: function _swap(l, r) {
-        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-      }
-
-      /**
-       * 転置
-       */
-
-    }, {
-      key: 'transpose',
-      value: function transpose() {
-        this._swap(1, 3);
-        this._swap(2, 6);
-        this._swap(5, 8);
-
-        return this;
-      }
-
-      /**
-       * 転置（static版）
-       */
-
-    }, {
-      key: 'multiplyVector',
-      value: function multiplyVector(vec) {
-        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z;
-        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z;
-        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z;
-
-        return new Vector3(x, y, z);
-      }
-
-      /**
-       * 行列同士の乗算
-       */
-
-    }, {
-      key: 'multiply',
-      value: function multiply(mat) {
-        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20;
-        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21;
-        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22;
-
-        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20;
-        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21;
-        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22;
-
-        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20;
-        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21;
-        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22;
-
-        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-
-      /**
-       * 行列同士の乗算（static版）
-       */
-
-    }, {
-      key: 'determinant',
-      value: function determinant() {
-        return this.m00 * this.m11 * this.m22 + this.m10 * this.m21 * this.m02 + this.m20 * this.m01 * this.m12 - this.m00 * this.m21 * this.m12 - this.m20 * this.m11 * this.m02 - this.m10 * this.m01 * this.m22;
-      }
-    }, {
-      key: 'invert',
-      value: function invert() {
-        var det = this.determinant();
-        var m00 = (this.m11 * this.m22 - this.m12 * this.m21) / det;
-        var m01 = (this.m02 * this.m21 - this.m01 * this.m22) / det;
-        var m02 = (this.m01 * this.m12 - this.m02 * this.m11) / det;
-        var m10 = (this.m12 * this.m20 - this.m10 * this.m22) / det;
-        var m11 = (this.m00 * this.m22 - this.m02 * this.m20) / det;
-        var m12 = (this.m02 * this.m10 - this.m00 * this.m12) / det;
-        var m20 = (this.m10 * this.m21 - this.m11 * this.m20) / det;
-        var m21 = (this.m01 * this.m20 - this.m00 * this.m21) / det;
-        var m22 = (this.m00 * this.m11 - this.m01 * this.m10) / det;
-
-        return this.setComponents(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + '\n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + '\n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + '\n';
-      }
-    }, {
-      key: 'nearZeroToZero',
-      value: function nearZeroToZero(value) {
-        if (Math.abs(value) < 0.00001) {
-          value = 0;
-        } else if (0.99999 < value && value < 1.00001) {
-          value = 1;
-        } else if (-1.00001 < value && value < -0.99999) {
-          value = -1;
-        }
-        return value;
-      }
-    }, {
-      key: 'toStringApproximately',
-      value: function toStringApproximately() {
-        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + '\n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
-      }
-    }, {
-      key: 'm00',
-      set: function set(val) {
-        this.m[0] = val;
-      },
-      get: function get() {
-        return this.m[0];
-      }
-    }, {
-      key: 'm10',
-      set: function set(val) {
-        this.m[1] = val;
-      },
-      get: function get() {
-        return this.m[1];
-      }
-    }, {
-      key: 'm20',
-      set: function set(val) {
-        this.m[2] = val;
-      },
-      get: function get() {
-        return this.m[2];
-      }
-    }, {
-      key: 'm01',
-      set: function set(val) {
-        this.m[3] = val;
-      },
-      get: function get() {
-        return this.m[3];
-      }
-    }, {
-      key: 'm11',
-      set: function set(val) {
-        this.m[4] = val;
-      },
-      get: function get() {
-        return this.m[4];
-      }
-    }, {
-      key: 'm21',
-      set: function set(val) {
-        this.m[5] = val;
-      },
-      get: function get() {
-        return this.m[5];
-      }
-    }, {
-      key: 'm02',
-      set: function set(val) {
-        this.m[6] = val;
-      },
-      get: function get() {
-        return this.m[6];
-      }
-    }, {
-      key: 'm12',
-      set: function set(val) {
-        this.m[7] = val;
-      },
-      get: function get() {
-        return this.m[7];
-      }
-    }, {
-      key: 'm22',
-      set: function set(val) {
-        this.m[8] = val;
-      },
-      get: function get() {
-        return this.m[8];
-      }
-    }], [{
-      key: 'identity',
-      value: function identity() {
-        return new Matrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateX',
-      value: function rotateX(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix33(1, 0, 0, 0, cos, -sin, 0, sin, cos);
-      }
-    }, {
-      key: 'rotateY',
-      value: function rotateY(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix33(cos, 0, sin, 0, 1, 0, -sin, 0, cos);
-      }
-    }, {
-      key: 'rotateZ',
-      value: function rotateZ(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix33(cos, -sin, 0, sin, cos, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'zero',
-      value: function zero() {
-        return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
-      }
-    }, {
-      key: 'transpose',
-      value: function transpose(mat) {
-
-        var mat_t = new Matrix33(mat.m00, mat.m10, mat.m20, mat.m01, mat.m11, mat.m21, mat.m02, mat.m12, mat.m22);
-
-        return mat_t;
-      }
-    }, {
-      key: 'multiply',
-      value: function multiply(l_m, r_m) {
-        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20;
-        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20;
-        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20;
-
-        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21;
-        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21;
-        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21;
-
-        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22;
-        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22;
-        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22;
-
-        return new Matrix33(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }, {
-      key: 'determinant',
-      value: function determinant(mat) {
-        return mat.m00 * mat.m11 * mat.m22 + mat.m10 * mat.m21 * mat.m02 + mat.m20 * mat.m01 * mat.m12 - mat.m00 * mat.m21 * mat.m12 - mat.m20 * mat.m11 * mat.m02 - mat.m10 * mat.m01 * mat.m22;
-      }
-    }, {
-      key: 'invert',
-      value: function invert(mat) {
-        var det = mat.determinant();
-        var m00 = (mat.m11 * mat.m22 - mat.m12 * mat.m21) / det;
-        var m01 = (mat.m02 * mat.m21 - mat.m01 * mat.m22) / det;
-        var m02 = (mat.m01 * mat.m12 - mat.m02 * mat.m11) / det;
-        var m10 = (mat.m12 * mat.m20 - mat.m10 * mat.m22) / det;
-        var m11 = (mat.m00 * mat.m22 - mat.m02 * mat.m20) / det;
-        var m12 = (mat.m02 * mat.m10 - mat.m00 * mat.m12) / det;
-        var m20 = (mat.m10 * mat.m21 - mat.m11 * mat.m20) / det;
-        var m21 = (mat.m01 * mat.m20 - mat.m00 * mat.m21) / det;
-        var m22 = (mat.m00 * mat.m11 - mat.m01 * mat.m10) / det;
-
-        return new Matrix33(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-      }
-    }]);
-    return Matrix33;
-  }();
-
-  GLBoost$1['Matrix33'] = Matrix33;
-
   var L_CameraController = function (_GLBoostObject) {
     babelHelpers.inherits(L_CameraController, _GLBoostObject);
 
@@ -2257,703 +2993,6 @@
     }]);
     return L_CameraController;
   }(GLBoostObject);
-
-  var Matrix44 = function () {
-    function Matrix44(m) {
-      var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      babelHelpers.classCallCheck(this, Matrix44);
-
-      this.m = new Float32Array(16);
-      if (arguments.length >= 16) {
-        if (isColumnMajor === true) {
-          var _m = arguments;
-          this.setComponents(_m[0], _m[4], _m[8], _m[12], _m[1], _m[5], _m[9], _m[13], _m[2], _m[6], _m[10], _m[14], _m[3], _m[7], _m[11], _m[15]);
-        } else {
-          this.setComponents.apply(this, arguments); // arguments[0-15] must be row major values if isColumnMajor is false
-        }
-      } else if (Array.isArray(m)) {
-        if (isColumnMajor === true) {
-          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else if (m instanceof Float32Array) {
-        if (isColumnMajor === true) {
-          this.setComponents(m[0], m[4], m[8], m[12], m[1], m[5], m[9], m[13], m[2], m[6], m[10], m[14], m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else {
-        this.identity();
-      }
-    }
-
-    babelHelpers.createClass(Matrix44, [{
-      key: 'setComponents',
-      value: function setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-        this.m00 = m00;this.m01 = m01;this.m02 = m02;this.m03 = m03;
-        this.m10 = m10;this.m11 = m11;this.m12 = m12;this.m13 = m13;
-        this.m20 = m20;this.m21 = m21;this.m22 = m22;this.m23 = m23;
-        this.m30 = m30;this.m31 = m31;this.m32 = m32;this.m33 = m33;
-
-        return this;
-      }
-    }, {
-      key: 'clone',
-      value: function clone() {
-        return new Matrix44(this.m[0], this.m[4], this.m[8], this.m[12], this.m[1], this.m[5], this.m[9], this.m[13], this.m[2], this.m[6], this.m[10], this.m[14], this.m[3], this.m[7], this.m[11], this.m[15]);
-      }
-
-      /**
-       * 単位行列にする
-       */
-
-    }, {
-      key: 'identity',
-      value: function identity() {
-        this.setComponents(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        return this;
-      }
-
-      /**
-       * 単位行列にする（static版）
-       */
-
-    }, {
-      key: 'translate',
-      value: function translate(vec) {
-        return this.setComponents(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'scale',
-      value: function scale(vec) {
-        return this.setComponents(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateX',
-
-
-      /**
-       * Create X oriented Rotation Matrix
-       */
-      value: function rotateX(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create X oriented Rotation Matrix
-      */
-
-    }, {
-      key: 'rotateY',
-
-
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-      value: function rotateY(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create Y oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'rotateZ',
-
-
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-      value: function rotateZ(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return this.setComponents(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-      /**
-       * Create Z oriented Rotation Matrix
-       */
-
-    }, {
-      key: 'zero',
-
-
-      /**
-       * ゼロ行列
-       */
-      value: function zero() {
-        this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        return this;
-      }
-    }, {
-      key: 'flatten',
-      value: function flatten() {
-        return this.m;
-      }
-    }, {
-      key: 'flattenAsArray',
-      value: function flattenAsArray() {
-        return [this.m[0], this.m[1], this.m[2], this.m[3], this.m[4], this.m[5], this.m[6], this.m[7], this.m[8], this.m[9], this.m[10], this.m[11], this.m[12], this.m[13], this.m[14], this.m[15]];
-      }
-    }, {
-      key: '_swap',
-      value: function _swap(l, r) {
-        this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-      }
-
-      /**
-       * 転置
-       */
-
-    }, {
-      key: 'transpose',
-      value: function transpose() {
-        this._swap(1, 4);
-        this._swap(2, 8);
-        this._swap(3, 12);
-        this._swap(6, 9);
-        this._swap(7, 13);
-        this._swap(11, 14);
-
-        return this;
-      }
-
-      /**
-       * 転置（static版）
-       */
-
-    }, {
-      key: 'multiplyVector',
-      value: function multiplyVector(vec) {
-        var x = this.m00 * vec.x + this.m01 * vec.y + this.m02 * vec.z + this.m03 * vec.w;
-        var y = this.m10 * vec.x + this.m11 * vec.y + this.m12 * vec.z + this.m13 * vec.w;
-        var z = this.m20 * vec.x + this.m21 * vec.y + this.m22 * vec.z + this.m23 * vec.w;
-        var w = this.m30 * vec.x + this.m31 * vec.y + this.m32 * vec.z + this.m33 * vec.w;
-
-        return new Vector4(x, y, z, w);
-      }
-
-      /**
-       * 行列同士の乗算
-       */
-
-    }, {
-      key: 'multiply',
-      value: function multiply(mat) {
-        var m00 = this.m00 * mat.m00 + this.m01 * mat.m10 + this.m02 * mat.m20 + this.m03 * mat.m30;
-        var m01 = this.m00 * mat.m01 + this.m01 * mat.m11 + this.m02 * mat.m21 + this.m03 * mat.m31;
-        var m02 = this.m00 * mat.m02 + this.m01 * mat.m12 + this.m02 * mat.m22 + this.m03 * mat.m32;
-        var m03 = this.m00 * mat.m03 + this.m01 * mat.m13 + this.m02 * mat.m23 + this.m03 * mat.m33;
-
-        var m10 = this.m10 * mat.m00 + this.m11 * mat.m10 + this.m12 * mat.m20 + this.m13 * mat.m30;
-        var m11 = this.m10 * mat.m01 + this.m11 * mat.m11 + this.m12 * mat.m21 + this.m13 * mat.m31;
-        var m12 = this.m10 * mat.m02 + this.m11 * mat.m12 + this.m12 * mat.m22 + this.m13 * mat.m32;
-        var m13 = this.m10 * mat.m03 + this.m11 * mat.m13 + this.m12 * mat.m23 + this.m13 * mat.m33;
-
-        var m20 = this.m20 * mat.m00 + this.m21 * mat.m10 + this.m22 * mat.m20 + this.m23 * mat.m30;
-        var m21 = this.m20 * mat.m01 + this.m21 * mat.m11 + this.m22 * mat.m21 + this.m23 * mat.m31;
-        var m22 = this.m20 * mat.m02 + this.m21 * mat.m12 + this.m22 * mat.m22 + this.m23 * mat.m32;
-        var m23 = this.m20 * mat.m03 + this.m21 * mat.m13 + this.m22 * mat.m23 + this.m23 * mat.m33;
-
-        var m30 = this.m30 * mat.m00 + this.m31 * mat.m10 + this.m32 * mat.m20 + this.m33 * mat.m30;
-        var m31 = this.m30 * mat.m01 + this.m31 * mat.m11 + this.m32 * mat.m21 + this.m33 * mat.m31;
-        var m32 = this.m30 * mat.m02 + this.m31 * mat.m12 + this.m32 * mat.m22 + this.m33 * mat.m32;
-        var m33 = this.m30 * mat.m03 + this.m31 * mat.m13 + this.m32 * mat.m23 + this.m33 * mat.m33;
-
-        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-
-      /**
-       * 行列同士の乗算（static版）
-       */
-
-    }, {
-      key: 'toMatrix33',
-      value: function toMatrix33() {
-        return new Matrix33(this.m00, this.m01, this.m02, this.m10, this.m11, this.m12, this.m20, this.m21, this.m22);
-      }
-    }, {
-      key: 'determinant',
-      value: function determinant() {
-        return this.m00 * this.m11 * this.m22 * this.m33 + this.m00 * this.m12 * this.m23 * this.m31 + this.m00 * this.m13 * this.m21 * this.m32 + this.m01 * this.m10 * this.m23 * this.m32 + this.m01 * this.m12 * this.m20 * this.m33 + this.m01 * this.m13 * this.m22 * this.m30 + this.m02 * this.m10 * this.m21 * this.m33 + this.m02 * this.m11 * this.m23 * this.m30 + this.m02 * this.m13 * this.m20 * this.m31 + this.m03 * this.m10 * this.m22 * this.m31 + this.m03 * this.m11 * this.m20 * this.m32 + this.m03 * this.m12 * this.m21 * this.m30 - this.m00 * this.m11 * this.m23 * this.m32 - this.m00 * this.m12 * this.m21 * this.m33 - this.m00 * this.m13 * this.m22 * this.m31 - this.m01 * this.m10 * this.m22 * this.m33 - this.m01 * this.m12 * this.m23 * this.m30 - this.m01 * this.m13 * this.m20 * this.m32 - this.m02 * this.m10 * this.m23 * this.m31 - this.m02 * this.m11 * this.m20 * this.m33 - this.m02 * this.m13 * this.m21 * this.m30 - this.m03 * this.m10 * this.m21 * this.m32 - this.m03 * this.m11 * this.m22 * this.m30 - this.m03 * this.m12 * this.m20 * this.m31;
-      }
-    }, {
-      key: 'invert',
-      value: function invert() {
-        var det = this.determinant();
-        var m00 = (this.m11 * this.m22 * this.m33 + this.m12 * this.m23 * this.m31 + this.m13 * this.m21 * this.m32 - this.m11 * this.m23 * this.m32 - this.m12 * this.m21 * this.m33 - this.m13 * this.m22 * this.m31) / det;
-        var m01 = (this.m01 * this.m23 * this.m32 + this.m02 * this.m21 * this.m33 + this.m03 * this.m22 * this.m31 - this.m01 * this.m22 * this.m33 - this.m02 * this.m23 * this.m31 - this.m03 * this.m21 * this.m32) / det;
-        var m02 = (this.m01 * this.m12 * this.m33 + this.m02 * this.m13 * this.m31 + this.m03 * this.m11 * this.m32 - this.m01 * this.m13 * this.m32 - this.m02 * this.m11 * this.m33 - this.m03 * this.m12 * this.m31) / det;
-        var m03 = (this.m01 * this.m13 * this.m22 + this.m02 * this.m11 * this.m23 + this.m03 * this.m12 * this.m21 - this.m01 * this.m12 * this.m23 - this.m02 * this.m13 * this.m21 - this.m03 * this.m11 * this.m22) / det;
-        var m10 = (this.m10 * this.m23 * this.m32 + this.m12 * this.m20 * this.m33 + this.m13 * this.m22 * this.m30 - this.m10 * this.m22 * this.m33 - this.m12 * this.m23 * this.m30 - this.m13 * this.m20 * this.m32) / det;
-        var m11 = (this.m00 * this.m22 * this.m33 + this.m02 * this.m23 * this.m30 + this.m03 * this.m20 * this.m32 - this.m00 * this.m23 * this.m32 - this.m02 * this.m20 * this.m33 - this.m03 * this.m22 * this.m30) / det;
-        var m12 = (this.m00 * this.m13 * this.m32 + this.m02 * this.m10 * this.m33 + this.m03 * this.m12 * this.m30 - this.m00 * this.m12 * this.m33 - this.m02 * this.m13 * this.m30 - this.m03 * this.m10 * this.m32) / det;
-        var m13 = (this.m00 * this.m12 * this.m23 + this.m02 * this.m13 * this.m20 + this.m03 * this.m10 * this.m22 - this.m00 * this.m13 * this.m22 - this.m02 * this.m10 * this.m23 - this.m03 * this.m12 * this.m20) / det;
-        var m20 = (this.m10 * this.m21 * this.m33 + this.m11 * this.m23 * this.m30 + this.m13 * this.m20 * this.m31 - this.m10 * this.m23 * this.m31 - this.m11 * this.m20 * this.m33 - this.m13 * this.m21 * this.m30) / det;
-        var m21 = (this.m00 * this.m23 * this.m31 + this.m01 * this.m20 * this.m33 + this.m03 * this.m21 * this.m30 - this.m00 * this.m21 * this.m33 - this.m01 * this.m23 * this.m30 - this.m03 * this.m20 * this.m31) / det;
-        var m22 = (this.m00 * this.m11 * this.m33 + this.m01 * this.m13 * this.m30 + this.m03 * this.m10 * this.m31 - this.m00 * this.m13 * this.m31 - this.m01 * this.m10 * this.m33 - this.m03 * this.m11 * this.m30) / det;
-        var m23 = (this.m00 * this.m13 * this.m21 + this.m01 * this.m10 * this.m23 + this.m03 * this.m11 * this.m20 - this.m00 * this.m11 * this.m23 - this.m01 * this.m13 * this.m20 - this.m03 * this.m10 * this.m21) / det;
-        var m30 = (this.m10 * this.m22 * this.m31 + this.m11 * this.m20 * this.m32 + this.m12 * this.m21 * this.m30 - this.m10 * this.m21 * this.m32 - this.m11 * this.m22 * this.m30 - this.m12 * this.m20 * this.m31) / det;
-        var m31 = (this.m00 * this.m21 * this.m32 + this.m01 * this.m22 * this.m30 + this.m02 * this.m20 * this.m31 - this.m00 * this.m22 * this.m31 - this.m01 * this.m20 * this.m32 - this.m02 * this.m21 * this.m30) / det;
-        var m32 = (this.m00 * this.m12 * this.m31 + this.m01 * this.m10 * this.m32 + this.m02 * this.m11 * this.m30 - this.m00 * this.m11 * this.m32 - this.m01 * this.m12 * this.m30 - this.m02 * this.m10 * this.m31) / det;
-        var m33 = (this.m00 * this.m11 * this.m22 + this.m01 * this.m12 * this.m20 + this.m02 * this.m10 * this.m21 - this.m00 * this.m12 * this.m21 - this.m01 * this.m10 * this.m22 - this.m02 * this.m11 * this.m20) / det;
-
-        return this.setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' + this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' + this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' + this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
-      }
-    }, {
-      key: 'nearZeroToZero',
-      value: function nearZeroToZero(value) {
-        if (Math.abs(value) < 0.00001) {
-          value = 0;
-        } else if (0.99999 < value && value < 1.00001) {
-          value = 1;
-        } else if (-1.00001 < value && value < -0.99999) {
-          value = -1;
-        }
-        return value;
-      }
-    }, {
-      key: 'toStringApproximately',
-      value: function toStringApproximately() {
-        return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' + this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' + this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' + this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
-      }
-    }, {
-      key: 'm00',
-      set: function set(val) {
-        this.m[0] = val;
-      },
-      get: function get() {
-        return this.m[0];
-      }
-    }, {
-      key: 'm10',
-      set: function set(val) {
-        this.m[1] = val;
-      },
-      get: function get() {
-        return this.m[1];
-      }
-    }, {
-      key: 'm20',
-      set: function set(val) {
-        this.m[2] = val;
-      },
-      get: function get() {
-        return this.m[2];
-      }
-    }, {
-      key: 'm30',
-      set: function set(val) {
-        this.m[3] = val;
-      },
-      get: function get() {
-        return this.m[3];
-      }
-    }, {
-      key: 'm01',
-      set: function set(val) {
-        this.m[4] = val;
-      },
-      get: function get() {
-        return this.m[4];
-      }
-    }, {
-      key: 'm11',
-      set: function set(val) {
-        this.m[5] = val;
-      },
-      get: function get() {
-        return this.m[5];
-      }
-    }, {
-      key: 'm21',
-      set: function set(val) {
-        this.m[6] = val;
-      },
-      get: function get() {
-        return this.m[6];
-      }
-    }, {
-      key: 'm31',
-      set: function set(val) {
-        this.m[7] = val;
-      },
-      get: function get() {
-        return this.m[7];
-      }
-    }, {
-      key: 'm02',
-      set: function set(val) {
-        this.m[8] = val;
-      },
-      get: function get() {
-        return this.m[8];
-      }
-    }, {
-      key: 'm12',
-      set: function set(val) {
-        this.m[9] = val;
-      },
-      get: function get() {
-        return this.m[9];
-      }
-    }, {
-      key: 'm22',
-      set: function set(val) {
-        this.m[10] = val;
-      },
-      get: function get() {
-        return this.m[10];
-      }
-    }, {
-      key: 'm32',
-      set: function set(val) {
-        this.m[11] = val;
-      },
-      get: function get() {
-        return this.m[11];
-      }
-    }, {
-      key: 'm03',
-      set: function set(val) {
-        this.m[12] = val;
-      },
-      get: function get() {
-        return this.m[12];
-      }
-    }, {
-      key: 'm13',
-      set: function set(val) {
-        this.m[13] = val;
-      },
-      get: function get() {
-        return this.m[13];
-      }
-    }, {
-      key: 'm23',
-      set: function set(val) {
-        this.m[14] = val;
-      },
-      get: function get() {
-        return this.m[14];
-      }
-    }, {
-      key: 'm33',
-      set: function set(val) {
-        this.m[15] = val;
-      },
-      get: function get() {
-        return this.m[15];
-      }
-    }], [{
-      key: 'identity',
-      value: function identity() {
-        return new Matrix44(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'translate',
-      value: function translate(vec) {
-        return new Matrix44(1, 0, 0, vec.x, 0, 1, 0, vec.y, 0, 0, 1, vec.z, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'scale',
-      value: function scale(vec) {
-        return new Matrix44(vec.x, 0, 0, 0, 0, vec.y, 0, 0, 0, 0, vec.z, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateX',
-      value: function rotateX(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix44(1, 0, 0, 0, 0, cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateY',
-      value: function rotateY(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix44(cos, 0, sin, 0, 0, 1, 0, 0, -sin, 0, cos, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'rotateZ',
-      value: function rotateZ(angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-
-        var cos = Math.cos(radian);
-        var sin = Math.sin(radian);
-        return new Matrix44(cos, -sin, 0, 0, sin, cos, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-      }
-    }, {
-      key: 'zero',
-      value: function zero() {
-        return new Matrix44(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      }
-    }, {
-      key: 'transpose',
-      value: function transpose(mat) {
-
-        var mat_t = new Matrix44(mat.m00, mat.m10, mat.m20, mat.m30, mat.m01, mat.m11, mat.m21, mat.m31, mat.m02, mat.m12, mat.m22, mat.m32, mat.m03, mat.m13, mat.m23, mat.m33);
-
-        return mat_t;
-      }
-    }, {
-      key: 'multiply',
-      value: function multiply(l_m, r_m) {
-        var m00 = l_m.m00 * r_m.m00 + l_m.m01 * r_m.m10 + l_m.m02 * r_m.m20 + l_m.m03 * r_m.m30;
-        var m10 = l_m.m10 * r_m.m00 + l_m.m11 * r_m.m10 + l_m.m12 * r_m.m20 + l_m.m13 * r_m.m30;
-        var m20 = l_m.m20 * r_m.m00 + l_m.m21 * r_m.m10 + l_m.m22 * r_m.m20 + l_m.m23 * r_m.m30;
-        var m30 = l_m.m30 * r_m.m00 + l_m.m31 * r_m.m10 + l_m.m32 * r_m.m20 + l_m.m33 * r_m.m30;
-
-        var m01 = l_m.m00 * r_m.m01 + l_m.m01 * r_m.m11 + l_m.m02 * r_m.m21 + l_m.m03 * r_m.m31;
-        var m11 = l_m.m10 * r_m.m01 + l_m.m11 * r_m.m11 + l_m.m12 * r_m.m21 + l_m.m13 * r_m.m31;
-        var m21 = l_m.m20 * r_m.m01 + l_m.m21 * r_m.m11 + l_m.m22 * r_m.m21 + l_m.m23 * r_m.m31;
-        var m31 = l_m.m30 * r_m.m01 + l_m.m31 * r_m.m11 + l_m.m32 * r_m.m21 + l_m.m33 * r_m.m31;
-
-        var m02 = l_m.m00 * r_m.m02 + l_m.m01 * r_m.m12 + l_m.m02 * r_m.m22 + l_m.m03 * r_m.m32;
-        var m12 = l_m.m10 * r_m.m02 + l_m.m11 * r_m.m12 + l_m.m12 * r_m.m22 + l_m.m13 * r_m.m32;
-        var m22 = l_m.m20 * r_m.m02 + l_m.m21 * r_m.m12 + l_m.m22 * r_m.m22 + l_m.m23 * r_m.m32;
-        var m32 = l_m.m30 * r_m.m02 + l_m.m31 * r_m.m12 + l_m.m32 * r_m.m22 + l_m.m33 * r_m.m32;
-
-        var m03 = l_m.m00 * r_m.m03 + l_m.m01 * r_m.m13 + l_m.m02 * r_m.m23 + l_m.m03 * r_m.m33;
-        var m13 = l_m.m10 * r_m.m03 + l_m.m11 * r_m.m13 + l_m.m12 * r_m.m23 + l_m.m13 * r_m.m33;
-        var m23 = l_m.m20 * r_m.m03 + l_m.m21 * r_m.m13 + l_m.m22 * r_m.m23 + l_m.m23 * r_m.m33;
-        var m33 = l_m.m30 * r_m.m03 + l_m.m31 * r_m.m13 + l_m.m32 * r_m.m23 + l_m.m33 * r_m.m33;
-
-        return new Matrix44(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-    }, {
-      key: 'toMatrix33',
-      value: function toMatrix33(mat) {
-        return new Matrix33(mat.m00, mat.m01, mat.m02, mat.m10, mat.m11, mat.m12, mat.m20, mat.m21, mat.m22);
-      }
-    }, {
-      key: 'determinant',
-      value: function determinant(mat) {
-        return mat.m00 * mat.m11 * mat.m22 * mat.m33 + mat.m00 * mat.m12 * mat.m23 * mat.m31 + mat.m00 * mat.m13 * mat.m21 * mat.m32 + mat.m01 * mat.m10 * mat.m23 * mat.m32 + mat.m01 * mat.m12 * mat.m20 * mat.m33 + mat.m01 * mat.m13 * mat.m22 * mat.m30 + mat.m02 * mat.m10 * mat.m21 * mat.m33 + mat.m02 * mat.m11 * mat.m23 * mat.m30 + mat.m02 * mat.m13 * mat.m20 * mat.m31 + mat.m03 * mat.m10 * mat.m22 * mat.m31 + mat.m03 * mat.m11 * mat.m20 * mat.m32 + mat.m03 * mat.m12 * mat.m21 * mat.m30 - mat.m00 * mat.m11 * mat.m23 * mat.m32 - mat.m00 * mat.m12 * mat.m21 * mat.m33 - mat.m00 * mat.m13 * mat.m22 * mat.m31 - mat.m01 * mat.m10 * mat.m22 * mat.m33 - mat.m01 * mat.m12 * mat.m23 * mat.m30 - mat.m01 * mat.m13 * mat.m20 * mat.m32 - mat.m02 * mat.m10 * mat.m23 * mat.m31 - mat.m02 * mat.m11 * mat.m20 * mat.m33 - mat.m02 * mat.m13 * mat.m21 * mat.m30 - mat.m03 * mat.m10 * mat.m21 * mat.m32 - mat.m03 * mat.m11 * mat.m22 * mat.m30 - mat.m03 * mat.m12 * mat.m20 * mat.m31;
-      }
-    }, {
-      key: 'invert',
-      value: function invert(mat) {
-        var det = mat.determinant();
-        var m00 = (mat.m11 * mat.m22 * mat.m33 + mat.m12 * mat.m23 * mat.m31 + mat.m13 * mat.m21 * mat.m32 - mat.m11 * mat.m23 * mat.m32 - mat.m12 * mat.m21 * mat.m33 - mat.m13 * mat.m22 * mat.m31) / det;
-        var m01 = (mat.m01 * mat.m23 * mat.m32 + mat.m02 * mat.m21 * mat.m33 + mat.m03 * mat.m22 * mat.m31 - mat.m01 * mat.m22 * mat.m33 - mat.m02 * mat.m23 * mat.m31 - mat.m03 * mat.m21 * mat.m32) / det;
-        var m02 = (mat.m01 * mat.m12 * mat.m33 + mat.m02 * mat.m13 * mat.m31 + mat.m03 * mat.m11 * mat.m32 - mat.m01 * mat.m13 * mat.m32 - mat.m02 * mat.m11 * mat.m33 - mat.m03 * mat.m12 * mat.m31) / det;
-        var m03 = (mat.m01 * mat.m13 * mat.m22 + mat.m02 * mat.m11 * mat.m23 + mat.m03 * mat.m12 * mat.m21 - mat.m01 * mat.m12 * mat.m23 - mat.m02 * mat.m13 * mat.m21 - mat.m03 * mat.m11 * mat.m22) / det;
-        var m10 = (mat.m10 * mat.m23 * mat.m32 + mat.m12 * mat.m20 * mat.m33 + mat.m13 * mat.m22 * mat.m30 - mat.m10 * mat.m22 * mat.m33 - mat.m12 * mat.m23 * mat.m30 - mat.m13 * mat.m20 * mat.m32) / det;
-        var m11 = (mat.m00 * mat.m22 * mat.m33 + mat.m02 * mat.m23 * mat.m30 + mat.m03 * mat.m20 * mat.m32 - mat.m00 * mat.m23 * mat.m32 - mat.m02 * mat.m20 * mat.m33 - mat.m03 * mat.m22 * mat.m30) / det;
-        var m12 = (mat.m00 * mat.m13 * mat.m32 + mat.m02 * mat.m10 * mat.m33 + mat.m03 * mat.m12 * mat.m30 - mat.m00 * mat.m12 * mat.m33 - mat.m02 * mat.m13 * mat.m30 - mat.m03 * mat.m10 * mat.m32) / det;
-        var m13 = (mat.m00 * mat.m12 * mat.m23 + mat.m02 * mat.m13 * mat.m20 + mat.m03 * mat.m10 * mat.m22 - mat.m00 * mat.m13 * mat.m22 - mat.m02 * mat.m10 * mat.m23 - mat.m03 * mat.m12 * mat.m20) / det;
-        var m20 = (mat.m10 * mat.m21 * mat.m33 + mat.m11 * mat.m23 * mat.m30 + mat.m13 * mat.m20 * mat.m31 - mat.m10 * mat.m23 * mat.m31 - mat.m11 * mat.m20 * mat.m33 - mat.m13 * mat.m21 * mat.m30) / det;
-        var m21 = (mat.m00 * mat.m23 * mat.m31 + mat.m01 * mat.m20 * mat.m33 + mat.m03 * mat.m21 * mat.m30 - mat.m00 * mat.m21 * mat.m33 - mat.m01 * mat.m23 * mat.m30 - mat.m03 * mat.m20 * mat.m31) / det;
-        var m22 = (mat.m00 * mat.m11 * mat.m33 + mat.m01 * mat.m13 * mat.m30 + mat.m03 * mat.m10 * mat.m31 - mat.m00 * mat.m13 * mat.m31 - mat.m01 * mat.m10 * mat.m33 - mat.m03 * mat.m11 * mat.m30) / det;
-        var m23 = (mat.m00 * mat.m13 * mat.m21 + mat.m01 * mat.m10 * mat.m23 + mat.m03 * mat.m11 * mat.m20 - mat.m00 * mat.m11 * mat.m23 - mat.m01 * mat.m13 * mat.m20 - mat.m03 * mat.m10 * mat.m21) / det;
-        var m30 = (mat.m10 * mat.m22 * mat.m31 + mat.m11 * mat.m20 * mat.m32 + mat.m12 * mat.m21 * mat.m30 - mat.m10 * mat.m21 * mat.m32 - mat.m11 * mat.m22 * mat.m30 - mat.m12 * mat.m20 * mat.m31) / det;
-        var m31 = (mat.m00 * mat.m21 * mat.m32 + mat.m01 * mat.m22 * mat.m30 + mat.m02 * mat.m20 * mat.m31 - mat.m00 * mat.m22 * mat.m31 - mat.m01 * mat.m20 * mat.m32 - mat.m02 * mat.m21 * mat.m30) / det;
-        var m32 = (mat.m00 * mat.m12 * mat.m31 + mat.m01 * mat.m10 * mat.m32 + mat.m02 * mat.m11 * mat.m30 - mat.m00 * mat.m11 * mat.m32 - mat.m01 * mat.m12 * mat.m30 - mat.m02 * mat.m10 * mat.m31) / det;
-        var m33 = (mat.m00 * mat.m11 * mat.m22 + mat.m01 * mat.m12 * mat.m20 + mat.m02 * mat.m10 * mat.m21 - mat.m00 * mat.m12 * mat.m21 - mat.m01 * mat.m10 * mat.m22 - mat.m02 * mat.m11 * mat.m20) / det;
-
-        return new Matrix44(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
-      }
-    }]);
-    return Matrix44;
-  }();
-
-  GLBoost$1["Matrix44"] = Matrix44;
-
-  var Quaternion = function () {
-    function Quaternion(x, y, z, w) {
-      babelHelpers.classCallCheck(this, Quaternion);
-
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    babelHelpers.createClass(Quaternion, [{
-      key: 'isEqual',
-      value: function isEqual(vec) {
-        if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'clone',
-      value: function clone() {
-        return new Quaternion(this.x, this.y, this.z, this.w);
-      }
-    }, {
-      key: 'axisAngle',
-      value: function axisAngle(axisVec3, angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-        var halfAngle = 0.5 * radian;
-        var sin = Math.sin(halfAngle);
-
-        var axis = Vector3.normalize(axisVec3);
-        this.w = Math.cos(halfAngle);
-        this.x = sin * axis.x;
-        this.y = sin * axis.y;
-        this.z = sin * axis.z;
-
-        return this;
-      }
-    }, {
-      key: 'add',
-      value: function add(q) {
-        this.x += q.x;
-        this.y += q.y;
-        this.z += q.z;
-        this.w += q.w;
-
-        return this;
-      }
-    }, {
-      key: 'multiply',
-      value: function multiply(val) {
-        this.x *= val;
-        this.y *= val;
-        this.z *= val;
-        this.w *= val;
-
-        return this;
-      }
-    }, {
-      key: 'rotationMatrix',
-      get: function get() {
-        var sx = this.x * this.x;
-        var sy = this.y * this.y;
-        var sz = this.z * this.z;
-        var cx = this.y * this.z;
-        var cy = this.x * this.z;
-        var cz = this.x * this.y;
-        var wx = this.w * this.x;
-        var wy = this.w * this.y;
-        var wz = this.w * this.z;
-
-        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0, 2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0, 2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
-      }
-    }], [{
-      key: 'invert',
-      value: function invert(quat) {
-        return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0 / (quat.x * quat.x + quat.y * quat.y + quat.z * quat.z + quat.w * quat.w));
-      }
-    }, {
-      key: 'qlerp',
-      value: function qlerp(lhq, rhq, ratio) {
-
-        var q = new Quaternion(0, 0, 0, 1);
-        var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
-        var ss = 1.0 - qr * qr;
-
-        if (ss === 0.0) {
-          q.w = lhq.w;
-          q.x = lhq.x;
-          q.y = lhq.y;
-          q.z = lhq.z;
-
-          return q;
-        } else {
-
-          if (qr > 1) {
-            qr = 0.999;
-          } else if (qr < -1) {
-            qr = -0.999;
-          }
-
-          var ph = Math.acos(qr);
-          var s2 = void 0;
-          if (qr < 0.0 && ph > Math.PI / 2.0) {
-            qr = -lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
-            ph = Math.acos(qr);
-            s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
-          } else {
-            s2 = Math.sin(ph * ratio) / Math.sin(ph);
-          }
-          var s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
-
-          q.x = lhq.x * s1 + rhq.x * s2;
-          q.y = lhq.y * s1 + rhq.y * s2;
-          q.z = lhq.z * s1 + rhq.z * s2;
-          q.w = lhq.w * s1 + rhq.w * s2;
-
-          return q;
-        }
-      }
-    }, {
-      key: 'axisAngle',
-      value: function axisAngle(axisVec3, angle) {
-        var radian = 0;
-        if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-          radian = MathUtil.degreeToRadian(angle);
-        } else {
-          radian = angle;
-        }
-        var halfAngle = 0.5 * radian;
-        var sin = Math.sin(halfAngle);
-
-        var axis = Vector3.normalize(axisVec3);
-        return new Quaternion(sin * axis.x, sin * axis.y, sin * axis.z, Math.cos(halfAngle));
-      }
-    }]);
-    return Quaternion;
-  }();
-
-  GLBoost$1["Quaternion"] = Quaternion;
 
   var L_Element = function (_GLBoostObject) {
     babelHelpers.inherits(L_Element, _GLBoostObject);
@@ -3653,16 +3692,42 @@
       value: function _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
         var _this4 = this;
 
-        var vertexAttribsAsResult = [];
-
+        var temp = [];
         // and shade as mixin Prepare Functions
         this._classNamesOfPrepare.forEach(function (className) {
           var method = _this4['prepare_' + className];
           if (method) {
             var verAttirbs = method.bind(_this4, gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
-            vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
+            temp = temp.concat(verAttirbs);
           }
         });
+        var set = new Set(temp);
+
+        var vertexAttribsAsResult = [];
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = set[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var elem = _step.value;
+
+            vertexAttribsAsResult.push(elem);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
 
         return vertexAttribsAsResult;
       }
@@ -5520,8 +5585,10 @@
 
           if (!isVAOBound) {
             if (DrawKickerLocal._lastGeometry !== geometryName) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[geometryName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+              for (var attribName in vboDic) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
+                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+              }
             }
           }
 
@@ -5600,7 +5667,7 @@
           DrawKickerLocal._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
         }
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         DrawKickerLocal._lastGeometry = geometryName;
         DrawKickerLocal._lastRenderPassIndex = renderPassIndex;
@@ -5652,8 +5719,10 @@
 
           if (!isVAOBound) {
             if (DrawKickerWorld._lastGeometry !== geometryName) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[geometryName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+              for (var attribName in vboDic) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
+                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+              }
             }
           }
 
@@ -5725,6 +5794,7 @@
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
             gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+            //gl.drawElements(gl[primitiveType], 0, glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
@@ -5735,7 +5805,7 @@
           DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
         }
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
         DrawKickerWorld._lastGeometry = geometryName;
@@ -5795,6 +5865,18 @@
         this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
 
         return positionVector;
+      }
+    }, {
+      key: 'addPositionWithArray',
+      value: function addPositionWithArray(array, index) {
+        this._AABB_min.x = array[index + 0] < this._AABB_min.x ? array[index + 0] : this._AABB_min.x;
+        this._AABB_min.y = array[index + 1] < this._AABB_min.y ? array[index + 1] : this._AABB_min.y;
+        this._AABB_min.z = array[index + 2] < this._AABB_min.z ? array[index + 2] : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < array[index + 0] ? array[index + 0] : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < array[index + 1] ? array[index + 1] : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < array[index + 2] ? array[index + 2] : this._AABB_max.z;
+
+        return array;
       }
     }, {
       key: 'updateAllInfo',
@@ -5870,7 +5952,7 @@
 
   GLBoost$1['AABB'] = AABB;
 
-  var Geometry = function (_GLBoostObject) {
+  var Geometry$1 = function (_GLBoostObject) {
     babelHelpers.inherits(Geometry, _GLBoostObject);
 
     function Geometry(glBoostContext) {
@@ -5885,10 +5967,10 @@
       _this._vertices = null;
       _this._indicesArray = null;
       _this._performanceHint = null;
-      _this._vertexAttribComponentNDic = {};
       _this._defaultMaterial = glBoostContext.createClassicMaterial();
       _this._vertexData = [];
       _this._extraDataForShader = {};
+      _this._vboObj = {};
       _this._AABB = new AABB();
       _this._drawKicker = DrawKickerWorld.getInstance();
 
@@ -5897,58 +5979,53 @@
     }
 
     /**
-     * データとして利用する頂点属性を判断し、そのリストを返す
+     * 全ての頂点属性のリストを返す
      */
 
 
     babelHelpers.createClass(Geometry, [{
-      key: '_decideNeededVertexAttribs',
-      value: function _decideNeededVertexAttribs(vertices, material) {
+      key: '_checkAndSetVertexComponentNumber',
+      value: function _checkAndSetVertexComponentNumber(allVertexAttribs) {
+        var _this2 = this;
 
-        var attribNameArray = [];
-        for (var attribName in vertices) {
-          attribNameArray.push(attribName);
-        }
-
-        return attribNameArray;
-      }
-
-      /**
-       * 全ての頂点属性のリストを返す
-       */
-
-    }, {
-      key: '_allVertexAttribs',
-      value: function _allVertexAttribs(vertices) {
-        var attribNameArray = [];
-        for (var attribName in vertices) {
-          attribNameArray.push(attribName);
-        }
-
-        return attribNameArray;
+        allVertexAttribs.forEach(function (attribName) {
+          var element = _this2._vertices[attribName][0];
+          var componentN = MathUtil.compomentNumberOfVector(element);
+          if (componentN === 0) {
+            // if 0, it must be a number. so users must set components info.
+            return;
+          }
+          if (typeof _this2._vertices.components === 'undefined') {
+            _this2._vertices.components = {};
+          }
+          _this2._vertices.components[attribName] = componentN;
+        });
       }
     }, {
       key: 'setVerticesData',
       value: function setVerticesData(vertices, indicesArray) {
-        var _this2 = this;
+        var _this3 = this;
 
         var primitiveType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : GLBoost$1.TRIANGLES;
         var performanceHint = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : GLBoost$1.STATIC_DRAW;
 
         this._vertices = vertices;
 
-        var allVertexAttribs = this._allVertexAttribs(this._vertices);
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
 
-        // if array, convert to vector[2/3/4]
-        this._vertices.position.forEach(function (elem, index) {
-          allVertexAttribs.forEach(function (attribName) {
-            var element = _this2._vertices[attribName][index];
-            _this2._vertices[attribName][index] = MathUtil.arrayToVector(element);
+        this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
+        allVertexAttribs.forEach(function (attribName) {
+          var vertexAttribArray = [];
+          _this3._vertices[attribName].forEach(function (elem, index) {
+            var element = _this3._vertices[attribName][index];
+            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
             if (attribName === 'position') {
-              _this2._AABB.addPosition(_this2._vertices[attribName][index]);
+              var componentN = _this3._vertices.components[attribName];
+              _this3._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
             }
           });
+          _this3._vertices[attribName] = vertexAttribArray;
         });
 
         this._AABB.updateAllInfo();
@@ -5974,104 +6051,68 @@
     }, {
       key: 'updateVerticesData',
       value: function updateVerticesData(vertices) {
-        var _this3 = this;
-
-        var isAlreadyInterleaved = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var _this4 = this;
 
         var gl = this._glContext.gl;
-        var vertexData = this._vertexData;
-        //var vertexData = [];
-        if (isAlreadyInterleaved) {
-          vertexData = vertices;
-        } else {
-          var allVertexAttribs;
 
-          (function () {
-            _this3._vertices = ArrayUtil.merge(_this3._vertices, vertices);
-            allVertexAttribs = _this3._allVertexAttribs(_this3._vertices);
+        var _loop = function _loop(attribName) {
+          var vertexAttribArray = [];
+          _this4._vertices[attribName].forEach(function (elem, index) {
+            var element = vertices[attribName][index];
+            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
 
-            var isCached = vertexData.length == 0 ? false : true;
-
-            var idx = 0;
-            _this3._vertices.position.forEach(function (elem, index) {
-              allVertexAttribs.forEach(function (attribName) {
-                var element = _this3._vertices[attribName][index];
-                // if array, convert to vector[2/3/4]
-                _this3._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
-
-                if (attribName === 'position') {
-                  _this3._AABB.addPosition(_this3._vertices[attribName][index]);
-                }
-
-                vertexData[idx++] = element.x;
-                vertexData[idx++] = element.y;
-                if (element.z !== void 0) {
-                  vertexData[idx++] = element.z;
-                }
-                if (element.w !== void 0) {
-                  vertexData[idx++] = element.w;
-                }
-              });
-            });
-
-            _this3._AABB.updateAllInfo();
-
-            if (!isCached) {
-              _this3.Float32AryVertexData = new Float32Array(vertexData);
+            if (attribName === 'position') {
+              var componentN = _this4._vertices.components[attribName];
+              _this4._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
             }
-            var float32AryVertexData = _this3.Float32AryVertexData;
-            for (var i = 0; i < float32AryVertexData.length; i++) {
-              float32AryVertexData[i] = vertexData[i];
-            }
-            gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[_this3.toString()]);
-            gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-          })();
+            _this4._vertices[attribName] = vertexAttribArray;
+          });
+        };
+
+        for (var attribName in vertices) {
+          _loop(attribName);
+        }
+
+        this._AABB.updateAllInfo();
+
+        for (var _attribName in vertices) {
+          var float32AryVertexData = new Float32Array(this._vertices[_attribName]);
+          gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[_attribName]);
+          gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+          gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
       }
     }, {
       key: 'setUpVertexAttribs',
-      value: function setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
-        var _this4 = this;
+      value: function setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
+        var _this5 = this;
 
         var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-        var stride = 0;
-        _allVertexAttribs.forEach(function (attribName) {
-          stride += _this4._vertexAttribComponentNDic[attribName] * 4;
-        });
-
         // 頂点レイアウト設定
-        var offset = 0;
-        _allVertexAttribs.forEach(function (attribName) {
+        allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this4._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
+            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
           }
-          offset += _this4._vertexAttribComponentNDic[attribName] * 4;
         });
       }
     }, {
       key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
       value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
-        var _this5 = this;
-
         var doSetupVertexAttribs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
         var gl = this._glContext.gl;
         var vertices = this._vertices;
 
         var glem = GLExtensionsManager.getInstance(this._glContext);
-        var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+        var _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
 
         if (doSetupVertexAttribs) {
           glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-          gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
         }
 
-        var allVertexAttribs = this._allVertexAttribs(vertices);
-        allVertexAttribs.forEach(function (attribName) {
-          _this5._vertexAttribComponentNDic[attribName] = vertices[attribName][0].z === void 0 ? 2 : vertices[attribName][0].w === void 0 ? 3 : 4;
-        });
+        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
 
         if (material.shaderInstance === null) {
           var shaderClass = material.shaderClass;
@@ -6112,13 +6153,16 @@
     }, {
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
+        var _this6 = this;
 
         var vertices = this._vertices;
         var gl = this._glContext.gl;
 
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
-        this._vertexN = vertices.position.length;
+        this._vertexN = vertices.position.length / vertices.components.position;
+
+        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
 
         // create VAO
         if (Geometry._vaoDic[this.toString()]) {} else {
@@ -6129,14 +6173,15 @@
 
         var doAfter = true;
 
-        // create VBO
-        if (Geometry._vboDic[this.toString()]) {
-          doAfter = false;
-        } else {
-          var vbo = this._glContext.createBuffer(this);
-          Geometry._vboDic[this.toString()] = vbo;
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+        allVertexAttribs.forEach(function (attribName) {
+          // create VBO
+          if (_this6._vboObj[attribName]) {
+            doAfter = false;
+          } else {
+            var vbo = _this6._glContext.createBuffer(_this6);
+            _this6._vboObj[attribName] = vbo;
+          }
+        });
 
         var materials = null;
         if (this._materials.length > 0) {
@@ -6153,24 +6198,11 @@
 
         if (doAfter) {
 
-          var vertexData = [];
-          var allVertexAttribs = this._allVertexAttribs(vertices);
-          vertices.position.forEach(function (elem, index, array) {
-            allVertexAttribs.forEach(function (attribName) {
-              var element = vertices[attribName][index];
-              vertexData.push(element.x);
-              vertexData.push(element.y);
-              if (element.z !== void 0) {
-                vertexData.push(element.z);
-              }
-              if (element.w !== void 0) {
-                vertexData.push(element.w);
-              }
-            });
+          allVertexAttribs.forEach(function (attribName) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this6._vboObj[attribName]);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
           });
-
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
-          gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
           Geometry._iboArrayDic[this.toString()] = [];
           if (this._indicesArray) {
@@ -6186,7 +6218,6 @@
           }
           glem.bindVertexArray(gl, null);
         }
-
         return true;
       }
     }, {
@@ -6206,7 +6237,62 @@
 
         var thisName = this.toString();
 
-        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+      }
+    }, {
+      key: 'merge',
+      value: function merge(geometrys) {
+        var _this7 = this;
+
+        if (Array.isArray(geometrys)) {
+          (function () {
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this7._vertices[attribName].length;
+
+              var allGeomLength = 0;
+              geometrys.forEach(function (geometry) {
+                allGeomLength += geometry._vertices[attribName].length;
+              });
+              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+            });
+
+            var lastThisLengthDic = {};
+            allVertexAttribs.forEach(function (attribName) {
+              lastThisLengthDic[attribName] = 0;
+            });
+            geometrys.forEach(function (geometry, index) {
+              var typedSubArrayDic = {};
+              allVertexAttribs.forEach(function (attribName) {
+                var typedArray = typedArrayDic[attribName];
+
+                if (index === 0) {
+                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+                }
+
+                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
+                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+                lastThisLengthDic[attribName] = end;
+              });
+              _this7.mergeInner(geometry, typedSubArrayDic, index === 0);
+            });
+          })();
+        } else {
+          (function () {
+            var geometry = geometrys;
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this7._vertices[attribName].length;
+              var geomLength = geometry._vertices[attribName].length;
+
+              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+            });
+
+            _this7.mergeInner(geometry, typedArrayDic);
+          })();
+        }
       }
 
       /**
@@ -6215,16 +6301,41 @@
        */
 
     }, {
-      key: 'merge',
-      value: function merge(geometry) {
-        var baseLen = this._vertices.position.length;
+      key: 'mergeInner',
+      value: function mergeInner(geometry, typedArrayDic) {
+        var _this8 = this;
+
+        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var gl = this._glContext.gl;
+        var baseLen = this._vertices.position.length / this._vertices.components.position;;
 
         if (this === geometry) {
           console.assert('don\'t merge same geometry!');
         }
-        for (var attribName in this._vertices) {
-          Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
-        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+        allVertexAttribs.forEach(function (attribName) {
+          var thisLength = _this8._vertices[attribName].length;
+          var geomLength = geometry._vertices[attribName].length;
+
+          var float32array = typedArrayDic[attribName];
+
+          if (isFirst) {
+            float32array.set(_this8._vertices[attribName], 0);
+          }
+          float32array.set(geometry._vertices[attribName], thisLength);
+
+          _this8._vertices[attribName] = float32array;
+
+          if (typeof _this8._vboObj[attribName] !== 'undefined') {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this8._vboObj[attribName]);
+            gl.bufferData(gl.ARRAY_BUFFER, _this8._vertices[attribName], _this8._performanceHint);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          }
+        });
+
         var geometryIndicesN = geometry._indicesArray.length;
         for (var i = 0; i < geometryIndicesN; i++) {
           for (var j = 0; j < geometry._indicesArray[i].length; j++) {
@@ -6237,6 +6348,61 @@
         }
         this._vertexN += geometry._vertexN;
       }
+    }, {
+      key: 'mergeHarder',
+      value: function mergeHarder(geometrys) {
+        var _this9 = this;
+
+        if (Array.isArray(geometrys)) {
+          (function () {
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this9._vertices[attribName].length;
+
+              var allGeomLength = 0;
+              geometrys.forEach(function (geometry) {
+                allGeomLength += geometry._vertices[attribName].length;
+              });
+              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+            });
+
+            var lastThisLengthDic = {};
+            allVertexAttribs.forEach(function (attribName) {
+              lastThisLengthDic[attribName] = 0;
+            });
+            geometrys.forEach(function (geometry, index) {
+              var typedSubArrayDic = {};
+              allVertexAttribs.forEach(function (attribName) {
+                var typedArray = typedArrayDic[attribName];
+
+                if (index === 0) {
+                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+                }
+
+                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
+                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+                lastThisLengthDic[attribName] = end;
+              });
+              _this9.mergeHarderInner(geometry, typedSubArrayDic, index === 0);
+            });
+          })();
+        } else {
+          (function () {
+            var geometry = geometrys;
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this9._vertices[attribName].length;
+              var geomLength = geometry._vertices[attribName].length;
+
+              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+            });
+
+            _this9.mergeHarderInner(geometry, typedArrayDic);
+          })();
+        }
+      }
 
       /**
        * take no thought geometry's materials
@@ -6245,15 +6411,40 @@
        */
 
     }, {
-      key: 'mergeHarder',
-      value: function mergeHarder(geometry) {
-        var baseLen = this._vertices.position.length;
+      key: 'mergeHarderInner',
+      value: function mergeHarderInner(geometry, typedArrayDic) {
+        var _this10 = this;
+
+        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var gl = this._glContext.gl;
+        var baseLen = this._vertices.position.length / this._vertices.components.position;
         if (this === geometry) {
           console.assert('don\'t merge same geometry!');
         }
-        for (var attribName in this._vertices) {
-          Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
-        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+        allVertexAttribs.forEach(function (attribName) {
+          var thisLength = _this10._vertices[attribName].length;
+          var geomLength = geometry._vertices[attribName].length;
+
+          var float32array = typedArrayDic[attribName];
+
+          if (isFirst) {
+            float32array.set(_this10._vertices[attribName], 0);
+          }
+          float32array.set(geometry._vertices[attribName], thisLength);
+
+          _this10._vertices[attribName] = float32array;
+
+          if (typeof _this10._vboObj[attribName] !== 'undefined') {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this10._vboObj[attribName]);
+            gl.bufferData(gl.ARRAY_BUFFER, _this10._vertices[attribName], _this10._performanceHint);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          }
+        });
+
         for (var i = 0; i < this._indicesArray.length; i++) {
           var len = geometry._indicesArray[i].length;
           for (var j = 0; j < len; j++) {
@@ -6295,6 +6486,18 @@
         return this._AABB;
       }
     }], [{
+      key: '_allVertexAttribs',
+      value: function _allVertexAttribs(vertices) {
+        var attribNameArray = [];
+        for (var attribName in vertices) {
+          if (attribName !== 'components') {
+            attribNameArray.push(attribName);
+          }
+        }
+
+        return attribNameArray;
+      }
+    }, {
       key: 'clearMaterialCache',
       value: function clearMaterialCache() {
         Geometry._lastMaterial = null;
@@ -6303,9 +6506,8 @@
     return Geometry;
   }(GLBoostObject);
 
-  Geometry._vaoDic = {};
-  Geometry._vboDic = {};
-  Geometry._iboArrayDic = {};
+  Geometry$1._vaoDic = {};
+  Geometry$1._iboArrayDic = {};
 
   /**
    * This Particle class handles particles expressions.
@@ -6593,7 +6795,7 @@
       }
     }]);
     return Particle;
-  }(Geometry);
+  }(Geometry$1);
 
   GLBoost$1["Particle"] = Particle;
 
@@ -6684,7 +6886,7 @@
       }
     }]);
     return Sphere;
-  }(Geometry);
+  }(Geometry$1);
 
   GLBoost$1["Sphere"] = Sphere;
 
@@ -6769,7 +6971,7 @@
       }
     }]);
     return Plane;
-  }(Geometry);
+  }(Geometry$1);
 
   GLBoost$1["Plane"] = Plane;
 
@@ -6833,7 +7035,7 @@
       }
     }]);
     return Cube;
-  }(Geometry);
+  }(Geometry$1);
 
   GLBoost$1["Cube"] = Cube;
 
@@ -7132,7 +7334,7 @@
       }
     }]);
     return BlendShapeGeometry;
-  }(Geometry);
+  }(Geometry$1);
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
@@ -7158,7 +7360,7 @@
     }, {
       key: 'createGeometry',
       value: function createGeometry() {
-        return new Geometry(this);
+        return new Geometry$1(this);
       }
     }, {
       key: 'createBlendShapeGeometry',
