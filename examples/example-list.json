@@ -27,6 +27,7 @@
     "loading_gltf_anim",
     "loading_gltf_hierarchical_anim",
     "loading_gltf_skinning_anim",
+    "loading_gltf_skinning_anim_current_value_control",
     "multiple_contexts",
     "obj_mesh_changing_scene_graph",
     "obj_mesh_changing_shader",
