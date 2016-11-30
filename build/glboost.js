@@ -6997,11 +6997,11 @@
           globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
         }
         for (var _i = 0; _i < joints.length; _i++) {
-
           matrices[_i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[_i]);
           var inverseBindMatrix = typeof skeletalMesh.inverseBindMatrices[_i] !== 'undefined' ? skeletalMesh.inverseBindMatrices[_i] : Matrix44.identity();
           matrices[_i] = Matrix44.multiply(matrices[_i], inverseBindMatrix);
           matrices[_i] = Matrix44.multiply(matrices[_i], skeletalMesh.bindShapeMatrix);
+          matrices[_i] = Matrix44.multiply(matrices[_i], skeletalMesh.transformMatrixAccumulatedAncestry);
         }
 
         var flatMatrices = [];
@@ -7090,8 +7090,6 @@
     babelHelpers.createClass(M_SkeletalMesh, [{
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights, renderPasses) {
-        this.bakeTransformToGeometry();
-        this.multiplyMatrix(Matrix44.identity());
         var joints = this.jointsHierarchy.searchElementsByType(M_Joint);
 
         this._joints = [];
