@@ -74,18 +74,27 @@ export default class Geometry extends GLBoostObject {
 
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
-    allVertexAttribs.forEach((attribName)=> {
-      let vertexAttribArray = [];
-      this._vertices[attribName].forEach((elem, index) => {
-        let element = this._vertices[attribName][index];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-        if (attribName === 'position') {
-          let componentN = this._vertices.components[attribName];
-          this._AABB.addPositionWithArray(vertexAttribArray, index*componentN);
-        }
+    if (typeof this._vertices.position.buffer !== 'undefined') {
+      // position (and maybe others) are a TypedArray
+      let componentN = this._vertices.components.position;
+      let vertexNum = this._vertices.position.length / componentN;
+      for (let i=0; i<vertexNum; i++) {
+        this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+      }
+    } else {
+      allVertexAttribs.forEach((attribName)=> {
+        let vertexAttribArray = [];
+        this._vertices[attribName].forEach((elem, index) => {
+          let element = this._vertices[attribName][index];
+          Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          if (attribName === 'position') {
+            let componentN = this._vertices.components[attribName];
+            this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
+          }
+        });
+        this._vertices[attribName] = vertexAttribArray;
       });
-      this._vertices[attribName] = vertexAttribArray;
-    });
+    }
 
     this._AABB.updateAllInfo();
 
@@ -252,8 +261,6 @@ export default class Geometry extends GLBoostObject {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
       });
-
-
 
       Geometry._iboArrayDic[this.toString()] = [];
       if (this._indicesArray) {

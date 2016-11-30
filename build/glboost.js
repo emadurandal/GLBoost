@@ -5392,7 +5392,6 @@
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
             gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-            //gl.drawElements(gl[primitiveType], 0, glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
@@ -6177,18 +6176,27 @@
 
         this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
-        allVertexAttribs.forEach(function (attribName) {
-          var vertexAttribArray = [];
-          _this3._vertices[attribName].forEach(function (elem, index) {
-            var element = _this3._vertices[attribName][index];
-            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-            if (attribName === 'position') {
-              var componentN = _this3._vertices.components[attribName];
-              _this3._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
-            }
+        if (typeof this._vertices.position.buffer !== 'undefined') {
+          // position (and maybe others) are a TypedArray
+          var componentN = this._vertices.components.position;
+          var vertexNum = this._vertices.position.length / componentN;
+          for (var i = 0; i < vertexNum; i++) {
+            this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+          }
+        } else {
+          allVertexAttribs.forEach(function (attribName) {
+            var vertexAttribArray = [];
+            _this3._vertices[attribName].forEach(function (elem, index) {
+              var element = _this3._vertices[attribName][index];
+              Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+              if (attribName === 'position') {
+                var _componentN = _this3._vertices.components[attribName];
+                _this3._AABB.addPositionWithArray(vertexAttribArray, index * _componentN);
+              }
+            });
+            _this3._vertices[attribName] = vertexAttribArray;
           });
-          _this3._vertices[attribName] = vertexAttribArray;
-        });
+        }
 
         this._AABB.updateAllInfo();
 
@@ -10356,11 +10364,19 @@
         var _indicesArray = [];
         var _positions = [];
         var _normals = [];
+        var vertexData = {
+          position: _positions,
+          normal: _normals,
+          components: {},
+          componentBytes: {}
+        };
         var additional = {
           'joint': [],
           'weight': [],
           'texcoord': []
         };
+
+        var dataViewMethodDic = {};
 
         var materials = [];
 
@@ -10376,23 +10392,36 @@
           }
 
           var positionsAccessorStr = primitiveJson.attributes.POSITION;
-          var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl);
-          Array.prototype.push.apply(_positions, positions);
+          var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl, false, true);
+          _positions[i] = positions;
+          vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json, gl);
+          vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
+          dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
 
           var normalsAccessorStr = primitiveJson.attributes.NORMAL;
-          var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl);
-          Array.prototype.push.apply(_normals, normals);
+          var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+          //Array.prototype.push.apply(_normals, normals);
+          _normals[i] = normals;
+          vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
+          vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
+          dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
 
           /// if Skeletal
           var jointAccessorStr = primitiveJson.attributes.JOINT;
           if (jointAccessorStr) {
-            var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl);
-            Array.prototype.push.apply(additional['joint'], joints);
+            var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            additional['joint'][i] = joints;
+            vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json, gl);
+            vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json, gl);
+            dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json, gl);
           }
           var weightAccessorStr = primitiveJson.attributes.WEIGHT;
           if (weightAccessorStr) {
-            var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl);
-            Array.prototype.push.apply(additional['weight'], weights);
+            var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            additional['weight'][i] = weights;
+            vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json, gl);
+            vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json, gl);
+            dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json, gl);
           }
 
           // Texture
@@ -10411,8 +10440,11 @@
           var diffuseValue = materialJson.values.diffuse;
           // Diffuse Texture
           if (texcoords0AccessorStr) {
-            texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl);
-            Array.prototype.push.apply(additional['texcoord'], texcoords);
+            texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            additional['texcoord'][i] = texcoords;
+            vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
+            vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
+            dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
 
             if (typeof diffuseValue === 'string') {
               var textureStr = diffuseValue;
@@ -10446,12 +10478,19 @@
               material.diffuseTexture = texture;
             }
           } else {
-            if (additional['texcoord'].length > 0) {
+            if (typeof vertexData.components.texcoord !== 'undefined') {
+              // If texture coordinates existed even once in the previous loop
               var emptyTexcoords = [];
-              for (var k = 0; k < positions.length; k++) {
-                emptyTexcoords.push(new Vector2(0, 0));
+              var componentN = vertexData.components.position;
+              var length = positions.length / componentN;
+              for (var k = 0; k < length; k++) {
+                emptyTexcoords.push(0);
+                emptyTexcoords.push(0);
               }
-              Array.prototype.push.apply(additional['texcoord'], emptyTexcoords);
+              additional['texcoord'][i] = new Float32Array(emptyTexcoords);
+              vertexData.components.texcoord = 2;
+              vertexData.componentBytes.texcoord = 4;
+              dataViewMethodDic.texcoord = 'getFloat32';
             }
           }
 
@@ -10482,19 +10521,96 @@
           }
           materials.push(material);
         }
-        if (additional['joint'].length === 0) {
+
+        if (meshJson.primitives.length > 1) {
+          var getTypedArray = function getTypedArray(dataViewMethod, length) {
+            var vertexAttributeArray = null;
+            if (dataViewMethod === 'getInt8') {
+              vertexAttributeArray = new Int8Array(length);
+            } else if (dataViewMethod === 'getUint8') {
+              vertexAttributeArray = new Uint8Array(length);
+            } else if (dataViewMethod === 'getInt16') {
+              vertexAttributeArray = new Int16Array(length);
+            } else if (dataViewMethod === 'getUInt16') {
+              vertexAttributeArray = new Uint16Array(length);
+            } else if (dataViewMethod === 'getInt32') {
+              vertexAttributeArray = new Int32Array(length);
+            } else if (dataViewMethod === 'getUInt32') {
+              vertexAttributeArray = new Uint32Array(length);
+            } else if (dataViewMethod === 'getFloat32') {
+              vertexAttributeArray = new Float32Array(length);
+            }
+
+            return vertexAttributeArray;
+          };
+
+          var lengthDic = { position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0 };
+          for (var _i2 = 0; _i2 < meshJson.primitives.length; _i2++) {
+            lengthDic.position += _positions[_i2].length;
+            lengthDic.normal += _normals[_i2].length;
+            if (typeof additional['joint'][_i2] !== 'undefined') {
+              lengthDic.joint += additional['joint'][_i2].length;
+            }
+            if (typeof additional['weight'][_i2] !== 'undefined') {
+              lengthDic.weight += additional['weight'][_i2].length;
+            }
+            if (typeof additional['texcoord'][_i2] !== 'undefined') {
+              lengthDic.texcoord += additional['texcoord'][_i2].length;
+            }
+          }
+
+          for (var attribName in dataViewMethodDic) {
+            var newTypedArray = getTypedArray(dataViewMethodDic[attribName], lengthDic[attribName]);
+            var offset = 0;
+            for (var _i3 = 0; _i3 < meshJson.primitives.length; _i3++) {
+
+              var array = null;
+
+              if (attribName === 'position') {
+                array = _positions[_i3];
+              } else if (attribName === 'normal') {
+                array = _normals[_i3];
+              } else if (attribName === 'joint') {
+                array = additional['joint'][_i3];
+              } else if (attribName === 'weight') {
+                array = additional['weight'][_i3];
+              } else if (attribName === 'texcoord') {
+                array = additional['texcoord'][_i3];
+              }
+
+              newTypedArray.set(array, offset);
+              offset += array.length;
+            }
+
+            if (attribName === 'position') {
+              vertexData.position = newTypedArray;
+            } else if (attribName === 'normal') {
+              vertexData.normal = newTypedArray;
+            } else if (attribName === 'joint') {
+              additional['joint'] = newTypedArray;
+            } else if (attribName === 'weight') {
+              additional['weight'] = newTypedArray;
+            } else if (attribName === 'texcoord') {
+              additional['texcoord'] = newTypedArray;
+            }
+          }
+        } else {
+          vertexData.position = _positions[0];
+          vertexData.normal = _normals[0];
+          additional['joint'] = additional['joint'][0];
+          additional['weight'] = additional['weight'][0];
+          additional['texcoord'] = additional['texcoord'][0];
+        }
+
+        if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
           delete additional['joint'];
         }
-        if (additional['weight'].length === 0) {
+        if (typeof additional['weight'] === 'undefined' || additional['weight'].length === 0) {
           delete additional['weight'];
         }
-        if (additional['texcoord'].length === 0) {
+        if (typeof additional['texcoord'] === 'undefined' || additional['texcoord'].length === 0) {
           delete additional['texcoord'];
         }
-        var vertexData = {
-          position: _positions,
-          normal: _normals
-        };
 
         if (_indicesArray.length === 0) {
           _indicesArray = null;
@@ -10587,14 +10703,9 @@
         return dataUrl;
       }
     }, {
-      key: '_accessBinary',
-      value: function _accessBinary(accessorStr, json, arrayBuffer, scale, gl) {
-        var quaternionIfVec4 = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-
+      key: '_checkComponentNumber',
+      value: function _checkComponentNumber(accessorStr, json, gl) {
         var accessorJson = json.accessors[accessorStr];
-        var bufferViewStr = accessorJson.bufferView;
-        var bufferViewJson = json.bufferViews[bufferViewStr];
-        var byteOffset = bufferViewJson.byteOffset + accessorJson.byteOffset;
 
         var componentN = 0;
         switch (accessorJson.type) {
@@ -10615,73 +10726,182 @@
             break;
         }
 
+        return componentN;
+      }
+    }, {
+      key: '_checkBytesPerComponent',
+      value: function _checkBytesPerComponent(accessorStr, json, gl) {
+        var accessorJson = json.accessors[accessorStr];;
+
         var bytesPerComponent = 0;
-        var dataViewMethod = '';
         switch (accessorJson.componentType) {
           case gl.BYTE:
             bytesPerComponent = 1;
-            dataViewMethod = 'getInt8';
             break;
           case gl.UNSIGNED_BYTE:
             bytesPerComponent = 1;
-            dataViewMethod = 'getUint8';
             break;
           case gl.SHORT:
             bytesPerComponent = 2;
-            dataViewMethod = 'getInt16';
             break;
           case gl.UNSIGNED_SHORT:
             bytesPerComponent = 2;
-            dataViewMethod = 'getUint16';
             break;
           case gl.INT:
             bytesPerComponent = 4;
-            dataViewMethod = 'getInt33';
             break;
           case gl.UNSIGNED_INT:
             bytesPerComponent = 4;
-            dataViewMethod = 'getUint33';
             break;
           case gl.FLOAT:
             bytesPerComponent = 4;
+            break;
+          default:
+            break;
+        }
+        return bytesPerComponent;
+      }
+    }, {
+      key: '_checkDataViewMethod',
+      value: function _checkDataViewMethod(accessorStr, json, gl) {
+        var accessorJson = json.accessors[accessorStr];
+        var dataViewMethod = '';
+        switch (accessorJson.componentType) {
+          case gl.BYTE:
+            dataViewMethod = 'getInt8';
+            break;
+          case gl.UNSIGNED_BYTE:
+            dataViewMethod = 'getUint8';
+            break;
+          case gl.SHORT:
+            dataViewMethod = 'getInt16';
+            break;
+          case gl.UNSIGNED_SHORT:
+            dataViewMethod = 'getUint16';
+            break;
+          case gl.INT:
+            dataViewMethod = 'getInt33';
+            break;
+          case gl.UNSIGNED_INT:
+            dataViewMethod = 'getUint33';
+            break;
+          case gl.FLOAT:
             dataViewMethod = 'getFloat32';
             break;
           default:
             break;
         }
+        return dataViewMethod;
+      }
+    }, {
+      key: '_accessBinary',
+      value: function _accessBinary(accessorStr, json, arrayBuffer, scale, gl) {
+        var quaternionIfVec4 = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+        var toGetAsTypedArray = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+
+        var accessorJson = json.accessors[accessorStr];
+        var bufferViewStr = accessorJson.bufferView;
+        var bufferViewJson = json.bufferViews[bufferViewStr];
+        var byteOffset = bufferViewJson.byteOffset + accessorJson.byteOffset;
+
+        var componentN = this._checkComponentNumber(accessorStr, json, gl);
+        var bytesPerComponent = this._checkBytesPerComponent(accessorStr, json, gl);
+        var dataViewMethod = this._checkDataViewMethod(accessorStr, json, gl);
 
         var byteLength = bytesPerComponent * componentN * accessorJson.count;
 
         var vertexAttributeArray = [];
-        var dataView = new DataView(arrayBuffer, byteOffset, byteLength);
-        var byteDelta = bytesPerComponent * componentN;
-        var littleEndian = true;
-        for (var pos = 0; pos < byteLength; pos += byteDelta) {
 
-          switch (accessorJson.type) {
-            case 'SCALAR':
-              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
-              break;
-            case 'VEC2':
-              vertexAttributeArray.push(new Vector2(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale));
-              break;
-            case 'VEC3':
-              vertexAttributeArray.push(new Vector3(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale));
-              break;
-            case 'VEC4':
-              if (quaternionIfVec4) {
-                vertexAttributeArray.push(new Quaternion(dataView[dataViewMethod](pos, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian), dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
-              } else {
-                vertexAttributeArray.push(new Vector4(dataView[dataViewMethod](pos, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale, dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian)));
+        if (toGetAsTypedArray) {
+          if (GLTFLoader._isSystemLittleEndian()) {
+            if (dataViewMethod === 'getFloat32') {
+              vertexAttributeArray = new Float32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getInt8') {
+              vertexAttributeArray = new Int8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getUint8') {
+              vertexAttributeArray = new Uint8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getInt16') {
+              vertexAttributeArray = new Int16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getUint16') {
+              vertexAttributeArray = new Uint16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getInt32') {
+              vertexAttributeArray = new Int32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            } else if (dataViewMethod === 'getUint32') {
+              vertexAttributeArray = new Uint32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+            }
+          } else {
+            var dataView = new DataView(arrayBuffer, byteOffset, byteLength);
+            var byteDelta = bytesPerComponent * componentN;
+            var littleEndian = true;
+            for (var pos = 0; pos < byteLength; pos += byteDelta) {
+              switch (accessorJson.type) {
+                case 'SCALAR':
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+                  break;
+                case 'VEC2':
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
+                  break;
+                case 'VEC3':
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
+                  break;
+                case 'VEC4':
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian) * scale);
+                  break;
               }
-              break;
-            case 'MAT4':
-              var matrixComponents = [];
-              for (var i = 0; i < 16; i++) {
-                matrixComponents[i] = dataView[dataViewMethod](pos + bytesPerComponent * i, littleEndian) * scale;
-              }
-              vertexAttributeArray.push(new Matrix44(matrixComponents, true));
-              break;
+            }
+            if (dataViewMethod === 'getInt8') {
+              vertexAttributeArray = new Int8Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getUint8') {
+              vertexAttributeArray = new Uint8Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getInt16') {
+              vertexAttributeArray = new Int16Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getUInt16') {
+              vertexAttributeArray = new Uint16Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getInt32') {
+              vertexAttributeArray = new Int32Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getUInt32') {
+              vertexAttributeArray = new Uint32Array(vertexAttributeArray);
+            } else if (dataViewMethod === 'getFloat32') {
+              vertexAttributeArray = new Float32Array(vertexAttributeArray);
+            }
+          }
+        } else {
+          var _dataView = new DataView(arrayBuffer, byteOffset, byteLength);
+          var _byteDelta = bytesPerComponent * componentN;
+          var _littleEndian = true;
+          for (var _pos = 0; _pos < byteLength; _pos += _byteDelta) {
+
+            switch (accessorJson.type) {
+              case 'SCALAR':
+                vertexAttributeArray.push(_dataView[dataViewMethod](_pos, _littleEndian));
+                break;
+              case 'VEC2':
+                vertexAttributeArray.push(new Vector2(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale));
+                break;
+              case 'VEC3':
+                vertexAttributeArray.push(new Vector3(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian) * scale));
+                break;
+              case 'VEC4':
+                if (quaternionIfVec4) {
+                  vertexAttributeArray.push(new Quaternion(_dataView[dataViewMethod](_pos, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 3, _littleEndian)));
+                } else {
+                  vertexAttributeArray.push(new Vector4(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 3, _littleEndian)));
+                }
+                break;
+              case 'MAT4':
+                var matrixComponents = [];
+                for (var i = 0; i < 16; i++) {
+                  matrixComponents[i] = _dataView[dataViewMethod](_pos + bytesPerComponent * i, _littleEndian) * scale;
+                }
+                vertexAttributeArray.push(new Matrix44(matrixComponents, true));
+                break;
+            }
           }
         }
 
@@ -10694,6 +10914,11 @@
           this[singleton$1] = new GLTFLoader(singletonEnforcer$1);
         }
         return this[singleton$1];
+      }
+    }, {
+      key: '_isSystemLittleEndian',
+      value: function _isSystemLittleEndian() {
+        return !!new Uint8Array(new Uint16Array([0x00ff]).buffer)[0];
       }
     }]);
     return GLTFLoader;

@@ -5794,7 +5794,6 @@
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
             gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-            //gl.drawElements(gl[primitiveType], 0, glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
@@ -6015,18 +6014,27 @@
 
         this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
-        allVertexAttribs.forEach(function (attribName) {
-          var vertexAttribArray = [];
-          _this3._vertices[attribName].forEach(function (elem, index) {
-            var element = _this3._vertices[attribName][index];
-            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-            if (attribName === 'position') {
-              var componentN = _this3._vertices.components[attribName];
-              _this3._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
-            }
+        if (typeof this._vertices.position.buffer !== 'undefined') {
+          // position (and maybe others) are a TypedArray
+          var componentN = this._vertices.components.position;
+          var vertexNum = this._vertices.position.length / componentN;
+          for (var i = 0; i < vertexNum; i++) {
+            this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+          }
+        } else {
+          allVertexAttribs.forEach(function (attribName) {
+            var vertexAttribArray = [];
+            _this3._vertices[attribName].forEach(function (elem, index) {
+              var element = _this3._vertices[attribName][index];
+              Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+              if (attribName === 'position') {
+                var _componentN = _this3._vertices.components[attribName];
+                _this3._AABB.addPositionWithArray(vertexAttribArray, index * _componentN);
+              }
+            });
+            _this3._vertices[attribName] = vertexAttribArray;
           });
-          _this3._vertices[attribName] = vertexAttribArray;
-        });
+        }
 
         this._AABB.updateAllInfo();
 
