@@ -22,7 +22,6 @@ export default class M_Scene extends M_Group {
   constructor(glBoostContext) {
     super(glBoostContext);
     this._gl = this._glContext.gl;
-    this._currentAnimationInputValues = {};
     this._reset();
   }
 
@@ -32,32 +31,8 @@ export default class M_Scene extends M_Group {
     this._cameras = [];
   }
 
-  _setDirtyToAnimatedElement(inputName, element = this) {
-    if (element.hasAnimation(inputName)) {
-      element._needUpdate();
-    }
-
-    if (element instanceof M_Group || element instanceof M_Scene) {
-      let children = element.getChildren();
-      for (let i = 0; i < children.length; i++) {
-        this._setDirtyToAnimatedElement(inputName, children[i]);
-      }
-    }
-  }
-
   _getCurrentAnimationInputValue(inputName) {
     return this._currentAnimationInputValues[inputName];
-  }
-
-  /**
-   * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-   * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-   * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
-   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
-   */
-  setCurrentAnimationValue(inputName, inputValue) {
-    this._setDirtyToAnimatedElement(inputName);
-    this._currentAnimationInputValues[inputName] = inputValue;
   }
 
   /**

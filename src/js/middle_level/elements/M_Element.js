@@ -23,6 +23,8 @@ export default class M_Element extends L_Element {
     this.opacity = 1.0;
 
     this._activeAnimationLineName = null;
+    this._currentAnimationInputValues = {};
+    this._toInheritCurrentAnimationInputValue = true;
 
     this._camera = null;
     this._customFunction = null;
@@ -37,6 +39,46 @@ export default class M_Element extends L_Element {
 
   get updateCountAsElement() {
     return this._updateCountAsElement;
+  }
+
+  set toInheritCurrentAnimationInputValue(flg) {
+    this._toInheritCurrentAnimationInputValue = flg;
+  }
+
+  get toInheritCurrentAnimationInputValue() {
+    return this._toInheritCurrentAnimationInputValue;
+  }
+
+  /**
+   * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+   * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+   * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
+   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
+   */
+  setCurrentAnimationValue(inputName, inputValue) {
+    this._setDirtyToAnimatedElement(inputName);
+    this._currentAnimationInputValues[inputName] = inputValue;
+  }
+
+  _getCurrentAnimationInputValue(inputName) {
+    let value = this._currentAnimationInputValues[inputName];
+    if (typeof value !== 'undefined') {
+      return value;
+    } else if (this._toInheritCurrentAnimationInputValue) {
+      return this._parent._getCurrentAnimationInputValue(inputName);
+    } else {
+      return void 0;
+    }
+  }
+
+  removeCurrentAnimationValue(inputName) {
+    delete this._currentAnimationInputValues[inputName];
+  }
+
+  _setDirtyToAnimatedElement(inputName) {
+    if (this.hasAnimation(inputName)) {
+      this._needUpdate();
+    }
   }
 
   _getAnimatedTransformValue(value, animation, type) {
@@ -59,9 +101,7 @@ export default class M_Element extends L_Element {
     this._needUpdate();
   }
 
-  _getCurrentAnimationInputValue(inputName) {
-    return this._parent._getCurrentAnimationInputValue(inputName);
-  }
+
 
   get translate() {
     if (this._activeAnimationLineName) {

@@ -48,6 +48,17 @@ export default class M_Group extends M_Element {
     return this._elements;
   }
 
+  _setDirtyToAnimatedElement(inputName) {
+    if (this.hasAnimation(inputName)) {
+      this._needUpdate();
+    }
+
+    let children = this.getChildren();
+    for (let i = 0; i < children.length; i++) {
+      children[i]._setDirtyToAnimatedElement(inputName);
+    }
+  }
+
   searchElement(userflavorName, element = this) {
     if (element.userFlavorName === userflavorName) {
       return element;

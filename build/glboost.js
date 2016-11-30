@@ -2153,6 +2153,8 @@
       _this.opacity = 1.0;
 
       _this._activeAnimationLineName = null;
+      _this._currentAnimationInputValues = {};
+      _this._toInheritCurrentAnimationInputValue = true;
 
       _this._camera = null;
       _this._customFunction = null;
@@ -2167,6 +2169,44 @@
         this._updateCountAsElement++;
       }
     }, {
+      key: 'setCurrentAnimationValue',
+
+
+      /**
+       * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+       * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+       * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
+       * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
+       */
+      value: function setCurrentAnimationValue(inputName, inputValue) {
+        this._setDirtyToAnimatedElement(inputName);
+        this._currentAnimationInputValues[inputName] = inputValue;
+      }
+    }, {
+      key: '_getCurrentAnimationInputValue',
+      value: function _getCurrentAnimationInputValue(inputName) {
+        var value = this._currentAnimationInputValues[inputName];
+        if (typeof value !== 'undefined') {
+          return value;
+        } else if (this._toInheritCurrentAnimationInputValue) {
+          return this._parent._getCurrentAnimationInputValue(inputName);
+        } else {
+          return void 0;
+        }
+      }
+    }, {
+      key: 'removeCurrentAnimationValue',
+      value: function removeCurrentAnimationValue(inputName) {
+        delete this._currentAnimationInputValues[inputName];
+      }
+    }, {
+      key: '_setDirtyToAnimatedElement',
+      value: function _setDirtyToAnimatedElement(inputName) {
+        if (this.hasAnimation(inputName)) {
+          this._needUpdate();
+        }
+      }
+    }, {
       key: '_getAnimatedTransformValue',
       value: function _getAnimatedTransformValue(value, animation, type) {
         if (typeof animation !== 'undefined' && animation[type]) {
@@ -2178,11 +2218,6 @@
           }
           return this['_' + type];
         }
-      }
-    }, {
-      key: '_getCurrentAnimationInputValue',
-      value: function _getCurrentAnimationInputValue(inputName) {
-        return this._parent._getCurrentAnimationInputValue(inputName);
       }
     }, {
       key: 'getTranslateAt',
@@ -2434,6 +2469,14 @@
       key: 'updateCountAsElement',
       get: function get() {
         return this._updateCountAsElement;
+      }
+    }, {
+      key: 'toInheritCurrentAnimationInputValue',
+      set: function set(flg) {
+        this._toInheritCurrentAnimationInputValue = flg;
+      },
+      get: function get() {
+        return this._toInheritCurrentAnimationInputValue;
       }
     }, {
       key: 'translate',
@@ -3934,6 +3977,18 @@
       key: 'getChildren',
       value: function getChildren() {
         return this._elements;
+      }
+    }, {
+      key: '_setDirtyToAnimatedElement',
+      value: function _setDirtyToAnimatedElement(inputName) {
+        if (this.hasAnimation(inputName)) {
+          this._needUpdate();
+        }
+
+        var children = this.getChildren();
+        for (var i = 0; i < children.length; i++) {
+          children[i]._setDirtyToAnimatedElement(inputName);
+        }
       }
     }, {
       key: 'searchElement',
@@ -7171,7 +7226,6 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (M_Scene.__proto__ || Object.getPrototypeOf(M_Scene)).call(this, glBoostContext));
 
       _this._gl = _this._glContext.gl;
-      _this._currentAnimationInputValues = {};
       _this._reset();
       return _this;
     }
@@ -7184,39 +7238,9 @@
         this._cameras = [];
       }
     }, {
-      key: '_setDirtyToAnimatedElement',
-      value: function _setDirtyToAnimatedElement(inputName) {
-        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this;
-
-        if (element.hasAnimation(inputName)) {
-          element._needUpdate();
-        }
-
-        if (element instanceof M_Group || element instanceof M_Scene) {
-          var children = element.getChildren();
-          for (var i = 0; i < children.length; i++) {
-            this._setDirtyToAnimatedElement(inputName, children[i]);
-          }
-        }
-      }
-    }, {
       key: '_getCurrentAnimationInputValue',
       value: function _getCurrentAnimationInputValue(inputName) {
         return this._currentAnimationInputValues[inputName];
-      }
-
-      /**
-       * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-       * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-       * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
-       * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
-       */
-
-    }, {
-      key: 'setCurrentAnimationValue',
-      value: function setCurrentAnimationValue(inputName, inputValue) {
-        this._setDirtyToAnimatedElement(inputName);
-        this._currentAnimationInputValues[inputName] = inputValue;
       }
 
       /**
