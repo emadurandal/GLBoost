@@ -77,11 +77,11 @@ export default class M_SkeletalGeometry extends Geometry {
 
     }
     for (let i=0; i<joints.length; i++) {
-
       matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
       let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
       matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.transformMatrixAccumulatedAncestry);
     }
 
     var flatMatrices = [];

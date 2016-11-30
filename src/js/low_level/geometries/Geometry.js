@@ -24,10 +24,10 @@ export default class Geometry extends GLBoostObject {
     this._vertices = null;
     this._indicesArray = null;
     this._performanceHint = null;
-    this._vertexAttribComponentNDic = {};
     this._defaultMaterial = glBoostContext.createClassicMaterial();
     this._vertexData = [];
     this._extraDataForShader = {};
+    this._vboObj = {}
     this._AABB = new AABB();
     this._drawKicker = DrawKickerWorld.getInstance();
 
@@ -39,46 +39,62 @@ export default class Geometry extends GLBoostObject {
   }
 
   /**
-   * データとして利用する頂点属性を判断し、そのリストを返す
+   * 全ての頂点属性のリストを返す
    */
-  _decideNeededVertexAttribs(vertices, material) {
-
+  static _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
-      attribNameArray.push(attribName);
+      if (attribName !== 'components') {
+        attribNameArray.push(attribName);
+      }
     }
 
     return attribNameArray;
   }
 
-  /**
-   * 全ての頂点属性のリストを返す
-   */
-  _allVertexAttribs(vertices) {
-    var attribNameArray = [];
-    for (var attribName in vertices) {
-      attribNameArray.push(attribName);
-    }
-
-    return attribNameArray;
+  _checkAndSetVertexComponentNumber(allVertexAttribs) {
+    allVertexAttribs.forEach((attribName)=> {
+      let element = this._vertices[attribName][0];
+      let componentN = MathUtil.compomentNumberOfVector(element);
+      if (componentN === 0) {
+        // if 0, it must be a number. so users must set components info.
+        return;
+      }
+      if (typeof this._vertices.components === 'undefined') {
+        this._vertices.components = {};
+      }
+      this._vertices.components[attribName] = componentN;
+    });
   }
 
   setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
 
-    var allVertexAttribs = this._allVertexAttribs(this._vertices);
+    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
 
-    // if array, convert to vector[2/3/4]
-    this._vertices.position.forEach((elem, index) => {
+    this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
+    if (typeof this._vertices.position.buffer !== 'undefined') {
+      // position (and maybe others) are a TypedArray
+      let componentN = this._vertices.components.position;
+      let vertexNum = this._vertices.position.length / componentN;
+      for (let i=0; i<vertexNum; i++) {
+        this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+      }
+    } else {
       allVertexAttribs.forEach((attribName)=> {
-        var element = this._vertices[attribName][index];
-        this._vertices[attribName][index] = MathUtil.arrayToVector(element);
-
-        if (attribName === 'position') {
-          this._AABB.addPosition(this._vertices[attribName][index]);
-        }
+        let vertexAttribArray = [];
+        this._vertices[attribName].forEach((elem, index) => {
+          let element = this._vertices[attribName][index];
+          Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          if (attribName === 'position') {
+            let componentN = this._vertices.components[attribName];
+            this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
+          }
+        });
+        this._vertices[attribName] = vertexAttribArray;
       });
-    });
+    }
 
     this._AABB.updateAllInfo();
 
@@ -101,71 +117,44 @@ export default class Geometry extends GLBoostObject {
     this._performanceHint = hint;
   }
 
-  updateVerticesData(vertices, isAlreadyInterleaved = false) {
-    var gl = this._glContext.gl;
-    let vertexData = this._vertexData;
-    //var vertexData = [];
-    if (isAlreadyInterleaved) {
-      vertexData = vertices;
-    } else {
-      this._vertices = ArrayUtil.merge(this._vertices, vertices);
-      var allVertexAttribs = this._allVertexAttribs(this._vertices);
-      const isCached = vertexData.length == 0 ? false : true;
+  updateVerticesData(vertices) {
+    let gl = this._glContext.gl;
 
-      let idx = 0;
-      this._vertices.position.forEach((elem, index) => {
-        allVertexAttribs.forEach((attribName)=> {
-          var element = this._vertices[attribName][index];
-          // if array, convert to vector[2/3/4]
-          this._vertices[attribName][index] = element = MathUtil.arrayToVector(element);
+    for (let attribName in vertices) {
+      let vertexAttribArray = [];
+      this._vertices[attribName].forEach((elem, index) => {
+        let element = vertices[attribName][index];
+        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
 
-          if (attribName === 'position') {
-            this._AABB.addPosition(this._vertices[attribName][index]);
-          }
-
-          vertexData[idx++] = element.x;
-          vertexData[idx++] = element.y;
-          if (element.z !== void 0) {
-            vertexData[idx++] = element.z;
-          }
-          if (element.w !== void 0) {
-            vertexData[idx++] = element.w;
-          }
-        });
+        if (attribName === 'position') {
+          let componentN = this._vertices.components[attribName];
+          this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
+        }
+        this._vertices[attribName] = vertexAttribArray;
       });
+    }
 
-      this._AABB.updateAllInfo();
+    this._AABB.updateAllInfo();
 
-
-      if(!isCached) {
-        this.Float32AryVertexData = new Float32Array(vertexData);
-      }
-      let float32AryVertexData = this.Float32AryVertexData;
-      for(let i = 0; i < float32AryVertexData.length; i++) {
-        float32AryVertexData[i] = vertexData[i];
-      }
-      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+    for (let attribName in vertices) {
+      let float32AryVertexData = new Float32Array(this._vertices[attribName]);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
       gl.bindBuffer(gl.ARRAY_BUFFER, null);
     }
+
   }
 
-  setUpVertexAttribs(gl, glslProgram, _allVertexAttribs) {
+  setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
     var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-    var stride = 0;
-    _allVertexAttribs.forEach((attribName)=> {
-      stride += this._vertexAttribComponentNDic[attribName] * 4;
-    });
-
     // 頂点レイアウト設定
-    var offset = 0;
-    _allVertexAttribs.forEach((attribName)=> {
+    allVertexAttribs.forEach((attribName)=> {
       if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-          this._vertexAttribComponentNDic[attribName], gl.FLOAT, gl.FALSE, stride, offset);
+          this._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
       }
-      offset += this._vertexAttribComponentNDic[attribName] * 4;
     });
   }
 
@@ -174,17 +163,13 @@ export default class Geometry extends GLBoostObject {
     var vertices = this._vertices;
 
     var glem = GLExtensionsManager.getInstance(this._glContext);
-    var _optimizedVertexAttribs = this._decideNeededVertexAttribs(vertices, material);
+    var _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
 
     if (doSetupVertexAttribs) {
       glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-      gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
     }
 
-    var allVertexAttribs = this._allVertexAttribs(vertices);
-    allVertexAttribs.forEach((attribName)=> {
-      this._vertexAttribComponentNDic[attribName] = (vertices[attribName][0].z === void 0) ? 2 : ((vertices[attribName][0].w === void 0) ? 3 : 4);
-    });
+    var allVertexAttribs = Geometry._allVertexAttribs(vertices);
 
     if (material.shaderInstance === null) {
       let shaderClass = material.shaderClass;
@@ -229,7 +214,10 @@ export default class Geometry extends GLBoostObject {
 
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
-    this._vertexN = vertices.position.length;
+    this._vertexN = vertices.position.length / vertices.components.position;
+
+    var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+
 
     // create VAO
     if (Geometry._vaoDic[this.toString()]) {
@@ -239,16 +227,18 @@ export default class Geometry extends GLBoostObject {
     }
     glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
 
-    var doAfter = true;
+    let doAfter = true;
 
-    // create VBO
-    if (Geometry._vboDic[this.toString()]) {
-      doAfter = false;
-    } else {
-      var vbo = this._glContext.createBuffer(this);
-      Geometry._vboDic[this.toString()] = vbo;
-    }
-    gl.bindBuffer(gl.ARRAY_BUFFER, Geometry._vboDic[this.toString()]);
+    allVertexAttribs.forEach((attribName)=> {
+      // create VBO
+      if (this._vboObj[attribName]) {
+        doAfter = false;
+      } else {
+        let vbo = this._glContext.createBuffer(this);
+        this._vboObj[attribName] = vbo;
+      }
+    });
+
 
     var materials = null;
     if (this._materials.length > 0) {
@@ -266,24 +256,11 @@ export default class Geometry extends GLBoostObject {
 
     if (doAfter) {
 
-      var vertexData = [];
-      var allVertexAttribs = this._allVertexAttribs(vertices);
-      vertices.position.forEach((elem, index, array) => {
-        allVertexAttribs.forEach((attribName)=> {
-          var element = vertices[attribName][index];
-          vertexData.push(element.x);
-          vertexData.push(element.y);
-          if (element.z !== void 0) {
-            vertexData.push(element.z);
-          }
-          if (element.w !== void 0) {
-            vertexData.push(element.w);
-          }
-        });
+      allVertexAttribs.forEach((attribName)=> {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
       });
-
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), this._performanceHint);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
       Geometry._iboArrayDic[this.toString()] = [];
       if (this._indicesArray) {
@@ -299,8 +276,6 @@ export default class Geometry extends GLBoostObject {
       }
       glem.bindVertexArray(gl, null);
     }
-
-
     return true;
   }
 
@@ -319,23 +294,92 @@ export default class Geometry extends GLBoostObject {
 
     let thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, Geometry._vboDic, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
 
+  }
+
+  merge(geometrys) {
+    if (Array.isArray(geometrys)) {
+      let typedArrayDic = {};
+      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      allVertexAttribs.forEach((attribName)=> {
+        let thisLength = this._vertices[attribName].length;
+
+        let allGeomLength = 0;
+        geometrys.forEach((geometry) => {
+          allGeomLength += geometry._vertices[attribName].length;
+        });
+        typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+      });
+
+      let lastThisLengthDic = {};
+      allVertexAttribs.forEach((attribName)=> {
+        lastThisLengthDic[attribName] = 0;
+      });
+      geometrys.forEach((geometry, index) => {
+        let typedSubArrayDic = {};
+        allVertexAttribs.forEach((attribName)=> {
+          let typedArray = typedArrayDic[attribName];
+
+          if (index === 0) {
+            lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+          }
+
+          let end = (typeof geometrys[index+1] !== 'undefined') ? lastThisLengthDic[attribName]  + geometrys[index+1]._vertices[attribName].length : void 0;
+          typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+          lastThisLengthDic[attribName] = end;
+        });
+        this.mergeInner(geometry, typedSubArrayDic, (index === 0));
+      });
+    } else {
+      let geometry = geometrys;
+      let typedArrayDic = {};
+      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      allVertexAttribs.forEach((attribName)=> {
+        let thisLength = this._vertices[attribName].length;
+        let geomLength = geometry._vertices[attribName].length;
+
+        typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+      });
+
+      this.mergeInner(geometry, typedArrayDic);
+    }
   }
 
   /**
    *
    * @param geometry
    */
-  merge(geometry) {
-    var baseLen = this._vertices.position.length;
+  mergeInner(geometry, typedArrayDic, isFirst = false) {
+    let gl = this._glContext.gl;
+    let baseLen = this._vertices.position.length / this._vertices.components.position;;
 
     if (this === geometry) {
       console.assert('don\'t merge same geometry!');
     }
-    for (var attribName in this._vertices) {
-      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
-    }
+
+    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+    allVertexAttribs.forEach((attribName)=> {
+      let thisLength = this._vertices[attribName].length;
+      let geomLength =  geometry._vertices[attribName].length;
+
+      let float32array = typedArrayDic[attribName];
+
+      if (isFirst) {
+        float32array.set(this._vertices[attribName], 0);
+      }
+      float32array.set(geometry._vertices[attribName], thisLength);
+
+      this._vertices[attribName] = float32array;
+
+      if (typeof this._vboObj[attribName] !== 'undefined') {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
+        gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      }
+    });
+
     let geometryIndicesN = geometry._indicesArray.length;
     for (let i = 0; i < geometryIndicesN; i++) {
       for (let j = 0; j < geometry._indicesArray[i].length; j++) {
@@ -349,23 +393,93 @@ export default class Geometry extends GLBoostObject {
     this._vertexN += geometry._vertexN;
   }
 
+  mergeHarder(geometrys) {
+    if (Array.isArray(geometrys)) {
+      let typedArrayDic = {};
+      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      allVertexAttribs.forEach((attribName)=> {
+        let thisLength = this._vertices[attribName].length;
+
+        let allGeomLength = 0;
+        geometrys.forEach((geometry) => {
+          allGeomLength += geometry._vertices[attribName].length;
+        });
+        typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+      });
+
+      let lastThisLengthDic = {};
+      allVertexAttribs.forEach((attribName)=> {
+        lastThisLengthDic[attribName] = 0;
+      });
+      geometrys.forEach((geometry, index) => {
+        let typedSubArrayDic = {};
+        allVertexAttribs.forEach((attribName)=> {
+          let typedArray = typedArrayDic[attribName];
+
+          if (index === 0) {
+            lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+          }
+
+          let end = (typeof geometrys[index+1] !== 'undefined') ? lastThisLengthDic[attribName]  + geometrys[index+1]._vertices[attribName].length : void 0;
+          typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+          lastThisLengthDic[attribName] = end;
+        });
+        this.mergeHarderInner(geometry, typedSubArrayDic, (index === 0));
+      });
+    } else {
+      let geometry = geometrys;
+      let typedArrayDic = {};
+      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      allVertexAttribs.forEach((attribName)=> {
+        let thisLength = this._vertices[attribName].length;
+        let geomLength = geometry._vertices[attribName].length;
+
+        typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+      });
+
+      this.mergeHarderInner(geometry, typedArrayDic);
+    }
+  }
+
   /**
    * take no thought geometry's materials
    *
    * @param geometry
    */
-  mergeHarder(geometry) {
-    var baseLen = this._vertices.position.length;
+  mergeHarderInner(geometry, typedArrayDic, isFirst = false) {
+    let gl = this._glContext.gl;
+    let baseLen = this._vertices.position.length / this._vertices.components.position;
     if (this === geometry) {
       console.assert('don\'t merge same geometry!');
     }
-    for (var attribName in this._vertices) {
-      Array.prototype.push.apply(this._vertices[attribName], geometry._vertices[attribName]);
-    }
+
+    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+    allVertexAttribs.forEach((attribName)=> {
+      let thisLength = this._vertices[attribName].length;
+      let geomLength =  geometry._vertices[attribName].length;
+
+      let float32array = typedArrayDic[attribName];
+
+      if (isFirst) {
+        float32array.set(this._vertices[attribName], 0);
+      }
+      float32array.set(geometry._vertices[attribName], thisLength);
+
+      this._vertices[attribName] = float32array;
+
+      if (typeof this._vboObj[attribName] !== 'undefined') {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
+        gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      }
+    });
+
+
     for (let i = 0; i < this._indicesArray.length; i++) {
       let len = geometry._indicesArray[i].length;
       for (let j = 0; j < len; j++) {
-        var idx = geometry._indicesArray[i][j];
+        let idx = geometry._indicesArray[i][j];
         this._indicesArray[i].push(baseLen + idx);
       }
       if (this._materials[i]) {
@@ -406,5 +520,4 @@ export default class Geometry extends GLBoostObject {
 
 }
 Geometry._vaoDic = {};
-Geometry._vboDic = {};
 Geometry._iboArrayDic = {};

@@ -60,12 +60,13 @@ scene.addChild( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/pyramid_anim/pyramid_anim2.gltf', 100, null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/pyramid_anim/pyramid_anim2.gltf', 1, null);
 promise.then(function(group) {
   console.log(group);
 
   //mesh.scale = new GLBoost.Vector3(50,50,50);
   scene.addChild( group );
+  group.scale = new GLBoost.Vector3(100, 100, 100);
 
   var expression = glBoostContext.createExpressionAndRenderPasses(1);
   expression.renderPasses[0].scene = scene;

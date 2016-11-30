@@ -15,8 +15,6 @@ export default class M_SkeletalMesh extends M_Mesh {
   }
 
   prepareToRender(existCamera_f, lights, renderPasses) {
-    this.bakeTransformToGeometry();
-    this.multiplyMatrix(Matrix44.identity());
     let joints = this.jointsHierarchy.searchElementsByType(M_Joint);
 
     this._joints = [];

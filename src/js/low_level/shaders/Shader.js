@@ -251,16 +251,21 @@ export default class Shader extends GLBoostObject {
   }
 
   _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
-    var vertexAttribsAsResult = [];
-
+    var temp = [];
     // and shade as mixin Prepare Functions
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
         var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
-        vertexAttribsAsResult = vertexAttribsAsResult.concat(verAttirbs);
+        temp = temp.concat(verAttirbs);
       }
     });
+    let set = new Set(temp);
+
+    let vertexAttribsAsResult = [];
+    for (let elem of set) {
+      vertexAttribsAsResult.push(elem);
+    }
 
     return vertexAttribsAsResult;
   }

@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
-<!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>-->
-  <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
   <script src="../../../build/glboost.js"></script>
 </head>
 <body>
@@ -33,7 +31,7 @@ var canvas_1 = document.getElementById("world_1");
 var glBoostContext_1 = new GLBoost.GLBoostMiddleContext(canvas_1);
 
 var renderer_1 = glBoostContext_1.createRenderer({
-  clearColor: {red: 0.0, green: 0.0, blue: 0.0, alpha: 1}
+  clearColor: {red: 0.3, green: 0.3, blue: 0.3, alpha: 1}
 });
 
 var scene_1 = glBoostContext_1.createScene();
@@ -45,7 +43,7 @@ material_1.diffuseTexture = texture_1;
 var shader_1 = new GLBoost.PhongShader(glBoostContext_1);
 material_1.shaderInstance = shader_1;
 
-var geometry_1 = glBoostContext_1.createCube(new GLBoost.Vector3(24,24,24), new GLBoost.Vector3(1,0,0));
+var geometry_1 = glBoostContext_1.createCube(new GLBoost.Vector3(24,24,24), new GLBoost.Vector4(1,0,0,1));
 
 var cube = glBoostContext_1.createMesh(geometry_1, material_1);
 scene_1.addChild(cube);

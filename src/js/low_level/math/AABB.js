@@ -22,6 +22,17 @@ export default class AABB {
     return positionVector;
   }
 
+  addPositionWithArray(array, index) {
+    this._AABB_min.x = (array[index+0] < this._AABB_min.x) ? array[index+0] : this._AABB_min.x;
+    this._AABB_min.y = (array[index+1] < this._AABB_min.y) ? array[index+1] : this._AABB_min.y;
+    this._AABB_min.z = (array[index+2] < this._AABB_min.z) ? array[index+2] : this._AABB_min.z;
+    this._AABB_max.x = (this._AABB_max.x < array[index+0]) ? array[index+0] : this._AABB_max.x;
+    this._AABB_max.y = (this._AABB_max.y < array[index+1]) ? array[index+1] : this._AABB_max.y;
+    this._AABB_max.z = (this._AABB_max.z < array[index+2]) ? array[index+2] : this._AABB_max.z;
+
+    return array;
+  }
+
   updateAllInfo() {
     this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
     this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
