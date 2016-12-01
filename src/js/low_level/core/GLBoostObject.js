@@ -58,4 +58,7 @@ export default class GLBoostObject {
     return this._readyForDiscard;
   }
 
+  _copy(instance) {
+    instance._userFlavorName = this._userFlavorName;
+  }
 }

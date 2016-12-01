@@ -641,4 +641,51 @@ export default class M_Element extends L_Element {
   prepareToRender() {
 
   }
+
+  _copy(instance) {
+    super._copy(instance);
+
+    instance._parent = this._parent;
+    instance._invMatrix = this._invMatrix.clone();
+    instance._matrixGetMode = this._matrixGetMode;
+    instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
+    instance._updateCountAsElement = this._updateCountAsElement;
+    instance._accumulatedAncestryNameWithUpdateInfoString = this._accumulatedAncestryNameWithUpdateInfoString;
+    instance._accumulatedAncestryNameWithUpdateInfoStringNormal = this._accumulatedAncestryNameWithUpdateInfoStringNormal;
+    instance._accumulatedAncestryNameWithUpdateInfoStringInv = this._accumulatedAncestryNameWithUpdateInfoStringInv;
+    instance._animationLine = {};
+
+    for (let lineName in this._animationLine) {
+      instance._animationLine[lineName] = {};
+      for (let attributeName in this._animationLine[lineName]) {
+        instance._animationLine[lineName][attributeName] = {};
+        instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
+
+        let instanceOutput = [];
+        let thisOutput = this._animationLine[lineName][attributeName].output;
+        for (let i=0; i<thisOutput.length; i++) {
+          instanceOutput.push((typeof thisOutput[i] === 'number') ? thisOutput[i] : thisOutput[i].clone());
+        }
+        instance._animationLine[lineName][attributeName].output = instanceOutput;
+
+        instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
+
+        instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
+      }
+    }
+
+    instance._transparentByUser = this._transparentByUser;
+    instance.opacity = this.opacity;
+    instance._activeAnimationLineName = this._activeAnimationLineName;
+
+    instance._currentAnimationInputValues = {};
+    for (let inputName in this._currentAnimationInputValues) {
+      instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
+    }
+
+    instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
+
+    instance._camera = this._camera;
+    instance._customFunction = this._customFunction;
+  }
 }

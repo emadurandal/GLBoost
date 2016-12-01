@@ -1,12 +1,14 @@
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import M_Mesh from './meshes/M_Mesh';
+import MiscUtil from '../../low_level/misc/MiscUtil'
 
 export default class M_Group extends M_Element {
   constructor(glBoostContext) {
     super(glBoostContext);
     this._elements = [];
     this._AABB = new AABB();
+    this._isRootJointGroup = false;
   }
 
   /**
@@ -16,6 +18,7 @@ export default class M_Group extends M_Element {
    */
   addChild(element) {
     this.removeChild(element);
+    element._parent = this;
     this._elements.push(element);
   }
 
@@ -124,4 +127,33 @@ export default class M_Group extends M_Element {
   get AABB() {
     return this._AABB;
   }
+
+  clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+    let instance = new M_Group(this._glBoostContext);
+    if (clonedRootElement === null) {
+      clonedRootElement = instance;
+    }
+    this._copy(instance);
+
+    this._elements.forEach((element)=>{
+      if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
+        instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
+      } else {
+        instance._elements.push(element);
+      }
+    });
+
+    onCompleteFuncs.forEach((func)=>{
+      func();
+    });
+
+    return instance;
+  }
+
+  _copy(instance) {
+    super._copy(instance);
+    instance._AABB = this._AABB.clone();
+    instance._isRootJointGroup = this._isRootJointGroup;
+  }
+
 }

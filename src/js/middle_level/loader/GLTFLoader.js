@@ -192,6 +192,7 @@ export default class GLTFLoader {
     let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
     skeletalMeshes.forEach((skeletalMesh) => {
       var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+      rootJoint._isRootJointGroup = true;
       skeletalMesh.jointsHierarchy = rootJoint;
     });
 

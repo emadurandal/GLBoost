@@ -163,12 +163,22 @@
     return gl instanceof WebGL2RenderingContext;
   };
 
-  var Vector2 = function Vector2(x, y) {
-    babelHelpers.classCallCheck(this, Vector2);
+  var Vector2 = function () {
+    function Vector2(x, y) {
+      babelHelpers.classCallCheck(this, Vector2);
 
-    this.x = x;
-    this.y = y;
-  };
+      this.x = x;
+      this.y = y;
+    }
+
+    babelHelpers.createClass(Vector2, [{
+      key: "clone",
+      value: function clone() {
+        return new Vector2(this.x, this.y);
+      }
+    }]);
+    return Vector2;
+  }();
 
   GLBoost$1["Vector2"] = Vector2;
 
@@ -1930,6 +1940,11 @@
         this._readyForDiscard = true;
       }
     }, {
+      key: '_copy',
+      value: function _copy(instance) {
+        instance._userFlavorName = this._userFlavorName;
+      }
+    }, {
       key: 'belongingCanvasId',
       get: function get() {
         return this._glContext.canvas.id;
@@ -3029,6 +3044,20 @@
         this._matrix = mat.clone();
         this._currentCalcMode = 'matrix';
         this._needUpdate();
+      }
+    }, {
+      key: '_copy',
+      value: function _copy(instance) {
+        babelHelpers.get(L_Element.prototype.__proto__ || Object.getPrototypeOf(L_Element.prototype), '_copy', this).call(this, instance);
+
+        instance._translate = this._translate.clone();
+        instance._scale = this._scale.clone();
+        instance._rotate = this._rotate.clone();
+        instance._quaternion = this._quaternion.clone();
+        instance._matrix = this._matrix.clone();
+        instance._finalMatrix = this._finalMatrix.clone();
+        instance._dirtyAsElement = this._dirtyAsElement;
+        instance._currentCalcMode = this._currentCalcMode;
       }
     }, {
       key: 'translate',
@@ -5140,6 +5169,54 @@
       key: 'prepareToRender',
       value: function prepareToRender() {}
     }, {
+      key: '_copy',
+      value: function _copy(instance) {
+        babelHelpers.get(M_Element.prototype.__proto__ || Object.getPrototypeOf(M_Element.prototype), '_copy', this).call(this, instance);
+
+        instance._parent = this._parent;
+        instance._invMatrix = this._invMatrix.clone();
+        instance._matrixGetMode = this._matrixGetMode;
+        instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
+        instance._updateCountAsElement = this._updateCountAsElement;
+        instance._accumulatedAncestryNameWithUpdateInfoString = this._accumulatedAncestryNameWithUpdateInfoString;
+        instance._accumulatedAncestryNameWithUpdateInfoStringNormal = this._accumulatedAncestryNameWithUpdateInfoStringNormal;
+        instance._accumulatedAncestryNameWithUpdateInfoStringInv = this._accumulatedAncestryNameWithUpdateInfoStringInv;
+        instance._animationLine = {};
+
+        for (var lineName in this._animationLine) {
+          instance._animationLine[lineName] = {};
+          for (var attributeName in this._animationLine[lineName]) {
+            instance._animationLine[lineName][attributeName] = {};
+            instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
+
+            var instanceOutput = [];
+            var thisOutput = this._animationLine[lineName][attributeName].output;
+            for (var i = 0; i < thisOutput.length; i++) {
+              instanceOutput.push(typeof thisOutput[i] === 'number' ? thisOutput[i] : thisOutput[i].clone());
+            }
+            instance._animationLine[lineName][attributeName].output = instanceOutput;
+
+            instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
+
+            instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
+          }
+        }
+
+        instance._transparentByUser = this._transparentByUser;
+        instance.opacity = this.opacity;
+        instance._activeAnimationLineName = this._activeAnimationLineName;
+
+        instance._currentAnimationInputValues = {};
+        for (var inputName in this._currentAnimationInputValues) {
+          instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
+        }
+
+        instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
+
+        instance._camera = this._camera;
+        instance._customFunction = this._customFunction;
+      }
+    }, {
       key: 'updateCountAsElement',
       get: function get() {
         return this._updateCountAsElement;
@@ -5897,6 +5974,17 @@
     }
 
     babelHelpers.createClass(AABB, [{
+      key: 'clone',
+      value: function clone() {
+        var instance = new AABB();
+        instance._AABB_max = this._AABB_max.clone();
+        instance._AABB_min = this._AABB_min.clone();
+        instance._centerPoint = this._centerPoint !== null ? this._centerPoint.clone() : null;
+        instance._lengthCenterToCorner = this._lengthCenterToCorner;
+
+        return instance;
+      }
+    }, {
       key: 'addPosition',
       value: function addPosition(positionVector) {
         this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;

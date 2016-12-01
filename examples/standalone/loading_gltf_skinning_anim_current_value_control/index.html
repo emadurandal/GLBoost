@@ -6,9 +6,6 @@
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
-  <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
-    <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>                           -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.3.2/gl-matrix-min.js"></script>
   <script src="../../../build/glboost.js"></script>
 </head>
 <body>
@@ -74,95 +71,72 @@
   var centerLadyOverride = null;
   var rightLadyDontInherit = null;
 
-  Promise.resolve()
-    .then(function(){
-      return Promise.all([
-        new Promise(function(fulfilled, rejected){
-          var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', 1, null);
-          promise.then(function(group) {
-            console.log(group);
-
-            leftLadyInherit = group;
-
-            group.translate = new GLBoost.Vector3(-0.8, 0, 0);
-
-            scene.addChild( group );
-
-            fulfilled();
-
-          });
-        }),
-        new Promise(function(fulfilled, rejected){
-          var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', 1, null);
-          promise.then(function(group) {
-            console.log(group);
-
-            centerLadyOverride = group;
-
-            scene.addChild( group );
-
-            fulfilled();
-
-          });
-        }),
-        new Promise(function(fulfilled, rejected){
-          var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', 1, null);
-          promise.then(function(group) {
-            console.log(group);
-
-            rightLadyDontInherit = group;
-            rightLadyDontInherit.toInheritCurrentAnimationInputValue = false;
-
-            group.translate = new GLBoost.Vector3(0.8, 0, 0);
-
-            scene.addChild( group );
-
-            fulfilled();
-
-          });
-        })
-      ])
-    })
-    .then(function(){
-      var expression = glBoostContext.createExpressionAndRenderPasses(1);
-      expression.renderPasses[0].scene = scene;
-      expression.prepareToRender();
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', 1, null);
+  promise.then(function(group) {
+    console.log(group);
 
 
-      var sceneTime = 0;
-      var overrideTime = 0;
-      var timeDelta = 1/60;
-
-      var render = function(){
-        scene.setCurrentAnimationValue('time', sceneTime);
-        centerLadyOverride.setCurrentAnimationValue('time', overrideTime);
-        renderer.clearCanvas();
-        renderer.draw(expression);
-
-        sceneTime += timeDelta;
-        overrideTime += timeDelta*2;
-
-        var resetTime = function(time) {
-          if (time > 1.0) {
-            return 0;
-          } else {
-            return time;
-          }
-        };
-
-        sceneTime = resetTime(sceneTime);
-        overrideTime = resetTime(overrideTime);
+    // Left Lady
+    leftLadyInherit = group;
+    leftLadyInherit.translate = new GLBoost.Vector3(-0.8, 0, 0);
 
 
-        var rotateMatrix = GLBoost.Matrix33.rotateY(0.75);
-        var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-        //camera.eye = rotatedVector;
+    // Center Lady
+    centerLadyOverride = leftLadyInherit.clone();
+    centerLadyOverride.translate = new GLBoost.Vector3(0, 0, 0);
 
 
-        requestAnimationFrame(render);
+    // Right Lady
+    rightLadyDontInherit = leftLadyInherit.clone();
+    rightLadyDontInherit.translate = new GLBoost.Vector3(0.8, 0, 0);
+    rightLadyDontInherit.toInheritCurrentAnimationInputValue = false;
+
+
+    scene.addChild( leftLadyInherit );
+    scene.addChild(centerLadyOverride);
+    scene.addChild(rightLadyDontInherit);
+
+    var expression = glBoostContext.createExpressionAndRenderPasses(1);
+    expression.renderPasses[0].scene = scene;
+    expression.prepareToRender();
+
+
+    var sceneTime = 0;
+    var overrideTime = 0;
+    var timeDelta = 1/60;
+
+    var render = function(){
+      scene.setCurrentAnimationValue('time', sceneTime);
+      centerLadyOverride.setCurrentAnimationValue('time', overrideTime);
+      renderer.clearCanvas();
+      renderer.draw(expression);
+
+      sceneTime += timeDelta;
+      overrideTime += timeDelta*2;
+
+      var resetTime = function(time) {
+        if (time > 1.0) {
+          return 0;
+        } else {
+          return time;
+        }
       };
-      render();
-    });
+
+      sceneTime = resetTime(sceneTime);
+      overrideTime = resetTime(overrideTime);
+
+
+      var rotateMatrix = GLBoost.Matrix33.rotateY(0.75);
+      var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+      camera.eye = rotatedVector;
+
+
+      requestAnimationFrame(render);
+    };
+    render();
+
+  });
+
 
 
 

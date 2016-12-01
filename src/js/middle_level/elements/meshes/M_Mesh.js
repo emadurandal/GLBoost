@@ -200,6 +200,15 @@ export default class M_Mesh extends M_Element {
     return AABB.multiplyMatrix(world_m, this._geometry.AABB);
   }
 
+  clone() {
+    let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
+    this._copy(instance);
+  }
+
+  _copy(instance) {
+    super._copy(instance);
+    instance._transformedDepth = this._transformedDepth;
+  }
 }
 M_Mesh._geometries = {};
 

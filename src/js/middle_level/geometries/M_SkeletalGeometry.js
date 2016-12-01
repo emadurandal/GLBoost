@@ -62,6 +62,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
       for (let j = 0; j < jointsHierarchy.length; j++) {
         let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
+        //console.log(thisLoopMatrix.toStringApproximately());
         if (j > 0) {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
         } else {

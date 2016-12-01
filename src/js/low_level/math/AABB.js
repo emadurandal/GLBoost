@@ -11,6 +11,16 @@ export default class AABB {
     this._lengthCenterToCorner = null;
   }
 
+  clone() {
+    let instance = new AABB();
+    instance._AABB_max = this._AABB_max.clone();
+    instance._AABB_min = this._AABB_min.clone();
+    instance._centerPoint = (this._centerPoint !== null) ? this._centerPoint.clone() : null;
+    instance._lengthCenterToCorner = this._lengthCenterToCorner;
+
+    return instance;
+  }
+
   addPosition(positionVector) {
     this._AABB_min.x = (positionVector.x < this._AABB_min.x) ? positionVector.x : this._AABB_min.x;
     this._AABB_min.y = (positionVector.y < this._AABB_min.y) ? positionVector.y : this._AABB_min.y;
