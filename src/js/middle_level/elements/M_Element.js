@@ -93,16 +93,6 @@ export default class M_Element extends L_Element {
     }
   }
 
-  set translate(vec) {
-    if (this._translate.isEqual(vec)) {
-      return;
-    }
-    this._translate = vec;
-    this._needUpdate();
-  }
-
-
-
   get translate() {
     if (this._activeAnimationLineName) {
       return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
@@ -117,18 +107,6 @@ export default class M_Element extends L_Element {
 
   getTranslateNotAnimated() {
     return this._translate;
-  }
-
-  set rotate(vec) {
-    if (this._currentCalcMode !== 'euler') {
-      this._currentCalcMode = 'euler';
-      this._needUpdate();
-    }
-    if (this._rotate.isEqual(vec)) {
-      return;
-    }
-    this._rotate = vec;
-    this._needUpdate();
   }
 
   get rotate() {
@@ -173,14 +151,6 @@ export default class M_Element extends L_Element {
 
   getQuaternionAt(lineName, value) {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
-  }
-
-  set scale(vec) {
-    if (this._scale.isEqual(vec)) {
-      return;
-    }
-    this._scale = vec;
-    this._needUpdate();
   }
 
   get scale() {
