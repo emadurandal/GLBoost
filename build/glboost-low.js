@@ -5245,6 +5245,11 @@
         if (this._translate.isEqual(vec)) {
           return;
         }
+        if (this._currentCalcMode === 'matrix') {
+          this.matrix.m03 = vec.x;
+          this.matrix.m13 = vec.y;
+          this.matrix.m23 = vec.z;
+        }
         this._translate = vec;
         this._needUpdate();
       },
