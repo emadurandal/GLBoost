@@ -5241,6 +5241,13 @@
       }
     }, {
       key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        this._translate = vec;
+        this._needUpdate();
+      },
       get: function get() {
         if (this._activeAnimationLineName) {
           return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
@@ -5250,6 +5257,17 @@
       }
     }, {
       key: 'rotate',
+      set: function set(vec) {
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
+          this._needUpdate();
+        }
+        if (this._rotate.isEqual(vec)) {
+          return;
+        }
+        this._rotate = vec;
+        this._needUpdate();
+      },
       get: function get() {
         if (this._activeAnimationLineName) {
           return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
@@ -5279,6 +5297,13 @@
       }
     }, {
       key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
+        }
+        this._scale = vec;
+        this._needUpdate();
+      },
       get: function get() {
         if (this._activeAnimationLineName) {
           return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
