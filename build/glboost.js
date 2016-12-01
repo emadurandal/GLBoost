@@ -3985,6 +3985,8 @@
       value: function clone() {
         var instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
         this._copy(instance);
+
+        return instance;
       }
     }, {
       key: '_copy',
