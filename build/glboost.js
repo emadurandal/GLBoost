@@ -2071,6 +2071,11 @@
         if (this._translate.isEqual(vec)) {
           return;
         }
+        if (this._currentCalcMode !== 'matrix') {
+          this.matrix.m03 = this.translate.x;
+          this.matrix.m13 = this.translate.y;
+          this.matrix.m23 = this.translate.z;
+        }
         this._translate = vec;
         this._needUpdate();
       },
@@ -2104,6 +2109,11 @@
       },
       get: function get() {
         return this._scale;
+      }
+    }, {
+      key: 'matrix',
+      get: function get() {
+        return this._matrix;
       }
     }, {
       key: 'quaternion',
