@@ -30,9 +30,9 @@ export default class L_Element extends GLBoostObject {
       return;
     }
     if (this._currentCalcMode === 'matrix') {
-      this.matrix.m03 = this.translate.x;
-      this.matrix.m13 = this.translate.y;
-      this.matrix.m23 = this.translate.z;
+      this.matrix.m03 = vec.x;
+      this.matrix.m13 = vec.y;
+      this.matrix.m23 = vec.z;
     }
     this._translate = vec;
     this._needUpdate();
