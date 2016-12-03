@@ -7283,12 +7283,18 @@
 
         if (this._materials.length > 0) {
           for (var i = 0; i < this._materials.length; i++) {
-            this._materials[i].shaderClass = SkeletalShader;
+            if (this._materials[i].shaderClass !== SkeletalShader) {
+              this._materials[i].shaderClass = SkeletalShader;
+            }
           }
         } else if (meshMaterial) {
-          meshMaterial.shaderClass = SkeletalShader;
+          if (meshMaterial.shaderClass !== SkeletalShader) {
+            meshMaterial.shaderClass = SkeletalShader;
+          }
         } else {
-          this._defaultMaterial.shaderClass = SkeletalShader;
+          if (this._defaultMaterial.shaderClass !== SkeletalShader) {
+            this._defaultMaterial.shaderClass = SkeletalShader;
+          }
         }
 
         babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
