@@ -44,7 +44,7 @@ export default class Geometry extends GLBoostObject {
   static _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
-      if (attribName !== 'components') {
+      if (attribName !== 'components' && attribName !== 'componentBytes') {
         attribNameArray.push(attribName);
       }
     }
