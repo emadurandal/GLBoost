@@ -7283,16 +7283,16 @@
 
         if (this._materials.length > 0) {
           for (var i = 0; i < this._materials.length; i++) {
-            if (this._materials[i].shaderClass !== SkeletalShader) {
+            if (this._materials[i].shaderClass.name !== SkeletalShader.name) {
               this._materials[i].shaderClass = SkeletalShader;
             }
           }
         } else if (meshMaterial) {
-          if (meshMaterial.shaderClass !== SkeletalShader) {
+          if (meshMaterial.shaderClass.name !== SkeletalShader.name) {
             meshMaterial.shaderClass = SkeletalShader;
           }
         } else {
-          if (this._defaultMaterial.shaderClass !== SkeletalShader) {
+          if (this._defaultMaterial.shaderClass.name !== SkeletalShader.name) {
             this._defaultMaterial.shaderClass = SkeletalShader;
           }
         }
