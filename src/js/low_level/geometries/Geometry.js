@@ -258,7 +258,11 @@ export default class Geometry extends GLBoostObject {
 
       allVertexAttribs.forEach((attribName)=> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
+        if (typeof this._vertices[attribName].buffer !== 'undefined') {
+          gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+        } else {
+          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
       });
 

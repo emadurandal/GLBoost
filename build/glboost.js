@@ -6592,7 +6592,11 @@
 
           allVertexAttribs.forEach(function (attribName) {
             gl.bindBuffer(gl.ARRAY_BUFFER, _this6._vboObj[attribName]);
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
+            if (typeof _this6._vertices[attribName].buffer !== 'undefined') {
+              gl.bufferData(gl.ARRAY_BUFFER, _this6._vertices[attribName], _this6._performanceHint);
+            } else {
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
+            }
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
           });
 
