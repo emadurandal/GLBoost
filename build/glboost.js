@@ -6335,7 +6335,7 @@
     return ArrayUtil;
   }();
 
-  var Geometry$1 = function (_GLBoostObject) {
+  var Geometry = function (_GLBoostObject) {
     babelHelpers.inherits(Geometry, _GLBoostObject);
 
     function Geometry(glBoostContext) {
@@ -6898,8 +6898,8 @@
     return Geometry;
   }(GLBoostObject);
 
-  Geometry$1._vaoDic = {};
-  Geometry$1._iboArrayDic = {};
+  Geometry._vaoDic = {};
+  Geometry._iboArrayDic = {};
 
   /**
    * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -6969,7 +6969,7 @@
 
           if (renderPass.fbo) {
             gl.bindTexture(gl.TEXTURE_2D, null);
-            Geometry$1.clearMaterialCache();
+            Geometry.clearMaterialCache();
             gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
           }
           glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
@@ -7291,7 +7291,7 @@
       }
     }]);
     return M_SkeletalGeometry;
-  }(Geometry$1);
+  }(Geometry);
 
   var M_SkeletalMesh = function (_M_Mesh) {
     babelHelpers.inherits(M_SkeletalMesh, _M_Mesh);
@@ -8666,7 +8666,7 @@
       }
     }]);
     return Particle;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Particle"] = Particle;
 
@@ -8757,7 +8757,7 @@
       }
     }]);
     return Sphere;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Sphere"] = Sphere;
 
@@ -8842,7 +8842,7 @@
       }
     }]);
     return Plane;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Plane"] = Plane;
 
@@ -8906,7 +8906,7 @@
       }
     }]);
     return Cube;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Cube"] = Cube;
 
@@ -9205,7 +9205,7 @@
       }
     }]);
     return BlendShapeGeometry;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
@@ -9231,7 +9231,7 @@
     }, {
       key: 'createGeometry',
       value: function createGeometry() {
-        return new Geometry$1(this);
+        return new Geometry(this);
       }
     }, {
       key: 'createBlendShapeGeometry',
@@ -10843,6 +10843,10 @@
         if (indices !== null) {
           material.setVertexN(geometry, indices.length);
         }
+
+        var techniqueStr = materialJson.technique;
+        //this._loadTechnique(json, techniqueStr);
+
         if (defaultShader) {
           material.shaderClass = defaultShader;
         } else {
@@ -10850,6 +10854,20 @@
         }
 
         return texcoords;
+      }
+    }, {
+      key: '_loadTechnique',
+      value: function _loadTechnique(json, techniqueStr) {
+        var techniqueJson = json.techniques[techniqueStr];
+
+        var programStr = techniqueJson.program;
+
+        this._loadProgram(json, programStr);
+      }
+    }, {
+      key: '_loadProgram',
+      value: function _loadProgram(json, programStr) {
+        var programJson = json.programs[programStr];
       }
     }, {
       key: '_loadAnimation',

@@ -1,6 +1,7 @@
 import M_PointLight from '../elements/lights/M_PointLight';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
+import Geometry from '../../low_level/geometries/Geometry';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();

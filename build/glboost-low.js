@@ -6097,7 +6097,7 @@
 
   GLBoost$1['AABB'] = AABB;
 
-  var Geometry$1 = function (_GLBoostObject) {
+  var Geometry = function (_GLBoostObject) {
     babelHelpers.inherits(Geometry, _GLBoostObject);
 
     function Geometry(glBoostContext) {
@@ -6660,8 +6660,8 @@
     return Geometry;
   }(GLBoostObject);
 
-  Geometry$1._vaoDic = {};
-  Geometry$1._iboArrayDic = {};
+  Geometry._vaoDic = {};
+  Geometry._iboArrayDic = {};
 
   /**
    * This Particle class handles particles expressions.
@@ -6949,7 +6949,7 @@
       }
     }]);
     return Particle;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Particle"] = Particle;
 
@@ -7040,7 +7040,7 @@
       }
     }]);
     return Sphere;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Sphere"] = Sphere;
 
@@ -7125,7 +7125,7 @@
       }
     }]);
     return Plane;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Plane"] = Plane;
 
@@ -7189,7 +7189,7 @@
       }
     }]);
     return Cube;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1["Cube"] = Cube;
 
@@ -7488,7 +7488,7 @@
       }
     }]);
     return BlendShapeGeometry;
-  }(Geometry$1);
+  }(Geometry);
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
@@ -7514,7 +7514,7 @@
     }, {
       key: 'createGeometry',
       value: function createGeometry() {
-        return new Geometry$1(this);
+        return new Geometry(this);
       }
     }, {
       key: 'createBlendShapeGeometry',

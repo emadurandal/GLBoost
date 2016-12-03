@@ -348,7 +348,7 @@ export default class GLTFLoader {
     }
 
     if (meshJson.primitives.length > 1) {
-      let lengthDic = {position: 0, normal:0, joint:0, weight:0, texcoord:0};
+      let lengthDic = {position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
       for (let i = 0; i < meshJson.primitives.length; i++) {
         lengthDic.position += _positions[i].length;
         lengthDic.normal += _normals[i].length;
@@ -488,7 +488,7 @@ export default class GLTFLoader {
         let samplerStr = textureJson.sampler;
         let samplerJson = json.samplers[samplerStr];
 
-        var texture = glBoostContext.createTexture(textureUri, {
+        let texture = glBoostContext.createTexture(textureUri, {
           'TEXTURE_MAG_FILTER': samplerJson.magFilter,
           'TEXTURE_MIN_FILTER': samplerJson.minFilter,
           'TEXTURE_WRAP_S': samplerJson.wrapS,
@@ -534,6 +534,10 @@ export default class GLTFLoader {
     if (indices !== null) {
       material.setVertexN(geometry, indices.length);
     }
+
+    let techniqueStr = materialJson.technique;
+    //this._loadTechnique(json, techniqueStr);
+
     if (defaultShader) {
       material.shaderClass = defaultShader;
     } else {
@@ -541,6 +545,18 @@ export default class GLTFLoader {
     }
 
     return texcoords;
+  }
+
+  _loadTechnique(json, techniqueStr) {
+    let techniqueJson = json.techniques[techniqueStr];
+
+    let programStr = techniqueJson.program;
+
+    this._loadProgram(json, programStr);
+  }
+
+  _loadProgram(json, programStr) {
+    let programJson = json.programs[programStr];
   }
 
   _loadAnimation(element, arrayBuffer, json, canvas, scale) {
