@@ -10652,94 +10652,9 @@
           var material = glBoostContext.createClassicMaterial(canvas);
 
           var materialStr = primitiveJson.material;
-          var materialJson = json.materials[materialStr];
 
-          if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
-            materialJson = materialJson.extensions.KHR_materials_common;
-          }
+          texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, i);
 
-          var diffuseValue = materialJson.values.diffuse;
-          // Diffuse Texture
-          if (texcoords0AccessorStr) {
-            texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl, false, true);
-            additional['texcoord'][i] = texcoords;
-            vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
-            vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
-            dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
-
-            if (typeof diffuseValue === 'string') {
-              var textureStr = diffuseValue;
-              var textureJson = json.textures[textureStr];
-              var imageStr = textureJson.source;
-              var imageJson = json.images[imageStr];
-
-              var textureUri = null;
-
-              if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
-              } else {
-                var imageFileStr = imageJson.uri;
-                if (imageFileStr.match(/^data:/)) {
-                  textureUri = imageFileStr;
-                } else {
-                  textureUri = basePath + imageFileStr;
-                }
-              }
-
-              var samplerStr = textureJson.sampler;
-              var samplerJson = json.samplers[samplerStr];
-
-              var texture = glBoostContext.createTexture(textureUri, {
-                'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-                'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-                'TEXTURE_WRAP_S': samplerJson.wrapS,
-                'TEXTURE_WRAP_T': samplerJson.wrapT
-              });
-              texture.name = textureStr;
-              material.diffuseTexture = texture;
-            }
-          } else {
-            if (typeof vertexData.components.texcoord !== 'undefined') {
-              // If texture coordinates existed even once in the previous loop
-              var emptyTexcoords = [];
-              var componentN = vertexData.components.position;
-              var length = positions.length / componentN;
-              for (var k = 0; k < length; k++) {
-                emptyTexcoords.push(0);
-                emptyTexcoords.push(0);
-              }
-              additional['texcoord'][i] = new Float32Array(emptyTexcoords);
-              vertexData.components.texcoord = 2;
-              vertexData.componentBytes.texcoord = 4;
-              dataViewMethodDic.texcoord = 'getFloat32';
-            }
-          }
-
-          // Diffuse
-          if (diffuseValue && typeof diffuseValue !== 'string') {
-            material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-          }
-          // Ambient
-          var ambientValue = materialJson.values.ambient;
-          if (ambientValue && typeof ambientValue !== 'string') {
-            material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-          }
-          // Specular
-          var specularValue = materialJson.values.specular;
-          if (specularValue && typeof specularValue !== 'string') {
-            material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
-          }
-
-          var opacityValue = 1.0 - materialJson.values.transparency;
-
-          if (indices !== null) {
-            material.setVertexN(geometry, indices.length);
-          }
-          if (defaultShader) {
-            material.shaderClass = defaultShader;
-          } else {
-            material.shaderClass = PhongShader;
-          }
           materials.push(material);
         }
 
@@ -10841,6 +10756,100 @@
         geometry.materials = materials;
 
         return mesh;
+      }
+    }, {
+      key: '_loadMaterial',
+      value: function _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, idx) {
+        var materialJson = json.materials[materialStr];
+
+        if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
+          materialJson = materialJson.extensions.KHR_materials_common;
+        }
+
+        var diffuseValue = materialJson.values.diffuse;
+        // Diffuse Texture
+        if (texcoords0AccessorStr) {
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+          additional['texcoord'][idx] = texcoords;
+          vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
+          vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
+          dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
+
+          if (typeof diffuseValue === 'string') {
+            var textureStr = diffuseValue;
+            var textureJson = json.textures[textureStr];
+            var imageStr = textureJson.source;
+            var imageJson = json.images[imageStr];
+
+            var textureUri = null;
+
+            if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+              textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
+            } else {
+              var imageFileStr = imageJson.uri;
+              if (imageFileStr.match(/^data:/)) {
+                textureUri = imageFileStr;
+              } else {
+                textureUri = basePath + imageFileStr;
+              }
+            }
+
+            var samplerStr = textureJson.sampler;
+            var samplerJson = json.samplers[samplerStr];
+
+            var texture = glBoostContext.createTexture(textureUri, {
+              'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+              'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+              'TEXTURE_WRAP_S': samplerJson.wrapS,
+              'TEXTURE_WRAP_T': samplerJson.wrapT
+            });
+            texture.name = textureStr;
+            material.diffuseTexture = texture;
+          }
+        } else {
+          if (typeof vertexData.components.texcoord !== 'undefined') {
+            // If texture coordinates existed even once in the previous loop
+            var emptyTexcoords = [];
+            var componentN = vertexData.components.position;
+            var length = positions.length / componentN;
+            for (var k = 0; k < length; k++) {
+              emptyTexcoords.push(0);
+              emptyTexcoords.push(0);
+            }
+            additional['texcoord'][idx] = new Float32Array(emptyTexcoords);
+            vertexData.components.texcoord = 2;
+            vertexData.componentBytes.texcoord = 4;
+            dataViewMethodDic.texcoord = 'getFloat32';
+          }
+        }
+
+        // Diffuse
+        if (diffuseValue && typeof diffuseValue !== 'string') {
+          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
+        }
+        // Ambient
+        var ambientValue = materialJson.values.ambient;
+        if (ambientValue && typeof ambientValue !== 'string') {
+          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
+        }
+        // Specular
+        var specularValue = materialJson.values.specular;
+        if (specularValue && typeof specularValue !== 'string') {
+          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+        }
+
+        var opacityValue = 1.0 - materialJson.values.transparency;
+
+        if (indices !== null) {
+          material.setVertexN(geometry, indices.length);
+        }
+        if (defaultShader) {
+          material.shaderClass = defaultShader;
+        } else {
+          material.shaderClass = PhongShader;
+        }
+
+        return texcoords;
       }
     }, {
       key: '_loadAnimation',
