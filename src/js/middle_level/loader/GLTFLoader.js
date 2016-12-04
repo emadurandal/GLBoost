@@ -198,7 +198,10 @@ export default class GLTFLoader {
     let promisesToLoadShaders = [];
     for (let shaderName in shadersJson) {
       shaders[shaderName] = {};
-      let shaderUri = basePath + shadersJson[shaderName].uri;
+      let shaderUri = shadersJson[shaderName].uri;
+      if (!shaderUri.match(/^data:/)) {
+        shaderUri = basePath + shaderUri;
+      }
       let shaderType = shadersJson[shaderName].type;
       promisesToLoadShaders.push(
         new Promise((fulfilled, rejected) => {

@@ -10653,7 +10653,10 @@
 
         var _loop = function _loop(shaderName) {
           shaders[shaderName] = {};
-          var shaderUri = basePath + shadersJson[shaderName].uri;
+          var shaderUri = shadersJson[shaderName].uri;
+          if (!shaderUri.match(/^data:/)) {
+            shaderUri = basePath + shaderUri;
+          }
           var shaderType = shadersJson[shaderName].type;
           promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
             _this5._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
