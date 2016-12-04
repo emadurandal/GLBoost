@@ -265,7 +265,7 @@ export default class Geometry extends GLBoostObject {
         } else {
           gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
         }
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
       });
 
       Geometry._iboArrayDic[this.toString()] = [];

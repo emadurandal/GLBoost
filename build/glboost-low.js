@@ -6372,7 +6372,7 @@
             } else {
               gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
             }
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            //gl.bindBuffer(gl.ARRAY_BUFFER, null);
           });
 
           Geometry._iboArrayDic[this.toString()] = [];
