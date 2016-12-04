@@ -10291,6 +10291,27 @@
   GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;
   GLBoost$1['VALUE_LOG_GL_RESOURCE_LIFECYCLE'] = true;
 
+  var FreeShader = function (_Shader) {
+    babelHelpers.inherits(FreeShader, _Shader);
+
+    function FreeShader(glBoostContext, vertexShaderText, fragmentShaderText) {
+      babelHelpers.classCallCheck(this, FreeShader);
+      return babelHelpers.possibleConstructorReturn(this, (FreeShader.__proto__ || Object.getPrototypeOf(FreeShader)).call(this, glBoostContext));
+    }
+
+    babelHelpers.createClass(FreeShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+      }
+    }]);
+    return FreeShader;
+  }(Shader);
+
+  GLBoost['FreeShader'] = FreeShader;
+
   var DataUtil = function () {
     function DataUtil() {
       babelHelpers.classCallCheck(this, DataUtil);
@@ -10441,7 +10462,7 @@
           var json = JSON.parse(gotText);
           var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-          _this3._IterateNodeOfScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+          _this3._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
         };
 
         oReq.send(null);
@@ -10469,7 +10490,7 @@
         var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
         if (arrayBuffer) {
-          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+          this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
         }
       }
     }, {
@@ -10485,15 +10506,59 @@
           var arrayBuffer = oReq.response;
 
           if (arrayBuffer) {
-            _this4._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+            _this4._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
           }
         };
 
         oReq.send(null);
       }
     }, {
+      key: '_asyncShaderAccess',
+      value: function _asyncShaderAccess(fulfilled, shaderUri, shader, shaderType) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+            var gotText = xmlHttp.responseText;
+            shader.shaderText = gotText;
+            shader.shaderType = shaderType;
+            fulfilled();
+          }
+        };
+
+        xmlHttp.open("GET", shaderUri, true);
+        xmlHttp.send(null);
+      }
+    }, {
+      key: '_loadShadersAndScene',
+      value: function _loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+        var _this5 = this;
+
+        var shadersJson = json.shaders;
+        var shaders = {};
+        var promisesToLoadShaders = [];
+
+        var _loop = function _loop(shaderName) {
+          shaders[shaderName] = {};
+          var shaderUri = basePath + shadersJson[shaderName].uri;
+          var shaderType = shadersJson[shaderName].type;
+          promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
+            _this5._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
+          }));
+        };
+
+        for (var shaderName in shadersJson) {
+          _loop(shaderName);
+        }
+
+        Promise.resolve().then(function () {
+          return Promise.all(promisesToLoadShaders);
+        }).then(function () {
+          _this5._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+        });
+      }
+    }, {
       key: '_IterateNodeOfScene',
-      value: function _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+      value: function _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve) {
         var sceneStr = json.scene;
         var sceneJson = json.scenes[sceneStr];
 
@@ -10504,7 +10569,7 @@
           nodeStr = sceneJson.nodes[i];
 
           // iterate nodes and load meshes
-          var element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          var element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
           group.addChild(element);
         }
 
@@ -10523,7 +10588,7 @@
       }
     }, {
       key: '_recursiveIterateNode',
-      value: function _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+      value: function _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders) {
         var nodeJson = json.nodes[nodeStr];
         var group = glBoostContext.createGroup();
         group.userFlavorName = nodeStr;
@@ -10553,7 +10618,7 @@
               rootJointStr = nodeJson.skeletons[0];
               skinStr = nodeJson.skin;
             }
-            var mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+            var mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders);
             mesh.userFlavorName = meshStr;
             group.addChild(mesh);
           }
@@ -10565,7 +10630,7 @@
 
         for (var _i = 0; _i < nodeJson.children.length; _i++) {
           var _nodeStr = nodeJson.children[_i];
-          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
           group.addChild(childElement);
         }
 
@@ -10573,7 +10638,7 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
+      value: function _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders) {
         var mesh = null;
         var geometry = null;
         var gl = GLContext.getInstance(canvas).gl;
@@ -10663,7 +10728,7 @@
 
           var materialStr = primitiveJson.material;
 
-          texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, i);
+          texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
 
           materials.push(material);
         }
@@ -10769,7 +10834,7 @@
       }
     }, {
       key: '_loadMaterial',
-      value: function _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, idx) {
+      value: function _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
         var materialJson = json.materials[materialStr];
 
         if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -10855,7 +10920,7 @@
         }
 
         var techniqueStr = materialJson.technique;
-        //this._loadTechnique(json, techniqueStr);
+        this._loadTechnique(glBoostContext, json, techniqueStr, material, shaders);
 
         if (defaultShader) {
           material.shaderClass = defaultShader;
@@ -10867,17 +10932,23 @@
       }
     }, {
       key: '_loadTechnique',
-      value: function _loadTechnique(json, techniqueStr) {
+      value: function _loadTechnique(glBoostContext, json, techniqueStr, material, shaders) {
         var techniqueJson = json.techniques[techniqueStr];
 
         var programStr = techniqueJson.program;
 
-        this._loadProgram(json, programStr);
+        this._loadProgram(glBoostContext, json, programStr, material, shaders);
       }
     }, {
       key: '_loadProgram',
-      value: function _loadProgram(json, programStr) {
+      value: function _loadProgram(glBoostContext, json, programStr, material, shaders) {
         var programJson = json.programs[programStr];
+        var fragmentShaderStr = programJson.fragmentShader;
+        var vertexShaderStr = programJson.vertexShader;
+        var fragmentShaderText = shaders[fragmentShaderStr].shaderText;
+        var vertexShaderText = shaders[vertexShaderStr].shaderText;
+
+        material.shaderClass = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText);
       }
     }, {
       key: '_loadAnimation',
