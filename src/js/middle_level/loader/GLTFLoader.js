@@ -581,35 +581,94 @@ export default class GLTFLoader {
     }
 
     let techniqueStr = materialJson.technique;
-    //this._loadTechnique(glBoostContext, json, techniqueStr, material, shaders);
-
     if (defaultShader) {
       material.shaderClass = defaultShader;
     } else {
-      material.shaderClass = PhongShader;
+      if (typeof json.techniques !== 'undefined') {
+        this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
+      } else {
+        material.shaderClass = PhongShader;
+      }
     }
 
     return texcoords;
   }
 
-  _loadTechnique(glBoostContext, json, techniqueStr, material, shaders) {
+  _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders) {
     let techniqueJson = json.techniques[techniqueStr];
 
-    let programStr = techniqueJson.program;
 
-    this._loadProgram(glBoostContext, json, programStr, material, shaders);
+    let programStr = techniqueJson.program;
+    let uniformsJson = techniqueJson.uniforms;
+    let parametersJson = techniqueJson.parameters;
+    let attributesJson = techniqueJson.attributes;
+    let attributes = {};
+    for (let attributeName in attributesJson) {
+      //attributes[attributesJson[attributeName]] = attributeName;
+      let parameterName = attributesJson[attributeName];
+      let parameterJson = parametersJson[parameterName];
+      attributes[attributeName] = parameterJson.semantic;
+    }
+
+    let uniforms = {};
+    for (let uniformName in uniformsJson) {
+      let parameterName = uniformsJson[uniformName];
+      let parameterJson = parametersJson[parameterName];
+      if (typeof parameterJson.semantic !== 'undefined') {
+        uniforms[uniformName] = parameterJson.semantic;
+      } else {
+        let value = null;
+        if (typeof parameterJson.value !== 'undefined') {
+          value = parameterJson.value;
+        } else {
+          value = materialJson.values[parameterName];
+        }
+
+        switch (parameterJson.type) {
+          case 5126:
+            uniforms[uniformName] = value;
+            break;
+          case 35664:
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
+            break;
+          case 35665:
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
+            break;
+          case 35666:
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+            break;
+          case 5124:
+            uniforms[uniformName] = value;
+            break;
+          case 35667:
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
+            break;
+          case 35668:
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
+            break;
+          case 35669:
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+            break;
+          case 35678:
+            uniforms[uniformName] = 'TEXTURE';
+            break;
+        }
+      }
+    }
+
+    this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms);
   }
 
 
 
-  _loadProgram(glBoostContext, json, programStr, material, shaders) {
+  _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms) {
     let programJson = json.programs[programStr];
     let fragmentShaderStr = programJson.fragmentShader;
     let vertexShaderStr = programJson.vertexShader;
     let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
     let vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-    material.shaderClass = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText);
+    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms);
   }
 
   _loadAnimation(element, arrayBuffer, json, canvas, scale) {

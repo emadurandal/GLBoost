@@ -1,6 +1,7 @@
 import M_PointLight from '../elements/lights/M_PointLight';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
+import Matrix44 from '../../low_level/math/Matrix44';
 import Geometry from '../../low_level/geometries/Geometry';
 
 let singleton = Symbol();
@@ -57,6 +58,10 @@ export default class DrawKickerWorld {
         let projectionMatrix = camera.projectionRHMatrix();
         gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
         gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
+
+        if (typeof glslProgram.modelViewMatrix !== 'undefined') {
+          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44.multiply(viewMatrix, world_m).flatten());
+        }
       }
 
       if (glslProgram['lightPosition_0']) {
