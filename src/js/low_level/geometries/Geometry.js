@@ -1,10 +1,6 @@
 import GLBoost from '../../globals';
 import GLBoostObject from '../core/GLBoostObject';
-import Vector3 from '../../low_level/math/Vector3';
-import GLContext from '../core/GLContext';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import ClassicMaterial from './../ClassicMaterial';
-import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import MathUtil from '../../low_level/math/MathUtil';
 import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
@@ -27,7 +23,7 @@ export default class Geometry extends GLBoostObject {
     this._defaultMaterial = glBoostContext.createClassicMaterial();
     this._vertexData = [];
     this._extraDataForShader = {};
-    this._vboObj = {}
+    this._vboObj = {};
     this._AABB = new AABB();
     this._drawKicker = DrawKickerWorld.getInstance();
 
@@ -151,6 +147,7 @@ export default class Geometry extends GLBoostObject {
     // 頂点レイアウト設定
     allVertexAttribs.forEach((attribName)=> {
       if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        let vertexAttribName = null;
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
           this._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);

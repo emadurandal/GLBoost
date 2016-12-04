@@ -4,6 +4,7 @@ import Geometry from '../../low_level/geometries/Geometry';
 import M_Joint from '../elements/skeletons/M_Joint';
 import M_Group from '../elements/M_Group';
 import Matrix44 from '../../low_level/math/Matrix44';
+import FreeShader from '../shaders/FreeShader';
 
 export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
@@ -82,7 +83,7 @@ export default class M_SkeletalGeometry extends Geometry {
       let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
       matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
-      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.transformMatrixAccumulatedAncestry);
+      //matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.transformMatrixAccumulatedAncestry);
     }
 
     var flatMatrices = [];
@@ -107,7 +108,6 @@ export default class M_SkeletalGeometry extends Geometry {
       var glslProgram = materials[i].shaderInstance.glslProgram;
       gl.useProgram(glslProgram);
       gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
-      gl.uniformMatrix4fv(glslProgram.invWorldMatrix, false, Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry).flatten());
     }
 
     super.draw(lights, camera, skeletalMesh, scene, renderPass_index);
@@ -124,26 +124,29 @@ export default class M_SkeletalGeometry extends Geometry {
       this._materialForSkeletal = this._defaultMaterial;
     }
 
-    class SkeletalShader extends this._materialForSkeletal.shaderClass {
-      constructor(glBoostContext, basicShader) {
-        super(glBoostContext, basicShader);
-        SkeletalShader.mixin(SkeletalShaderSource);
-      }
-    }
+    if (!(this._materialForSkeletal.shaderInstance !== null && this._materialForSkeletal.shaderInstance.constructor === FreeShader)) {
 
-    if (this._materials.length > 0) {
-      for (let i=0; i<this._materials.length; i++) {
-        if (this._materials[i].shaderClass.name !== SkeletalShader.name) {
-          this._materials[i].shaderClass = SkeletalShader;
+      class SkeletalShader extends this._materialForSkeletal.shaderClass {
+        constructor(glBoostContext, basicShader) {
+          super(glBoostContext, basicShader);
+          SkeletalShader.mixin(SkeletalShaderSource);
         }
       }
-    } else if (meshMaterial) {
-      if (meshMaterial.shaderClass.name !== SkeletalShader.name) {
-        meshMaterial.shaderClass = SkeletalShader;
-      }
-    } else {
-      if (this._defaultMaterial.shaderClass.name !== SkeletalShader.name) {
-        this._defaultMaterial.shaderClass = SkeletalShader;
+
+      if (this._materials.length > 0) {
+        for (let i = 0; i < this._materials.length; i++) {
+          if (this._materials[i].shaderClass.name !== SkeletalShader.name) {
+            this._materials[i].shaderClass = SkeletalShader;
+          }
+        }
+      } else if (meshMaterial) {
+        if (meshMaterial.shaderClass.name !== SkeletalShader.name) {
+          meshMaterial.shaderClass = SkeletalShader;
+        }
+      } else {
+        if (this._defaultMaterial.shaderClass.name !== SkeletalShader.name) {
+          this._defaultMaterial.shaderClass = SkeletalShader;
+        }
       }
     }
 

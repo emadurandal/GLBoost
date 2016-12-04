@@ -17,6 +17,6 @@ emission = u_emission;
 diffuse.xyz *= max(dot(normal,vec3(0.,0.,1.)), 0.);
 color.xyz += diffuse.xyz;
 color.xyz += emission.xyz;
-color = vec4(color.rgb * diffuse.a, diffuse.a * u_transparency);
+color = vec4(color.rgb * diffuse.a, diffuse.a * (1.0 - u_transparency));
 gl_FragColor = color;
 }

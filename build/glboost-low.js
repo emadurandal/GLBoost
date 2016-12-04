@@ -657,7 +657,7 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
-  var Matrix44 = function () {
+  var Matrix44$1 = function () {
     function Matrix44(m) {
       var isColumnMajor = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       babelHelpers.classCallCheck(this, Matrix44);
@@ -1205,7 +1205,7 @@
     return Matrix44;
   }();
 
-  GLBoost$1["Matrix44"] = Matrix44;
+  GLBoost$1["Matrix44"] = Matrix44$1;
 
   var Quaternion = function () {
     function Quaternion(x, y, z, w) {
@@ -1284,7 +1284,7 @@
         var wy = this.w * this.y;
         var wz = this.w * this.z;
 
-        return new Matrix44(1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0, 2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0, 2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
+        return new Matrix44$1(1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0, 2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0, 2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0, 0.0, 0.0, 0.0, 1.0);
       }
     }], [{
       key: 'invert',
@@ -3023,9 +3023,9 @@
 
       _this._rotate = Vector3.zero();
       _this._quaternion = new Quaternion(0, 0, 0, 1);
-      _this._matrix = Matrix44.identity();
+      _this._matrix = Matrix44$1.identity();
 
-      _this._finalMatrix = Matrix44.identity();
+      _this._finalMatrix = Matrix44$1.identity();
 
       _this._dirtyAsElement = true;
       _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
@@ -3129,7 +3129,7 @@
       key: 'transformMatrix',
       get: function get() {
         if (this._dirtyAsElement) {
-          var matrix = Matrix44.identity();
+          var matrix = Matrix44$1.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
             this._dirtyAsElement = false;
@@ -3140,10 +3140,10 @@
           if (this._currentCalcMode === 'quaternion') {
             rotationMatrix = this.quaternion.rotationMatrix;
           } else {
-            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
           }
 
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
           this._finalMatrix.m03 = this.translate.x;
           this._finalMatrix.m13 = this.translate.y;
           this._finalMatrix.m23 = this.translate.z;
@@ -3317,7 +3317,7 @@
         var s = Vector3.normalize(Vector3.cross(f, up));
         var u = Vector3.cross(s, f);
 
-        return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
+        return new Matrix44$1(s.x, s.y, s.z, -Vector3.dotProduct(s, eye), u.x, u.y, u.z, -Vector3.dotProduct(u, eye), -f.x, -f.y, -f.z, Vector3.dotProduct(f, eye), 0, 0, 0, 1);
       }
     }]);
     return L_AbstractCamera;
@@ -3441,7 +3441,7 @@
       key: 'orthoRHMatrix',
       value: function orthoRHMatrix(left, right, bottom, top, near, far) {
 
-        return new Matrix44(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+        return new Matrix44$1(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
       }
     }]);
     return L_OrthoCamera;
@@ -3542,7 +3542,7 @@
         var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
         var xscale = yscale / aspect;
 
-        return new Matrix44(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+        return new Matrix44$1(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
       }
     }]);
     return L_PerspectiveCamera;
@@ -4854,7 +4854,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (M_Element.__proto__ || Object.getPrototypeOf(M_Element)).call(this, glBoostContext));
 
       _this._parent = null;
-      _this._invMatrix = Matrix44.identity();
+      _this._invMatrix = Matrix44$1.identity();
       _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
       _this._calculatedInverseMatrix = false;
       _this._updateCountAsElement = 0;
@@ -4986,7 +4986,7 @@
       key: 'getTransformMatrixNotAnimated',
       value: function getTransformMatrixNotAnimated() {
         if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
-          var matrix = Matrix44.identity();
+          var matrix = Matrix44$1.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
             this._dirtyAsElement = false;
@@ -4997,10 +4997,10 @@
           if (this._currentCalcMode === 'quaternion') {
             rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
           } else {
-            rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
+            rotationMatrix = Matrix44$1.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44$1.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44$1.rotateZ(this.getRotateNotAnimated().z));
           }
 
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
           this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
           this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
           this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
@@ -5027,7 +5027,7 @@
           rotationMatrix.m31 = 0;
           rotationMatrix.m32 = 0;
         } else {
-          rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+          rotationMatrix = Matrix44$1.rotateX(this.getRotate('time', value).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', value).z));
         }
 
         return rotationMatrix.clone();
@@ -5048,7 +5048,7 @@
           rotationMatrix.m31 = 0;
           rotationMatrix.m32 = 0;
         } else {
-          rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
+          rotationMatrix = Matrix44$1.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44$1.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44$1.rotateZ(this.getRotateNotAnimated().z));
         }
 
         return rotationMatrix.clone();
@@ -5069,10 +5069,10 @@
           if (withMySelf) {
             return currentElem.transformMatrix;
           } else {
-            return Matrix44.identity();
+            return Matrix44$1.identity();
           }
         } else {
-          var currentMatrix = Matrix44.identity();
+          var currentMatrix = Matrix44$1.identity();
           if (withMySelf) {
             currentMatrix = currentElem.transformMatrix;
           }
@@ -5086,10 +5086,10 @@
           if (withMySelf) {
             return currentElem.transformMatrix;
           } else {
-            return Matrix44.identity();
+            return Matrix44$1.identity();
           }
         } else {
-          var currentMatrix = Matrix44.identity();
+          var currentMatrix = Matrix44$1.identity();
           if (withMySelf) {
             currentMatrix = currentElem.transformMatrix;
           }
@@ -5103,10 +5103,10 @@
           if (withMySelf) {
             return currentElem.transformMatrixOnlyRotate;
           } else {
-            return Matrix44.identity();
+            return Matrix44$1.identity();
           }
         } else {
-          var currentMatrix = Matrix44.identity();
+          var currentMatrix = Matrix44$1.identity();
           if (withMySelf) {
             currentMatrix = currentElem.transformMatrixOnlyRotate;
           }
@@ -5333,7 +5333,7 @@
           input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
         }
         if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
-          var matrix = Matrix44.identity();
+          var matrix = Matrix44$1.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
             this._dirtyAsElement = false;
@@ -5344,10 +5344,10 @@
           if (this._currentCalcMode === 'quaternion') {
             rotationMatrix = this.quaternion.rotationMatrix;
           } else {
-            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
           }
 
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
           this._finalMatrix.m03 = this.translate.x;
           this._finalMatrix.m13 = this.translate.y;
           this._finalMatrix.m23 = this.translate.z;
@@ -5366,7 +5366,7 @@
           input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
         }
         if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
-          var matrix = Matrix44.identity();
+          var matrix = Matrix44$1.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
             this._dirtyAsElement = false;
@@ -5378,14 +5378,14 @@
             //let quaternion = new Quaternion(this.quaternion.w, this.quaternion.z, this.quaternion.y, this.quaternion.x);
             rotationMatrix = this.quaternion.rotationMatrix;
           } else {
-            rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
           }
 
-          this._finalMatrix = Matrix44.identity();
+          this._finalMatrix = Matrix44$1.identity();
           this._finalMatrix.m03 = this.translate.x;
           this._finalMatrix.m13 = this.translate.y;
           this._finalMatrix.m23 = this.translate.z;
-          this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44.scale(this.scale));
+          this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44$1.scale(this.scale));
 
           this._dirtyAsElement = false;
           this._matrixGetMode = 'animated_' + input;
@@ -5397,7 +5397,7 @@
       key: 'transformMatrixOnInit',
       get: function get() {
         if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
-          var matrix = Matrix44.identity();
+          var matrix = Matrix44$1.identity();
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
             this._dirtyAsElement = false;
@@ -5408,10 +5408,10 @@
           if (this._currentCalcMode === 'quaternion') {
             rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
           } else {
-            rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
+            rotationMatrix = Matrix44$1.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', 0).z));
           }
 
-          this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
           this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
           this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
           this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
@@ -5438,7 +5438,7 @@
           rotationMatrix.m31 = 0;
           rotationMatrix.m32 = 0;
         } else {
-          rotationMatrix = Matrix44.rotateX(this.rotate.x).multiply(Matrix44.rotateY(this.rotate.y)).multiply(Matrix44.rotateZ(this.rotate.z));
+          rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
         }
 
         return rotationMatrix.clone();
@@ -5476,7 +5476,7 @@
         //console.log(tempString);
         if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
           var world_m = this._multiplyMyAndParentTransformMatrices(this, true);
-          this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
+          this._normalMatrixAccumulatedAncestry = Matrix44$1.invert(world_m).transpose().toMatrix33();
           this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
         }
 
@@ -5486,7 +5486,7 @@
       key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
       get: function get() {
         if (this._parent === null) {
-          return Matrix44.identity();
+          return Matrix44$1.identity();
         }
 
         var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
@@ -5733,8 +5733,11 @@
           if (camera) {
             var viewMatrix = camera.lookAtRHMatrix();
             var projectionMatrix = camera.projectionRHMatrix();
-            var m_m = mesh.transformMatrixAccumulatedAncestry;
-            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+            var world_m = mesh.transformMatrixAccumulatedAncestry;
+            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
+            if (typeof glslProgram.modelViewMatrix !== 'undefined') {
+              gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44.multiply(viewMatrix, world_m).flatten());
+            }
             gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
           }
 
@@ -5874,6 +5877,10 @@
             var projectionMatrix = camera.projectionRHMatrix();
             gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
             gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
+
+            if (typeof glslProgram.modelViewMatrix !== 'undefined') {
+              gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44$1.multiply(viewMatrix, world_m).flatten());
+            }
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -6246,6 +6253,7 @@
         // 頂点レイアウト設定
         allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+            var vertexAttribName = null;
             gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
             gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
           }

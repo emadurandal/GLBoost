@@ -6,7 +6,6 @@ export default class SkeletalShaderSource {
     shaderText += `${in_} vec4 aVertex_joint;\n`;
     shaderText += `${in_} vec4 aVertex_weight;\n`;
     shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-    shaderText += `uniform mat4 invWorldMatrix;\n`;
     return shaderText;
   }
 
@@ -22,7 +21,7 @@ export default class SkeletalShaderSource {
     shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
     shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
 
-    shaderText += '  vec4 position = invWorldMatrix * vec4(aVertex_position.x, aVertex_position.y, aVertex_position.z, 1.0);';
+    shaderText += '  vec4 position = vec4(aVertex_position.x, aVertex_position.y, aVertex_position.z, 1.0);';
 
     if (existCamera_f) {
       shaderText += '  gl_Position = pvwMatrix * skinMat * position;\n';
@@ -56,8 +55,6 @@ export default class SkeletalShaderSource {
       );
     }
     gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
-
-    shaderProgram['invWorldMatrix'] = gl.getUniformLocation(shaderProgram, 'invWorldMatrix');
 
     return vertexAttribsAsResult;
   }

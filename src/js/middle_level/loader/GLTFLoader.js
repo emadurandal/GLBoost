@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import GLContext from '../../low_level/core/GLContext';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import PhongShader from '../shaders/PhongShader';
+import FreeShader from '../shaders/FreeShader';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 import Vector4 from '../../low_level/math/Vector4';
@@ -41,6 +42,8 @@ export default class GLTFLoader {
     }
     return this[singleton];
   }
+
+
 
   /**
    * [en] the method to load glTF file.<br>
@@ -126,7 +129,7 @@ export default class GLTFLoader {
       var json = JSON.parse(gotText);
       let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-      this._IterateNodeOfScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+      this._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
     };
 
     oReq.send(null);
@@ -152,7 +155,7 @@ export default class GLTFLoader {
     var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
     if (arrayBuffer) {
-      this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+      this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
     }
   }
 
@@ -166,14 +169,54 @@ export default class GLTFLoader {
       var arrayBuffer = oReq.response;
 
       if (arrayBuffer) {
-        this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
       }
     };
 
     oReq.send(null);
   }
 
-  _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+
+  _asyncShaderAccess(fulfilled, shaderUri, shader, shaderType) {
+    let xmlHttp = new XMLHttpRequest();
+    xmlHttp.onreadystatechange = () => {
+      if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+        let gotText = xmlHttp.responseText;
+        shader.shaderText = gotText;
+        shader.shaderType = shaderType;
+        fulfilled();
+      }
+    };
+
+    xmlHttp.open("GET", shaderUri, true);
+    xmlHttp.send(null);
+  }
+
+  _loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+    let shadersJson = json.shaders;
+    let shaders = {};
+    let promisesToLoadShaders = [];
+    for (let shaderName in shadersJson) {
+      shaders[shaderName] = {};
+      let shaderUri = basePath + shadersJson[shaderName].uri;
+      let shaderType = shadersJson[shaderName].type;
+      promisesToLoadShaders.push(
+        new Promise((fulfilled, rejected) => {
+          this._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
+        })
+      );
+    }
+
+    Promise.resolve()
+      .then(() => {
+        return Promise.all(promisesToLoadShaders);
+      })
+      .then(() => {
+        this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+      });
+  }
+
+  _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve) {
     let sceneStr = json.scene;
     let sceneJson = json.scenes[sceneStr];
 
@@ -184,7 +227,7 @@ export default class GLTFLoader {
       nodeStr = sceneJson.nodes[i];
 
       // iterate nodes and load meshes
-      let element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader)
+      let element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
       group.addChild(element);
     }
 
@@ -202,7 +245,9 @@ export default class GLTFLoader {
     resolve(group);
   }
 
-  _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader) {
+
+
+  _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -232,7 +277,7 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr);
+        let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -244,14 +289,14 @@ export default class GLTFLoader {
 
     for (let i = 0; i < nodeJson.children.length; i++) {
       let nodeStr = nodeJson.children[i];
-      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader);
+      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
       group.addChild(childElement);
     }
 
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr) {
+  _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders) {
     var mesh = null;
     var geometry = null;
     let gl = GLContext.getInstance(canvas).gl;
@@ -341,7 +386,7 @@ export default class GLTFLoader {
 
       let materialStr = primitiveJson.material;
 
-      texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, i);
+      texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
 
       materials.push(material);
 
@@ -450,7 +495,7 @@ export default class GLTFLoader {
     return mesh;
   }
 
-  _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, idx) {
+  _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
     let materialJson = json.materials[materialStr];
 
     if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -536,27 +581,94 @@ export default class GLTFLoader {
     }
 
     let techniqueStr = materialJson.technique;
-    //this._loadTechnique(json, techniqueStr);
-
     if (defaultShader) {
       material.shaderClass = defaultShader;
     } else {
-      material.shaderClass = PhongShader;
+      if (typeof json.techniques !== 'undefined') {
+        this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
+      } else {
+        material.shaderClass = PhongShader;
+      }
     }
 
     return texcoords;
   }
 
-  _loadTechnique(json, techniqueStr) {
+  _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders) {
     let techniqueJson = json.techniques[techniqueStr];
 
-    let programStr = techniqueJson.program;
 
-    this._loadProgram(json, programStr);
+    let programStr = techniqueJson.program;
+    let uniformsJson = techniqueJson.uniforms;
+    let parametersJson = techniqueJson.parameters;
+    let attributesJson = techniqueJson.attributes;
+    let attributes = {};
+    for (let attributeName in attributesJson) {
+      //attributes[attributesJson[attributeName]] = attributeName;
+      let parameterName = attributesJson[attributeName];
+      let parameterJson = parametersJson[parameterName];
+      attributes[attributeName] = parameterJson.semantic;
+    }
+
+    let uniforms = {};
+    for (let uniformName in uniformsJson) {
+      let parameterName = uniformsJson[uniformName];
+      let parameterJson = parametersJson[parameterName];
+      if (typeof parameterJson.semantic !== 'undefined') {
+        uniforms[uniformName] = parameterJson.semantic;
+      } else {
+        let value = null;
+        if (typeof parameterJson.value !== 'undefined') {
+          value = parameterJson.value;
+        } else {
+          value = materialJson.values[parameterName];
+        }
+
+        switch (parameterJson.type) {
+          case 5126:
+            uniforms[uniformName] = value;
+            break;
+          case 35664:
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
+            break;
+          case 35665:
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
+            break;
+          case 35666:
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+            break;
+          case 5124:
+            uniforms[uniformName] = value;
+            break;
+          case 35667:
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
+            break;
+          case 35668:
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
+            break;
+          case 35669:
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+            break;
+          case 35678:
+            uniforms[uniformName] = 'TEXTURE';
+            break;
+        }
+      }
+    }
+
+    this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms);
   }
 
-  _loadProgram(json, programStr) {
+
+
+  _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms) {
     let programJson = json.programs[programStr];
+    let fragmentShaderStr = programJson.fragmentShader;
+    let vertexShaderStr = programJson.vertexShader;
+    let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
+    let vertexShaderText = shaders[vertexShaderStr].shaderText;
+
+    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms);
   }
 
   _loadAnimation(element, arrayBuffer, json, canvas, scale) {

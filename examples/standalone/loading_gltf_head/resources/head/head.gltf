@@ -4660,46 +4660,6 @@
         }
     },
     "shaders": {
-        "head0FS": {
-            "type": 35632,
-            "uri": "head0FS.glsl"
-        },
-        "head0VS": {
-            "type": 35633,
-            "uri": "head0VS.glsl"
-        },
-        "head1FS": {
-            "type": 35632,
-            "uri": "head1FS.glsl"
-        },
-        "head1VS": {
-            "type": 35633,
-            "uri": "head1VS.glsl"
-        },
-        "head2FS": {
-            "type": 35632,
-            "uri": "head2FS.glsl"
-        },
-        "head2VS": {
-            "type": 35633,
-            "uri": "head2VS.glsl"
-        },
-        "head3FS": {
-            "type": 35632,
-            "uri": "head3FS.glsl"
-        },
-        "head3VS": {
-            "type": 35633,
-            "uri": "head3VS.glsl"
-        },
-        "head4FS": {
-            "type": 35632,
-            "uri": "head4FS.glsl"
-        },
-        "head4VS": {
-            "type": 35633,
-            "uri": "head4VS.glsl"
-        }
     },
     "skins": {},
     "techniques": {
