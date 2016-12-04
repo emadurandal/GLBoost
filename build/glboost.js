@@ -5716,7 +5716,12 @@
           if (typeof _this2._vertices.components === 'undefined') {
             _this2._vertices.components = {};
           }
+          if (typeof _this2._vertices.componentType === 'undefined') {
+            _this2._vertices.componentType = {};
+          }
+
           _this2._vertices.components[attribName] = componentN;
+          _this2._vertices.componentType[attribName] = 5126;
         });
       }
     }, {

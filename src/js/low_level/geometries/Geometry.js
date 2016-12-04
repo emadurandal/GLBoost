@@ -59,7 +59,12 @@ export default class Geometry extends GLBoostObject {
       if (typeof this._vertices.components === 'undefined') {
         this._vertices.components = {};
       }
+      if (typeof this._vertices.componentType === 'undefined') {
+        this._vertices.componentType = {};
+      }
+
       this._vertices.components[attribName] = componentN;
+      this._vertices.componentType[attribName] = 5126;
     });
   }
 
