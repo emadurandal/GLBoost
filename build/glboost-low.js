@@ -6255,7 +6255,7 @@
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
             var vertexAttribName = null;
             gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
+            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], _this5._vertices.componentType[attribName], gl.FALSE, 0, 0);
           }
         });
       }
@@ -6656,7 +6656,7 @@
       value: function _allVertexAttribs(vertices) {
         var attribNameArray = [];
         for (var attribName in vertices) {
-          if (attribName !== 'components' && attribName !== 'componentBytes') {
+          if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
             attribNameArray.push(attribName);
           }
         }

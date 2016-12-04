@@ -40,7 +40,7 @@ export default class Geometry extends GLBoostObject {
   static _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
-      if (attribName !== 'components' && attribName !== 'componentBytes') {
+      if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
         attribNameArray.push(attribName);
       }
     }
@@ -150,7 +150,7 @@ export default class Geometry extends GLBoostObject {
         let vertexAttribName = null;
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-          this._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
+          this._vertices.components[attribName], this._vertices.componentType[attribName], gl.FALSE, 0, 0);
       }
     });
   }

@@ -325,7 +325,8 @@ export default class GLTFLoader {
       position: _positions,
       normal: _normals,
       components: {},
-      componentBytes: {}
+      componentBytes: {},
+      componentType: {}
     };
     let additional = {
       'joint': [],
@@ -353,6 +354,7 @@ export default class GLTFLoader {
       _positions[i] = positions;
       vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json, gl);
       vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
+      vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
       dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
 
       let normalsAccessorStr = primitiveJson.attributes.NORMAL;
@@ -361,6 +363,7 @@ export default class GLTFLoader {
       _normals[i] = normals;
       vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
       vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
+      vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
       dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
 
       /// if Skeletal
@@ -370,6 +373,7 @@ export default class GLTFLoader {
         additional['joint'][i] = joints;
         vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json, gl);
         vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json, gl);
+        vertexData.componentType.joint = this._getDataType(jointAccessorStr, json, gl);
         dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json, gl);
       }
       let weightAccessorStr = primitiveJson.attributes.WEIGHT;
@@ -378,6 +382,7 @@ export default class GLTFLoader {
         additional['weight'][i] = weights;
         vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json, gl);
         vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json, gl);
+        vertexData.componentType.weight = this._getDataType(weightAccessorStr, json, gl);
         dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json, gl);
       }
 
@@ -512,6 +517,7 @@ export default class GLTFLoader {
       additional['texcoord'][idx] = texcoords;
       vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
       vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
+      vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
       dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
 
       if (typeof diffuseValue === 'string') {
@@ -845,6 +851,11 @@ export default class GLTFLoader {
         break;
     }
     return dataViewMethod;
+  }
+
+  _getDataType(accessorStr, json, gl) {
+    var accessorJson = json.accessors[accessorStr];
+    return accessorJson.componentType;
   }
 
   _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false, toGetAsTypedArray = false) {

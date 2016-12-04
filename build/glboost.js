@@ -5821,7 +5821,7 @@
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
             var vertexAttribName = null;
             gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], gl.FLOAT, gl.FALSE, 0, 0);
+            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], _this5._vertices.componentType[attribName], gl.FALSE, 0, 0);
           }
         });
       }
@@ -6222,7 +6222,7 @@
       value: function _allVertexAttribs(vertices) {
         var attribNameArray = [];
         for (var attribName in vertices) {
-          if (attribName !== 'components' && attribName !== 'componentBytes') {
+          if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
             attribNameArray.push(attribName);
           }
         }
@@ -10781,7 +10781,8 @@
           position: _positions,
           normal: _normals,
           components: {},
-          componentBytes: {}
+          componentBytes: {},
+          componentType: {}
         };
         var additional = {
           'joint': [],
@@ -10809,6 +10810,7 @@
           _positions[i] = positions;
           vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json, gl);
           vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
+          vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
           dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
 
           var normalsAccessorStr = primitiveJson.attributes.NORMAL;
@@ -10817,6 +10819,7 @@
           _normals[i] = normals;
           vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
           vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
+          vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
           dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
 
           /// if Skeletal
@@ -10826,6 +10829,7 @@
             additional['joint'][i] = joints;
             vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json, gl);
             vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json, gl);
+            vertexData.componentType.joint = this._getDataType(jointAccessorStr, json, gl);
             dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json, gl);
           }
           var weightAccessorStr = primitiveJson.attributes.WEIGHT;
@@ -10834,6 +10838,7 @@
             additional['weight'][i] = weights;
             vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json, gl);
             vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json, gl);
+            vertexData.componentType.weight = this._getDataType(weightAccessorStr, json, gl);
             dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json, gl);
           }
 
@@ -10965,6 +10970,7 @@
           additional['texcoord'][idx] = texcoords;
           vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
           vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
+          vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
           dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
 
           if (typeof diffuseValue === 'string') {
@@ -11296,6 +11302,12 @@
             break;
         }
         return dataViewMethod;
+      }
+    }, {
+      key: '_getDataType',
+      value: function _getDataType(accessorStr, json, gl) {
+        var accessorJson = json.accessors[accessorStr];
+        return accessorJson.componentType;
       }
     }, {
       key: '_accessBinary',
