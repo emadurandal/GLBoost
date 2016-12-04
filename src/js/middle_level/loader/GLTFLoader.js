@@ -198,11 +198,20 @@ export default class GLTFLoader {
     let promisesToLoadShaders = [];
     for (let shaderName in shadersJson) {
       shaders[shaderName] = {};
-      let shaderUri = shadersJson[shaderName].uri;
+
+      let shaderJson = shadersJson[shaderName];
+      let shaderType = shaderJson.type;
+      if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
+        shaders[shaderName].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer);
+        shaders[shaderName].shaderType = shaderType;
+        continue;
+      }
+
+      let shaderUri = shaderJson.uri;
       if (!shaderUri.match(/^data:/)) {
         shaderUri = basePath + shaderUri;
       }
-      let shaderType = shadersJson[shaderName].type;
+
       promisesToLoadShaders.push(
         new Promise((fulfilled, rejected) => {
           this._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
@@ -210,13 +219,18 @@ export default class GLTFLoader {
       );
     }
 
-    Promise.resolve()
-      .then(() => {
-        return Promise.all(promisesToLoadShaders);
-      })
-      .then(() => {
-        this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
-      });
+    if (promisesToLoadShaders.length > 0) {
+      Promise.resolve()
+        .then(() => {
+          return Promise.all(promisesToLoadShaders);
+        })
+        .then(() => {
+          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+        });
+    } else {
+      this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+    }
+
   }
 
   _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve) {
@@ -729,6 +743,17 @@ export default class GLTFLoader {
         }
       }
     }
+  }
+  _accessBinaryAsShader(bufferViewStr, json, arrayBuffer) {
+    let bufferViewJson = json.bufferViews[bufferViewStr];
+    let byteOffset = bufferViewJson.byteOffset;
+    let byteLength = bufferViewJson.byteLength;
+
+
+    let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+
+    let text_decoder = new TextDecoder();
+    return text_decoder.decode(arrayBufferSliced);
   }
 
   _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {

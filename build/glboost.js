@@ -10653,25 +10653,40 @@
 
         var _loop = function _loop(shaderName) {
           shaders[shaderName] = {};
-          var shaderUri = shadersJson[shaderName].uri;
+
+          var shaderJson = shadersJson[shaderName];
+          var shaderType = shaderJson.type;
+          if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
+            shaders[shaderName].shaderText = _this5._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer);
+            shaders[shaderName].shaderType = shaderType;
+            return 'continue';
+          }
+
+          var shaderUri = shaderJson.uri;
           if (!shaderUri.match(/^data:/)) {
             shaderUri = basePath + shaderUri;
           }
-          var shaderType = shadersJson[shaderName].type;
+
           promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
             _this5._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
           }));
         };
 
         for (var shaderName in shadersJson) {
-          _loop(shaderName);
+          var _ret = _loop(shaderName);
+
+          if (_ret === 'continue') continue;
         }
 
-        Promise.resolve().then(function () {
-          return Promise.all(promisesToLoadShaders);
-        }).then(function () {
-          _this5._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
-        });
+        if (promisesToLoadShaders.length > 0) {
+          Promise.resolve().then(function () {
+            return Promise.all(promisesToLoadShaders);
+          }).then(function () {
+            _this5._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+          });
+        } else {
+          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+        }
       }
     }, {
       key: '_IterateNodeOfScene',
@@ -11182,6 +11197,18 @@
             }
           }
         }
+      }
+    }, {
+      key: '_accessBinaryAsShader',
+      value: function _accessBinaryAsShader(bufferViewStr, json, arrayBuffer) {
+        var bufferViewJson = json.bufferViews[bufferViewStr];
+        var byteOffset = bufferViewJson.byteOffset;
+        var byteLength = bufferViewJson.byteLength;
+
+        var arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+
+        var text_decoder = new TextDecoder();
+        return text_decoder.decode(arrayBufferSliced);
       }
     }, {
       key: '_accessBinaryAsImage',
