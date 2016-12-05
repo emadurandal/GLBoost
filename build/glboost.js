@@ -3058,6 +3058,8 @@
       _this._cameraController = null;
 
       _this._dirtyView = true;
+
+      _this._middleLevelCamera = null;
       return _this;
     }
 
@@ -3065,7 +3067,7 @@
       key: '_affectedByCameraController',
       value: function _affectedByCameraController() {
         if (this._cameraController !== null) {
-          var results = this._cameraController.convert(this._translate, this._center, this._up);
+          var results = this._cameraController.convert(this);
           this._translateInner = results[0];
           this._centerInner = results[1];
           this._upInner = results[2];
@@ -3111,7 +3113,19 @@
       key: 'cameraController',
       set: function set(controller) {
         this._cameraController = controller;
-        controller.addCamera(this);
+        if (this._middleLevelCamera !== null) {
+          controller.addCamera(this._middleLevelCamera);
+        } else {
+          controller.addCamera(this);
+        }
+      },
+      get: function get() {
+        return this._cameraController;
+      }
+    }, {
+      key: 'middleLevelCamera',
+      get: function get() {
+        return this._middleLevelCamera;
       }
     }, {
       key: 'translate',
@@ -3360,10 +3374,6 @@
       }
     }, {
       key: 'lookAtRHMatrix',
-
-
-      // ===================== delegate to low level class ========================
-
       value: function lookAtRHMatrix() {
         return this._lowLevelCamera.lookAtRHMatrix();
       }
@@ -3371,6 +3381,9 @@
       key: 'cameraController',
       set: function set(controller) {
         this._lowLevelCamera.cameraController = controller;
+      },
+      get: function get() {
+        return this._lowLevelCamera.cameraController;
       }
     }, {
       key: 'updateCountAsCameraView',
@@ -3458,6 +3471,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (M_OrthoCamera.__proto__ || Object.getPrototypeOf(M_OrthoCamera)).call(this, glBoostContext, toRegister));
 
       _this._lowLevelCamera = new L_OrthoCamera(_this, false, lookat, ortho);
+      _this._lowLevelCamera._middleLevelCamera = _this;
       return _this;
     }
 
@@ -3640,6 +3654,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (M_PerspectiveCamera.__proto__ || Object.getPrototypeOf(M_PerspectiveCamera)).call(this, glBoostContext, toRegister));
 
       _this._lowLevelCamera = new L_PerspectiveCamera(_this, false, lookat, perspective);
+      _this._lowLevelCamera._middleLevelCamera = _this;
       return _this;
     }
 
@@ -3701,7 +3716,7 @@
       babelHelpers.classCallCheck(this, AABB);
 
       this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+      this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
       this._centerPoint = null;
       this._lengthCenterToCorner = null;
     }
@@ -3716,6 +3731,15 @@
         instance._lengthCenterToCorner = this._lengthCenterToCorner;
 
         return instance;
+      }
+    }, {
+      key: 'isVanilla',
+      value: function isVanilla() {
+        if (this._AABB_min.x == Number.MAX_VALUE && this._AABB_min.y == Number.MAX_VALUE && this._AABB_min.z == Number.MAX_VALUE && this._AABB_max.x == -Number.MAX_VALUE && this._AABB_max.y == -Number.MAX_VALUE && this._AABB_max.z == -Number.MAX_VALUE) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }, {
       key: 'addPosition',
@@ -3751,6 +3775,22 @@
       key: 'mergeAABB',
       value: function mergeAABB(aabb) {
         var isUpdated = false;
+
+        if (aabb.isVanilla()) {
+          return isUpdated;
+        }
+
+        if (this.isVanilla()) {
+          this._AABB_min.x = aabb.minPoint.x;
+          this._AABB_min.y = aabb.minPoint.y;
+          this._AABB_min.z = aabb.minPoint.z;
+          this._AABB_max.x = aabb.maxPoint.x;
+          this._AABB_max.y = aabb.maxPoint.y;
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+          return isUpdated;
+        }
+
         if (aabb.minPoint.x < this._AABB_min.x) {
           this._AABB_min.x = aabb.minPoint.x;
           isUpdated = true;
@@ -3780,6 +3820,11 @@
         return isUpdated;
       }
     }, {
+      key: 'toString',
+      value: function toString() {
+        return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n' + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
+      }
+    }, {
       key: 'minPoint',
       get: function get() {
         return this._AABB_min;
@@ -3802,9 +3847,27 @@
     }], [{
       key: 'multiplyMatrix',
       value: function multiplyMatrix(matrix, aabb) {
+        if (aabb.isVanilla()) {
+          return aabb.clone();
+        }
         var newAabb = new AABB();
-        newAabb._AABB_min = matrix.multiplyVector(aabb._AABB_min.toVector4()).toVector3();
-        newAabb._AABB_max = matrix.multiplyVector(aabb._AABB_max.toVector4()).toVector3();
+
+        var AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+        var AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+        var AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+        var AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+        var AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+        var AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+        var AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+        var AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+        newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
         newAabb.updateAllInfo();
 
         return newAabb;
@@ -4033,7 +4096,7 @@
         return this._transformedDepth;
       }
     }, {
-      key: 'AABB',
+      key: 'AABBInWorld',
       get: function get() {
         var world_m = this.transformMatrixAccumulatedAncestry;
         return AABB.multiplyMatrix(world_m, this._geometry.AABB);
@@ -4181,14 +4244,21 @@
               }
             }
             return elem.AABB;
+            //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
           }
           if (elem instanceof M_Mesh) {
-            return elem.AABB;
+            var _aabb = elem.AABBInWorld;
+            //console.log(aabb.toString());
+            return _aabb;
           }
 
           return null;
         }(this);
         this.AABB.mergeAABB(aabb);
+
+        var newAABB = this.AABB;
+
+        return newAABB;
       }
     }, {
       key: 'clone',
@@ -7799,10 +7869,9 @@
 
       _this._mouseTranslateVec = new Vector3(0, 0, 0);
 
-      _this._rotateM_for_mouseTranslate_x = Matrix33.identity();
-      _this._rotateM_for_mouseTranslate_y = Matrix33.identity();
-
       _this._newUpVec = new Vector3(0, 0, 0);
+
+      _this._target = null;
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -7939,15 +8008,21 @@
 
     babelHelpers.createClass(L_CameraController, [{
       key: 'convert',
-      value: function convert(eyeVec, centerVec, upVec) {
+      value: function convert(camera) {
         var newEyeVec = null;
         var newCenterVec = null;
         var newUpVec = null;
+
+        //if (this._isKeyUp) {
+
+        //}
+
         if (this._isKeyUp || !this._isForceGrab) {
-          this._eyeVec = eyeVec;
-          this._centerVec = centerVec;
-          this._upVec = upVec;
+          this._eyeVec = camera.eye;
+          this._centerVec = camera.center;
+          this._upVec = camera.up;
         }
+
         if (this._isSymmetryMode) {
           var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
           var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
@@ -8002,6 +8077,41 @@
         return [newEyeVec, newCenterVec, newUpVec];
       }
     }, {
+      key: '_updateTargeting',
+      value: function _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
+        if (this._target === null) {
+          return [eyeVec, centerVec, upVec];
+        }
+
+        var targetAABB = null;
+        if (typeof this._target.updateAABB !== 'undefined') {
+          targetAABB = this._target.updateAABB();
+        } else {
+          targetAABB = this._target.AABB;
+        }
+
+        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
+
+        var newCenterVec = targetAABB.centerPoint;
+
+        var centerToCameraVec = Vector3.subtract(eyeVec, newCenterVec);
+        var centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
+
+        var newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+
+        var newUpVec = null;
+        if (camera instanceof M_AbstractCamera) {
+          var mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+          newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
+          newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
+          newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+        } else {
+          newUpVec = upVec;
+        }
+
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
       key: 'tryReset',
       value: function tryReset() {
         if (this._doResetWhenCameraSettingChanged) {
@@ -8014,9 +8124,27 @@
         }
       }
     }, {
+      key: 'updateTargeting',
+      value: function updateTargeting() {
+        var _this2 = this;
+
+        this._camaras.forEach(function (camera) {
+          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+          camera.eye = vectors[0];
+          camera.center = vectors[1];
+          camera.upVec = vectors[2];
+        });
+      }
+    }, {
       key: 'addCamera',
       value: function addCamera(camera) {
         this._camaras.add(camera);
+      }
+    }, {
+      key: 'target',
+      set: function set(object) {
+        this._target = object;
+        this.updateTargeting();
       }
     }]);
     return L_CameraController;

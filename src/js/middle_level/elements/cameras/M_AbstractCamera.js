@@ -20,6 +20,10 @@ export default class M_AbstractCamera extends M_Element {
     this._lowLevelCamera.cameraController = controller;
   }
 
+  get cameraController() {
+    return this._lowLevelCamera.cameraController;
+  }
+
   _needUpdateView() {
     this._lowLevelCamera._needUpdateView();
     this._updateCountAsCameraView++;
@@ -51,8 +55,6 @@ export default class M_AbstractCamera extends M_Element {
   get texture() {
     return this._texture;
   }
-
-// ===================== delegate to low level class ========================
 
   lookAtRHMatrix() {
     return this._lowLevelCamera.lookAtRHMatrix();

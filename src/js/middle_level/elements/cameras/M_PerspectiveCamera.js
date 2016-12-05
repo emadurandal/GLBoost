@@ -6,6 +6,7 @@ export default class M_PerspectiveCamera extends M_AbstractCamera {
     super(glBoostContext, toRegister);
 
     this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
+    this._lowLevelCamera._middleLevelCamera = this;
   }
 
   // ===================== delegate to low level class ========================

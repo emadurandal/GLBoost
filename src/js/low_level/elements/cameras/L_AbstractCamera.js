@@ -18,16 +18,26 @@ export default class L_AbstractCamera extends L_Element {
     this._cameraController = null;
 
     this._dirtyView = true;
+
+    this._middleLevelCamera = null;
   }
 
   set cameraController(controller) {
     this._cameraController = controller;
-    controller.addCamera(this);
+    if (this._middleLevelCamera !== null) {
+      controller.addCamera(this._middleLevelCamera);
+    } else {
+      controller.addCamera(this);
+    }
+  }
+
+  get cameraController() {
+    return this._cameraController;
   }
 
   _affectedByCameraController() {
     if (this._cameraController !== null) {
-      let results = this._cameraController.convert(this._translate, this._center, this._up);
+      let results = this._cameraController.convert(this);
       this._translateInner = results[0];
       this._centerInner = results[1];
       this._upInner = results[2];
@@ -36,6 +46,10 @@ export default class L_AbstractCamera extends L_Element {
       this._centerInner = this._center.clone();
       this._upInner = this._up.clone();
     }
+  }
+
+  get middleLevelCamera() {
+    return this._middleLevelCamera;
   }
 
   _needUpdateView(withTryingResetOfCameraController = true) {

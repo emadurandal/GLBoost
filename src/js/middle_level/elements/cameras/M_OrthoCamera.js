@@ -6,6 +6,7 @@ export default class M_OrthoCamera extends M_AbstractCamera {
     super(glBoostContext, toRegister);
 
     this._lowLevelCamera = new L_OrthoCamera(this, false, lookat, ortho);
+    this._lowLevelCamera._middleLevelCamera = this;
   }
 
   // ===================== delegate to low level class ========================

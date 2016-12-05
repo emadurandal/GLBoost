@@ -114,14 +114,21 @@ export default class M_Group extends M_Element {
           }
         }
         return elem.AABB;
+        //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
       }
       if (elem instanceof M_Mesh) {
-        return elem.AABB;
+        let aabb = elem.AABBInWorld;
+        //console.log(aabb.toString());
+        return aabb;
       }
 
       return null;
     })(this);
     this.AABB.mergeAABB(aabb);
+
+    let newAABB = this.AABB;
+
+    return newAABB;
   }
 
   get AABB() {

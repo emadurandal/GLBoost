@@ -1,6 +1,8 @@
 import Vector3 from '../../math/Vector3';
+import Vector4 from '../../math/Vector4';
 import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
+import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
 
 export default class L_CameraController extends GLBoostObject {
   constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
@@ -31,10 +33,9 @@ export default class L_CameraController extends GLBoostObject {
 
     this._mouseTranslateVec = new Vector3(0, 0, 0);
 
-    this._rotateM_for_mouseTranslate_x = Matrix33.identity();
-    this._rotateM_for_mouseTranslate_y = Matrix33.identity();
-
     this._newUpVec = new Vector3(0, 0, 0);
+
+    this._target = null;
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -172,15 +173,21 @@ export default class L_CameraController extends GLBoostObject {
 
 
 
-  convert(eyeVec, centerVec, upVec) {
+  convert(camera) {
     let newEyeVec = null;
     let newCenterVec = null;
     let newUpVec = null;
+
+    //if (this._isKeyUp) {
+
+    //}
+
     if (this._isKeyUp || !this._isForceGrab) {
-      this._eyeVec = eyeVec;
-      this._centerVec = centerVec;
-      this._upVec = upVec;
+      this._eyeVec = camera.eye;
+      this._centerVec = camera.center;
+      this._upVec = camera.up;
     }
+
     if (this._isSymmetryMode) {
       let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
       let horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
@@ -237,6 +244,40 @@ export default class L_CameraController extends GLBoostObject {
     return [newEyeVec, newCenterVec, newUpVec];
   }
 
+  _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
+    if (this._target === null) {
+      return [eyeVec, centerVec, upVec];
+    }
+
+    let targetAABB = null;
+    if (typeof this._target.updateAABB !== 'undefined') {
+      targetAABB = this._target.updateAABB();
+    } else {
+      targetAABB = this._target.AABB;
+    }
+
+    let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2);
+
+    let newCenterVec = targetAABB.centerPoint;
+
+    let centerToCameraVec = Vector3.subtract(eyeVec, newCenterVec);
+    let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
+
+    let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+
+    let newUpVec = null;
+    if (camera instanceof M_AbstractCamera) {
+      let mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+      newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
+      newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
+      newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+    } else {
+      newUpVec = upVec;
+    }
+
+    return [newEyeVec, newCenterVec, newUpVec];
+  }
+
   tryReset() {
     if (this._doResetWhenCameraSettingChanged) {
       if (this._isKeyUp) {
@@ -249,7 +290,21 @@ export default class L_CameraController extends GLBoostObject {
 
   }
 
+  updateTargeting() {
+    this._camaras.forEach((camera)=>{
+      let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+      camera.eye = vectors[0];
+      camera.center = vectors[1];
+      camera.upVec = vectors[2];
+    });
+  }
+
   addCamera(camera) {
     this._camaras.add(camera);
+  }
+
+  set target(object) {
+    this._target = object;
+    this.updateTargeting();
   }
 }
