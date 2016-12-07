@@ -351,18 +351,11 @@ export default class GLTFLoader {
     let dataViewMethodDic = {};
 
     let materials = [];
-
+    let indicesAccumulatedLength = 0;
     for (let i = 0; i < meshJson.primitives.length; i++) {
       let primitiveJson = meshJson.primitives[i];
 
       // Geometry
-      let indices = null;
-      if (typeof primitiveJson.indices !== 'undefined') {
-        let indicesAccessorStr = primitiveJson.indices;
-        indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-        _indicesArray.push(indices);
-      }
-
       let positionsAccessorStr = primitiveJson.attributes.POSITION;
       let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl, false, true);
       _positions[i] = positions;
@@ -370,6 +363,19 @@ export default class GLTFLoader {
       vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
       vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
       dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
+
+
+      let indices = null;
+      if (typeof primitiveJson.indices !== 'undefined') {
+        let indicesAccessorStr = primitiveJson.indices;
+        indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+        for (let j=0; j<indices.length; j++) {
+          indices[j] = indicesAccumulatedLength + indices[j];
+        }
+        _indicesArray[i] = indices;
+        indicesAccumulatedLength += _positions[i].length /  vertexData.components.position;
+      }
+
 
       let normalsAccessorStr = primitiveJson.attributes.NORMAL;
       let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
@@ -415,8 +421,9 @@ export default class GLTFLoader {
     }
 
     if (meshJson.primitives.length > 1) {
-      let lengthDic = {position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+      let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
       for (let i = 0; i < meshJson.primitives.length; i++) {
+        //lengthDic.index += _indicesArray[i].length;
         lengthDic.position += _positions[i].length;
         lengthDic.normal += _normals[i].length;
         if (typeof additional['joint'][i] !== 'undefined') {
@@ -438,11 +445,11 @@ export default class GLTFLoader {
           vertexAttributeArray = new Uint8Array(length);
         } else if (dataViewMethod === 'getInt16') {
           vertexAttributeArray = new Int16Array(length);
-        } else if (dataViewMethod === 'getUInt16') {
+        } else if (dataViewMethod === 'getUint16') {
           vertexAttributeArray = new Uint16Array(length);
         } else if (dataViewMethod === 'getInt32') {
           vertexAttributeArray = new Int32Array(length);
-        } else if (dataViewMethod === 'getUInt32') {
+        } else if (dataViewMethod === 'getUint32') {
           vertexAttributeArray = new Uint32Array(length);
         } else if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = new Float32Array(length);
@@ -948,11 +955,11 @@ export default class GLTFLoader {
           vertexAttributeArray = new Uint8Array(vertexAttributeArray);
         } else if (dataViewMethod === 'getInt16') {
           vertexAttributeArray = new Int16Array(vertexAttributeArray);
-        } else if (dataViewMethod === 'getUInt16') {
+        } else if (dataViewMethod === 'getUint16') {
           vertexAttributeArray = new Uint16Array(vertexAttributeArray);
         } else if (dataViewMethod === 'getInt32') {
           vertexAttributeArray = new Int32Array(vertexAttributeArray);
-        } else if (dataViewMethod === 'getUInt32') {
+        } else if (dataViewMethod === 'getUint32') {
           vertexAttributeArray = new Uint32Array(vertexAttributeArray);
         } else if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = new Float32Array(vertexAttributeArray);

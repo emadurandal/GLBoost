@@ -10941,18 +10941,11 @@
         var dataViewMethodDic = {};
 
         var materials = [];
-
+        var indicesAccumulatedLength = 0;
         for (var i = 0; i < meshJson.primitives.length; i++) {
           var primitiveJson = meshJson.primitives[i];
 
           // Geometry
-          var indices = null;
-          if (typeof primitiveJson.indices !== 'undefined') {
-            var indicesAccessorStr = primitiveJson.indices;
-            indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
-            _indicesArray.push(indices);
-          }
-
           var positionsAccessorStr = primitiveJson.attributes.POSITION;
           var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl, false, true);
           _positions[i] = positions;
@@ -10960,6 +10953,17 @@
           vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
           vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
           dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
+
+          var indices = null;
+          if (typeof primitiveJson.indices !== 'undefined') {
+            var indicesAccessorStr = primitiveJson.indices;
+            indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+            for (var j = 0; j < indices.length; j++) {
+              indices[j] = indicesAccumulatedLength + indices[j];
+            }
+            _indicesArray[i] = indices;
+            indicesAccumulatedLength += _positions[i].length / vertexData.components.position;
+          }
 
           var normalsAccessorStr = primitiveJson.attributes.NORMAL;
           var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
@@ -11012,11 +11016,11 @@
               vertexAttributeArray = new Uint8Array(length);
             } else if (dataViewMethod === 'getInt16') {
               vertexAttributeArray = new Int16Array(length);
-            } else if (dataViewMethod === 'getUInt16') {
+            } else if (dataViewMethod === 'getUint16') {
               vertexAttributeArray = new Uint16Array(length);
             } else if (dataViewMethod === 'getInt32') {
               vertexAttributeArray = new Int32Array(length);
-            } else if (dataViewMethod === 'getUInt32') {
+            } else if (dataViewMethod === 'getUint32') {
               vertexAttributeArray = new Uint32Array(length);
             } else if (dataViewMethod === 'getFloat32') {
               vertexAttributeArray = new Float32Array(length);
@@ -11025,8 +11029,9 @@
             return vertexAttributeArray;
           };
 
-          var lengthDic = { position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0 };
+          var lengthDic = { index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0 };
           for (var _i2 = 0; _i2 < meshJson.primitives.length; _i2++) {
+            //lengthDic.index += _indicesArray[i].length;
             lengthDic.position += _positions[_i2].length;
             lengthDic.normal += _normals[_i2].length;
             if (typeof additional['joint'][_i2] !== 'undefined') {
@@ -11537,11 +11542,11 @@
               vertexAttributeArray = new Uint8Array(vertexAttributeArray);
             } else if (dataViewMethod === 'getInt16') {
               vertexAttributeArray = new Int16Array(vertexAttributeArray);
-            } else if (dataViewMethod === 'getUInt16') {
+            } else if (dataViewMethod === 'getUint16') {
               vertexAttributeArray = new Uint16Array(vertexAttributeArray);
             } else if (dataViewMethod === 'getInt32') {
               vertexAttributeArray = new Int32Array(vertexAttributeArray);
-            } else if (dataViewMethod === 'getUInt32') {
+            } else if (dataViewMethod === 'getUint32') {
               vertexAttributeArray = new Uint32Array(vertexAttributeArray);
             } else if (dataViewMethod === 'getFloat32') {
               vertexAttributeArray = new Float32Array(vertexAttributeArray);
