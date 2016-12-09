@@ -32,7 +32,12 @@ export default class M_Scene extends M_Group {
   }
 
   _getCurrentAnimationInputValue(inputName) {
-    return this._currentAnimationInputValues[inputName];
+    let value = this._currentAnimationInputValues[inputName];
+    if (typeof value === 'undefined') {
+      return -1;
+    } else {
+      return value;
+    }
   }
 
   /**

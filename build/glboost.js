@@ -2230,7 +2230,7 @@
         } else if (this._toInheritCurrentAnimationInputValue) {
           return this._parent._getCurrentAnimationInputValue(inputName);
         } else {
-          return void 0;
+          return -1;
         }
       }
     }, {
@@ -2309,35 +2309,6 @@
         return this._matrix;
       }
     }, {
-      key: 'getTransformMatrixNotAnimated',
-      value: function getTransformMatrixNotAnimated() {
-        if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
-          var matrix = Matrix44$1.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44$1.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44$1.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44$1.rotateZ(this.getRotateNotAnimated().z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
-          this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
-          this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'notanimated';
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
       key: 'getTransformMatrixOnlyRotateOn',
       value: function getTransformMatrixOnlyRotateOn(value) {
 
@@ -2354,27 +2325,6 @@
           rotationMatrix.m32 = 0;
         } else {
           rotationMatrix = Matrix44$1.rotateX(this.getRotate('time', value).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', value).z));
-        }
-
-        return rotationMatrix.clone();
-      }
-    }, {
-      key: 'getTransformMatrixOnlyRotateNotAnimated',
-      value: function getTransformMatrixOnlyRotateNotAnimated() {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.getMatrixNotAnimated();
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44$1.rotateX(this.getRotateNotAnimated().x).multiply(Matrix44$1.rotateY(this.getRotateNotAnimated().y)).multiply(Matrix44$1.rotateZ(this.getRotateNotAnimated().z));
         }
 
         return rotationMatrix.clone();
@@ -2654,12 +2604,13 @@
     }, {
       key: 'transformMatrix',
       get: function get() {
-        var input = null;
+        var input = -1;
         if (this._activeAnimationLineName !== null) {
           input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
         }
-        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+        if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
           var matrix = Matrix44$1.identity();
+
           if (this._currentCalcMode === 'matrix') {
             this._finalMatrix = matrix.multiply(this.matrix);
             this._dirtyAsElement = false;
@@ -2680,70 +2631,6 @@
 
           this._dirtyAsElement = false;
           this._matrixGetMode = 'animated_' + input;
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixGLTFStyle',
-      get: function get() {
-        var input = null;
-        if (this._activeAnimationLineName !== null) {
-          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-        }
-        if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
-          var matrix = Matrix44$1.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.matrix);
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            //let quaternion = new Quaternion(this.quaternion.w, this.quaternion.z, this.quaternion.y, this.quaternion.x);
-            rotationMatrix = this.quaternion.rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
-          }
-
-          this._finalMatrix = Matrix44$1.identity();
-          this._finalMatrix.m03 = this.translate.x;
-          this._finalMatrix.m13 = this.translate.y;
-          this._finalMatrix.m23 = this.translate.z;
-          this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44$1.scale(this.scale));
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'animated_' + input;
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixOnInit',
-      get: function get() {
-        if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
-          var matrix = Matrix44$1.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44$1.rotateX(this.getRotateAt('time', 0).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', 0).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', 0).z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
-          this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
-          this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'animated_0';
         }
 
         return this._finalMatrix.clone();
@@ -6769,56 +6656,62 @@
         var joints = skeletalMesh._joints; //skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
         var matrices = [];
         var globalJointTransform = [];
-        var inverseBindPoseMatrices = [];
-        for (var i = 0; i < joints.length; i++) {
 
-          var jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-          if (jointsHierarchy == null) {
-            jointsHierarchy = [];
+        if (joints[0].parent._getCurrentAnimationInputValue(joints[0].parent._activeAnimationLineName) < 0) {
+          // if not set input value
+          for (var i = 0; i < joints.length; i++) {
+            matrices[i] = skeletalMesh.bindShapeMatrix;
           }
-          jointsHierarchy.push(joints[i]);
-          //console.log(jointsHierarchy);
-          var tempMatrices = [];
+        } else {
+          for (var _i = 0; _i < joints.length; _i++) {
 
-          for (var j = 0; j < jointsHierarchy.length; j++) {
-            var thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
-            //console.log(thisLoopMatrix.toStringApproximately());
-            if (j > 0) {
-              tempMatrices[j] = Matrix44$1.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            } else {
-              var upperGroupsAccumulatedMatrix = Matrix44$1.identity();
-              if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
-                // if there are group hierarchies above the root joint ...
-                upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
-              }
-              tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
+            var jointsHierarchy = calcParentJointsMatricesRecursively(joints[_i]);
+            if (jointsHierarchy == null) {
+              jointsHierarchy = [];
             }
+            jointsHierarchy.push(joints[_i]);
+            //console.log(jointsHierarchy);
+            var tempMatrices = [];
+
+            for (var j = 0; j < jointsHierarchy.length; j++) {
+              var thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
+              //console.log(thisLoopMatrix.toStringApproximately());
+              if (j > 0) {
+                tempMatrices[j] = Matrix44$1.multiply(tempMatrices[j - 1], thisLoopMatrix);
+              } else {
+                var upperGroupsAccumulatedMatrix = Matrix44$1.identity();
+                if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
+                  // if there are group hierarchies above the root joint ...
+                  upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
+                }
+                tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
+              }
+            }
+            globalJointTransform[_i] = tempMatrices[jointsHierarchy.length - 1];
           }
-          globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
-        }
-        for (var _i = 0; _i < joints.length; _i++) {
-          matrices[_i] = Matrix44$1.multiply(Matrix44$1.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[_i]);
-          var inverseBindMatrix = typeof skeletalMesh.inverseBindMatrices[_i] !== 'undefined' ? skeletalMesh.inverseBindMatrices[_i] : Matrix44$1.identity();
-          matrices[_i] = Matrix44$1.multiply(matrices[_i], inverseBindMatrix);
-          matrices[_i] = Matrix44$1.multiply(matrices[_i], skeletalMesh.bindShapeMatrix);
-          //matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.transformMatrixAccumulatedAncestry);
+          for (var _i2 = 0; _i2 < joints.length; _i2++) {
+            matrices[_i2] = Matrix44$1.multiply(Matrix44$1.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[_i2]);
+            var inverseBindMatrix = typeof skeletalMesh.inverseBindMatrices[_i2] !== 'undefined' ? skeletalMesh.inverseBindMatrices[_i2] : Matrix44$1.identity();
+            matrices[_i2] = Matrix44$1.multiply(matrices[_i2], inverseBindMatrix);
+            matrices[_i2] = Matrix44$1.multiply(matrices[_i2], skeletalMesh.bindShapeMatrix);
+          }
         }
 
         var flatMatrices = [];
-        for (var _i2 = 0; _i2 < matrices.length; _i2++) {
-          Array.prototype.push.apply(flatMatrices, matrices[_i2].flattenAsArray());
+        for (var _i3 = 0; _i3 < matrices.length; _i3++) {
+          Array.prototype.push.apply(flatMatrices, matrices[_i3].flattenAsArray());
         }
 
         if (matrices.length < 4) {
           var identityMatrices = [];
-          for (var _i3 = 0; _i3 < 4 - matrices.length; _i3++) {
+          for (var _i4 = 0; _i4 < 4 - matrices.length; _i4++) {
             Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
           }
           Array.prototype.push.apply(flatMatrices, identityMatrices);
         }
 
-        for (var _i4 = 0; _i4 < materials.length; _i4++) {
-          var glslProgram = materials[_i4].shaderInstance.glslProgram;
+        for (var _i5 = 0; _i5 < materials.length; _i5++) {
+          var glslProgram = materials[_i5].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
           Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
         }
@@ -7026,7 +6919,12 @@
     }, {
       key: '_getCurrentAnimationInputValue',
       value: function _getCurrentAnimationInputValue(inputName) {
-        return this._currentAnimationInputValues[inputName];
+        var value = this._currentAnimationInputValues[inputName];
+        if (typeof value === 'undefined') {
+          return -1;
+        } else {
+          return value;
+        }
       }
 
       /**

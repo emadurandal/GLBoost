@@ -51,40 +51,46 @@ export default class M_SkeletalGeometry extends Geometry {
     var joints = skeletalMesh._joints;//skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
     var matrices = [];
     var globalJointTransform = [];
-    var inverseBindPoseMatrices = [];
-    for (let i=0; i<joints.length; i++) {
 
-      let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-      if (jointsHierarchy == null) {
-        jointsHierarchy = [];
+    if (joints[0].parent._getCurrentAnimationInputValue(joints[0].parent._activeAnimationLineName) < 0) {
+      // if not set input value
+      for (let i=0; i<joints.length; i++) {
+        matrices[i] = skeletalMesh.bindShapeMatrix;
       }
-      jointsHierarchy.push(joints[i]);
-      //console.log(jointsHierarchy);
-      let tempMatrices = [];
+    } else {
+      for (let i=0; i<joints.length; i++) {
 
-      for (let j = 0; j < jointsHierarchy.length; j++) {
-        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrixGLTFStyle;
-        //console.log(thisLoopMatrix.toStringApproximately());
-        if (j > 0) {
-          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-        } else {
-          let upperGroupsAccumulatedMatrix = Matrix44.identity();
-          if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
-            // if there are group hierarchies above the root joint ...
-            upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
-          }
-          tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
+        let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
+        if (jointsHierarchy == null) {
+          jointsHierarchy = [];
         }
-      }
-      globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
+        jointsHierarchy.push(joints[i]);
+        //console.log(jointsHierarchy);
+        let tempMatrices = [];
 
-    }
-    for (let i=0; i<joints.length; i++) {
-      matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
-      let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
-      matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
-      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
-      //matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.transformMatrixAccumulatedAncestry);
+        for (let j = 0; j < jointsHierarchy.length; j++) {
+          let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
+          //console.log(thisLoopMatrix.toStringApproximately());
+          if (j > 0) {
+            tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+          } else {
+            let upperGroupsAccumulatedMatrix = Matrix44.identity();
+            if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
+              // if there are group hierarchies above the root joint ...
+              upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
+            }
+            tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
+          }
+        }
+        globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
+
+      }
+      for (let i=0; i<joints.length; i++) {
+        matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
+        let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
+        matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
+        matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+      }
     }
 
     var flatMatrices = [];

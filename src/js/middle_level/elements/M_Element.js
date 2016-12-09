@@ -67,7 +67,7 @@ export default class M_Element extends L_Element {
     } else if (this._toInheritCurrentAnimationInputValue) {
       return this._parent._getCurrentAnimationInputValue(inputName);
     } else {
-      return void 0;
+      return -1;
     }
   }
 
@@ -219,12 +219,13 @@ export default class M_Element extends L_Element {
   }
 
   get transformMatrix() {
-    var input = null;
+    var input = -1;
     if (this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
-    if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
+    if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
+
       if (this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.matrix);
         this._dirtyAsElement = false;
@@ -252,104 +253,6 @@ export default class M_Element extends L_Element {
     return this._finalMatrix.clone();
   }
 
-  get transformMatrixGLTFStyle() {
-    var input = null;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-    if (this._dirtyAsElement || input === null || this._matrixGetMode !== 'animated_' + input) {
-      var matrix = Matrix44.identity();
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = null;
-      if (this._currentCalcMode === 'quaternion') {
-        //let quaternion = new Quaternion(this.quaternion.w, this.quaternion.z, this.quaternion.y, this.quaternion.x);
-        rotationMatrix = this.quaternion.rotationMatrix;
-      } else {
-        rotationMatrix = Matrix44.rotateX(this.rotate.x).
-        multiply(Matrix44.rotateY(this.rotate.y)).
-        multiply(Matrix44.rotateZ(this.rotate.z));
-      }
-
-      this._finalMatrix = Matrix44.identity();
-      this._finalMatrix.m03 = this.translate.x;
-      this._finalMatrix.m13 = this.translate.y;
-      this._finalMatrix.m23 = this.translate.z;
-      this._finalMatrix = this._finalMatrix.multiply(rotationMatrix).multiply(Matrix44.scale(this.scale));
-
-
-      this._dirtyAsElement = false;
-      this._matrixGetMode = 'animated_' + input;
-    }
-
-    return this._finalMatrix.clone();
-  }
-
-
-
-  get transformMatrixOnInit() {
-    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_0') {
-      var matrix = Matrix44.identity();
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.getMatrixAt('time', 0));
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = null;
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.getQuaternionAt('time', 0).rotationMatrix;
-      } else {
-        rotationMatrix = Matrix44.rotateX(this.getRotateAt('time', 0).x).
-        multiply(Matrix44.rotateY(this.getRotateAt('time', 0).y)).
-        multiply(Matrix44.rotateZ(this.getRotateAt('time', 0).z));
-      }
-
-      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt('time', 0))).multiply(rotationMatrix);
-      this._finalMatrix.m03 = this.getTranslateAt('time', 0).x;
-      this._finalMatrix.m13 = this.getTranslateAt('time', 0).y;
-      this._finalMatrix.m23 = this.getTranslateAt('time', 0).z;
-
-      this._dirtyAsElement = false;
-      this._matrixGetMode = 'animated_0';
-    }
-
-    return this._finalMatrix.clone();
-  }
-
-  getTransformMatrixNotAnimated() {
-    if (this._dirtyAsElement || this._matrixGetMode !== 'notanimated') {
-      var matrix = Matrix44.identity();
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = null;
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-      } else {
-        rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).
-        multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).
-        multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
-      }
-
-      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleNotAnimated())).multiply(rotationMatrix);
-      this._finalMatrix.m03 = this.getTranslateNotAnimated().x;
-      this._finalMatrix.m13 = this.getTranslateNotAnimated().y;
-      this._finalMatrix.m23 = this.getTranslateNotAnimated().z;
-
-      this._dirtyAsElement = false;
-      this._matrixGetMode = 'notanimated';
-    }
-
-    return this._finalMatrix.clone();
-  }
 
   get transformMatrixOnlyRotate() {
 
@@ -394,28 +297,6 @@ export default class M_Element extends L_Element {
       rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
       multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
       multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
-    }
-
-    return rotationMatrix.clone();
-  }
-
-  getTransformMatrixOnlyRotateNotAnimated() {
-
-    var rotationMatrix = null;
-    if (this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.getMatrixNotAnimated();
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      rotationMatrix = Matrix44.rotateX(this.getRotateNotAnimated().x).
-      multiply(Matrix44.rotateY(this.getRotateNotAnimated().y)).
-      multiply(Matrix44.rotateZ(this.getRotateNotAnimated().z));
     }
 
     return rotationMatrix.clone();
