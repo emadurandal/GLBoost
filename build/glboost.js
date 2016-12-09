@@ -10567,8 +10567,9 @@
     babelHelpers.createClass(DataUtil, null, [{
       key: 'base64ToArrayBuffer',
       value: function base64ToArrayBuffer(dataUri) {
-        var type = dataUri[0].split(':')[1].split(';')[0];
-        var byteString = atob(dataUri[1]);
+        var splittedDataUri = dataUri.split(',');
+        var type = splittedDataUri[0].split(':')[1].split(';')[0];
+        var byteString = atob(splittedDataUri[1]);
         var byteStringLength = byteString.length;
         var arrayBuffer = new ArrayBuffer(byteStringLength);
         var uint8Array = new Uint8Array(arrayBuffer);
@@ -10576,6 +10577,21 @@
           uint8Array[i] = byteString.charCodeAt(i);
         }
         return arrayBuffer;
+      }
+    }, {
+      key: 'arrayBufferToString',
+      value: function arrayBufferToString(byteArray) {
+        if (typeof TextDecoder !== 'undefined') {
+          var textDecoder = new TextDecoder();
+          return textDecoder.decode(arrayBuffer);
+        } else {
+          var result = "";
+          var length = byteArray.length;
+          for (var i = 0; i < length; i++) {
+            result += String.fromCharCode(byteArray[i]);
+          }
+          return result;
+        }
       }
     }]);
     return DataUtil;
@@ -10703,9 +10719,8 @@
             reject('invalid contentFormat field in this binary glTF file.');
           }
 
-          var text_decoder = new TextDecoder();
           var arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
-          var gotText = text_decoder.decode(arrayBufferContent);
+          var gotText = DataUtil.arrayBufferToString(arrayBufferContent);
           var json = JSON.parse(gotText);
           var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
@@ -10733,7 +10748,6 @@
     }, {
       key: '_loadInternalBase64Binary',
       value: function _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
-        dataUri = dataUri.split(',');
         var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
         if (arrayBuffer) {
@@ -10796,13 +10810,19 @@
           }
 
           var shaderUri = shaderJson.uri;
-          if (!shaderUri.match(/^data:/)) {
+          if (shaderUri.match(/^data:/)) {
+            promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
+              var arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
+              shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+              shaders[shaderName].shaderType = shaderType;
+              fulfilled();
+            }));
+          } else {
             shaderUri = basePath + shaderUri;
+            promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
+              _this5._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
+            }));
           }
-
-          promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
-            _this5._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
-          }));
         };
 
         for (var shaderName in shadersJson) {
@@ -11345,8 +11365,7 @@
 
         var arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
 
-        var text_decoder = new TextDecoder();
-        return text_decoder.decode(arrayBufferSliced);
+        return DataUtil.arrayBufferToString(arrayBufferSliced);
       }
     }, {
       key: '_accessBinaryAsImage',

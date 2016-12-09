@@ -123,10 +123,9 @@ export default class GLTFLoader {
       }
 
 
-      var text_decoder = new TextDecoder();
       let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
-      let gotText = text_decoder.decode(arrayBufferContent);
-      var json = JSON.parse(gotText);
+      let gotText = DataUtil.arrayBufferToString(arrayBufferContent);
+      let json = JSON.parse(gotText);
       let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
       this._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
@@ -151,7 +150,6 @@ export default class GLTFLoader {
   }
 
   _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
-    dataUri = dataUri.split(',');
     var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
     if (arrayBuffer) {
@@ -208,15 +206,23 @@ export default class GLTFLoader {
       }
 
       let shaderUri = shaderJson.uri;
-      if (!shaderUri.match(/^data:/)) {
+      if (shaderUri.match(/^data:/)) {
+        promisesToLoadShaders.push(
+          new Promise((fulfilled, rejected) => {
+            let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
+            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            shaders[shaderName].shaderType = shaderType;
+            fulfilled();
+          })
+        );
+      } else {
         shaderUri = basePath + shaderUri;
+        promisesToLoadShaders.push(
+          new Promise((fulfilled, rejected) => {
+            this._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
+          })
+        );
       }
-
-      promisesToLoadShaders.push(
-        new Promise((fulfilled, rejected) => {
-          this._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
-        })
-      );
     }
 
     if (promisesToLoadShaders.length > 0) {
@@ -759,8 +765,7 @@ export default class GLTFLoader {
 
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
 
-    let text_decoder = new TextDecoder();
-    return text_decoder.decode(arrayBufferSliced);
+    return DataUtil.arrayBufferToString(arrayBufferSliced);
   }
 
   _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
