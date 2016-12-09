@@ -17,15 +17,16 @@ export default class DataUtil {
     return arrayBuffer;
   }
 
-  static arrayBufferToString(byteArray) {
+  static arrayBufferToString(arrayBuffer) {
     if (typeof TextDecoder !== 'undefined') {
       let textDecoder = new TextDecoder();
       return textDecoder.decode(arrayBuffer);
     } else {
+      let bytes = new Uint8Array(arrayBuffer);
       let result = "";
-      let length = byteArray.length;
+      let length = bytes.length;
       for (let i = 0; i < length; i++) {
-        result += String.fromCharCode(byteArray[i]);
+        result += String.fromCharCode(bytes[i]);
       }
       return result;
     }

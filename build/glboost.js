@@ -10580,15 +10580,16 @@
       }
     }, {
       key: 'arrayBufferToString',
-      value: function arrayBufferToString(byteArray) {
+      value: function arrayBufferToString(arrayBuffer) {
         if (typeof TextDecoder !== 'undefined') {
           var textDecoder = new TextDecoder();
           return textDecoder.decode(arrayBuffer);
         } else {
+          var bytes = new Uint8Array(arrayBuffer);
           var result = "";
-          var length = byteArray.length;
+          var length = bytes.length;
           for (var i = 0; i < length; i++) {
-            result += String.fromCharCode(byteArray[i]);
+            result += String.fromCharCode(bytes[i]);
           }
           return result;
         }
