@@ -5,6 +5,7 @@ import M_Joint from '../elements/skeletons/M_Joint';
 import M_Group from '../elements/M_Group';
 import Matrix44 from '../../low_level/math/Matrix44';
 import FreeShader from '../shaders/FreeShader';
+import Shader from '../../low_level/shaders/Shader';
 
 export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
@@ -107,7 +108,7 @@ export default class M_SkeletalGeometry extends Geometry {
     for (let i=0; i<materials.length;i++) {
       var glslProgram = materials[i].shaderInstance.glslProgram;
       gl.useProgram(glslProgram);
-      gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
     }
 
     super.draw(lights, camera, skeletalMesh, scene, renderPass_index);

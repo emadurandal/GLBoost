@@ -68,10 +68,14 @@ export default class VertexWorldShaderSource {
     });
 
     shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+    shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
     shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+    shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
       shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+      shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
       shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+      shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {

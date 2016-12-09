@@ -2,6 +2,7 @@ import M_PointLight from '../elements/lights/M_PointLight';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
 import Geometry from '../../low_level/geometries/Geometry';
+import Shader from '../../low_level/shaders/Shader';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -52,10 +53,8 @@ export default class DrawKickerLocal {
         var projectionMatrix = camera.projectionRHMatrix();
         var world_m = mesh.transformMatrixAccumulatedAncestry;
         var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
-        if (typeof glslProgram.modelViewMatrix !== 'undefined') {
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44.multiply(viewMatrix, world_m).flatten());
-        }
-        gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
       }
 
       if (glslProgram['lightPosition_0']) {

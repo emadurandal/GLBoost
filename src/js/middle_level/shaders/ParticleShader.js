@@ -29,6 +29,9 @@ export default class ParticleShaderSource {
 
     shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
     shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+    shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
+    shaderProgram._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
+
 
     return vertexAttribsAsResult;
   }

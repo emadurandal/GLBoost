@@ -5031,6 +5031,8 @@
           //gl.useProgram(programToReturn);
         }
         this._glslProgram = programToReturn;
+
+        programToReturn._semanticsDic = {};
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
 
         return programToReturn;
@@ -5260,6 +5262,38 @@
       value: function _set_glFragData_inGLVer1(gl, i) {
         return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragData[' + i + '] = rt' + i + ';\n' : '';
       }
+    }, {
+      key: 'trySettingMatrix44ToUniform',
+      value: function trySettingMatrix44ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+        if (typeof semanticsDir[semantics] === 'undefined') {
+          return;
+        }
+        if (typeof semanticsDir[semantics] === 'string') {
+          gl.uniformMatrix4fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+          return;
+        }
+
+        // it must be an Array...
+        semanticsDir[semantics].forEach(function (uniformName) {
+          gl.uniformMatrix4fv(glslProgram[uniformName], false, matrixArray);
+        });
+      }
+    }, {
+      key: 'trySettingMatrix33ToUniform',
+      value: function trySettingMatrix33ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+        if (typeof semanticsDir[semantics] === 'undefined') {
+          return;
+        }
+        if (typeof semanticsDir[semantics] === 'string') {
+          gl.uniformMatrix3fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+          return;
+        }
+
+        // it must be an Array...
+        semanticsDir[semantics].forEach(function (uniformName) {
+          gl.uniformMatrix3fv(glslProgram[uniformName], false, matrixArray);
+        });
+      }
     }]);
     return Shader;
   }(GLBoostObject);
@@ -5333,6 +5367,7 @@
 
         if (existCamera_f) {
           shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+          shaderProgram._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
@@ -5394,10 +5429,8 @@
             var projectionMatrix = camera.projectionRHMatrix();
             var world_m = mesh.transformMatrixAccumulatedAncestry;
             var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
-            if (typeof glslProgram.modelViewMatrix !== 'undefined') {
-              gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44.multiply(viewMatrix, world_m).flatten());
-            }
-            gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, pvm_m.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWPROJECTION', pvm_m.flatten());
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -5562,10 +5595,14 @@
         });
 
         shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
         shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
         if (existCamera_f) {
           shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
           shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
@@ -5623,19 +5660,16 @@
           gl.uniform1f(glslProgram.opacity, opacity);
 
           var world_m = mesh.transformMatrixAccumulatedAncestry;
-          gl.uniformMatrix4fv(glslProgram.worldMatrix, false, world_m.flatten());
+          Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'WORLD', world_m.flatten());
           var normal_m = mesh.normalMatrixAccumulatedAncestry;
-          gl.uniformMatrix3fv(glslProgram.normalMatrix, false, normal_m.flatten());
+          Shader.trySettingMatrix33ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
           if (camera) {
             var cameraMatrix = camera.lookAtRHMatrix();
             var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
             var projectionMatrix = camera.projectionRHMatrix();
-            gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
-            gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
-
-            if (typeof glslProgram.modelViewMatrix !== 'undefined') {
-              gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44$1.multiply(viewMatrix, world_m).flatten());
-            }
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'VIEW', viewMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
           }
 
           if (glslProgram['lightPosition_0']) {
@@ -6544,6 +6578,7 @@
         });
 
         shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+        shaderProgram._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
         // とりあえず単位行列で初期化
         var identityMatrices = [];
         for (var i = 0; i < extraData.jointN; i++) {
@@ -6634,16 +6669,21 @@
 
           switch (this._uniforms[uniformName]) {
             case 'MODELVIEW':
-              shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-              continue;
             case 'MODELVIEWINVERSETRANSPOSE':
-              shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-              continue;
             case 'PROJECTION':
-              shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-              continue;
             case 'JOINTMATRIX':
-              shaderProgram.skinTransformMatrices = gl.getUniformLocation(shaderProgram, uniformName);
+              if (typeof shaderProgram._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
+                shaderProgram._semanticsDic[this._uniforms[uniformName]] = uniformName;
+              } else if (babelHelpers.typeof(shaderProgram._semanticsDic[this._uniforms[uniformName] === 'string'])) {
+                var tmpSemanticsStr = shaderProgram._semanticsDic[this._uniforms[uniformName]];
+                shaderProgram._semanticsDic[this._uniforms[uniformName]] = [];
+                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(tmpSemanticsStr);
+                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+              } else {
+                // it must be Array
+                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+              }
+              shaderProgram[uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
               continue;
           }
         }
@@ -6780,7 +6820,7 @@
         for (var _i4 = 0; _i4 < materials.length; _i4++) {
           var glslProgram = materials[_i4].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
-          gl.uniformMatrix4fv(glslProgram.skinTransformMatrices, false, new Float32Array(flatMatrices));
+          Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
         }
 
         babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
@@ -8265,10 +8305,14 @@
         });
 
         shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
         shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
         if (existCamera_f) {
           shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
           shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
@@ -8621,6 +8665,8 @@
 
         shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
         shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+        shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        shaderProgram._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
 
         return vertexAttribsAsResult;
       }

@@ -69,20 +69,23 @@ export default class FreeShader extends Shader {
 
       switch (this._uniforms[uniformName]) {
         case 'MODELVIEW':
-          shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-          continue;
         case 'MODELVIEWINVERSETRANSPOSE':
-          shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-          continue;
         case 'PROJECTION':
-          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, uniformName);
-          continue;
         case 'JOINTMATRIX':
-          shaderProgram.skinTransformMatrices = gl.getUniformLocation(shaderProgram, uniformName);
+          if (typeof shaderProgram._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
+            shaderProgram._semanticsDic[this._uniforms[uniformName]] = uniformName;
+          } else if (typeof shaderProgram._semanticsDic[this._uniforms[uniformName] === 'string'] ) {
+            let tmpSemanticsStr = shaderProgram._semanticsDic[this._uniforms[uniformName]];
+            shaderProgram._semanticsDic[this._uniforms[uniformName]] = [];
+            shaderProgram._semanticsDic[this._uniforms[uniformName]].push(tmpSemanticsStr);
+            shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+          } else {
+            // it must be Array
+            shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+          }
+          shaderProgram[uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
           continue;
       }
-
-
     }
 
     return vertexAttribsAsResult;

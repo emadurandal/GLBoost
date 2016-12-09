@@ -56,6 +56,7 @@ export default class VertexLocalShaderSource {
 
     if (existCamera_f) {
       shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+      shaderProgram._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {

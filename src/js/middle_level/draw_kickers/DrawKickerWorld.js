@@ -3,6 +3,7 @@ import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Geometry from '../../low_level/geometries/Geometry';
+import Shader from '../../low_level/shaders/Shader';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -49,19 +50,16 @@ export default class DrawKickerWorld {
       gl.uniform1f(glslProgram.opacity, opacity);
 
       let world_m = mesh.transformMatrixAccumulatedAncestry;
-      gl.uniformMatrix4fv(glslProgram.worldMatrix, false, world_m.flatten());
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'WORLD', world_m.flatten());
       let normal_m = mesh.normalMatrixAccumulatedAncestry;
-      gl.uniformMatrix3fv(glslProgram.normalMatrix, false, normal_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
       if (camera) {
         let cameraMatrix = camera.lookAtRHMatrix();
         let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
         let projectionMatrix = camera.projectionRHMatrix();
-        gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
-        gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
-
-        if (typeof glslProgram.modelViewMatrix !== 'undefined') {
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, Matrix44.multiply(viewMatrix, world_m).flatten());
-        }
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'VIEW', viewMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
       }
 
       if (glslProgram['lightPosition_0']) {
