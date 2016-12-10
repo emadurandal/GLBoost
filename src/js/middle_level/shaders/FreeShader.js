@@ -54,8 +54,10 @@ export default class FreeShader extends Shader {
 
     vertexAttribs.forEach((attribName)=>{
       shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, this._attributes[attribName]);
-      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-      vertexAttribsAsResult.push(attribName);
+      if (shaderProgram['vertexAttribute_' + attribName] >= 0) {
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        vertexAttribsAsResult.push(attribName);
+      }
     });
 
     for (let uniformName in this._uniforms) {

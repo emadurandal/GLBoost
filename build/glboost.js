@@ -6541,8 +6541,10 @@
 
         vertexAttribs.forEach(function (attribName) {
           shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, _this2._attributes[attribName]);
-          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-          vertexAttribsAsResult.push(attribName);
+          if (shaderProgram['vertexAttribute_' + attribName] >= 0) {
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
         });
 
         for (var uniformName in this._uniforms) {
@@ -6657,14 +6659,15 @@
         var matrices = [];
         var globalJointTransform = [];
 
-        if (joints[0].parent._getCurrentAnimationInputValue(joints[0].parent._activeAnimationLineName) < 0) {
-          // if not set input value
-          for (var i = 0; i < joints.length; i++) {
-            matrices[i] = skeletalMesh.bindShapeMatrix;
+        var areThereAnyJointsWhichHaveAnimation = false;
+        for (var i = 0; i < joints.length; i++) {
+          if (joints[i].parent._getCurrentAnimationInputValue(joints[i].parent._activeAnimationLineName) >= 0) {
+            areThereAnyJointsWhichHaveAnimation = true;
           }
-        } else {
-          for (var _i = 0; _i < joints.length; _i++) {
+        }
 
+        if (areThereAnyJointsWhichHaveAnimation) {
+          for (var _i = 0; _i < joints.length; _i++) {
             var jointsHierarchy = calcParentJointsMatricesRecursively(joints[_i]);
             if (jointsHierarchy == null) {
               jointsHierarchy = [];
@@ -6695,23 +6698,27 @@
             matrices[_i2] = Matrix44$1.multiply(matrices[_i2], inverseBindMatrix);
             matrices[_i2] = Matrix44$1.multiply(matrices[_i2], skeletalMesh.bindShapeMatrix);
           }
+        } else {
+          for (var _i3 = 0; _i3 < joints.length; _i3++) {
+            matrices[_i3] = skeletalMesh.bindShapeMatrix;
+          }
         }
 
         var flatMatrices = [];
-        for (var _i3 = 0; _i3 < matrices.length; _i3++) {
-          Array.prototype.push.apply(flatMatrices, matrices[_i3].flattenAsArray());
+        for (var _i4 = 0; _i4 < matrices.length; _i4++) {
+          Array.prototype.push.apply(flatMatrices, matrices[_i4].flattenAsArray());
         }
 
         if (matrices.length < 4) {
           var identityMatrices = [];
-          for (var _i4 = 0; _i4 < 4 - matrices.length; _i4++) {
+          for (var _i5 = 0; _i5 < 4 - matrices.length; _i5++) {
             Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
           }
           Array.prototype.push.apply(flatMatrices, identityMatrices);
         }
 
-        for (var _i5 = 0; _i5 < materials.length; _i5++) {
-          var glslProgram = materials[_i5].shaderInstance.glslProgram;
+        for (var _i6 = 0; _i6 < materials.length; _i6++) {
+          var glslProgram = materials[_i6].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
           Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
         }

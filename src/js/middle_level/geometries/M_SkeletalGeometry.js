@@ -52,14 +52,15 @@ export default class M_SkeletalGeometry extends Geometry {
     var matrices = [];
     var globalJointTransform = [];
 
-    if (joints[0].parent._getCurrentAnimationInputValue(joints[0].parent._activeAnimationLineName) < 0) {
-      // if not set input value
-      for (let i=0; i<joints.length; i++) {
-        matrices[i] = skeletalMesh.bindShapeMatrix;
+    let areThereAnyJointsWhichHaveAnimation = false;
+    for (let i=0; i<joints.length; i++) {
+      if (joints[i].parent._getCurrentAnimationInputValue(joints[i].parent._activeAnimationLineName) >= 0) {
+        areThereAnyJointsWhichHaveAnimation = true;
       }
-    } else {
-      for (let i=0; i<joints.length; i++) {
+    }
 
+    if (areThereAnyJointsWhichHaveAnimation) {
+      for (let i=0; i<joints.length; i++) {
         let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
         if (jointsHierarchy == null) {
           jointsHierarchy = [];
@@ -90,6 +91,10 @@ export default class M_SkeletalGeometry extends Geometry {
         let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
         matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
         matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+      }
+    } else {
+      for (let i=0; i<joints.length; i++) {
+        matrices[i] = skeletalMesh.bindShapeMatrix;
       }
     }
 
