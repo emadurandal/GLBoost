@@ -134,7 +134,7 @@ var particleGeometry = glBoostContext.createParticle(
 var material = glBoostContext.createClassicMaterial();
 material.shaderClass = MyCustomShader;
 var texture = glBoostContext.createTexture('resources/iceball.png');
-material.diffuseTexture = texture;
+material.setTexture(texture);
 var particle = glBoostContext.createMesh(particleGeometry, material);
 
 scene.addChild(particle);

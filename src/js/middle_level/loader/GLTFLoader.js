@@ -547,36 +547,38 @@ export default class GLTFLoader {
       vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
       dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
 
-      if (typeof diffuseValue === 'string') {
-        let textureStr = diffuseValue;
-        let textureJson = json.textures[textureStr];
-        let imageStr = textureJson.source;
-        let imageJson = json.images[imageStr];
+      for (let valueName in materialJson.values) {
+        let value = materialJson.values[valueName];
+        if (typeof value === 'string') {
+          let textureStr = value;
+          let textureJson = json.textures[textureStr];
+          let imageStr = textureJson.source;
+          let imageJson = json.images[imageStr];
 
-        let textureUri = null;
+          let textureUri = null;
 
-        if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-          textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
-        } else {
-          let imageFileStr = imageJson.uri;
-          if (imageFileStr.match(/^data:/)) {
-            textureUri = imageFileStr;
+          if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
           } else {
-            textureUri = basePath + imageFileStr;
+            let imageFileStr = imageJson.uri;
+            if (imageFileStr.match(/^data:/)) {
+              textureUri = imageFileStr;
+            } else {
+              textureUri = basePath + imageFileStr;
+            }
           }
+
+          let samplerStr = textureJson.sampler;
+          let samplerJson = json.samplers[samplerStr];
+
+          let texture = glBoostContext.createTexture(textureUri, textureStr, {
+            'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+            'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+            'TEXTURE_WRAP_S': samplerJson.wrapS,
+            'TEXTURE_WRAP_T': samplerJson.wrapT
+          });
+          material.setTexture(texture);
         }
-
-        let samplerStr = textureJson.sampler;
-        let samplerJson = json.samplers[samplerStr];
-
-        let texture = glBoostContext.createTexture(textureUri, {
-          'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-          'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-          'TEXTURE_WRAP_S': samplerJson.wrapS,
-          'TEXTURE_WRAP_T': samplerJson.wrapT
-        });
-        texture.name = textureStr;
-        material.diffuseTexture = texture;
       }
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
@@ -595,19 +597,11 @@ export default class GLTFLoader {
       }
     }
 
-    // Diffuse
-    if (diffuseValue && typeof diffuseValue !== 'string') {
-      material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-    }
-    // Ambient
-    let ambientValue = materialJson.values.ambient;
-    if (ambientValue && typeof ambientValue !== 'string') {
-      material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-    }
-    // Specular
-    let specularValue = materialJson.values.specular;
-    if (specularValue && typeof specularValue !== 'string') {
-      material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+    for (let valueName in materialJson.values) {
+      let value = materialJson.values[valueName];
+      if (typeof value !== 'string') {
+        material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
+      }
     }
 
     let opacityValue = 1.0 - materialJson.values.transparency;
@@ -647,6 +641,7 @@ export default class GLTFLoader {
     }
 
     let uniforms = {};
+    let textureNames = {};
     for (let uniformName in uniformsJson) {
       let parameterName = uniformsJson[uniformName];
       let parameterJson = parametersJson[parameterName];
@@ -687,24 +682,25 @@ export default class GLTFLoader {
             break;
           case 35678:
             uniforms[uniformName] = 'TEXTURE';
+            textureNames[uniformName] =  materialJson.values[parameterName];
             break;
         }
       }
     }
 
-    this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms);
+    this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames);
   }
 
 
 
-  _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms) {
+  _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames) {
     let programJson = json.programs[programStr];
     let fragmentShaderStr = programJson.fragmentShader;
     let vertexShaderStr = programJson.vertexShader;
     let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
     let vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms);
+    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
   _loadAnimation(element, arrayBuffer, json, canvas, scale) {

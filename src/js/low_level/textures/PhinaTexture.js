@@ -5,7 +5,7 @@ import MiscUtil from '../misc/MiscUtil';
 
 export default class PhinaTexture extends Texture {
   constructor(glBoostContext, width, height, fillStyle, parameters = null) {
-    super(glBoostContext, null, parameters);
+    super(glBoostContext, null, null, parameters);
     this._parameters['UNPACK_FLIP_Y_WEBGL'] = true;
 
     this._width = width;

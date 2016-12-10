@@ -35,8 +35,8 @@ export class HalfLambertAndWrapLightingShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-    shaderProgram.wrap = gl.getUniformLocation(shaderProgram, 'wrap');
+    material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+    material.uniform_wrap = gl.getUniformLocation(shaderProgram, 'wrap');
 
     return vertexAttribsAsResult;
   }
@@ -57,8 +57,8 @@ export default class HalfLambertAndWrapLightingShader extends DecalShader {
     super.setUniforms(gl, glslProgram, material);
 
     var Kd = material.diffuseColor;
-    gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-    gl.uniform3f(glslProgram.wrap, this._wrap.x, this._wrap.y, this._wrap.z);
+    gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform3f(material.uniform_wrap, this._wrap.x, this._wrap.y, this._wrap.z);
   }
 
   set wrap(value) {

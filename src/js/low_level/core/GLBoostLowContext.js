@@ -73,8 +73,8 @@ export default class GLBoostLowContext {
     return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
   }
 
-  createTexture(src, parameters = null) {
-    return new Texture(this, src, parameters);
+  createTexture(src, userFlavorName, parameters = null) {
+    return new Texture(this, src, userFlavorName, parameters);
   }
 
   createPhinaTexture(width, height, fillStyle, parameters = null) {

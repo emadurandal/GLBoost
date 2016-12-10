@@ -61,7 +61,7 @@
         var geometry = glBoostContext.createGeometry();
         var texture = glBoostContext.createTexture('resources/texture.png');
         var material =glBoostContext.createClassicMaterial();
-        material.diffuseTexture = texture;
+        material.setTexture(texture);
         var mesh = glBoostContext.createMesh(geometry, material);
         geometry.setVerticesData({
           position: positions,

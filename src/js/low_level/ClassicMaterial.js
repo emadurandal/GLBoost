@@ -8,7 +8,7 @@ export default class ClassicMaterial extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
 
-    this._diffuseTexture = null;
+    this._textureDic = {};
     this._gl = this._glContext.gl;
     this._canvas = this._glContext.canvas;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -71,13 +71,29 @@ export default class ClassicMaterial extends GLBoostObject {
     return this._shaderInstance;
   }
 
-  set diffuseTexture(tex) {
-    this._diffuseTexture = tex;
+  setTexture(texture) {
+    this._textureDic[texture.userFlavorName] = texture;
     this._updateCount();
   }
 
-  get diffuseTexture() {
-    return this._diffuseTexture;
+  getTexture(userFlavorName) {
+    return this._textureDic[userFlavorName];
+  }
+
+  getOneTexture() {
+    for (let userFlavorName in this._textureDic) {
+      return this._textureDic[userFlavorName];
+    }
+    return null;
+  }
+
+  hasAnyTextures() {
+    let result = false;
+    for (let userFlavorName in this._textureDic) {
+      result = true;
+    }
+
+    return result;
   }
 
   set baseColor(vec) {
@@ -132,11 +148,12 @@ export default class ClassicMaterial extends GLBoostObject {
     return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
   }
 
-  setUp() {
+  setUp(textureName, textureUnitIndex) {
     var gl = this._gl;
     var result = false;
-    if (this._diffuseTexture) {
-      result = this._diffuseTexture.setUp(0);
+    let texture = this.getTexture(textureName);
+    if (texture) {
+      result = texture.setUp(textureUnitIndex);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
       result = true;
@@ -145,9 +162,10 @@ export default class ClassicMaterial extends GLBoostObject {
     return result;
   }
 
-  tearDown() {
-    if (this._diffuseTexture) {
-      this._diffuseTexture.tearDown();
+  tearDown(textureName) {
+    let texture = this.getTexture(textureName);
+    if (texture) {
+      texture.tearDown();
     }
   }
 

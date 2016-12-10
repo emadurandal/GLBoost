@@ -36,7 +36,7 @@ export default class BlendShapeShaderSource {
     return shaderText;
   }
 
-  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs) {
+  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) { // if POSITION and ShapeTargets...
@@ -48,9 +48,9 @@ export default class BlendShapeShaderSource {
 
     vertexAttribs.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
-        shaderProgram['uniformFloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
+        material['uniform_FloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
         // とりあえずゼロ初期化
-        gl.uniform1f(shaderProgram['uniformFloatSampler_blendWeight_' + attribName], 0.0);
+        gl.uniform1f(material['uniform_FloatSampler_blendWeight_' + attribName], 0.0);
       }
     });
 

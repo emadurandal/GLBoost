@@ -38,7 +38,7 @@ var scene_1 = glBoostContext_1.createScene();
 
 var material_1 = glBoostContext_1.createClassicMaterial();
 var texture_1 = glBoostContext_1.createTexture('resources/texture.png');
-material_1.diffuseTexture = texture_1;
+material_1.setTexture(texture_1);
 
 var shader_1 = new GLBoost.PhongShader(glBoostContext_1);
 material_1.shaderInstance = shader_1;
@@ -64,7 +64,7 @@ var scene_2 = glBoostContext_2.createScene();
 
 var material_2 = glBoostContext_2.createClassicMaterial();
 var texture_2 = glBoostContext_2.createTexture('resources/texture.png');
-material_2.diffuseTexture = texture_2;
+material_2.setTexture(texture_2);
 
 var shader_2 = new GLBoost.PhongShader(glBoostContext_2);
 material_2.shaderInstance = shader_2;
