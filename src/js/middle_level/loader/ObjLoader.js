@@ -133,9 +133,8 @@ export default class ObjLoader {
       if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-        var texture = glBoostContext.createTexture(basePath + matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
-        texture.name = matchArray[2];
-        materials[iMCount].diffuseTexture = texture;
+        var texture = glBoostContext.createTexture(basePath + matchArray[2], matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
+        materials[iMCount].setTexture(texture);
       }
     }
     return materials;
@@ -322,7 +321,7 @@ export default class ObjLoader {
 
 
 
-            if(materials[i].diffuseTexture) {
+            if(materials[i].hasAnyTextures()) {
               if (isQuad) {
                 this._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
               } else {

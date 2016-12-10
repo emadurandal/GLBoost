@@ -38,7 +38,7 @@ var scene = glBoostContext.createScene();
 
 var material = glBoostContext.createClassicMaterial();
 var texture = glBoostContext.createTexture('resources/texture.png');
-material.diffuseTexture = texture;
+material.setTexture(texture);
 
 var group1 = glBoostContext.createGroup();
 var group2 = glBoostContext.createGroup();

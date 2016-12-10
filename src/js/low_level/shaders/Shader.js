@@ -385,7 +385,9 @@ export default class Shader extends GLBoostObject {
     }
     this._glslProgram = programToReturn;
 
-    programToReturn._semanticsDic = {};
+    material._semanticsDic = {};
+    material.uniformTextureSamplerDic = {};
+    programToReturn._material = material;
     programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
 
     return programToReturn;
@@ -471,33 +473,33 @@ export default class Shader extends GLBoostObject {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 
-  static trySettingMatrix44ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix44ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix4fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+      gl.uniformMatrix4fv(material['uniform_'+semanticsDir[semantics]], false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix4fv(glslProgram[uniformName], false, matrixArray);
+      gl.uniformMatrix4fv(material['uniform_'+uniformName], false, matrixArray);
     });
   }
 
-  static trySettingMatrix33ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix33ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix3fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+      gl.uniformMatrix3fv(material['uniform_'+semanticsDir[semantics]], false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix3fv(glslProgram[uniformName], false, matrixArray);
+      gl.uniformMatrix3fv(material['uniform_'+uniformName], false, matrixArray);
     });
   }
 

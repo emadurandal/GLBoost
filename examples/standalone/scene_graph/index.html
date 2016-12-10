@@ -40,7 +40,7 @@ var scene = glBoostContext.createScene();
 var material = glBoostContext.createClassicMaterial();
 material.shaderClass = GLBoost.PhongShader;
 var texture = glBoostContext.createTexture('resources/texture.png');
-material.diffuseTexture = texture;
+material.setTexture(texture);
 
 
 var group = glBoostContext.createGroup();

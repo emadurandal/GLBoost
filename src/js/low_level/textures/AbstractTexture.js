@@ -21,8 +21,6 @@ export default class AbstractTexture extends GLBoostObject {
       throw new TypeError('Cannot construct AbstractTexture instances directly.');
     }
 
-    this._name = '';
-
     this._textureUnitIndex = 0;
   }
 
@@ -59,14 +57,6 @@ export default class AbstractTexture extends GLBoostObject {
   tearDown() {
     var gl = this._glContext.gl;
     gl.bindTexture(gl.TEXTURE_2D, null);
-  }
-
-  set name(name) {
-    this._name = name;
-  }
-
-  get name() {
-    return this._name;
   }
 
   get width() {

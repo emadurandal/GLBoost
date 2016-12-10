@@ -39,7 +39,7 @@
 
         var material = glBoostContext.createClassicMaterial();
         var texture = glBoostContext.createTexture('resources/texture.png');
-        material.diffuseTexture = texture;
+        material.setTexture(texture);
 
         var planeGeometry = glBoostContext.createPlane(10, 10, 10, 10, null);
         var plane = glBoostContext.createMesh(planeGeometry, material);

@@ -4,11 +4,16 @@ import GLExtensionsManager from '../core/GLExtensionsManager';
 import MiscUtil from '../misc/MiscUtil';
 
 export default class Texture extends AbstractTexture {
-  constructor(glBoostContext, src, parameters = null) {
+  constructor(glBoostContext, src, userFlavorName, parameters = null) {
     super(glBoostContext);
 
     this._isTextureReady = false;
     this._texture = null;
+    if (typeof userFlavorName === 'undefined' || userFlavorName === null) {
+      this.userFlavorName = this._instanceName;
+    } else {
+      this.userFlavorName = userFlavorName;
+    }
 
     this._parameters = (parameters) ? parameters : {};
 

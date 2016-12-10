@@ -36,7 +36,7 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    if (material.diffuseTexture !== null) {
+    if (material.hasAnyTextures()) {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
@@ -51,7 +51,7 @@ export class DecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD) && material.diffuseTexture !== null) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
     //shaderText += '    float shadowRatio = 0.0;\n';
@@ -60,7 +60,7 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -71,12 +71,20 @@ export class DecalShaderSource {
       }
     });
 
-    shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+    material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-        shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'uTexture');
-      // set texture unit 0 to the sampler
-      gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+      if (material.getOneTexture()) {
+        material.uniformTextureSamplerDic['uTexture'] = {};
+        material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
+        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+        material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+
+        // set texture unit 0 to the sampler
+        gl.uniform1i( material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
+        material._semanticsDic['TEXTURE'] = 'uTexture';
+      }
     }
 
     return vertexAttribsAsResult;
@@ -99,7 +107,7 @@ export default class DecalShader extends Shader {
   setUniforms(gl, glslProgram, material) {
 
     var baseColor = material.baseColor;
-    gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+    gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
   }
 }
 

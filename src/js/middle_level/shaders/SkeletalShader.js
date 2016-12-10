@@ -43,8 +43,8 @@ export default class SkeletalShaderSource {
       }
     });
 
-    shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-    shaderProgram._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
+    material['uniform_skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+    material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
     // とりあえず単位行列で初期化
     let identityMatrices = [];
     for (let i=0; i<extraData.jointN; i++) {
@@ -55,7 +55,7 @@ export default class SkeletalShaderSource {
           0, 0, 0, 1]
       );
     }
-    gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
+    gl.uniformMatrix4fv(shaderProgram['uniform_skinTransformMatrices'], false, new Float32Array(identityMatrices));
 
     return vertexAttribsAsResult;
   }

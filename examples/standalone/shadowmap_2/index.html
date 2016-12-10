@@ -57,7 +57,7 @@
     var material = glBoostContext.createClassicMaterial();
     material.shaderClass = GLBoost.LambertShader;
     var texture = glBoostContext.createTexture('resources/texture.png');
-    material.diffuseTexture = texture;
+    material.setTexture(texture);
 
     var planeGeometry = glBoostContext.createPlane(10, 10, 10, 10, null);
     var cubeGeometry = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
@@ -185,7 +185,7 @@
 
     var planeGeometry = glBoostContext.createPlane(1, 1, 1, 1, null);
     var material = glBoostContext.createClassicMaterial();
-    material.diffuseTexture = depthTexture;
+    material.setTexture(depthTexture);
     material.shaderClass = GLBoost.DepthDisplayShader;
     var plane = glBoostContext.createMesh(planeGeometry, material);
     plane.rotate = new GLBoost.Vector3(90, 0, 0);

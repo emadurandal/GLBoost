@@ -5,6 +5,7 @@ import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import ParticleShaderSource from '../../middle_level/shaders/ParticleShader';
+import Shader from '../../low_level/shaders/Shader';
 import MathUtil from '../../low_level/math/MathUtil';
 
 /**
@@ -237,11 +238,11 @@ export default class Particle extends Geometry {
         super.setUniforms(gl, glslProgram, material, camera, mesh);
 
         if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-          gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.projectionRHMatrix().flatten());
+          Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'PROJECTION', camera.projectionRHMatrix().flatten());
         }
 
         if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-          gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
+          Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'MODELVIEW', camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
         }
 
         this._meshTransformUpdateCount = mesh.updateCountAsElement;

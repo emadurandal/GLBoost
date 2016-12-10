@@ -103,7 +103,7 @@ phina.define('MainScene', {
     var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/multiple_render_targets/resources/texture.png');
     var material = glBoostContext.createClassicMaterial();
     material.shaderClass = MyCustomShader;
-    material.diffuseTexture = texture;
+    material.setTexture(texture);
     var mesh = glBoostContext.createMesh(geometry, material);
     geometry.setVerticesData({
       position: positions,
@@ -123,14 +123,14 @@ phina.define('MainScene', {
     scene2.addChild( camera );
     var geometry2_1 = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
     var material2_1 = glBoostContext.createClassicMaterial();
-    material2_1.diffuseTexture = renderTextures[0];
+    material2_1.setTexture(renderTextures[0]);
     var mesh2_1 = glBoostContext.createMesh(geometry2_1, material2_1);
     scene2.addChild( mesh2_1 );
     mesh2_1.translate = new GLBoost.Vector3(-1, 0, 0);
 
     var geometry2_2 = glBoostContext.createCube(new GLBoost.Vector3(1,1,1), new GLBoost.Vector4(1,1,1,1));
     var material2_2 = glBoostContext.createClassicMaterial();
-    material2_2.diffuseTexture = renderTextures[1];
+    material2_2.setTexture(renderTextures[1]);
     var mesh2_2 = glBoostContext.createMesh(geometry2_2, material2_2);
     scene2.addChild( mesh2_2 );
 

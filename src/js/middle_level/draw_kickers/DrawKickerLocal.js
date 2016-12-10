@@ -29,9 +29,10 @@ export default class DrawKickerLocal {
     }
 
     for (let i=0; i<materials.length;i++) {
-      let materialUpdateStateString = materials[i].getUpdateStateString();
+      let material = materials[i];
+      let materialUpdateStateString = material.getUpdateStateString();
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-        this._glslProgram = materials[i].shaderInstance.glslProgram;
+        this._glslProgram = material.shaderInstance.glslProgram;
         gl.useProgram(this._glslProgram);
       }
       let glslProgram = this._glslProgram;
@@ -57,9 +58,9 @@ export default class DrawKickerLocal {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
       }
 
-      if (glslProgram['lightPosition_0']) {
-        lights = materials[i].shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
-        if (glslProgram['viewPosition']) {
+      if (material['uniform_lightPosition_0']) {
+        lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+        if (material['uniform_viewPosition']) {
           let cameraPosInLocalCoord = null;
           if (camera) {
             let cameraPos = new Vector4(0, 0, 0, 1);
@@ -68,11 +69,11 @@ export default class DrawKickerLocal {
           } else {
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
           }
-          gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+          gl.uniform3f(material['uniform_viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
         }
 
         for (let j = 0; j < lights.length; j++) {
-          if (glslProgram[`lightPosition_${j}`] && glslProgram[`lightDiffuse_${j}`]) {
+          if (material[`uniform_lightPosition_${j}`] && material[`uniform_lightDiffuse_${j}`]) {
             let lightVec = null;
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
@@ -87,23 +88,23 @@ export default class DrawKickerLocal {
             }
 
             let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-            gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+            gl.uniform4f(material[`uniform_lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
-            gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            gl.uniform4f(material[`uniform_lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
           }
         }
       }
 
       let isMaterialSetupDone = true;
 
-      if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-        var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
-        materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
+      if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
+        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, material, camera, mesh);
+        material.shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
-        if (materials[i]) {
-          isMaterialSetupDone = materials[i].setUp();
+        if (material) {
+          isMaterialSetupDone = material.setUp();
         }
       }
       if (!isMaterialSetupDone) {
@@ -112,7 +113,7 @@ export default class DrawKickerLocal {
 
       if (iboArrayDic[geometryName].length > 0) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-        gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+        gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(gl[primitiveType], 0, vertexN);

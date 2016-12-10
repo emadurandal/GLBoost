@@ -60,20 +60,20 @@ export default class VertexWorldShadowShaderSource {
       }
     });
 
-    shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-    shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
-    shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
-    shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+    material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+    material._semanticsDic['WORLD'] = 'worldMatrix';
+    material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+    material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
-      shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-      shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
-      shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-      shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
+      material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+      material._semanticsDic['VIEW'] = 'viewMatrix';
+      material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+      material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      shaderProgram['lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      shaderProgram['lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
+      material['uniform_lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
+      material['uniform_lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
     }
 
     let textureUnitIndex = 0;
@@ -81,7 +81,7 @@ export default class VertexWorldShadowShaderSource {
       //if (lights[i].camera && lights[i].camera.texture) {
 
       // matrices
-      shaderProgram['depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
+      material['uniform_depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
 
       textureUnitIndex++;
       //}

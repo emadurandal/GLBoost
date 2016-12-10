@@ -88,7 +88,7 @@ phina.define('MainScene', {
     texture.addPhinaObject(label).addPhinaObject(heart).renderPhinaObjects();
 
     var material = glBoostContext.createClassicMaterial();
-    material.diffuseTexture = texture;
+    material.setTexture(texture);
     var mesh = glBoostContext.createMesh(geometry, material);
     layer.scene.addChild( mesh );
 

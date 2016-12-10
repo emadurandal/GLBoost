@@ -67,7 +67,7 @@ phina.define('MainScene', {
     var geometry = glBoostContext.createBlendShapeGeometry();
     var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/multiple_render_passes/resources/texture.png');
     var material = glBoostContext.createClassicMaterial();
-    material.diffuseTexture = texture;
+    material.setTexture(texture);
     var mesh = glBoostContext.createMesh(geometry, material);
     geometry.setVerticesData({
       position: positions,
@@ -84,7 +84,7 @@ phina.define('MainScene', {
 
     var geometry2 = glBoostContext.createGeometry();
     var material2 = glBoostContext.createClassicMaterial();
-    material2.diffuseTexture = renderTextures[0];
+    material2.setTexture(renderTextures[0]);
     var mesh2 = glBoostContext.createMesh(geometry2, material2);
     geometry2.setVerticesData({
       position: positions,

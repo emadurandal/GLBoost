@@ -4919,7 +4919,9 @@
         }
         this._glslProgram = programToReturn;
 
-        programToReturn._semanticsDic = {};
+        material._semanticsDic = {};
+        material.uniformTextureSamplerDic = {};
+        programToReturn._material = material;
         programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
 
         return programToReturn;
@@ -5151,34 +5153,34 @@
       }
     }, {
       key: 'trySettingMatrix44ToUniform',
-      value: function trySettingMatrix44ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+      value: function trySettingMatrix44ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
         if (typeof semanticsDir[semantics] === 'undefined') {
           return;
         }
         if (typeof semanticsDir[semantics] === 'string') {
-          gl.uniformMatrix4fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+          gl.uniformMatrix4fv(material['uniform_' + semanticsDir[semantics]], false, matrixArray);
           return;
         }
 
         // it must be an Array...
         semanticsDir[semantics].forEach(function (uniformName) {
-          gl.uniformMatrix4fv(glslProgram[uniformName], false, matrixArray);
+          gl.uniformMatrix4fv(material['uniform_' + uniformName], false, matrixArray);
         });
       }
     }, {
       key: 'trySettingMatrix33ToUniform',
-      value: function trySettingMatrix33ToUniform(gl, glslProgram, semanticsDir, semantics, matrixArray) {
+      value: function trySettingMatrix33ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
         if (typeof semanticsDir[semantics] === 'undefined') {
           return;
         }
         if (typeof semanticsDir[semantics] === 'string') {
-          gl.uniformMatrix3fv(glslProgram[semanticsDir[semantics]], false, matrixArray);
+          gl.uniformMatrix3fv(material['uniform_' + semanticsDir[semantics]], false, matrixArray);
           return;
         }
 
         // it must be an Array...
         semanticsDir[semantics].forEach(function (uniformName) {
-          gl.uniformMatrix3fv(glslProgram[uniformName], false, matrixArray);
+          gl.uniformMatrix3fv(material['uniform_' + uniformName], false, matrixArray);
         });
       }
     }]);
@@ -5253,13 +5255,13 @@
         });
 
         if (existCamera_f) {
-          shaderProgram.modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
-          shaderProgram._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
+          material.uniform_modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+          material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
         }
 
         return vertexAttribsAsResult;
@@ -5292,9 +5294,10 @@
         }
 
         for (var i = 0; i < materials.length; i++) {
-          var materialUpdateStateString = materials[i].getUpdateStateString();
+          var material = materials[i];
+          var materialUpdateStateString = material.getUpdateStateString();
           if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-            this._glslProgram = materials[i].shaderInstance.glslProgram;
+            this._glslProgram = material.shaderInstance.glslProgram;
             gl.useProgram(this._glslProgram);
           }
           var glslProgram = this._glslProgram;
@@ -5320,9 +5323,9 @@
             Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWPROJECTION', pvm_m.flatten());
           }
 
-          if (glslProgram['lightPosition_0']) {
-            lights = materials[i].shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
-            if (glslProgram['viewPosition']) {
+          if (material['uniform_lightPosition_0']) {
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            if (material['uniform_viewPosition']) {
               var cameraPosInLocalCoord = null;
               if (camera) {
                 var cameraPos = new Vector4(0, 0, 0, 1);
@@ -5331,11 +5334,11 @@
               } else {
                 cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
               }
-              gl.uniform3f(glslProgram['viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+              gl.uniform3f(material['uniform_viewPosition'], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
             }
 
             for (var j = 0; j < lights.length; j++) {
-              if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
+              if (material['uniform_lightPosition_' + j] && material['uniform_lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
                 if (lights[j] instanceof M_PointLight) {
@@ -5350,23 +5353,23 @@
                 }
 
                 var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                gl.uniform4f(glslProgram['lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+                gl.uniform4f(material['uniform_lightPosition_' + j], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
-                gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+                gl.uniform4f(material['uniform_lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
               }
             }
           }
 
           var isMaterialSetupDone = true;
 
-          if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh);
-            materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
+          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
+            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, material, camera, mesh);
+            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
           if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
-            if (materials[i]) {
-              isMaterialSetupDone = materials[i].setUp();
+            if (material) {
+              isMaterialSetupDone = material.setUp();
             }
           }
           if (!isMaterialSetupDone) {
@@ -5375,7 +5378,7 @@
 
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-            gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+            gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
@@ -5481,20 +5484,20 @@
           }
         });
 
-        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-        shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
-        shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
-        shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
         if (existCamera_f) {
-          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-          shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
-          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-          shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
+          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
         }
 
         return vertexAttribsAsResult;
@@ -5521,18 +5524,21 @@
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
       value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+        var _this = this;
+
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
         }
 
-        for (var i = 0; i < materials.length; i++) {
-          var materialUpdateStateString = materials[i].getUpdateStateString();
+        var _loop = function _loop(i) {
+          var material = materials[i];
+          var materialUpdateStateString = material.getUpdateStateString();
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            this._glslProgram = materials[i].shaderInstance.glslProgram;
-            gl.useProgram(this._glslProgram);
+            _this._glslProgram = material.shaderInstance.glslProgram;
+            gl.useProgram(_this._glslProgram);
           }
-          var glslProgram = this._glslProgram;
+          var glslProgram = _this._glslProgram;
 
           if (!isVAOBound) {
             if (DrawKickerWorld._lastGeometry !== geometryName) {
@@ -5547,30 +5553,30 @@
           gl.uniform1f(glslProgram.opacity, opacity);
 
           var world_m = mesh.transformMatrixAccumulatedAncestry;
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'WORLD', world_m.flatten());
+          Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'WORLD', world_m.flatten());
           var normal_m = mesh.normalMatrixAccumulatedAncestry;
-          Shader.trySettingMatrix33ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+          Shader.trySettingMatrix33ToUniform(gl, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
           if (camera) {
             var cameraMatrix = camera.lookAtRHMatrix();
             var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
             var projectionMatrix = camera.projectionRHMatrix();
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'VIEW', viewMatrix.flatten());
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
+            Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
           }
 
-          if (glslProgram['lightPosition_0']) {
-            lights = materials[i].shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
-            if (glslProgram['viewPosition']) {
+          if (material['uniform_lightPosition_0']) {
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            if (material['uniform_viewPosition']) {
               var cameraPos = new Vector4(0, 0, 1, 1);
               if (camera) {
                 cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
               }
-              gl.uniform3f(glslProgram['viewPosition'], cameraPos.x, cameraPos.y, cameraPos.z);
+              gl.uniform3f(material['uniform_viewPosition'], cameraPos.x, cameraPos.y, cameraPos.z);
             }
 
             for (var j = 0; j < lights.length; j++) {
-              if (glslProgram['lightPosition_' + j] && glslProgram['lightDiffuse_' + j]) {
+              if (material['uniform_lightPosition_' + j] && material['uniform_lightDiffuse_' + j]) {
                 var lightVec = null;
                 var isPointLight = -9999;
                 if (lights[j] instanceof M_PointLight) {
@@ -5584,42 +5590,68 @@
                   isPointLight = 0.0;
                 }
 
-                gl.uniform4f(glslProgram['lightPosition_' + j], lightVec.x, lightVec.y, lightVec.z, isPointLight);
-                gl.uniform4f(glslProgram['lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+                gl.uniform4f(material['uniform_lightPosition_' + j], lightVec.x, lightVec.y, lightVec.z, isPointLight);
+                gl.uniform4f(material['uniform_lightDiffuse_' + j], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
               }
             }
           }
 
           var isMaterialSetupDone = true;
 
-          if (materials[i].shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            var needTobeStillDirty = materials[i].shaderInstance.setUniforms(gl, glslProgram, materials[i], camera, mesh, lights);
-            materials[i].shaderInstance.dirty = needTobeStillDirty ? true : false;
+          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
+            needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, material, camera, mesh, lights);
+
+            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
-            if (materials[i]) {
-              isMaterialSetupDone = materials[i].setUp();
+            if (material) {
+              if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
+                // do nothing
+              } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
+                var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+                var textureName = textureSamplerDic.textureName;
+                var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+                isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+              } else {
+                // it must be an Array...
+                material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
+                  var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
+                  var textureName = textureSamplerDic.textureName;
+                  var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+                  isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+                });
+              }
             }
           }
 
           if (!isMaterialSetupDone) {
-            return;
+            return {
+              v: void 0
+            };
           }
 
-          this._setupOtherTextures(lights);
+          _this._setupOtherTextures(lights);
 
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-            gl.drawElements(gl[primitiveType], materials[i].getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+            gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           } else {
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
 
-          this._tearDownOtherTextures(lights);
+          _this._tearDownOtherTextures(lights);
 
           DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
+        };
+
+        for (var i = 0; i < materials.length; i++) {
+          var needTobeStillDirty;
+
+          var _ret = _loop(i);
+
+          if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
         }
 
         //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -6464,14 +6496,14 @@
           }
         });
 
-        shaderProgram['skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-        shaderProgram._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
+        material['uniform_skinTransformMatrices'] = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+        material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
         // とりあえず単位行列で初期化
         var identityMatrices = [];
         for (var i = 0; i < extraData.jointN; i++) {
           Array.prototype.push.apply(identityMatrices, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
         }
-        gl.uniformMatrix4fv(shaderProgram['skinTransformMatrices'], false, new Float32Array(identityMatrices));
+        gl.uniformMatrix4fv(shaderProgram['uniform_skinTransformMatrices'], false, new Float32Array(identityMatrices));
 
         return vertexAttribsAsResult;
       }
@@ -6482,7 +6514,7 @@
   var FreeShader = function (_Shader) {
     babelHelpers.inherits(FreeShader, _Shader);
 
-    function FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms) {
+    function FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames) {
       babelHelpers.classCallCheck(this, FreeShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (FreeShader.__proto__ || Object.getPrototypeOf(FreeShader)).call(this, glBoostContext));
@@ -6519,6 +6551,7 @@
 
       _this._attributes = newAttributes;
       _this._uniforms = uniforms;
+      _this._textureNames = textureNames;
       return _this;
     }
 
@@ -6547,13 +6580,23 @@
           }
         });
 
+        var textureCount = 0;
+        gl.useProgram(shaderProgram);
+
         for (var uniformName in this._uniforms) {
           if (this._uniforms[uniformName] === 'TEXTURE') {
-            shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, uniformName);
-            // set texture unit 0 to the sampler
-            gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+            material.uniformTextureSamplerDic[uniformName] = {};
+            var textureUniformLocation = gl.getUniformLocation(shaderProgram, uniformName);
+            if (textureUniformLocation < 0) {
+              continue;
+            }
+            material.uniformTextureSamplerDic[uniformName].uniformLocation = textureUniformLocation;
+            material.uniformTextureSamplerDic[uniformName].textureName = this._textureNames[uniformName];
+            material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
 
-            continue;
+            gl.uniform1i(material.uniformTextureSamplerDic[uniformName].uniformLocation, textureCount);
+
+            textureCount++;
           }
 
           switch (this._uniforms[uniformName]) {
@@ -6561,18 +6604,19 @@
             case 'MODELVIEWINVERSETRANSPOSE':
             case 'PROJECTION':
             case 'JOINTMATRIX':
-              if (typeof shaderProgram._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
-                shaderProgram._semanticsDic[this._uniforms[uniformName]] = uniformName;
-              } else if (babelHelpers.typeof(shaderProgram._semanticsDic[this._uniforms[uniformName] === 'string'])) {
-                var tmpSemanticsStr = shaderProgram._semanticsDic[this._uniforms[uniformName]];
-                shaderProgram._semanticsDic[this._uniforms[uniformName]] = [];
-                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(tmpSemanticsStr);
-                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+              material['uniform_' + uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
+            case 'TEXTURE':
+              if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
+                material._semanticsDic[this._uniforms[uniformName]] = uniformName;
+              } else if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'string') {
+                var tmpSemanticsStr = material._semanticsDic[this._uniforms[uniformName]];
+                material._semanticsDic[this._uniforms[uniformName]] = [];
+                material._semanticsDic[this._uniforms[uniformName]].push(tmpSemanticsStr);
+                material._semanticsDic[this._uniforms[uniformName]].push(uniformName);
               } else {
                 // it must be Array
-                shaderProgram._semanticsDic[this._uniforms[uniformName]].push(uniformName);
+                material._semanticsDic[this._uniforms[uniformName]].push(uniformName);
               }
-              shaderProgram[uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
               continue;
           }
         }
@@ -6584,19 +6628,19 @@
       value: function setUniforms(gl, glslProgram, material) {
 
         for (var uniformName in this._uniforms) {
-          glslProgram['uniform_' + uniformName] = gl.getUniformLocation(glslProgram, uniformName);
+          material['uniform_' + uniformName] = gl.getUniformLocation(glslProgram, uniformName);
           var value = this._uniforms[uniformName];
 
           gl.useProgram(glslProgram);
 
           if (typeof value === 'number') {
-            gl.uniform1f(glslProgram['uniform_' + uniformName], value);
+            gl.uniform1f(material['uniform_' + uniformName], value);
           } else if (value instanceof Vector2) {
-            gl.uniform2f(glslProgram['uniform_' + uniformName], value.x, value.y);
+            gl.uniform2f(material['uniform_' + uniformName], value.x, value.y);
           } else if (value instanceof Vector3) {
-            gl.uniform3f(glslProgram['uniform_' + uniformName], value.x, value.y, value.z);
+            gl.uniform3f(material['uniform_' + uniformName], value.x, value.y, value.z);
           } else if (value instanceof Vector4) {
-            gl.uniform4f(glslProgram['uniform_' + uniformName], value.x, value.y, value.z, value.w);
+            gl.uniform4f(material['uniform_' + uniformName], value.x, value.y, value.z, value.w);
           }
         }
       }
@@ -6720,7 +6764,7 @@
         for (var _i6 = 0; _i6 < materials.length; _i6++) {
           var glslProgram = materials[_i6].shaderInstance.glslProgram;
           gl.useProgram(glslProgram);
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram, glslProgram._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
+          Shader.trySettingMatrix44ToUniform(gl, materials[_i6], materials[_i6]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
         }
 
         babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
@@ -7347,8 +7391,6 @@
         throw new TypeError('Cannot construct AbstractTexture instances directly.');
       }
 
-      _this._name = '';
-
       _this._textureUnitIndex = 0;
       return _this;
     }
@@ -7453,14 +7495,6 @@
         return this._texture;
       }
     }, {
-      key: 'name',
-      set: function set(name) {
-        this._name = name;
-      },
-      get: function get() {
-        return this._name;
-      }
-    }, {
       key: 'width',
       get: function get() {
         return this._width;
@@ -7554,14 +7588,19 @@
   var Texture = function (_AbstractTexture) {
     babelHelpers.inherits(Texture, _AbstractTexture);
 
-    function Texture(glBoostContext, src) {
-      var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    function Texture(glBoostContext, src, userFlavorName) {
+      var parameters = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
       babelHelpers.classCallCheck(this, Texture);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (Texture.__proto__ || Object.getPrototypeOf(Texture)).call(this, glBoostContext));
 
       _this._isTextureReady = false;
       _this._texture = null;
+      if (typeof userFlavorName === 'undefined' || userFlavorName === null) {
+        _this.userFlavorName = _this._instanceName;
+      } else {
+        _this.userFlavorName = userFlavorName;
+      }
 
       _this._parameters = parameters ? parameters : {};
 
@@ -7706,7 +7745,7 @@
       var parameters = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
       babelHelpers.classCallCheck(this, PhinaTexture);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, (PhinaTexture.__proto__ || Object.getPrototypeOf(PhinaTexture)).call(this, glBoostContext, null, parameters));
+      var _this = babelHelpers.possibleConstructorReturn(this, (PhinaTexture.__proto__ || Object.getPrototypeOf(PhinaTexture)).call(this, glBoostContext, null, null, parameters));
 
       _this._parameters['UNPACK_FLIP_Y_WEBGL'] = true;
 
@@ -8209,20 +8248,20 @@
           }
         });
 
-        shaderProgram.worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-        shaderProgram._semanticsDic['WORLD'] = 'worldMatrix';
-        shaderProgram.normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
-        shaderProgram._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
         if (existCamera_f) {
-          shaderProgram.viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-          shaderProgram._semanticsDic['VIEW'] = 'viewMatrix';
-          shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-          shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
+          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
-          shaderProgram['lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          shaderProgram['lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
         }
 
         var textureUnitIndex = 0;
@@ -8230,7 +8269,7 @@
           //if (lights[i].camera && lights[i].camera.texture) {
 
           // matrices
-          shaderProgram['depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
+          material['uniform_depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
 
           textureUnitIndex++;
           //}
@@ -8286,7 +8325,7 @@
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += in_ + ' vec2 texcoord;\n\n';
         }
-        if (material.diffuseTexture !== null) {
+        if (material.hasAnyTextures()) {
           shaderText += 'uniform sampler2D uTexture;\n';
         }
         shaderText += 'uniform vec4 materialBaseColor;\n';
@@ -8302,7 +8341,7 @@
           shaderText += '  rt0 *= color;\n';
         }
         shaderText += '    rt0 *= materialBaseColor;\n';
-        if (Shader._exist(f, GLBoost.TEXCOORD) && material.diffuseTexture !== null) {
+        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
         //shaderText += '    float shadowRatio = 0.0;\n';
@@ -8312,7 +8351,7 @@
       }
     }, {
       key: 'prepare_DecalShaderSource',
-      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
 
         var vertexAttribsAsResult = [];
         vertexAttribs.forEach(function (attribName) {
@@ -8323,12 +8362,20 @@
           }
         });
 
-        shaderProgram.materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+        material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
 
         if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-          shaderProgram.uniformTextureSampler_0 = gl.getUniformLocation(shaderProgram, 'uTexture');
-          // set texture unit 0 to the sampler
-          gl.uniform1i(shaderProgram.uniformTextureSampler_0, 0);
+          if (material.getOneTexture()) {
+            material.uniformTextureSamplerDic['uTexture'] = {};
+            material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
+            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+
+            // set texture unit 0 to the sampler
+            gl.uniform1i(material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
+            material._semanticsDic['TEXTURE'] = 'uTexture';
+          }
         }
 
         return vertexAttribsAsResult;
@@ -8360,7 +8407,7 @@
       value: function setUniforms(gl, glslProgram, material) {
 
         var baseColor = material.baseColor;
-        gl.uniform4f(glslProgram.materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+        gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
       }
     }]);
     return DecalShader;
@@ -8376,7 +8423,7 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
 
-      _this._diffuseTexture = null;
+      _this._textureDic = {};
       _this._gl = _this._glContext.gl;
       _this._canvas = _this._glContext.canvas;
       _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -8420,6 +8467,35 @@
         return this.toString() + '_updateCount_' + this._countOfUpdate;
       }
     }, {
+      key: 'setTexture',
+      value: function setTexture(texture) {
+        this._textureDic[texture.userFlavorName] = texture;
+        this._updateCount();
+      }
+    }, {
+      key: 'getTexture',
+      value: function getTexture(userFlavorName) {
+        return this._textureDic[userFlavorName];
+      }
+    }, {
+      key: 'getOneTexture',
+      value: function getOneTexture() {
+        for (var userFlavorName in this._textureDic) {
+          return this._textureDic[userFlavorName];
+        }
+        return null;
+      }
+    }, {
+      key: 'hasAnyTextures',
+      value: function hasAnyTextures() {
+        var result = false;
+        for (var userFlavorName in this._textureDic) {
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
       key: 'setVertexN',
       value: function setVertexN(geom, num) {
         this._vertexNofGeometries[geom] = num;
@@ -8431,11 +8507,12 @@
       }
     }, {
       key: 'setUp',
-      value: function setUp() {
+      value: function setUp(textureName, textureUnitIndex) {
         var gl = this._gl;
         var result = false;
-        if (this._diffuseTexture) {
-          result = this._diffuseTexture.setUp(0);
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          result = texture.setUp(textureUnitIndex);
         } else {
           gl.bindTexture(gl.TEXTURE_2D, null);
           result = true;
@@ -8445,9 +8522,10 @@
       }
     }, {
       key: 'tearDown',
-      value: function tearDown() {
-        if (this._diffuseTexture) {
-          this._diffuseTexture.tearDown();
+      value: function tearDown(textureName) {
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          texture.tearDown();
         }
       }
     }, {
@@ -8473,15 +8551,6 @@
       },
       get: function get() {
         return this._shaderInstance;
-      }
-    }, {
-      key: 'diffuseTexture',
-      set: function set(tex) {
-        this._diffuseTexture = tex;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._diffuseTexture;
       }
     }, {
       key: 'baseColor',
@@ -8561,17 +8630,17 @@
       }
     }, {
       key: 'prepare_ParticleShaderSource',
-      value: function prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+      value: function prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
         var vertexAttribsAsResult = [];
 
         shaderProgram['vertexAttribute_' + 'particleCenterPos'] = gl.getAttribLocation(shaderProgram, 'aVertex_' + 'particleCenterPos');
         gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + 'particleCenterPos']);
         vertexAttribsAsResult.push('particleCenterPos');
 
-        shaderProgram.projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-        shaderProgram.modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
-        shaderProgram._semanticsDic['PROJECTION'] = 'projectionMatrix';
-        shaderProgram._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
+        material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+        material.uniform_modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+        material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        material._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
 
         return vertexAttribsAsResult;
       }
@@ -8859,11 +8928,11 @@
               babelHelpers.get(ParticleShader.prototype.__proto__ || Object.getPrototypeOf(ParticleShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material, camera, mesh);
 
               if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-                gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, camera.projectionRHMatrix().flatten());
+                Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'PROJECTION', camera.projectionRHMatrix().flatten());
               }
 
               if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-                gl.uniformMatrix4fv(glslProgram.modelViewMatrix, false, camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
+                Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'MODELVIEW', camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
               }
 
               this._meshTransformUpdateCount = mesh.updateCountAsElement;
@@ -9186,7 +9255,7 @@
       }
     }, {
       key: 'prepare_BlendShapeShaderSource',
-      value: function prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs) {
+      value: function prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
         var _this3 = this;
 
         var vertexAttribsAsResult = [];
@@ -9201,9 +9270,9 @@
 
         vertexAttribs.forEach(function (attribName) {
           if (_this3.BlendShapeShaderSource_isShapeTarget(attribName)) {
-            shaderProgram['uniformFloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
+            material['uniform_FloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
             // とりあえずゼロ初期化
-            gl.uniform1f(shaderProgram['uniformFloatSampler_blendWeight_' + attribName], 0.0);
+            gl.uniform1f(material['uniform_FloatSampler_blendWeight_' + attribName], 0.0);
           }
         });
 
@@ -9299,7 +9368,7 @@
         var materials = [this._materialForBlend];
         for (var i = 0; i < materials.length; i++) {
           gl.useProgram(materials[i].shaderInstance.glslProgram);
-          gl.uniform1f(materials[i].shaderInstance.glslProgram['uniformFloatSampler_blendWeight_' + blendTarget], weight);
+          gl.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight);
         }
       }
     }, {
@@ -9509,10 +9578,10 @@
       }
     }, {
       key: 'createTexture',
-      value: function createTexture(src) {
-        var parameters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      value: function createTexture(src, userFlavorName) {
+        var parameters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-        return new Texture(this, src, parameters);
+        return new Texture(this, src, userFlavorName, parameters);
       }
     }, {
       key: 'createPhinaTexture',
@@ -9766,11 +9835,11 @@
 
         var vertexAttribsAsResult = [];
 
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-        shaderProgram.Ks = gl.getUniformLocation(shaderProgram, 'Ks');
-        shaderProgram.power = gl.getUniformLocation(shaderProgram, 'power');
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
+        material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
 
-        shaderProgram['viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
+        material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
 
         return vertexAttribsAsResult;
       }
@@ -9800,9 +9869,9 @@
 
         var Kd = material.diffuseColor;
         var Ks = material.specularColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-        gl.uniform4f(glslProgram.Ks, Ks.x, Ks.y, Ks.z, Ks.w);
-        gl.uniform1f(glslProgram.power, this._power);
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
+        gl.uniform1f(material.uniform_power, this._power);
       }
     }, {
       key: 'Kd',
@@ -9967,9 +10036,8 @@
 
           if (_matchArray[1].toLowerCase() === "map_kd") {
             _matchArray = mtlTextRows[_i2].match(/(\w+) ([\w:\/\-\.]+)/);
-            var texture = glBoostContext.createTexture(basePath + _matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
-            texture.name = _matchArray[2];
-            materials[iMCount].diffuseTexture = texture;
+            var texture = glBoostContext.createTexture(basePath + _matchArray[2], _matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
+            materials[iMCount].setTexture(texture);
           }
         }
         return materials;
@@ -10152,7 +10220,7 @@
                   isQuad = false;
                 }
 
-                if (materials[_i5].diffuseTexture) {
+                if (materials[_i5].hasAnyTextures()) {
                   if (isQuad) {
                     _this3._addQuadDataToArraysWithTexture(tmpPositions, tmpNormals, tmpTexcoords, pvCoord, pvNormal, pvTexture, objTextRows[j], fCount);
                   } else {
@@ -11098,36 +11166,38 @@
           vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
           dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
 
-          if (typeof diffuseValue === 'string') {
-            var textureStr = diffuseValue;
-            var textureJson = json.textures[textureStr];
-            var imageStr = textureJson.source;
-            var imageJson = json.images[imageStr];
+          for (var valueName in materialJson.values) {
+            var value = materialJson.values[valueName];
+            if (typeof value === 'string') {
+              var textureStr = value;
+              var textureJson = json.textures[textureStr];
+              var imageStr = textureJson.source;
+              var imageJson = json.images[imageStr];
 
-            var textureUri = null;
+              var textureUri = null;
 
-            if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-              textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
-            } else {
-              var imageFileStr = imageJson.uri;
-              if (imageFileStr.match(/^data:/)) {
-                textureUri = imageFileStr;
+              if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
               } else {
-                textureUri = basePath + imageFileStr;
+                var imageFileStr = imageJson.uri;
+                if (imageFileStr.match(/^data:/)) {
+                  textureUri = imageFileStr;
+                } else {
+                  textureUri = basePath + imageFileStr;
+                }
               }
+
+              var samplerStr = textureJson.sampler;
+              var samplerJson = json.samplers[samplerStr];
+
+              var texture = glBoostContext.createTexture(textureUri, textureStr, {
+                'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+                'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+                'TEXTURE_WRAP_S': samplerJson.wrapS,
+                'TEXTURE_WRAP_T': samplerJson.wrapT
+              });
+              material.setTexture(texture);
             }
-
-            var samplerStr = textureJson.sampler;
-            var samplerJson = json.samplers[samplerStr];
-
-            var texture = glBoostContext.createTexture(textureUri, {
-              'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-              'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-              'TEXTURE_WRAP_S': samplerJson.wrapS,
-              'TEXTURE_WRAP_T': samplerJson.wrapT
-            });
-            texture.name = textureStr;
-            material.diffuseTexture = texture;
           }
         } else {
           if (typeof vertexData.components.texcoord !== 'undefined') {
@@ -11146,19 +11216,11 @@
           }
         }
 
-        // Diffuse
-        if (diffuseValue && typeof diffuseValue !== 'string') {
-          material.diffuseColor = new Vector4(diffuseValue[0], diffuseValue[1], diffuseValue[2], diffuseValue[3]);
-        }
-        // Ambient
-        var ambientValue = materialJson.values.ambient;
-        if (ambientValue && typeof ambientValue !== 'string') {
-          material.ambientColor = new Vector4(ambientValue[0], ambientValue[1], ambientValue[2], ambientValue[3]);
-        }
-        // Specular
-        var specularValue = materialJson.values.specular;
-        if (specularValue && typeof specularValue !== 'string') {
-          material.specularColor = new Vector4(specularValue[0], specularValue[1], specularValue[2], specularValue[3]);
+        for (var _valueName in materialJson.values) {
+          var _value = materialJson.values[_valueName];
+          if (typeof _value !== 'string') {
+            material[_valueName + 'Color'] = new Vector4(_value[0], _value[1], _value[2], _value[3]);
+          }
         }
 
         var opacityValue = 1.0 - materialJson.values.transparency;
@@ -11198,6 +11260,7 @@
         }
 
         var uniforms = {};
+        var textureNames = {};
         for (var uniformName in uniformsJson) {
           var _parameterName = uniformsJson[uniformName];
           var _parameterJson = parametersJson[_parameterName];
@@ -11238,23 +11301,24 @@
                 break;
               case 35678:
                 uniforms[uniformName] = 'TEXTURE';
+                textureNames[uniformName] = materialJson.values[_parameterName];
                 break;
             }
           }
         }
 
-        this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms);
+        this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames);
       }
     }, {
       key: '_loadProgram',
-      value: function _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms) {
+      value: function _loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames) {
         var programJson = json.programs[programStr];
         var fragmentShaderStr = programJson.fragmentShader;
         var vertexShaderStr = programJson.vertexShader;
         var fragmentShaderText = shaders[fragmentShaderStr].shaderText;
         var vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-        material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms);
+        material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
       }
     }, {
       key: '_loadAnimation',
@@ -11732,14 +11796,12 @@
         var shaderText = '';
         shaderText += 'uniform vec4 Kd;\n';
 
-        var textureUnitIndex = 0;
         //for (let i=0; i<lights.length; i++) {
         //  if (lights[i].camera && lights[i].camera.texture) {
         shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
 
         shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
 
-        textureUnitIndex++;
         //}
         //}
         shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
@@ -11799,15 +11861,15 @@
 
         var vertexAttribsAsResult = [];
 
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
-          shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+          material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
           // depthTexture
-          shaderProgram['uniformDepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
+          material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
           // set texture unit i+1 to the sampler
-          gl.uniform1i(shaderProgram['uniformDepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
+          gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
 
           if (lights[i].camera && lights[i].camera.texture) {
             lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
@@ -11838,21 +11900,21 @@
         babelHelpers.get(LambertShader.prototype.__proto__ || Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
 
         for (var j = 0; j < lights.length; j++) {
           if (lights[j].camera && lights[j].camera.texture) {
             var cameraMatrix = lights[j].camera.lookAtRHMatrix();
             var projectionMatrix = lights[j].camera.projectionRHMatrix();
-            gl.uniformMatrix4fv(glslProgram['depthPVMatrix_' + j], false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
+            gl.uniformMatrix4fv(material['uniform_depthPVMatrix_' + j], false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
           }
         }
 
         for (var i = 0; i < lights.length; i++) {
           if (lights[i].camera && lights[i].camera.texture) {
-            gl.uniform1i(glslProgram['isShadowCasting' + i], 1);
+            gl.uniform1i(material['uniform_isShadowCasting' + i], 1);
           } else {
-            gl.uniform1i(glslProgram['isShadowCasting' + i], 0);
+            gl.uniform1i(material['uniform_isShadowCasting' + i], 0);
           }
         }
       }
@@ -11904,7 +11966,7 @@
 
         var vertexAttribsAsResult = [];
 
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
 
         return vertexAttribsAsResult;
       }
@@ -11930,7 +11992,7 @@
         babelHelpers.get(HalfLambertShader.prototype.__proto__ || Object.getPrototypeOf(HalfLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
       }
     }]);
     return HalfLambertShader;
@@ -11979,8 +12041,8 @@
 
         var vertexAttribsAsResult = [];
 
-        shaderProgram.Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-        shaderProgram.wrap = gl.getUniformLocation(shaderProgram, 'wrap');
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_wrap = gl.getUniformLocation(shaderProgram, 'wrap');
 
         return vertexAttribsAsResult;
       }
@@ -12008,8 +12070,8 @@
         babelHelpers.get(HalfLambertAndWrapLightingShader.prototype.__proto__ || Object.getPrototypeOf(HalfLambertAndWrapLightingShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
 
         var Kd = material.diffuseColor;
-        gl.uniform4f(glslProgram.Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-        gl.uniform3f(glslProgram.wrap, this._wrap.x, this._wrap.y, this._wrap.z);
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform3f(material.uniform_wrap, this._wrap.x, this._wrap.y, this._wrap.z);
       }
     }, {
       key: 'wrap',

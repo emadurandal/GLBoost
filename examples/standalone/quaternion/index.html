@@ -42,7 +42,7 @@ var scene = glBoostContext.createScene();
 
 var material = glBoostContext.createClassicMaterial();
 var texture = glBoostContext.createTexture('resources/texture.png'); // earth.jpg
-material.diffuseTexture = texture;
+material.setTexture(texture);
 
 var shader = GLBoost.PhongShader;
 material.shaderClass = shader;
