@@ -41,6 +41,7 @@ Then, access http://localhost:3000/examples by your web browser.
 * Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
 * WebGL2.0 Ready (Currently, Firefox nightly and Chrome Canary)
 * User's Custom Shader Support
+* Obj and glTF loader
 
 ## Supported Browsers
 
