@@ -90,7 +90,7 @@ var scene = glBoostContext.createScene();
 // setup material
 var material = glBoostContext.createClassicMaterial();
 var texture = glBoostContext.createTexture('resources/texture.png');
-material.diffuseTexture = texture;
+material.setTexture(texture);
 material.shaderClass = GLBoost.PhongShader;
 
 // make a Sphere geometry
