@@ -8,8 +8,13 @@ import AABB from '../../../low_level/math/AABB';
 export default class M_Mesh extends M_Element {
   constructor(glBoostContext, geometry, material) {
     super(glBoostContext);
-    this.geometry = geometry;
-    this.material = material;
+
+    if (geometry) {
+      this.geometry = geometry;
+    }
+    if (material) {
+      this.material = material;
+    }
     this._transformedDepth = 0;
   }
 

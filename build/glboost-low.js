@@ -7201,6 +7201,53 @@
 
   GLBoost$1["Particle"] = Particle;
 
+  var Axis = function (_Geometry) {
+    babelHelpers.inherits(Axis, _Geometry);
+
+    function Axis(glBoostContext, length) {
+      babelHelpers.classCallCheck(this, Axis);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (Axis.__proto__ || Object.getPrototypeOf(Axis)).call(this, glBoostContext));
+
+      _this._setupVertexData(length);
+      return _this;
+    }
+
+    babelHelpers.createClass(Axis, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(length) {
+
+        var positions = [
+        // X Axis
+        new Vector3(0, 0, 0), new Vector3(length, 0, 0),
+
+        // Y Axis
+        new Vector3(0, 0, 0), new Vector3(0, length, 0),
+
+        // Z Axis
+        new Vector3(0, 0, 0), new Vector3(0, 0, length)];
+
+        var colors = [
+        // X Axis
+        new Vector4(1, 0, 0, 1), new Vector4(1, 0, 0, 1),
+
+        // Y Axis
+        new Vector4(0, 1, 0, 1), new Vector4(0, 1, 0, 1),
+
+        // Z Axis
+        new Vector4(0, 0, 1, 1), new Vector4(0, 0, 1, 1)];
+
+        this.setVerticesData({
+          position: positions,
+          color: colors
+        }, null, GLBoost$1.LINES);
+      }
+    }]);
+    return Axis;
+  }(Geometry);
+
+  GLBoost$1["Axis"] = Axis;
+
   var Sphere = function (_Geometry) {
     babelHelpers.inherits(Sphere, _Geometry);
 
@@ -7783,6 +7830,11 @@
       key: 'createSphere',
       value: function createSphere(radius, widthSegments, heightSegments, vertexColor) {
         return new Sphere(this, radius, widthSegments, heightSegments, vertexColor);
+      }
+    }, {
+      key: 'createAxis',
+      value: function createAxis(length) {
+        return new Axis(length);
       }
     }, {
       key: 'createParticle',

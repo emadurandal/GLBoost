@@ -12,6 +12,7 @@ import PhinaTexture from '../textures/PhinaTexture';
 import Cube from '../primitives/Cube';
 import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
+import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 
 export default class GLBoostLowContext {
@@ -51,6 +52,10 @@ export default class GLBoostLowContext {
 
   createSphere(radius, widthSegments, heightSegments, vertexColor) {
     return new Sphere(this, radius, widthSegments, heightSegments, vertexColor);
+  }
+
+  createAxis(length) {
+    return new Axis(length);
   }
 
   createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
