@@ -51,6 +51,9 @@
   var axisGizmo = glBoostContext.createAxisGizmo(1);
   scene.addChild(axisGizmo);
 
+  var gridGizmo = glBoostContext.createGridGizmo(3, 4, true, false, true, new GLBoost.Vector4(1, 1, 1, 1));
+  scene.addChild(gridGizmo);
+
   var camera = glBoostContext.createPerspectiveCamera(
       {
         eye: new GLBoost.Vector3(0.0, 1, 3),

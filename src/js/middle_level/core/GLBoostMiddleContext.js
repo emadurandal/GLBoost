@@ -13,6 +13,7 @@ import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import M_PointLight from '../elements/lights/M_PointLight';
 import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
+import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas) {
@@ -86,6 +87,10 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
 
   createAxisGizmo(length) {
     return new M_AxisGizmo(this, length);
+  }
+
+  createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
+    return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
   }
 
 }

@@ -12,18 +12,21 @@ export default class Axis extends Geometry {
 
   _setupVertexData(length) {
 
+    // to avoid z fighting with GridGizmo
+    let nearZeroValue = 0.0001;
+
     let positions = [
       // X Axis
-      new Vector3(0, 0, 0),
-      new Vector3(length,  0, 0),
+      new Vector3(0, nearZeroValue, nearZeroValue),
+      new Vector3(length,  nearZeroValue, nearZeroValue),
 
       // Y Axis
-      new Vector3(0, 0, 0),
-      new Vector3(0, length, 0),
+      new Vector3(nearZeroValue, 0, nearZeroValue),
+      new Vector3(nearZeroValue, length, nearZeroValue),
 
       // Z Axis
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, length),
+      new Vector3(nearZeroValue, nearZeroValue, 0),
+      new Vector3(nearZeroValue, nearZeroValue, length),
     ];
 
     let colors = [
