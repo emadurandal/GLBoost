@@ -10001,8 +10001,8 @@
         shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
         shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
         shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
-        shaderText += '    vec3 reflect = -view + 2.0 * max(dot(normal, view), 0.0) * normal;\n';
-        shaderText += '    float specular = pow(max(dot(light, reflect), 0.0), power);\n';
+        shaderText += '    vec3 reflect = reflect(light, normal);\n';
+        shaderText += '    float specular = pow(max(dot(reflect, view), 0.0), power);\n';
         shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
         shaderText += '  }\n';
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
