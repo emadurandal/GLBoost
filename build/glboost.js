@@ -10039,7 +10039,7 @@
 
       PhongShader.mixin(PhongShaderSource);
 
-      _this._power = 5.0;
+      _this._power = 64.0;
 
       return _this;
     }
@@ -11936,6 +11936,122 @@
       });
     });
   }
+
+  var BlinnPhongShaderSource = function () {
+    function BlinnPhongShaderSource() {
+      babelHelpers.classCallCheck(this, BlinnPhongShaderSource);
+    }
+
+    babelHelpers.createClass(BlinnPhongShaderSource, [{
+      key: 'FSDefine_BlinnPhongShaderSource',
+      value: function FSDefine_BlinnPhongShaderSource(in_, f, lights) {
+        var shaderText = '';
+        shaderText += 'uniform vec3 viewPosition;\n';
+        shaderText += 'uniform vec4 Kd;\n';
+        shaderText += 'uniform vec4 Ks;\n';
+        shaderText += 'uniform float power;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_BlinnPhongShaderSource',
+      value: function FSShade_BlinnPhongShaderSource(f, gl, lights) {
+        var shaderText = '';
+        shaderText += '  vec4 surfaceColor = rt0;\n';
+        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
+
+        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
+        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+
+        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
+        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+        shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
+        shaderText += '    vec3 halfVec = normalize(light + view);\n';
+        shaderText += '    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n';
+        shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
+
+        shaderText += '  }\n';
+        //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
+        //shaderText += '  rt0.a = 1.0;\n';
+
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_BlinnPhongShaderSource',
+      value: function prepare_BlinnPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+
+        var vertexAttribsAsResult = [];
+
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
+        material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
+
+        material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return BlinnPhongShaderSource;
+  }();
+
+  var BlinnPhongShader = function (_DecalShader) {
+    babelHelpers.inherits(BlinnPhongShader, _DecalShader);
+
+    function BlinnPhongShader(glBoostContext, basicShader) {
+      babelHelpers.classCallCheck(this, BlinnPhongShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (BlinnPhongShader.__proto__ || Object.getPrototypeOf(BlinnPhongShader)).call(this, glBoostContext, basicShader));
+
+      BlinnPhongShader.mixin(BlinnPhongShaderSource);
+
+      _this._power = 64.0;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(BlinnPhongShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(BlinnPhongShader.prototype.__proto__ || Object.getPrototypeOf(BlinnPhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        var Ks = material.specularColor;
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
+        gl.uniform1f(material.uniform_power, this._power);
+      }
+    }, {
+      key: 'Kd',
+      set: function set(value) {
+        this._Kd = value;
+      },
+      get: function get() {
+        return this._Kd;
+      }
+    }, {
+      key: 'Ks',
+      set: function set(value) {
+        this._Ks = value;
+      },
+      get: function get() {
+        return this._Ks;
+      }
+    }, {
+      key: 'power',
+      set: function set(value) {
+        this._power = value;
+      },
+      get: function get() {
+        return this._power;
+      }
+    }]);
+    return BlinnPhongShader;
+  }(DecalShader);
+
+  GLBoost['BlinnPhongShader'] = BlinnPhongShader;
 
   var LambertShaderSource = function () {
     function LambertShaderSource() {

@@ -19,6 +19,7 @@ import GLTFLoader from './loader/GLTFLoader';
 import GLBoost from './plugins/phina.glboost';
 import SimpleShader from './shaders/FragmentSimpleShader';
 import PhongShader from './shaders/PhongShader';
+import BlinnPhongShader from './shaders/BlinnPhongShader';
 import LambertShader from './shaders/LambertShader';
 import HalfLambertShader from './shaders/HalfLambertShader';
 import HalfLambertAndWrapLightingShader from './shaders/HalfLambertAndWrapLightingShader';

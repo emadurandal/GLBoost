@@ -58,7 +58,7 @@ export default class PhongShader extends DecalShader {
     super(glBoostContext, basicShader);
     PhongShader.mixin(PhongShaderSource);
 
-    this._power = 5.0;
+    this._power = 64.0;
 
   }
 
