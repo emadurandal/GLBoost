@@ -15,11 +15,15 @@ export default class GLBoostObject {
     }
     this._userFlavorName = '';
     this._readyForDiscard = false;
+
   }
 
   _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
-    this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
+    if (typeof GLBoostObject.classInfoDic[this.constructor.name] === 'undefined') {
+      GLBoostObject.classInfoDic[this.constructor.name] = {};
+    }
+    GLBoostObject.classInfoDic[this.constructor.name]._instanceCount = (typeof GLBoostObject.classInfoDic[this.constructor.name]._instanceCount === 'undefined') ? 0 : (GLBoostObject.classInfoDic[this.constructor.name]._instanceCount + 1);
+    this._instanceName = this.constructor.name + '_' + GLBoostObject.classInfoDic[this.constructor.name]._instanceCount;
   }
 
   /**
@@ -62,3 +66,5 @@ export default class GLBoostObject {
     instance._userFlavorName = this._userFlavorName;
   }
 }
+
+GLBoostObject.classInfoDic = {};
