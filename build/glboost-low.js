@@ -4494,6 +4494,17 @@
         // begin of main function
         shaderText += 'void main(void) {\n';
 
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfVSMethodDefine.forEach(function (className) {
+          var method = _this2['VSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
+          }
+        });
+
         /// Transform
         // start transforming. first, sub class Shader, ...
         // seconds, transform as mixin Shaders
@@ -4554,6 +4565,17 @@
           }
         });
         shaderText += this._removeDuplicatedLine(fsDefineShaderText);
+
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfFSMethodDefine.forEach(function (className) {
+          var method = _this3['FSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
+          }
+        });
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -4801,10 +4823,12 @@
       key: 'initMixinMethodArray',
       value: function initMixinMethodArray() {
         this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
+        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
         this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
         this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
         this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
+        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
         this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
 
         this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
@@ -4820,6 +4844,9 @@
         if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSDefine.push(source.name);
         }
+        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSMethodDefine.push(source.name);
+        }
         if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSTransform.push(source.name);
         }
@@ -4828,6 +4855,9 @@
         }
         if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSDefine.push(source.name);
+        }
+        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfFSMethodDefine.push(source.name);
         }
         if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSShade.push(source.name);
@@ -4850,6 +4880,10 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
         }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
+        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
@@ -4861,6 +4895,10 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
         if (matchIdx !== -1) {
@@ -4884,6 +4922,10 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
         }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
+        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
@@ -4895,6 +4937,10 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
         if (matchIdx !== -1) {
