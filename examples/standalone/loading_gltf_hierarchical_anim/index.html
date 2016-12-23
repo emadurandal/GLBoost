@@ -60,7 +60,7 @@ scene.addChild( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/hierarchical_anim/hierarchical_anim2.gltf', 1, null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/hierarchical_anim/hierarchical_anim2.gltf', null);
 promise.then(function(group) {
   console.log(group);
 

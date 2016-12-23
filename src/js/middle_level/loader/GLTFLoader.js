@@ -49,11 +49,10 @@ export default class GLTFLoader {
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
    * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-   * @param {number} scale [en] scale of size of loaded models [ja] 読み込んだモデルのサイズのスケール
    * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url, scale = 1.0, defaultShader = null) {
+  loadGLTF(glBoostContext, url, defaultShader = null) {
     return new Promise((resolve, reject) => {
       var oReq = new XMLHttpRequest();
       oReq.open("GET", url, true);
@@ -80,7 +79,7 @@ export default class GLTFLoader {
           for (var i = 0; i < partsOfPath.length - 1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          this._readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve);
+          this._readBuffers(glBoostContext, gotText, basePath, defaultShader, resolve);
 
           return;
         }
@@ -104,14 +103,14 @@ export default class GLTFLoader {
         let json = JSON.parse(gotText);
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-        this._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+        this._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
       };
 
       oReq.send(null);
     });
   }
 
-  _readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
+  _readBuffers(glBoostContext, gotText, basePath, defaultShader, resolve) {
     var json = JSON.parse(gotText);
 
     for (let bufferName in json.buffers) {
@@ -119,22 +118,22 @@ export default class GLTFLoader {
       let bufferInfo = json.buffers[bufferName];
 
       if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
-        this._loadInternalBase64Binary(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadInternalBase64Binary(glBoostContext, bufferInfo.uri, basePath, json, defaultShader, resolve);
       } else {
-        this._loadExternalBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadExternalBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, defaultShader, resolve);
       }
     }
   }
 
-  _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, defaultShader, resolve) {
     var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
 
     if (arrayBuffer) {
-      this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+      this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, resolve);
     }
   }
 
-  _loadExternalBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadExternalBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, defaultShader, resolve) {
     var oReq = new XMLHttpRequest();
     oReq.open("GET", binaryFilePath, true);
     oReq.responseType = "arraybuffer";
@@ -144,7 +143,7 @@ export default class GLTFLoader {
       var arrayBuffer = oReq.response;
 
       if (arrayBuffer) {
-        this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
+        this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, resolve);
       }
     };
 
@@ -167,7 +166,7 @@ export default class GLTFLoader {
     xmlHttp.send(null);
   }
 
-  _loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
+  _loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, resolve) {
     let shadersJson = json.shaders;
     let shaders = {};
     let promisesToLoadShaders = [];
@@ -208,15 +207,15 @@ export default class GLTFLoader {
           return Promise.all(promisesToLoadShaders);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, shaders, resolve);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+      this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, shaders, resolve);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve) {
+  _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, defaultShader, shaders, resolve) {
     let sceneStr = json.scene;
     let sceneJson = json.scenes[sceneStr];
 
@@ -227,7 +226,7 @@ export default class GLTFLoader {
       nodeStr = sceneJson.nodes[i];
 
       // iterate nodes and load meshes
-      let element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
+      let element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, defaultShader, shaders);
       group.addChild(element);
     }
 
@@ -240,14 +239,14 @@ export default class GLTFLoader {
     });
 
     // Animation
-    this._loadAnimation(group, arrayBuffer, json, canvas, scale);
+    this._loadAnimation(group, arrayBuffer, json);
 
     resolve(group);
   }
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders) {
+  _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, defaultShader, shaders) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -277,7 +276,7 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders);
+        let mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, defaultShader, rootJointStr, skinStr, shaders);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -289,17 +288,16 @@ export default class GLTFLoader {
 
     for (let i = 0; i < nodeJson.children.length; i++) {
       let nodeStr = nodeJson.children[i];
-      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
+      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, defaultShader, shaders);
       group.addChild(childElement);
     }
 
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders) {
+  _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, defaultShader, rootJointStr, skinStr, shaders) {
     var mesh = null;
     var geometry = null;
-    let gl = GLContext.getInstance(canvas).gl;
     if (rootJointStr) {
       geometry = glBoostContext.createSkeletalGeometry();
       mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
@@ -309,9 +307,9 @@ export default class GLTFLoader {
       mesh.jointNames = skin.jointNames;
 
       let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
-      mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
+      mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer);
     } else {
-      geometry = glBoostContext.createGeometry(canvas);
+      geometry = glBoostContext.createGeometry();
       mesh = glBoostContext.createMesh(geometry);
     }
 
@@ -340,18 +338,18 @@ export default class GLTFLoader {
 
       // Geometry
       let positionsAccessorStr = primitiveJson.attributes.POSITION;
-      let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl, false, true);
+      let positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, false, true);
       _positions[i] = positions;
-      vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json, gl);
-      vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
-      vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
-      dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
+      vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json);
+      vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json);
+      vertexData.componentType.position = this._getDataType(positionsAccessorStr, json);
+      dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json);
 
 
       let indices = null;
       if (typeof primitiveJson.indices !== 'undefined') {
         let indicesAccessorStr = primitiveJson.indices;
-        indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+        indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer);
         for (let j=0; j<indices.length; j++) {
           indices[j] = indicesAccumulatedLength + indices[j];
         }
@@ -362,44 +360,44 @@ export default class GLTFLoader {
 
       let normalsAccessorStr = primitiveJson.attributes.NORMAL;
       if (normalsAccessorStr) {
-        let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+        let normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, false, true);
         //Array.prototype.push.apply(_normals, normals);
         _normals[i] = normals;
-        vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
-        vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
-        vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
-        dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
+        vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json);
+        vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json);
+        vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json);
+        dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json);
       }
 
       /// if Skeletal
       let jointAccessorStr = primitiveJson.attributes.JOINT;
       if (jointAccessorStr) {
-        let joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+        let joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, false, true);
         additional['joint'][i] = joints;
-        vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json, gl);
-        vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json, gl);
-        vertexData.componentType.joint = this._getDataType(jointAccessorStr, json, gl);
-        dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json, gl);
+        vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json);
+        vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json);
+        vertexData.componentType.joint = this._getDataType(jointAccessorStr, json);
+        dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json);
       }
       let weightAccessorStr = primitiveJson.attributes.WEIGHT;
       if (weightAccessorStr) {
-        let weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+        let weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, false, true);
         additional['weight'][i] = weights;
-        vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json, gl);
-        vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json, gl);
-        vertexData.componentType.weight = this._getDataType(weightAccessorStr, json, gl);
-        dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json, gl);
+        vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json);
+        vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json);
+        vertexData.componentType.weight = this._getDataType(weightAccessorStr, json);
+        dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json);
       }
 
       // Texture
       let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
       var texcoords = null;
 
-      let material = glBoostContext.createClassicMaterial(canvas);
+      let material = glBoostContext.createClassicMaterial();
 
       let materialStr = primitiveJson.material;
 
-      texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
+      texcoords = this._loadMaterial(glBoostContext, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
 
       materials.push(material);
 
@@ -512,7 +510,7 @@ export default class GLTFLoader {
     return mesh;
   }
 
-  _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
+  _loadMaterial(glBoostContext, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
     let materialJson = json.materials[materialStr];
 
     if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -522,12 +520,12 @@ export default class GLTFLoader {
     let diffuseValue = materialJson.values.diffuse;
     // Diffuse Texture
     if (texcoords0AccessorStr) {
-      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+      texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, false, true);
       additional['texcoord'][idx] = texcoords;
-      vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
-      vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
-      vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
-      dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
+      vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json);
+      vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json);
+      vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json);
+      dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json);
 
       for (let valueName in materialJson.values) {
         let value = materialJson.values[valueName];
@@ -685,7 +683,7 @@ export default class GLTFLoader {
     material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
-  _loadAnimation(element, arrayBuffer, json, canvas, scale) {
+  _loadAnimation(element, arrayBuffer, json) {
     let animationJson = null;
     for (let anim in json.animations) {
       animationJson = json.animations[anim];
@@ -705,15 +703,14 @@ export default class GLTFLoader {
           let animInputAccessorStr = animationJson.parameters[animInputStr];
           let animOutputAccessorStr = animationJson.parameters[animOutputStr];
 
-          let gl = GLContext.getInstance(canvas).gl;
-          var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+          var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer);
           let animOutputArray = null;
           if (animOutputStr === 'translation') {
-            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer);
           } else if (animOutputStr === 'rotation') {
-            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, true);
           } else {
-            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+            animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer);
           }
 
           let animationAttributeName = '';
@@ -780,7 +777,7 @@ export default class GLTFLoader {
     return !!(new Uint8Array((new Uint16Array([0x00ff])).buffer))[0];
   }
 
-  _checkComponentNumber(accessorStr, json, gl) {
+  _checkComponentNumber(accessorStr, json) {
     var accessorJson = json.accessors[accessorStr];
 
     var componentN = 0;
@@ -805,30 +802,30 @@ export default class GLTFLoader {
     return componentN;
   }
 
-  _checkBytesPerComponent(accessorStr, json, gl) {
-    var accessorJson = json.accessors[accessorStr];;
+  _checkBytesPerComponent(accessorStr, json) {
+    var accessorJson = json.accessors[accessorStr];
 
     var bytesPerComponent = 0;
     switch (accessorJson.componentType) {
-      case gl.BYTE:
+      case 5120: // gl.BYTE
         bytesPerComponent = 1;
         break;
-      case gl.UNSIGNED_BYTE:
+      case 5121: // gl.UNSIGNED_BYTE
         bytesPerComponent = 1;
         break;
-      case gl.SHORT:
+      case 5122: // gl.SHORT
         bytesPerComponent = 2;
         break;
-      case gl.UNSIGNED_SHORT:
+      case 5123: // gl.UNSIGNED_SHORT
         bytesPerComponent = 2;
         break;
-      case gl.INT:
+      case 5124: // gl.INT
         bytesPerComponent = 4;
         break;
-      case gl.UNSIGNED_INT:
+      case 5125: // gl.UNSIGNED_INT
         bytesPerComponent = 4;
         break;
-      case gl.FLOAT:
+      case 5126: // gl.FLOAT
         bytesPerComponent = 4;
         break;
       default:
@@ -837,29 +834,29 @@ export default class GLTFLoader {
     return bytesPerComponent;
   }
 
-  _checkDataViewMethod(accessorStr, json, gl) {
+  _checkDataViewMethod(accessorStr, json) {
     var accessorJson = json.accessors[accessorStr];
     var dataViewMethod = '';
     switch (accessorJson.componentType) {
-      case gl.BYTE:
+      case 5120: // gl.BYTE
         dataViewMethod = 'getInt8';
         break;
-      case gl.UNSIGNED_BYTE:
+      case 5121: // gl.UNSIGNED_BYTE
         dataViewMethod = 'getUint8';
         break;
-      case gl.SHORT:
+      case 5122: // gl.SHORT
         dataViewMethod = 'getInt16';
         break;
-      case gl.UNSIGNED_SHORT:
+      case 5123: // gl.UNSIGNED_SHORT
         dataViewMethod = 'getUint16';
         break;
-      case gl.INT:
+      case 5124: // gl.INT
         dataViewMethod = 'getInt33';
         break;
-      case gl.UNSIGNED_INT:
+      case 5125: // gl.UNSIGNED_INT
         dataViewMethod = 'getUint33';
         break;
-      case gl.FLOAT:
+      case 5126: // gl.FLOAT
         dataViewMethod = 'getFloat32';
         break;
       default:
@@ -868,20 +865,20 @@ export default class GLTFLoader {
     return dataViewMethod;
   }
 
-  _getDataType(accessorStr, json, gl) {
+  _getDataType(accessorStr, json) {
     var accessorJson = json.accessors[accessorStr];
     return accessorJson.componentType;
   }
 
-  _accessBinary(accessorStr, json, arrayBuffer, scale, gl, quaternionIfVec4 = false, toGetAsTypedArray = false) {
+  _accessBinary(accessorStr, json, arrayBuffer, quaternionIfVec4 = false, toGetAsTypedArray = false) {
     var accessorJson = json.accessors[accessorStr];
     var bufferViewStr = accessorJson.bufferView;
     var bufferViewJson = json.bufferViews[bufferViewStr];
     var byteOffset = bufferViewJson.byteOffset + accessorJson.byteOffset;
 
-    let componentN = this._checkComponentNumber(accessorStr, json, gl);
-    let bytesPerComponent = this._checkBytesPerComponent(accessorStr, json, gl);
-    var dataViewMethod = this._checkDataViewMethod(accessorStr, json, gl);
+    let componentN = this._checkComponentNumber(accessorStr, json);
+    let bytesPerComponent = this._checkBytesPerComponent(accessorStr, json);
+    var dataViewMethod = this._checkDataViewMethod(accessorStr, json);
 
 
     var byteLength = bytesPerComponent * componentN * accessorJson.count;
@@ -916,19 +913,19 @@ export default class GLTFLoader {
               vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
               break;
             case 'VEC2':
-              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
+              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
               break;
             case 'VEC3':
-              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
+              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian));
               break;
             case 'VEC4':
-              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
-              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian) * scale);
+              vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian));
+              vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian));
               break;
           }
         }
@@ -960,15 +957,15 @@ export default class GLTFLoader {
             break;
           case 'VEC2':
             vertexAttributeArray.push(new Vector2(
-              dataView[dataViewMethod](pos, littleEndian)*scale,
-              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale
+              dataView[dataViewMethod](pos, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)
             ));
             break;
           case 'VEC3':
             vertexAttributeArray.push(new Vector3(
-              dataView[dataViewMethod](pos, littleEndian)*scale,
-              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
-              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale
+              dataView[dataViewMethod](pos, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
+              dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)
             ));
             break;
           case 'VEC4':
@@ -981,9 +978,9 @@ export default class GLTFLoader {
               ));
             } else {
               vertexAttributeArray.push(new Vector4(
-                dataView[dataViewMethod](pos, littleEndian)*scale,
-                dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)*scale,
-                dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)*scale,
+                dataView[dataViewMethod](pos, littleEndian),
+                dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
+                dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
               ));
             }
@@ -991,7 +988,7 @@ export default class GLTFLoader {
           case 'MAT4':
             let matrixComponents = [];
             for (let i=0; i<16; i++) {
-              matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian)*scale;
+              matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian);
             }
             vertexAttributeArray.push(new Matrix44(matrixComponents, true));
             break;

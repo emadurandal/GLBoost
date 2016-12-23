@@ -61,7 +61,7 @@ camera.cameraController = glBoostContext.createCameraController(true, false, fal
 scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/head/head.gltf', 1, GLBoost.HalfLambertAndWrapLightingShader);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/head/head.gltf', GLBoost.HalfLambertAndWrapLightingShader);
 promise.then(function(mesh) {
   console.log(mesh);
 

@@ -101,6 +101,9 @@ export default class FreeShader extends Shader {
           }
           continue;
       }
+
+      material['uniform_' + uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
+
     }
 
     return vertexAttribsAsResult;
@@ -113,10 +116,7 @@ export default class FreeShader extends Shader {
   setUniforms(gl, glslProgram, material) {
 
     for (let uniformName in this._uniforms) {
-      material['uniform_' + uniformName] = gl.getUniformLocation(glslProgram, uniformName);
       let value = this._uniforms[uniformName];
-
-      gl.useProgram(glslProgram);
 
       if (typeof value === 'number') {
         gl.uniform1f(material['uniform_' + uniformName], value);
