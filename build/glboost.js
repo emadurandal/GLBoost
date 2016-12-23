@@ -7508,6 +7508,8 @@
               }
               continue;
           }
+
+          material['uniform_' + uniformName] = gl.getUniformLocation(shaderProgram, uniformName);
         }
 
         return vertexAttribsAsResult;
@@ -7517,10 +7519,7 @@
       value: function setUniforms(gl, glslProgram, material) {
 
         for (var uniformName in this._uniforms) {
-          material['uniform_' + uniformName] = gl.getUniformLocation(glslProgram, uniformName);
           var value = this._uniforms[uniformName];
-
-          gl.useProgram(glslProgram);
 
           if (typeof value === 'number') {
             gl.uniform1f(material['uniform_' + uniformName], value);
@@ -10883,15 +10882,13 @@
        * [en] the method to load glTF file.<br>
        * [ja] glTF fileをロードするためのメソッド。
        * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-       * @param {number} scale [en] scale of size of loaded models [ja] 読み込んだモデルのサイズのスケール
        * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
        * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
        */
       value: function loadGLTF(glBoostContext, url) {
         var _this = this;
 
-        var scale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
-        var defaultShader = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+        var defaultShader = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
         return new Promise(function (resolve, reject) {
           var oReq = new XMLHttpRequest();
@@ -10919,7 +10916,8 @@
               for (var i = 0; i < partsOfPath.length - 1; i++) {
                 basePath += partsOfPath[i] + '/';
               }
-              _this._readBuffers(glBoostContext, _gotText, basePath, canvas, scale, defaultShader, resolve);
+              var _json = JSON.parse(_gotText);
+              _this._loadResourcesAndScene(glBoostContext, null, basePath, _json, defaultShader, resolve);
 
               return;
             }
@@ -10943,55 +10941,11 @@
             var json = JSON.parse(gotText);
             var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-            _this._loadShadersAndScene(glBoostContext, arrayBufferBinary, null, json, canvas, scale, defaultShader, resolve);
+            _this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
           };
 
           oReq.send(null);
         });
-      }
-    }, {
-      key: '_readBuffers',
-      value: function _readBuffers(glBoostContext, gotText, basePath, canvas, scale, defaultShader, resolve) {
-        var json = JSON.parse(gotText);
-
-        for (var bufferName in json.buffers) {
-          //console.log("name: " + bufferName + " data:" + );
-          var bufferInfo = json.buffers[bufferName];
-
-          if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
-            this._loadInternalBase64Binary(glBoostContext, bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
-          } else {
-            this._loadExternalBinaryFileUsingXHR(glBoostContext, basePath + bufferInfo.uri, basePath, json, canvas, scale, defaultShader, resolve);
-          }
-        }
-      }
-    }, {
-      key: '_loadInternalBase64Binary',
-      value: function _loadInternalBase64Binary(glBoostContext, dataUri, basePath, json, canvas, scale, defaultShader, resolve) {
-        var arrayBuffer = DataUtil.base64ToArrayBuffer(dataUri);
-
-        if (arrayBuffer) {
-          this._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
-        }
-      }
-    }, {
-      key: '_loadExternalBinaryFileUsingXHR',
-      value: function _loadExternalBinaryFileUsingXHR(glBoostContext, binaryFilePath, basePath, json, canvas, scale, defaultShader, resolve) {
-        var _this2 = this;
-
-        var oReq = new XMLHttpRequest();
-        oReq.open("GET", binaryFilePath, true);
-        oReq.responseType = "arraybuffer";
-
-        oReq.onload = function (oEvent) {
-          var arrayBuffer = oReq.response;
-
-          if (arrayBuffer) {
-            _this2._loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve);
-          }
-        };
-
-        oReq.send(null);
       }
     }, {
       key: '_asyncShaderAccess',
@@ -11010,13 +10964,28 @@
         xmlHttp.send(null);
       }
     }, {
-      key: '_loadShadersAndScene',
-      value: function _loadShadersAndScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, resolve) {
-        var _this3 = this;
+      key: '_asyncBufferAccess',
+      value: function _asyncBufferAccess(fulfilled, bufferUri, buffers, bufferName) {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function () {
+          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+            buffers[bufferName] = xmlHttp.response;
+            fulfilled();
+          }
+        };
+        xmlHttp.responseType = "arraybuffer";
+        xmlHttp.open("GET", bufferUri, true);
+        xmlHttp.send(null);
+      }
+    }, {
+      key: '_loadResourcesAndScene',
+      value: function _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, resolve) {
+        var _this2 = this;
 
         var shadersJson = json.shaders;
         var shaders = {};
-        var promisesToLoadShaders = [];
+        var buffers = {};
+        var promisesToLoadResources = [];
 
         var _loop = function _loop(shaderName) {
           shaders[shaderName] = {};
@@ -11024,14 +10993,14 @@
           var shaderJson = shadersJson[shaderName];
           var shaderType = shaderJson.type;
           if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
-            shaders[shaderName].shaderText = _this3._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer);
+            shaders[shaderName].shaderText = _this2._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
             shaders[shaderName].shaderType = shaderType;
             return 'continue';
           }
 
           var shaderUri = shaderJson.uri;
           if (shaderUri.match(/^data:/)) {
-            promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
+            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
               var arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
               shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
               shaders[shaderName].shaderType = shaderType;
@@ -11039,8 +11008,8 @@
             }));
           } else {
             shaderUri = basePath + shaderUri;
-            promisesToLoadShaders.push(new Promise(function (fulfilled, rejected) {
-              _this3._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
+            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
+              _this2._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
             }));
           }
         };
@@ -11051,19 +11020,41 @@
           if (_ret === 'continue') continue;
         }
 
-        if (promisesToLoadShaders.length > 0) {
+        var _loop2 = function _loop2(bufferName) {
+          var bufferInfo = json.buffers[bufferName];
+
+          if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
+              var arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
+              buffers[bufferName] = arrayBuffer;
+              fulfilled();
+            }));
+          } else if (bufferInfo.uri === 'data:,') {
+            buffers[bufferName] = arrayBufferBinary;
+          } else {
+            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
+              _this2._asyncBufferAccess(fulfilled, basePath + bufferInfo.uri, buffers, bufferName);
+            }));
+          }
+        };
+
+        for (var bufferName in json.buffers) {
+          _loop2(bufferName);
+        }
+
+        if (promisesToLoadResources.length > 0) {
           Promise.resolve().then(function () {
-            return Promise.all(promisesToLoadShaders);
+            return Promise.all(promisesToLoadResources);
           }).then(function () {
-            _this3._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+            _this2._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
           });
         } else {
-          this._IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
         }
       }
     }, {
       key: '_IterateNodeOfScene',
-      value: function _IterateNodeOfScene(glBoostContext, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders, resolve) {
+      value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve) {
         var sceneStr = json.scene;
         var sceneJson = json.scenes[sceneStr];
 
@@ -11074,7 +11065,7 @@
           nodeStr = sceneJson.nodes[i];
 
           // iterate nodes and load meshes
-          var element = this._recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
+          var element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders);
           group.addChild(element);
         }
 
@@ -11087,13 +11078,13 @@
         });
 
         // Animation
-        this._loadAnimation(group, arrayBuffer, json, canvas, scale);
+        this._loadAnimation(group, buffers, json);
 
         resolve(group);
       }
     }, {
       key: '_recursiveIterateNode',
-      value: function _recursiveIterateNode(glBoostContext, nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders) {
+      value: function _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders) {
         var nodeJson = json.nodes[nodeStr];
         var group = glBoostContext.createGroup();
         group.userFlavorName = nodeStr;
@@ -11123,7 +11114,7 @@
               rootJointStr = nodeJson.skeletons[0];
               skinStr = nodeJson.skin;
             }
-            var mesh = this._loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders);
+            var mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders);
             mesh.userFlavorName = meshStr;
             group.addChild(mesh);
           }
@@ -11135,7 +11126,7 @@
 
         for (var _i = 0; _i < nodeJson.children.length; _i++) {
           var _nodeStr = nodeJson.children[_i];
-          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, arrayBuffer, basePath, json, canvas, scale, defaultShader, shaders);
+          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders);
           group.addChild(childElement);
         }
 
@@ -11143,10 +11134,9 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(glBoostContext, meshJson, arrayBuffer, basePath, json, canvas, scale, defaultShader, rootJointStr, skinStr, shaders) {
+      value: function _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders) {
         var mesh = null;
         var geometry = null;
-        var gl = GLContext.getInstance(canvas).gl;
         if (rootJointStr) {
           geometry = glBoostContext.createSkeletalGeometry();
           mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
@@ -11156,9 +11146,9 @@
           mesh.jointNames = skin.jointNames;
 
           var inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
-          mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, arrayBuffer, 1.0, gl);
+          mesh.inverseBindMatrices = this._accessBinary(inverseBindMatricesAccessorStr, json, buffers);
         } else {
-          geometry = glBoostContext.createGeometry(canvas);
+          geometry = glBoostContext.createGeometry();
           mesh = glBoostContext.createMesh(geometry);
         }
 
@@ -11187,17 +11177,17 @@
 
           // Geometry
           var positionsAccessorStr = primitiveJson.attributes.POSITION;
-          var positions = this._accessBinary(positionsAccessorStr, json, arrayBuffer, scale, gl, false, true);
+          var positions = this._accessBinary(positionsAccessorStr, json, buffers, false, true);
           _positions[i] = positions;
-          vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json, gl);
-          vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json, gl);
-          vertexData.componentType.position = this._getDataType(positionsAccessorStr, json, gl);
-          dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json, gl);
+          vertexData.components.position = this._checkComponentNumber(positionsAccessorStr, json);
+          vertexData.componentBytes.position = this._checkBytesPerComponent(positionsAccessorStr, json);
+          vertexData.componentType.position = this._getDataType(positionsAccessorStr, json);
+          dataViewMethodDic.position = this._checkDataViewMethod(positionsAccessorStr, json);
 
           var indices = null;
           if (typeof primitiveJson.indices !== 'undefined') {
             var indicesAccessorStr = primitiveJson.indices;
-            indices = this._accessBinary(indicesAccessorStr, json, arrayBuffer, 1.0, gl);
+            indices = this._accessBinary(indicesAccessorStr, json, buffers);
             for (var j = 0; j < indices.length; j++) {
               indices[j] = indicesAccumulatedLength + indices[j];
             }
@@ -11207,44 +11197,44 @@
 
           var normalsAccessorStr = primitiveJson.attributes.NORMAL;
           if (normalsAccessorStr) {
-            var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            var normals = this._accessBinary(normalsAccessorStr, json, buffers, false, true);
             //Array.prototype.push.apply(_normals, normals);
             _normals[i] = normals;
-            vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
-            vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
-            vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
-            dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
+            vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json);
+            vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json);
+            vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json);
+            dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json);
           }
 
           /// if Skeletal
           var jointAccessorStr = primitiveJson.attributes.JOINT;
           if (jointAccessorStr) {
-            var joints = this._accessBinary(jointAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            var joints = this._accessBinary(jointAccessorStr, json, buffers, false, true);
             additional['joint'][i] = joints;
-            vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json, gl);
-            vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json, gl);
-            vertexData.componentType.joint = this._getDataType(jointAccessorStr, json, gl);
-            dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json, gl);
+            vertexData.components.joint = this._checkComponentNumber(jointAccessorStr, json);
+            vertexData.componentBytes.joint = this._checkBytesPerComponent(jointAccessorStr, json);
+            vertexData.componentType.joint = this._getDataType(jointAccessorStr, json);
+            dataViewMethodDic.joint = this._checkDataViewMethod(jointAccessorStr, json);
           }
           var weightAccessorStr = primitiveJson.attributes.WEIGHT;
           if (weightAccessorStr) {
-            var weights = this._accessBinary(weightAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            var weights = this._accessBinary(weightAccessorStr, json, buffers, false, true);
             additional['weight'][i] = weights;
-            vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json, gl);
-            vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json, gl);
-            vertexData.componentType.weight = this._getDataType(weightAccessorStr, json, gl);
-            dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json, gl);
+            vertexData.components.weight = this._checkComponentNumber(weightAccessorStr, json);
+            vertexData.componentBytes.weight = this._checkBytesPerComponent(weightAccessorStr, json);
+            vertexData.componentType.weight = this._getDataType(weightAccessorStr, json);
+            dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json);
           }
 
           // Texture
           var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
           var texcoords = null;
 
-          var material = glBoostContext.createClassicMaterial(canvas);
+          var material = glBoostContext.createClassicMaterial();
 
           var materialStr = primitiveJson.material;
 
-          texcoords = this._loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
+          texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
 
           materials.push(material);
         }
@@ -11354,7 +11344,7 @@
       }
     }, {
       key: '_loadMaterial',
-      value: function _loadMaterial(glBoostContext, gl, basePath, arrayBuffer, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
+      value: function _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
         var materialJson = json.materials[materialStr];
 
         if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -11364,12 +11354,12 @@
         var diffuseValue = materialJson.values.diffuse;
         // Diffuse Texture
         if (texcoords0AccessorStr) {
-          texcoords = this._accessBinary(texcoords0AccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+          texcoords = this._accessBinary(texcoords0AccessorStr, json, buffers, false, true);
           additional['texcoord'][idx] = texcoords;
-          vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json, gl);
-          vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json, gl);
-          vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json, gl);
-          dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json, gl);
+          vertexData.components.texcoord = this._checkComponentNumber(texcoords0AccessorStr, json);
+          vertexData.componentBytes.texcoord = this._checkBytesPerComponent(texcoords0AccessorStr, json);
+          vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json);
+          dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json);
 
           for (var valueName in materialJson.values) {
             var value = materialJson.values[valueName];
@@ -11382,7 +11372,7 @@
               var textureUri = null;
 
               if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBuffer, imageJson.extensions.KHR_binary_glTF.mimeType);
+                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
               } else {
                 var imageFileStr = imageJson.uri;
                 if (imageFileStr.match(/^data:/)) {
@@ -11527,7 +11517,7 @@
       }
     }, {
       key: '_loadAnimation',
-      value: function _loadAnimation(element, arrayBuffer, json, canvas, scale) {
+      value: function _loadAnimation(element, buffers, json) {
         var animationJson = null;
         for (var anim in json.animations) {
           animationJson = json.animations[anim];
@@ -11547,15 +11537,14 @@
               var animInputAccessorStr = animationJson.parameters[animInputStr];
               var animOutputAccessorStr = animationJson.parameters[animOutputStr];
 
-              var gl = GLContext.getInstance(canvas).gl;
-              var animInputArray = this._accessBinary(animInputAccessorStr, json, arrayBuffer, 1.0, gl);
+              var animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
               var animOutputArray = null;
               if (animOutputStr === 'translation') {
-                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, scale, gl);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
               } else if (animOutputStr === 'rotation') {
-                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl, true);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers, true);
               } else {
-                animOutputArray = this._accessBinary(animOutputAccessorStr, json, arrayBuffer, 1.0, gl);
+                animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
               }
 
               var animationAttributeName = '';
@@ -11590,10 +11579,11 @@
       }
     }, {
       key: '_accessBinaryAsImage',
-      value: function _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+      value: function _accessBinaryAsImage(bufferViewStr, json, buffers, mimeType) {
         var bufferViewJson = json.bufferViews[bufferViewStr];
         var byteOffset = bufferViewJson.byteOffset;
         var byteLength = bufferViewJson.byteLength;
+        var arrayBuffer = buffers[bufferViewJson.buffer];
 
         var arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
         var bytes = new Uint8Array(arrayBufferSliced);
@@ -11619,7 +11609,7 @@
       }
     }, {
       key: '_checkComponentNumber',
-      value: function _checkComponentNumber(accessorStr, json, gl) {
+      value: function _checkComponentNumber(accessorStr, json) {
         var accessorJson = json.accessors[accessorStr];
 
         var componentN = 0;
@@ -11645,30 +11635,37 @@
       }
     }, {
       key: '_checkBytesPerComponent',
-      value: function _checkBytesPerComponent(accessorStr, json, gl) {
-        var accessorJson = json.accessors[accessorStr];;
+      value: function _checkBytesPerComponent(accessorStr, json) {
+        var accessorJson = json.accessors[accessorStr];
 
         var bytesPerComponent = 0;
         switch (accessorJson.componentType) {
-          case gl.BYTE:
+          case 5120:
+            // gl.BYTE
             bytesPerComponent = 1;
             break;
-          case gl.UNSIGNED_BYTE:
+          case 5121:
+            // gl.UNSIGNED_BYTE
             bytesPerComponent = 1;
             break;
-          case gl.SHORT:
+          case 5122:
+            // gl.SHORT
             bytesPerComponent = 2;
             break;
-          case gl.UNSIGNED_SHORT:
+          case 5123:
+            // gl.UNSIGNED_SHORT
             bytesPerComponent = 2;
             break;
-          case gl.INT:
+          case 5124:
+            // gl.INT
             bytesPerComponent = 4;
             break;
-          case gl.UNSIGNED_INT:
+          case 5125:
+            // gl.UNSIGNED_INT
             bytesPerComponent = 4;
             break;
-          case gl.FLOAT:
+          case 5126:
+            // gl.FLOAT
             bytesPerComponent = 4;
             break;
           default:
@@ -11678,29 +11675,36 @@
       }
     }, {
       key: '_checkDataViewMethod',
-      value: function _checkDataViewMethod(accessorStr, json, gl) {
+      value: function _checkDataViewMethod(accessorStr, json) {
         var accessorJson = json.accessors[accessorStr];
         var dataViewMethod = '';
         switch (accessorJson.componentType) {
-          case gl.BYTE:
+          case 5120:
+            // gl.BYTE
             dataViewMethod = 'getInt8';
             break;
-          case gl.UNSIGNED_BYTE:
+          case 5121:
+            // gl.UNSIGNED_BYTE
             dataViewMethod = 'getUint8';
             break;
-          case gl.SHORT:
+          case 5122:
+            // gl.SHORT
             dataViewMethod = 'getInt16';
             break;
-          case gl.UNSIGNED_SHORT:
+          case 5123:
+            // gl.UNSIGNED_SHORT
             dataViewMethod = 'getUint16';
             break;
-          case gl.INT:
+          case 5124:
+            // gl.INT
             dataViewMethod = 'getInt33';
             break;
-          case gl.UNSIGNED_INT:
+          case 5125:
+            // gl.UNSIGNED_INT
             dataViewMethod = 'getUint33';
             break;
-          case gl.FLOAT:
+          case 5126:
+            // gl.FLOAT
             dataViewMethod = 'getFloat32';
             break;
           default:
@@ -11710,24 +11714,26 @@
       }
     }, {
       key: '_getDataType',
-      value: function _getDataType(accessorStr, json, gl) {
+      value: function _getDataType(accessorStr, json) {
         var accessorJson = json.accessors[accessorStr];
         return accessorJson.componentType;
       }
     }, {
       key: '_accessBinary',
-      value: function _accessBinary(accessorStr, json, arrayBuffer, scale, gl) {
-        var quaternionIfVec4 = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
-        var toGetAsTypedArray = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+      value: function _accessBinary(accessorStr, json, buffers) {
+        var quaternionIfVec4 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+        var toGetAsTypedArray = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
         var accessorJson = json.accessors[accessorStr];
         var bufferViewStr = accessorJson.bufferView;
         var bufferViewJson = json.bufferViews[bufferViewStr];
         var byteOffset = bufferViewJson.byteOffset + accessorJson.byteOffset;
+        var bufferStr = bufferViewJson.buffer;
+        var arrayBuffer = buffers[bufferStr];
 
-        var componentN = this._checkComponentNumber(accessorStr, json, gl);
-        var bytesPerComponent = this._checkBytesPerComponent(accessorStr, json, gl);
-        var dataViewMethod = this._checkDataViewMethod(accessorStr, json, gl);
+        var componentN = this._checkComponentNumber(accessorStr, json);
+        var bytesPerComponent = this._checkBytesPerComponent(accessorStr, json);
+        var dataViewMethod = this._checkDataViewMethod(accessorStr, json);
 
         var byteLength = bytesPerComponent * componentN * accessorJson.count;
 
@@ -11760,19 +11766,19 @@
                   vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
                   break;
                 case 'VEC2':
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
                   break;
                 case 'VEC3':
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian));
                   break;
                 case 'VEC4':
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian) * scale);
-                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian) * scale);
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 2, littleEndian));
+                  vertexAttributeArray.push(dataView[dataViewMethod](pos + bytesPerComponent * 3, littleEndian));
                   break;
               }
             }
@@ -11803,22 +11809,22 @@
                 vertexAttributeArray.push(_dataView[dataViewMethod](_pos, _littleEndian));
                 break;
               case 'VEC2':
-                vertexAttributeArray.push(new Vector2(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale));
+                vertexAttributeArray.push(new Vector2(_dataView[dataViewMethod](_pos, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian)));
                 break;
               case 'VEC3':
-                vertexAttributeArray.push(new Vector3(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian) * scale));
+                vertexAttributeArray.push(new Vector3(_dataView[dataViewMethod](_pos, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian)));
                 break;
               case 'VEC4':
                 if (quaternionIfVec4) {
                   vertexAttributeArray.push(new Quaternion(_dataView[dataViewMethod](_pos, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 3, _littleEndian)));
                 } else {
-                  vertexAttributeArray.push(new Vector4(_dataView[dataViewMethod](_pos, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian) * scale, _dataView[dataViewMethod](_pos + bytesPerComponent * 3, _littleEndian)));
+                  vertexAttributeArray.push(new Vector4(_dataView[dataViewMethod](_pos, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 2, _littleEndian), _dataView[dataViewMethod](_pos + bytesPerComponent * 3, _littleEndian)));
                 }
                 break;
               case 'MAT4':
                 var matrixComponents = [];
                 for (var i = 0; i < 16; i++) {
-                  matrixComponents[i] = _dataView[dataViewMethod](_pos + bytesPerComponent * i, _littleEndian) * scale;
+                  matrixComponents[i] = _dataView[dataViewMethod](_pos + bytesPerComponent * i, _littleEndian);
                 }
                 vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
                 break;
