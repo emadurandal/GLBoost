@@ -11206,13 +11206,15 @@
           }
 
           var normalsAccessorStr = primitiveJson.attributes.NORMAL;
-          var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
-          //Array.prototype.push.apply(_normals, normals);
-          _normals[i] = normals;
-          vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
-          vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
-          vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
-          dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
+          if (normalsAccessorStr) {
+            var normals = this._accessBinary(normalsAccessorStr, json, arrayBuffer, 1.0, gl, false, true);
+            //Array.prototype.push.apply(_normals, normals);
+            _normals[i] = normals;
+            vertexData.components.normal = this._checkComponentNumber(normalsAccessorStr, json, gl);
+            vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json, gl);
+            vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json, gl);
+            dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json, gl);
+          }
 
           /// if Skeletal
           var jointAccessorStr = primitiveJson.attributes.JOINT;
@@ -11328,6 +11330,9 @@
           additional['texcoord'] = additional['texcoord'][0];
         }
 
+        if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
+          delete vertexData.normal;
+        }
         if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
           delete additional['joint'];
         }
