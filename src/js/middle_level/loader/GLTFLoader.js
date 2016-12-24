@@ -846,10 +846,10 @@ export default class GLTFLoader {
         dataViewMethod = 'getUint16';
         break;
       case 5124: // gl.INT
-        dataViewMethod = 'getInt33';
+        dataViewMethod = 'getInt32';
         break;
       case 5125: // gl.UNSIGNED_INT
-        dataViewMethod = 'getUint33';
+        dataViewMethod = 'getUint32';
         break;
       case 5126: // gl.FLOAT
         dataViewMethod = 'getFloat32';
