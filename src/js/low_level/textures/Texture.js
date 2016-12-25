@@ -58,7 +58,7 @@ export default class Texture extends AbstractTexture {
     if (isNode) {
       let getPixels = require("get-pixels");
 
-      let results = getPixels(imageUri, function(err, pixels) {
+      let results = getPixels(imageUri, (err, pixels) => {
         if(err) {
           console.log("Bad image path");
           return;

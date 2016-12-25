@@ -8355,15 +8355,15 @@
               return;
             }
 
-            var texture = this._generateTextureInner(pixels.data, isKeepBound);
+            var texture = _this2._generateTextureInner(pixels.data, isKeepBound);
 
-            this._width = pixels.shape[0];
-            this._height = pixels.shape[1];
+            _this2._width = pixels.shape[0];
+            _this2._height = pixels.shape[1];
 
-            this._texture = texture;
-            this._isTextureReady = true;
+            _this2._texture = texture;
+            _this2._isTextureReady = true;
 
-            this._onLoad();
+            _this2._onLoad();
           });
         } else {
           this._img = new Image();
