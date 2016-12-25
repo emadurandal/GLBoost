@@ -64,10 +64,10 @@ export default class Texture extends AbstractTexture {
           return;
         }
 
-        let texture = this._generateTextureInner(pixels.data, isKeepBound);
-
         this._width = pixels.shape[0];
         this._height = pixels.shape[1];
+
+        let texture = this._generateTextureInnerWithArrayBufferView(pixels.data, this._width, this._height, isKeepBound);
 
         this._texture = texture;
         this._isTextureReady = true;
@@ -113,6 +113,30 @@ export default class Texture extends AbstractTexture {
     this._img = imageData;
 
     this._onLoad();
+  }
+
+  _generateTextureInnerWithArrayBufferView(imgCanvas, width, height, isKeepBound) {
+    var gl = this._glContext.gl;
+    var glem = GLExtensionsManager.getInstance(this._glContext);
+    var texture = this._glContext.createTexture(this);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative('UNPACK_FLIP_Y_WEBGL', false));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
+
+    if (glem.extTFA) {
+      gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+    }
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative('TEXTURE_MAG_FILTER', gl.LINEAR));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative('TEXTURE_MIN_FILTER', gl.LINEAR_MIPMAP_LINEAR));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative('TEXTURE_WRAP_S', gl.REPEAT));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative('TEXTURE_WRAP_T', gl.REPEAT));
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    if (!isKeepBound) {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+    return texture;
   }
 
   _generateTextureInner(imgCanvas, isKeepBound) {
