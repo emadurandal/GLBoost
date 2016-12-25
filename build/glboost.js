@@ -8347,9 +8347,6 @@
 
         var isNode = typeof process !== "undefined" && typeof require !== "undefined";
         if (isNode) {
-          this._texture = texture;
-          this._isTextureReady = true;
-
           var getPixels = require("get-pixels");
 
           var results = getPixels(imageUri, function (err, pixels) {

@@ -54,11 +54,8 @@ export default class Texture extends AbstractTexture {
   }
 
   _generateTextureFromUri(imageUri, isKeepBound = false) {
-    var isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
     if (isNode) {
-      this._texture = texture;
-      this._isTextureReady = true;
-
       let getPixels = require("get-pixels");
 
       let results = getPixels(imageUri, function(err, pixels) {
@@ -83,11 +80,11 @@ export default class Texture extends AbstractTexture {
         this._img.crossOrigin = 'Anonymous';
       }
       this._img.onload = () => {
-        var imgCanvas = this._getResizedCanvas(this._img);
+        let imgCanvas = this._getResizedCanvas(this._img);
         this._width = imgCanvas.width;
         this._height = imgCanvas.height;
 
-        var texture = this._generateTextureInner(imgCanvas, isKeepBound);
+        let texture = this._generateTextureInner(imgCanvas, isKeepBound);
 
         this._texture = texture;
         this._isTextureReady = true;
