@@ -216,7 +216,6 @@ export default class Particle extends Geometry {
 
   prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-    var canvas = this._canvas;
 
     if (meshMaterial) {
       this._materialForBillboard = meshMaterial;

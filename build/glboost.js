@@ -634,17 +634,6 @@
         // begin of main function
         shaderText += 'void main(void) {\n';
 
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfVSMethodDefine.forEach(function (className) {
-          var method = _this2['VSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
-          }
-        });
-
         /// Transform
         // start transforming. first, sub class Shader, ...
         // seconds, transform as mixin Shaders
@@ -705,17 +694,6 @@
           }
         });
         shaderText += this._removeDuplicatedLine(fsDefineShaderText);
-
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfFSMethodDefine.forEach(function (className) {
-          var method = _this3['FSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
-          }
-        });
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -853,7 +831,7 @@
         var gl = this._glContext.gl;
         var canvas = this._glContext.canvas;
 
-        lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
+        lights = this.getDefaultPointLightIfNotExist(lights);
 
         var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
         var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material, extraData);
@@ -907,7 +885,7 @@
       }
     }, {
       key: 'getDefaultPointLightIfNotExist',
-      value: function getDefaultPointLightIfNotExist(gl, lights, canvas) {
+      value: function getDefaultPointLightIfNotExist(lights) {
 
         if (lights.length === 0) {
           if (Shader._defaultLight === null) {
@@ -963,12 +941,10 @@
       key: 'initMixinMethodArray',
       value: function initMixinMethodArray() {
         this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
-        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
         this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
         this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
         this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
-        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
         this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
 
         this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
@@ -984,9 +960,6 @@
         if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSDefine.push(source.name);
         }
-        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSMethodDefine.push(source.name);
-        }
         if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSTransform.push(source.name);
         }
@@ -995,9 +968,6 @@
         }
         if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfFSMethodDefine.push(source.name);
         }
         if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSShade.push(source.name);
@@ -1020,10 +990,6 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
         }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
-        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
@@ -1035,10 +1001,6 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
         if (matchIdx !== -1) {
@@ -1062,10 +1024,6 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
         }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
-        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
@@ -1077,10 +1035,6 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
         if (matchIdx !== -1) {
@@ -4584,7 +4538,7 @@
           }
 
           if (material['uniform_lightPosition_0']) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
             if (material['uniform_viewPosition']) {
               var cameraPosInLocalCoord = null;
               if (camera) {
@@ -4726,7 +4680,7 @@
           }
 
           if (material['uniform_lightPosition_0']) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
             if (material['uniform_viewPosition']) {
               var cameraPos = new Vector4(0, 0, 1, 1);
               if (camera) {
@@ -5027,8 +4981,6 @@
       babelHelpers.classCallCheck(this, Geometry);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (Geometry.__proto__ || Object.getPrototypeOf(Geometry)).call(this, glBoostContext));
-
-      _this._canvas = _this._glContext.canvas;
 
       _this._materials = [];
       _this._vertexN = 0;
@@ -9110,7 +9062,6 @@
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
 
         if (meshMaterial) {
           this._materialForBillboard = meshMaterial;
@@ -9546,7 +9497,6 @@
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
 
         if (meshMaterial) {
           this._materialForBlend = meshMaterial;
@@ -9720,10 +9670,11 @@
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
   var GLBoostLowContext = function () {
-    function GLBoostLowContext(canvas) {
+    function GLBoostLowContext(canvas, glContext) {
       babelHelpers.classCallCheck(this, GLBoostLowContext);
 
       this._setName();
+
       this._glContext = GLContext.getInstance(canvas);
     }
 
@@ -9916,9 +9867,9 @@
   var GLBoostMiddleContext = function (_GLBoostLowContext) {
     babelHelpers.inherits(GLBoostMiddleContext, _GLBoostLowContext);
 
-    function GLBoostMiddleContext(canvas) {
+    function GLBoostMiddleContext(canvas, glContext) {
       babelHelpers.classCallCheck(this, GLBoostMiddleContext);
-      return babelHelpers.possibleConstructorReturn(this, (GLBoostMiddleContext.__proto__ || Object.getPrototypeOf(GLBoostMiddleContext)).call(this, canvas));
+      return babelHelpers.possibleConstructorReturn(this, (GLBoostMiddleContext.__proto__ || Object.getPrototypeOf(GLBoostMiddleContext)).call(this, canvas, glContext));
     }
 
     babelHelpers.createClass(GLBoostMiddleContext, [{
@@ -11697,11 +11648,11 @@
             break;
           case 5124:
             // gl.INT
-            dataViewMethod = 'getInt33';
+            dataViewMethod = 'getInt32';
             break;
           case 5125:
             // gl.UNSIGNED_INT
-            dataViewMethod = 'getUint33';
+            dataViewMethod = 'getUint32';
             break;
           case 5126:
             // gl.FLOAT
@@ -12081,150 +12032,6 @@
   }(DecalShader);
 
   GLBoost['BlinnPhongShader'] = BlinnPhongShader;
-
-  // http://www.slis.tsukuba.ac.jp/~fujisawa.makoto.fu/cgi-bin/wiki/index.php?GLSL%A4%CB%A4%E8%A4%EB%A5%D5%A5%A9%A5%F3%A5%B7%A5%A7%A1%BC%A5%C7%A5%A3%A5%F3%A5%B0#q72b7deb
-
-  var BlinnShaderSource = function () {
-    function BlinnShaderSource() {
-      babelHelpers.classCallCheck(this, BlinnShaderSource);
-    }
-
-    babelHelpers.createClass(BlinnShaderSource, [{
-      key: 'FSDefine_BlinnShaderSource',
-      value: function FSDefine_BlinnShaderSource(in_, f, lights) {
-        var shaderText = '';
-        shaderText += 'uniform vec3 viewPosition;\n';
-        shaderText += 'uniform vec4 Kd;\n';
-        shaderText += 'uniform vec4 Ks;\n';
-        shaderText += 'uniform float power;\n';
-        shaderText += 'uniform float C;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSMethodDefine_BlinnShaderSource',
-      value: function FSMethodDefine_BlinnShaderSource(in_, f, lights) {
-        var shaderText = '';
-        shaderText += 'float D_phong(vec3 normal, vec3 halfVec) {\n';
-        shaderText += '  float alpha = acos(dot(normal, halfVec));\n';
-        shaderText += '  float result = pow(cos(alpha), C);\n';
-        shaderText += '  return result;\n';
-        shaderText += '}\n\n';
-
-        shaderText += 'float D_TorranceSparrow(vec3 normal, vec3 halfVec) {\n';
-        shaderText += '  float alpha = acos(dot(normal, halfVec));\n';
-        shaderText += '  float ac = - (alpha * C)*(alpha * C);\n';
-        shaderText += '  float result = exp(ac);\n';
-        shaderText += '  return result;\n';
-        shaderText += '}\n\n';
-
-        shaderText += 'float D_TrowbridgeReitz(vec3 normal, vec3 halfVec) {\n';
-        shaderText += '  float alpha = acos(dot(normal, halfVec));\n';
-        shaderText += '  float result = pow((C*C)/(pow(cos(alpha * (C*C - 1.0)), 2.0) + 1.0), 2.0);\n';
-        shaderText += '  return result;\n';
-        shaderText += '}\n\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_BlinnShaderSource',
-      value: function FSShade_BlinnShaderSource(f, gl, lights) {
-        var shaderText = '';
-        shaderText += '  vec4 surfaceColor = rt0;\n';
-        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-        shaderText += '  vec3 normal = normalize(v_normal);\n';
-
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-        shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
-        shaderText += '    vec3 halfVec = normalize(light + view);\n';
-        shaderText += '    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n';
-        shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
-
-        shaderText += '  }\n';
-        //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
-        //shaderText += '  rt0.a = 1.0;\n';
-
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_BlinnShaderSource',
-      value: function prepare_BlinnShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
-
-        var vertexAttribsAsResult = [];
-
-        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-        material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
-        material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
-
-        material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return BlinnShaderSource;
-  }();
-
-  var BlinnShader = function (_DecalShader) {
-    babelHelpers.inherits(BlinnShader, _DecalShader);
-
-    function BlinnShader(glBoostContext, basicShader) {
-      babelHelpers.classCallCheck(this, BlinnShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (BlinnShader.__proto__ || Object.getPrototypeOf(BlinnShader)).call(this, glBoostContext, basicShader));
-
-      BlinnShader.mixin(BlinnShaderSource);
-
-      _this._power = 64.0;
-
-      return _this;
-    }
-
-    babelHelpers.createClass(BlinnShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material) {
-        babelHelpers.get(BlinnShader.prototype.__proto__ || Object.getPrototypeOf(BlinnShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
-
-        var Kd = material.diffuseColor;
-        var Ks = material.specularColor;
-        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-        gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
-        gl.uniform1f(material.uniform_power, this._power);
-      }
-    }, {
-      key: 'Kd',
-      set: function set(value) {
-        this._Kd = value;
-      },
-      get: function get() {
-        return this._Kd;
-      }
-    }, {
-      key: 'Ks',
-      set: function set(value) {
-        this._Ks = value;
-      },
-      get: function get() {
-        return this._Ks;
-      }
-    }, {
-      key: 'power',
-      set: function set(value) {
-        this._power = value;
-      },
-      get: function get() {
-        return this._power;
-      }
-    }]);
-    return BlinnShader;
-  }(DecalShader);
-
-  GLBoost['BlinnShader'] = BlinnShader;
 
   var LambertShaderSource = function () {
     function LambertShaderSource() {

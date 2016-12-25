@@ -339,7 +339,7 @@ export default class Shader extends GLBoostObject {
     var gl = this._glContext.gl;
     var canvas = this._glContext.canvas;
 
-    lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
+    lights = this.getDefaultPointLightIfNotExist(lights);
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
     var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
@@ -393,7 +393,7 @@ export default class Shader extends GLBoostObject {
     return programToReturn;
   }
 
-  getDefaultPointLightIfNotExist(gl, lights, canvas) {
+  getDefaultPointLightIfNotExist(lights) {
 
     if (lights.length === 0) {
       if (Shader._defaultLight === null) {

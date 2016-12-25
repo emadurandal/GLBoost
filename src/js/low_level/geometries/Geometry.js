@@ -13,8 +13,6 @@ export default class Geometry extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
 
-    this._canvas = this._glContext.canvas;
-
     this._materials = [];
     this._vertexN = 0;
     this._vertices = null;

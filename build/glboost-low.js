@@ -4494,17 +4494,6 @@
         // begin of main function
         shaderText += 'void main(void) {\n';
 
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfVSMethodDefine.forEach(function (className) {
-          var method = _this2['VSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
-          }
-        });
-
         /// Transform
         // start transforming. first, sub class Shader, ...
         // seconds, transform as mixin Shaders
@@ -4565,17 +4554,6 @@
           }
         });
         shaderText += this._removeDuplicatedLine(fsDefineShaderText);
-
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfFSMethodDefine.forEach(function (className) {
-          var method = _this3['FSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
-          }
-        });
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -4713,7 +4691,7 @@
         var gl = this._glContext.gl;
         var canvas = this._glContext.canvas;
 
-        lights = this.getDefaultPointLightIfNotExist(gl, lights, canvas);
+        lights = this.getDefaultPointLightIfNotExist(lights);
 
         var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
         var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material, extraData);
@@ -4767,7 +4745,7 @@
       }
     }, {
       key: 'getDefaultPointLightIfNotExist',
-      value: function getDefaultPointLightIfNotExist(gl, lights, canvas) {
+      value: function getDefaultPointLightIfNotExist(lights) {
 
         if (lights.length === 0) {
           if (Shader._defaultLight === null) {
@@ -4823,12 +4801,10 @@
       key: 'initMixinMethodArray',
       value: function initMixinMethodArray() {
         this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
-        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
         this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
         this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
         this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
-        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
         this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
 
         this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
@@ -4844,9 +4820,6 @@
         if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSDefine.push(source.name);
         }
-        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSMethodDefine.push(source.name);
-        }
         if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSTransform.push(source.name);
         }
@@ -4855,9 +4828,6 @@
         }
         if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfFSMethodDefine.push(source.name);
         }
         if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSShade.push(source.name);
@@ -4880,10 +4850,6 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
         }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
-        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
@@ -4895,10 +4861,6 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
         if (matchIdx !== -1) {
@@ -4922,10 +4884,6 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
         }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
-        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
@@ -4937,10 +4895,6 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
         if (matchIdx !== -1) {
@@ -5950,7 +5904,7 @@
           }
 
           if (material['uniform_lightPosition_0']) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
             if (material['uniform_viewPosition']) {
               var cameraPosInLocalCoord = null;
               if (camera) {
@@ -6092,7 +6046,7 @@
           }
 
           if (material['uniform_lightPosition_0']) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
             if (material['uniform_viewPosition']) {
               var cameraPos = new Vector4(0, 0, 1, 1);
               if (camera) {
@@ -6393,8 +6347,6 @@
       babelHelpers.classCallCheck(this, Geometry);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (Geometry.__proto__ || Object.getPrototypeOf(Geometry)).call(this, glBoostContext));
-
-      _this._canvas = _this._glContext.canvas;
 
       _this._materials = [];
       _this._vertexN = 0;
@@ -7182,7 +7134,6 @@
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
 
         if (meshMaterial) {
           this._materialForBillboard = meshMaterial;
@@ -7668,7 +7619,6 @@
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-        var canvas = this._canvas;
 
         if (meshMaterial) {
           this._materialForBlend = meshMaterial;
@@ -7842,10 +7792,11 @@
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
   var GLBoostLowContext = function () {
-    function GLBoostLowContext(canvas) {
+    function GLBoostLowContext(canvas, glContext) {
       babelHelpers.classCallCheck(this, GLBoostLowContext);
 
       this._setName();
+
       this._glContext = GLContext.getInstance(canvas);
     }
 

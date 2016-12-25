@@ -29,7 +29,6 @@ export default class BlendShapeGeometry extends Geometry {
 
   prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-    var canvas = this._canvas;
 
     if (meshMaterial) {
       this._materialForBlend = meshMaterial;

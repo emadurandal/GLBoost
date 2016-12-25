@@ -64,7 +64,7 @@ export default class DrawKickerWorld {
       }
 
       if (material['uniform_lightPosition_0']) {
-        lights = material.shaderInstance.getDefaultPointLightIfNotExist(gl, lights, glContext.canvas);
+        lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
         if (material['uniform_viewPosition']) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
