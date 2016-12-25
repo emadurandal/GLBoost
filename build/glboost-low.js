@@ -175,8 +175,6 @@
     };
   })(global);
 
-  console.log(global);
-
   var GLBoost$1 = global.GLBoost;
 
   var Vector2 = function () {

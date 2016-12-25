@@ -65,7 +65,5 @@ var global = ('global',eval)('this');
 
 })(global);
 
-console.log(global);
-
 export default global.GLBoost;
 
