@@ -114,10 +114,11 @@
 
     if (typeof define === 'function' && define.amd) {
       define(function () {
-        return lib;
+        return GLBoost;
       });
     } else if ((typeof exports === 'undefined' ? 'undefined' : babelHelpers.typeof(exports)) === 'object') {
       module.exports = GLBoost;
+      global.GLBoost = GLBoost;
     } else {
       global.GLBoost = GLBoost;
     }
@@ -173,6 +174,8 @@
       return gl instanceof WebGL2RenderingContext;
     };
   })(global);
+
+  console.log(global);
 
   var GLBoost$1 = global.GLBoost;
 

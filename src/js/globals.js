@@ -4,9 +4,10 @@ var global = ('global',eval)('this');
   let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: '1' };
 
   if (typeof define === 'function' && define.amd) {
-    define(function() { return lib; });
+    define(function() { return GLBoost; });
   } else if (typeof exports === 'object') {
     module.exports = GLBoost;
+    global.GLBoost = GLBoost;
   } else {
     global.GLBoost = GLBoost;
   }
@@ -63,6 +64,8 @@ var global = ('global',eval)('this');
   };
 
 })(global);
+
+console.log(global);
 
 export default global.GLBoost;
 
