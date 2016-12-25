@@ -165,16 +165,16 @@
     GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
     GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
     GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
+
+    GLBoost.isThisGLVersion_2 = function (gl) {
+      if (typeof WebGL2RenderingContext === 'undefined') {
+        return false;
+      }
+      return gl instanceof WebGL2RenderingContext;
+    };
   })(global);
 
   var GLBoost$1 = global.GLBoost;
-
-  global.GLBoost.isThisGLVersion_2 = function (gl) {
-    if (typeof WebGL2RenderingContext === 'undefined') {
-      return false;
-    }
-    return gl instanceof WebGL2RenderingContext;
-  };
 
   var GLExtensionsManager = function () {
     function GLExtensionsManager(glContext) {
