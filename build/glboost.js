@@ -168,9 +168,6 @@
       babelHelpers.classCallCheck(this, GLExtensionsManager);
 
       var gl = glContext.gl;
-      if (GLExtensionsManager._instances[glContext.canvas.id]) {
-        return GLExtensionsManager._instances[glContext.canvas.id];
-      }
 
       if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
         this._extVAO = gl.getExtension('OES_vertex_array_object');
@@ -184,7 +181,7 @@
         this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
       }
 
-      GLExtensionsManager._instances[glContext.canvas.id] = this;
+      GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
     }
 
     babelHelpers.createClass(GLExtensionsManager, [{
@@ -269,8 +266,11 @@
       }
     }], [{
       key: 'getInstance',
-      value: function getInstance(gl) {
-        return new GLExtensionsManager(gl);
+      value: function getInstance(glContext) {
+        if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
+          return GLExtensionsManager._instances[glContext.belongingCanvasId];
+        }
+        return new GLExtensionsManager(glContext);
       }
     }]);
     return GLExtensionsManager;
@@ -545,7 +545,7 @@
     }, {
       key: 'belongingCanvasId',
       get: function get() {
-        return this._glContext.canvas.id;
+        return this._glBoostContext.belongingCanvasId;
       }
     }, {
       key: 'userFlavorName',
@@ -829,7 +829,7 @@
         var extraData = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
         var gl = this._glContext.gl;
-        var canvas = this._glContext.canvas;
+        var canvasId = this._glContext.belongingCanvasId;
 
         lights = this.getDefaultPointLightIfNotExist(lights);
 
@@ -839,11 +839,11 @@
         // lookup shaderHashTable
         var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
         var hash = Hash.toCRC32(baseText);
-        if (!Shader._shaderHashTable[canvas.id]) {
-          Shader._shaderHashTable[canvas.id] = {};
+        if (!Shader._shaderHashTable[canvasId]) {
+          Shader._shaderHashTable[canvasId] = {};
         }
         var programToReturn = null;
-        var hashTable = Shader._shaderHashTable[canvas.id];
+        var hashTable = Shader._shaderHashTable[canvasId];
         if (hash in hashTable) {
           if (hashTable[hash].code === baseText) {
             programToReturn = hashTable[hash].program;
@@ -870,7 +870,7 @@
             indexStr = hash;
           }
           hashTable[indexStr] = { code: baseText, program: programToReturn, collisionN: 0 };
-          Shader._shaderHashTable[canvas.id] = hashTable;
+          Shader._shaderHashTable[canvasId] = hashTable;
         } else {
           //gl.useProgram(programToReturn);
         }
@@ -879,7 +879,7 @@
         material._semanticsDic = {};
         material.uniformTextureSamplerDic = {};
         programToReturn._material = material;
-        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
+        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData);
 
         return programToReturn;
       }
@@ -1212,7 +1212,7 @@
       }
     }, {
       key: 'prepare_VertexWorldShaderSource',
-      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -1350,7 +1350,7 @@
       }
     }, {
       key: 'prepare_VertexWorldShadowShaderSource',
-      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -1465,7 +1465,7 @@
       }
     }, {
       key: 'prepare_DecalShaderSource',
-      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
         vertexAttribs.forEach(function (attribName) {
@@ -3101,22 +3101,27 @@
 
     babelHelpers.createClass(GLContextImpl, [{
       key: "init",
-      value: function init(glVersionString, ContextType) {
+      value: function init(glVersionString, ContextType, gl) {
 
-        var gl = this._canvas.getContext(glVersionString);
+        if (gl) {
+          this._gl = gl;
+        } else {
 
-        if (!gl) {
-          gl = this._canvas.getContext('experimental-' + glVersionString);
-          if (!gl) {
-            throw new Error("This platform doesn't support WebGL.");
+          var _gl = this._canvas.getContext(glVersionString);
+
+          if (!_gl) {
+            _gl = this._canvas.getContext('experimental-' + glVersionString);
+            if (!_gl) {
+              throw new Error("This platform doesn't support WebGL.");
+            }
           }
-        }
 
-        if (!gl instanceof ContextType) {
-          throw new Error("Unexpected rendering context.");
-        }
+          if (!_gl instanceof ContextType) {
+            throw new Error("Unexpected rendering context.");
+          }
 
-        this._gl = gl;
+          this._gl = _gl;
+        }
       }
     }, {
       key: "gl",
@@ -3135,12 +3140,12 @@
   var GLContextWebGL2Impl = function (_GLContextImpl) {
     babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
 
-    function GLContextWebGL2Impl(canvas, parent) {
+    function GLContextWebGL2Impl(canvas, parent, gl) {
       babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
 
-      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext);
+      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext, gl);
 
       return _this;
     }
@@ -3151,12 +3156,12 @@
   var GLContextWebGL1Impl = function (_GLContextImpl) {
     babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
 
-    function GLContextWebGL1Impl(canvas, parent) {
+    function GLContextWebGL1Impl(canvas, parent, gl) {
       babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
 
-      babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext);
+      babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext, gl);
 
       return _this;
     }
@@ -3165,20 +3170,31 @@
   }(GLContextImpl);
 
   var GLContext = function () {
-    function GLContext(canvas) {
+    function GLContext(canvas, gl, width, height) {
       babelHelpers.classCallCheck(this, GLContext);
 
-      if (GLContext._instances[canvas.id] instanceof GLContext) {
-        return GLContext._instances[canvas.id];
+
+      if (gl) {
+        this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+        this._width = width;
+        this._height = height;
+        GLContext._instances['nocanvas'] = this;
+      } else {
+        if (GLContext._instances[canvas.id] instanceof GLContext) {
+          return GLContext._instances[canvas.id];
+        }
+
+        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
+          this.impl = new GLContextWebGL1Impl(canvas, this);
+        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
+          this.impl = new GLContextWebGL2Impl(canvas, this);
+        }
+
+        GLContext._instances[canvas.id] = this;
+        this._width = canvas.width;
+        this._height = canvas.height;
       }
 
-      if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
-      } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
-      }
-
-      GLContext._instances[canvas.id] = this;
       this._monitor = GLBoostMonitor.getInstance();
     }
 
@@ -3269,17 +3285,43 @@
         return this.impl.gl;
       }
     }, {
-      key: 'canvas',
+      key: 'belongingCanvasId',
       get: function get() {
-        return this.impl.canvas;
+        if (this.impl.canvas) {
+          return this.impl.canvas.id;
+        } else {
+          return 'nocanvas';
+        }
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      },
+      set: function set(width) {
+        if (this.impl.canvas) {
+          this.impl.canvas.width = width;
+        }
+        this._width = width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      },
+      set: function set(height) {
+        if (this.impl.canvas) {
+          this.impl.canvas.height = height;
+        }
+        this._height = height;
       }
     }], [{
       key: 'getInstance',
-      value: function getInstance(canvas) {
+      value: function getInstance(canvas, gl) {
         if (typeof canvas === 'string') {
           canvas = window.document.querySelector(canvas);
         }
-        return new GLContext(canvas);
+        return new GLContext(canvas, gl);
       }
     }]);
     return GLContext;
@@ -3297,7 +3339,6 @@
 
       _this._textureDic = {};
       _this._gl = _this._glContext.gl;
-      _this._canvas = _this._glContext.canvas;
       _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
       _this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
       _this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
@@ -3314,7 +3355,7 @@
     babelHelpers.createClass(ClassicMaterial, [{
       key: 'clone',
       value: function clone() {
-        var material = new ClassicMaterial(this._canvas);
+        var material = new ClassicMaterial(this._glBoostContext);
         material._baseColor = this._baseColor;
         material._diffuseColor = this._diffuseColor;
         material._specularColor = this._specularColor;
@@ -3525,7 +3566,7 @@
       }
     }, {
       key: 'prepare_VertexLocalShaderSource',
-      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -7170,8 +7211,8 @@
             }
           });
 
-          var gl = _this2._glContext.gl;
-          var canvas = _this2._glContext.canvas;
+          var glContext = _this2._glContext;
+          var gl = glContext.gl;
           var glem = GLExtensionsManager.getInstance(_this2._glContext);
 
           var lights = renderPass.scene.lights;
@@ -7186,7 +7227,7 @@
           if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
             gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
           } else {
-            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.viewport(0, 0, glContext.width, glContext.height);
           }
 
           _this2._clearBuffer(gl, renderPass);
@@ -7270,8 +7311,8 @@
        * @param {number} height en: height to resize, ja:リサイズする高さ
        */
       value: function resize(width, height) {
-        this._glContext.canvas.width = width;
-        this._glContext.canvas.height = height;
+        this._glContext.width = width;
+        this._glContext.height = height;
 
         this._glContext.gl.viewport(0, 0, width, height);
       }
@@ -7326,7 +7367,7 @@
       }
     }, {
       key: 'prepare_SkeletalShaderSource',
-      value: function prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
         var vertexAttribsAsResult = [];
 
         vertexAttribs.forEach(function (attribName) {
@@ -7408,7 +7449,7 @@
       }
     }, {
       key: '_prepareAssetsForShaders',
-      value: function _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
         var _this2 = this;
 
         var vertexAttribsAsResult = [];
@@ -8794,7 +8835,7 @@
       }
     }, {
       key: 'prepare_ParticleShaderSource',
-      value: function prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
         var vertexAttribsAsResult = [];
 
         shaderProgram['vertexAttribute_' + 'particleCenterPos'] = gl.getAttribLocation(shaderProgram, 'aVertex_' + 'particleCenterPos');
@@ -9418,7 +9459,7 @@
       }
     }, {
       key: 'prepare_BlendShapeShaderSource',
-      value: function prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
         var _this3 = this;
 
         var vertexAttribsAsResult = [];
@@ -9670,13 +9711,13 @@
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
   var GLBoostLowContext = function () {
-    function GLBoostLowContext(canvas, glContext) {
+    function GLBoostLowContext(canvas, gl) {
       babelHelpers.classCallCheck(this, GLBoostLowContext);
 
       this._setName();
 
-      if (glContext) {
-        this._glContext = glContext;
+      if (gl) {
+        this._glContext = GLContext.getInstance(null, gl);
       } else {
         this._glContext = GLContext.getInstance(canvas);
       }
@@ -9778,15 +9819,14 @@
       value: function createTexturesForRenderTarget(width, height, textureNum) {
         var glContext = this._glContext;
         var gl = glContext.gl;
-        var canvas = glContext.canvas;
 
         var glem = GLExtensionsManager.getInstance(glContext);
 
         // Create FBO
         var fbo = glContext.createFramebuffer(this);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-        fbo.width = width ? width : canvas.width;
-        fbo.height = height ? height : canvas.height;
+        fbo.width = width;
+        fbo.height = height;
 
         var renderTargetTextures = [];
         for (var i = 0; i < textureNum; i++) {
@@ -9826,8 +9866,8 @@
         // Create FBO
         var fbo = glContext.createFramebuffer(this);
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-        fbo.width = width ? width : canvas.width;
-        fbo.height = height ? height : canvas.height;
+        fbo.width = width;
+        fbo.height = height;
 
         // Create color RenderBuffer
         var colorBuffer = gl.createRenderbuffer();
@@ -9860,7 +9900,7 @@
     }, {
       key: 'belongingCanvasId',
       get: function get() {
-        return this._glContext.canvas.id;
+        return this._glContext.belongingCanvasId;
       }
     }]);
     return GLBoostLowContext;
@@ -10013,7 +10053,7 @@
       }
     }, {
       key: 'prepare_PhongShaderSource',
-      value: function prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_PhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -11965,7 +12005,7 @@
       }
     }, {
       key: 'prepare_BlinnPhongShaderSource',
-      value: function prepare_BlinnPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_BlinnPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -12139,7 +12179,7 @@
       }
     }, {
       key: 'prepare_LambertShaderSource',
-      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_LambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -12244,7 +12284,7 @@
       }
     }, {
       key: 'prepare_HalfLambertShaderSource',
-      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -12319,7 +12359,7 @@
       }
     }, {
       key: 'prepare_HalfLambertAndWrapLightingShaderSource',
-      value: function prepare_HalfLambertAndWrapLightingShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+      value: function prepare_HalfLambertAndWrapLightingShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 

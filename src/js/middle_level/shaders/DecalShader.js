@@ -60,7 +60,7 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{

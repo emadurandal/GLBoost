@@ -32,7 +32,7 @@ export default class SkeletalShaderSource {
     return shaderText;
   }
 
-  prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+  prepare_SkeletalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
     var vertexAttribsAsResult = [];
 
     vertexAttribs.forEach((attribName)=>{

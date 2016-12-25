@@ -20,22 +20,27 @@ export default class GLContextImpl {
 
   }
 
-  init(glVersionString, ContextType) {
+  init(glVersionString, ContextType, gl) {
 
-    var gl = this._canvas.getContext(glVersionString);
+    if (gl) {
+      this._gl = gl;
+    } else {
 
-    if (!gl) {
-      gl = this._canvas.getContext('experimental-' + glVersionString);
+      let gl = this._canvas.getContext(glVersionString);
+
       if (!gl) {
-        throw new Error("This platform doesn't support WebGL.");
+        gl = this._canvas.getContext('experimental-' + glVersionString);
+        if (!gl) {
+          throw new Error("This platform doesn't support WebGL.");
+        }
       }
-    }
 
-    if (!gl instanceof ContextType) {
-      throw new Error("Unexpected rendering context.");
-    }
+      if (!gl instanceof ContextType) {
+        throw new Error("Unexpected rendering context.");
+      }
 
-    this._gl = gl;
+      this._gl = gl;
+    }
   }
 
   get gl() {

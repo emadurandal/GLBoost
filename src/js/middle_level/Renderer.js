@@ -49,8 +49,8 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
-      var gl = this._glContext.gl;
-      var canvas = this._glContext.canvas;
+      var glContext = this._glContext;
+      var gl = glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
       let lights = renderPass.scene.lights;
@@ -65,7 +65,7 @@ export default class Renderer extends GLBoostObject {
       if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
-        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.viewport(0, 0, glContext.width, glContext.height);
       }
       
       this._clearBuffer(gl, renderPass);
@@ -147,8 +147,8 @@ export default class Renderer extends GLBoostObject {
    * @param {number} height en: height to resize, ja:リサイズする高さ
    */
   resize(width, height) {
-    this._glContext.canvas.width = width;
-    this._glContext.canvas.height = height;
+    this._glContext.width = width;
+    this._glContext.height = height;
 
     this._glContext.gl.viewport(0, 0, width, height);
   }

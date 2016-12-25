@@ -4,9 +4,6 @@ export default class GLExtensionsManager {
 
   constructor(glContext) {
     var gl = glContext.gl;
-    if (GLExtensionsManager._instances[glContext.canvas.id]) {
-      return GLExtensionsManager._instances[glContext.canvas.id];
-    }
 
     if (GLBoost.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
       this._extVAO = gl.getExtension('OES_vertex_array_object');
@@ -22,10 +19,13 @@ export default class GLExtensionsManager {
       this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
     }
 
-    GLExtensionsManager._instances[glContext.canvas.id] = this;
+    GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
   }
-  static getInstance(gl) {
-    return new GLExtensionsManager(gl);
+  static getInstance(glContext) {
+    if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
+      return GLExtensionsManager._instances[glContext.belongingCanvasId];
+    }
+    return new GLExtensionsManager(glContext);
   }
 
   get extVAO() {

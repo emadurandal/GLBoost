@@ -36,7 +36,7 @@ export default class GLBoostObject {
   }
 
   get belongingCanvasId() {
-    return this._glContext.canvas.id;
+    return this._glBoostContext.belongingCanvasId;
   }
 
   set userFlavorName(name) {
