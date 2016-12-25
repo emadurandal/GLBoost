@@ -16,8 +16,8 @@ import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
-  constructor(canvas, glContext) {
-    super(canvas, glContext);
+  constructor(canvas, gl, width, height) {
+    super(canvas, gl, width, height);
   }
 
   createScene() {

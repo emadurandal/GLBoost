@@ -7,7 +7,7 @@ export default class GLContext {
 
   constructor(canvas, gl, width, height) {
 
-    if (gl) {
+    if (typeof gl !== 'undefined' && gl !== null) {
       this.impl = new GLContextWebGL1Impl(canvas, this, gl);
       this._width = width;
       this._height = height;
@@ -31,11 +31,11 @@ export default class GLContext {
     this._monitor = GLBoostMonitor.getInstance();
   }
 
-  static getInstance(canvas, gl) {
+  static getInstance(canvas, gl, width, height) {
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
-    return new GLContext(canvas, gl);
+    return new GLContext(canvas, gl, width, height);
   }
 
   get gl() {

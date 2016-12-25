@@ -2202,7 +2202,7 @@
       babelHelpers.classCallCheck(this, GLContext);
 
 
-      if (gl) {
+      if (typeof gl !== 'undefined' && gl !== null) {
         this.impl = new GLContextWebGL1Impl(canvas, this, gl);
         this._width = width;
         this._height = height;
@@ -2350,11 +2350,11 @@
       }
     }], [{
       key: 'getInstance',
-      value: function getInstance(canvas, gl) {
+      value: function getInstance(canvas, gl, width, height) {
         if (typeof canvas === 'string') {
           canvas = window.document.querySelector(canvas);
         }
-        return new GLContext(canvas, gl);
+        return new GLContext(canvas, gl, width, height);
       }
     }]);
     return GLContext;
@@ -7852,13 +7852,13 @@
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
   var GLBoostLowContext = function () {
-    function GLBoostLowContext(canvas, gl) {
+    function GLBoostLowContext(canvas, gl, width, height) {
       babelHelpers.classCallCheck(this, GLBoostLowContext);
 
       this._setName();
 
       if (gl) {
-        this._glContext = GLContext.getInstance(null, gl);
+        this._glContext = GLContext.getInstance(null, gl, width, height);
       } else {
         this._glContext = GLContext.getInstance(canvas);
       }
