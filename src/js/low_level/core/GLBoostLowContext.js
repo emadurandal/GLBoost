@@ -16,9 +16,14 @@ import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 
 export default class GLBoostLowContext {
-  constructor(canvas) {
+  constructor(canvas, glContext) {
     this._setName();
-    this._glContext = GLContext.getInstance(canvas);
+
+    if (glContext) {
+      this._glContext = glContext;
+    } else {
+      this._glContext = GLContext.getInstance(canvas);
+    }
   }
 
   _setName() {

@@ -9675,7 +9675,11 @@
 
       this._setName();
 
-      this._glContext = GLContext.getInstance(canvas);
+      if (glContext) {
+        this._glContext = glContext;
+      } else {
+        this._glContext = GLContext.getInstance(canvas);
+      }
     }
 
     babelHelpers.createClass(GLBoostLowContext, [{
