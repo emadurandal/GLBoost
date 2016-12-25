@@ -8302,7 +8302,7 @@
       if (typeof src === 'undefined' || src === null) {
         // do nothing
       } else if (typeof src === 'string') {
-        _this._generateTextureFromUri(src);
+        _this.generateTextureFromUri(src);
       } else {
         _this._generateTextureFromImageData(src);
       }
@@ -8339,52 +8339,55 @@
         return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost$1[param]), alternative);
       }
     }, {
-      key: '_generateTextureFromUri',
-      value: function _generateTextureFromUri(imageUri) {
+      key: 'generateTextureFromUri',
+      value: function generateTextureFromUri(imageUri) {
         var _this2 = this;
 
         var isKeepBound = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        var isNode = typeof process !== "undefined" && typeof require !== "undefined";
-        if (isNode) {
-          var getPixels = require("get-pixels");
+        return new Promise(function (resolve, reject) {
+          var isNode = typeof process !== "undefined" && typeof require !== "undefined";
+          if (isNode) {
+            var getPixels = require("get-pixels");
 
-          var results = getPixels(imageUri, function (err, pixels) {
-            if (err) {
-              console.log("Bad image path");
-              return;
+            var results = getPixels(imageUri, function (err, pixels) {
+              if (err) {
+                console.log("Bad image path");
+                reject();
+                return;
+              }
+
+              _this2._width = pixels.shape[0];
+              _this2._height = pixels.shape[1];
+
+              var texture = _this2._generateTextureInnerWithArrayBufferView(pixels.data, _this2._width, _this2._height, isKeepBound);
+
+              _this2._texture = texture;
+              _this2._isTextureReady = true;
+
+              resolve();
+            });
+          } else {
+            _this2._img = new Image();
+            if (!imageUri.match(/^data:/)) {
+              _this2._img.crossOrigin = 'Anonymous';
             }
+            _this2._img.onload = function () {
+              var imgCanvas = _this2._getResizedCanvas(_this2._img);
+              _this2._width = imgCanvas.width;
+              _this2._height = imgCanvas.height;
 
-            _this2._width = pixels.shape[0];
-            _this2._height = pixels.shape[1];
+              var texture = _this2._generateTextureInner(imgCanvas, isKeepBound);
 
-            var texture = _this2._generateTextureInnerWithArrayBufferView(pixels.data, _this2._width, _this2._height, isKeepBound);
+              _this2._texture = texture;
+              _this2._isTextureReady = true;
 
-            _this2._texture = texture;
-            _this2._isTextureReady = true;
+              resolve();
+            };
 
-            _this2._onLoad();
-          });
-        } else {
-          this._img = new Image();
-          if (!imageUri.match(/^data:/)) {
-            this._img.crossOrigin = 'Anonymous';
+            _this2._img.src = imageUri;
           }
-          this._img.onload = function () {
-            var imgCanvas = _this2._getResizedCanvas(_this2._img);
-            _this2._width = imgCanvas.width;
-            _this2._height = imgCanvas.height;
-
-            var texture = _this2._generateTextureInner(imgCanvas, isKeepBound);
-
-            _this2._texture = texture;
-            _this2._isTextureReady = true;
-
-            _this2._onLoad();
-          };
-
-          this._img.src = imageUri;
-        }
+        });
       }
     }, {
       key: '_generateTextureFromImageData',
@@ -8541,7 +8544,7 @@
       key: '_recreateTexture',
       value: function _recreateTexture(imageDataUri) {
         var oldTexture = this._texture;
-        this._generateTextureFromUri(imageDataUri, true);
+        this.generateTextureFromUri(imageDataUri, true);
         if (typeof oldTexture !== 'undefined' && oldTexture !== null) {
           this._glContext.deleteTexture(this, oldTexture);
         }

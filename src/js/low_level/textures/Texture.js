@@ -20,7 +20,7 @@ export default class Texture extends AbstractTexture {
     if (typeof src === 'undefined' || src === null) {
       // do nothing
     } else if (typeof src === 'string') {
-        this._generateTextureFromUri(src);
+        this.generateTextureFromUri(src);
     } else {
         this._generateTextureFromImageData(src);
     }
@@ -53,48 +53,51 @@ export default class Texture extends AbstractTexture {
     return MiscUtil.getTheValueOrAlternative(this._getParameter(GLBoost[param]), alternative);
   }
 
-  _generateTextureFromUri(imageUri, isKeepBound = false) {
-    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
-    if (isNode) {
-      let getPixels = require("get-pixels");
+  generateTextureFromUri(imageUri, isKeepBound = false) {
+    return new Promise((resolve, reject)=> {
+      let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+      if (isNode) {
+        let getPixels = require("get-pixels");
 
-      let results = getPixels(imageUri, (err, pixels) => {
-        if(err) {
-          console.log("Bad image path");
-          return;
+        let results = getPixels(imageUri, (err, pixels) => {
+          if (err) {
+            console.log("Bad image path");
+            reject();
+            return;
+          }
+
+          this._width = pixels.shape[0];
+          this._height = pixels.shape[1];
+
+          let texture = this._generateTextureInnerWithArrayBufferView(pixels.data, this._width, this._height, isKeepBound);
+
+          this._texture = texture;
+          this._isTextureReady = true;
+
+          resolve();
+        });
+
+      } else {
+        this._img = new Image();
+        if (!imageUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
         }
+        this._img.onload = () => {
+          let imgCanvas = this._getResizedCanvas(this._img);
+          this._width = imgCanvas.width;
+          this._height = imgCanvas.height;
 
-        this._width = pixels.shape[0];
-        this._height = pixels.shape[1];
+          let texture = this._generateTextureInner(imgCanvas, isKeepBound);
 
-        let texture = this._generateTextureInnerWithArrayBufferView(pixels.data, this._width, this._height, isKeepBound);
+          this._texture = texture;
+          this._isTextureReady = true;
 
-        this._texture = texture;
-        this._isTextureReady = true;
+          resolve();
+        };
 
-        this._onLoad();
-      });
-
-    } else {
-      this._img = new Image();
-      if (!imageUri.match(/^data:/)) {
-        this._img.crossOrigin = 'Anonymous';
+        this._img.src = imageUri;
       }
-      this._img.onload = () => {
-        let imgCanvas = this._getResizedCanvas(this._img);
-        this._width = imgCanvas.width;
-        this._height = imgCanvas.height;
-
-        let texture = this._generateTextureInner(imgCanvas, isKeepBound);
-
-        this._texture = texture;
-        this._isTextureReady = true;
-
-        this._onLoad();
-      };
-
-      this._img.src = imageUri;
-    }
+    });
   }
 
   _generateTextureFromImageData(imageData) {
