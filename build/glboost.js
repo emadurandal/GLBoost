@@ -8382,9 +8382,9 @@
 
             _this2._onLoad();
           };
-        }
 
-        this._img.src = imageUri;
+          this._img.src = imageUri;
+        }
       }
     }, {
       key: '_generateTextureFromImageData',

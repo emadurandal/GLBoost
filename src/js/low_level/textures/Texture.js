@@ -67,7 +67,7 @@ export default class Texture extends AbstractTexture {
         let texture = this._generateTextureInner(pixels.data, isKeepBound);
 
         this._width = pixels.shape[0];
-        this._height =pixels.shape[1];
+        this._height = pixels.shape[1];
 
         this._texture = texture;
         this._isTextureReady = true;
@@ -92,9 +92,9 @@ export default class Texture extends AbstractTexture {
 
         this._onLoad();
       };
-    }
 
-    this._img.src = imageUri;
+      this._img.src = imageUri;
+    }
   }
 
   _generateTextureFromImageData(imageData) {
