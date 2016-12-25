@@ -8355,15 +8355,16 @@
               return;
             }
 
-            var texture = this._generateTextureInner(pixels.shape.slice(), isKeepBound);
+            var texture = this._generateTextureInner(pixels.data, isKeepBound);
+
+            this._width = pixels.shape[0];
+            this._height = pixels.shape[1];
 
             this._texture = texture;
             this._isTextureReady = true;
 
             this._onLoad();
           });
-          this._width = results[0];
-          this._height = results[1];
         } else {
           this._img = new Image();
           if (!imageUri.match(/^data:/)) {
