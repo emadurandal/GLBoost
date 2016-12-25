@@ -50,6 +50,10 @@ export default class GLContext {
     }
   }
 
+  get canvas() {
+    return this.impl.canvas;
+  }
+
   createVertexArray(glBoostObject) {
     var gl = this.gl;
     var glem = GLExtensionsManager.getInstance(this);

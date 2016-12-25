@@ -3307,6 +3307,11 @@
         }
       }
     }, {
+      key: 'canvas',
+      get: function get() {
+        return this.impl.canvas;
+      }
+    }, {
       key: 'width',
       get: function get() {
         return this._width;
