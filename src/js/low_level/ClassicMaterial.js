@@ -10,7 +10,6 @@ export default class ClassicMaterial extends GLBoostObject {
 
     this._textureDic = {};
     this._gl = this._glContext.gl;
-    this._canvas = this._glContext.canvas;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
@@ -24,7 +23,7 @@ export default class ClassicMaterial extends GLBoostObject {
   }
 
   clone() {
-    var material = new ClassicMaterial(this._canvas);
+    var material = new ClassicMaterial(this._glBoostContext);
     material._baseColor = this._baseColor;
     material._diffuseColor = this._diffuseColor;
     material._specularColor = this._specularColor;

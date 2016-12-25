@@ -51,7 +51,7 @@ export default class FreeShader extends Shader {
     return this._fragmentShaderText;
   }
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
     var vertexAttribsAsResult = [];
 
     vertexAttribs.forEach((attribName)=>{

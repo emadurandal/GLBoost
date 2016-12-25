@@ -36,7 +36,7 @@ export default class BlendShapeShaderSource {
     return shaderText;
   }
 
-  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+  prepare_BlendShapeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) { // if POSITION and ShapeTargets...

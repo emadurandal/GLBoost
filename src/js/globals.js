@@ -1,55 +1,69 @@
 var global = ('global',eval)('this');
 
-global.GLBoost = global.GLBoost || { REVISION: '1' };
+(function (global) {
+  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: '1' };
 
-global.GLBoost['POSITION'] = 'position';
-global.GLBoost['COLOR'] = 'color';
-global.GLBoost['NORMAL'] = 'normal';
-global.GLBoost['TEXCOORD'] = 'texcoord';
-global.GLBoost['JOINT'] = 'joint';
-global.GLBoost['WEIGHT'] = 'weight';
-global.GLBoost['POINTS'] = 'POINTS';
-global.GLBoost['LINES'] = 'LINES';
-global.GLBoost['LINE_STRIP'] = 'LINE_STRIP';
-global.GLBoost['LINE_LOOP'] = 'LINE_LOOP';
-global.GLBoost['TRIANGLES'] = 'TRIANGLES';
-global.GLBoost['TRIANGLE_STRIP'] = 'TRIANGLE_STRIP';
-global.GLBoost['STATIC_DRAW'] = 'STATIC_DRAW';
-global.GLBoost['STREAM_DRAW'] = 'STREAM_DRAW';
-global.GLBoost['DYNAMIC_DRAW'] = 'DYNAMIC_DRAW';
-global.GLBoost['BLENDTARGET1'] = 'shapetarget_1';
-global.GLBoost['BLENDTARGET2'] = 'shapetarget_2';
-global.GLBoost['BLENDTARGET3'] = 'shapetarget_3';
-global.GLBoost['BLENDTARGET4'] = 'shapetarget_4';
-global.GLBoost['BLENDTARGET5'] = 'shapetarget_5';
-global.GLBoost['BLENDTARGET6'] = 'shapetarget_6';
-global.GLBoost['BLENDTARGET7'] = 'shapetarget_7';
-global.GLBoost['BLENDTARGET8'] = 'shapetarget_8';
-global.GLBoost['BLENDTARGET9'] = 'shapetarget_9';
-global.GLBoost['BLENDTARGET10'] = 'shapetarget_10';
-global.GLBoost['RADIAN'] = 'radian';
-global.GLBoost['DEGREE'] = 'degree';
-global.GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
-global.GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
-global.GLBoost['UNPACK_FLIP_Y_WEBGL'] = 'UNPACK_FLIP_Y_WEBGL';
-global.GLBoost['TEXTURE_MAG_FILTER'] = 'TEXTURE_MAG_FILTER';
-global.GLBoost['TEXTURE_MIN_FILTER'] = 'TEXTURE_MIN_FILTER';
-global.GLBoost['LINEAR'] = 'LINEAR';
-global.GLBoost['LINEAR_MIPMAP_LINEAR'] = 'LINEAR_MIPMAP_LINEAR';
-global.GLBoost['NEAREST'] = 'NEAREST';
-global.GLBoost['TEXTURE_WRAP_S'] = 'TEXTURE_WRAP_S';
-global.GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
-global.GLBoost['REPEAT'] = 'REPEAT';
-global.GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
-global.GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
-global.GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
-global.GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
-global.GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
+  if (typeof define === 'function' && define.amd) {
+    define(function() { return GLBoost; });
+  } else if (typeof exports === 'object') {
+    module.exports = GLBoost;
+    global.GLBoost = GLBoost;
+  } else {
+    global.GLBoost = GLBoost;
+  }
+
+  GLBoost['POSITION'] = 'position';
+  GLBoost['COLOR'] = 'color';
+  GLBoost['NORMAL'] = 'normal';
+  GLBoost['TEXCOORD'] = 'texcoord';
+  GLBoost['JOINT'] = 'joint';
+  GLBoost['WEIGHT'] = 'weight';
+  GLBoost['POINTS'] = 'POINTS';
+  GLBoost['LINES'] = 'LINES';
+  GLBoost['LINE_STRIP'] = 'LINE_STRIP';
+  GLBoost['LINE_LOOP'] = 'LINE_LOOP';
+  GLBoost['TRIANGLES'] = 'TRIANGLES';
+  GLBoost['TRIANGLE_STRIP'] = 'TRIANGLE_STRIP';
+  GLBoost['STATIC_DRAW'] = 'STATIC_DRAW';
+  GLBoost['STREAM_DRAW'] = 'STREAM_DRAW';
+  GLBoost['DYNAMIC_DRAW'] = 'DYNAMIC_DRAW';
+  GLBoost['BLENDTARGET1'] = 'shapetarget_1';
+  GLBoost['BLENDTARGET2'] = 'shapetarget_2';
+  GLBoost['BLENDTARGET3'] = 'shapetarget_3';
+  GLBoost['BLENDTARGET4'] = 'shapetarget_4';
+  GLBoost['BLENDTARGET5'] = 'shapetarget_5';
+  GLBoost['BLENDTARGET6'] = 'shapetarget_6';
+  GLBoost['BLENDTARGET7'] = 'shapetarget_7';
+  GLBoost['BLENDTARGET8'] = 'shapetarget_8';
+  GLBoost['BLENDTARGET9'] = 'shapetarget_9';
+  GLBoost['BLENDTARGET10'] = 'shapetarget_10';
+  GLBoost['RADIAN'] = 'radian';
+  GLBoost['DEGREE'] = 'degree';
+  GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
+  GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
+  GLBoost['UNPACK_FLIP_Y_WEBGL'] = 'UNPACK_FLIP_Y_WEBGL';
+  GLBoost['TEXTURE_MAG_FILTER'] = 'TEXTURE_MAG_FILTER';
+  GLBoost['TEXTURE_MIN_FILTER'] = 'TEXTURE_MIN_FILTER';
+  GLBoost['LINEAR'] = 'LINEAR';
+  GLBoost['LINEAR_MIPMAP_LINEAR'] = 'LINEAR_MIPMAP_LINEAR';
+  GLBoost['NEAREST'] = 'NEAREST';
+  GLBoost['TEXTURE_WRAP_S'] = 'TEXTURE_WRAP_S';
+  GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
+  GLBoost['REPEAT'] = 'REPEAT';
+  GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
+  GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
+  GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
+  GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
+  GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
+
+  GLBoost.isThisGLVersion_2 = function(gl) {
+    if (typeof WebGL2RenderingContext === 'undefined') {
+      return false;
+    }
+    return gl instanceof WebGL2RenderingContext;
+  };
+
+})(global);
+
 export default global.GLBoost;
 
-global.GLBoost.isThisGLVersion_2 = function(gl) {
-  if (typeof WebGL2RenderingContext === 'undefined') {
-    return false;
-  }
-  return gl instanceof WebGL2RenderingContext;
-};

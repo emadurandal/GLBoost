@@ -16,9 +16,14 @@ import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 
 export default class GLBoostLowContext {
-  constructor(canvas) {
+  constructor(canvas, gl, width, height) {
     this._setName();
-    this._glContext = GLContext.getInstance(canvas);
+
+    if (gl) {
+      this._glContext = GLContext.getInstance(null, gl, width, height);
+    } else {
+      this._glContext = GLContext.getInstance(canvas);
+    }
   }
 
   _setName() {
@@ -98,15 +103,14 @@ export default class GLBoostLowContext {
   createTexturesForRenderTarget(width, height, textureNum) {
     var glContext = this._glContext;
     var gl = glContext.gl;
-    var canvas = glContext.canvas;
 
     var glem = GLExtensionsManager.getInstance(glContext);
 
     // Create FBO
     var fbo = glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    fbo.width = width ? width : canvas.width;
-    fbo.height = height ? height : canvas.height;
+    fbo.width = width;
+    fbo.height = height;
 
     var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
@@ -145,8 +149,8 @@ export default class GLBoostLowContext {
     // Create FBO
     var fbo = glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    fbo.width = width ? width : canvas.width;
-    fbo.height = height ? height : canvas.height;
+    fbo.width = width;
+    fbo.height = height;
 
     // Create color RenderBuffer
     var colorBuffer = gl.createRenderbuffer();
@@ -175,7 +179,7 @@ export default class GLBoostLowContext {
   }
 
   get belongingCanvasId() {
-    return this._glContext.canvas.id;
+    return this._glContext.belongingCanvasId;
   }
 
 }

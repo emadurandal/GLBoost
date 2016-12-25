@@ -337,7 +337,7 @@ export default class Shader extends GLBoostObject {
 
   getShaderProgram(vertexAttribs, existCamera_f, lights, material, extraData = {}) {
     var gl = this._glContext.gl;
-    var canvas = this._glContext.canvas;
+    var canvasId = this._glContext.belongingCanvasId;
 
     lights = this.getDefaultPointLightIfNotExist(lights);
 
@@ -347,11 +347,11 @@ export default class Shader extends GLBoostObject {
     // lookup shaderHashTable
     var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
     var hash = Hash.toCRC32(baseText);
-    if (!Shader._shaderHashTable[canvas.id]) {
-      Shader._shaderHashTable[canvas.id] = {};
+    if (!Shader._shaderHashTable[canvasId]) {
+      Shader._shaderHashTable[canvasId] = {};
     }
     let programToReturn = null;
-    var hashTable = Shader._shaderHashTable[canvas.id];
+    var hashTable = Shader._shaderHashTable[canvasId];
     if (hash in hashTable) {
       if (hashTable[hash].code === baseText) {
         programToReturn = hashTable[hash].program;
@@ -378,7 +378,7 @@ export default class Shader extends GLBoostObject {
         indexStr = hash;
       }
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
-      Shader._shaderHashTable[canvas.id] = hashTable;
+      Shader._shaderHashTable[canvasId] = hashTable;
 
     } else {
       //gl.useProgram(programToReturn);
@@ -388,7 +388,7 @@ export default class Shader extends GLBoostObject {
     material._semanticsDic = {};
     material.uniformTextureSamplerDic = {};
     programToReturn._material = material;
-    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData, canvas);
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData);
 
     return programToReturn;
   }
