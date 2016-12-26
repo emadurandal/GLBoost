@@ -10075,6 +10075,81 @@
 
   GLBoost['GLBoostMiddleContext'] = GLBoostMiddleContext;
 
+  var DataUtil = function () {
+    function DataUtil() {
+      babelHelpers.classCallCheck(this, DataUtil);
+    }
+
+    babelHelpers.createClass(DataUtil, null, [{
+      key: 'base64ToArrayBuffer',
+      value: function base64ToArrayBuffer(dataUri) {
+        var splittedDataUri = dataUri.split(',');
+        var type = splittedDataUri[0].split(':')[1].split(';')[0];
+        var byteString = atob(splittedDataUri[1]);
+        var byteStringLength = byteString.length;
+        var arrayBuffer = new ArrayBuffer(byteStringLength);
+        var uint8Array = new Uint8Array(arrayBuffer);
+        for (var i = 0; i < byteStringLength; i++) {
+          uint8Array[i] = byteString.charCodeAt(i);
+        }
+        return arrayBuffer;
+      }
+    }, {
+      key: 'arrayBufferToString',
+      value: function arrayBufferToString(arrayBuffer) {
+        if (typeof TextDecoder !== 'undefined') {
+          var textDecoder = new TextDecoder();
+          return textDecoder.decode(arrayBuffer);
+        } else {
+          var bytes = new Uint8Array(arrayBuffer);
+          var result = "";
+          var length = bytes.length;
+          for (var i = 0; i < length; i++) {
+            result += String.fromCharCode(bytes[i]);
+          }
+          return result;
+        }
+      }
+    }, {
+      key: 'loadResourceAsync',
+      value: function loadResourceAsync(resourceUri, isBinary, resolveCallback, rejectCallback) {
+        return new Promise(function (resolve, reject) {
+          var isNode = typeof process !== "undefined" && typeof require !== "undefined";
+
+          if (isNode) {
+            var fs = require('fs');
+            fs.readFile(resourceUri, 'utf8', function (err, text) {
+              if (err) {
+                if (rejectCallback) {
+                  rejectCallback(reject, err);
+                }
+                return;
+              }
+              resolveCallback(resolve, text);
+            });
+          } else {
+            (function () {
+              var xmlHttp = new XMLHttpRequest();
+              xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+                  resolveCallback(resolve, xmlHttp.responseText);
+                } else {
+                  if (rejectCallback) {
+                    rejectCallback(reject, xmlHttp.status);
+                  }
+                }
+              };
+
+              xmlHttp.open("GET", resourceUri, true);
+              xmlHttp.send(null);
+            })();
+          }
+        });
+      }
+    }]);
+    return DataUtil;
+  }();
+
   var PhongShaderSource = function () {
     function PhongShaderSource() {
       babelHelpers.classCallCheck(this, PhongShaderSource);
@@ -10238,23 +10313,15 @@
         var defaultShader = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
         var mtlString = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
-        return new Promise(function (resolve, reject) {
-          var xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-              var gotText = xmlHttp.responseText;
-              var partsOfPath = url.split('/');
-              var basePath = '';
-              for (var i = 0; i < partsOfPath.length - 1; i++) {
-                basePath += partsOfPath[i] + '/';
-              }
-              _this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
-            }
-          };
-
-          xmlHttp.open("GET", url, true);
-          xmlHttp.send(null);
-        });
+        return DataUtil.loadResourceAsync(url, false, function (resolve, responseText) {
+          var gotText = responseText;
+          var partsOfPath = url.split('/');
+          var basePath = '';
+          for (var i = 0; i < partsOfPath.length - 1; i++) {
+            basePath += partsOfPath[i] + '/';
+          }
+          _this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
+        }, function (reject, err) {});
       }
     }, {
       key: '_loadMaterialsFromString',
@@ -10333,16 +10400,8 @@
       value: function _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
         var _this2 = this;
 
-        return new Promise(function (resolve, reject) {
-          var xmlHttp = new XMLHttpRequest();
-          xmlHttp.onreadystatechange = function () {
-            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-              resolve(_this2._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, defaultShader, basePath));
-            }
-          };
-
-          xmlHttp.open("GET", basePath + fileName, true);
-          xmlHttp.send(null);
+        return DataUtil.loadResourceAsync(basePath + fileName, false, function (resolve, responseText) {
+          resolve(_this2._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath), function (reject, err) {});
         });
       }
     }, {
@@ -10863,45 +10922,6 @@
   GLBoost$1['VALUE_LOG_SHADER_CODE'] = true;
   GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;
   GLBoost$1['VALUE_LOG_GL_RESOURCE_LIFECYCLE'] = true;
-
-  var DataUtil = function () {
-    function DataUtil() {
-      babelHelpers.classCallCheck(this, DataUtil);
-    }
-
-    babelHelpers.createClass(DataUtil, null, [{
-      key: 'base64ToArrayBuffer',
-      value: function base64ToArrayBuffer(dataUri) {
-        var splittedDataUri = dataUri.split(',');
-        var type = splittedDataUri[0].split(':')[1].split(';')[0];
-        var byteString = atob(splittedDataUri[1]);
-        var byteStringLength = byteString.length;
-        var arrayBuffer = new ArrayBuffer(byteStringLength);
-        var uint8Array = new Uint8Array(arrayBuffer);
-        for (var i = 0; i < byteStringLength; i++) {
-          uint8Array[i] = byteString.charCodeAt(i);
-        }
-        return arrayBuffer;
-      }
-    }, {
-      key: 'arrayBufferToString',
-      value: function arrayBufferToString(arrayBuffer) {
-        if (typeof TextDecoder !== 'undefined') {
-          var textDecoder = new TextDecoder();
-          return textDecoder.decode(arrayBuffer);
-        } else {
-          var bytes = new Uint8Array(arrayBuffer);
-          var result = "";
-          var length = bytes.length;
-          for (var i = 0; i < length; i++) {
-            result += String.fromCharCode(bytes[i]);
-          }
-          return result;
-        }
-      }
-    }]);
-    return DataUtil;
-  }();
 
   var singleton$1 = Symbol();
   var singletonEnforcer$1 = Symbol();

@@ -3,6 +3,7 @@ import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 import PhongShader from '../../middle_level/shaders/PhongShader';
 import Hash from '../../low_level/misc/Hash';
+import DataUtil from '../../low_level/misc/DataUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -46,23 +47,18 @@ export default class ObjLoader {
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
   loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
-    return new Promise((resolve, reject)=> {
-      var xmlHttp = new XMLHttpRequest();
-      xmlHttp.onreadystatechange = ()=> {
-        if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-          var gotText = xmlHttp.responseText;
-          var partsOfPath = url.split('/');
-          var basePath = '';
-          for(var i=0; i<partsOfPath.length-1; i++) {
-            basePath += partsOfPath[i] + '/';
-          }
-          this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
-        }
-      };
+    return DataUtil.loadResourceAsync(url, false, (resolve, responseText)=>{
+      let gotText = responseText;
+      let partsOfPath = url.split('/');
+      let basePath = '';
+      for(let i=0; i<partsOfPath.length-1; i++) {
+        basePath += partsOfPath[i] + '/';
+      }
+      this._constructMesh(glBoostContext, gotText, basePath, defaultShader, mtlString, resolve);
+    }, (reject, err)=>{
 
-      xmlHttp.open("GET", url, true);
-      xmlHttp.send(null);
     });
+
   }
 
   _loadMaterialsFromString(glBoostContext, mtlString, defaultShader, basePath = '') {
@@ -141,16 +137,10 @@ export default class ObjLoader {
   }
 
   _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
-    return new Promise((resolve, reject)=> {
-      var xmlHttp = new XMLHttpRequest();
-      xmlHttp.onreadystatechange = ()=> {
-        if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-          resolve(this._loadMaterialsFromString(glBoostContext, xmlHttp.responseText, defaultShader, basePath));
-        }
-      };
+    return DataUtil.loadResourceAsync(basePath + fileName, false, (resolve, responseText)=>{
+      resolve(this._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath), (reject, err)=>{
 
-      xmlHttp.open("GET", basePath + fileName, true);
-      xmlHttp.send(null);
+      });
     });
   }
 

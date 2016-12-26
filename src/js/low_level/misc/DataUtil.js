@@ -31,5 +31,38 @@ export default class DataUtil {
       return result;
     }
   }
+
+  static loadResourceAsync(resourceUri, isBinary, resolveCallback, rejectCallback) {
+    return new Promise((resolve, reject)=> {
+      let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+
+      if (isNode) {
+        let fs = require('fs');
+        fs.readFile(resourceUri, 'utf8', (err, text) => {
+          if (err) {
+            if (rejectCallback) {
+              rejectCallback(reject, err);
+            }
+            return;
+          }
+          resolveCallback(resolve, text);
+        });
+      } else {
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = ()=> {
+          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
+            resolveCallback(resolve, xmlHttp.responseText);
+          } else {
+            if (rejectCallback) {
+              rejectCallback(reject, xmlHttp.status);
+            }
+          }
+        };
+
+        xmlHttp.open("GET", resourceUri, true);
+        xmlHttp.send(null);
+      }
+    });
+  }
 }
 
