@@ -361,6 +361,17 @@ export default class M_Element extends L_Element {
     return this._matrixAccumulatedAncestry.clone();
   }
 
+  get transformMatrixAccumulatedAncestryWithoutMySelf() {
+    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempString);
+    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
+      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+    }
+
+    return this._matrixAccumulatedAncestry.clone();
+  }
+
   get normalMatrixAccumulatedAncestry() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);

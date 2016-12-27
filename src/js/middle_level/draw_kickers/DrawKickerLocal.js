@@ -63,8 +63,7 @@ export default class DrawKickerLocal {
         if (material['uniform_viewPosition']) {
           let cameraPosInLocalCoord = null;
           if (camera) {
-            let cameraPos = new Vector4(0, 0, 0, 1);
-            cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+            let cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
           } else {
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));

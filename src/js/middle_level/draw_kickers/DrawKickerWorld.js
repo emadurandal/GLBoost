@@ -66,9 +66,12 @@ export default class DrawKickerWorld {
       if (material['uniform_lightPosition_0']) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
         if (material['uniform_viewPosition']) {
-          let cameraPos = new Vector4(0, 0, 1, 1);
+          let cameraPos = new Vector4(0, 0, 0, 1);
           if (camera) {
-            cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+            cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+          //  console.log(cameraPos);
+          } else {
+            let cameraPos = new Vector4(0, 0, 1, 1);
           }
           gl.uniform3f(material['uniform_viewPosition'], cameraPos.x, cameraPos.y, cameraPos.z);
         }
