@@ -11190,7 +11190,7 @@
           var textureUri = null;
 
           if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
+            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
           } else {
             var imageFileStr = imageJson.uri;
             if (imageFileStr.match(/^data:/)) {
@@ -11722,11 +11722,10 @@
       }
     }, {
       key: '_accessBinaryAsImage',
-      value: function _accessBinaryAsImage(bufferViewStr, json, buffers, mimeType) {
+      value: function _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
         var bufferViewJson = json.bufferViews[bufferViewStr];
         var byteOffset = bufferViewJson.byteOffset;
         var byteLength = bufferViewJson.byteLength;
-        var arrayBuffer = buffers[bufferViewJson.buffer];
 
         var arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
         var bytes = new Uint8Array(arrayBufferSliced);
