@@ -47,6 +47,10 @@ export default class GLContextImpl {
     return this._gl;
   }
 
+  set gl(gl) {
+    this._gl = gl;
+  }
+
   get canvas() {
     return this._canvas;
   }

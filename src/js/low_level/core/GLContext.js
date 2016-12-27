@@ -42,6 +42,10 @@ export default class GLContext {
     return this.impl.gl;
   }
 
+  set gl(gl) {
+    this.impl.gl = gl;
+  }
+
   get belongingCanvasId() {
     if (this.impl.canvas) {
       return this.impl.canvas.id;

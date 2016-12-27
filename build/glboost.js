@@ -648,6 +648,17 @@
         // begin of main function
         shaderText += 'void main(void) {\n';
 
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfVSMethodDefine.forEach(function (className) {
+          var method = _this2['VSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
+          }
+        });
+
         /// Transform
         // start transforming. first, sub class Shader, ...
         // seconds, transform as mixin Shaders
@@ -708,6 +719,17 @@
           }
         });
         shaderText += this._removeDuplicatedLine(fsDefineShaderText);
+
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfFSMethodDefine.forEach(function (className) {
+          var method = _this3['FSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
+          }
+        });
 
         // begin of main function
         shaderText += 'void main(void) {\n';
@@ -935,7 +957,9 @@
     }, {
       key: 'readyForDiscard',
       value: function readyForDiscard() {
-        this._glContext.deleteProgram(this, this._glslProgram);
+        if (this._glslProgram) {
+          this._glContext.deleteProgram(this, this._glslProgram);
+        }
         babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
       }
     }, {
@@ -955,10 +979,12 @@
       key: 'initMixinMethodArray',
       value: function initMixinMethodArray() {
         this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
+        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
         this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
         this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
         this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
+        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
         this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
 
         this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
@@ -974,6 +1000,9 @@
         if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSDefine.push(source.name);
         }
+        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSMethodDefine.push(source.name);
+        }
         if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
           this.prototype._classNamesOfVSTransform.push(source.name);
         }
@@ -982,6 +1011,9 @@
         }
         if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSDefine.push(source.name);
+        }
+        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfFSMethodDefine.push(source.name);
         }
         if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
           this.prototype._classNamesOfFSShade.push(source.name);
@@ -1004,6 +1036,10 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
         }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
+        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
@@ -1015,6 +1051,10 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
         if (matchIdx !== -1) {
@@ -1038,6 +1078,10 @@
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
         }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
+        }
         matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
@@ -1049,6 +1093,10 @@
         matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
         if (matchIdx !== -1) {
           this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
         }
         matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
         if (matchIdx !== -1) {
@@ -3141,6 +3189,9 @@
       key: "gl",
       get: function get() {
         return this._gl;
+      },
+      set: function set(gl) {
+        this._gl = gl;
       }
     }, {
       key: "canvas",
@@ -3300,6 +3351,9 @@
       key: 'gl',
       get: function get() {
         return this.impl.gl;
+      },
+      set: function set(gl) {
+        this.impl.gl = gl;
       }
     }, {
       key: 'belongingCanvasId',
@@ -4330,6 +4384,18 @@
         return this._matrixAccumulatedAncestry.clone();
       }
     }, {
+      key: 'transformMatrixAccumulatedAncestryWithoutMySelf',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._matrixAccumulatedAncestry.clone();
+      }
+    }, {
       key: 'normalMatrixAccumulatedAncestry',
       get: function get() {
         var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
@@ -4605,8 +4671,7 @@
             if (material['uniform_viewPosition']) {
               var cameraPosInLocalCoord = null;
               if (camera) {
-                var cameraPos = new Vector4(0, 0, 0, 1);
-                cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+                var cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
                 cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
               } else {
                 cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
@@ -4745,9 +4810,12 @@
           if (material['uniform_lightPosition_0']) {
             lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
             if (material['uniform_viewPosition']) {
-              var cameraPos = new Vector4(0, 0, 1, 1);
+              var cameraPos = new Vector4(0, 0, 0, 1);
               if (camera) {
-                cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+                cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+                //  console.log(cameraPos);
+              } else {
+                var _cameraPos = new Vector4(0, 0, 1, 1);
               }
               gl.uniform3f(material['uniform_viewPosition'], cameraPos.x, cameraPos.y, cameraPos.z);
             }
