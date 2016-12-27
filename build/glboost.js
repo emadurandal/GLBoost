@@ -11070,7 +11070,10 @@
         var shadersJson = json.shaders;
         var shaders = {};
         var buffers = {};
+        var textures = {};
         var promisesToLoadResources = [];
+
+        // Shaders Async load
 
         var _loop = function _loop(shaderName) {
           shaders[shaderName] = {};
@@ -11107,6 +11110,8 @@
           if (_ret === 'continue') continue;
         }
 
+        // Buffers Async load
+
         var _loop2 = function _loop2(bufferName) {
           var bufferInfo = json.buffers[bufferName];
 
@@ -11130,19 +11135,49 @@
           _loop2(bufferName);
         }
 
+        // Textures Async load
+        for (var textureName in json.textures) {
+          var textureJson = json.textures[textureName];
+          var imageJson = json.images[textureJson.source];
+          var samplerJson = json.samplers[textureJson.sampler];
+
+          var textureUri = null;
+
+          if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
+          } else {
+            var imageFileStr = imageJson.uri;
+            if (imageFileStr.match(/^data:/)) {
+              textureUri = imageFileStr;
+            } else {
+              textureUri = basePath + imageFileStr;
+            }
+          }
+
+          var texture = glBoostContext.createTexture(null, textureName, {
+            'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+            'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+            'TEXTURE_WRAP_S': samplerJson.wrapS,
+            'TEXTURE_WRAP_T': samplerJson.wrapT
+          });
+          var promise = texture.generateTextureFromUri(textureUri, false);
+          textures[textureName] = texture;
+          promisesToLoadResources.push(promise);
+        }
+
         if (promisesToLoadResources.length > 0) {
           Promise.resolve().then(function () {
             return Promise.all(promisesToLoadResources);
           }).then(function () {
-            _this2._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
+            _this2._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
           });
         } else {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
         }
       }
     }, {
       key: '_IterateNodeOfScene',
-      value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve) {
+      value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
         var sceneStr = json.scene;
         var sceneJson = json.scenes[sceneStr];
 
@@ -11153,7 +11188,7 @@
           nodeStr = sceneJson.nodes[i];
 
           // iterate nodes and load meshes
-          var element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders);
+          var element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
           group.addChild(element);
         }
 
@@ -11172,7 +11207,7 @@
       }
     }, {
       key: '_recursiveIterateNode',
-      value: function _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders) {
+      value: function _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures) {
         var nodeJson = json.nodes[nodeStr];
         var group = glBoostContext.createGroup();
         group.userFlavorName = nodeStr;
@@ -11202,7 +11237,7 @@
               rootJointStr = nodeJson.skeletons[0];
               skinStr = nodeJson.skin;
             }
-            var mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders);
+            var mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures);
             mesh.userFlavorName = meshStr;
             group.addChild(mesh);
           }
@@ -11214,7 +11249,7 @@
 
         for (var _i = 0; _i < nodeJson.children.length; _i++) {
           var _nodeStr = nodeJson.children[_i];
-          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders);
+          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
           group.addChild(childElement);
         }
 
@@ -11222,7 +11257,7 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders) {
+      value: function _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures) {
         var mesh = null;
         var geometry = null;
         if (rootJointStr) {
@@ -11322,7 +11357,7 @@
 
           var materialStr = primitiveJson.material;
 
-          texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
+          texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
           materials.push(material);
         }
@@ -11432,7 +11467,7 @@
       }
     }, {
       key: '_loadMaterial',
-      value: function _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
+      value: function _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx) {
         var materialJson = json.materials[materialStr];
 
         if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -11453,33 +11488,7 @@
             var value = materialJson.values[valueName];
             if (typeof value === 'string') {
               var textureStr = value;
-              var textureJson = json.textures[textureStr];
-              var imageStr = textureJson.source;
-              var imageJson = json.images[imageStr];
-
-              var textureUri = null;
-
-              if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-                textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
-              } else {
-                var imageFileStr = imageJson.uri;
-                if (imageFileStr.match(/^data:/)) {
-                  textureUri = imageFileStr;
-                } else {
-                  textureUri = basePath + imageFileStr;
-                }
-              }
-
-              var samplerStr = textureJson.sampler;
-              var samplerJson = json.samplers[samplerStr];
-
-              var texture = glBoostContext.createTexture(textureUri, textureStr, {
-                'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-                'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-                'TEXTURE_WRAP_S': samplerJson.wrapS,
-                'TEXTURE_WRAP_T': samplerJson.wrapT
-              });
-              material.setTexture(texture);
+              material.setTexture(textures[textureStr]);
             }
           }
         } else {

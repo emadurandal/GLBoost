@@ -111,7 +111,10 @@ export default class GLTFLoader {
     let shadersJson = json.shaders;
     let shaders = {};
     let buffers = {};
+    let textures = {};
     let promisesToLoadResources = [];
+
+    // Shaders Async load
     for (let shaderName in shadersJson) {
       shaders[shaderName] = {};
 
@@ -149,6 +152,8 @@ export default class GLTFLoader {
         );
       }
     }
+
+    // Buffers Async load
     for (let bufferName in json.buffers) {
       let bufferInfo = json.buffers[bufferName];
 
@@ -177,21 +182,52 @@ export default class GLTFLoader {
       }
     }
 
+    // Textures Async load
+    for (let textureName in json.textures) {
+      let textureJson = json.textures[textureName];
+      let imageJson = json.images[textureJson.source];
+      let samplerJson = json.samplers[textureJson.sampler];
+
+      let textureUri = null;
+
+      if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+        textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
+      } else {
+        let imageFileStr = imageJson.uri;
+        if (imageFileStr.match(/^data:/)) {
+          textureUri = imageFileStr;
+        } else {
+          textureUri = basePath + imageFileStr;
+        }
+      }
+
+      let texture = glBoostContext.createTexture(null, textureName, {
+        'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+        'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+        'TEXTURE_WRAP_S': samplerJson.wrapS,
+        'TEXTURE_WRAP_T': samplerJson.wrapT
+      });
+      let promise = texture.generateTextureFromUri(textureUri, false);
+      textures[textureName] = texture;
+      promisesToLoadResources.push(promise);
+
+    }
+
     if (promisesToLoadResources.length > 0) {
       Promise.resolve()
         .then(() => {
           return Promise.all(promisesToLoadResources);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve);
+      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, resolve) {
+  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
     let sceneStr = json.scene;
     let sceneJson = json.scenes[sceneStr];
 
@@ -202,7 +238,7 @@ export default class GLTFLoader {
       nodeStr = sceneJson.nodes[i];
 
       // iterate nodes and load meshes
-      let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders);
+      let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
       group.addChild(element);
     }
 
@@ -222,7 +258,7 @@ export default class GLTFLoader {
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders) {
+  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -252,7 +288,7 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -264,14 +300,14 @@ export default class GLTFLoader {
 
     for (let i = 0; i < nodeJson.children.length; i++) {
       let nodeStr = nodeJson.children[i];
-      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders);
+      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
       group.addChild(childElement);
     }
 
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders) {
+  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -373,7 +409,7 @@ export default class GLTFLoader {
 
       let materialStr = primitiveJson.material;
 
-      texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, i);
+      texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
       materials.push(material);
 
@@ -486,7 +522,7 @@ export default class GLTFLoader {
     return mesh;
   }
 
-  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, idx) {
+  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx) {
     let materialJson = json.materials[materialStr];
 
     if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
@@ -507,33 +543,7 @@ export default class GLTFLoader {
         let value = materialJson.values[valueName];
         if (typeof value === 'string') {
           let textureStr = value;
-          let textureJson = json.textures[textureStr];
-          let imageStr = textureJson.source;
-          let imageJson = json.images[imageStr];
-
-          let textureUri = null;
-
-          if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-            textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, buffers, imageJson.extensions.KHR_binary_glTF.mimeType);
-          } else {
-            let imageFileStr = imageJson.uri;
-            if (imageFileStr.match(/^data:/)) {
-              textureUri = imageFileStr;
-            } else {
-              textureUri = basePath + imageFileStr;
-            }
-          }
-
-          let samplerStr = textureJson.sampler;
-          let samplerJson = json.samplers[samplerStr];
-
-          let texture = glBoostContext.createTexture(textureUri, textureStr, {
-            'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-            'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-            'TEXTURE_WRAP_S': samplerJson.wrapS,
-            'TEXTURE_WRAP_T': samplerJson.wrapT
-          });
-          material.setTexture(texture);
+          material.setTexture(textures[textureStr]);
         }
       }
     } else {
