@@ -168,7 +168,7 @@ export default class ObjLoader {
     if (mtlString) {
       promise = (()=>{
         return new Promise((resolve, reject)=> {
-          resolve(this._loadMaterialsFromString(glBoostContext, mtlString, defaultShader));
+          this._loadMaterialsFromString(glBoostContext, mtlString, defaultShader, '', resolve);
         });
       })();
     }
