@@ -53,13 +53,9 @@ export default class GLTFLoader {
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
   loadGLTF(glBoostContext, url, defaultShader = null) {
-    return new Promise((resolve, reject) => {
-      var oReq = new XMLHttpRequest();
-      oReq.open("GET", url, true);
-      oReq.responseType = "arraybuffer";
-
-      oReq.onload = (oEvent) => {
-        var arrayBuffer = oReq.response;
+    return DataUtil.loadResourceAsync(url, true,
+      (resolve, response)=>{
+        var arrayBuffer = response;
 
         let dataView = new DataView(arrayBuffer, 0, 20);
         let isLittleEndian = true;
@@ -105,38 +101,10 @@ export default class GLTFLoader {
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
         this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
-      };
+      }, (reject, error)=>{
 
-      oReq.send(null);
-    });
-  }
+      });
 
-  _asyncShaderAccess(fulfilled, shaderUri, shader, shaderType) {
-    let xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = () => {
-      if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-        let gotText = xmlHttp.responseText;
-        shader.shaderText = gotText;
-        shader.shaderType = shaderType;
-        fulfilled();
-      }
-    };
-
-    xmlHttp.open("GET", shaderUri, true);
-    xmlHttp.send(null);
-  }
-
-  _asyncBufferAccess(fulfilled, bufferUri, buffers, bufferName) {
-    let xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = () => {
-      if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-        buffers[bufferName] = xmlHttp.response;
-        fulfilled();
-      }
-    };
-    xmlHttp.responseType = "arraybuffer";
-    xmlHttp.open("GET", bufferUri, true);
-    xmlHttp.send(null);
   }
 
   _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, resolve) {
@@ -168,9 +136,16 @@ export default class GLTFLoader {
       } else {
         shaderUri = basePath + shaderUri;
         promisesToLoadResources.push(
-          new Promise((fulfilled, rejected) => {
-            this._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
-          })
+          DataUtil.loadResourceAsync(shaderUri, false,
+            (resolve, response)=>{
+              shaders[shaderName].shaderText = response;
+              shaders[shaderName].shaderType = shaderType;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
         );
       }
     }
@@ -189,9 +164,15 @@ export default class GLTFLoader {
         buffers[bufferName] = arrayBufferBinary;
       } else {
         promisesToLoadResources.push(
-          new Promise((fulfilled, rejected) => {
-            this._asyncBufferAccess(fulfilled, basePath + bufferInfo.uri, buffers, bufferName);
-          })
+          DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
+            (resolve, response)=>{
+              buffers[bufferName] = response;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
         );
       }
     }

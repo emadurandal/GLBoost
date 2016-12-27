@@ -10118,27 +10118,55 @@
 
           if (isNode) {
             var fs = require('fs');
-            fs.readFile(resourceUri, 'utf8', function (err, text) {
+            var args = [resourceUri];
+            var func = function func(err, response) {
               if (err) {
                 if (rejectCallback) {
                   rejectCallback(reject, err);
                 }
                 return;
               }
-              resolveCallback(resolve, text);
-            });
+              resolveCallback(resolve, response);
+            };
+
+            if (isBinary) {
+              args.push(func);
+            } else {
+              args.push('utf8');
+              args.push(func);
+            }
+            fs.readFile.apply(fs, args);
           } else {
             (function () {
               var xmlHttp = new XMLHttpRequest();
-              xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-                  resolveCallback(resolve, xmlHttp.responseText);
-                } else {
-                  if (rejectCallback) {
-                    rejectCallback(reject, xmlHttp.status);
+              if (isBinary) {
+                xmlHttp.responseType = "arraybuffer";
+                xmlHttp.onload = function (oEvent) {
+                  var response = null;
+                  if (isBinary) {
+                    response = xmlHttp.response;
+                  } else {
+                    response = xmlHttp.responseText;
                   }
-                }
-              };
+                  resolveCallback(resolve, response);
+                };
+              } else {
+                xmlHttp.onreadystatechange = function () {
+                  if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
+                    var response = null;
+                    if (isBinary) {
+                      response = xmlHttp.response;
+                    } else {
+                      response = xmlHttp.responseText;
+                    }
+                    resolveCallback(resolve, response);
+                  } else {
+                    if (rejectCallback) {
+                      rejectCallback(reject, xmlHttp.status);
+                    }
+                  }
+                };
+              }
 
               xmlHttp.open("GET", resourceUri, true);
               xmlHttp.send(null);
@@ -10430,7 +10458,7 @@
         if (mtlString) {
           promise = function () {
             return new Promise(function (resolve, reject) {
-              resolve(_this3._loadMaterialsFromString(glBoostContext, mtlString, defaultShader));
+              _this3._loadMaterialsFromString(glBoostContext, mtlString, defaultShader, '', resolve);
             });
           }();
         }
@@ -10978,92 +11006,54 @@
 
         var defaultShader = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-        return new Promise(function (resolve, reject) {
-          var oReq = new XMLHttpRequest();
-          oReq.open("GET", url, true);
-          oReq.responseType = "arraybuffer";
+        return DataUtil.loadResourceAsync(url, true, function (resolve, response) {
+          var arrayBuffer = response;
 
-          oReq.onload = function (oEvent) {
-            var arrayBuffer = oReq.response;
+          var dataView = new DataView(arrayBuffer, 0, 20);
+          var isLittleEndian = true;
 
-            var dataView = new DataView(arrayBuffer, 0, 20);
-            var isLittleEndian = true;
+          // Magic field
+          var magicStr = '';
+          magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
+          magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
 
-            // Magic field
-            var magicStr = '';
-            magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
-            magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
-            magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
-            magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
-
-            if (magicStr !== 'glTF') {
-              // It must be normal glTF (NOT binary) file...
-              var _gotText = DataUtil.arrayBufferToString(arrayBuffer);
-              var partsOfPath = url.split('/');
-              var basePath = '';
-              for (var i = 0; i < partsOfPath.length - 1; i++) {
-                basePath += partsOfPath[i] + '/';
-              }
-              var _json = JSON.parse(_gotText);
-              _this._loadResourcesAndScene(glBoostContext, null, basePath, _json, defaultShader, resolve);
-
-              return;
+          if (magicStr !== 'glTF') {
+            // It must be normal glTF (NOT binary) file...
+            var _gotText = DataUtil.arrayBufferToString(arrayBuffer);
+            var partsOfPath = url.split('/');
+            var basePath = '';
+            for (var i = 0; i < partsOfPath.length - 1; i++) {
+              basePath += partsOfPath[i] + '/';
             }
+            var _json = JSON.parse(_gotText);
+            _this._loadResourcesAndScene(glBoostContext, null, basePath, _json, defaultShader, resolve);
 
-            var gltfVer = dataView.getUint32(4, isLittleEndian);
-            if (gltfVer !== 1) {
-              reject('invalid version field in this binary glTF file.');
-            }
-
-            var lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
-            var lengthOfContent = dataView.getUint32(12, isLittleEndian);
-            var contentFormat = dataView.getUint32(16, isLittleEndian);
-
-            if (contentFormat !== 0) {
-              // 0 means JSON format
-              reject('invalid contentFormat field in this binary glTF file.');
-            }
-
-            var arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
-            var gotText = DataUtil.arrayBufferToString(arrayBufferContent);
-            var json = JSON.parse(gotText);
-            var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
-
-            _this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
-          };
-
-          oReq.send(null);
-        });
-      }
-    }, {
-      key: '_asyncShaderAccess',
-      value: function _asyncShaderAccess(fulfilled, shaderUri, shader, shaderType) {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function () {
-          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-            var gotText = xmlHttp.responseText;
-            shader.shaderText = gotText;
-            shader.shaderType = shaderType;
-            fulfilled();
+            return;
           }
-        };
 
-        xmlHttp.open("GET", shaderUri, true);
-        xmlHttp.send(null);
-      }
-    }, {
-      key: '_asyncBufferAccess',
-      value: function _asyncBufferAccess(fulfilled, bufferUri, buffers, bufferName) {
-        var xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = function () {
-          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status / 100) === 2 || xmlHttp.status === 0)) {
-            buffers[bufferName] = xmlHttp.response;
-            fulfilled();
+          var gltfVer = dataView.getUint32(4, isLittleEndian);
+          if (gltfVer !== 1) {
+            reject('invalid version field in this binary glTF file.');
           }
-        };
-        xmlHttp.responseType = "arraybuffer";
-        xmlHttp.open("GET", bufferUri, true);
-        xmlHttp.send(null);
+
+          var lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+          var lengthOfContent = dataView.getUint32(12, isLittleEndian);
+          var contentFormat = dataView.getUint32(16, isLittleEndian);
+
+          if (contentFormat !== 0) {
+            // 0 means JSON format
+            reject('invalid contentFormat field in this binary glTF file.');
+          }
+
+          var arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
+          var gotText = DataUtil.arrayBufferToString(arrayBufferContent);
+          var json = JSON.parse(gotText);
+          var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
+
+          _this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
+        }, function (reject, error) {});
       }
     }, {
       key: '_loadResourcesAndScene',
@@ -11096,9 +11086,11 @@
             }));
           } else {
             shaderUri = basePath + shaderUri;
-            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
-              _this2._asyncShaderAccess(fulfilled, shaderUri, shaders[shaderName], shaderType);
-            }));
+            promisesToLoadResources.push(DataUtil.loadResourceAsync(shaderUri, false, function (resolve, response) {
+              shaders[shaderName].shaderText = response;
+              shaders[shaderName].shaderType = shaderType;
+              resolve();
+            }, function (reject, error) {}));
           }
         };
 
@@ -11120,9 +11112,10 @@
           } else if (bufferInfo.uri === 'data:,') {
             buffers[bufferName] = arrayBufferBinary;
           } else {
-            promisesToLoadResources.push(new Promise(function (fulfilled, rejected) {
-              _this2._asyncBufferAccess(fulfilled, basePath + bufferInfo.uri, buffers, bufferName);
-            }));
+            promisesToLoadResources.push(DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true, function (resolve, response) {
+              buffers[bufferName] = response;
+              resolve();
+            }, function (reject, error) {}));
           }
         };
 

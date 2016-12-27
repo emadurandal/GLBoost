@@ -38,26 +38,54 @@ export default class DataUtil {
 
       if (isNode) {
         let fs = require('fs');
-        fs.readFile(resourceUri, 'utf8', (err, text) => {
+        let args = [resourceUri];
+        let func = (err, response) => {
           if (err) {
             if (rejectCallback) {
               rejectCallback(reject, err);
             }
             return;
           }
-          resolveCallback(resolve, text);
-        });
+          resolveCallback(resolve, response);
+        };
+
+        if (isBinary) {
+          args.push(func);
+        } else {
+          args.push('utf8');
+          args.push(func);
+        }
+        fs.readFile.apply(fs, args);
       } else {
         let xmlHttp = new XMLHttpRequest();
-        xmlHttp.onreadystatechange = ()=> {
-          if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
-            resolveCallback(resolve, xmlHttp.responseText);
-          } else {
-            if (rejectCallback) {
-              rejectCallback(reject, xmlHttp.status);
+        if (isBinary) {
+          xmlHttp.responseType = "arraybuffer";
+          xmlHttp.onload = (oEvent) => {
+            let response = null;
+            if (isBinary) {
+              response = xmlHttp.response;
+            } else {
+              response = xmlHttp.responseText;
             }
-          }
-        };
+            resolveCallback(resolve, response);
+          };
+        } else {
+          xmlHttp.onreadystatechange = ()=> {
+            if (xmlHttp.readyState === 4 && (Math.floor(xmlHttp.status/100) === 2 || xmlHttp.status === 0)) {
+              let response = null;
+              if (isBinary) {
+                response = xmlHttp.response;
+              } else {
+                response = xmlHttp.responseText;
+              }
+              resolveCallback(resolve, response);
+            } else {
+              if (rejectCallback) {
+                rejectCallback(reject, xmlHttp.status);
+              }
+            }
+          };
+        }
 
         xmlHttp.open("GET", resourceUri, true);
         xmlHttp.send(null);
