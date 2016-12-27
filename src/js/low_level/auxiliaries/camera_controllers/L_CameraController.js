@@ -161,14 +161,16 @@ export default class L_CameraController extends GLBoostObject {
       });
     };
 
-    this._glContext.canvas.addEventListener('mousedown', this._onMouseDown);
-    this._glContext.canvas.addEventListener('mouseup', this._onMouseUp);
-    this._glContext.canvas.addEventListener('mousemove', this._onMouseMove);
-    if (window.WheelEvent) {
-      this._glContext.canvas.addEventListener("wheel", this._onMouseWheel);
+    if (this._glContext.canvas) {
+      this._glContext.canvas.addEventListener('mousedown', this._onMouseDown);
+      this._glContext.canvas.addEventListener('mouseup', this._onMouseUp);
+      this._glContext.canvas.addEventListener('mousemove', this._onMouseMove);
+      if (window.WheelEvent) {
+        this._glContext.canvas.addEventListener("wheel", this._onMouseWheel);
+      }
+      this._glContext.canvas.addEventListener('contextmenu', this._onContexMenu, false);
+      this._glContext.canvas.addEventListener("dblclick", this._onMouseDblClick);
     }
-    this._glContext.canvas.addEventListener('contextmenu', this._onContexMenu, false);
-    this._glContext.canvas.addEventListener("dblclick", this._onMouseDblClick);
   }
 
 

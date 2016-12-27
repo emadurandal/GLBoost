@@ -3957,14 +3957,16 @@
         });
       };
 
-      _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
-      _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
-      _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
-      if (window.WheelEvent) {
-        _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
+      if (_this._glContext.canvas) {
+        _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
+        _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
+        _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
+        if (window.WheelEvent) {
+          _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
+        }
+        _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
+        _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
       }
-      _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
-      _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
       return _this;
     }
 
