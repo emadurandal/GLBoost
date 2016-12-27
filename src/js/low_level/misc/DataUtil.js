@@ -48,7 +48,8 @@ export default class DataUtil {
           }
           if (isBinary) {
             let buf = new Buffer(response, 'binary');
-            response = buf.toArrayBuffer();
+            let uint8Buffer = new Uint8Array(buffer);
+            response = uint8Buffer.buffer;
           }
           resolveCallback(resolve, response);
         };
