@@ -10128,6 +10128,10 @@
                 }
                 return;
               }
+              if (isBinary) {
+                var buf = new Buffer(response, 'binary');
+                response = buf.toArrayBuffer();
+              }
               resolveCallback(resolve, response);
             };
 

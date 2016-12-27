@@ -46,6 +46,10 @@ export default class DataUtil {
             }
             return;
           }
+          if (isBinary) {
+            let buf = new Buffer(response, 'binary');
+            response = buf.toArrayBuffer();
+          }
           resolveCallback(resolve, response);
         };
 
