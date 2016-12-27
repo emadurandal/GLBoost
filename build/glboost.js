@@ -10083,9 +10083,35 @@
     }
 
     babelHelpers.createClass(DataUtil, null, [{
+      key: "btoa",
+      value: function (_btoa) {
+        function btoa(_x) {
+          return _btoa.apply(this, arguments);
+        }
+
+        btoa.toString = function () {
+          return _btoa.toString();
+        };
+
+        return btoa;
+      }(function (str) {
+        var isNode = typeof process !== "undefined" && typeof require !== "undefined";
+        if (isNode) {
+          var buffer = void 0;
+          if (Buffer.isBuffer(str)) {
+            buffer = str;
+          } else {
+            buffer = new Buffer(str.toString(), 'binary');
+          }
+          return buffer.toString('base64');
+        } else {
+          return btoa(str);
+        }
+      })
+    }, {
       key: "atob",
       value: function (_atob) {
-        function atob(_x) {
+        function atob(_x2) {
           return _atob.apply(this, arguments);
         }
 
@@ -11720,7 +11746,7 @@
         } else {
           imgSrc = "data:image/unknown;base64,";
         }
-        var dataUrl = imgSrc + window.btoa(binaryData);
+        var dataUrl = imgSrc + DataUtil.btoa(binaryData);
 
         return dataUrl;
       }

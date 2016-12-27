@@ -4,6 +4,22 @@ export default class DataUtil {
 
   }
 
+  static btoa(str) {
+    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+    if (isNode) {
+      let buffer;
+      if (Buffer.isBuffer(str)) {
+        buffer = str;
+      }
+      else {
+        buffer = new Buffer(str.toString(), 'binary');
+      }
+      return buffer.toString('base64');
+    } else {
+      return btoa(str)
+    }
+  }
+
   static atob(str) {
     let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
     if (isNode) {

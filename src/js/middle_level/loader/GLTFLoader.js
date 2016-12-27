@@ -753,7 +753,7 @@ export default class GLTFLoader {
     } else {
       imgSrc = "data:image/unknown;base64,";
     }
-    let dataUrl = imgSrc + window.btoa(binaryData);
+    let dataUrl = imgSrc + DataUtil.btoa(binaryData);
 
     return dataUrl;
   }
