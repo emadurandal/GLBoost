@@ -10129,7 +10129,7 @@
                 return;
               }
               if (isBinary) {
-                var buf = new Buffer(response, 'binary');
+                var buffer = new Buffer(response, 'binary');
                 var uint8Buffer = new Uint8Array(buffer);
                 response = uint8Buffer.buffer;
               }

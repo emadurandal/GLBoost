@@ -47,7 +47,7 @@ export default class DataUtil {
             return;
           }
           if (isBinary) {
-            let buf = new Buffer(response, 'binary');
+            let buffer = new Buffer(response, 'binary');
             let uint8Buffer = new Uint8Array(buffer);
             response = uint8Buffer.buffer;
           }
