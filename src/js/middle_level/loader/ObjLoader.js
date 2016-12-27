@@ -61,7 +61,7 @@ export default class ObjLoader {
 
   }
 
-  _loadMaterialsFromString(glBoostContext, mtlString, defaultShader, basePath = '') {
+  _loadMaterialsFromString(glBoostContext, mtlString, defaultShader, basePath = '', resolve) {
 
     var mtlTextRows = mtlString.split('\n');
 
@@ -82,6 +82,8 @@ export default class ObjLoader {
     var materials = new Array(numMaterial);
     var iMCount = -1;
 
+
+    let promisesToLoadTexture = [];
     // main loading
     for (let i=0; i<mtlTextRows.length; i++) {
       let matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
@@ -129,19 +131,27 @@ export default class ObjLoader {
       if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-        var texture = glBoostContext.createTexture(basePath + matchArray[2], matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
+        //var texture = glBoostContext.createTexture(basePath + matchArray[2], matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
+        var texture = glBoostContext.createTexture(null, matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
+        let promise = texture.generateTextureFromUri(basePath + matchArray[2], false);
+        promisesToLoadTexture.push(promise);
         materials[iMCount].setTexture(texture);
       }
     }
-    return materials;
+
+    let promiseAll = Promise.all(promisesToLoadTexture);
+    promiseAll.then(()=>{
+      resolve(materials);
+    });
   }
 
   _loadMaterialsFromFile(glBoostContext, basePath, fileName, defaultShader) {
-    return DataUtil.loadResourceAsync(basePath + fileName, false, (resolve, responseText)=>{
-      resolve(this._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath), (reject, err)=>{
-
-      });
-    });
+    return DataUtil.loadResourceAsync(basePath + fileName, false,
+      (resolve, responseText)=>{
+        this._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath, resolve);
+      },
+      (reject, err)=>{}
+      );
   }
 
   _constructMesh(glBoostContext, objText, basePath, defaultShader, mtlString, resolve) {

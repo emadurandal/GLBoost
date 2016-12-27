@@ -10327,6 +10327,7 @@
       key: '_loadMaterialsFromString',
       value: function _loadMaterialsFromString(glBoostContext, mtlString, defaultShader) {
         var basePath = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+        var resolve = arguments[4];
 
 
         var mtlTextRows = mtlString.split('\n');
@@ -10347,6 +10348,7 @@
         var materials = new Array(numMaterial);
         var iMCount = -1;
 
+        var promisesToLoadTexture = [];
         // main loading
         for (var _i2 = 0; _i2 < mtlTextRows.length; _i2++) {
           var _matchArray = mtlTextRows[_i2].match(/(\w+) ([\w:\/\-\.]+)/);
@@ -10389,11 +10391,18 @@
 
           if (_matchArray[1].toLowerCase() === "map_kd") {
             _matchArray = mtlTextRows[_i2].match(/(\w+) ([\w:\/\-\.]+)/);
-            var texture = glBoostContext.createTexture(basePath + _matchArray[2], _matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
+            //var texture = glBoostContext.createTexture(basePath + matchArray[2], matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
+            var texture = glBoostContext.createTexture(null, _matchArray[2], { 'UNPACK_FLIP_Y_WEBGL': true });
+            var promise = texture.generateTextureFromUri(basePath + _matchArray[2], false);
+            promisesToLoadTexture.push(promise);
             materials[iMCount].setTexture(texture);
           }
         }
-        return materials;
+
+        var promiseAll = Promise.all(promisesToLoadTexture);
+        promiseAll.then(function () {
+          resolve(materials);
+        });
       }
     }, {
       key: '_loadMaterialsFromFile',
@@ -10401,8 +10410,8 @@
         var _this2 = this;
 
         return DataUtil.loadResourceAsync(basePath + fileName, false, function (resolve, responseText) {
-          resolve(_this2._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath), function (reject, err) {});
-        });
+          _this2._loadMaterialsFromString(glBoostContext, responseText, defaultShader, basePath, resolve);
+        }, function (reject, err) {});
       }
     }, {
       key: '_constructMesh',
