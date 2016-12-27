@@ -4,10 +4,19 @@ export default class DataUtil {
 
   }
 
+  static atob(str) {
+    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+    if (isNode) {
+      return new Buffer(str, 'base64').toString('binary');
+    } else {
+      return atob(str)
+    }
+  }
+
   static base64ToArrayBuffer(dataUri) {
     let splittedDataUri = dataUri.split(',');
     let type = splittedDataUri[0].split(':')[1].split(';')[0];
-    let byteString = atob(splittedDataUri[1]);
+    let byteString = DataUtil.atob(splittedDataUri[1]);
     let byteStringLength = byteString.length;
     let arrayBuffer = new ArrayBuffer(byteStringLength);
     let uint8Array = new Uint8Array(arrayBuffer);

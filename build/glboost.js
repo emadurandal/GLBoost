@@ -10083,11 +10083,31 @@
     }
 
     babelHelpers.createClass(DataUtil, null, [{
-      key: 'base64ToArrayBuffer',
+      key: "atob",
+      value: function (_atob) {
+        function atob(_x) {
+          return _atob.apply(this, arguments);
+        }
+
+        atob.toString = function () {
+          return _atob.toString();
+        };
+
+        return atob;
+      }(function (str) {
+        var isNode = typeof process !== "undefined" && typeof require !== "undefined";
+        if (isNode) {
+          return new Buffer(str, 'base64').toString('binary');
+        } else {
+          return atob(str);
+        }
+      })
+    }, {
+      key: "base64ToArrayBuffer",
       value: function base64ToArrayBuffer(dataUri) {
         var splittedDataUri = dataUri.split(',');
         var type = splittedDataUri[0].split(':')[1].split(';')[0];
-        var byteString = atob(splittedDataUri[1]);
+        var byteString = DataUtil.atob(splittedDataUri[1]);
         var byteStringLength = byteString.length;
         var arrayBuffer = new ArrayBuffer(byteStringLength);
         var uint8Array = new Uint8Array(arrayBuffer);
@@ -10097,7 +10117,7 @@
         return arrayBuffer;
       }
     }, {
-      key: 'arrayBufferToString',
+      key: "arrayBufferToString",
       value: function arrayBufferToString(arrayBuffer) {
         if (typeof TextDecoder !== 'undefined') {
           var textDecoder = new TextDecoder();
@@ -10113,7 +10133,7 @@
         }
       }
     }, {
-      key: 'loadResourceAsync',
+      key: "loadResourceAsync",
       value: function loadResourceAsync(resourceUri, isBinary, resolveCallback, rejectCallback) {
         return new Promise(function (resolve, reject) {
           var isNode = typeof process !== "undefined" && typeof require !== "undefined";
