@@ -62,7 +62,7 @@ camera.cameraController = glBoostContext.createCameraController(true, false, fal
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/TriangleWithoutIndices/glTF/TriangleWithoutIndices.gltf', null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/Triangle/glTF-Embedded/Triangle.gltf', null);
 promise.then(function(group) {
   console.log(group);
 
