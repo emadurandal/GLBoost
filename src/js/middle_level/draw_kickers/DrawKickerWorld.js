@@ -106,20 +106,22 @@ export default class DrawKickerWorld {
 
       if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
         if (material) {
+          material.setUpStates();
+          isMaterialSetupDone = true;
           if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
             // do nothing
           } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
             let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
             let textureName = textureSamplerDic.textureName;
             let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-            isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+            isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
           } else {
             // it must be an Array...
             material._semanticsDic['TEXTURE'].forEach((uniformName) => {
               let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
               let textureName = textureSamplerDic.textureName;
               let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-              isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+              isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
             });
           }
         }
@@ -140,6 +142,8 @@ export default class DrawKickerWorld {
       }
 
       this._tearDownOtherTextures(lights);
+
+      material.tearDownStates();
 
       DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }

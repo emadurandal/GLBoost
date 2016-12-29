@@ -1,5 +1,5 @@
 import GLBoost from '../globals';
-import GLContext from './core/GLContext';
+import Renderer from '../middle_level/Renderer';
 import Vector4 from './math/Vector4';
 import DecalShader from '../middle_level/shaders/DecalShader';
 import GLBoostObject from './core/GLBoostObject';
@@ -18,6 +18,24 @@ export default class ClassicMaterial extends GLBoostObject {
     this._shaderClass = DecalShader;
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
+    this._states = null;
+
+    this._stateFunctionsToReset = {
+      "blendColor": [0.0, 0.0, 0.0, 0.0],
+      "blendEquationSeparate": [
+        32774,
+        32774
+      ],
+      "blendFuncSeparate": [1, 0, 1, 0],
+      "colorMask": [true, true, true, true],
+      "cullFace": [1029],
+      "depthFunc": [513],
+      "depthMask": [true],
+      "depthRange": [0.0, 1.0],
+      "frontFace": [2305],
+      "lineWidth": [1.0],
+      "polygonOffset": [0.0, 0.0]
+    };
 
     this._countOfUpdate = 0;
   }
@@ -131,6 +149,29 @@ export default class ClassicMaterial extends GLBoostObject {
     return this._ambientColor;
   }
 
+  set states(states) {
+    this._states = states;
+  }
+
+  get states() {
+    return this._states;
+  }
+
+  isTransparent() {
+    let isTransparent = false;
+    if (this._states) {
+      if (this._states.enable) {
+        this._states.enable.forEach((state) => {
+          if (state === 3042) {
+            isTransparent = true;
+          }
+        });
+      }
+    }
+
+    return isTransparent;
+  }
+
   set name(name) {
     this._name = name;
   }
@@ -147,7 +188,7 @@ export default class ClassicMaterial extends GLBoostObject {
     return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
   }
 
-  setUp(textureName, textureUnitIndex) {
+  setUpTexture(textureName, textureUnitIndex) {
     var gl = this._gl;
     var result = false;
     let texture = this.getTexture(textureName);
@@ -161,13 +202,50 @@ export default class ClassicMaterial extends GLBoostObject {
     return result;
   }
 
-  tearDown(textureName) {
+  tearDownTexture(textureName) {
     let texture = this.getTexture(textureName);
     if (texture) {
       texture.tearDown();
     }
+
   }
 
+  setUpStates() {
+    var gl = this._gl;
+
+    if (this._states) {
+      Renderer.disableAllGLState(gl);
+
+      if (this._states.enable) {
+        this._states.enable.forEach((state)=>{
+          gl.enable(state);
+        });
+      }
+      if (this._states.functions) {
+        for (let functionName in this._states.functions) {
+          gl[functionName].apply(gl, this._states.functions[functionName]);
+        }
+      }
+    }
+  }
+
+  tearDownStates() {
+    var gl = this._gl;
+
+    if (this._states) {
+      if (this._states.enable) {
+        this._states.enable.forEach((state)=>{
+          gl.disable(state);
+        });
+      }
+      if (this._states.functions) {
+        for (let functionName in this._stateFunctionsToReset) {
+          gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
+        }
+      }
+      Renderer.reflectGlobalGLState(gl);
+    }
+  }
 }
 
 GLBoost['ClassicMaterial'] = ClassicMaterial;

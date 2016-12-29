@@ -103,7 +103,7 @@ export default class DrawKickerLocal {
 
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
         if (material) {
-          isMaterialSetupDone = material.setUp();
+          isMaterialSetupDone = material.setUpTexture();
         }
       }
       if (!isMaterialSetupDone) {

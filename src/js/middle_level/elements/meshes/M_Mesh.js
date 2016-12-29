@@ -200,6 +200,12 @@ export default class M_Mesh extends M_Element {
     return this._transformedDepth;
   }
 
+  isTransparent() {
+    let isTransparent = (this._opacity < 1.0 || this._transparentByUser) ? true : false;
+    isTransparent |= this.geometry.isTransparent(this);
+    return isTransparent;
+  }
+
   get AABBInWorld() {
     var world_m = this.transformMatrixAccumulatedAncestry;
     return AABB.multiplyMatrix(world_m, this._geometry.AABB);

@@ -207,6 +207,18 @@ export default class Geometry extends GLBoostObject {
     }
   }
 
+  _getAppropriateMaterials(mesh) {
+    let materials = null;
+    if (this._materials.length > 0) {
+      materials = this._materials;
+    } else if (mesh.material){
+      materials = [mesh.material];
+    } else {
+      materials = [this._defaultMaterial];
+    }
+    return materials;
+  }
+
   prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
 
     var vertices = this._vertices;
@@ -240,14 +252,7 @@ export default class Geometry extends GLBoostObject {
     });
 
 
-    var materials = null;
-    if (this._materials.length > 0) {
-      materials = this._materials;
-    } else if (mesh.material){
-      materials = [mesh.material];
-    } else {
-      materials = [this._defaultMaterial];
-    }
+    let materials = this._getAppropriateMaterials(mesh);
 
 
     for (let i=0; i<materials.length;i++) {
@@ -287,14 +292,7 @@ export default class Geometry extends GLBoostObject {
     var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
-    var materials = null;
-    if (this._materials.length > 0) {
-      materials = this._materials;
-    } else if (mesh.material){
-      materials = [mesh.material];
-    } else {
-      materials = [this._defaultMaterial];
-    }
+    let materials = this._getAppropriateMaterials(mesh);
 
     let thisName = this.toString();
 
@@ -516,6 +514,17 @@ export default class Geometry extends GLBoostObject {
 
   static clearMaterialCache() {
     Geometry._lastMaterial = null;
+  }
+
+  isTransparent(mesh) {
+    let materials = this._getAppropriateMaterials(mesh);
+    let isTransparent = false;
+    materials.forEach((material)=>{
+      if (material.isTransparent()) {
+        isTransparent = true;
+      }
+    });
+    return isTransparent;
   }
 
   get AABB() {

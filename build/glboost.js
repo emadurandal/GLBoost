@@ -1210,55 +1210,48 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  var VertexWorldShaderSource = function () {
-    function VertexWorldShaderSource() {
-      babelHelpers.classCallCheck(this, VertexWorldShaderSource);
+  var VertexLocalShaderSource = function () {
+    function VertexLocalShaderSource() {
+      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
     }
 
-    babelHelpers.createClass(VertexWorldShaderSource, [{
-      key: 'VSDefine_VertexWorldShaderSource',
-      value: function VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
+    babelHelpers.createClass(VertexLocalShaderSource, [{
+      key: 'VSDefine_VertexLocalShaderSource',
+      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
         var shaderText = in_ + ' vec3 aVertex_position;\n';
-
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += in_ + ' vec3 aVertex_normal;\n';
           shaderText += out_ + ' vec3 v_normal;\n';
         }
         shaderText += out_ + ' vec4 position;\n';
-
-        shaderText += 'uniform mat4 worldMatrix;\n';
-        shaderText += 'uniform mat4 viewMatrix;\n';
-        shaderText += 'uniform mat4 projectionMatrix;\n';
-        shaderText += 'uniform mat3 normalMatrix;\n';
+        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
         return shaderText;
       }
     }, {
-      key: 'VSTransform_VertexWorldShaderSource',
-      value: function VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+      key: 'VSTransform_VertexLocalShaderSource',
+      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
         var shaderText = '';
         if (existCamera_f) {
-          shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-          shaderText += '  gl_Position = pvwMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
         } else {
-          shaderText += '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
         }
         if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
+          shaderText += '  v_normal = aVertex_normal;\n';
         }
-        shaderText += '  position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
 
         return shaderText;
       }
     }, {
-      key: 'FSDefine_VertexWorldShaderSource',
-      value: function FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
+      key: 'FSDefine_VertexLocalShaderSource',
+      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
         var shaderText = '';
-
         if (lights.length > 0) {
           shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
           shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
         }
-
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += in_ + ' vec3 v_normal;\n';
         }
@@ -1267,14 +1260,8 @@
         return shaderText;
       }
     }, {
-      key: 'FSShade_VertexWorldShaderSource',
-      value: function FSShade_VertexWorldShaderSource(f, gl, lights) {
-        var shaderText = '';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexWorldShaderSource',
-      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+      key: 'prepare_VertexLocalShaderSource',
+      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
         var vertexAttribsAsResult = [];
 
@@ -1286,15 +1273,9 @@
           }
         });
 
-        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-        material._semanticsDic['WORLD'] = 'worldMatrix';
-        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
-        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
         if (existCamera_f) {
-          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-          material._semanticsDic['VIEW'] = 'viewMatrix';
-          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+          material.uniform_modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+          material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
         }
 
         for (var i = 0; i < lights.length; i++) {
@@ -1305,291 +1286,10 @@
         return vertexAttribsAsResult;
       }
     }]);
-    return VertexWorldShaderSource;
+    return VertexLocalShaderSource;
   }();
 
-  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
-
-  var FragmentSimpleShaderSource = function () {
-    function FragmentSimpleShaderSource() {
-      babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
-    }
-
-    babelHelpers.createClass(FragmentSimpleShaderSource, [{
-      key: 'FSDefine_FragmentSimpleShaderSource',
-      value: function FSDefine_FragmentSimpleShaderSource(in_, f) {
-        var shaderText = 'uniform float opacity;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_FragmentSimpleShaderSource',
-      value: function FSShade_FragmentSimpleShaderSource(f, gl) {
-        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_FragmentSimpleShaderSource',
-      value: function prepare_FragmentSimpleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
-
-        var vertexAttribsAsResult = [];
-
-        shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return FragmentSimpleShaderSource;
-  }();
-
-  var SimpleShader = function (_Shader) {
-    babelHelpers.inherits(SimpleShader, _Shader);
-
-    function SimpleShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, SimpleShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SimpleShader.__proto__ || Object.getPrototypeOf(SimpleShader)).call(this, glBoostContext));
-
-      SimpleShader.mixin(basicShader);
-      SimpleShader.mixin(FragmentSimpleShaderSource);
-      return _this;
-    }
-
-    return SimpleShader;
-  }(Shader);
-
-  GLBoost['SimpleShader'] = SimpleShader;
-
-  var VertexWorldShadowShaderSource = function () {
-    function VertexWorldShadowShaderSource() {
-      babelHelpers.classCallCheck(this, VertexWorldShadowShaderSource);
-    }
-
-    babelHelpers.createClass(VertexWorldShadowShaderSource, [{
-      key: 'VSDefine_VertexWorldShadowShaderSource',
-      value: function VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = '';
-        var textureUnitIndex = 0;
-        //for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
-        shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
-        textureUnitIndex++;
-        //}
-        //}
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexWorldShadowShaderSource',
-      value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-
-        shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
-
-        //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-        for (var i = 0; i < lights.length; i++) {
-          shaderText += '  { // ' + i + '\n';
-          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
-          //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
-          shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ' + i + '\n';
-          shaderText += '  } // ' + i + '\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexWorldShadowShaderSource',
-      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_VertexWorldShadowShaderSource',
-      value: function FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
-        var shaderText = '';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexWorldShadowShaderSource',
-      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
-        material._semanticsDic['WORLD'] = 'worldMatrix';
-        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
-        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
-        if (existCamera_f) {
-          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
-          material._semanticsDic['VIEW'] = 'viewMatrix';
-          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        var textureUnitIndex = 0;
-        for (var _i = 0; _i < lights.length; _i++) {
-          //if (lights[i].camera && lights[i].camera.texture) {
-
-          // matrices
-          material['uniform_depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
-
-          textureUnitIndex++;
-          //}
-          //shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexWorldShadowShaderSource;
-  }();
-
-  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
-
-  var DecalShaderSource = function () {
-    function DecalShaderSource() {
-      babelHelpers.classCallCheck(this, DecalShaderSource);
-    }
-
-    babelHelpers.createClass(DecalShaderSource, [{
-      key: 'VSDefine_DecalShaderSource',
-      value: function VSDefine_DecalShaderSource(in_, out_, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 aVertex_color;\n';
-          shaderText += out_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
-          shaderText += out_ + ' vec2 texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_DecalShaderSource',
-      value: function VSTransform_DecalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  color = aVertex_color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += '  texcoord = aVertex_texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_DecalShaderSource',
-      value: function FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 texcoord;\n\n';
-        }
-        if (material.hasAnyTextures()) {
-          shaderText += 'uniform sampler2D uTexture;\n';
-        }
-        shaderText += 'uniform vec4 materialBaseColor;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_DecalShaderSource',
-      value: function FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
-        var shaderText = '';
-        var textureFunc = Shader._texture_func(gl);
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  rt0 *= color;\n';
-        }
-        shaderText += '    rt0 *= materialBaseColor;\n';
-        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
-        }
-        //shaderText += '    float shadowRatio = 0.0;\n';
-
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_DecalShaderSource',
-      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
-
-        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-          if (material.getOneTexture()) {
-            material.uniformTextureSamplerDic['uTexture'] = {};
-            material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
-            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-
-            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
-
-            // set texture unit 0 to the sampler
-            gl.uniform1i(material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
-            material._semanticsDic['TEXTURE'] = 'uTexture';
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return DecalShaderSource;
-  }();
-
-  var DecalShader = function (_Shader) {
-    babelHelpers.inherits(DecalShader, _Shader);
-
-    function DecalShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, DecalShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
-
-      DecalShader.mixin(basicShader);
-      if (basicShader === VertexWorldShaderSource) {
-        DecalShader.mixin(VertexWorldShadowShaderSource);
-      }
-      DecalShader.mixin(FragmentSimpleShaderSource);
-      DecalShader.mixin(DecalShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(DecalShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material) {
-
-        var baseColor = material.baseColor;
-        gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
-      }
-    }]);
-    return DecalShader;
-  }(Shader);
-
-  GLBoost['DecalShader'] = DecalShader;
+  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
   var Matrix33 = function () {
     function Matrix33(m) {
@@ -3141,537 +2841,6 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
-  var GLContextImpl = function () {
-    function GLContextImpl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextImpl);
-
-      //    if (new.target === GLContextImpl) {
-      if (this.constructor === GLContextImpl) {
-        throw new TypeError("Cannot construct GLContextImpl instances directly");
-      }
-
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
-
-      if (canvas === void 0) {
-        throw new Error("Failed to create WebGL Context due to no canvas object.");
-      }
-
-      this._canvas = canvas;
-    }
-
-    babelHelpers.createClass(GLContextImpl, [{
-      key: "init",
-      value: function init(glVersionString, ContextType, gl) {
-
-        if (gl) {
-          this._gl = gl;
-        } else {
-
-          var _gl = this._canvas.getContext(glVersionString);
-
-          if (!_gl) {
-            _gl = this._canvas.getContext('experimental-' + glVersionString);
-            if (!_gl) {
-              throw new Error("This platform doesn't support WebGL.");
-            }
-          }
-
-          if (!_gl instanceof ContextType) {
-            throw new Error("Unexpected rendering context.");
-          }
-
-          this._gl = _gl;
-        }
-      }
-    }, {
-      key: "gl",
-      get: function get() {
-        return this._gl;
-      },
-      set: function set(gl) {
-        this._gl = gl;
-      }
-    }, {
-      key: "canvas",
-      get: function get() {
-        return this._canvas;
-      }
-    }]);
-    return GLContextImpl;
-  }();
-
-  var GLContextWebGL2Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
-
-    function GLContextWebGL2Impl(canvas, parent, gl) {
-      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
-
-      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext, gl);
-
-      return _this;
-    }
-
-    return GLContextWebGL2Impl;
-  }(GLContextImpl);
-
-  var GLContextWebGL1Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
-
-    function GLContextWebGL1Impl(canvas, parent, gl) {
-      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
-
-      if (gl) {
-        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', null, gl);
-      } else {
-        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext, gl);
-      }
-      return _this;
-    }
-
-    return GLContextWebGL1Impl;
-  }(GLContextImpl);
-
-  var GLContext = function () {
-    function GLContext(canvas, gl, width, height) {
-      babelHelpers.classCallCheck(this, GLContext);
-
-
-      if (typeof gl !== 'undefined' && gl !== null) {
-        this.impl = new GLContextWebGL1Impl(canvas, this, gl);
-        this._width = width;
-        this._height = height;
-        GLContext._instances['nocanvas'] = this;
-      } else {
-        if (GLContext._instances[canvas.id] instanceof GLContext) {
-          return GLContext._instances[canvas.id];
-        }
-
-        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
-          this.impl = new GLContextWebGL1Impl(canvas, this);
-        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
-          this.impl = new GLContextWebGL2Impl(canvas, this);
-        }
-
-        GLContext._instances[canvas.id] = this;
-        this._width = canvas.width;
-        this._height = canvas.height;
-      }
-
-      this._monitor = GLBoostMonitor.getInstance();
-    }
-
-    babelHelpers.createClass(GLContext, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(glBoostObject) {
-        var gl = this.gl;
-        var glem = GLExtensionsManager.getInstance(this);
-        var glResource = glem.createVertexArray(gl);
-        if (glResource) {
-          this._monitor.registerWebGLResource(glBoostObject, glResource);
-        }
-
-        return glResource;
-      }
-    }, {
-      key: 'createBuffer',
-      value: function createBuffer(glBoostObject) {
-        var glResource = this.gl.createBuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createFramebuffer',
-      value: function createFramebuffer(glBoostObject) {
-        var glResource = this.gl.createFramebuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteFramebuffer',
-      value: function deleteFramebuffer(glBoostObject, frameBuffer) {
-        this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
-        this.gl.deleteFramebuffer(frameBuffer);
-        frameBuffer = null;
-      }
-    }, {
-      key: 'createRenderbuffer',
-      value: function createRenderbuffer(glBoostObject) {
-        var glResource = this.gl.createRenderbuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createShader',
-      value: function createShader(glBoostObject, shaderType) {
-        var glResource = this.gl.createShader(shaderType);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteShader',
-      value: function deleteShader(glBoostObject, shader) {
-        this._monitor.deregisterWebGLResource(glBoostObject, shader);
-        this.gl.deleteShader(shader);
-        shader = null;
-      }
-    }, {
-      key: 'createProgram',
-      value: function createProgram(glBoostObject) {
-        var glResource = this.gl.createProgram();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteProgram',
-      value: function deleteProgram(glBoostObject, program) {
-        this._monitor.deregisterWebGLResource(glBoostObject, program);
-        this.gl.deleteProgram(program);
-      }
-    }, {
-      key: 'createTexture',
-      value: function createTexture(glBoostObject) {
-        var glResource = this.gl.createTexture();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteTexture',
-      value: function deleteTexture(glBoostObject, texture) {
-        this._monitor.deregisterWebGLResource(glBoostObject, texture);
-        this.gl.deleteTexture(texture);
-        texture = null;
-      }
-    }, {
-      key: 'gl',
-      get: function get() {
-        return this.impl.gl;
-      },
-      set: function set(gl) {
-        this.impl.gl = gl;
-      }
-    }, {
-      key: 'belongingCanvasId',
-      get: function get() {
-        if (this.impl.canvas) {
-          return this.impl.canvas.id;
-        } else {
-          return 'nocanvas';
-        }
-      }
-    }, {
-      key: 'canvas',
-      get: function get() {
-        return this.impl.canvas;
-      }
-    }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      },
-      set: function set(width) {
-        if (this.impl.canvas) {
-          this.impl.canvas.width = width;
-        }
-        this._width = width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      },
-      set: function set(height) {
-        if (this.impl.canvas) {
-          this.impl.canvas.height = height;
-        }
-        this._height = height;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(canvas, gl, width, height) {
-        if (typeof canvas === 'string') {
-          canvas = window.document.querySelector(canvas);
-        }
-        return new GLContext(canvas, gl, width, height);
-      }
-    }]);
-    return GLContext;
-  }();
-
-  GLContext._instances = new Object();
-
-  var ClassicMaterial = function (_GLBoostObject) {
-    babelHelpers.inherits(ClassicMaterial, _GLBoostObject);
-
-    function ClassicMaterial(glBoostContext) {
-      babelHelpers.classCallCheck(this, ClassicMaterial);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
-
-      _this._textureDic = {};
-      _this._gl = _this._glContext.gl;
-      _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      _this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      _this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
-      _this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
-      _this._name = '';
-      _this._shaderClass = DecalShader;
-      _this._shaderInstance = null;
-      _this._vertexNofGeometries = {};
-
-      _this._countOfUpdate = 0;
-      return _this;
-    }
-
-    babelHelpers.createClass(ClassicMaterial, [{
-      key: 'clone',
-      value: function clone() {
-        var material = new ClassicMaterial(this._glBoostContext);
-        material._baseColor = this._baseColor;
-        material._diffuseColor = this._diffuseColor;
-        material._specularColor = this._specularColor;
-        material._ambientColor = this._ambientColor;
-        material._shaderClass = this._shaderClass;
-        material._shaderInstance = this._shaderInstance;
-
-        for (var geom in this._vertexNofGeometries) {
-          material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
-        }
-
-        return material;
-      }
-    }, {
-      key: '_updateCount',
-      value: function _updateCount() {
-        this._countOfUpdate += 1;
-      }
-    }, {
-      key: 'getUpdateStateString',
-      value: function getUpdateStateString() {
-        return this.toString() + '_updateCount_' + this._countOfUpdate;
-      }
-    }, {
-      key: 'setTexture',
-      value: function setTexture(texture) {
-        this._textureDic[texture.userFlavorName] = texture;
-        this._updateCount();
-      }
-    }, {
-      key: 'getTexture',
-      value: function getTexture(userFlavorName) {
-        return this._textureDic[userFlavorName];
-      }
-    }, {
-      key: 'getOneTexture',
-      value: function getOneTexture() {
-        for (var userFlavorName in this._textureDic) {
-          return this._textureDic[userFlavorName];
-        }
-        return null;
-      }
-    }, {
-      key: 'hasAnyTextures',
-      value: function hasAnyTextures() {
-        var result = false;
-        for (var userFlavorName in this._textureDic) {
-          result = true;
-        }
-
-        return result;
-      }
-    }, {
-      key: 'setVertexN',
-      value: function setVertexN(geom, num) {
-        this._vertexNofGeometries[geom] = num;
-      }
-    }, {
-      key: 'getVertexN',
-      value: function getVertexN(geom) {
-        return typeof this._vertexNofGeometries[geom] === 'undefined' ? 0 : this._vertexNofGeometries[geom];
-      }
-    }, {
-      key: 'setUp',
-      value: function setUp(textureName, textureUnitIndex) {
-        var gl = this._gl;
-        var result = false;
-        var texture = this.getTexture(textureName);
-        if (texture) {
-          result = texture.setUp(textureUnitIndex);
-        } else {
-          gl.bindTexture(gl.TEXTURE_2D, null);
-          result = true;
-        }
-
-        return result;
-      }
-    }, {
-      key: 'tearDown',
-      value: function tearDown(textureName) {
-        var texture = this.getTexture(textureName);
-        if (texture) {
-          texture.tearDown();
-        }
-      }
-    }, {
-      key: 'shaderClass',
-      set: function set(shaderClass) {
-        if (this._shaderClass === shaderClass) {
-          return;
-        }
-        this._shaderClass = shaderClass;
-        if (this._shaderInstance) {
-          this._shaderInstance.readyForDiscard();
-        }
-        this._shaderInstance = null;
-      },
-      get: function get() {
-        return this._shaderClass;
-      }
-    }, {
-      key: 'shaderInstance',
-      set: function set(shaderInstance) {
-        this._shaderInstance = shaderInstance;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._shaderInstance;
-      }
-    }, {
-      key: 'baseColor',
-      set: function set(vec) {
-        this._baseColor = vec;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._baseColor;
-      }
-    }, {
-      key: 'diffuseColor',
-      set: function set(vec) {
-        this._diffuseColor = vec;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._diffuseColor;
-      }
-    }, {
-      key: 'specularColor',
-      set: function set(vec) {
-        this._specularColor = vec;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._specularColor;
-      }
-    }, {
-      key: 'ambientColor',
-      set: function set(vec) {
-        this._ambientColor = vec;
-        this._updateCount();
-      },
-      get: function get() {
-        return this._ambientColor;
-      }
-    }, {
-      key: 'name',
-      set: function set(name) {
-        this._name = name;
-      },
-      get: function get() {
-        return this._name;
-      }
-    }]);
-    return ClassicMaterial;
-  }(GLBoostObject);
-
-  GLBoost$1['ClassicMaterial'] = ClassicMaterial;
-
-  var VertexLocalShaderSource = function () {
-    function VertexLocalShaderSource() {
-      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
-    }
-
-    babelHelpers.createClass(VertexLocalShaderSource, [{
-      key: 'VSDefine_VertexLocalShaderSource',
-      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
-        var shaderText = in_ + ' vec3 aVertex_position;\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 v_normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexLocalShaderSource',
-      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (existCamera_f) {
-          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
-          shaderText += '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
-        } else {
-          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
-        }
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += '  v_normal = aVertex_normal;\n';
-        }
-        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexLocalShaderSource',
-      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (lights.length > 0) {
-          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        }
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 v_normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexLocalShaderSource',
-      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          material.uniform_modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
-          material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
-          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexLocalShaderSource;
-  }();
-
-  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
-
   var AnimationUtil = function () {
     function AnimationUtil() {
       babelHelpers.classCallCheck(this, AnimationUtil);
@@ -4098,11 +3267,6 @@
         } else {
           return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
         }
-      }
-    }, {
-      key: 'isTransparent',
-      value: function isTransparent() {
-        return this._opacity < 1.0 || this._transparentByUser ? true : false;
       }
     }, {
       key: 'toStringWithUpdateInfo',
@@ -4711,7 +3875,7 @@
 
           if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
             if (material) {
-              isMaterialSetupDone = material.setUp();
+              isMaterialSetupDone = material.setUpTexture();
             }
           }
           if (!isMaterialSetupDone) {
@@ -4749,6 +3913,106 @@
   DrawKickerLocal._lastMaterialUpdateStateString = null;
   DrawKickerLocal._lastGeometry = null;
   DrawKickerLocal._lastRenderPassIndex = -1;
+
+  var VertexWorldShaderSource = function () {
+    function VertexWorldShaderSource() {
+      babelHelpers.classCallCheck(this, VertexWorldShaderSource);
+    }
+
+    babelHelpers.createClass(VertexWorldShaderSource, [{
+      key: 'VSDefine_VertexWorldShaderSource',
+      value: function VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 v_normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+
+        shaderText += 'uniform mat4 worldMatrix;\n';
+        shaderText += 'uniform mat4 viewMatrix;\n';
+        shaderText += 'uniform mat4 projectionMatrix;\n';
+        shaderText += 'uniform mat3 normalMatrix;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexWorldShaderSource',
+      value: function VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+        if (existCamera_f) {
+          shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+          shaderText += '  gl_Position = pvwMatrix * vec4(aVertex_position, 1.0);\n';
+        } else {
+          shaderText += '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+        }
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
+        }
+        shaderText += '  position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexWorldShaderSource',
+      value: function FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        if (lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 v_normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_VertexWorldShaderSource',
+      value: function FSShade_VertexWorldShaderSource(f, gl, lights) {
+        var shaderText = '';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexWorldShaderSource',
+      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        if (existCamera_f) {
+          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexWorldShaderSource;
+  }();
+
+  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
   var singleton$3 = Symbol();
   var singletonEnforcer$3 = Symbol();
@@ -4851,20 +4115,22 @@
 
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
             if (material) {
+              material.setUpStates();
+              isMaterialSetupDone = true;
               if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
                 // do nothing
               } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
                 var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
                 var textureName = textureSamplerDic.textureName;
                 var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-                isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+                isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
               } else {
                 // it must be an Array...
                 material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
                   var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
                   var textureName = textureSamplerDic.textureName;
                   var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-                  isMaterialSetupDone = material.setUp(textureName, textureUnitIndex);
+                  isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
                 });
               }
             }
@@ -4887,6 +4153,8 @@
           }
 
           _this._tearDownOtherTextures(lights);
+
+          material.tearDownStates();
 
           DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
         };
@@ -5317,6 +4585,19 @@
         }
       }
     }, {
+      key: '_getAppropriateMaterials',
+      value: function _getAppropriateMaterials(mesh) {
+        var materials = null;
+        if (this._materials.length > 0) {
+          materials = this._materials;
+        } else if (mesh.material) {
+          materials = [mesh.material];
+        } else {
+          materials = [this._defaultMaterial];
+        }
+        return materials;
+      }
+    }, {
       key: 'prepareToRender',
       value: function prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
         var _this6 = this;
@@ -5349,14 +4630,7 @@
           }
         });
 
-        var materials = null;
-        if (this._materials.length > 0) {
-          materials = this._materials;
-        } else if (mesh.material) {
-          materials = [mesh.material];
-        } else {
-          materials = [this._defaultMaterial];
-        }
+        var materials = this._getAppropriateMaterials(mesh);
 
         for (var i = 0; i < materials.length; i++) {
           this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
@@ -5396,14 +4670,7 @@
         var gl = this._glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
-        var materials = null;
-        if (this._materials.length > 0) {
-          materials = this._materials;
-        } else if (mesh.material) {
-          materials = [mesh.material];
-        } else {
-          materials = [this._defaultMaterial];
-        }
+        var materials = this._getAppropriateMaterials(mesh);
 
         var thisName = this.toString();
 
@@ -5638,6 +4905,18 @@
         return this._extraDataForShader[name];
       }
     }, {
+      key: 'isTransparent',
+      value: function isTransparent(mesh) {
+        var materials = this._getAppropriateMaterials(mesh);
+        var isTransparent = false;
+        materials.forEach(function (material) {
+          if (material.isTransparent()) {
+            isTransparent = true;
+          }
+        });
+        return isTransparent;
+      }
+    }, {
       key: 'materials',
       set: function set(materials) {
         this._materials = materials;
@@ -5678,6 +4957,736 @@
 
   Geometry._vaoDic = {};
   Geometry._iboArrayDic = {};
+
+  /**
+   * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
+   * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+   */
+
+  var Renderer = function (_GLBoostObject) {
+    babelHelpers.inherits(Renderer, _GLBoostObject);
+
+    function Renderer(glBoostContext, parameters) {
+      babelHelpers.classCallCheck(this, Renderer);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (Renderer.__proto__ || Object.getPrototypeOf(Renderer)).call(this, glBoostContext));
+
+      var _clearColor = parameters.clearColor;
+
+      var gl = _this._glContext.gl;
+
+      Renderer.reflectGlobalGLState(gl);
+
+      gl.clearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
+
+      return _this;
+    }
+
+    babelHelpers.createClass(Renderer, [{
+      key: 'draw',
+
+
+      /**
+       * en: draw elements of the scene.<br>
+       * ja: sceneが持つオブジェクトを描画します
+       * @param {Scene} scene a instance of Scene class
+       */
+      value: function draw(expression) {
+        var _this2 = this;
+
+        expression.renderPasses.forEach(function (renderPass, index) {
+          if (!renderPass.scene) {
+            return;
+          }
+
+          var camera = false;
+          renderPass.scene.cameras.forEach(function (elm) {
+            if (elm.isMainCamera(renderPass.scene)) {
+              camera = elm;
+            }
+          });
+
+          var glContext = _this2._glContext;
+          var gl = glContext.gl;
+          var glem = GLExtensionsManager.getInstance(_this2._glContext);
+
+          var lights = renderPass.scene.lights;
+
+          if (renderPass.fbo) {
+            gl.bindTexture(gl.TEXTURE_2D, null);
+            Geometry.clearMaterialCache();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+          }
+          glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
+
+          if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+            gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
+          } else {
+            gl.viewport(0, 0, glContext.width, glContext.height);
+          }
+
+          _this2._clearBuffer(gl, renderPass);
+
+          // draw opacity meshes.
+          var opacityMeshes = renderPass.opacityMeshes;
+          opacityMeshes.forEach(function (mesh) {
+            mesh.draw(lights, camera, renderPass.scene, index);
+          });
+
+          if (camera) {
+            renderPass.sortTransparentMeshes(camera);
+          }
+          // draw transparent meshes.
+          var transparentMeshes = renderPass.transparentMeshes;
+          transparentMeshes.forEach(function (mesh) {
+            mesh.draw(lights, camera, renderPass.scene, index);
+          });
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+          //      glem.drawBuffers(gl, [gl.BACK]);
+        });
+      }
+    }, {
+      key: '_clearBuffer',
+      value: function _clearBuffer(gl, renderPass) {
+        var clearColor = renderPass.clearColor;
+        var clearDepth = renderPass.clearDepth;
+        if (clearColor) {
+          gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+        }
+        if (clearDepth) {
+          gl.clearDepth(clearDepth);
+        }
+        if (clearColor || clearDepth) {
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        } else if (clearColor) {
+          gl.clear(gl.COLOR_BUFFER_BIT);
+        } else {
+          gl.clear(gl.DEPTH_BUFFER_BIT);
+        }
+      }
+
+      /**
+       * en: clear color/depth/stencil of canvas.<br>
+       * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
+       * @param {boolean} color_flg true: clear color, false: don't clear color
+       * @param {boolean} depth_flg true: clear depth, false: don't clear depth
+       * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+       */
+
+    }, {
+      key: 'clearCanvas',
+      value: function clearCanvas(color_flg, depth_flg, stencil_flg) {
+
+        var gl = this._glContext.gl;
+
+        var bufferBits = 0;
+
+        if (color_flg === void 0 || color_flg) bufferBits |= gl.COLOR_BUFFER_BIT;
+        if (depth_flg === void 0 || depth_flg) bufferBits |= gl.DEPTH_BUFFER_BIT;
+        if (stencil_flg === void 0 || stencil_flg) bufferBits |= gl.STENCIL_BUFFER_BIT;
+
+        gl.clear(bufferBits);
+      }
+
+      /**
+       * en: Get WebGL context.<br>
+       * ja: WebGLコンテキストを取得します。
+       * @returns {webglcontext} a context of WebGL
+       */
+
+    }, {
+      key: 'resize',
+
+
+      /**
+       * en: resize canvas and viewport.<br>
+       * ja: canvasとビューポートをリサイズします。
+       * @param {number} width en: width to resize, ja: リサイズする幅
+       * @param {number} height en: height to resize, ja:リサイズする高さ
+       */
+      value: function resize(width, height) {
+        this._glContext.width = width;
+        this._glContext.height = height;
+
+        this._glContext.gl.viewport(0, 0, width, height);
+      }
+    }, {
+      key: 'glContext',
+      get: function get() {
+        return this._glContext.gl;
+      }
+    }], [{
+      key: 'reflectGlobalGLState',
+      value: function reflectGlobalGLState(gl) {
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+
+        gl.enable(gl.BLEND);
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        gl.clearDepth(1);
+        gl.clearStencil(0);
+      }
+    }, {
+      key: 'disableAllGLState',
+      value: function disableAllGLState(gl) {
+        var states = [3042, 2884, 2929, 32823, 32926];
+
+        states.forEach(function (state) {
+          gl.disable(state);
+        });
+      }
+    }]);
+    return Renderer;
+  }(GLBoostObject);
+
+  var FragmentSimpleShaderSource = function () {
+    function FragmentSimpleShaderSource() {
+      babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
+    }
+
+    babelHelpers.createClass(FragmentSimpleShaderSource, [{
+      key: 'FSDefine_FragmentSimpleShaderSource',
+      value: function FSDefine_FragmentSimpleShaderSource(in_, f) {
+        var shaderText = 'uniform float opacity;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_FragmentSimpleShaderSource',
+      value: function FSShade_FragmentSimpleShaderSource(f, gl) {
+        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_FragmentSimpleShaderSource',
+      value: function prepare_FragmentSimpleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+
+        var vertexAttribsAsResult = [];
+
+        shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return FragmentSimpleShaderSource;
+  }();
+
+  var SimpleShader = function (_Shader) {
+    babelHelpers.inherits(SimpleShader, _Shader);
+
+    function SimpleShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, SimpleShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SimpleShader.__proto__ || Object.getPrototypeOf(SimpleShader)).call(this, glBoostContext));
+
+      SimpleShader.mixin(basicShader);
+      SimpleShader.mixin(FragmentSimpleShaderSource);
+      return _this;
+    }
+
+    return SimpleShader;
+  }(Shader);
+
+  GLBoost['SimpleShader'] = SimpleShader;
+
+  var VertexWorldShadowShaderSource = function () {
+    function VertexWorldShadowShaderSource() {
+      babelHelpers.classCallCheck(this, VertexWorldShadowShaderSource);
+    }
+
+    babelHelpers.createClass(VertexWorldShadowShaderSource, [{
+      key: 'VSDefine_VertexWorldShadowShaderSource',
+      value: function VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = '';
+        var textureUnitIndex = 0;
+        //for (let i=0; i<lights.length; i++) {
+        //if (lights[i].camera && lights[i].camera.texture) {
+        shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
+        shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
+        textureUnitIndex++;
+        //}
+        //}
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexWorldShadowShaderSource',
+      value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
+
+        //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
+        for (var i = 0; i < lights.length; i++) {
+          shaderText += '  { // ' + i + '\n';
+          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
+          //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
+          shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ' + i + '\n';
+          shaderText += '  } // ' + i + '\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexWorldShadowShaderSource',
+      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_VertexWorldShadowShaderSource',
+      value: function FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
+        var shaderText = '';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexWorldShadowShaderSource',
+      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        if (existCamera_f) {
+          material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          material['uniform_lightPosition_' + i] = gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']');
+          material['uniform_lightDiffuse_' + i] = gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']');
+        }
+
+        var textureUnitIndex = 0;
+        for (var _i = 0; _i < lights.length; _i++) {
+          //if (lights[i].camera && lights[i].camera.texture) {
+
+          // matrices
+          material['uniform_depthPVMatrix_' + textureUnitIndex] = gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']');
+
+          textureUnitIndex++;
+          //}
+          //shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexWorldShadowShaderSource;
+  }();
+
+  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
+
+  var DecalShaderSource = function () {
+    function DecalShaderSource() {
+      babelHelpers.classCallCheck(this, DecalShaderSource);
+    }
+
+    babelHelpers.createClass(DecalShaderSource, [{
+      key: 'VSDefine_DecalShaderSource',
+      value: function VSDefine_DecalShaderSource(in_, out_, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 aVertex_color;\n';
+          shaderText += out_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+          shaderText += out_ + ' vec2 texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_DecalShaderSource',
+      value: function VSTransform_DecalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  color = aVertex_color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += '  texcoord = aVertex_texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_DecalShaderSource',
+      value: function FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 texcoord;\n\n';
+        }
+        if (material.hasAnyTextures()) {
+          shaderText += 'uniform sampler2D uTexture;\n';
+        }
+        shaderText += 'uniform vec4 materialBaseColor;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_DecalShaderSource',
+      value: function FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+        var textureFunc = Shader._texture_func(gl);
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  rt0 *= color;\n';
+        }
+        shaderText += '    rt0 *= materialBaseColor;\n';
+        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
+        }
+        //shaderText += '    float shadowRatio = 0.0;\n';
+
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_DecalShaderSource',
+      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+
+        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+          if (material.getOneTexture()) {
+            material.uniformTextureSamplerDic['uTexture'] = {};
+            material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
+            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+
+            // set texture unit 0 to the sampler
+            gl.uniform1i(material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
+            material._semanticsDic['TEXTURE'] = 'uTexture';
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return DecalShaderSource;
+  }();
+
+  var DecalShader = function (_Shader) {
+    babelHelpers.inherits(DecalShader, _Shader);
+
+    function DecalShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, DecalShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
+
+      DecalShader.mixin(basicShader);
+      if (basicShader === VertexWorldShaderSource) {
+        DecalShader.mixin(VertexWorldShadowShaderSource);
+      }
+      DecalShader.mixin(FragmentSimpleShaderSource);
+      DecalShader.mixin(DecalShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(DecalShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+      }
+    }]);
+    return DecalShader;
+  }(Shader);
+
+  GLBoost['DecalShader'] = DecalShader;
+
+  var ClassicMaterial = function (_GLBoostObject) {
+    babelHelpers.inherits(ClassicMaterial, _GLBoostObject);
+
+    function ClassicMaterial(glBoostContext) {
+      babelHelpers.classCallCheck(this, ClassicMaterial);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
+
+      _this._textureDic = {};
+      _this._gl = _this._glContext.gl;
+      _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      _this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      _this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
+      _this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
+      _this._name = '';
+      _this._shaderClass = DecalShader;
+      _this._shaderInstance = null;
+      _this._vertexNofGeometries = {};
+      _this._states = null;
+
+      _this._stateFunctionsToReset = {
+        "blendColor": [0.0, 0.0, 0.0, 0.0],
+        "blendEquationSeparate": [32774, 32774],
+        "blendFuncSeparate": [1, 0, 1, 0],
+        "colorMask": [true, true, true, true],
+        "cullFace": [1029],
+        "depthFunc": [513],
+        "depthMask": [true],
+        "depthRange": [0.0, 1.0],
+        "frontFace": [2305],
+        "lineWidth": [1.0],
+        "polygonOffset": [0.0, 0.0]
+      };
+
+      _this._countOfUpdate = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(ClassicMaterial, [{
+      key: 'clone',
+      value: function clone() {
+        var material = new ClassicMaterial(this._glBoostContext);
+        material._baseColor = this._baseColor;
+        material._diffuseColor = this._diffuseColor;
+        material._specularColor = this._specularColor;
+        material._ambientColor = this._ambientColor;
+        material._shaderClass = this._shaderClass;
+        material._shaderInstance = this._shaderInstance;
+
+        for (var geom in this._vertexNofGeometries) {
+          material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
+        }
+
+        return material;
+      }
+    }, {
+      key: '_updateCount',
+      value: function _updateCount() {
+        this._countOfUpdate += 1;
+      }
+    }, {
+      key: 'getUpdateStateString',
+      value: function getUpdateStateString() {
+        return this.toString() + '_updateCount_' + this._countOfUpdate;
+      }
+    }, {
+      key: 'setTexture',
+      value: function setTexture(texture) {
+        this._textureDic[texture.userFlavorName] = texture;
+        this._updateCount();
+      }
+    }, {
+      key: 'getTexture',
+      value: function getTexture(userFlavorName) {
+        return this._textureDic[userFlavorName];
+      }
+    }, {
+      key: 'getOneTexture',
+      value: function getOneTexture() {
+        for (var userFlavorName in this._textureDic) {
+          return this._textureDic[userFlavorName];
+        }
+        return null;
+      }
+    }, {
+      key: 'hasAnyTextures',
+      value: function hasAnyTextures() {
+        var result = false;
+        for (var userFlavorName in this._textureDic) {
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent() {
+        var isTransparent = false;
+        if (this._states) {
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              if (state === 3042) {
+                isTransparent = true;
+              }
+            });
+          }
+        }
+
+        return isTransparent;
+      }
+    }, {
+      key: 'setVertexN',
+      value: function setVertexN(geom, num) {
+        this._vertexNofGeometries[geom] = num;
+      }
+    }, {
+      key: 'getVertexN',
+      value: function getVertexN(geom) {
+        return typeof this._vertexNofGeometries[geom] === 'undefined' ? 0 : this._vertexNofGeometries[geom];
+      }
+    }, {
+      key: 'setUpTexture',
+      value: function setUpTexture(textureName, textureUnitIndex) {
+        var gl = this._gl;
+        var result = false;
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          result = texture.setUp(textureUnitIndex);
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, null);
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
+      key: 'tearDownTexture',
+      value: function tearDownTexture(textureName) {
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          texture.tearDown();
+        }
+      }
+    }, {
+      key: 'setUpStates',
+      value: function setUpStates() {
+        var gl = this._gl;
+
+        if (this._states) {
+          Renderer.disableAllGLState(gl);
+
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              gl.enable(state);
+            });
+          }
+          if (this._states.functions) {
+            for (var functionName in this._states.functions) {
+              gl[functionName].apply(gl, this._states.functions[functionName]);
+            }
+          }
+        }
+      }
+    }, {
+      key: 'tearDownStates',
+      value: function tearDownStates() {
+        var gl = this._gl;
+
+        if (this._states) {
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              gl.disable(state);
+            });
+          }
+          if (this._states.functions) {
+            for (var functionName in this._stateFunctionsToReset) {
+              gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
+            }
+          }
+          Renderer.reflectGlobalGLState(gl);
+        }
+      }
+    }, {
+      key: 'shaderClass',
+      set: function set(shaderClass) {
+        if (this._shaderClass === shaderClass) {
+          return;
+        }
+        this._shaderClass = shaderClass;
+        if (this._shaderInstance) {
+          this._shaderInstance.readyForDiscard();
+        }
+        this._shaderInstance = null;
+      },
+      get: function get() {
+        return this._shaderClass;
+      }
+    }, {
+      key: 'shaderInstance',
+      set: function set(shaderInstance) {
+        this._shaderInstance = shaderInstance;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._shaderInstance;
+      }
+    }, {
+      key: 'baseColor',
+      set: function set(vec) {
+        this._baseColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._baseColor;
+      }
+    }, {
+      key: 'diffuseColor',
+      set: function set(vec) {
+        this._diffuseColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._diffuseColor;
+      }
+    }, {
+      key: 'specularColor',
+      set: function set(vec) {
+        this._specularColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._specularColor;
+      }
+    }, {
+      key: 'ambientColor',
+      set: function set(vec) {
+        this._ambientColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._ambientColor;
+      }
+    }, {
+      key: 'states',
+      set: function set(states) {
+        this._states = states;
+      },
+      get: function get() {
+        return this._states;
+      }
+    }, {
+      key: 'name',
+      set: function set(name) {
+        this._name = name;
+      },
+      get: function get() {
+        return this._name;
+      }
+    }]);
+    return ClassicMaterial;
+  }(GLBoostObject);
+
+  GLBoost$1['ClassicMaterial'] = ClassicMaterial;
 
   var Grid = function (_Geometry) {
     babelHelpers.inherits(Grid, _Geometry);
@@ -5922,6 +5931,13 @@
         var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
         this._transformedDepth = transformedCenterPosition.z;
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent() {
+        var isTransparent = this._opacity < 1.0 || this._transparentByUser ? true : false;
+        isTransparent |= this.geometry.isTransparent(this);
+        return isTransparent;
       }
     }, {
       key: 'clone',
@@ -7241,180 +7257,6 @@
 
   GLBoost$1['Expression'] = Expression;
 
-  /**
-   * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
-   * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
-   */
-
-  var Renderer = function (_GLBoostObject) {
-    babelHelpers.inherits(Renderer, _GLBoostObject);
-
-    function Renderer(glBoostContext, parameters) {
-      babelHelpers.classCallCheck(this, Renderer);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (Renderer.__proto__ || Object.getPrototypeOf(Renderer)).call(this, glBoostContext));
-
-      var _clearColor = parameters.clearColor;
-
-      var gl = _this._glContext.gl;
-
-      var setDefaultGLStates = function setDefaultGLStates() {
-
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
-
-        gl.enable(gl.BLEND);
-        gl.blendEquation(gl.FUNC_ADD);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-        gl.clearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
-        gl.clearDepth(1);
-        gl.clearStencil(0);
-      };
-
-      setDefaultGLStates();
-
-      return _this;
-    }
-
-    /**
-     * en: draw elements of the scene.<br>
-     * ja: sceneが持つオブジェクトを描画します
-     * @param {Scene} scene a instance of Scene class
-     */
-
-
-    babelHelpers.createClass(Renderer, [{
-      key: 'draw',
-      value: function draw(expression) {
-        var _this2 = this;
-
-        expression.renderPasses.forEach(function (renderPass, index) {
-          if (!renderPass.scene) {
-            return;
-          }
-
-          var camera = false;
-          renderPass.scene.cameras.forEach(function (elm) {
-            if (elm.isMainCamera(renderPass.scene)) {
-              camera = elm;
-            }
-          });
-
-          var glContext = _this2._glContext;
-          var gl = glContext.gl;
-          var glem = GLExtensionsManager.getInstance(_this2._glContext);
-
-          var lights = renderPass.scene.lights;
-
-          if (renderPass.fbo) {
-            gl.bindTexture(gl.TEXTURE_2D, null);
-            Geometry.clearMaterialCache();
-            gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
-          }
-          glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
-
-          if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
-            gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
-          } else {
-            gl.viewport(0, 0, glContext.width, glContext.height);
-          }
-
-          _this2._clearBuffer(gl, renderPass);
-
-          // draw opacity meshes.
-          var opacityMeshes = renderPass.opacityMeshes;
-          opacityMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
-          });
-
-          if (camera) {
-            renderPass.sortTransparentMeshes(camera);
-          }
-          // draw transparent meshes.
-          var transparentMeshes = renderPass.transparentMeshes;
-          transparentMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
-          });
-
-          gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-          //      glem.drawBuffers(gl, [gl.BACK]);
-        });
-      }
-    }, {
-      key: '_clearBuffer',
-      value: function _clearBuffer(gl, renderPass) {
-        var clearColor = renderPass.clearColor;
-        var clearDepth = renderPass.clearDepth;
-        if (clearColor) {
-          gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-        }
-        if (clearDepth) {
-          gl.clearDepth(clearDepth);
-        }
-        if (clearColor || clearDepth) {
-          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        } else if (clearColor) {
-          gl.clear(gl.COLOR_BUFFER_BIT);
-        } else {
-          gl.clear(gl.DEPTH_BUFFER_BIT);
-        }
-      }
-
-      /**
-       * en: clear color/depth/stencil of canvas.<br>
-       * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
-       * @param {boolean} color_flg true: clear color, false: don't clear color
-       * @param {boolean} depth_flg true: clear depth, false: don't clear depth
-       * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
-       */
-
-    }, {
-      key: 'clearCanvas',
-      value: function clearCanvas(color_flg, depth_flg, stencil_flg) {
-
-        var gl = this._glContext.gl;
-
-        var bufferBits = 0;
-
-        if (color_flg === void 0 || color_flg) bufferBits |= gl.COLOR_BUFFER_BIT;
-        if (depth_flg === void 0 || depth_flg) bufferBits |= gl.DEPTH_BUFFER_BIT;
-        if (stencil_flg === void 0 || stencil_flg) bufferBits |= gl.STENCIL_BUFFER_BIT;
-
-        gl.clear(bufferBits);
-      }
-
-      /**
-       * en: Get WebGL context.<br>
-       * ja: WebGLコンテキストを取得します。
-       * @returns {webglcontext} a context of WebGL
-       */
-
-    }, {
-      key: 'resize',
-
-
-      /**
-       * en: resize canvas and viewport.<br>
-       * ja: canvasとビューポートをリサイズします。
-       * @param {number} width en: width to resize, ja: リサイズする幅
-       * @param {number} height en: height to resize, ja:リサイズする高さ
-       */
-      value: function resize(width, height) {
-        this._glContext.width = width;
-        this._glContext.height = height;
-
-        this._glContext.gl.viewport(0, 0, width, height);
-      }
-    }, {
-      key: 'glContext',
-      get: function get() {
-        return this._glContext.gl;
-      }
-    }]);
-    return Renderer;
-  }(GLBoostObject);
-
   var SkeletalShaderSource = function () {
     function SkeletalShaderSource() {
       babelHelpers.classCallCheck(this, SkeletalShaderSource);
@@ -8130,6 +7972,270 @@
     }]);
     return M_Scene;
   }(M_Group);
+
+  var GLContextImpl = function () {
+    function GLContextImpl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextImpl);
+
+      //    if (new.target === GLContextImpl) {
+      if (this.constructor === GLContextImpl) {
+        throw new TypeError("Cannot construct GLContextImpl instances directly");
+      }
+
+      if (!(parent instanceof GLContext)) {
+        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+      }
+
+      if (canvas === void 0) {
+        throw new Error("Failed to create WebGL Context due to no canvas object.");
+      }
+
+      this._canvas = canvas;
+    }
+
+    babelHelpers.createClass(GLContextImpl, [{
+      key: "init",
+      value: function init(glVersionString, ContextType, gl) {
+
+        if (gl) {
+          this._gl = gl;
+        } else {
+
+          var _gl = this._canvas.getContext(glVersionString);
+
+          if (!_gl) {
+            _gl = this._canvas.getContext('experimental-' + glVersionString);
+            if (!_gl) {
+              throw new Error("This platform doesn't support WebGL.");
+            }
+          }
+
+          if (!_gl instanceof ContextType) {
+            throw new Error("Unexpected rendering context.");
+          }
+
+          this._gl = _gl;
+        }
+      }
+    }, {
+      key: "gl",
+      get: function get() {
+        return this._gl;
+      },
+      set: function set(gl) {
+        this._gl = gl;
+      }
+    }, {
+      key: "canvas",
+      get: function get() {
+        return this._canvas;
+      }
+    }]);
+    return GLContextImpl;
+  }();
+
+  var GLContextWebGL2Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+    function GLContextWebGL2Impl(canvas, parent, gl) {
+      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
+
+      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext, gl);
+
+      return _this;
+    }
+
+    return GLContextWebGL2Impl;
+  }(GLContextImpl);
+
+  var GLContextWebGL1Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+
+    function GLContextWebGL1Impl(canvas, parent, gl) {
+      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
+
+      if (gl) {
+        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', null, gl);
+      } else {
+        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext, gl);
+      }
+      return _this;
+    }
+
+    return GLContextWebGL1Impl;
+  }(GLContextImpl);
+
+  var GLContext = function () {
+    function GLContext(canvas, gl, width, height) {
+      babelHelpers.classCallCheck(this, GLContext);
+
+
+      if (typeof gl !== 'undefined' && gl !== null) {
+        this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+        this._width = width;
+        this._height = height;
+        GLContext._instances['nocanvas'] = this;
+      } else {
+        if (GLContext._instances[canvas.id] instanceof GLContext) {
+          return GLContext._instances[canvas.id];
+        }
+
+        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
+          this.impl = new GLContextWebGL1Impl(canvas, this);
+        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
+          this.impl = new GLContextWebGL2Impl(canvas, this);
+        }
+
+        GLContext._instances[canvas.id] = this;
+        this._width = canvas.width;
+        this._height = canvas.height;
+      }
+
+      this._monitor = GLBoostMonitor.getInstance();
+    }
+
+    babelHelpers.createClass(GLContext, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(glBoostObject) {
+        var gl = this.gl;
+        var glem = GLExtensionsManager.getInstance(this);
+        var glResource = glem.createVertexArray(gl);
+        if (glResource) {
+          this._monitor.registerWebGLResource(glBoostObject, glResource);
+        }
+
+        return glResource;
+      }
+    }, {
+      key: 'createBuffer',
+      value: function createBuffer(glBoostObject) {
+        var glResource = this.gl.createBuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createFramebuffer',
+      value: function createFramebuffer(glBoostObject) {
+        var glResource = this.gl.createFramebuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteFramebuffer',
+      value: function deleteFramebuffer(glBoostObject, frameBuffer) {
+        this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
+        this.gl.deleteFramebuffer(frameBuffer);
+        frameBuffer = null;
+      }
+    }, {
+      key: 'createRenderbuffer',
+      value: function createRenderbuffer(glBoostObject) {
+        var glResource = this.gl.createRenderbuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createShader',
+      value: function createShader(glBoostObject, shaderType) {
+        var glResource = this.gl.createShader(shaderType);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteShader',
+      value: function deleteShader(glBoostObject, shader) {
+        this._monitor.deregisterWebGLResource(glBoostObject, shader);
+        this.gl.deleteShader(shader);
+        shader = null;
+      }
+    }, {
+      key: 'createProgram',
+      value: function createProgram(glBoostObject) {
+        var glResource = this.gl.createProgram();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteProgram',
+      value: function deleteProgram(glBoostObject, program) {
+        this._monitor.deregisterWebGLResource(glBoostObject, program);
+        this.gl.deleteProgram(program);
+      }
+    }, {
+      key: 'createTexture',
+      value: function createTexture(glBoostObject) {
+        var glResource = this.gl.createTexture();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteTexture',
+      value: function deleteTexture(glBoostObject, texture) {
+        this._monitor.deregisterWebGLResource(glBoostObject, texture);
+        this.gl.deleteTexture(texture);
+        texture = null;
+      }
+    }, {
+      key: 'gl',
+      get: function get() {
+        return this.impl.gl;
+      },
+      set: function set(gl) {
+        this.impl.gl = gl;
+      }
+    }, {
+      key: 'belongingCanvasId',
+      get: function get() {
+        if (this.impl.canvas) {
+          return this.impl.canvas.id;
+        } else {
+          return 'nocanvas';
+        }
+      }
+    }, {
+      key: 'canvas',
+      get: function get() {
+        return this.impl.canvas;
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      },
+      set: function set(width) {
+        if (this.impl.canvas) {
+          this.impl.canvas.width = width;
+        }
+        this._width = width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      },
+      set: function set(height) {
+        if (this.impl.canvas) {
+          this.impl.canvas.height = height;
+        }
+        this._height = height;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(canvas, gl, width, height) {
+        if (typeof canvas === 'string') {
+          canvas = window.document.querySelector(canvas);
+        }
+        return new GLContext(canvas, gl, width, height);
+      }
+    }]);
+    return GLContext;
+  }();
+
+  GLContext._instances = new Object();
 
   /**
    * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -11740,6 +11846,18 @@
                 break;
             }
           }
+        }
+
+        if (techniqueJson.states) {
+          if (techniqueJson.states.functions) {
+            for (var functionName in techniqueJson.states.functions) {
+              if (!Array.isArray(techniqueJson.states.functions[functionName])) {
+                techniqueJson.states.functions[functionName] = [techniqueJson.states.functions[functionName]];
+              }
+            }
+          }
+
+          material.states = techniqueJson.states;
         }
 
         this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames);

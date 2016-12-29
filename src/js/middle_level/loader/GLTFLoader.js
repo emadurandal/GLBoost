@@ -677,6 +677,18 @@ export default class GLTFLoader {
       }
     }
 
+    if (techniqueJson.states) {
+      if (techniqueJson.states.functions) {
+        for (let functionName in techniqueJson.states.functions) {
+          if (!Array.isArray(techniqueJson.states.functions[functionName])) {
+            techniqueJson.states.functions[functionName] = [techniqueJson.states.functions[functionName]];
+          }
+        }
+      }
+
+      material.states = techniqueJson.states;
+    }
+
     this._loadProgram(glBoostContext, json, programStr, material, shaders, attributes, uniforms, textureNames);
   }
 

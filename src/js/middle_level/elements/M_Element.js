@@ -460,10 +460,6 @@ export default class M_Element extends L_Element {
     this._transparentByUser = flg;
   }
 
-  isTransparent() {
-    return (this._opacity < 1.0 || this._transparentByUser) ? true : false;
-  }
-
   set dirty(flg) {
     this._dirtyAsElement = flg;
     if (flg) {
