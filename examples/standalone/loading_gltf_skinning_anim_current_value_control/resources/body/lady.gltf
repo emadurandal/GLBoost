@@ -1820,24 +1820,8 @@
             "program": "program_0",
             "states": {
                 "enable": [
-                    2929,
-                    3042
-                ],
-                "functions": {
-                    "blendEquationSeparate": [
-                        32774,
-                        32774
-                    ],
-                    "blendFuncSeparate": [
-                        1,
-                        771,
-                        1,
-                        771
-                    ],
-                    "depthMask": [
-                        false
-                    ]
-                }
+                    2929
+                ]
             },
             "uniforms": {
                 "u_ambient": "ambient",
