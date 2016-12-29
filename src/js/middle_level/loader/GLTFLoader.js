@@ -408,17 +408,21 @@ export default class GLTFLoader {
         dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json);
       }
 
-      // Texture
-      let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-      if (texcoords0AccessorStr) {
+      // Material
+      if (primitiveJson.material) {
         var texcoords = null;
-
-        let material = glBoostContext.createClassicMaterial();
+        let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
 
         let materialStr = primitiveJson.material;
 
+        let material = glBoostContext.createClassicMaterial();
+
         texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
+        materials.push(material);
+      } else {
+        let material = glBoostContext.createClassicMaterial();
+        material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
         materials.push(material);
       }
 
@@ -864,6 +868,14 @@ export default class GLTFLoader {
     return accessorJson.componentType;
   }
 
+  _adjustByteAlign(typedArrayClass, arrayBuffer, alignSize, byteOffset, length) {
+    if (( byteOffset % alignSize ) != 0) {
+      return new typedArrayClass(arrayBuffer.slice(byteOffset), 0, length);
+    } else {
+      return new typedArrayClass(arrayBuffer, byteOffset, length);
+    }
+  }
+
   _accessBinary(accessorStr, json, buffers, quaternionIfVec4 = false, toGetAsTypedArray = false) {
     var accessorJson = json.accessors[accessorStr];
     var bufferViewStr = accessorJson.bufferView;
@@ -884,19 +896,19 @@ export default class GLTFLoader {
     if (toGetAsTypedArray) {
       if (GLTFLoader._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
-          vertexAttributeArray = new Float32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+          vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getInt8') {
           vertexAttributeArray = new Int8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getUint8') {
           vertexAttributeArray = new Uint8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getInt16') {
-          vertexAttributeArray = new Int16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+          vertexAttributeArray = this._adjustByteAlign(Int16Array, arrayBuffer, 2, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getUint16') {
-          vertexAttributeArray = new Uint16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+          vertexAttributeArray = this._adjustByteAlign(Uint16Array, arrayBuffer, 2, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getInt32') {
-          vertexAttributeArray = new Int32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+          vertexAttributeArray = this._adjustByteAlign(Int32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getUint32') {
-          vertexAttributeArray = new Uint32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+          vertexAttributeArray = this._adjustByteAlign(Uint32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
         }
 
       } else {

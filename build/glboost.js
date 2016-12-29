@@ -1324,7 +1324,7 @@
     }, {
       key: 'FSShade_FragmentSimpleShaderSource',
       value: function FSShade_FragmentSimpleShaderSource(f, gl) {
-        var shaderText = 'rt0 = vec4(0.5, 0.5, 0.5, opacity);\n';
+        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
         return shaderText;
       }
     }, {
@@ -11475,18 +11475,22 @@
             dataViewMethodDic.weight = this._checkDataViewMethod(weightAccessorStr, json);
           }
 
-          // Texture
-          var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-          if (texcoords0AccessorStr) {
+          // Material
+          if (primitiveJson.material) {
             var texcoords = null;
-
-            var material = glBoostContext.createClassicMaterial();
+            var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
 
             var materialStr = primitiveJson.material;
+
+            var material = glBoostContext.createClassicMaterial();
 
             texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
             materials.push(material);
+          } else {
+            var _material = glBoostContext.createClassicMaterial();
+            _material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+            materials.push(_material);
           }
         }
 
@@ -11943,6 +11947,15 @@
         return accessorJson.componentType;
       }
     }, {
+      key: '_adjustByteAlign',
+      value: function _adjustByteAlign(typedArrayClass, arrayBuffer, alignSize, byteOffset, length) {
+        if (byteOffset % alignSize != 0) {
+          return new typedArrayClass(arrayBuffer.slice(byteOffset), 0, length);
+        } else {
+          return new typedArrayClass(arrayBuffer, byteOffset, length);
+        }
+      }
+    }, {
       key: '_accessBinary',
       value: function _accessBinary(accessorStr, json, buffers) {
         var quaternionIfVec4 = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
@@ -11966,19 +11979,19 @@
         if (toGetAsTypedArray) {
           if (GLTFLoader._isSystemLittleEndian()) {
             if (dataViewMethod === 'getFloat32') {
-              vertexAttributeArray = new Float32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+              vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getInt8') {
               vertexAttributeArray = new Int8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getUint8') {
               vertexAttributeArray = new Uint8Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getInt16') {
-              vertexAttributeArray = new Int16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+              vertexAttributeArray = this._adjustByteAlign(Int16Array, arrayBuffer, 2, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getUint16') {
-              vertexAttributeArray = new Uint16Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+              vertexAttributeArray = this._adjustByteAlign(Uint16Array, arrayBuffer, 2, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getInt32') {
-              vertexAttributeArray = new Int32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+              vertexAttributeArray = this._adjustByteAlign(Int32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
             } else if (dataViewMethod === 'getUint32') {
-              vertexAttributeArray = new Uint32Array(arrayBuffer, byteOffset, byteLength / bytesPerComponent);
+              vertexAttributeArray = this._adjustByteAlign(Uint32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
             }
           } else {
             var dataView = new DataView(arrayBuffer, byteOffset, byteLength);

@@ -9,7 +9,7 @@ export class FragmentSimpleShaderSource {
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
-    var shaderText =   `rt0 = vec4(0.5, 0.5, 0.5, opacity);\n`;
+    var shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
     return shaderText;
   }
 
