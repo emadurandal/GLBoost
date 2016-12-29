@@ -1324,7 +1324,7 @@
     }, {
       key: 'FSShade_FragmentSimpleShaderSource',
       value: function FSShade_FragmentSimpleShaderSource(f, gl) {
-        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
+        var shaderText = 'rt0 = vec4(0.5, 0.5, 0.5, opacity);\n';
         return shaderText;
       }
     }, {
@@ -11292,32 +11292,42 @@
     }, {
       key: '_IterateNodeOfScene',
       value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
-        var sceneStr = json.scene;
-        var sceneJson = json.scenes[sceneStr];
+        var _this3 = this;
 
-        var group = glBoostContext.createGroup();
-        group.userFlavorName = 'TopGroup';
-        var nodeStr = null;
-        for (var i = 0; i < sceneJson.nodes.length; i++) {
-          nodeStr = sceneJson.nodes[i];
+        var rootGroup = glBoostContext.createGroup();
 
-          // iterate nodes and load meshes
-          var element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
-          group.addChild(element);
+        var _loop3 = function _loop3(sceneStr) {
+          var sceneJson = json.scenes[sceneStr];
+          var group = glBoostContext.createGroup();
+          group.userFlavorName = 'TopGroup';
+          var nodeStr = null;
+          for (var i = 0; i < sceneJson.nodes.length; i++) {
+            nodeStr = sceneJson.nodes[i];
+
+            // iterate nodes and load meshes
+            var element = _this3._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+            group.addChild(element);
+          }
+
+          // register joints hierarchy to skeletal mesh
+          var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
+          skeletalMeshes.forEach(function (skeletalMesh) {
+            var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+            rootJoint._isRootJointGroup = true;
+            skeletalMesh.jointsHierarchy = rootJoint;
+          });
+
+          // Animation
+          _this3._loadAnimation(group, buffers, json);
+
+          rootGroup.addChild(group);
+        };
+
+        for (var sceneStr in json.scenes) {
+          _loop3(sceneStr);
         }
 
-        // register joints hierarchy to skeletal mesh
-        var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
-        skeletalMeshes.forEach(function (skeletalMesh) {
-          var rootJoint = group.searchElement(skeletalMesh.rootJointName);
-          rootJoint._isRootJointGroup = true;
-          skeletalMesh.jointsHierarchy = rootJoint;
-        });
-
-        // Animation
-        this._loadAnimation(group, buffers, json);
-
-        resolve(group);
+        resolve(rootGroup);
       }
     }, {
       key: '_recursiveIterateNode',
@@ -11361,10 +11371,12 @@
           group.addChild(joint);
         }
 
-        for (var _i = 0; _i < nodeJson.children.length; _i++) {
-          var _nodeStr = nodeJson.children[_i];
-          var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
-          group.addChild(childElement);
+        if (nodeJson.children) {
+          for (var _i = 0; _i < nodeJson.children.length; _i++) {
+            var _nodeStr = nodeJson.children[_i];
+            var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+            group.addChild(childElement);
+          }
         }
 
         return group;
@@ -11465,15 +11477,17 @@
 
           // Texture
           var texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-          var texcoords = null;
+          if (texcoords0AccessorStr) {
+            var texcoords = null;
 
-          var material = glBoostContext.createClassicMaterial();
+            var material = glBoostContext.createClassicMaterial();
 
-          var materialStr = primitiveJson.material;
+            var materialStr = primitiveJson.material;
 
-          texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
+            texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
-          materials.push(material);
+            materials.push(material);
+          }
         }
 
         if (meshJson.primitives.length > 1) {
@@ -11642,7 +11656,7 @@
           if (typeof json.techniques !== 'undefined') {
             this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
           } else {
-            material.shaderClass = PhongShader;
+            material.shaderClass = DecalShader;
           }
         }
 

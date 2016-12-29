@@ -1,7 +1,7 @@
 import GLBoost from '../../globals';
 import GLContext from '../../low_level/core/GLContext';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
-import PhongShader from '../shaders/PhongShader';
+import DecalShader from '../shaders/DecalShader';
 import FreeShader from '../shaders/FreeShader';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
@@ -228,32 +228,37 @@ export default class GLTFLoader {
   }
 
   _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
-    let sceneStr = json.scene;
-    let sceneJson = json.scenes[sceneStr];
 
-    let group = glBoostContext.createGroup();
-    group.userFlavorName = 'TopGroup';
-    let nodeStr = null;
-    for (let i = 0; i < sceneJson.nodes.length; i++) {
-      nodeStr = sceneJson.nodes[i];
+    let rootGroup = glBoostContext.createGroup();
 
-      // iterate nodes and load meshes
-      let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
-      group.addChild(element);
+    for (let sceneStr in json.scenes) {
+      let sceneJson = json.scenes[sceneStr];
+      let group = glBoostContext.createGroup();
+      group.userFlavorName = 'TopGroup';
+      let nodeStr = null;
+      for (let i = 0; i < sceneJson.nodes.length; i++) {
+        nodeStr = sceneJson.nodes[i];
+
+        // iterate nodes and load meshes
+        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+        group.addChild(element);
+      }
+
+      // register joints hierarchy to skeletal mesh
+      let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
+      skeletalMeshes.forEach((skeletalMesh) => {
+        var rootJoint = group.searchElement(skeletalMesh.rootJointName);
+        rootJoint._isRootJointGroup = true;
+        skeletalMesh.jointsHierarchy = rootJoint;
+      });
+
+      // Animation
+      this._loadAnimation(group, buffers, json);
+
+      rootGroup.addChild(group)
     }
 
-    // register joints hierarchy to skeletal mesh
-    let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
-    skeletalMeshes.forEach((skeletalMesh) => {
-      var rootJoint = group.searchElement(skeletalMesh.rootJointName);
-      rootJoint._isRootJointGroup = true;
-      skeletalMesh.jointsHierarchy = rootJoint;
-    });
-
-    // Animation
-    this._loadAnimation(group, buffers, json);
-
-    resolve(group);
+    resolve(rootGroup);
   }
 
 
@@ -298,10 +303,12 @@ export default class GLTFLoader {
       group.addChild(joint);
     }
 
-    for (let i = 0; i < nodeJson.children.length; i++) {
-      let nodeStr = nodeJson.children[i];
-      let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
-      group.addChild(childElement);
+    if (nodeJson.children) {
+      for (let i = 0; i < nodeJson.children.length; i++) {
+        let nodeStr = nodeJson.children[i];
+        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+        group.addChild(childElement);
+      }
     }
 
     return group;
@@ -403,15 +410,17 @@ export default class GLTFLoader {
 
       // Texture
       let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
-      var texcoords = null;
+      if (texcoords0AccessorStr) {
+        var texcoords = null;
 
-      let material = glBoostContext.createClassicMaterial();
+        let material = glBoostContext.createClassicMaterial();
 
-      let materialStr = primitiveJson.material;
+        let materialStr = primitiveJson.material;
 
-      texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
+        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
 
-      materials.push(material);
+        materials.push(material);
+      }
 
     }
 
@@ -583,7 +592,7 @@ export default class GLTFLoader {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
       } else {
-        material.shaderClass = PhongShader;
+        material.shaderClass = DecalShader;
       }
     }
 
