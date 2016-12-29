@@ -76,7 +76,10 @@ export default class GLTFLoader {
             basePath += partsOfPath[i] + '/';
           }
           let json = JSON.parse(gotText);
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, resolve);
+
+          let glTFVer = this._checkGLTFVersion(json);
+
+          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve);
 
           return;
         }
@@ -100,14 +103,24 @@ export default class GLTFLoader {
         let json = JSON.parse(gotText);
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
+        let glTFVer = this._checkGLTFVersion(json);
+
+        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve);
       }, (reject, error)=>{
 
       });
 
   }
 
-  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, resolve) {
+  _checkGLTFVersion(json) {
+    let glTFVer = 1.0;
+    if (json.asset) {
+      glTFVer = parseFloat(json.asset.version);
+    }
+    return glTFVer;
+  }
+
+  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve) {
     let shadersJson = json.shaders;
     let shaders = {};
     let buffers = {};
@@ -219,15 +232,15 @@ export default class GLTFLoader {
           return Promise.all(promisesToLoadResources);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
+      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
+  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve) {
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -253,7 +266,7 @@ export default class GLTFLoader {
       });
 
       // Animation
-      this._loadAnimation(group, buffers, json);
+      this._loadAnimation(group, buffers, json, glTFVer);
 
       rootGroup.addChild(group)
     }
@@ -628,10 +641,10 @@ export default class GLTFLoader {
         uniforms[uniformName] = parameterJson.semantic;
       } else {
         let value = null;
-        if (typeof parameterJson.value !== 'undefined') {
-          value = parameterJson.value;
-        } else {
+        if (typeof materialJson.values[parameterName] !== 'undefined') {
           value = materialJson.values[parameterName];
+        } else {
+          value = parameterJson.value;
         }
 
         switch (parameterJson.type) {
@@ -682,7 +695,7 @@ export default class GLTFLoader {
     material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
-  _loadAnimation(element, buffers, json) {
+  _loadAnimation(element, buffers, json, glTFVer) {
     let animationJson = null;
     for (let anim in json.animations) {
       animationJson = json.animations[anim];
@@ -697,28 +710,36 @@ export default class GLTFLoader {
           let targetPathStr = channelJson.target.path;
           let samplerStr = channelJson.sampler;
           let samplerJson = animationJson.samplers[samplerStr];
-          let animInputStr = samplerJson.input;
-          var animOutputStr = samplerJson.output;
-          let animInputAccessorStr = animationJson.parameters[animInputStr];
-          let animOutputAccessorStr = animationJson.parameters[animOutputStr];
 
-          var animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
+          let animInputAccessorStr = null;
+          let animOutputAccessorStr = null;
+          if (glTFVer < 1.1) {
+            let animInputStr = samplerJson.input;
+            let animOutputStr = samplerJson.output;
+            animInputAccessorStr = animationJson.parameters[animInputStr];
+            animOutputAccessorStr = animationJson.parameters[animOutputStr];
+          } else {
+            animInputAccessorStr = samplerJson.input;
+            animOutputAccessorStr = samplerJson.output;
+          }
+
+          let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
           let animOutputArray = null;
-          if (animOutputStr === 'translation') {
+          if (targetPathStr === 'translation') {
             animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
-          } else if (animOutputStr === 'rotation') {
+          } else if (targetPathStr === 'rotation') {
             animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers, true);
           } else {
             animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
           }
 
           let animationAttributeName = '';
-          if (animOutputStr === 'translation') {
+          if (targetPathStr === 'translation') {
             animationAttributeName = 'translate';
-          } else if (animOutputStr === 'rotation') {
+          } else if (targetPathStr === 'rotation') {
             animationAttributeName = 'quaternion';
           } else {
-            animationAttributeName = animOutputStr;
+            animationAttributeName = targetPathStr;
           }
 
           let hitElement = element.searchElement(targetMeshStr);

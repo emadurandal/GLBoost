@@ -11149,7 +11149,10 @@
               basePath += partsOfPath[i] + '/';
             }
             var _json = JSON.parse(_gotText);
-            _this._loadResourcesAndScene(glBoostContext, null, basePath, _json, defaultShader, resolve);
+
+            var _glTFVer = _this._checkGLTFVersion(_json);
+
+            _this._loadResourcesAndScene(glBoostContext, null, basePath, _json, defaultShader, _glTFVer, resolve);
 
             return;
           }
@@ -11173,12 +11176,23 @@
           var json = JSON.parse(gotText);
           var arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
-          _this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, resolve);
+          var glTFVer = _this._checkGLTFVersion(json);
+
+          _this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve);
         }, function (reject, error) {});
       }
     }, {
+      key: '_checkGLTFVersion',
+      value: function _checkGLTFVersion(json) {
+        var glTFVer = 1.0;
+        if (json.asset) {
+          glTFVer = parseFloat(json.asset.version);
+        }
+        return glTFVer;
+      }
+    }, {
       key: '_loadResourcesAndScene',
-      value: function _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, resolve) {
+      value: function _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve) {
         var _this2 = this;
 
         var shadersJson = json.shaders;
@@ -11283,15 +11297,15 @@
           Promise.resolve().then(function () {
             return Promise.all(promisesToLoadResources);
           }).then(function () {
-            _this2._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
+            _this2._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
           });
         } else {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
         }
       }
     }, {
       key: '_IterateNodeOfScene',
-      value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, resolve) {
+      value: function _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve) {
         var _this3 = this;
 
         var rootGroup = glBoostContext.createGroup();
@@ -11318,7 +11332,7 @@
           });
 
           // Animation
-          _this3._loadAnimation(group, buffers, json);
+          _this3._loadAnimation(group, buffers, json, glTFVer);
 
           rootGroup.addChild(group);
         };
@@ -11692,10 +11706,10 @@
             uniforms[uniformName] = _parameterJson.semantic;
           } else {
             var value = null;
-            if (typeof _parameterJson.value !== 'undefined') {
-              value = _parameterJson.value;
-            } else {
+            if (typeof materialJson.values[_parameterName] !== 'undefined') {
               value = materialJson.values[_parameterName];
+            } else {
+              value = _parameterJson.value;
             }
 
             switch (_parameterJson.type) {
@@ -11746,7 +11760,7 @@
       }
     }, {
       key: '_loadAnimation',
-      value: function _loadAnimation(element, buffers, json) {
+      value: function _loadAnimation(element, buffers, json, glTFVer) {
         var animationJson = null;
         for (var anim in json.animations) {
           animationJson = json.animations[anim];
@@ -11761,28 +11775,36 @@
               var targetPathStr = channelJson.target.path;
               var samplerStr = channelJson.sampler;
               var samplerJson = animationJson.samplers[samplerStr];
-              var animInputStr = samplerJson.input;
-              var animOutputStr = samplerJson.output;
-              var animInputAccessorStr = animationJson.parameters[animInputStr];
-              var animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+              var animInputAccessorStr = null;
+              var animOutputAccessorStr = null;
+              if (glTFVer < 1.1) {
+                var animInputStr = samplerJson.input;
+                var animOutputStr = samplerJson.output;
+                animInputAccessorStr = animationJson.parameters[animInputStr];
+                animOutputAccessorStr = animationJson.parameters[animOutputStr];
+              } else {
+                animInputAccessorStr = samplerJson.input;
+                animOutputAccessorStr = samplerJson.output;
+              }
 
               var animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
               var animOutputArray = null;
-              if (animOutputStr === 'translation') {
+              if (targetPathStr === 'translation') {
                 animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
-              } else if (animOutputStr === 'rotation') {
+              } else if (targetPathStr === 'rotation') {
                 animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers, true);
               } else {
                 animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
               }
 
               var animationAttributeName = '';
-              if (animOutputStr === 'translation') {
+              if (targetPathStr === 'translation') {
                 animationAttributeName = 'translate';
-              } else if (animOutputStr === 'rotation') {
+              } else if (targetPathStr === 'rotation') {
                 animationAttributeName = 'quaternion';
               } else {
-                animationAttributeName = animOutputStr;
+                animationAttributeName = targetPathStr;
               }
 
               var hitElement = element.searchElement(targetMeshStr);
