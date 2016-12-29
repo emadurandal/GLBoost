@@ -11319,7 +11319,7 @@
             nodeStr = sceneJson.nodes[i];
 
             // iterate nodes and load meshes
-            var element = _this3._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+            var element = _this3._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
             group.addChild(element);
           }
 
@@ -11345,7 +11345,7 @@
       }
     }, {
       key: '_recursiveIterateNode',
-      value: function _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures) {
+      value: function _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer) {
         var nodeJson = json.nodes[nodeStr];
         var group = glBoostContext.createGroup();
         group.userFlavorName = nodeStr;
@@ -11375,7 +11375,7 @@
               rootJointStr = nodeJson.skeletons[0];
               skinStr = nodeJson.skin;
             }
-            var mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures);
+            var mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer);
             mesh.userFlavorName = meshStr;
             group.addChild(mesh);
           }
@@ -11388,7 +11388,7 @@
         if (nodeJson.children) {
           for (var _i = 0; _i < nodeJson.children.length; _i++) {
             var _nodeStr = nodeJson.children[_i];
-            var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+            var childElement = this._recursiveIterateNode(glBoostContext, _nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
             group.addChild(childElement);
           }
         }
@@ -11397,7 +11397,7 @@
       }
     }, {
       key: '_loadMesh',
-      value: function _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures) {
+      value: function _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer) {
         var mesh = null;
         var geometry = null;
         if (rootJointStr) {
@@ -11498,7 +11498,7 @@
 
             var material = glBoostContext.createClassicMaterial();
 
-            texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
+            texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
 
             materials.push(material);
           } else {
@@ -11613,14 +11613,13 @@
       }
     }, {
       key: '_loadMaterial',
-      value: function _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx) {
+      value: function _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
         var materialJson = json.materials[materialStr];
 
         if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
           materialJson = materialJson.extensions.KHR_materials_common;
         }
 
-        var diffuseValue = materialJson.values.diffuse;
         // Diffuse Texture
         if (texcoords0AccessorStr) {
           texcoords = this._accessBinary(texcoords0AccessorStr, json, buffers, false, true);
@@ -11661,8 +11660,6 @@
           }
         }
 
-        var opacityValue = 1.0 - materialJson.values.transparency;
-
         if (indices !== null) {
           material.setVertexN(geometry, indices.length);
         }
@@ -11672,7 +11669,7 @@
           material.shaderClass = defaultShader;
         } else {
           if (typeof json.techniques !== 'undefined') {
-            this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
+            this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
           } else {
             material.shaderClass = DecalShader;
           }
@@ -11682,7 +11679,7 @@
       }
     }, {
       key: '_loadTechnique',
-      value: function _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders) {
+      value: function _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer) {
         var techniqueJson = json.techniques[techniqueStr];
 
         var programStr = techniqueJson.program;
@@ -11706,7 +11703,7 @@
             uniforms[uniformName] = _parameterJson.semantic;
           } else {
             var value = null;
-            if (typeof materialJson.values[_parameterName] !== 'undefined') {
+            if (typeof materialJson.values !== 'undefined' && typeof materialJson.values[_parameterName] !== 'undefined') {
               value = materialJson.values[_parameterName];
             } else {
               value = _parameterJson.value;
@@ -11714,7 +11711,7 @@
 
             switch (_parameterJson.type) {
               case 5126:
-                uniforms[uniformName] = value;
+                uniforms[uniformName] = glTFVer < 1.1 ? value : value[0];
                 break;
               case 35664:
                 uniforms[uniformName] = new Vector2(value[0], value[1]);
@@ -11726,7 +11723,7 @@
                 uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
                 break;
               case 5124:
-                uniforms[uniformName] = value;
+                uniforms[uniformName] = glTFVer < 1.1 ? value : value[0];
                 break;
               case 35667:
                 uniforms[uniformName] = new Vector2(value[0], value[1]);

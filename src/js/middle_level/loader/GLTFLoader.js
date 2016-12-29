@@ -253,7 +253,7 @@ export default class GLTFLoader {
         nodeStr = sceneJson.nodes[i];
 
         // iterate nodes and load meshes
-        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
         group.addChild(element);
       }
 
@@ -276,7 +276,7 @@ export default class GLTFLoader {
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures) {
+  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -306,7 +306,7 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -319,7 +319,7 @@ export default class GLTFLoader {
     if (nodeJson.children) {
       for (let i = 0; i < nodeJson.children.length; i++) {
         let nodeStr = nodeJson.children[i];
-        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures);
+        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
         group.addChild(childElement);
       }
     }
@@ -327,7 +327,7 @@ export default class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures) {
+  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -430,7 +430,7 @@ export default class GLTFLoader {
 
         let material = glBoostContext.createClassicMaterial();
 
-        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i);
+        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
 
         materials.push(material);
       } else {
@@ -548,14 +548,13 @@ export default class GLTFLoader {
     return mesh;
   }
 
-  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx) {
+  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
     let materialJson = json.materials[materialStr];
 
     if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
       materialJson = materialJson.extensions.KHR_materials_common;
     }
 
-    let diffuseValue = materialJson.values.diffuse;
     // Diffuse Texture
     if (texcoords0AccessorStr) {
       texcoords = this._accessBinary(texcoords0AccessorStr, json, buffers, false, true);
@@ -596,8 +595,6 @@ export default class GLTFLoader {
       }
     }
 
-    let opacityValue = 1.0 - materialJson.values.transparency;
-
     if (indices !== null) {
       material.setVertexN(geometry, indices.length);
     }
@@ -607,7 +604,7 @@ export default class GLTFLoader {
       material.shaderClass = defaultShader;
     } else {
       if (typeof json.techniques !== 'undefined') {
-        this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders);
+        this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
         material.shaderClass = DecalShader;
       }
@@ -616,7 +613,7 @@ export default class GLTFLoader {
     return texcoords;
   }
 
-  _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders) {
+  _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer) {
     let techniqueJson = json.techniques[techniqueStr];
 
 
@@ -641,7 +638,7 @@ export default class GLTFLoader {
         uniforms[uniformName] = parameterJson.semantic;
       } else {
         let value = null;
-        if (typeof materialJson.values[parameterName] !== 'undefined') {
+        if (typeof materialJson.values !== 'undefined' && typeof materialJson.values[parameterName] !== 'undefined') {
           value = materialJson.values[parameterName];
         } else {
           value = parameterJson.value;
@@ -649,7 +646,7 @@ export default class GLTFLoader {
 
         switch (parameterJson.type) {
           case 5126:
-            uniforms[uniformName] = value;
+            uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
             break;
           case 35664:
             uniforms[uniformName] = new Vector2(value[0], value[1]);
@@ -661,7 +658,7 @@ export default class GLTFLoader {
             uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
             break;
           case 5124:
-            uniforms[uniformName] = value;
+            uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
             break;
           case 35667:
             uniforms[uniformName] = new Vector2(value[0], value[1]);
