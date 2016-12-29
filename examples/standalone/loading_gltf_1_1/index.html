@@ -27,6 +27,7 @@ for(var i = 0; pair[i] ; i++) {
 }
 
 GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING = true;
 
 var canvas = document.getElementById("world");
 
@@ -62,7 +63,7 @@ camera.cameraController = glBoostContext.createCameraController(true, false, fal
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/Triangle/glTF-Embedded/Triangle.gltf', null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/SimpleMeshesWithAdvancedMaterial/glTF-Embedded-buffer/SimpleMeshesWithAdvancedMaterial.gltf', null);
 promise.then(function(group) {
   console.log(group);
 
