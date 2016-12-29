@@ -260,9 +260,15 @@ export default class GLTFLoader {
       // register joints hierarchy to skeletal mesh
       let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
       skeletalMeshes.forEach((skeletalMesh) => {
-        var rootJoint = group.searchElement(skeletalMesh.rootJointName);
-        rootJoint._isRootJointGroup = true;
-        skeletalMesh.jointsHierarchy = rootJoint;
+        let rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+        if (!rootJointGroup) {
+          // This is a countermeasure when skeleton node does not exist in scene.nodes.
+          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+          group.addChild(rootJointGroup);
+        }
+
+        rootJointGroup._isRootJointGroup = true;
+        skeletalMesh.jointsHierarchy = rootJointGroup;
       });
 
       // Animation
@@ -564,13 +570,31 @@ export default class GLTFLoader {
       vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json);
       dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json);
 
-      for (let valueName in materialJson.values) {
-        let value = materialJson.values[valueName];
-        if (typeof value === 'string') {
-          let textureStr = value;
-          material.setTexture(textures[textureStr]);
+      let setTextures = (values, isParameter)=> {
+        for (let valueName in values) {
+          let value = null;
+          if (isParameter) {
+            value = values[valueName].value;
+            if (typeof value === 'undefined') {
+              continue;
+            }
+          } else {
+            value = values[valueName];
+          }
+          if (glTFVer >= 1.1) {
+            value = value[0];
+          }
+          if (typeof value === 'string') {
+            let textureStr = value;
+            material.setTexture(textures[textureStr]);
+          }
         }
+      };
+      setTextures(materialJson.values, false);
+      if (materialJson.technique) {
+        setTextures(json.techniques[materialJson.technique].parameters, true);
       }
+
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
         // If texture coordinates existed even once in the previous loop
@@ -671,7 +695,7 @@ export default class GLTFLoader {
             break;
           case 35678:
             uniforms[uniformName] = 'TEXTURE';
-            textureNames[uniformName] =  materialJson.values[parameterName];
+            textureNames[uniformName] =  (glTFVer < 1.1) ? value : value[0];
             break;
         }
       }

@@ -11432,9 +11432,15 @@
           // register joints hierarchy to skeletal mesh
           var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
           skeletalMeshes.forEach(function (skeletalMesh) {
-            var rootJoint = group.searchElement(skeletalMesh.rootJointName);
-            rootJoint._isRootJointGroup = true;
-            skeletalMesh.jointsHierarchy = rootJoint;
+            var rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+            if (!rootJointGroup) {
+              // This is a countermeasure when skeleton node does not exist in scene.nodes.
+              rootJointGroup = _this3._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+              group.addChild(rootJointGroup);
+            }
+
+            rootJointGroup._isRootJointGroup = true;
+            skeletalMesh.jointsHierarchy = rootJointGroup;
           });
 
           // Animation
@@ -11735,12 +11741,29 @@
           vertexData.componentType.texcoord = this._getDataType(texcoords0AccessorStr, json);
           dataViewMethodDic.texcoord = this._checkDataViewMethod(texcoords0AccessorStr, json);
 
-          for (var valueName in materialJson.values) {
-            var value = materialJson.values[valueName];
-            if (typeof value === 'string') {
-              var textureStr = value;
-              material.setTexture(textures[textureStr]);
+          var setTextures = function setTextures(values, isParameter) {
+            for (var valueName in values) {
+              var value = null;
+              if (isParameter) {
+                value = values[valueName].value;
+                if (typeof value === 'undefined') {
+                  continue;
+                }
+              } else {
+                value = values[valueName];
+              }
+              if (glTFVer >= 1.1) {
+                value = value[0];
+              }
+              if (typeof value === 'string') {
+                var textureStr = value;
+                material.setTexture(textures[textureStr]);
+              }
             }
+          };
+          setTextures(materialJson.values, false);
+          if (materialJson.technique) {
+            setTextures(json.techniques[materialJson.technique].parameters, true);
           }
         } else {
           if (typeof vertexData.components.texcoord !== 'undefined') {
@@ -11759,10 +11782,10 @@
           }
         }
 
-        for (var _valueName in materialJson.values) {
-          var _value = materialJson.values[_valueName];
-          if (typeof _value !== 'string') {
-            material[_valueName + 'Color'] = new Vector4(_value[0], _value[1], _value[2], _value[3]);
+        for (var valueName in materialJson.values) {
+          var value = materialJson.values[valueName];
+          if (typeof value !== 'string') {
+            material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
           }
         }
 
@@ -11842,7 +11865,7 @@
                 break;
               case 35678:
                 uniforms[uniformName] = 'TEXTURE';
-                textureNames[uniformName] = materialJson.values[_parameterName];
+                textureNames[uniformName] = glTFVer < 1.1 ? value : value[0];
                 break;
             }
           }
