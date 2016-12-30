@@ -1,7 +1,7 @@
 var global = ('global',eval)('this');
 
 (function (global) {
-  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: '1' };
+  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r1' };
 
   if (typeof define === 'function' && define.amd) {
     define(function() { return GLBoost; });
@@ -52,6 +52,7 @@ var global = ('global',eval)('this');
   GLBoost['REPEAT'] = 'REPEAT';
   GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
   GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
+  GLBoost['LOG_GENERAL'] = 'LOG_GENERAL';
   GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
   GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
   GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';

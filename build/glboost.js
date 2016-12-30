@@ -110,7 +110,7 @@
   var global = ('global', eval)('this');
 
   (function (global) {
-    var GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: '1' };
+    var GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r1' };
 
     if (typeof define === 'function' && define.amd) {
       define(function () {
@@ -163,6 +163,7 @@
     GLBoost['REPEAT'] = 'REPEAT';
     GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
     GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
+    GLBoost['LOG_GENERAL'] = 'LOG_GENERAL';
     GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
     GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
     GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
@@ -9991,6 +9992,8 @@
 
       this._setName();
 
+      MiscUtil.consoleLog(GLBoost$1.LOG_GENERAL, '*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
+
       if (gl) {
         this._glContext = GLContext.getInstance(null, gl, width, height);
       } else {
@@ -10181,7 +10184,7 @@
     return GLBoostLowContext;
   }();
 
-  GLBoost['GLBoostLowContext'] = GLBoostLowContext;
+  GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
   var GLBoostMiddleContext = function (_GLBoostLowContext) {
     babelHelpers.inherits(GLBoostMiddleContext, _GLBoostLowContext);
@@ -11218,6 +11221,7 @@
   GLBoost$1['VALUE_ANGLE_UNIT'] = GLBoost$1.DEGREE;
   GLBoost$1['VALUE_WEBGL_ONE_USE_EXTENSIONS'] = true;
   GLBoost$1['VALUE_CONSOLE_OUT_FOR_DEBUGGING'] = false;
+  GLBoost$1['VALUE_LOG_GENERAL'] = true;
   GLBoost$1['VALUE_LOG_SHADER_CODE'] = true;
   GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;
   GLBoost$1['VALUE_LOG_GL_RESOURCE_LIFECYCLE'] = true;

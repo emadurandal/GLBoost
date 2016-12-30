@@ -14,10 +14,14 @@ import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
 import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
+import MiscUtil from '../misc/MiscUtil';
+import GLBoost from '../../globals';
 
 export default class GLBoostLowContext {
   constructor(canvas, gl, width, height) {
     this._setName();
+
+    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, '*** GLBoost revision ' + GLBoost.REVISION + ' ***');
 
     if (gl) {
       this._glContext = GLContext.getInstance(null, gl, width, height);
