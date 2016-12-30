@@ -83,11 +83,11 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   setAsMainCamera(scene) {
-    this._mainCamera[scene.toString()] = this;
+    L_AbstractCamera._mainCamera[scene.toString()] = this;
   }
 
   isMainCamera(scene) {
-    return this._mainCamera[scene.toString()] === this;
+    return L_AbstractCamera._mainCamera[scene.toString()] === this;
   }
 
   set translate(vec) {
@@ -156,3 +156,5 @@ export default class L_AbstractCamera extends L_Element {
     return this._texture;
   }
 }
+
+L_AbstractCamera._mainCamera = {};

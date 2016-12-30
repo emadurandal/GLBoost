@@ -11,6 +11,8 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     this._top = ortho.top;
     this._zNear = ortho.zNear;
     this._zFar = ortho.zFar;
+    this._xmag = ortho.xmag;
+    this._ymag = ortho.ymag;
 
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection = 0;
@@ -27,7 +29,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+      this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar, this._xmag, this._ymag);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {
@@ -35,15 +37,23 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     }
   }
 
-  static orthoRHMatrix(left, right, bottom, top, near, far) {
+  static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
 
-    return new Matrix44(
-      2/(right-left), 0.0, 0.0, -(right+left)/(right-left),
-      0.0, 2/(top-bottom), 0.0, -(top+bottom)/(top-bottom),
-      0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
-      0.0, 0.0, 0.0, 1.0
-    );
-
+    if (xmag && ymag) {
+      return new Matrix44(
+        1/xmag, 0.0, 0.0, 0,
+        0.0, 1/ymag, 0.0, 0,
+        0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
+        0.0, 0.0, 0.0, 1.0
+      );
+    } else {
+      return new Matrix44(
+        2/(right-left), 0.0, 0.0, -(right+left)/(right-left),
+        0.0, 2/(top-bottom), 0.0, -(top+bottom)/(top-bottom),
+        0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
+        0.0, 0.0, 0.0, 1.0
+      );
+    }
   }
 
   set left(value) {
@@ -116,5 +126,29 @@ export default class L_OrthoCamera extends L_AbstractCamera {
 
   get zFar() {
     return this._zFar;
+  }
+
+  set xmag(value) {
+    if (this._xmag === value) {
+      return;
+    }
+    this._xmag = value;
+    this._needUpdateProjection();
+  }
+
+  get xmag() {
+    return this._xmag;
+  }
+
+  set ymag(value) {
+    if (this._ymag === value) {
+      return;
+    }
+    this._ymag = value;
+    this._needUpdateProjection();
+  }
+
+  get ymag() {
+    return this._ymag;
   }
 }

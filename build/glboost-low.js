@@ -3695,7 +3695,6 @@
       _this._lowLevelCamera = null;
 
       _this._updateCountAsCameraView = 0;
-      _this._mainCamera = {};
 
       _this._texture = null; // for example, depth texture
       return _this;
@@ -3710,12 +3709,12 @@
     }, {
       key: 'setAsMainCamera',
       value: function setAsMainCamera(scene) {
-        this._mainCamera[scene.toString()] = this;
+        this._lowLevelCamera.setAsMainCamera(scene);
       }
     }, {
       key: 'isMainCamera',
       value: function isMainCamera(scene) {
-        return this._mainCamera[scene.toString()] === this;
+        return this._lowLevelCamera.isMainCamera(scene);
       }
     }, {
       key: 'lookAtRHMatrix',
@@ -4190,12 +4189,12 @@
     }, {
       key: 'setAsMainCamera',
       value: function setAsMainCamera(scene) {
-        this._mainCamera[scene.toString()] = this;
+        L_AbstractCamera._mainCamera[scene.toString()] = this;
       }
     }, {
       key: 'isMainCamera',
       value: function isMainCamera(scene) {
-        return this._mainCamera[scene.toString()] === this;
+        return L_AbstractCamera._mainCamera[scene.toString()] === this;
       }
     }, {
       key: 'cameraController',
@@ -4299,6 +4298,8 @@
     return L_AbstractCamera;
   }(L_Element);
 
+  L_AbstractCamera._mainCamera = {};
+
   var L_OrthoCamera = function (_L_AbstractCamera) {
     babelHelpers.inherits(L_OrthoCamera, _L_AbstractCamera);
 
@@ -4313,6 +4314,8 @@
       _this._top = ortho.top;
       _this._zNear = ortho.zNear;
       _this._zFar = ortho.zFar;
+      _this._xmag = ortho.xmag;
+      _this._ymag = ortho.ymag;
 
       _this._dirtyProjection = true;
       _this._updateCountAsCameraProjection = 0;
@@ -4329,7 +4332,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar);
+          this._projectionMatrix = L_OrthoCamera.orthoRHMatrix(this._left, this._right, this._bottom, this._top, this._zNear, this._zFar, this._xmag, this._ymag);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -4413,11 +4416,39 @@
       get: function get() {
         return this._zFar;
       }
+    }, {
+      key: 'xmag',
+      set: function set(value) {
+        if (this._xmag === value) {
+          return;
+        }
+        this._xmag = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._xmag;
+      }
+    }, {
+      key: 'ymag',
+      set: function set(value) {
+        if (this._ymag === value) {
+          return;
+        }
+        this._ymag = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._ymag;
+      }
     }], [{
       key: 'orthoRHMatrix',
-      value: function orthoRHMatrix(left, right, bottom, top, near, far) {
+      value: function orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
 
-        return new Matrix44$1(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+        if (xmag && ymag) {
+          return new Matrix44$1(1 / xmag, 0.0, 0.0, 0, 0.0, 1 / ymag, 0.0, 0, 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+        } else {
+          return new Matrix44$1(2 / (right - left), 0.0, 0.0, -(right + left) / (right - left), 0.0, 2 / (top - bottom), 0.0, -(top + bottom) / (top - bottom), 0.0, 0.0, -2 / (far - near), -(far + near) / (far - near), 0.0, 0.0, 0.0, 1.0);
+        }
       }
     }]);
     return L_OrthoCamera;
@@ -4518,7 +4549,11 @@
         var yscale = 1.0 / Math.tan(0.5 * fovy * Math.PI / 180);
         var xscale = yscale / aspect;
 
-        return new Matrix44$1(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+        if (zFar) {
+          return new Matrix44$1(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -(2.0 * zFar * zNear) / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+        } else {
+          return new Matrix44$1(xscale, 0.0, 0.0, 0.0, 0.0, yscale, 0.0, 0.0, 0.0, 0.0, -1, 0, -2 * zNear, 0.0, 0.0, -1.0, 0.0);
+        }
       }
     }]);
     return L_PerspectiveCamera;

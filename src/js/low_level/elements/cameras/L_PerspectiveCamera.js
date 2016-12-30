@@ -38,12 +38,21 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
     var xscale = yscale / aspect;
 
-    return new Matrix44(
-      xscale, 0.0, 0.0, 0.0,
-      0.0, yscale, 0.0, 0.0,
-      0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
-      0.0, 0.0, -1.0, 0.0
-    );
+    if (zFar) {
+      return new Matrix44(
+        xscale, 0.0, 0.0, 0.0,
+        0.0, yscale, 0.0, 0.0,
+        0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
+        0.0, 0.0, -1.0, 0.0
+      );
+    } else {
+      return new Matrix44(
+        xscale, 0.0, 0.0, 0.0,
+        0.0, yscale, 0.0, 0.0,
+        0.0, 0.0, -1,0, -2*zNear,
+        0.0, 0.0, -1.0, 0.0
+      );
+    }
 
   }
 

@@ -11,7 +11,6 @@ export default class M_AbstractCamera extends M_Element {
     this._lowLevelCamera = null;
 
     this._updateCountAsCameraView = 0;
-    this._mainCamera = {};
 
     this._texture = null; // for example, depth texture
   }
@@ -41,11 +40,11 @@ export default class M_AbstractCamera extends M_Element {
   }
 
   setAsMainCamera(scene) {
-    this._mainCamera[scene.toString()] = this;
+    this._lowLevelCamera.setAsMainCamera(scene);
   }
 
   isMainCamera(scene) {
-    return this._mainCamera[scene.toString()] === this;
+    return this._lowLevelCamera.isMainCamera(scene);
   }
 
   set texture(texture) {

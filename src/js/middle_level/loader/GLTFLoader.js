@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
-import GLContext from '../../low_level/core/GLContext';
+import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
+import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import DecalShader from '../shaders/DecalShader';
 import FreeShader from '../shaders/FreeShader';
@@ -320,6 +321,43 @@ export default class GLTFLoader {
       let joint = glBoostContext.createJoint();
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
+    } else if (nodeJson.camera) {
+      let cameraStr = nodeJson.camera;
+      let cameraJson = json.cameras[cameraStr];
+      let camera = null;
+      if (cameraJson.type === 'perspective') {
+        let perspective = cameraJson.perspective;
+        camera = glBoostContext.createPerspectiveCamera(
+          {
+            eye: new Vector3(0.0, 0.0, 0),
+            center: new Vector3(0.0, 0.0, -1.0),
+            up: new Vector3(0.0, 1.0, 0.0)
+          },
+          {
+            fovy: perspective.yfov,
+            aspect: perspective.aspectRatio,
+            zNear: perspective.znear,
+            zFar: perspective.zfar
+          }
+        );
+      } else if (cameraJson.type === 'orthographic') {
+        let orthographic = cameraJson.orthographic;
+        camera = glBoostContext.createOrthoCamera(
+          {
+            eye: new Vector3(0.0, 0.0, 0),
+            center: new Vector3(0.0, 0.0, -1.0),
+            up: new Vector3(0.0, 1.0, 0.0)
+          },
+          {
+            xmag: orthographic.xmag,
+            ymag: orthographic.ymag,
+            zNear: orthographic.znear,
+            zFar: orthographic.zfar
+          }
+        );
+      }
+      camera.userFlavorName = cameraStr;
+      group.addChild(camera);
     }
 
     if (nodeJson.children) {
