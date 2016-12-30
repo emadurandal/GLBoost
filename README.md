@@ -22,6 +22,10 @@ GLBoostはWebGLライブラリです。
 WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の幅を制約することのない、
 3Dグラフィックス開発の玄人向けのライブラリを目指しています。
 
+## Latest released revision
+
+Currently, **r1** released!
+
 ## Demo
 
 [Check our examples page!](http://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
