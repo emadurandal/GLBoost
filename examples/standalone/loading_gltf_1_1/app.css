@@ -3,7 +3,9 @@
   padding: 0; }
 
 body {
-  padding: 10px; }
+  padding: 10px;
+  background-color: black;
+}
 
 .header-title {
   margin: 10px;

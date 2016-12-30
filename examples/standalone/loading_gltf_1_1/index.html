@@ -33,7 +33,7 @@ var canvas = document.getElementById("world");
 
 var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-var renderer = glBoostContext.createRenderer({ clearColor: {red:1.0, green:0.5, blue:0.5, alpha:1}});
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0, green:0, blue:0, alpha:1}});
 
 var scene = glBoostContext.createScene();
 
@@ -63,7 +63,7 @@ camera.cameraController = glBoostContext.createCameraController(true, false, fal
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/SimpleMeshesWithAdvancedMaterial/glTF-Embedded-buffer/SimpleMeshesWithAdvancedMaterial.gltf', null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/SimpleTexture/glTF/SimpleTexture.gltf', null);
 promise.then(function(group) {
   console.log(group);
 
@@ -75,6 +75,8 @@ promise.then(function(group) {
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
 
+  scene.cameras[0].setAsMainCamera(scene);
+
   var render = function(){
     scene.setCurrentAnimationValue('time', gtime);
     renderer.clearCanvas();
@@ -83,7 +85,7 @@ promise.then(function(group) {
 
     gtime += 0.01;
 
-    if (gtime > 1.5) {
+    if (gtime > 7) {
       gtime = 0.0;
     }
 
