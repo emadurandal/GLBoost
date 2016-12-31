@@ -21,7 +21,7 @@ export default class GLBoostLowContext {
   constructor(canvas, gl, width, height) {
     this._setName();
 
-    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, '*** GLBoost revision ' + GLBoost.REVISION + ' ***');
+    console.log('*** GLBoost revision ' + GLBoost.REVISION + ' ***');
 
     if (gl) {
       this._glContext = GLContext.getInstance(null, gl, width, height);

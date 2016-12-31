@@ -9992,7 +9992,7 @@
 
       this._setName();
 
-      MiscUtil.consoleLog(GLBoost$1.LOG_GENERAL, '*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
+      console.log('*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
 
       if (gl) {
         this._glContext = GLContext.getInstance(null, gl, width, height);
