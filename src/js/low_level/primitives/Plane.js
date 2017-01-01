@@ -51,9 +51,9 @@ export default class Plane extends Geometry {
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         if (isUVRepeat) {
-          texcoords.push(new Vector2(j, 1.0-i));
+          texcoords.push(new Vector2(j, i));
         } else {
-          texcoords.push(new Vector2(j/uSpan, 1.0-i/vSpan));
+          texcoords.push(new Vector2(j/uSpan, i/vSpan));
         }
       }
     }

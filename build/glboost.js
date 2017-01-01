@@ -9593,9 +9593,9 @@
         for (var _i3 = 0; _i3 <= vSpan; _i3++) {
           for (var _j3 = 0; _j3 <= uSpan; _j3++) {
             if (isUVRepeat) {
-              texcoords.push(new Vector2(_j3, 1.0 - _i3));
+              texcoords.push(new Vector2(_j3, _i3));
             } else {
-              texcoords.push(new Vector2(_j3 / uSpan, 1.0 - _i3 / vSpan));
+              texcoords.push(new Vector2(_j3 / uSpan, _i3 / vSpan));
             }
           }
         }
