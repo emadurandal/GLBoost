@@ -10,6 +10,6 @@ export default class M_AxisGizmo extends M_Mesh {
   }
 
   _init(length) {
-    this.geometry = new Axis(glBoostContext, length);
+    this.geometry = new Axis(this._glBoostContext, length);
   }
 }

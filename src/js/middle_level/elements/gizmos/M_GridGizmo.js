@@ -10,8 +10,8 @@ export default class M_GridGizmo extends M_Mesh {
   }
 
   _init(length, division, isXZ, isXY, isYZ, colorVec) {
-    this.geometry = new Grid(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
-    this.material = new ClassicMaterial(glBoostContext);
+    this.geometry = new Grid(this._glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
+    this.material = new ClassicMaterial(this._glBoostContext);
     this.material.baseColor = colorVec;
   }
 }

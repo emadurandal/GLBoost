@@ -6010,8 +6010,8 @@
     babelHelpers.createClass(M_GridGizmo, [{
       key: '_init',
       value: function _init(length, division, isXZ, isXY, isYZ, colorVec) {
-        this.geometry = new Grid(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
-        this.material = new ClassicMaterial(glBoostContext);
+        this.geometry = new Grid(this._glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
+        this.material = new ClassicMaterial(this._glBoostContext);
         this.material.baseColor = colorVec;
       }
     }]);
@@ -6083,7 +6083,7 @@
     babelHelpers.createClass(M_AxisGizmo, [{
       key: '_init',
       value: function _init(length) {
-        this.geometry = new Axis(glBoostContext, length);
+        this.geometry = new Axis(this._glBoostContext, length);
       }
     }]);
     return M_AxisGizmo;
