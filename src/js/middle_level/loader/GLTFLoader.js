@@ -479,7 +479,11 @@ export default class GLTFLoader {
         materials.push(material);
       } else {
         let material = glBoostContext.createClassicMaterial();
-        material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+        if (defaultShader) {
+          material.shaderClass = defaultShader;
+        } else {
+          material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+        }
         materials.push(material);
       }
 

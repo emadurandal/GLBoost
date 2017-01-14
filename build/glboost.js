@@ -11685,7 +11685,11 @@
             materials.push(material);
           } else {
             var _material = glBoostContext.createClassicMaterial();
-            _material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+            if (defaultShader) {
+              _material.shaderClass = defaultShader;
+            } else {
+              _material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+            }
             materials.push(_material);
           }
         }
