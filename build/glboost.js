@@ -11836,8 +11836,10 @@
             }
           };
           setTextures(materialJson.values, false);
-          if (materialJson.technique) {
-            setTextures(json.techniques[materialJson.technique].parameters, true);
+          if (materialJson.technique && json.techniques) {
+            if (typeof json.techniques[materialJson.technique] === "undefined") {
+              setTextures(json.techniques[materialJson.technique].parameters, true);
+            }
           }
         } else {
           if (typeof vertexData.components.texcoord !== 'undefined') {
