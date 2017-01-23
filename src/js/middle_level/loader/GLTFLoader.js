@@ -3,6 +3,8 @@ import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import DecalShader from '../shaders/DecalShader';
+import LambertShader from '../shaders/LambertShader';
+import PhongShader from '../shaders/PhongShader';
 import FreeShader from '../shaders/FreeShader';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
@@ -596,10 +598,18 @@ export default class GLTFLoader {
     return mesh;
   }
 
+  _isKHRMaterialsCommon(materialJson) {
+    if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
     let materialJson = json.materials[materialStr];
-
-    if (typeof materialJson.extensions !== 'undefined' && typeof materialJson.extensions.KHR_materials_common !== 'undefined') {
+    let originalMaterialJson = materialJson;
+    if (this._isKHRMaterialsCommon(materialJson)) {
       materialJson = materialJson.extensions.KHR_materials_common;
     }
 
@@ -670,6 +680,18 @@ export default class GLTFLoader {
     let techniqueStr = materialJson.technique;
     if (defaultShader) {
       material.shaderClass = defaultShader;
+    } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
+      switch (techniqueStr) {
+        case 'CONSTANT':
+          material.shaderClass = DecalShader;
+          break;
+        case 'LAMBERT':
+          material.shaderClass = LambertShader;
+          break;
+        case 'PHONG':
+          material.shaderClass = PhongShader;
+          break;
+      }
     } else {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
