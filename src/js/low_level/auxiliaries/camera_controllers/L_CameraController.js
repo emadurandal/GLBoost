@@ -262,7 +262,7 @@ export default class L_CameraController extends GLBoostObject {
 
     let newCenterVec = targetAABB.centerPoint;
 
-    let centerToCameraVec = Vector3.subtract(eyeVec, newCenterVec);
+    let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
     let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
 
     let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
@@ -297,7 +297,7 @@ export default class L_CameraController extends GLBoostObject {
       let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
       camera.eye = vectors[0];
       camera.center = vectors[1];
-      camera.upVec = vectors[2];
+      camera.up = vectors[2];
     });
   }
 
