@@ -12017,7 +12017,7 @@
           };
           setTextures(materialJson.values, false);
           if (materialJson.technique && json.techniques) {
-            if (typeof json.techniques[materialJson.technique] === "undefined") {
+            if (typeof json.techniques[materialJson.technique] !== "undefined") {
               setTextures(json.techniques[materialJson.technique].parameters, true);
             }
           }
