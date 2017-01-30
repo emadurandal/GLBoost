@@ -49,7 +49,6 @@
   var plane = null;
   var cube = null;
   var planeForDepth = null;
-  var cubeForDepth = null;
   var camera = null;
   var depthTextures = [];
   var depthCameras = [];
@@ -75,15 +74,8 @@
 
       var materialForDepth = glBoostContext.createClassicMaterial();
       materialForDepth.shaderClass = GLBoost.PassThroughShader;
-      //materialForDepth.diffuseTexture = texture;
-      /*
-       materialForDepth.shaderClass = GLBoost.LambertShader;
-       texture = glBoostContext.createTexture('resources/texture.png');
-       materialForDepth.diffuseTexture = texture;
-       */
+
       planeForDepth = glBoostContext.createMesh(planeGeometry, materialForDepth);
-      cubeForDepth = glBoostContext.createMesh(cubeGeometry, materialForDepth);
-      cubeForDepth.translate = new GLBoost.Vector3(0,2,0);
 
 
     })();
@@ -96,8 +88,6 @@
           var scene = glBoostContext.createScene();
           scene.addChild(planeForDepth);
           scene.addChild(character);
-          //scene.addChild( plane );
-          //scene.addChild( cube );
 
           depthCamera = glBoostContext.createOrthoCamera(
             {
@@ -134,9 +124,6 @@
             var depthCamera = depthCameras[i];
             depthCamera.eye = cameraEye;
             depthCamera.center = cameraCenter;
-            //    depthCamera.eye = new GLBoost.Vector3(0.0, 10, 0.0);
-            //    depthCamera.center = new GLBoost.Vector3(0.0, 0, 0.0);
-            //depthCamera.up = new GLBoost.Vector3(1.0, 0, 0.0);
 
             depthCamera.left = -lengthBtwCenterToCornerOfAABB;
             depthCamera.right = lengthBtwCenterToCornerOfAABB;
