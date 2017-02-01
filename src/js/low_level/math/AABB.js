@@ -56,6 +56,8 @@ export default class AABB {
   updateAllInfo() {
     this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
     this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+
+    return this;
   }
 
   mergeAABB(aabb) {
