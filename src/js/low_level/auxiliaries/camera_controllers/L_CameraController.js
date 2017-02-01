@@ -84,8 +84,8 @@ export default class L_CameraController extends GLBoostObject {
       if (typeof evt.buttons !== 'undefined') {
         let data = evt.buttons;
         let button_l = ((data & 0x0001) ? true : false);
-        let button_r = ((data & 0x0002) ? true : false);
-        if (button_r) {
+        let button_c = ((data & 0x0004) ? true : false);
+        if (button_c) {
           this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
           this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
 

@@ -3897,8 +3897,8 @@
         if (typeof evt.buttons !== 'undefined') {
           var data = evt.buttons;
           var button_l = data & 0x0001 ? true : false;
-          var button_r = data & 0x0002 ? true : false;
-          if (button_r) {
+          var button_c = data & 0x0004 ? true : false;
+          if (button_c) {
             _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
             _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
 
