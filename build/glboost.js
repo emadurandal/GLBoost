@@ -4268,6 +4268,8 @@
       value: function updateAllInfo() {
         this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
         this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+
+        return this;
       }
     }, {
       key: 'mergeAABB',
@@ -8806,6 +8808,9 @@
 
       _this._target = null;
 
+      _this._lengthCenterToCorner = 10;
+      _this._scaleOfTraslation = 5.0;
+
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
       _this._onMouseDown = function (evt) {
@@ -8855,12 +8860,13 @@
             _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
             _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
 
+            var scale = _this._lengthCenterToCorner * _this._scaleOfTraslation;
             if (evt.shiftKey) {
-              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y));
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y).multiply(scale));
             } else {
-              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y));
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y).multiply(scale));
             }
-            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x));
+            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x).multiply(scale));
 
             _this._clickedMouseYOnCanvas = _this._movedMouseYOnCanvas;
             _this._clickedMouseXOnCanvas = _this._movedMouseXOnCanvas;
@@ -9025,6 +9031,7 @@
           targetAABB = this._target.AABB;
         }
 
+        this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
         var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
 
         var newCenterVec = targetAABB.centerPoint;

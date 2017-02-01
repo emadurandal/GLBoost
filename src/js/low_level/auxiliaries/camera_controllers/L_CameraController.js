@@ -37,6 +37,9 @@ export default class L_CameraController extends GLBoostObject {
 
     this._target = null;
 
+    this._lengthCenterToCorner = 10;
+    this._scaleOfTraslation = 5.0;
+
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
     this._onMouseDown = (evt) => {
@@ -86,12 +89,13 @@ export default class L_CameraController extends GLBoostObject {
           this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
           this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
 
+          let scale = this._lengthCenterToCorner * this._scaleOfTraslation;
           if (evt.shiftKey) {
-            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y));
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
           } else {
-            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y));
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
           }
-          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x));
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
 
           this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
           this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
@@ -258,6 +262,7 @@ export default class L_CameraController extends GLBoostObject {
       targetAABB = this._target.AABB;
     }
 
+    this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
     let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2);
 
     let newCenterVec = targetAABB.centerPoint;
