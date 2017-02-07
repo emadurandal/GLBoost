@@ -8767,6 +8767,326 @@
     return PhinaTexture;
   }(Texture);
 
+  var L_SPVCameraController = function (_GLBoostObject) {
+    babelHelpers.inherits(L_SPVCameraController, _GLBoostObject);
+
+    function L_SPVCameraController(glBoostContext) {
+      var isSymmetryMode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var doResetWhenCameraSettingChanged = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var isForceGrab = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var efficiency = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1.0;
+      babelHelpers.classCallCheck(this, L_SPVCameraController);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_SPVCameraController.__proto__ || Object.getPrototypeOf(L_SPVCameraController)).call(this, glBoostContext));
+
+      _this._camaras = new Set();
+
+      _this._isKeyUp = true;
+      _this._isForceGrab = isForceGrab;
+      _this._isSymmetryMode = isSymmetryMode;
+
+      _this._efficiency = 0.5 * efficiency;
+
+      _this._rot_bgn_x = 0;
+      _this._rot_bgn_y = 0;
+      _this._rot_x = 0;
+      _this._rot_y = 0;
+      _this._clickedMouseYOnCanvas = 0;
+      _this._clickedMouseXOnCanvas = 0;
+
+      _this._verticalAngleOfVectors = 0;
+
+      _this._verticalAngleThrethold = 90;
+
+      _this._wheel_y = 1;
+      _this._mouse_translate_y = 0;
+      _this._mouse_translate_x = 0;
+
+      _this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+      _this._newUpVec = new Vector3(0, 0, 0);
+
+      _this._target = null;
+
+      _this._lengthCenterToCorner = 10;
+      _this._scaleOfTraslation = 5.0;
+
+      _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
+
+      _this._onMouseDown = function (evt) {
+        var rect = evt.target.getBoundingClientRect();
+        _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
+        _this._rot_bgn_x = _this._rot_x;
+        _this._rot_bgn_y = _this._rot_y;
+
+        _this._isKeyUp = false;
+
+        if (typeof evt.buttons !== 'undefined') {
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
+        }
+        return false;
+      };
+
+      _this._onMouseUp = function (evt) {
+        _this._isKeyUp = true;
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
+      };
+
+      _this._onMouseMove = function (evt) {
+        if (_this._isKeyUp) {
+          return;
+        }
+
+        var rect = evt.target.getBoundingClientRect();
+        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
+
+        if (typeof evt.buttons !== 'undefined') {
+          var data = evt.buttons;
+          var button_l = data & 0x0001 ? true : false;
+          var button_c = data & 0x0004 ? true : false;
+          if (button_c) {
+            _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
+            _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
+
+            var scale = _this._lengthCenterToCorner * _this._scaleOfTraslation;
+            if (evt.shiftKey) {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y).multiply(scale));
+            } else {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y).multiply(scale));
+            }
+            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x).multiply(scale));
+
+            _this._clickedMouseYOnCanvas = _this._movedMouseYOnCanvas;
+            _this._clickedMouseXOnCanvas = _this._movedMouseXOnCanvas;
+          }
+
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
+
+          if (!button_l) {
+            return;
+          }
+        }
+
+        // calc rotation angle
+        var delta_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
+        var delta_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
+        _this._rot_y = _this._rot_bgn_y - delta_y;
+        _this._rot_x = _this._rot_bgn_x - delta_x;
+
+        // check if rotation angle is within range
+        if (_this._verticalAngleThrethold - _this._verticalAngleOfVectors < _this._rot_y) {
+          _this._rot_y = _this._verticalAngleThrethold + _this._verticalAngleOfVectors;
+        }
+
+        if (_this._rot_y < -_this._verticalAngleThrethold + _this._verticalAngleOfVectors) {
+          _this._rot_y = -_this._verticalAngleThrethold - _this._verticalAngleOfVectors;
+        }
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      _this._onMouseWheel = function (evt) {
+        evt.preventDefault();
+        _this._wheel_y -= evt.deltaY / 200;
+        _this._wheel_y = Math.min(_this._wheel_y, 3);
+        _this._wheel_y = Math.max(_this._wheel_y, 0.1);
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      _this._onContexMenu = function (evt) {
+        if (evt.preventDefault) {
+          evt.preventDefault();
+        } else {
+          event.returnValue = false;
+        }
+      };
+
+      _this._onMouseDblClick = function (evt) {
+        if (evt.shiftKey) {
+          _this._mouseTranslateVec = new Vector3(0, 0, 0);
+        } else {
+          _this._rot_y = 0;
+          _this._rot_x = 0;
+          _this._rot_bgn_y = 0;
+          _this._rot_bgn_x = 0;
+        }
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      if (_this._glContext.canvas) {
+        _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
+        _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
+        _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
+        if (window.WheelEvent) {
+          _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
+        }
+        _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
+        _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
+      }
+      return _this;
+    }
+
+    babelHelpers.createClass(L_SPVCameraController, [{
+      key: 'convert',
+      value: function convert(camera) {
+        var newEyeVec = null;
+        var newCenterVec = null;
+        var newUpVec = null;
+
+        //if (this._isKeyUp) {
+
+        //}
+
+        if (this._isKeyUp || !this._isForceGrab) {
+          this._eyeVec = camera.eye;
+          this._centerVec = camera.center;
+          this._upVec = camera.up;
+        }
+
+        if (this._isSymmetryMode) {
+          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+          var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
+          var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
+          if (horizontalSign >= 0) {
+            horizontalSign = 1;
+          } else {
+            horizontalSign = -1;
+          }
+          horizontalAngleOfVectors *= horizontalSign;
+          var rotateM_Reset = Matrix33.rotateY(horizontalAngleOfVectors);
+          var rotateM_X = Matrix33.rotateX(this._rot_y);
+          var rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
+          var rotateM = Matrix33.multiply(rotateM_Revert, Matrix33.multiply(rotateM_Y, Matrix33.multiply(rotateM_X, rotateM_Reset)));
+
+          newUpVec = rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
+
+          var horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
+          this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
+          var verticalSign = Vector3.cross(horizonResetVec, new Vector3(0, 0, 1)).x;
+          if (verticalSign >= 0) {
+            verticalSign = 1;
+          } else {
+            verticalSign = -1;
+          }
+          this._verticalAngleOfVectors *= verticalSign;
+        } else {
+          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+          var _rotateM_X = Matrix33.rotateX(this._rot_y);
+          var _rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var _rotateM = _rotateM_Y.multiply(_rotateM_X);
+
+          newUpVec = _rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
+        }
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: '_updateTargeting',
+      value: function _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
+        if (this._target === null) {
+          return [eyeVec, centerVec, upVec];
+        }
+
+        var targetAABB = null;
+        if (typeof this._target.updateAABB !== 'undefined') {
+          targetAABB = this._target.updateAABB();
+        } else {
+          targetAABB = this._target.AABB;
+        }
+
+        this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
+        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
+
+        var newCenterVec = targetAABB.centerPoint;
+
+        var centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
+        var centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
+
+        var newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+
+        var newUpVec = null;
+        if (camera instanceof M_AbstractCamera) {
+          var mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+          newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
+          newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
+          newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+        } else {
+          newUpVec = upVec;
+        }
+
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: 'tryReset',
+      value: function tryReset() {
+        if (this._doResetWhenCameraSettingChanged) {
+          if (this._isKeyUp) {
+            this._rot_y = 0;
+            this._rot_x = 0;
+            this._rot_bgn_y = 0;
+            this._rot_bgn_x = 0;
+          }
+        }
+      }
+    }, {
+      key: 'updateTargeting',
+      value: function updateTargeting() {
+        var _this2 = this;
+
+        this._camaras.forEach(function (camera) {
+          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+          camera.eye = vectors[0];
+          camera.center = vectors[1];
+          camera.up = vectors[2];
+        });
+      }
+    }, {
+      key: 'addCamera',
+      value: function addCamera(camera) {
+        this._camaras.add(camera);
+      }
+    }, {
+      key: 'target',
+      set: function set(object) {
+        this._target = object;
+        this.updateTargeting();
+      }
+    }]);
+    return L_SPVCameraController;
+  }(GLBoostObject);
+
   var L_CameraController = function (_GLBoostObject) {
     babelHelpers.inherits(L_CameraController, _GLBoostObject);
 
@@ -8825,11 +9145,6 @@
         _this._isKeyUp = false;
 
         if (typeof evt.buttons !== 'undefined') {
-          var data = evt.buttons;
-          var button_c = data & 0x0004 ? true : false;
-          if (button_c) {
-            _this._wheel_y = 1;
-          }
           _this._camaras.forEach(function (camera) {
             camera._needUpdateView(false);
           });
@@ -10075,6 +10390,11 @@
       key: 'createCameraController',
       value: function createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
         return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+      }
+    }, {
+      key: 'createSPVCameraController',
+      value: function createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
+        return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
       }
     }, {
       key: 'createTexture',
