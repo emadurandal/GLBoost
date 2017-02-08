@@ -289,7 +289,17 @@ export default class L_SPVCameraController extends GLBoostObject {
         this._rot_bgn_x = 0;
       }
     }
+  }
 
+  reset() {
+    this._rot_y = 0;
+    this._rot_x = 0;
+    this._rot_bgn_y = 0;
+    this._rot_bgn_x = 0;
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
   }
 
   updateTargeting() {

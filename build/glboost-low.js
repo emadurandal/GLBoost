@@ -4103,6 +4103,18 @@
         }
       }
     }, {
+      key: 'reset',
+      value: function reset() {
+        this._rot_y = 0;
+        this._rot_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
       key: 'updateTargeting',
       value: function updateTargeting() {
         var _this2 = this;
@@ -4421,6 +4433,18 @@
             this._rot_bgn_x = 0;
           }
         }
+      }
+    }, {
+      key: 'reset',
+      value: function reset() {
+        this._rot_y = 0;
+        this._rot_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
       }
     }, {
       key: 'updateTargeting',
