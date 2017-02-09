@@ -54,11 +54,6 @@ export default class L_CameraController extends GLBoostObject {
       this._isKeyUp = false;
 
       if (typeof evt.buttons !== 'undefined') {
-        let data = evt.buttons;
-        let button_c = ((data & 0x0004) ? true : false);
-        if (button_c) {
-          this._wheel_y = 1;
-        }
         this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);
         });
@@ -294,7 +289,17 @@ export default class L_CameraController extends GLBoostObject {
         this._rot_bgn_x = 0;
       }
     }
+  }
 
+  reset() {
+    this._rot_y = 0;
+    this._rot_x = 0;
+    this._rot_bgn_y = 0;
+    this._rot_bgn_x = 0;
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
   }
 
   updateTargeting() {

@@ -8825,11 +8825,6 @@
         _this._isKeyUp = false;
 
         if (typeof evt.buttons !== 'undefined') {
-          var data = evt.buttons;
-          var button_c = data & 0x0004 ? true : false;
-          if (button_c) {
-            _this._wheel_y = 1;
-          }
           _this._camaras.forEach(function (camera) {
             camera._needUpdateView(false);
           });
@@ -9064,6 +9059,18 @@
             this._rot_bgn_x = 0;
           }
         }
+      }
+    }, {
+      key: 'reset',
+      value: function reset() {
+        this._rot_y = 0;
+        this._rot_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
       }
     }, {
       key: 'updateTargeting',
