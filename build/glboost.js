@@ -8898,9 +8898,9 @@
 
       _this._onMouseWheel = function (evt) {
         evt.preventDefault();
-        _this._wheel_y -= evt.deltaY / 200;
+        _this._wheel_y += evt.deltaY / 600;
         _this._wheel_y = Math.min(_this._wheel_y, 3);
-        _this._wheel_y = Math.max(_this._wheel_y, 0.1);
+        _this._wheel_y = Math.max(_this._wheel_y, 0.4);
 
         _this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);

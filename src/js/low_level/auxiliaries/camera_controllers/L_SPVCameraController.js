@@ -129,9 +129,9 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._onMouseWheel = (evt) => {
       evt.preventDefault();
-      this._wheel_y -= evt.deltaY / 200;
+      this._wheel_y += evt.deltaY / 600;
       this._wheel_y = Math.min(this._wheel_y, 3);
-      this._wheel_y = Math.max(this._wheel_y, 0.1);
+      this._wheel_y = Math.max(this._wheel_y, 0.4);
 
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
