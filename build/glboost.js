@@ -9067,6 +9067,26 @@
         this._rot_x = 0;
         this._rot_bgn_y = 0;
         this._rot_bgn_x = 0;
+        this._wheel_y = 1;
+        this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
+      key: 'resetDolly',
+      value: function resetDolly() {
+        this._wheel_y = 1;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
+      key: 'resetTrack',
+      value: function resetTrack() {
+        this._mouseTranslateVec = new Vector3(0, 0, 0);
 
         this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);

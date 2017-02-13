@@ -296,6 +296,24 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._rot_x = 0;
     this._rot_bgn_y = 0;
     this._rot_bgn_x = 0;
+    this._wheel_y = 1;
+    this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
+  }
+
+  resetDolly() {
+    this._wheel_y = 1;
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
+  }
+
+  resetTrack() {
+    this._mouseTranslateVec = new Vector3(0, 0, 0);
 
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
