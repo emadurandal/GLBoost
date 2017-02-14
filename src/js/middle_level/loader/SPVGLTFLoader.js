@@ -1,7 +1,7 @@
 import GLBoost from '../../globals';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import DecalShader from '../shaders/DecalShader';
-import LambertShader from '../shaders/LambertShader';
+import SPVLambertShader from '../shaders/SPVLambertShader';
 import PhongShader from '../shaders/PhongShader';
 import FreeShader from '../shaders/FreeShader';
 import Vector3 from '../../low_level/math/Vector3';
@@ -684,7 +684,7 @@ export default class SPVGLTFLoader {
           material.shaderClass = DecalShader;
           break;
         case 'LAMBERT':
-          material.shaderClass = LambertShader;
+          material.shaderClass = SPVLambertShader;
           break;
         case 'PHONG':
           material.shaderClass = PhongShader;
