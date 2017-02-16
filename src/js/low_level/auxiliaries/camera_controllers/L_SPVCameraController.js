@@ -308,7 +308,11 @@ export default class L_SPVCameraController extends GLBoostObject {
   }
 
   resetDolly() {
-    this._wheel_y = 1;
+    this.setDolly(1);
+  }
+
+  setDolly(value) {
+    this._wheel_y = value;
 
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
