@@ -37,15 +37,12 @@ export class SPVLambertShaderSource {
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
     shaderText += `uniform vec4 Kd;\n`;
+    shaderText += `uniform vec4 Ka;\n`;
 
-    //for (let i=0; i<lights.length; i++) {
-    //  if (lights[i].camera && lights[i].camera.texture) {
     shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
 
     shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
 
-      //}
-    //}
     shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
     shaderText += `${in_} vec4 temp[1];\n`;
 
@@ -90,6 +87,10 @@ export class SPVLambertShaderSource {
       shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `  }\n`;
     }
+
+
+    shaderText +=   `rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n`;
+
     //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
 
@@ -102,6 +103,7 @@ export class SPVLambertShaderSource {
     var vertexAttribsAsResult = [];
 
     material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+    material.uniform_Ka = gl.getUniformLocation(shaderProgram, 'Ka');
 
     let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
@@ -126,7 +128,7 @@ export default class SPVLambertShader extends DecalShader {
   constructor(glBoostContext, basicShader) {
 
     super(glBoostContext, basicShader);
-    SPVLambertShader.mixin(SPVLambertShader);
+    SPVLambertShader.mixin(SPVLambertShaderSource);
   }
 
   setUniforms(gl, glslProgram, material, camera, mesh, lights) {
@@ -135,6 +137,8 @@ export default class SPVLambertShader extends DecalShader {
     var Kd = material.diffuseColor;
     gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
 
+    var Ka = material.ambientColor;
+    gl.uniform4f(material.uniform_Ka, Ka.x, Ka.y, Ka.z, Ka.w);
 
     for (let j = 0; j < lights.length; j++) {
       if (lights[j].camera && lights[j].camera.texture) {
