@@ -3855,6 +3855,9 @@
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+      // Enable Flags
+      _this._enableRotation = true;
+
       _this._onMouseDown = function (evt) {
         var rect = evt.target.getBoundingClientRect();
         _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -3913,7 +3916,7 @@
             camera._needUpdateView(false);
           });
 
-          if (!button_l) {
+          if (!button_l || !_this._enableRotation) {
             return;
           }
         }
@@ -4150,6 +4153,14 @@
       key: 'addCamera',
       value: function addCamera(camera) {
         this._camaras.add(camera);
+      }
+    }, {
+      key: 'enableRotation',
+      set: function set(flg) {
+        this._enableRotation = flg;
+      },
+      get: function get() {
+        return this._enableRotation;
       }
     }, {
       key: 'target',

@@ -42,6 +42,9 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+    // Enable Flags
+    this._enableRotation = true;
+
     this._onMouseDown = (evt) => {
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -100,7 +103,7 @@ export default class L_SPVCameraController extends GLBoostObject {
           camera._needUpdateView(false);
         });
 
-        if (!button_l) {
+        if (!button_l || !this._enableRotation) {
           return;
         }
       }
@@ -318,6 +321,14 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
     });
+  }
+
+  set enableRotation(flg) {
+    this._enableRotation = flg;
+  }
+
+  get enableRotation() {
+    return this._enableRotation;
   }
 
   updateTargeting() {

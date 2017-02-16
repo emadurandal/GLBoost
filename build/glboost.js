@@ -8813,6 +8813,9 @@
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+      // Enable Flags
+      _this._enableRotation = true;
+
       _this._onMouseDown = function (evt) {
         var rect = evt.target.getBoundingClientRect();
         _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -8871,7 +8874,7 @@
             camera._needUpdateView(false);
           });
 
-          if (!button_l) {
+          if (!button_l || !_this._enableRotation) {
             return;
           }
         }
@@ -9108,6 +9111,14 @@
       key: 'addCamera',
       value: function addCamera(camera) {
         this._camaras.add(camera);
+      }
+    }, {
+      key: 'enableRotation',
+      set: function set(flg) {
+        this._enableRotation = flg;
+      },
+      get: function get() {
+        return this._enableRotation;
       }
     }, {
       key: 'target',
@@ -13451,15 +13462,12 @@
         var sampler2D = this._sampler2DShadow_func();
         var shaderText = '';
         shaderText += 'uniform vec4 Kd;\n';
+        shaderText += 'uniform vec4 Ka;\n';
 
-        //for (let i=0; i<lights.length; i++) {
-        //  if (lights[i].camera && lights[i].camera.texture) {
         shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
 
         shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
 
-        //}
-        //}
         shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
         shaderText += in_ + ' vec4 temp[1];\n';
 
@@ -13505,6 +13513,9 @@
           shaderText += '    rt0 += Kd * lightDiffuse[' + _i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '  }\n';
         }
+
+        shaderText += 'rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n';
+
         //shaderText += '  rt0.a = 1.0;\n';
         //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
 
@@ -13518,6 +13529,7 @@
         var vertexAttribsAsResult = [];
 
         material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Ka = gl.getUniformLocation(shaderProgram, 'Ka');
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
@@ -13546,7 +13558,7 @@
 
       var _this = babelHelpers.possibleConstructorReturn(this, (SPVLambertShader.__proto__ || Object.getPrototypeOf(SPVLambertShader)).call(this, glBoostContext, basicShader));
 
-      SPVLambertShader.mixin(SPVLambertShader);
+      SPVLambertShader.mixin(SPVLambertShaderSource);
       return _this;
     }
 
@@ -13557,6 +13569,9 @@
 
         var Kd = material.diffuseColor;
         gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+
+        var Ka = material.ambientColor;
+        gl.uniform4f(material.uniform_Ka, Ka.x, Ka.y, Ka.z, Ka.w);
 
         for (var j = 0; j < lights.length; j++) {
           if (lights[j].camera && lights[j].camera.texture) {
