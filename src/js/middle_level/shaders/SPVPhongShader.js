@@ -1,35 +1,33 @@
 import Shader from '../../low_level/shaders/Shader';
-import DecalShader from './DecalShader';
+import SPVDecalShader from './SPVDecalShader';
 import Matrix44 from '../../low_level/math/Matrix44';
 
-export class SPVLambertShaderSource {
+export class SPVPhongShaderSource {
 
-  FSDefine_SPVLambertShaderSource(in_, f, lights) {
-    
-    var sampler2D = this._sampler2DShadow_func();
+  FSDefine_SPVPhongShaderSource(in_, f, lights) {
     var shaderText = '';
+    shaderText += `uniform vec3 viewPosition;\n`;
     shaderText += `uniform vec4 Kd;\n`;
-    shaderText += `uniform vec4 Ka;\n`;
+    shaderText += `uniform vec4 Ks;\n`;
+    shaderText += `uniform float power;\n`;
 
+    var sampler2D = this._sampler2DShadow_func();
     shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
-
     shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
-
     shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
 
     return shaderText;
   }
 
-  FSShade_SPVLambertShaderSource(f, gl, lights) {
-    var shaderText = '';
-
+  FSShade_SPVPhongShaderSource(f, gl, lights) {
     var textureProjFunc = Shader._textureProj_func(gl);
 
+    var shaderText = '';
     shaderText += '  float depthBias = 0.005;\n';
-
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
+
     for (let i=0; i<lights.length; i++) {
       shaderText += `  {\n`;
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
@@ -44,33 +42,35 @@ export class SPVLambertShaderSource {
 
       shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
       shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `    vec3 view = normalize(viewPosition - position.xyz);\n`;
+      shaderText += `    vec3 reflect = reflect(-light, normal);\n`;
+      shaderText += `    float specular = pow(max(dot(reflect, view), 0.0), power);\n`;
+      shaderText += `    rt0 += Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
       shaderText += `  }\n`;
-    }
-
-
-    shaderText +=   `rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n`;
-
+//    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
-    //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
+    }
 
 
     return shaderText;
   }
 
-  prepare_SPVLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_SPVPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
     material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-    material.uniform_Ka = gl.getUniformLocation(shaderProgram, 'Ka');
+    material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
+    material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
 
-    let textureUnitIndex = 0;
+    material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
+
     for (let i=0; i<lights.length; i++) {
       material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
       // depthTexture
       material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
       // set texture unit i+1 to the sampler
-      gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i+1);  // +1 because 0 is used for diffuse texture
+      gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1);  // +1 because 0 is used for diffuse texture
 
       if (lights[i].camera && lights[i].camera.texture) {
         lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
@@ -83,21 +83,24 @@ export class SPVLambertShaderSource {
 
 
 
-export default class SPVLambertShader extends DecalShader {
+export default class SPVPhongShader extends SPVDecalShader {
   constructor(glBoostContext, basicShader) {
 
     super(glBoostContext, basicShader);
-    SPVLambertShader.mixin(SPVLambertShaderSource);
+    SPVPhongShader.mixin(SPVPhongShaderSource);
+
+    this._power = 64.0;
+
   }
 
   setUniforms(gl, glslProgram, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, material);
 
     var Kd = material.diffuseColor;
+    var Ks = material.specularColor;
     gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-
-    var Ka = material.ambientColor;
-    gl.uniform4f(material.uniform_Ka, Ka.x, Ka.y, Ka.z, Ka.w);
+    gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
+    gl.uniform1f(material.uniform_power, this._power);
 
     for (let j = 0; j < lights.length; j++) {
       if (lights[j].camera && lights[j].camera.texture) {
@@ -115,6 +118,30 @@ export default class SPVLambertShader extends DecalShader {
       }
     }
   }
+
+  set Kd(value) {
+    this._Kd = value;
+  }
+
+  get Kd() {
+    return this._Kd;
+  }
+
+  set Ks(value) {
+    this._Ks = value;
+  }
+
+  get Ks() {
+    return this._Ks;
+  }
+
+  set power(value) {
+    this._power = value;
+  }
+
+  get power() {
+    return this._power;
+  }
 }
 
-GLBoost['SPVLambertShader'] = SPVLambertShader;
+GLBoost['SPVPhongShader'] = SPVPhongShader;

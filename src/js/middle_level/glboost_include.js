@@ -27,4 +27,6 @@ import DepthDisplayShader from './shaders/DepthDisplayShader';
 import PassThroughShader from './shaders/PassThroughShader';
 
 import SPVLambertShader from './shaders/SPVLambertShader';
+import SPVPhongShader from './shaders/SPVPhongShader';
+import SPVDecalShader from './shaders/SPVDecalShader';
 import SPVGLTFLoader from './loader/SPVGLTFLoader';
