@@ -2557,6 +2557,13 @@
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrapS);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrapT);
+      if (GLBoost$1.isThisGLVersion_2(gl) && internalFormat === 0x1902) {
+        // gl.DEPTH_COMPONENT
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LESS);
+      }
       gl.texImage2D(gl.TEXTURE_2D, level, internalFormat, width, height, 0, format, type, null);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
@@ -4780,7 +4787,8 @@
         var _this4 = this;
 
         var temp = [];
-        // and shade as mixin Prepare Functions
+
+        gl.useProgram(shaderProgram);
         this._classNamesOfPrepare.forEach(function (className) {
           var method = _this4['prepare_' + className];
           if (method) {
@@ -4969,7 +4977,7 @@
       key: '_sampler2DShadow_func',
       value: function _sampler2DShadow_func() {
         var gl = this._glContext.gl;
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2D' : 'sampler2D';
       }
     }, {
       key: 'readyForDiscard',
