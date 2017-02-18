@@ -298,7 +298,8 @@ export default class Shader extends GLBoostObject {
 
   _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var temp = [];
-    // and shade as mixin Prepare Functions
+
+    gl.useProgram(shaderProgram);
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
