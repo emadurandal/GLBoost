@@ -764,7 +764,8 @@
         var _this4 = this;
 
         var temp = [];
-        // and shade as mixin Prepare Functions
+
+        gl.useProgram(shaderProgram);
         this._classNamesOfPrepare.forEach(function (className) {
           var method = _this4['prepare_' + className];
           if (method) {
@@ -13434,138 +13435,6 @@
 
   GLBoost['PassThroughShader'] = PassThroughShader;
 
-  var SPVLambertShaderSource = function () {
-    function SPVLambertShaderSource() {
-      babelHelpers.classCallCheck(this, SPVLambertShaderSource);
-    }
-
-    babelHelpers.createClass(SPVLambertShaderSource, [{
-      key: 'FSDefine_SPVLambertShaderSource',
-      value: function FSDefine_SPVLambertShaderSource(in_, f, lights) {
-
-        var sampler2D = this._sampler2DShadow_func();
-        var shaderText = '';
-        shaderText += 'uniform vec4 Kd;\n';
-        shaderText += 'uniform vec4 Ka;\n';
-
-        shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
-
-        shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
-
-        shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_SPVLambertShaderSource',
-      value: function FSShade_SPVLambertShaderSource(f, gl, lights) {
-        var shaderText = '';
-
-        var textureProjFunc = Shader._textureProj_func(gl);
-
-        shaderText += '  float depthBias = 0.005;\n';
-
-        shaderText += '  vec4 surfaceColor = rt0;\n';
-        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-        shaderText += '  vec3 normal = normalize(v_normal);\n';
-        for (var i = 0; i < lights.length; i++) {
-          shaderText += '  {\n';
-          // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-          shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
-
-          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
-          shaderText += '        light *= 0.5;\n';
-          shaderText += '      }\n';
-          shaderText += '    }\n';
-
-          shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-          shaderText += '    rt0 += Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-          shaderText += '  }\n';
-        }
-
-        shaderText += 'rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n';
-
-        //shaderText += '  rt0.a = 1.0;\n';
-        //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
-
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_SPVLambertShaderSource',
-      value: function prepare_SPVLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-        material.uniform_Ka = gl.getUniformLocation(shaderProgram, 'Ka');
-
-        var textureUnitIndex = 0;
-        for (var i = 0; i < lights.length; i++) {
-          material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-          // depthTexture
-          material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
-          // set texture unit i+1 to the sampler
-          gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
-
-          if (lights[i].camera && lights[i].camera.texture) {
-            lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return SPVLambertShaderSource;
-  }();
-
-  var SPVLambertShader = function (_DecalShader) {
-    babelHelpers.inherits(SPVLambertShader, _DecalShader);
-
-    function SPVLambertShader(glBoostContext, basicShader) {
-      babelHelpers.classCallCheck(this, SPVLambertShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SPVLambertShader.__proto__ || Object.getPrototypeOf(SPVLambertShader)).call(this, glBoostContext, basicShader));
-
-      SPVLambertShader.mixin(SPVLambertShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(SPVLambertShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material, camera, mesh, lights) {
-        babelHelpers.get(SPVLambertShader.prototype.__proto__ || Object.getPrototypeOf(SPVLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
-
-        var Kd = material.diffuseColor;
-        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-
-        var Ka = material.ambientColor;
-        gl.uniform4f(material.uniform_Ka, Ka.x, Ka.y, Ka.z, Ka.w);
-
-        for (var j = 0; j < lights.length; j++) {
-          if (lights[j].camera && lights[j].camera.texture) {
-            var cameraMatrix = lights[j].camera.lookAtRHMatrix();
-            var projectionMatrix = lights[j].camera.projectionRHMatrix();
-            gl.uniformMatrix4fv(material['uniform_depthPVMatrix_' + j], false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
-          }
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            gl.uniform1i(material['uniform_isShadowCasting' + i], 1);
-          } else {
-            gl.uniform1i(material['uniform_isShadowCasting' + i], 0);
-          }
-        }
-      }
-    }]);
-    return SPVLambertShader;
-  }(DecalShader);
-
-  GLBoost['SPVLambertShader'] = SPVLambertShader;
-
   var SPVDecalShaderSource = function () {
     function SPVDecalShaderSource() {
       babelHelpers.classCallCheck(this, SPVDecalShaderSource);
@@ -13697,6 +13566,138 @@
 
   GLBoost['SPVDecalShader'] = SPVDecalShader;
 
+  var SPVLambertShaderSource = function () {
+    function SPVLambertShaderSource() {
+      babelHelpers.classCallCheck(this, SPVLambertShaderSource);
+    }
+
+    babelHelpers.createClass(SPVLambertShaderSource, [{
+      key: 'FSDefine_SPVLambertShaderSource',
+      value: function FSDefine_SPVLambertShaderSource(in_, f, lights) {
+
+        var sampler2D = this._sampler2DShadow_func();
+        var shaderText = '';
+        shaderText += 'uniform vec4 Kd;\n';
+        shaderText += 'uniform vec4 Ka;\n';
+
+        shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
+
+        shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
+
+        shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_SPVLambertShaderSource',
+      value: function FSShade_SPVLambertShaderSource(f, gl, lights) {
+        var shaderText = '';
+
+        var textureProjFunc = Shader._textureProj_func(gl);
+
+        shaderText += '  float depthBias = 0.005;\n';
+
+        shaderText += '  vec4 surfaceColor = rt0;\n';
+        shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        shaderText += '  vec3 normal = normalize(v_normal);\n';
+        for (var i = 0; i < lights.length; i++) {
+          shaderText += '  {\n';
+          // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+          shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
+          shaderText += '    float visibility = 1.0; // ' + i + '\n';
+          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
+          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
+          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
+          shaderText += '        visibility *= 0.25;\n';
+          shaderText += '      }\n';
+          shaderText += '    }\n';
+
+          shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+          shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '  }\n';
+        }
+
+        //shaderText +=   `rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n`;
+
+        //shaderText += '  rt0.a = 1.0;\n';
+        //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
+
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_SPVLambertShaderSource',
+      value: function prepare_SPVLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+        material.uniform_Ka = gl.getUniformLocation(shaderProgram, 'Ka');
+
+        var textureUnitIndex = 0;
+        for (var i = 0; i < lights.length; i++) {
+          material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+          // depthTexture
+          material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
+          // set texture unit i+1 to the sampler
+          gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
+
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return SPVLambertShaderSource;
+  }();
+
+  var SPVLambertShader = function (_SPVDecalShader) {
+    babelHelpers.inherits(SPVLambertShader, _SPVDecalShader);
+
+    function SPVLambertShader(glBoostContext, basicShader) {
+      babelHelpers.classCallCheck(this, SPVLambertShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVLambertShader.__proto__ || Object.getPrototypeOf(SPVLambertShader)).call(this, glBoostContext, basicShader));
+
+      SPVLambertShader.mixin(SPVLambertShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(SPVLambertShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material, camera, mesh, lights) {
+        babelHelpers.get(SPVLambertShader.prototype.__proto__ || Object.getPrototypeOf(SPVLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var Kd = material.diffuseColor;
+        gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+
+        var Ka = material.ambientColor;
+        gl.uniform4f(material.uniform_Ka, Ka.x, Ka.y, Ka.z, Ka.w);
+
+        for (var j = 0; j < lights.length; j++) {
+          if (lights[j].camera && lights[j].camera.texture) {
+            var cameraMatrix = lights[j].camera.lookAtRHMatrix();
+            var projectionMatrix = lights[j].camera.projectionRHMatrix();
+            gl.uniformMatrix4fv(material['uniform_depthPVMatrix_' + j], false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
+          }
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            gl.uniform1i(material['uniform_isShadowCasting' + i], 1);
+          } else {
+            gl.uniform1i(material['uniform_isShadowCasting' + i], 0);
+          }
+        }
+      }
+    }]);
+    return SPVLambertShader;
+  }(SPVDecalShader);
+
+  GLBoost['SPVLambertShader'] = SPVLambertShader;
+
   var SPVPhongShaderSource = function () {
     function SPVPhongShaderSource() {
       babelHelpers.classCallCheck(this, SPVPhongShaderSource);
@@ -13733,20 +13734,22 @@
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
           shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
-
+          shaderText += '    float visibility = 1.0; // ' + i + '\n';
+          shaderText += '    float visibilitySpecular = 1.0; // ' + i + '\n';
           shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
           shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
           shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
-          shaderText += '        light *= 0.5;\n';
+          shaderText += '        visibility *= 0.25;\n';
+          shaderText += '        visibilitySpecular *= 0.0;\n';
           shaderText += '      }\n';
           shaderText += '    }\n';
 
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-          shaderText += '    rt0 += Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
           shaderText += '    vec3 reflect = reflect(-light, normal);\n';
           shaderText += '    float specular = pow(max(dot(reflect, view), 0.0), power);\n';
-          shaderText += '    rt0 += Ks * lightDiffuse[' + i + '] * vec4(specular, specular, specular, 0.0);\n';
+          shaderText += '    rt0 += vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[' + i + '] * vec4(specular, specular, specular, 0.0);\n';
           shaderText += '  }\n';
           //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
           //shaderText += '  rt0.a = 1.0;\n';

@@ -5155,7 +5155,8 @@
         var _this4 = this;
 
         var temp = [];
-        // and shade as mixin Prepare Functions
+
+        gl.useProgram(shaderProgram);
         this._classNamesOfPrepare.forEach(function (className) {
           var method = _this4['prepare_' + className];
           if (method) {
