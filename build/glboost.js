@@ -954,7 +954,7 @@
       key: '_sampler2DShadow_func',
       value: function _sampler2DShadow_func() {
         var gl = this._glContext.gl;
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2D' : 'sampler2D';
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
       }
     }, {
       key: 'readyForDiscard',
@@ -13024,8 +13024,8 @@
         return shaderText;
       }
     }, {
-      key: 'prepare_DecalShaderSource',
-      value: function prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+      key: 'prepare_PassThroughShaderSource',
+      value: function prepare_PassThroughShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
 
         var vertexAttribsAsResult = [];
         /*

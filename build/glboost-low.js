@@ -4977,7 +4977,7 @@
       key: '_sampler2DShadow_func',
       value: function _sampler2DShadow_func() {
         var gl = this._glContext.gl;
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2D' : 'sampler2D';
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
       }
     }, {
       key: 'readyForDiscard',
