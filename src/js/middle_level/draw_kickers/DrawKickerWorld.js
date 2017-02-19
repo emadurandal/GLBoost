@@ -48,24 +48,24 @@ export default class DrawKickerWorld {
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      gl.uniform1f(glslProgram.opacity, opacity);
+      gl.uniform1f(material.getUniform(expression.toString(), 'opacity'), opacity);
 
       let world_m = mesh.transformMatrixAccumulatedAncestry;
-      Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      Shader.trySettingMatrix44ToUniform(gl, expression, material, material._semanticsDic, 'WORLD', world_m.flatten());
       let normal_m = mesh.normalMatrixAccumulatedAncestry;
-      Shader.trySettingMatrix33ToUniform(gl, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, expression, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
       if (camera) {
         let cameraMatrix = camera.lookAtRHMatrix();
         let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
         let projectionMatrix = camera.projectionRHMatrix();
-        Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, expression, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, expression, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, expression, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
       }
 
-      if (material['uniform_lightPosition_0']) {
+      if (material.getUniform(expression.toString(), 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-        if (material['uniform_viewPosition']) {
+        if (material.getUniform(expression.toString(), 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 0, 1);
           if (camera) {
             cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
@@ -73,11 +73,11 @@ export default class DrawKickerWorld {
           } else {
             let cameraPos = new Vector4(0, 0, 1, 1);
           }
-          gl.uniform3f(material['uniform_viewPosition'], cameraPos.x, cameraPos.y, cameraPos.z);
+          gl.uniform3f(material.getUniform(expression.toString(), 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z);
         }
 
         for (let j = 0; j < lights.length; j++) {
-          if (material[`uniform_lightPosition_${j}`] && material[`uniform_lightDiffuse_${j}`]) {
+          if (material.getUniform(expression.toString(), `uniform_lightPosition_${j}`) && material.getUniform(expression.toString(), `uniform_lightDiffuse_${j}`)) {
             let lightVec = null;
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
@@ -91,8 +91,8 @@ export default class DrawKickerWorld {
               isPointLight = 0.0;
             }
 
-            gl.uniform4f(material[`uniform_lightPosition_${j}`], lightVec.x, lightVec.y, lightVec.z, isPointLight);
-            gl.uniform4f(material[`uniform_lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            gl.uniform4f(material.getUniform(expression.toString(), `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight);
+            gl.uniform4f(material.getUniform(expression.toString(), `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
           }
         }
       }
@@ -100,7 +100,7 @@ export default class DrawKickerWorld {
       let isMaterialSetupDone = true;
 
       if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, material, camera, mesh, lights);
+        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
       }
 

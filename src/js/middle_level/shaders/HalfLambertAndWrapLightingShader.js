@@ -31,12 +31,12 @@ export class HalfLambertAndWrapLightingShaderSource {
     return shaderText;
   }
 
-  prepare_HalfLambertAndWrapLightingShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_HalfLambertAndWrapLightingShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-    material.uniform_wrap = gl.getUniformLocation(shaderProgram, 'wrap');
+    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(expression.toString(), 'uniform_wrap', gl.getUniformLocation(shaderProgram, 'wrap'));
 
     return vertexAttribsAsResult;
   }
@@ -53,12 +53,12 @@ export default class HalfLambertAndWrapLightingShader extends DecalShader {
     this._wrap = new Vector3(0.6, 0.3, 0.0);
   }
 
-  setUniforms(gl, glslProgram, material) {
-    super.setUniforms(gl, glslProgram, material);
+  setUniforms(gl, glslProgram, expression, material) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
     var Kd = material.diffuseColor;
-    gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-    gl.uniform3f(material.uniform_wrap, this._wrap.x, this._wrap.y, this._wrap.z);
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform3f(material.getUniform(expression.toString(), 'uniform_wrap'), this._wrap.x, this._wrap.y, this._wrap.z);
   }
 
   set wrap(value) {

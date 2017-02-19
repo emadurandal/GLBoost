@@ -31,11 +31,11 @@ export class HalfLambertShaderSource {
     return shaderText;
   }
 
-  prepare_HalfLambertShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_HalfLambertShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
+    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
     return vertexAttribsAsResult;
   }
@@ -50,11 +50,11 @@ export default class HalfLambertShader extends DecalShader {
     HalfLambertShader.mixin(HalfLambertShaderSource);
   }
 
-  setUniforms(gl, glslProgram, material) {
-    super.setUniforms(gl, glslProgram, material);
+  setUniforms(gl, glslProgram, expression, material) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
-    var Kd = material.diffuseColor;
-    gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
+    let Kd = material.diffuseColor;
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
   }
 }
 

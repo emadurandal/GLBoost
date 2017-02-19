@@ -42,7 +42,7 @@ export default class VertexLocalShaderSource {
     return shaderText;
   }
 
-  prepare_VertexLocalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_VertexLocalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
@@ -55,13 +55,13 @@ export default class VertexLocalShaderSource {
     });
 
     if (existCamera_f) {
-      material.uniform_modelViewProjectionMatrix = gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix');
+      material.setUniform(expression.toString(), 'uniform_modelViewProjectionMatrix', gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
       material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      material['uniform_lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      material['uniform_lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
+      material.setUniform(expression.toString(), 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
+      material.setUniform(expression.toString(), 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
     return vertexAttribsAsResult;

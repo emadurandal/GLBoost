@@ -296,14 +296,14 @@ export default class Shader extends GLBoostObject {
     return shaderText;
   }
 
-  _prepareAssetsForShaders(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+  _prepareAssetsForShaders(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var temp = [];
 
     gl.useProgram(shaderProgram);
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
-        var verAttirbs = method.bind(this, gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
+        var verAttirbs = method.bind(this, gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
         temp = temp.concat(verAttirbs);
       }
     });
@@ -435,7 +435,7 @@ export default class Shader extends GLBoostObject {
     material._semanticsDic = {};
     material.uniformTextureSamplerDic = {};
     programToReturn._material = material;
-    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, vertexAttribs, existCamera_f, lights, material, extraData);
+    programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, expression, vertexAttribs, existCamera_f, lights, material, extraData);
 
     return programToReturn;
   }
@@ -520,33 +520,33 @@ export default class Shader extends GLBoostObject {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 
-  static trySettingMatrix44ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix44ToUniform(gl, expression, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix4fv(material['uniform_'+semanticsDir[semantics]], false, matrixArray);
+      gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_'+semanticsDir[semantics]), false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix4fv(material['uniform_'+uniformName], false, matrixArray);
+      gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_'+uniformName), false, matrixArray);
     });
   }
 
-  static trySettingMatrix33ToUniform(gl, material, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix33ToUniform(gl, expression, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix3fv(material['uniform_'+semanticsDir[semantics]], false, matrixArray);
+      gl.uniformMatrix3fv(material.getUniform(expression.toString(), 'uniform_'+semanticsDir[semantics]), false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix3fv(material['uniform_'+uniformName], false, matrixArray);
+      gl.uniformMatrix3fv(material.getUniform(expression.toString(), 'uniform_'+uniformName), false, matrixArray);
     });
   }
 
