@@ -5254,8 +5254,8 @@
       }
     }, {
       key: 'getShaderProgram',
-      value: function getShaderProgram(vertexAttribs, existCamera_f, lights, material) {
-        var extraData = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+      value: function getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material) {
+        var extraData = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
 
         var gl = this._glContext.gl;
         var canvasId = this._glContext.belongingCanvasId;
@@ -5345,7 +5345,7 @@
       key: '_sampler2DShadow_func',
       value: function _sampler2DShadow_func() {
         var gl = this._glContext.gl;
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2D' : 'sampler2D';
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
       }
     }, {
       key: 'readyForDiscard',
@@ -5818,7 +5818,7 @@
 
     babelHelpers.createClass(DrawKickerLocal, [{
       key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
         var isVAOBound = false;
         if (DrawKickerLocal._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -6053,9 +6053,10 @@
 
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
         var _this = this;
 
+        var isVAOBound = false;
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -6559,8 +6560,8 @@
       }
     }, {
       key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
-      value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
-        var doSetupVertexAttribs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+      value: function prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights) {
+        var doSetupVertexAttribs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
 
         var gl = this._glContext.gl;
         var vertices = this._vertices;
@@ -6586,7 +6587,7 @@
 
           material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
         }
-        var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+        var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
         if (doSetupVertexAttribs) {
           this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
         }
@@ -6625,7 +6626,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
+      value: function prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
         var _this6 = this;
 
         var vertices = this._vertices;
@@ -6659,7 +6660,7 @@
         var materials = this._getAppropriateMaterials(mesh);
 
         for (var i = 0; i < materials.length; i++) {
-          this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
+          this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
         }
 
         if (doAfter) {
@@ -6692,7 +6693,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, mesh, scene, renderPassIndex) {
+      value: function draw(expression, lights, camera, mesh, scene, renderPassIndex) {
         var gl = this._glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -6700,7 +6701,7 @@
 
         var thisName = this.toString();
 
-        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+        this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
       }
     }, {
       key: 'merge',
@@ -7056,7 +7057,7 @@
           // draw opacity meshes.
           var opacityMeshes = renderPass.opacityMeshes;
           opacityMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
+            mesh.draw(expression, lights, camera, renderPass.scene, index);
           });
 
           if (camera) {
@@ -7065,7 +7066,7 @@
           // draw transparent meshes.
           var transparentMeshes = renderPass.transparentMeshes;
           transparentMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
+            mesh.draw(expression, lights, camera, renderPass.scene, index);
           });
 
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -7469,6 +7470,7 @@
       _this._shaderInstance = null;
       _this._vertexNofGeometries = {};
       _this._states = null;
+      _this._shaderUniformsOfExpressions = {};
 
       _this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],

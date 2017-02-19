@@ -45,7 +45,7 @@ export class PassThroughShaderSource {
     return shaderText;
   }
 
-  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_PassThroughShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
 
     var vertexAttribsAsResult = [];
     /*

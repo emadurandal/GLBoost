@@ -44,7 +44,7 @@ export default class M_Scene extends M_Group {
    * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
    * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
    */
-  prepareToRender() {
+  prepareToRender(expression) {
     this._reset();
 
     var aabb = (function setParentAndMergeAABBRecursively(elem) {
@@ -145,7 +145,7 @@ export default class M_Scene extends M_Group {
           callPrepareToRenderMethodOfAllElements(child);
         });
       } else if (elem instanceof M_Mesh) {
-        elem.prepareToRender(existCamera_f, this._lights);
+        elem.prepareToRender(expression, existCamera_f, this._lights);
       } else if (elem instanceof M_Element) {
         elem.prepareToRender();
       } else {

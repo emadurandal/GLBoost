@@ -158,7 +158,7 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights, doSetupVertexAttribs = true) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true) {
     var gl = this._glContext.gl;
     var vertices = this._vertices;
 
@@ -183,7 +183,7 @@ export default class Geometry extends GLBoostObject {
 
       material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
     }
-    var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+    var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
     if (doSetupVertexAttribs) {
       this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
     }
@@ -219,7 +219,7 @@ export default class Geometry extends GLBoostObject {
     return materials;
   }
 
-  prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
+  prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
 
     var vertices = this._vertices;
     var gl = this._glContext.gl;
@@ -256,7 +256,7 @@ export default class Geometry extends GLBoostObject {
 
 
     for (let i=0; i<materials.length;i++) {
-      this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
+      this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
     }
 
     if (doAfter) {
@@ -288,7 +288,7 @@ export default class Geometry extends GLBoostObject {
     return true;
   }
 
-  draw(lights, camera, mesh, scene, renderPassIndex) {
+  draw(expression, lights, camera, mesh, scene, renderPassIndex) {
     var gl = this._glContext.gl;
     var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -296,7 +296,7 @@ export default class Geometry extends GLBoostObject {
 
     let thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+    this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
 
   }
 

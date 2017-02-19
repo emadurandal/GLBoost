@@ -382,7 +382,7 @@ export default class Shader extends GLBoostObject {
     return shaderProgram;
   }
 
-  getShaderProgram(vertexAttribs, existCamera_f, lights, material, extraData = {}) {
+  getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material, extraData = {}) {
     var gl = this._glContext.gl;
     var canvasId = this._glContext.belongingCanvasId;
 
