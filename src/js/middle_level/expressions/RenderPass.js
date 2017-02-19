@@ -141,7 +141,7 @@ export default class RenderPass extends GLBoostObject {
     return this._customFunction;
   }
 
-  prepareToRender() {
+  prepareToRender(expression) {
     let collectMeshes = function(elem) {
       if (elem instanceof M_Group) {
         var children = elem.getChildren();
@@ -176,7 +176,7 @@ export default class RenderPass extends GLBoostObject {
     });
 
     if (this._scene) {
-      this._scene.prepareToRender();
+      this._scene.prepareToRender(expression);
     }
 
     if (this._customFunction) {

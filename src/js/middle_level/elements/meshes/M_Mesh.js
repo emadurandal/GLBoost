@@ -18,15 +18,15 @@ export default class M_Mesh extends M_Element {
     this._transformedDepth = 0;
   }
 
-  prepareToRender(existCamera_f, lights) {
-    this._geometry.prepareToRender(existCamera_f, lights, this._material, this);
+  prepareToRender(expression, existCamera_f, lights) {
+    this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
     if (this._geometry._materials.length === 0 && this._material) {
-      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights);
+      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
     }
   }
 
-  draw(lights, camera, scene, renderPassIndex) {
-    this._geometry.draw(lights, camera, this, scene, renderPassIndex);
+  draw(expression, lights, camera, scene, renderPassIndex) {
+    this._geometry.draw(expression, lights, camera, this, scene, renderPassIndex);
   }
 
   set geometry(geometry) {

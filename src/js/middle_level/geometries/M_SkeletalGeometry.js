@@ -13,7 +13,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
   }
 
-  draw(lights, camera, skeletalMesh, scene, renderPass_index) {
+  draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
     var gl = this._glContext.gl;
     if (this._materials.length > 0) {
       var materials = this._materials;
@@ -122,10 +122,10 @@ export default class M_SkeletalGeometry extends Geometry {
       Shader.trySettingMatrix44ToUniform(gl, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
     }
 
-    super.draw(lights, camera, skeletalMesh, scene, renderPass_index);
+    super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
   }
 
-  prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
+  prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
     if (this._materials.length > 0) {
@@ -162,6 +162,6 @@ export default class M_SkeletalGeometry extends Geometry {
       }
     }
 
-    super.prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh);
+    super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh);
   }
 }

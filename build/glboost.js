@@ -863,8 +863,8 @@
       }
     }, {
       key: 'getShaderProgram',
-      value: function getShaderProgram(vertexAttribs, existCamera_f, lights, material) {
-        var extraData = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
+      value: function getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material) {
+        var extraData = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
 
         var gl = this._glContext.gl;
         var canvasId = this._glContext.belongingCanvasId;
@@ -3798,7 +3798,7 @@
 
     babelHelpers.createClass(DrawKickerLocal, [{
       key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
         var isVAOBound = false;
         if (DrawKickerLocal._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -4033,9 +4033,10 @@
 
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
-      value: function draw(gl, glem, glContext, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
         var _this = this;
 
+        var isVAOBound = false;
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -4539,8 +4540,8 @@
       }
     }, {
       key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
-      value: function prepareGLSLProgramAndSetVertexNtoMaterial(material, index, existCamera_f, lights) {
-        var doSetupVertexAttribs = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+      value: function prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights) {
+        var doSetupVertexAttribs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
 
         var gl = this._glContext.gl;
         var vertices = this._vertices;
@@ -4566,7 +4567,7 @@
 
           material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
         }
-        var glslProgram = material.shaderInstance.getShaderProgram(_optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+        var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
         if (doSetupVertexAttribs) {
           this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
         }
@@ -4605,7 +4606,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, lights, meshMaterial, mesh) {
+      value: function prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
         var _this6 = this;
 
         var vertices = this._vertices;
@@ -4639,7 +4640,7 @@
         var materials = this._getAppropriateMaterials(mesh);
 
         for (var i = 0; i < materials.length; i++) {
-          this.prepareGLSLProgramAndSetVertexNtoMaterial(materials[i], i, existCamera_f, lights, doAfter);
+          this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
         }
 
         if (doAfter) {
@@ -4672,7 +4673,7 @@
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, mesh, scene, renderPassIndex) {
+      value: function draw(expression, lights, camera, mesh, scene, renderPassIndex) {
         var gl = this._glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -4680,7 +4681,7 @@
 
         var thisName = this.toString();
 
-        this._drawKicker.draw(gl, glem, this._glContext, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+        this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
       }
     }, {
       key: 'merge',
@@ -5036,7 +5037,7 @@
           // draw opacity meshes.
           var opacityMeshes = renderPass.opacityMeshes;
           opacityMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
+            mesh.draw(expression, lights, camera, renderPass.scene, index);
           });
 
           if (camera) {
@@ -5045,7 +5046,7 @@
           // draw transparent meshes.
           var transparentMeshes = renderPass.transparentMeshes;
           transparentMeshes.forEach(function (mesh) {
-            mesh.draw(lights, camera, renderPass.scene, index);
+            mesh.draw(expression, lights, camera, renderPass.scene, index);
           });
 
           gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -5449,6 +5450,7 @@
       _this._shaderInstance = null;
       _this._vertexNofGeometries = {};
       _this._states = null;
+      _this._shaderUniformsOfExpressions = {};
 
       _this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -5774,16 +5776,16 @@
 
     babelHelpers.createClass(M_Mesh, [{
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, lights) {
-        this._geometry.prepareToRender(existCamera_f, lights, this._material, this);
+      value: function prepareToRender(expression, existCamera_f, lights) {
+        this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
         if (this._geometry._materials.length === 0 && this._material) {
-          this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this._material, 0, existCamera_f, lights);
+          this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
         }
       }
     }, {
       key: 'draw',
-      value: function draw(lights, camera, scene, renderPassIndex) {
-        this._geometry.draw(lights, camera, this, scene, renderPassIndex);
+      value: function draw(expression, lights, camera, scene, renderPassIndex) {
+        this._geometry.draw(expression, lights, camera, this, scene, renderPassIndex);
       }
     }, {
       key: 'bakeTransformToGeometry',
@@ -7092,7 +7094,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender() {
+      value: function prepareToRender(expression) {
         var _this3 = this;
 
         var collectMeshes = function collectMeshes(elem) {
@@ -7129,7 +7131,7 @@
         });
 
         if (this._scene) {
-          this._scene.prepareToRender();
+          this._scene.prepareToRender(expression);
         }
 
         if (this._customFunction) {
@@ -7283,8 +7285,10 @@
     }, {
       key: 'prepareToRender',
       value: function prepareToRender() {
+        var _this3 = this;
+
         this._renderPasses.forEach(function (renderPass) {
-          renderPass.prepareToRender();
+          renderPass.prepareToRender(_this3);
         });
       }
     }, {
@@ -7519,7 +7523,7 @@
 
     babelHelpers.createClass(M_SkeletalGeometry, [{
       key: 'draw',
-      value: function draw(lights, camera, skeletalMesh, scene, renderPass_index) {
+      value: function draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
         var gl = this._glContext.gl;
         if (this._materials.length > 0) {
           var materials = this._materials;
@@ -7621,11 +7625,11 @@
           Shader.trySettingMatrix44ToUniform(gl, materials[_i6], materials[_i6]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
         }
 
-        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, lights, camera, skeletalMesh, scene, renderPass_index);
+        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'draw', this).call(this, expression, lights, camera, skeletalMesh, scene, renderPass_index);
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, skeletalMesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh) {
         var _this3 = this;
 
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
@@ -7673,7 +7677,7 @@
           })();
         }
 
-        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, skeletalMesh);
+        babelHelpers.get(M_SkeletalGeometry.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalGeometry.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, skeletalMesh);
       }
     }]);
     return M_SkeletalGeometry;
@@ -7698,7 +7702,7 @@
 
     babelHelpers.createClass(M_SkeletalMesh, [{
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, lights, renderPasses) {
+      value: function prepareToRender(expression, existCamera_f, lights, renderPasses) {
         var joints = this.jointsHierarchy.searchElementsByType(M_Joint);
 
         this._joints = [];
@@ -7713,7 +7717,7 @@
         }
         //this._joints = joints;
 
-        babelHelpers.get(M_SkeletalMesh.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, existCamera_f, lights, renderPasses);
+        babelHelpers.get(M_SkeletalMesh.prototype.__proto__ || Object.getPrototypeOf(M_SkeletalMesh.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, lights, renderPasses);
       }
     }, {
       key: 'clone',
@@ -7839,7 +7843,7 @@
 
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender() {
+      value: function prepareToRender(expression) {
         var _this2 = this;
 
         this._reset();
@@ -7941,7 +7945,7 @@
               callPrepareToRenderMethodOfAllElements(child);
             });
           } else if (elem instanceof M_Mesh) {
-            elem.prepareToRender(existCamera_f, _this2._lights);
+            elem.prepareToRender(expression, existCamera_f, _this2._lights);
           } else if (elem instanceof M_Element) {
             elem.prepareToRender();
           } else {
@@ -11360,13 +11364,13 @@
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
-          material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-          // depthTexture
-          material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
-          // set texture unit i+1 to the sampler
-          gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
-
           if (lights[i].camera && lights[i].camera.texture) {
+            material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+            // depthTexture
+            material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
+            // set texture unit i+1 to the sampler
+            gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
+
             lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
           }
         }

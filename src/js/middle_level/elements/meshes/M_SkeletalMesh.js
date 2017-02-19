@@ -14,7 +14,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     this._joints = [];
   }
 
-  prepareToRender(existCamera_f, lights, renderPasses) {
+  prepareToRender(expression, existCamera_f, lights, renderPasses) {
     let joints = this.jointsHierarchy.searchElementsByType(M_Joint);
 
     this._joints = [];
@@ -29,7 +29,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     }
     //this._joints = joints;
 
-    super.prepareToRender(existCamera_f, lights, renderPasses);
+    super.prepareToRender(expression, existCamera_f, lights, renderPasses);
   }
 
   set jointsHierarchy(jointsHierarchy) {
