@@ -57,24 +57,26 @@ export class SPVPhongShaderSource {
     return shaderText;
   }
 
-  prepare_SPVPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_SPVPhongShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-    material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
-    material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
+    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(expression.toString(), 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
+    material.setUniform(expression.toString(), 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
 
-    material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
+    material.setUniform(expression.toString(), 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
 
     for (let i=0; i<lights.length; i++) {
-      material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-      // depthTexture
-      material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
-      // set texture unit i+1 to the sampler
-      gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1);  // +1 because 0 is used for diffuse texture
 
+      material.setUniform(expression.toString(), 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
       if (lights[i].camera && lights[i].camera.texture) {
+        // depthTexture
+        let depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
+        material.setUniform(expression.toString(), 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+        // set texture unit i+1 to the sampler
+        gl.uniform1i(depthTextureUniformLocation, i+1);  // +1 because 0 is used for diffuse texture
+
         lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
       }
     }
@@ -95,28 +97,28 @@ export default class SPVPhongShader extends SPVDecalShader {
 
   }
 
-  setUniforms(gl, glslProgram, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
-    var Kd = material.diffuseColor;
-    var Ks = material.specularColor;
-    gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-    gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
-    gl.uniform1f(material.uniform_power, this._power);
+    let Kd = material.diffuseColor;
+    let Ks = material.specularColor;
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
+    gl.uniform1f(material.getUniform(expression.toString(), 'uniform_power'), this._power);
 
     for (let j = 0; j < lights.length; j++) {
       if (lights[j].camera && lights[j].camera.texture) {
         let cameraMatrix = lights[j].camera.lookAtRHMatrix();
         let projectionMatrix = lights[j].camera.projectionRHMatrix();
-        gl.uniformMatrix4fv(material['uniform_depthPVMatrix_'+j], false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
+        gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
       }
     }
 
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
-        gl.uniform1i(material['uniform_isShadowCasting' + i], 1);
+        gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 1);
       } else {
-        gl.uniform1i(material['uniform_isShadowCasting' + i], 0);
+        gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 0);
       }
     }
   }
