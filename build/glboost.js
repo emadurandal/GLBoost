@@ -5501,7 +5501,7 @@
       key: 'setTexture',
       value: function setTexture(texture) {
         this._textureDic[texture.userFlavorName] = texture;
-        this._textureContributionRateDic[texture.userFlavorName] = 1.0;
+        this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
         this._updateCount();
       }
     }, {
@@ -5519,15 +5519,15 @@
       }
     }, {
       key: 'setAllTextureContributionRate',
-      value: function setAllTextureContributionRate(ratio) {
+      value: function setAllTextureContributionRate(rateVec4) {
         for (var userFlavorName in this._textureContributionRateDic) {
-          this._textureContributionRateDic[userFlavorName] = ratio;
+          this._textureContributionRateDic[userFlavorName] = rateVec4;
         }
       }
     }, {
       key: 'setTextureContributionRate',
-      value: function setTextureContributionRate(textureUserFlavorName, ratio) {
-        this._textureContributionRateDic[textureUserFlavorName] = ratio;
+      value: function setTextureContributionRate(textureUserFlavorName, rateVec4) {
+        this._textureContributionRateDic[textureUserFlavorName] = rateVec4;
       }
     }, {
       key: 'getTextureContributionRate',
