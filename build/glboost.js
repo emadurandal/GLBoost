@@ -5440,6 +5440,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
 
       _this._textureDic = {};
+      _this._textureContributionRateDic = {};
       _this._gl = _this._glContext.gl;
       _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
       _this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -5450,7 +5451,6 @@
       _this._shaderInstance = null;
       _this._vertexNofGeometries = {};
       _this._states = null;
-      _this._shaderUniformsOfExpressions = {};
 
       _this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -5501,6 +5501,7 @@
       key: 'setTexture',
       value: function setTexture(texture) {
         this._textureDic[texture.userFlavorName] = texture;
+        this._textureContributionRateDic[texture.userFlavorName] = 1.0;
         this._updateCount();
       }
     }, {
@@ -5515,6 +5516,23 @@
           return this._textureDic[userFlavorName];
         }
         return null;
+      }
+    }, {
+      key: 'setAllTextureContributionRate',
+      value: function setAllTextureContributionRate(ratio) {
+        for (var userFlavorName in this._textureContributionRateDic) {
+          this._textureContributionRateDic[userFlavorName] = ratio;
+        }
+      }
+    }, {
+      key: 'setTextureContributionRate',
+      value: function setTextureContributionRate(textureUserFlavorName, ratio) {
+        this._textureContributionRateDic[textureUserFlavorName] = ratio;
+      }
+    }, {
+      key: 'getTextureContributionRate',
+      value: function getTextureContributionRate(textureUserFlavorName) {
+        return this._textureContributionRateDic[textureUserFlavorName];
       }
     }, {
       key: 'hasAnyTextures',
@@ -11364,13 +11382,13 @@
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-            // depthTexture
-            material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
-            // set texture unit i+1 to the sampler
-            gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
+          material['uniform_isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+          // depthTexture
+          material['uniform_DepthTextureSampler_' + i] = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
+          // set texture unit i+1 to the sampler
+          gl.uniform1i(material['uniform_DepthTextureSampler_' + i], i + 1); // +1 because 0 is used for diffuse texture
 
+          if (lights[i].camera && lights[i].camera.texture) {
             lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
           }
         }

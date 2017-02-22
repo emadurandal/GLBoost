@@ -9,6 +9,7 @@ export default class ClassicMaterial extends GLBoostObject {
     super(glBoostContext);
 
     this._textureDic = {};
+    this._textureContributionRateDic = {};
     this._gl = this._glContext.gl;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -90,6 +91,7 @@ export default class ClassicMaterial extends GLBoostObject {
 
   setTexture(texture) {
     this._textureDic[texture.userFlavorName] = texture;
+    this._textureContributionRateDic[texture.userFlavorName] = 1.0;
     this._updateCount();
   }
 
@@ -103,6 +105,21 @@ export default class ClassicMaterial extends GLBoostObject {
     }
     return null;
   }
+
+  setAllTextureContributionRate(ratio) {
+    for (let userFlavorName in this._textureContributionRateDic) {
+      this._textureContributionRateDic[userFlavorName] = ratio;
+    }
+  }
+
+  setTextureContributionRate(textureUserFlavorName, ratio) {
+    this._textureContributionRateDic[textureUserFlavorName] = ratio;
+  }
+
+  getTextureContributionRate(textureUserFlavorName) {
+    return this._textureContributionRateDic[textureUserFlavorName];
+  }
+
 
   hasAnyTextures() {
     let result = false;
