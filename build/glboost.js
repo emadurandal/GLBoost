@@ -13502,6 +13502,7 @@
           shaderText += 'uniform sampler2D uTexture;\n';
         }
         shaderText += 'uniform vec4 materialBaseColor;\n';
+        shaderText += 'uniform vec4 textureContributionRate;\n';
 
         return shaderText;
       }
@@ -13515,7 +13516,7 @@
         }
         shaderText += '    rt0 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
+          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
         }
         //shaderText += '    float shadowRatio = 0.0;\n';
 
@@ -13536,6 +13537,7 @@
         });
 
         material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+        material.uniform_textureContributionRate = gl.getUniformLocation(shaderProgram, 'textureContributionRate');
 
         if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
           if (material.getOneTexture()) {
@@ -13581,6 +13583,14 @@
 
         var baseColor = material.baseColor;
         gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+
+        var texture = material.getOneTexture();
+
+        var rateVec4 = new Vector4(1, 1, 1, 1);
+        if (texture) {
+          rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
+        }
+        gl.uniform4f(material.uniform_textureContributionRate, rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
       }
     }]);
     return SPVDecalShader;
