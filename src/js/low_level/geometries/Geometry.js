@@ -7,6 +7,7 @@ import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
 import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 import AABB from '../../low_level/math/AABB';
+import Vector3 from '../../low_level/math/Vector3';
 
 
 export default class Geometry extends GLBoostObject {
@@ -68,10 +69,48 @@ export default class Geometry extends GLBoostObject {
 
   setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
+    this._indicesArray = indicesArray;
+
+    let vertexNum = 0;
+    if (typeof this._vertices.position.buffer !== 'undefined') {
+      vertexNum = this._vertices.position.length / 3;
+    } else {
+      vertexNum = this._vertices.position.length;
+    }
+
+    // for Wireframe
+    this._vertices.barycentricCoord = [];
+    for (let i=0; i<this._indicesArray.length; i++) {
+      let indices = this._indicesArray[i];
+      for (let j=0; j<indices.length; j++) {
+        let bary = null;
+        if (j % 3 === 0) {
+          bary = new Vector3(1, 0, 0);
+        } else if (j % 3 === 1) {
+          bary = new Vector3(0, 1, 0);
+        } else if (j % 3 === 2) {
+          bary = new Vector3(0, 0, 1);
+        }
+        this._vertices.barycentricCoord[indices[j]] = bary;
+      }
+    }
+    for (let i=0; i<vertexNum; i++) {
+      if (typeof this._vertices.barycentricCoord[i] === 'undefined') {
+        this._vertices.barycentricCoord[i] = new Vector3(0, 0, 0); // Dummy Data
+      }
+    }
 
     let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
+    {
+      let vertexAttribArray = [];
+      for (let i=0; i<this._vertices.barycentricCoord.length; i++) {
+        let element = this._vertices.barycentricCoord[i];
+        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+      }
+      this._vertices.barycentricCoord = vertexAttribArray;
+    }
 
     if (typeof this._vertices.position.buffer !== 'undefined') {
       // position (and maybe others) are a TypedArray
@@ -80,8 +119,16 @@ export default class Geometry extends GLBoostObject {
       for (let i=0; i<vertexNum; i++) {
         this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
       }
+
+      let barycentricCoords = this._vertices.barycentricCoord;
+      this._vertices.barycentricCoord = new Float32Array(this._vertices.position.length);
+      this._vertices.barycentricCoord.set(barycentricCoords);
+
     } else {
       allVertexAttribs.forEach((attribName)=> {
+        if (attribName === 'barycentricCoord') {
+          return;
+        }
         let vertexAttribArray = [];
         this._vertices[attribName].forEach((elem, index) => {
           let element = this._vertices[attribName][index];
@@ -92,12 +139,15 @@ export default class Geometry extends GLBoostObject {
           }
         });
         this._vertices[attribName] = vertexAttribArray;
+
       });
     }
 
+
+
+
     this._AABB.updateAllInfo();
 
-    this._indicesArray = indicesArray;
     this._primitiveType = primitiveType;
 
     var gl = this._glContext.gl;
@@ -147,7 +197,7 @@ export default class Geometry extends GLBoostObject {
   setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
     var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-    // 頂点レイアウト設定
+    // setup vertex layouts
     allVertexAttribs.forEach((attribName)=> {
       if (optimizedVertexAttribs.indexOf(attribName) != -1) {
         let vertexAttribName = null;

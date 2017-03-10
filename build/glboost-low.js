@@ -6093,20 +6093,65 @@
         var performanceHint = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : GLBoost$1.STATIC_DRAW;
 
         this._vertices = vertices;
+        this._indicesArray = indicesArray;
+
+        var vertexNum = 0;
+        if (typeof this._vertices.position.buffer !== 'undefined') {
+          vertexNum = this._vertices.position.length / 3;
+        } else {
+          vertexNum = this._vertices.position.length;
+        }
+
+        // for Wireframe
+        this._vertices.barycentricCoord = [];
+        for (var i = 0; i < this._indicesArray.length; i++) {
+          var indices = this._indicesArray[i];
+          for (var j = 0; j < indices.length; j++) {
+            var bary = null;
+            if (j % 3 === 0) {
+              bary = new Vector3(1, 0, 0);
+            } else if (j % 3 === 1) {
+              bary = new Vector3(0, 1, 0);
+            } else if (j % 3 === 2) {
+              bary = new Vector3(0, 0, 1);
+            }
+            this._vertices.barycentricCoord[indices[j]] = bary;
+          }
+        }
+        for (var _i = 0; _i < vertexNum; _i++) {
+          if (typeof this._vertices.barycentricCoord[_i] === 'undefined') {
+            this._vertices.barycentricCoord[_i] = new Vector3(0, 0, 0); // Dummy Data
+          }
+        }
 
         var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-
         this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
+        {
+          var vertexAttribArray = [];
+          for (var _i2 = 0; _i2 < this._vertices.barycentricCoord.length; _i2++) {
+            var element = this._vertices.barycentricCoord[_i2];
+            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          }
+          this._vertices.barycentricCoord = vertexAttribArray;
+        }
 
         if (typeof this._vertices.position.buffer !== 'undefined') {
           // position (and maybe others) are a TypedArray
           var componentN = this._vertices.components.position;
-          var vertexNum = this._vertices.position.length / componentN;
-          for (var i = 0; i < vertexNum; i++) {
-            this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+          var _vertexNum = this._vertices.position.length / componentN;
+          for (var _i3 = 0; _i3 < _vertexNum; _i3++) {
+            this._AABB.addPositionWithArray(this._vertices.position, _i3 * componentN);
           }
+
+          var barycentricCoords = this._vertices.barycentricCoord;
+          this._vertices.barycentricCoord = new Float32Array(this._vertices.position.length);
+          this._vertices.barycentricCoord.set(barycentricCoords);
         } else {
           allVertexAttribs.forEach(function (attribName) {
+            if (attribName === 'barycentricCoord') {
+              return;
+            }
             var vertexAttribArray = [];
             _this3._vertices[attribName].forEach(function (elem, index) {
               var element = _this3._vertices[attribName][index];
@@ -6122,7 +6167,6 @@
 
         this._AABB.updateAllInfo();
 
-        this._indicesArray = indicesArray;
         this._primitiveType = primitiveType;
 
         var gl = this._glContext.gl;
@@ -6181,7 +6225,7 @@
 
         var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-        // 頂点レイアウト設定
+        // setup vertex layouts
         allVertexAttribs.forEach(function (attribName) {
           if (optimizedVertexAttribs.indexOf(attribName) != -1) {
             var vertexAttribName = null;
@@ -6310,13 +6354,13 @@
           Geometry._iboArrayDic[this.toString()] = [];
           if (this._indicesArray) {
             // create Index Buffer
-            for (var _i = 0; _i < this._indicesArray.length; _i++) {
+            for (var _i4 = 0; _i4 < this._indicesArray.length; _i4++) {
               var ibo = this._glContext.createBuffer(this);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i]), gl.STATIC_DRAW);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i4]), gl.STATIC_DRAW);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-              Geometry._iboArrayDic[this.toString()][_i] = ibo;
-              this._defaultMaterial.setVertexN(this._indicesArray[_i].length);
+              Geometry._iboArrayDic[this.toString()][_i4] = ibo;
+              this._defaultMaterial.setVertexN(this._indicesArray[_i4].length);
             }
           }
           glem.bindVertexArray(gl, null);
@@ -6952,6 +6996,100 @@
 
   GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
 
+  var WireframeShaderSource = function () {
+    function WireframeShaderSource() {
+      babelHelpers.classCallCheck(this, WireframeShaderSource);
+    }
+
+    babelHelpers.createClass(WireframeShaderSource, [{
+      key: 'VSDefine_WireframeShaderSource',
+      value: function VSDefine_WireframeShaderSource(in_, out_, f) {
+        var shaderText = '';
+        shaderText += in_ + ' vec3 aVertex_barycentricCoord;\n';
+        shaderText += out_ + ' vec3 barycentricCoord;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_WireframeShaderSource',
+      value: function VSTransform_WireframeShaderSource(existCamera_f, f) {
+        var shaderText = '';
+
+        shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_WireframeShaderSource',
+      value: function FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += in_ + ' vec3 barycentricCoord;\n';
+
+        shaderText += 'uniform bool isWireframe;\n';
+        shaderText += 'uniform float wireframeThicknessThreshold;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_WireframeShaderSource',
+      value: function FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
+        shaderText += 'if ( isWireframe ) {\n';
+        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+        shaderText += '  } else {\n';
+        shaderText += '    rt0.xyz = grayColor;\n';
+        shaderText += '  }\n';
+        shaderText += '}\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_WireframeShaderSource',
+      value: function prepare_WireframeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
+        vertexAttribsAsResult.push('barycentricCoord');
+
+        material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+        gl.uniform1i(material.uniform_isWireframe, 1);
+
+        material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
+        gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return WireframeShaderSource;
+  }();
+
+  var WireframeShader = function (_Shader) {
+    babelHelpers.inherits(WireframeShader, _Shader);
+
+    function WireframeShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, WireframeShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (WireframeShader.__proto__ || Object.getPrototypeOf(WireframeShader)).call(this, glBoostContext));
+
+      WireframeShader.mixin(basicShader);
+      if (basicShader === VertexWorldShaderSource) {
+        WireframeShader.mixin(VertexWorldShadowShaderSource);
+      }
+      WireframeShader.mixin(FragmentSimpleShaderSource);
+      WireframeShader.mixin(WireframeShaderSource);
+      return _this;
+    }
+
+    return WireframeShader;
+  }(Shader);
+
+  GLBoost['WireframeShader'] = WireframeShader;
+
   var DecalShaderSource = function () {
     function DecalShaderSource() {
       babelHelpers.classCallCheck(this, DecalShaderSource);
@@ -7012,6 +7150,12 @@
         if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
+        shaderText += 'if ( isWireframe ) {\n';
+        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+        shaderText += '  } else {\n';
+        shaderText += '    rt0.xyz = grayColor;\n';
+        shaderText += '  }\n';
+        shaderText += '}\n';
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
@@ -7052,20 +7196,14 @@
     return DecalShaderSource;
   }();
 
-  var DecalShader = function (_Shader) {
-    babelHelpers.inherits(DecalShader, _Shader);
+  var DecalShader = function (_WireframeShader) {
+    babelHelpers.inherits(DecalShader, _WireframeShader);
 
     function DecalShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
       babelHelpers.classCallCheck(this, DecalShader);
 
       var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
 
-      DecalShader.mixin(basicShader);
-      if (basicShader === VertexWorldShaderSource) {
-        DecalShader.mixin(VertexWorldShadowShaderSource);
-      }
-      DecalShader.mixin(FragmentSimpleShaderSource);
       DecalShader.mixin(DecalShaderSource);
       return _this;
     }
@@ -7079,7 +7217,7 @@
       }
     }]);
     return DecalShader;
-  }(Shader);
+  }(WireframeShader);
 
   GLBoost['DecalShader'] = DecalShader;
 
