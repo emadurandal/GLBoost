@@ -6104,23 +6104,37 @@
 
         // for Wireframe
         this._vertices.barycentricCoord = [];
-        for (var i = 0; i < this._indicesArray.length; i++) {
-          var indices = this._indicesArray[i];
-          for (var j = 0; j < indices.length; j++) {
+        if (!this._indicesArray) {
+          for (var i = 0; i < this._vertices.position.length; i++) {
             var bary = null;
-            if (j % 3 === 0) {
+            if (i % 3 === 0) {
               bary = new Vector3(1, 0, 0);
-            } else if (j % 3 === 1) {
+            } else if (i % 3 === 1) {
               bary = new Vector3(0, 1, 0);
-            } else if (j % 3 === 2) {
+            } else if (i % 3 === 2) {
               bary = new Vector3(0, 0, 1);
             }
-            this._vertices.barycentricCoord[indices[j]] = bary;
+            this._vertices.barycentricCoord[i] = bary;
+          }
+        } else {
+          for (var _i = 0; _i < this._indicesArray.length; _i++) {
+            var indices = this._indicesArray[_i];
+            for (var j = 0; j < indices.length; j++) {
+              var _bary = null;
+              if (j % 3 === 0) {
+                _bary = new Vector3(1, 0, 0);
+              } else if (j % 3 === 1) {
+                _bary = new Vector3(0, 1, 0);
+              } else if (j % 3 === 2) {
+                _bary = new Vector3(0, 0, 1);
+              }
+              this._vertices.barycentricCoord[indices[j]] = _bary;
+            }
           }
         }
-        for (var _i = 0; _i < vertexNum; _i++) {
-          if (typeof this._vertices.barycentricCoord[_i] === 'undefined') {
-            this._vertices.barycentricCoord[_i] = new Vector3(0, 0, 0); // Dummy Data
+        for (var _i2 = 0; _i2 < vertexNum; _i2++) {
+          if (typeof this._vertices.barycentricCoord[_i2] === 'undefined') {
+            this._vertices.barycentricCoord[_i2] = new Vector3(0, 0, 0); // Dummy Data
           }
         }
 
@@ -6129,8 +6143,8 @@
 
         {
           var vertexAttribArray = [];
-          for (var _i2 = 0; _i2 < this._vertices.barycentricCoord.length; _i2++) {
-            var element = this._vertices.barycentricCoord[_i2];
+          for (var _i3 = 0; _i3 < this._vertices.barycentricCoord.length; _i3++) {
+            var element = this._vertices.barycentricCoord[_i3];
             Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
           }
           this._vertices.barycentricCoord = vertexAttribArray;
@@ -6140,8 +6154,8 @@
           // position (and maybe others) are a TypedArray
           var componentN = this._vertices.components.position;
           var _vertexNum = this._vertices.position.length / componentN;
-          for (var _i3 = 0; _i3 < _vertexNum; _i3++) {
-            this._AABB.addPositionWithArray(this._vertices.position, _i3 * componentN);
+          for (var _i4 = 0; _i4 < _vertexNum; _i4++) {
+            this._AABB.addPositionWithArray(this._vertices.position, _i4 * componentN);
           }
 
           var barycentricCoords = this._vertices.barycentricCoord;
@@ -6354,13 +6368,13 @@
           Geometry._iboArrayDic[this.toString()] = [];
           if (this._indicesArray) {
             // create Index Buffer
-            for (var _i4 = 0; _i4 < this._indicesArray.length; _i4++) {
+            for (var _i5 = 0; _i5 < this._indicesArray.length; _i5++) {
               var ibo = this._glContext.createBuffer(this);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i4]), gl.STATIC_DRAW);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i5]), gl.STATIC_DRAW);
               gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-              Geometry._iboArrayDic[this.toString()][_i4] = ibo;
-              this._defaultMaterial.setVertexN(this._indicesArray[_i4].length);
+              Geometry._iboArrayDic[this.toString()][_i5] = ibo;
+              this._defaultMaterial.setVertexN(this._indicesArray[_i5].length);
             }
           }
           glem.bindVertexArray(gl, null);
@@ -7150,12 +7164,6 @@
         if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
-        shaderText += 'if ( isWireframe ) {\n';
-        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-        shaderText += '  } else {\n';
-        shaderText += '    rt0.xyz = grayColor;\n';
-        shaderText += '  }\n';
-        shaderText += '}\n';
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
