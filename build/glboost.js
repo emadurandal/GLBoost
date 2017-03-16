@@ -4452,18 +4452,20 @@
 
         // for Wireframe
         this._vertices.barycentricCoord = [];
-        for (var i = 0; i < this._indicesArray.length; i++) {
-          var indices = this._indicesArray[i];
-          for (var j = 0; j < indices.length; j++) {
-            var bary = null;
-            if (j % 3 === 0) {
-              bary = new Vector3(1, 0, 0);
-            } else if (j % 3 === 1) {
-              bary = new Vector3(0, 1, 0);
-            } else if (j % 3 === 2) {
-              bary = new Vector3(0, 0, 1);
+        if (this._indicesArray) {
+          for (var i = 0; i < this._indicesArray.length; i++) {
+            var indices = this._indicesArray[i];
+            for (var j = 0; j < indices.length; j++) {
+              var bary = null;
+              if (j % 3 === 0) {
+                bary = new Vector3(1, 0, 0);
+              } else if (j % 3 === 1) {
+                bary = new Vector3(0, 1, 0);
+              } else if (j % 3 === 2) {
+                bary = new Vector3(0, 0, 1);
+              }
+              this._vertices.barycentricCoord[indices[j]] = bary;
             }
-            this._vertices.barycentricCoord[indices[j]] = bary;
           }
         }
         for (var _i = 0; _i < vertexNum; _i++) {
@@ -5404,7 +5406,7 @@
         vertexAttribsAsResult.push('barycentricCoord');
 
         material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
-        gl.uniform1i(material.uniform_isWireframe, 1);
+        gl.uniform1i(material.uniform_isWireframe, 0);
 
         material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
         gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
@@ -5498,12 +5500,6 @@
         if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
-        shaderText += 'if ( isWireframe ) {\n';
-        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-        shaderText += '  } else {\n';
-        shaderText += '    rt0.xyz = grayColor;\n';
-        shaderText += '  }\n';
-        shaderText += '}\n';
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
@@ -9561,7 +9557,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -9624,7 +9620,7 @@
          }
          */
 
-        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
       }
     }]);
     return Particle;
@@ -9996,7 +9992,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -10022,7 +10018,7 @@
 
         this._materialForBlend.shaderClass = BlendShapeShader;
 
-        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, mesh);
+        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, mesh);
       }
     }, {
       key: '_setBlendWeightToGlslProgram',
@@ -10661,13 +10657,6 @@
         shaderText += '    float specular = pow(max(dot(reflect, view), 0.0), power);\n';
         shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
         shaderText += '  }\n';
-
-        shaderText += 'if ( isWireframe ) {\n';
-        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-        shaderText += '  } else {\n';
-        shaderText += '    rt0.xyz = grayColor;\n';
-        shaderText += '  }\n';
-        shaderText += '}\n';
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
         //shaderText += '  rt0.a = 1.0;\n';
 
