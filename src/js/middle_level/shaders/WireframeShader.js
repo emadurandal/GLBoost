@@ -53,7 +53,6 @@ export class WireframeShaderSource {
     vertexAttribsAsResult.push('barycentricCoord');
 
     material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
-    gl.uniform1i( material.uniform_isWireframe, 1);
 
     material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
     gl.uniform1f( material.uniform_wireframeThicknessThreshold, 0.04);
@@ -73,6 +72,16 @@ export default class WireframeShader extends Shader {
     }
     WireframeShader.mixin(FragmentSimpleShaderSource);
     WireframeShader.mixin(WireframeShaderSource);
+  }
+
+  setUniforms(gl, glslProgram, material) {
+    let isWifeframe = false;
+
+    if (typeof material.isWireframe !== 'undefined') {
+      isWifeframe = material.isWireframe;
+    }
+
+    gl.uniform1i( material.uniform_isWireframe, isWifeframe);
   }
 }
 

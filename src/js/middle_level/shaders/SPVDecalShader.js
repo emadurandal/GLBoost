@@ -1,7 +1,6 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
-import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
-import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
+import WireframeShader from './WireframeShader';
 import Vector4 from '../../low_level/math/Vector4';
 
 export class SPVDecalShaderSource {
@@ -94,21 +93,17 @@ export class SPVDecalShaderSource {
   }
 }
 
-export default class SPVDecalShader extends Shader {
+export default class SPVDecalShader extends WireframeShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
-    SPVDecalShader.mixin(basicShader);
-    if (basicShader === VertexWorldShaderSource) {
-      SPVDecalShader.mixin(VertexWorldShadowShaderSource);
-    }
-    SPVDecalShader.mixin(FragmentSimpleShaderSource);
     SPVDecalShader.mixin(SPVDecalShaderSource);
   }
 
   setUniforms(gl, glslProgram, material) {
-
+    super.setUniforms(gl, glslProgram, material);
+    
     var baseColor = material.baseColor;
     gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
 

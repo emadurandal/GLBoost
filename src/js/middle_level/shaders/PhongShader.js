@@ -28,6 +28,13 @@ export class PhongShaderSource {
     shaderText += `    float specular = pow(max(dot(reflect, view), 0.0), power);\n`;
     shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
     shaderText += `  }\n`;
+
+    shaderText += 'if ( isWireframe ) {\n';
+    shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+    shaderText += '  } else {\n';
+    shaderText += '    rt0.xyz = grayColor;\n';
+    shaderText += '  }\n';
+    shaderText += '}\n';
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
 

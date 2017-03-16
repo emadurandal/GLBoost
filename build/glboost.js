@@ -5418,7 +5418,6 @@
         vertexAttribsAsResult.push('barycentricCoord');
 
         material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
-        gl.uniform1i(material.uniform_isWireframe, 1);
 
         material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
         gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
@@ -5447,6 +5446,18 @@
       return _this;
     }
 
+    babelHelpers.createClass(WireframeShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        var isWifeframe = false;
+
+        if (typeof material.isWireframe !== 'undefined') {
+          isWifeframe = material.isWireframe;
+        }
+
+        gl.uniform1i(material.uniform_isWireframe, isWifeframe);
+      }
+    }]);
     return WireframeShader;
   }(Shader);
 
@@ -5577,7 +5588,7 @@
 
   GLBoost['DecalShader'] = DecalShader;
 
-  var ClassicMaterial = function (_GLBoostObject) {
+  var ClassicMaterial$1 = function (_GLBoostObject) {
     babelHelpers.inherits(ClassicMaterial, _GLBoostObject);
 
     function ClassicMaterial(glBoostContext) {
@@ -5858,7 +5869,7 @@
     return ClassicMaterial;
   }(GLBoostObject);
 
-  GLBoost$1['ClassicMaterial'] = ClassicMaterial;
+  GLBoost$1['ClassicMaterial'] = ClassicMaterial$1;
 
   var Grid = function (_Geometry) {
     babelHelpers.inherits(Grid, _Geometry);
@@ -6182,7 +6193,7 @@
       key: '_init',
       value: function _init(length, division, isXZ, isXY, isYZ, colorVec) {
         this.geometry = new Grid(this._glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
-        this.material = new ClassicMaterial(this._glBoostContext);
+        this.material = new ClassicMaterial$1(this._glBoostContext);
         this.material.baseColor = colorVec;
       }
     }]);
@@ -8182,6 +8193,803 @@
     return M_Scene;
   }(M_Group);
 
+  var SPVDecalShaderSource = function () {
+    function SPVDecalShaderSource() {
+      babelHelpers.classCallCheck(this, SPVDecalShaderSource);
+    }
+
+    babelHelpers.createClass(SPVDecalShaderSource, [{
+      key: 'VSDefine_SPVDecalShaderSource',
+      value: function VSDefine_SPVDecalShaderSource(in_, out_, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 aVertex_color;\n';
+          shaderText += out_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+          shaderText += out_ + ' vec2 texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_SPVDecalShaderSource',
+      value: function VSTransform_SPVDecalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  color = aVertex_color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += '  texcoord = aVertex_texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_SPVDecalShaderSource',
+      value: function FSDefine_SPVDecalShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 texcoord;\n\n';
+        }
+        if (material.hasAnyTextures()) {
+          shaderText += 'uniform sampler2D uTexture;\n';
+        }
+        shaderText += 'uniform vec4 materialBaseColor;\n';
+        shaderText += 'uniform vec4 textureContributionRate;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_SPVDecalShaderSource',
+      value: function FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+        var textureFunc = Shader._texture_func(gl);
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  rt0 *= color;\n';
+        }
+        shaderText += '    rt0 *= materialBaseColor;\n';
+        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
+        }
+        //shaderText += '    float shadowRatio = 0.0;\n';
+
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_SPVDecalShaderSource',
+      value: function prepare_SPVDecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+        material.uniform_textureContributionRate = gl.getUniformLocation(shaderProgram, 'textureContributionRate');
+
+        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+          if (material.getOneTexture()) {
+            material.uniformTextureSamplerDic['uTexture'] = {};
+            material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
+            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+
+            // set texture unit 0 to the sampler
+            gl.uniform1i(material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
+            material._semanticsDic['TEXTURE'] = 'uTexture';
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return SPVDecalShaderSource;
+  }();
+
+  var SPVDecalShader = function (_WireframeShader) {
+    babelHelpers.inherits(SPVDecalShader, _WireframeShader);
+
+    function SPVDecalShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, SPVDecalShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVDecalShader.__proto__ || Object.getPrototypeOf(SPVDecalShader)).call(this, glBoostContext));
+
+      SPVDecalShader.mixin(SPVDecalShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(SPVDecalShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, material) {
+        babelHelpers.get(SPVDecalShader.prototype.__proto__ || Object.getPrototypeOf(SPVDecalShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, material);
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+
+        var texture = material.getOneTexture();
+
+        var rateVec4 = new Vector4(1, 1, 1, 1);
+        if (texture) {
+          rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
+        }
+        gl.uniform4f(material.uniform_textureContributionRate, rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+      }
+    }]);
+    return SPVDecalShader;
+  }(WireframeShader);
+
+  GLBoost['SPVDecalShader'] = SPVDecalShader;
+
+  var SPVClassicMaterial = function (_GLBoostObject) {
+    babelHelpers.inherits(SPVClassicMaterial, _GLBoostObject);
+
+    function SPVClassicMaterial(glBoostContext) {
+      babelHelpers.classCallCheck(this, SPVClassicMaterial);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVClassicMaterial.__proto__ || Object.getPrototypeOf(SPVClassicMaterial)).call(this, glBoostContext));
+
+      _this._textureDic = {};
+      _this._textureContributionRateDic = {};
+      _this._gl = _this._glContext.gl;
+      _this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      _this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      _this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
+      _this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
+      _this._name = '';
+      _this._shaderClass = SPVDecalShader;
+      _this._shaderInstance = null;
+      _this._vertexNofGeometries = {};
+      _this._states = null;
+      _this._isWireframe = false;
+
+      _this._stateFunctionsToReset = {
+        "blendColor": [0.0, 0.0, 0.0, 0.0],
+        "blendEquationSeparate": [32774, 32774],
+        "blendFuncSeparate": [1, 0, 1, 0],
+        "colorMask": [true, true, true, true],
+        "cullFace": [1029],
+        "depthFunc": [513],
+        "depthMask": [true],
+        "depthRange": [0.0, 1.0],
+        "frontFace": [2305],
+        "lineWidth": [1.0],
+        "polygonOffset": [0.0, 0.0]
+      };
+
+      _this._countOfUpdate = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(SPVClassicMaterial, [{
+      key: 'clone',
+      value: function clone() {
+        var material = new ClassicMaterial(this._glBoostContext);
+        material._baseColor = this._baseColor;
+        material._diffuseColor = this._diffuseColor;
+        material._specularColor = this._specularColor;
+        material._ambientColor = this._ambientColor;
+        material._shaderClass = this._shaderClass;
+        material._shaderInstance = this._shaderInstance;
+
+        for (var geom in this._vertexNofGeometries) {
+          material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
+        }
+
+        return material;
+      }
+    }, {
+      key: '_updateCount',
+      value: function _updateCount() {
+        this._countOfUpdate += 1;
+      }
+    }, {
+      key: 'getUpdateStateString',
+      value: function getUpdateStateString() {
+        return this.toString() + '_updateCount_' + this._countOfUpdate;
+      }
+    }, {
+      key: 'setTexture',
+      value: function setTexture(texture) {
+        this._textureDic[texture.userFlavorName] = texture;
+        this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+        this._updateCount();
+      }
+    }, {
+      key: 'getTexture',
+      value: function getTexture(userFlavorName) {
+        return this._textureDic[userFlavorName];
+      }
+    }, {
+      key: 'getOneTexture',
+      value: function getOneTexture() {
+        for (var userFlavorName in this._textureDic) {
+          return this._textureDic[userFlavorName];
+        }
+        return null;
+      }
+    }, {
+      key: 'setAllTextureContributionRate',
+      value: function setAllTextureContributionRate(rateVec4) {
+        for (var userFlavorName in this._textureContributionRateDic) {
+          this._textureContributionRateDic[userFlavorName] = rateVec4;
+        }
+      }
+    }, {
+      key: 'setTextureContributionRate',
+      value: function setTextureContributionRate(textureUserFlavorName, rateVec4) {
+        this._textureContributionRateDic[textureUserFlavorName] = rateVec4;
+      }
+    }, {
+      key: 'getTextureContributionRate',
+      value: function getTextureContributionRate(textureUserFlavorName) {
+        return this._textureContributionRateDic[textureUserFlavorName];
+      }
+    }, {
+      key: 'hasAnyTextures',
+      value: function hasAnyTextures() {
+        var result = false;
+        for (var userFlavorName in this._textureDic) {
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent() {
+        var isTransparent = false;
+        if (this._states) {
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              if (state === 3042) {
+                isTransparent = true;
+              }
+            });
+          }
+        }
+
+        return isTransparent;
+      }
+    }, {
+      key: 'setVertexN',
+      value: function setVertexN(geom, num) {
+        this._vertexNofGeometries[geom] = num;
+      }
+    }, {
+      key: 'getVertexN',
+      value: function getVertexN(geom) {
+        return typeof this._vertexNofGeometries[geom] === 'undefined' ? 0 : this._vertexNofGeometries[geom];
+      }
+    }, {
+      key: 'setUpTexture',
+      value: function setUpTexture(textureName, textureUnitIndex) {
+        var gl = this._gl;
+        var result = false;
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          result = texture.setUp(textureUnitIndex);
+        } else {
+          gl.bindTexture(gl.TEXTURE_2D, null);
+          result = true;
+        }
+
+        return result;
+      }
+    }, {
+      key: 'tearDownTexture',
+      value: function tearDownTexture(textureName) {
+        var texture = this.getTexture(textureName);
+        if (texture) {
+          texture.tearDown();
+        }
+      }
+    }, {
+      key: 'setUpStates',
+      value: function setUpStates() {
+        var gl = this._gl;
+
+        if (this._states) {
+          Renderer.disableAllGLState(gl);
+
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              gl.enable(state);
+            });
+          }
+          if (this._states.functions) {
+            for (var functionName in this._states.functions) {
+              gl[functionName].apply(gl, this._states.functions[functionName]);
+            }
+          }
+        }
+      }
+    }, {
+      key: 'tearDownStates',
+      value: function tearDownStates() {
+        var gl = this._gl;
+
+        if (this._states) {
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              gl.disable(state);
+            });
+          }
+          if (this._states.functions) {
+            for (var functionName in this._stateFunctionsToReset) {
+              gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
+            }
+          }
+          Renderer.reflectGlobalGLState(gl);
+        }
+      }
+    }, {
+      key: 'shaderClass',
+      set: function set(shaderClass) {
+        if (this._shaderClass === shaderClass) {
+          return;
+        }
+        this._shaderClass = shaderClass;
+        if (this._shaderInstance) {
+          this._shaderInstance.readyForDiscard();
+        }
+        this._shaderInstance = null;
+      },
+      get: function get() {
+        return this._shaderClass;
+      }
+    }, {
+      key: 'shaderInstance',
+      set: function set(shaderInstance) {
+        this._shaderInstance = shaderInstance;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._shaderInstance;
+      }
+    }, {
+      key: 'baseColor',
+      set: function set(vec) {
+        this._baseColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._baseColor;
+      }
+    }, {
+      key: 'diffuseColor',
+      set: function set(vec) {
+        this._diffuseColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._diffuseColor;
+      }
+    }, {
+      key: 'specularColor',
+      set: function set(vec) {
+        this._specularColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._specularColor;
+      }
+    }, {
+      key: 'ambientColor',
+      set: function set(vec) {
+        this._ambientColor = vec;
+        this._updateCount();
+      },
+      get: function get() {
+        return this._ambientColor;
+      }
+    }, {
+      key: 'states',
+      set: function set(states) {
+        this._states = states;
+      },
+      get: function get() {
+        return this._states;
+      }
+    }, {
+      key: 'isWireframe',
+      set: function set(flag) {
+        this._isWireframe = flag;
+      },
+      get: function get() {
+        return this._isWireframe;
+      }
+    }, {
+      key: 'name',
+      set: function set(name) {
+        this._name = name;
+      },
+      get: function get() {
+        return this._name;
+      }
+    }]);
+    return SPVClassicMaterial;
+  }(GLBoostObject);
+
+  GLBoost$1['SPVClassicMaterial'] = SPVClassicMaterial;
+
+  var L_SPVCameraController = function (_GLBoostObject) {
+    babelHelpers.inherits(L_SPVCameraController, _GLBoostObject);
+
+    function L_SPVCameraController(glBoostContext) {
+      var isSymmetryMode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var doResetWhenCameraSettingChanged = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      var isForceGrab = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      var efficiency = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1.0;
+      babelHelpers.classCallCheck(this, L_SPVCameraController);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_SPVCameraController.__proto__ || Object.getPrototypeOf(L_SPVCameraController)).call(this, glBoostContext));
+
+      _this._camaras = new Set();
+
+      _this._isKeyUp = true;
+      _this._isForceGrab = isForceGrab;
+      _this._isSymmetryMode = isSymmetryMode;
+
+      _this._efficiency = 0.5 * efficiency;
+
+      _this._rot_bgn_x = 0;
+      _this._rot_bgn_y = 0;
+      _this._rot_x = 0;
+      _this._rot_y = 0;
+      _this._clickedMouseYOnCanvas = 0;
+      _this._clickedMouseXOnCanvas = 0;
+
+      _this._verticalAngleOfVectors = 0;
+
+      _this._verticalAngleThrethold = 90;
+
+      _this._wheel_y = 1;
+      _this._mouse_translate_y = 0;
+      _this._mouse_translate_x = 0;
+
+      _this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+      _this._newUpVec = new Vector3(0, 0, 0);
+
+      _this._target = null;
+
+      _this._lengthCenterToCorner = 10;
+      _this._scaleOfTraslation = 5.0;
+
+      _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
+
+      // Enable Flags
+      _this._enableRotation = true;
+
+      _this._onMouseDown = function (evt) {
+        var rect = evt.target.getBoundingClientRect();
+        _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
+        _this._rot_bgn_x = _this._rot_x;
+        _this._rot_bgn_y = _this._rot_y;
+
+        _this._isKeyUp = false;
+
+        if (typeof evt.buttons !== 'undefined') {
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
+        }
+        return false;
+      };
+
+      _this._onMouseUp = function (evt) {
+        _this._isKeyUp = true;
+        _this._movedMouseYOnCanvas = -1;
+        _this._movedMouseXOnCanvas = -1;
+      };
+
+      _this._onMouseMove = function (evt) {
+        if (_this._isKeyUp) {
+          return;
+        }
+
+        var rect = evt.target.getBoundingClientRect();
+        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
+        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
+
+        if (typeof evt.buttons !== 'undefined') {
+          var data = evt.buttons;
+          var button_l = data & 0x0001 ? true : false;
+          var button_c = data & 0x0004 ? true : false;
+          if (button_c) {
+            _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
+            _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
+
+            var scale = _this._lengthCenterToCorner * _this._scaleOfTraslation;
+            if (evt.shiftKey) {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y).multiply(scale));
+            } else {
+              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y).multiply(scale));
+            }
+            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x).multiply(scale));
+
+            _this._clickedMouseYOnCanvas = _this._movedMouseYOnCanvas;
+            _this._clickedMouseXOnCanvas = _this._movedMouseXOnCanvas;
+          }
+
+          _this._camaras.forEach(function (camera) {
+            camera._needUpdateView(false);
+          });
+
+          if (!button_l || !_this._enableRotation) {
+            return;
+          }
+        }
+
+        // calc rotation angle
+        var delta_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
+        var delta_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
+        _this._rot_y = _this._rot_bgn_y - delta_y;
+        _this._rot_x = _this._rot_bgn_x - delta_x;
+
+        // check if rotation angle is within range
+        if (_this._verticalAngleThrethold - _this._verticalAngleOfVectors < _this._rot_y) {
+          _this._rot_y = _this._verticalAngleThrethold + _this._verticalAngleOfVectors;
+        }
+
+        if (_this._rot_y < -_this._verticalAngleThrethold + _this._verticalAngleOfVectors) {
+          _this._rot_y = -_this._verticalAngleThrethold - _this._verticalAngleOfVectors;
+        }
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      _this._onMouseWheel = function (evt) {
+        evt.preventDefault();
+        _this._wheel_y += evt.deltaY / 600;
+        _this._wheel_y = Math.min(_this._wheel_y, 3);
+        _this._wheel_y = Math.max(_this._wheel_y, 0.4);
+
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      _this._onContexMenu = function (evt) {
+        if (evt.preventDefault) {
+          evt.preventDefault();
+        } else {
+          event.returnValue = false;
+        }
+      };
+
+      _this._onMouseDblClick = function (evt) {
+        if (evt.shiftKey) {
+          _this._mouseTranslateVec = new Vector3(0, 0, 0);
+        } else {
+          _this._rot_y = 0;
+          _this._rot_x = 0;
+          _this._rot_bgn_y = 0;
+          _this._rot_bgn_x = 0;
+        }
+        _this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      };
+
+      if (_this._glContext.canvas) {
+        _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
+        _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
+        _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
+        if (window.WheelEvent) {
+          _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
+        }
+        _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
+        _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
+      }
+      return _this;
+    }
+
+    babelHelpers.createClass(L_SPVCameraController, [{
+      key: 'convert',
+      value: function convert(camera) {
+        var newEyeVec = null;
+        var newCenterVec = null;
+        var newUpVec = null;
+
+        //if (this._isKeyUp) {
+
+        //}
+
+        if (this._isKeyUp || !this._isForceGrab) {
+          this._eyeVec = camera.eye;
+          this._centerVec = camera.center;
+          this._upVec = camera.up;
+        }
+
+        if (this._isSymmetryMode) {
+          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+          var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
+          var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
+          if (horizontalSign >= 0) {
+            horizontalSign = 1;
+          } else {
+            horizontalSign = -1;
+          }
+          horizontalAngleOfVectors *= horizontalSign;
+          var rotateM_Reset = Matrix33.rotateY(horizontalAngleOfVectors);
+          var rotateM_X = Matrix33.rotateX(this._rot_y);
+          var rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
+          var rotateM = Matrix33.multiply(rotateM_Revert, Matrix33.multiply(rotateM_Y, Matrix33.multiply(rotateM_X, rotateM_Reset)));
+
+          newUpVec = rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
+
+          var horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
+          this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
+          var verticalSign = Vector3.cross(horizonResetVec, new Vector3(0, 0, 1)).x;
+          if (verticalSign >= 0) {
+            verticalSign = 1;
+          } else {
+            verticalSign = -1;
+          }
+          this._verticalAngleOfVectors *= verticalSign;
+        } else {
+          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+          var _rotateM_X = Matrix33.rotateX(this._rot_y);
+          var _rotateM_Y = Matrix33.rotateY(this._rot_x);
+          var _rotateM = _rotateM_Y.multiply(_rotateM_X);
+
+          newUpVec = _rotateM.multiplyVector(this._upVec);
+          this._newUpVec = newUpVec;
+          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(this._centerVec);
+          newCenterVec = this._centerVec.clone();
+          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
+
+          newEyeVec.add(this._mouseTranslateVec);
+          newCenterVec.add(this._mouseTranslateVec);
+        }
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: '_updateTargeting',
+      value: function _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
+        if (this._target === null) {
+          return [eyeVec, centerVec, upVec];
+        }
+
+        var targetAABB = null;
+        if (typeof this._target.updateAABB !== 'undefined') {
+          targetAABB = this._target.updateAABB();
+        } else {
+          targetAABB = this._target.AABB;
+        }
+
+        this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
+        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
+
+        var newCenterVec = targetAABB.centerPoint;
+
+        var centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
+        var centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
+
+        var newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+
+        var newUpVec = null;
+        if (camera instanceof M_AbstractCamera) {
+          var mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+          newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
+          newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
+          newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+        } else {
+          newUpVec = upVec;
+        }
+
+        return [newEyeVec, newCenterVec, newUpVec];
+      }
+    }, {
+      key: 'tryReset',
+      value: function tryReset() {
+        if (this._doResetWhenCameraSettingChanged) {
+          if (this._isKeyUp) {
+            this._rot_y = 0;
+            this._rot_x = 0;
+            this._rot_bgn_y = 0;
+            this._rot_bgn_x = 0;
+          }
+        }
+      }
+    }, {
+      key: 'reset',
+      value: function reset() {
+        this._rot_y = 0;
+        this._rot_x = 0;
+        this._rot_bgn_y = 0;
+        this._rot_bgn_x = 0;
+        this._wheel_y = 1;
+        this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
+      key: 'resetDolly',
+      value: function resetDolly() {
+        this.setDolly(1);
+      }
+    }, {
+      key: 'setDolly',
+      value: function setDolly(value) {
+        this._wheel_y = value;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
+      key: 'resetTrack',
+      value: function resetTrack() {
+        this._mouseTranslateVec = new Vector3(0, 0, 0);
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      }
+    }, {
+      key: 'updateTargeting',
+      value: function updateTargeting() {
+        var _this2 = this;
+
+        this._camaras.forEach(function (camera) {
+          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+          camera.eye = vectors[0];
+          camera.center = vectors[1];
+          camera.up = vectors[2];
+        });
+      }
+    }, {
+      key: 'addCamera',
+      value: function addCamera(camera) {
+        this._camaras.add(camera);
+      }
+    }, {
+      key: 'enableRotation',
+      set: function set(flg) {
+        this._enableRotation = flg;
+      },
+      get: function get() {
+        return this._enableRotation;
+      }
+    }, {
+      key: 'target',
+      set: function set(object) {
+        this._target = object;
+        this.updateTargeting();
+      }
+    }]);
+    return L_SPVCameraController;
+  }(GLBoostObject);
+
   var GLContextImpl = function () {
     function GLContextImpl(canvas, parent) {
       babelHelpers.classCallCheck(this, GLContextImpl);
@@ -8942,374 +9750,6 @@
     }]);
     return PhinaTexture;
   }(Texture);
-
-  var L_SPVCameraController = function (_GLBoostObject) {
-    babelHelpers.inherits(L_SPVCameraController, _GLBoostObject);
-
-    function L_SPVCameraController(glBoostContext) {
-      var isSymmetryMode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      var doResetWhenCameraSettingChanged = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-      var isForceGrab = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-      var efficiency = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1.0;
-      babelHelpers.classCallCheck(this, L_SPVCameraController);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (L_SPVCameraController.__proto__ || Object.getPrototypeOf(L_SPVCameraController)).call(this, glBoostContext));
-
-      _this._camaras = new Set();
-
-      _this._isKeyUp = true;
-      _this._isForceGrab = isForceGrab;
-      _this._isSymmetryMode = isSymmetryMode;
-
-      _this._efficiency = 0.5 * efficiency;
-
-      _this._rot_bgn_x = 0;
-      _this._rot_bgn_y = 0;
-      _this._rot_x = 0;
-      _this._rot_y = 0;
-      _this._clickedMouseYOnCanvas = 0;
-      _this._clickedMouseXOnCanvas = 0;
-
-      _this._verticalAngleOfVectors = 0;
-
-      _this._verticalAngleThrethold = 90;
-
-      _this._wheel_y = 1;
-      _this._mouse_translate_y = 0;
-      _this._mouse_translate_x = 0;
-
-      _this._mouseTranslateVec = new Vector3(0, 0, 0);
-
-      _this._newUpVec = new Vector3(0, 0, 0);
-
-      _this._target = null;
-
-      _this._lengthCenterToCorner = 10;
-      _this._scaleOfTraslation = 5.0;
-
-      _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
-
-      // Enable Flags
-      _this._enableRotation = true;
-
-      _this._onMouseDown = function (evt) {
-        var rect = evt.target.getBoundingClientRect();
-        _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
-        _this._clickedMouseYOnCanvas = evt.clientY - rect.top;
-        _this._movedMouseYOnCanvas = -1;
-        _this._movedMouseXOnCanvas = -1;
-        _this._rot_bgn_x = _this._rot_x;
-        _this._rot_bgn_y = _this._rot_y;
-
-        _this._isKeyUp = false;
-
-        if (typeof evt.buttons !== 'undefined') {
-          _this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-          });
-        }
-        return false;
-      };
-
-      _this._onMouseUp = function (evt) {
-        _this._isKeyUp = true;
-        _this._movedMouseYOnCanvas = -1;
-        _this._movedMouseXOnCanvas = -1;
-      };
-
-      _this._onMouseMove = function (evt) {
-        if (_this._isKeyUp) {
-          return;
-        }
-
-        var rect = evt.target.getBoundingClientRect();
-        _this._movedMouseXOnCanvas = evt.clientX - rect.left;
-        _this._movedMouseYOnCanvas = evt.clientY - rect.top;
-
-        if (typeof evt.buttons !== 'undefined') {
-          var data = evt.buttons;
-          var button_l = data & 0x0001 ? true : false;
-          var button_c = data & 0x0004 ? true : false;
-          if (button_c) {
-            _this._mouse_translate_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) / 1000 * _this._efficiency;
-            _this._mouse_translate_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) / 1000 * _this._efficiency;
-
-            var scale = _this._lengthCenterToCorner * _this._scaleOfTraslation;
-            if (evt.shiftKey) {
-              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newEyeToCenterVec).multiply(-_this._mouse_translate_y).multiply(scale));
-            } else {
-              _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newUpVec).multiply(_this._mouse_translate_y).multiply(scale));
-            }
-            _this._mouseTranslateVec = Vector3.add(_this._mouseTranslateVec, Vector3.normalize(_this._newTangentVec).multiply(_this._mouse_translate_x).multiply(scale));
-
-            _this._clickedMouseYOnCanvas = _this._movedMouseYOnCanvas;
-            _this._clickedMouseXOnCanvas = _this._movedMouseXOnCanvas;
-          }
-
-          _this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-          });
-
-          if (!button_l || !_this._enableRotation) {
-            return;
-          }
-        }
-
-        // calc rotation angle
-        var delta_y = (_this._movedMouseYOnCanvas - _this._clickedMouseYOnCanvas) * _this._efficiency;
-        var delta_x = (_this._movedMouseXOnCanvas - _this._clickedMouseXOnCanvas) * _this._efficiency;
-        _this._rot_y = _this._rot_bgn_y - delta_y;
-        _this._rot_x = _this._rot_bgn_x - delta_x;
-
-        // check if rotation angle is within range
-        if (_this._verticalAngleThrethold - _this._verticalAngleOfVectors < _this._rot_y) {
-          _this._rot_y = _this._verticalAngleThrethold + _this._verticalAngleOfVectors;
-        }
-
-        if (_this._rot_y < -_this._verticalAngleThrethold + _this._verticalAngleOfVectors) {
-          _this._rot_y = -_this._verticalAngleThrethold - _this._verticalAngleOfVectors;
-        }
-
-        _this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      };
-
-      _this._onMouseWheel = function (evt) {
-        evt.preventDefault();
-        _this._wheel_y += evt.deltaY / 600;
-        _this._wheel_y = Math.min(_this._wheel_y, 3);
-        _this._wheel_y = Math.max(_this._wheel_y, 0.4);
-
-        _this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      };
-
-      _this._onContexMenu = function (evt) {
-        if (evt.preventDefault) {
-          evt.preventDefault();
-        } else {
-          event.returnValue = false;
-        }
-      };
-
-      _this._onMouseDblClick = function (evt) {
-        if (evt.shiftKey) {
-          _this._mouseTranslateVec = new Vector3(0, 0, 0);
-        } else {
-          _this._rot_y = 0;
-          _this._rot_x = 0;
-          _this._rot_bgn_y = 0;
-          _this._rot_bgn_x = 0;
-        }
-        _this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      };
-
-      if (_this._glContext.canvas) {
-        _this._glContext.canvas.addEventListener('mousedown', _this._onMouseDown);
-        _this._glContext.canvas.addEventListener('mouseup', _this._onMouseUp);
-        _this._glContext.canvas.addEventListener('mousemove', _this._onMouseMove);
-        if (window.WheelEvent) {
-          _this._glContext.canvas.addEventListener("wheel", _this._onMouseWheel);
-        }
-        _this._glContext.canvas.addEventListener('contextmenu', _this._onContexMenu, false);
-        _this._glContext.canvas.addEventListener("dblclick", _this._onMouseDblClick);
-      }
-      return _this;
-    }
-
-    babelHelpers.createClass(L_SPVCameraController, [{
-      key: 'convert',
-      value: function convert(camera) {
-        var newEyeVec = null;
-        var newCenterVec = null;
-        var newUpVec = null;
-
-        //if (this._isKeyUp) {
-
-        //}
-
-        if (this._isKeyUp || !this._isForceGrab) {
-          this._eyeVec = camera.eye;
-          this._centerVec = camera.center;
-          this._upVec = camera.up;
-        }
-
-        if (this._isSymmetryMode) {
-          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
-          var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
-          var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
-          if (horizontalSign >= 0) {
-            horizontalSign = 1;
-          } else {
-            horizontalSign = -1;
-          }
-          horizontalAngleOfVectors *= horizontalSign;
-          var rotateM_Reset = Matrix33.rotateY(horizontalAngleOfVectors);
-          var rotateM_X = Matrix33.rotateX(this._rot_y);
-          var rotateM_Y = Matrix33.rotateY(this._rot_x);
-          var rotateM_Revert = Matrix33.rotateY(-horizontalAngleOfVectors);
-          var rotateM = Matrix33.multiply(rotateM_Revert, Matrix33.multiply(rotateM_Y, Matrix33.multiply(rotateM_X, rotateM_Reset)));
-
-          newUpVec = rotateM.multiplyVector(this._upVec);
-          this._newUpVec = newUpVec;
-          newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
-          newCenterVec = this._centerVec.clone();
-          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
-          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
-
-          newEyeVec.add(this._mouseTranslateVec);
-          newCenterVec.add(this._mouseTranslateVec);
-
-          var horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
-          this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
-          var verticalSign = Vector3.cross(horizonResetVec, new Vector3(0, 0, 1)).x;
-          if (verticalSign >= 0) {
-            verticalSign = 1;
-          } else {
-            verticalSign = -1;
-          }
-          this._verticalAngleOfVectors *= verticalSign;
-        } else {
-          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
-          var _rotateM_X = Matrix33.rotateX(this._rot_y);
-          var _rotateM_Y = Matrix33.rotateY(this._rot_x);
-          var _rotateM = _rotateM_Y.multiply(_rotateM_X);
-
-          newUpVec = _rotateM.multiplyVector(this._upVec);
-          this._newUpVec = newUpVec;
-          newEyeVec = _rotateM.multiplyVector(_centerToEyeVec).add(this._centerVec);
-          newCenterVec = this._centerVec.clone();
-          this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
-          this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
-
-          newEyeVec.add(this._mouseTranslateVec);
-          newCenterVec.add(this._mouseTranslateVec);
-        }
-        return [newEyeVec, newCenterVec, newUpVec];
-      }
-    }, {
-      key: '_updateTargeting',
-      value: function _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-        if (this._target === null) {
-          return [eyeVec, centerVec, upVec];
-        }
-
-        var targetAABB = null;
-        if (typeof this._target.updateAABB !== 'undefined') {
-          targetAABB = this._target.updateAABB();
-        } else {
-          targetAABB = this._target.AABB;
-        }
-
-        this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
-
-        var newCenterVec = targetAABB.centerPoint;
-
-        var centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
-        var centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
-
-        var newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
-
-        var newUpVec = null;
-        if (camera instanceof M_AbstractCamera) {
-          var mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
-          newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
-          newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
-          newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
-        } else {
-          newUpVec = upVec;
-        }
-
-        return [newEyeVec, newCenterVec, newUpVec];
-      }
-    }, {
-      key: 'tryReset',
-      value: function tryReset() {
-        if (this._doResetWhenCameraSettingChanged) {
-          if (this._isKeyUp) {
-            this._rot_y = 0;
-            this._rot_x = 0;
-            this._rot_bgn_y = 0;
-            this._rot_bgn_x = 0;
-          }
-        }
-      }
-    }, {
-      key: 'reset',
-      value: function reset() {
-        this._rot_y = 0;
-        this._rot_x = 0;
-        this._rot_bgn_y = 0;
-        this._rot_bgn_x = 0;
-        this._wheel_y = 1;
-        this._mouseTranslateVec = new Vector3(0, 0, 0);
-
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      }
-    }, {
-      key: 'resetDolly',
-      value: function resetDolly() {
-        this.setDolly(1);
-      }
-    }, {
-      key: 'setDolly',
-      value: function setDolly(value) {
-        this._wheel_y = value;
-
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      }
-    }, {
-      key: 'resetTrack',
-      value: function resetTrack() {
-        this._mouseTranslateVec = new Vector3(0, 0, 0);
-
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      }
-    }, {
-      key: 'updateTargeting',
-      value: function updateTargeting() {
-        var _this2 = this;
-
-        this._camaras.forEach(function (camera) {
-          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
-          camera.eye = vectors[0];
-          camera.center = vectors[1];
-          camera.up = vectors[2];
-        });
-      }
-    }, {
-      key: 'addCamera',
-      value: function addCamera(camera) {
-        this._camaras.add(camera);
-      }
-    }, {
-      key: 'enableRotation',
-      set: function set(flg) {
-        this._enableRotation = flg;
-      },
-      get: function get() {
-        return this._enableRotation;
-      }
-    }, {
-      key: 'target',
-      set: function set(object) {
-        this._target = object;
-        this.updateTargeting();
-      }
-    }]);
-    return L_SPVCameraController;
-  }(GLBoostObject);
 
   var L_CameraController = function (_GLBoostObject) {
     babelHelpers.inherits(L_CameraController, _GLBoostObject);
@@ -10610,7 +11050,7 @@
     }, {
       key: 'createClassicMaterial',
       value: function createClassicMaterial() {
-        return new ClassicMaterial(this);
+        return new ClassicMaterial$1(this);
       }
     }, {
       key: 'createPerspectiveCamera',
@@ -10626,11 +11066,6 @@
       key: 'createCameraController',
       value: function createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
         return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
-      }
-    }, {
-      key: 'createSPVCameraController',
-      value: function createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
-        return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
       }
     }, {
       key: 'createTexture',
@@ -10734,6 +11169,16 @@
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         return depthTexture;
+      }
+    }, {
+      key: 'createSPVCameraController',
+      value: function createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
+        return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+      }
+    }, {
+      key: 'createSPVClassicMaterial',
+      value: function createSPVClassicMaterial() {
+        return new SPVClassicMaterial(this);
       }
     }, {
       key: 'glContext',
@@ -13610,147 +14055,6 @@
 
   GLBoost['PassThroughShader'] = PassThroughShader;
 
-  var SPVDecalShaderSource = function () {
-    function SPVDecalShaderSource() {
-      babelHelpers.classCallCheck(this, SPVDecalShaderSource);
-    }
-
-    babelHelpers.createClass(SPVDecalShaderSource, [{
-      key: 'VSDefine_SPVDecalShaderSource',
-      value: function VSDefine_SPVDecalShaderSource(in_, out_, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 aVertex_color;\n';
-          shaderText += out_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
-          shaderText += out_ + ' vec2 texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_SPVDecalShaderSource',
-      value: function VSTransform_SPVDecalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  color = aVertex_color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += '  texcoord = aVertex_texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_SPVDecalShaderSource',
-      value: function FSDefine_SPVDecalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 texcoord;\n\n';
-        }
-        if (material.hasAnyTextures()) {
-          shaderText += 'uniform sampler2D uTexture;\n';
-        }
-        shaderText += 'uniform vec4 materialBaseColor;\n';
-        shaderText += 'uniform vec4 textureContributionRate;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_SPVDecalShaderSource',
-      value: function FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
-        var shaderText = '';
-        var textureFunc = Shader._texture_func(gl);
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  rt0 *= color;\n';
-        }
-        shaderText += '    rt0 *= materialBaseColor;\n';
-        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
-        }
-        //shaderText += '    float shadowRatio = 0.0;\n';
-
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_SPVDecalShaderSource',
-      value: function prepare_SPVDecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
-        material.uniform_textureContributionRate = gl.getUniformLocation(shaderProgram, 'textureContributionRate');
-
-        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-          if (material.getOneTexture()) {
-            material.uniformTextureSamplerDic['uTexture'] = {};
-            material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
-            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-
-            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
-
-            // set texture unit 0 to the sampler
-            gl.uniform1i(material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
-            material._semanticsDic['TEXTURE'] = 'uTexture';
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return SPVDecalShaderSource;
-  }();
-
-  var SPVDecalShader = function (_Shader) {
-    babelHelpers.inherits(SPVDecalShader, _Shader);
-
-    function SPVDecalShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, SPVDecalShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SPVDecalShader.__proto__ || Object.getPrototypeOf(SPVDecalShader)).call(this, glBoostContext));
-
-      SPVDecalShader.mixin(basicShader);
-      if (basicShader === VertexWorldShaderSource) {
-        SPVDecalShader.mixin(VertexWorldShadowShaderSource);
-      }
-      SPVDecalShader.mixin(FragmentSimpleShaderSource);
-      SPVDecalShader.mixin(SPVDecalShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(SPVDecalShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, material) {
-
-        var baseColor = material.baseColor;
-        gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
-
-        var texture = material.getOneTexture();
-
-        var rateVec4 = new Vector4(1, 1, 1, 1);
-        if (texture) {
-          rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
-        }
-        gl.uniform4f(material.uniform_textureContributionRate, rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
-      }
-    }]);
-    return SPVDecalShader;
-  }(Shader);
-
-  GLBoost['SPVDecalShader'] = SPVDecalShader;
-
   var SPVLambertShaderSource = function () {
     function SPVLambertShaderSource() {
       babelHelpers.classCallCheck(this, SPVLambertShaderSource);
@@ -14496,13 +14800,13 @@
 
             var materialStr = primitiveJson.material;
 
-            var material = glBoostContext.createClassicMaterial();
+            var material = glBoostContext.createSPVClassicMaterial();
 
             texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
 
             materials.push(material);
           } else {
-            var _material = glBoostContext.createClassicMaterial();
+            var _material = glBoostContext.createSPVClassicMaterial();
             if (defaultShader) {
               _material.shaderClass = defaultShader;
             } else {
@@ -14702,7 +15006,7 @@
         } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
           switch (techniqueStr) {
             case 'CONSTANT':
-              material.shaderClass = DecalShader;
+              material.shaderClass = SPVDecalShader;
               break;
             case 'LAMBERT':
               material.shaderClass = SPVLambertShader;
@@ -14715,7 +15019,7 @@
           if (typeof json.techniques !== 'undefined') {
             this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
           } else {
-            material.shaderClass = DecalShader;
+            material.shaderClass = SPVDecalShader;
           }
         }
 
