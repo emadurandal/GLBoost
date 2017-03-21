@@ -20,6 +20,7 @@ export default class SPVClassicMaterial extends GLBoostObject {
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
     this._states = null;
+    this._shaderUniformLocationsOfExpressions = {};
     this._isWireframe = false;
 
     this._stateFunctionsToReset = {
@@ -271,6 +272,18 @@ export default class SPVClassicMaterial extends GLBoostObject {
       }
       Renderer.reflectGlobalGLState(gl);
     }
+  }
+
+  setUniform(expressionName, uniformLocationName, uniformLocation) {
+    if (!this._shaderUniformLocationsOfExpressions[expressionName]) {
+      this._shaderUniformLocationsOfExpressions[expressionName] = {};
+    }
+
+    this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName] = uniformLocation;
+  }
+
+  getUniform(expressionName, uniformLocationName) {
+    return this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName];
   }
 }
 

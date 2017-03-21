@@ -5622,6 +5622,7 @@
       _this._shaderInstance = null;
       _this._vertexNofGeometries = {};
       _this._states = null;
+      _this._shaderUniformLocationsOfExpressions = {};
       _this._isWireframe = false;
 
       _this._stateFunctionsToReset = {
@@ -5803,6 +5804,20 @@
           }
           Renderer.reflectGlobalGLState(gl);
         }
+      }
+    }, {
+      key: 'setUniform',
+      value: function setUniform(expressionName, uniformLocationName, uniformLocation) {
+        if (!this._shaderUniformLocationsOfExpressions[expressionName]) {
+          this._shaderUniformLocationsOfExpressions[expressionName] = {};
+        }
+
+        this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName] = uniformLocation;
+      }
+    }, {
+      key: 'getUniform',
+      value: function getUniform(expressionName, uniformLocationName) {
+        return this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName];
       }
     }, {
       key: 'shaderClass',
