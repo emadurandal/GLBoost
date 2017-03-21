@@ -79,6 +79,23 @@ export default class M_Group extends M_Element {
     return null;
   }
 
+  searchElementByNameAndType(userflavorName, type, element = this) {
+    if (element.userFlavorName === userflavorName && element instanceof type) {
+      return element;
+    }
+
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChild = this.searchElementByNameAndType(userflavorName, type, children[i]);
+        if (hitChild) {
+          return hitChild;
+        }
+      }
+    }
+    return null;
+  }
+
   searchElementsByType(type, element = this) {
     if (element instanceof type) {
       return element;

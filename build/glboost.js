@@ -7076,6 +7076,26 @@
         return null;
       }
     }, {
+      key: 'searchElementByNameAndType',
+      value: function searchElementByNameAndType(userflavorName, type) {
+        var element = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this;
+
+        if (element.userFlavorName === userflavorName && element instanceof type) {
+          return element;
+        }
+
+        if (element instanceof M_Group) {
+          var children = element.getChildren();
+          for (var i = 0; i < children.length; i++) {
+            var hitChild = this.searchElementByNameAndType(userflavorName, type, children[i]);
+            if (hitChild) {
+              return hitChild;
+            }
+          }
+        }
+        return null;
+      }
+    }, {
       key: 'searchElementsByType',
       value: function searchElementsByType(type) {
         var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this;
@@ -11820,7 +11840,7 @@
           // register joints hierarchy to skeletal mesh
           var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
           skeletalMeshes.forEach(function (skeletalMesh) {
-            var rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+            var rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
             if (!rootJointGroup) {
               // This is a countermeasure when skeleton node does not exist in scene.nodes.
               rootJointGroup = _this3._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
