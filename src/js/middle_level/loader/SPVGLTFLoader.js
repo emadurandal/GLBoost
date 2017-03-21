@@ -1,6 +1,6 @@
 import GLBoost from '../../globals';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
-import DecalShader from '../shaders/DecalShader';
+import SPVDecalShader from '../shaders/SPVDecalShader';
 import SPVLambertShader from '../shaders/SPVLambertShader';
 import SPVPhongShader from '../shaders/SPVPhongShader';
 import FreeShader from '../shaders/FreeShader';
@@ -261,7 +261,7 @@ export default class SPVGLTFLoader {
       // register joints hierarchy to skeletal mesh
       let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
       skeletalMeshes.forEach((skeletalMesh) => {
-        let rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+        let rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
         if (!rootJointGroup) {
           // This is a countermeasure when skeleton node does not exist in scene.nodes.
           rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
@@ -472,13 +472,13 @@ export default class SPVGLTFLoader {
 
         let materialStr = primitiveJson.material;
 
-        let material = glBoostContext.createClassicMaterial();
+        let material = glBoostContext.createSPVClassicMaterial();
 
         texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
 
         materials.push(material);
       } else {
-        let material = glBoostContext.createClassicMaterial();
+        let material = glBoostContext.createSPVClassicMaterial();
         if (defaultShader) {
           material.shaderClass = defaultShader;
         } else {
@@ -681,7 +681,7 @@ export default class SPVGLTFLoader {
     } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
       switch (techniqueStr) {
         case 'CONSTANT':
-          material.shaderClass = DecalShader;
+          material.shaderClass = SPVDecalShader;
           break;
         case 'LAMBERT':
           material.shaderClass = SPVLambertShader;
@@ -694,7 +694,7 @@ export default class SPVGLTFLoader {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
-        material.shaderClass = DecalShader;
+        material.shaderClass = SPVDecalShader;
       }
     }
 

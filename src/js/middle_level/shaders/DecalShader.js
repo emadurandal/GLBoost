@@ -1,7 +1,5 @@
 import Shader from '../../low_level/shaders/Shader';
-import VertexWorldShaderSource from './VertexWorldShader';
-import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
-import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
+import WireframeShader from './WireframeShader';
 
 export class DecalShaderSource {
   VSDefine_DecalShaderSource(in_, out_, f) {
@@ -91,16 +89,11 @@ export class DecalShaderSource {
   }
 }
 
-export default class DecalShader extends Shader {
-  constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+export default class DecalShader extends WireframeShader {
+  constructor(glBoostContext) {
 
     super(glBoostContext);
 
-    DecalShader.mixin(basicShader);
-    if (basicShader === VertexWorldShaderSource) {
-      DecalShader.mixin(VertexWorldShadowShaderSource);
-    }
-    DecalShader.mixin(FragmentSimpleShaderSource);
     DecalShader.mixin(DecalShaderSource);
   }
 

@@ -1,7 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
-import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
-import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
+import WireframeShader from './WireframeShader';
+import Vector4 from '../../low_level/math/Vector4';
 
 export class SPVDecalShaderSource {
   VSDefine_SPVDecalShaderSource(in_, out_, f) {
@@ -40,6 +40,7 @@ export class SPVDecalShaderSource {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
+    shaderText += 'uniform vec4 textureContributionRate;\n';
 
     return shaderText;
   }
@@ -52,7 +53,7 @@ export class SPVDecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
     }
     //shaderText += '    float shadowRatio = 0.0;\n';
 
@@ -72,6 +73,7 @@ export class SPVDecalShaderSource {
     });
 
     material.setUniform(expression.toString(), 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+    material.setUniform(expression.toString(), 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       if (material.getOneTexture()) {
@@ -92,23 +94,28 @@ export class SPVDecalShaderSource {
   }
 }
 
-export default class SPVDecalShader extends Shader {
+export default class SPVDecalShader extends WireframeShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
-    SPVDecalShader.mixin(basicShader);
-    if (basicShader === VertexWorldShaderSource) {
-      SPVDecalShader.mixin(VertexWorldShadowShaderSource);
-    }
-    SPVDecalShader.mixin(FragmentSimpleShaderSource);
     SPVDecalShader.mixin(SPVDecalShaderSource);
   }
 
   setUniforms(gl, glslProgram, expression, material) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
     let baseColor = material.baseColor;
     gl.uniform4f(material.getUniform(expression.toString(), 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+
+    var texture = material.getOneTexture();
+
+    var rateVec4 = new Vector4(1, 1, 1, 1);
+    if (texture) {
+      rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
+    }
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+
   }
 }
 

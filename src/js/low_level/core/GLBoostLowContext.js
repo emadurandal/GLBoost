@@ -16,7 +16,8 @@ import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 import MiscUtil from '../misc/MiscUtil';
 import GLBoost from '../../globals';
-import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController'
+import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
+import SPVClassicMaterial from '../SPVClassicMaterial';
 
 export default class GLBoostLowContext {
   constructor(canvas, gl, width, height) {
@@ -86,10 +87,6 @@ export default class GLBoostLowContext {
 
   createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
     return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
-  }
-
-  createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
-    return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
   }
 
   createTexture(src, userFlavorName, parameters = null) {
@@ -191,6 +188,13 @@ export default class GLBoostLowContext {
     return this._glContext.belongingCanvasId;
   }
 
+  createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
+    return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+  }
+
+  createSPVClassicMaterial() {
+    return new SPVClassicMaterial(this);
+  }
 }
 
 GLBoost['GLBoostLowContext'] = GLBoostLowContext;

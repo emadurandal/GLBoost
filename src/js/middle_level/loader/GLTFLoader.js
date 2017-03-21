@@ -13,6 +13,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import DataUtil from '../../low_level/misc/DataUtil';
+import M_Group from '../elements/M_Group';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -263,7 +264,7 @@ export default class GLTFLoader {
       // register joints hierarchy to skeletal mesh
       let skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
       skeletalMeshes.forEach((skeletalMesh) => {
-        let rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+        let rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
         if (!rootJointGroup) {
           // This is a countermeasure when skeleton node does not exist in scene.nodes.
           rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);

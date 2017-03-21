@@ -1,10 +1,10 @@
 import GLBoost from '../globals';
 import Renderer from '../middle_level/Renderer';
 import Vector4 from './math/Vector4';
-import DecalShader from '../middle_level/shaders/DecalShader';
+import SPVDecalShader from '../middle_level/shaders/SPVDecalShader';
 import GLBoostObject from './core/GLBoostObject';
 
-export default class ClassicMaterial extends GLBoostObject {
+export default class SPVClassicMaterial extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -16,10 +16,11 @@ export default class ClassicMaterial extends GLBoostObject {
     this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
     this._ambientColor = new Vector4(0.0, 0.0, 0.0, 1.0);
     this._name = '';
-    this._shaderClass = DecalShader;
+    this._shaderClass = SPVDecalShader;
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
     this._states = null;
+    this._isWireframe = false;
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -189,6 +190,14 @@ export default class ClassicMaterial extends GLBoostObject {
     return isTransparent;
   }
 
+  set isWireframe(flag) {
+    this._isWireframe = flag;
+  }
+
+  get isWireframe() {
+    return this._isWireframe;
+  }
+
   set name(name) {
     this._name = name;
   }
@@ -265,4 +274,4 @@ export default class ClassicMaterial extends GLBoostObject {
   }
 }
 
-GLBoost['ClassicMaterial'] = ClassicMaterial;
+GLBoost['SPVClassicMaterial'] = SPVClassicMaterial;
