@@ -27,7 +27,7 @@ export default class BlendShapeGeometry extends Geometry {
     super.draw(lights, camera, mesh, scene, renderPass_index);
   }
 
-  prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
+  prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
     if (meshMaterial) {
@@ -46,7 +46,7 @@ export default class BlendShapeGeometry extends Geometry {
 
     this._materialForBlend.shaderClass = BlendShapeShader;
 
-    super.prepareToRender(existCamera_f, pointLight, meshMaterial, mesh);
+    super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
   _setBlendWeightToGlslProgram(blendTarget, weight) {

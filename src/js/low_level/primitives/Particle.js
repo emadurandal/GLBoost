@@ -214,7 +214,7 @@ export default class Particle extends Geometry {
     super.updateVerticesData(result.vertexAttributes);
   }
 
-  prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+  prepareToRender(expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
     // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
     if (meshMaterial) {
@@ -267,7 +267,7 @@ export default class Particle extends Geometry {
      }
      */
 
-    super.prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+    super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
   }
 
 }
