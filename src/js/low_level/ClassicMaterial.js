@@ -20,6 +20,7 @@ export default class ClassicMaterial extends GLBoostObject {
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
     this._states = null;
+    this._shaderUniformLocationsOfExpressions = {};
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -262,6 +263,18 @@ export default class ClassicMaterial extends GLBoostObject {
       }
       Renderer.reflectGlobalGLState(gl);
     }
+  }
+
+  setUniform(expressionName, uniformLocationName, uniformLocation) {
+    if (!this._shaderUniformLocationsOfExpressions[expressionName]) {
+      this._shaderUniformLocationsOfExpressions[expressionName] = {};
+    }
+
+    this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName] = uniformLocation;
+  }
+
+  getUniform(expressionName, uniformLocationName) {
+    return this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName];
   }
 }
 

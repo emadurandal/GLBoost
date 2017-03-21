@@ -58,7 +58,7 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  prepare_DecalShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
     vertexAttribs.forEach((attribName)=>{
@@ -69,18 +69,19 @@ export class DecalShaderSource {
       }
     });
 
-    material.uniform_materialBaseColor = gl.getUniformLocation(shaderProgram, 'materialBaseColor');
+    material.setUniform(expression.toString(), 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       if (material.getOneTexture()) {
         material.uniformTextureSamplerDic['uTexture'] = {};
-        material.uniformTextureSamplerDic['uTexture'].uniformLocation = gl.getUniformLocation(shaderProgram, 'uTexture');
+        let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
+        material.setUniform(expression.toString(), 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
         material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
 
         // set texture unit 0 to the sampler
-        gl.uniform1i( material.uniformTextureSamplerDic['uTexture'].uniformLocation, 0);
+        gl.uniform1i( uTexture, 0);
         material._semanticsDic['TEXTURE'] = 'uTexture';
       }
     }
@@ -97,10 +98,10 @@ export default class DecalShader extends WireframeShader {
     DecalShader.mixin(DecalShaderSource);
   }
 
-  setUniforms(gl, glslProgram, material) {
+  setUniforms(gl, glslProgram, expression, material) {
 
-    var baseColor = material.baseColor;
-    gl.uniform4f(material.uniform_materialBaseColor, baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+    let baseColor = material.baseColor;
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
   }
 }
 

@@ -55,7 +55,7 @@ export default class VertexWorldShaderSource {
     return shaderText;
   }
 
-  prepare_VertexWorldShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
@@ -67,20 +67,20 @@ export default class VertexWorldShaderSource {
       }
     });
 
-    material.uniform_worldMatrix = gl.getUniformLocation(shaderProgram, 'worldMatrix');
+    material.setUniform(expression.toString(), 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';
-    material.uniform_normalMatrix = gl.getUniformLocation(shaderProgram, 'normalMatrix');
+    material.setUniform(expression.toString(), 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
     material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
-      material.uniform_viewMatrix = gl.getUniformLocation(shaderProgram, 'viewMatrix');
+      material.setUniform(expression.toString(), 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
       material._semanticsDic['VIEW'] = 'viewMatrix';
-      material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+      material.setUniform(expression.toString(), 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      material['uniform_lightPosition_'+i] = gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`);
-      material['uniform_lightDiffuse_'+i] = gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`);
+      material.setUniform(expression.toString(), 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
+      material.setUniform(expression.toString(), 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
     return vertexAttribsAsResult;

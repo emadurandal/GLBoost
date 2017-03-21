@@ -38,15 +38,16 @@ export class BlinnPhongShaderSource {
     return shaderText;
   }
 
-  prepare_BlinnPhongShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_BlinnPhongShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    material.uniform_Kd = gl.getUniformLocation(shaderProgram, 'Kd');
-    material.uniform_Ks = gl.getUniformLocation(shaderProgram, 'Ks');
-    material.uniform_power = gl.getUniformLocation(shaderProgram, 'power');
+    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(expression.toString(), 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
+    material.setUniform(expression.toString(), 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
 
-    material['uniform_viewPosition'] = gl.getUniformLocation(shaderProgram, 'viewPosition');
+    material.setUniform(expression.toString(), 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
+
 
     return vertexAttribsAsResult;
   }
@@ -64,14 +65,14 @@ export default class BlinnPhongShader extends DecalShader {
 
   }
 
-  setUniforms(gl, glslProgram, material) {
-    super.setUniforms(gl, glslProgram, material);
+  setUniforms(gl, glslProgram, expression, material) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
     var Kd = material.diffuseColor;
     var Ks = material.specularColor;
-    gl.uniform4f(material.uniform_Kd, Kd.x, Kd.y, Kd.z, Kd.w);
-    gl.uniform4f(material.uniform_Ks, Ks.x, Ks.y, Ks.z, Ks.w);
-    gl.uniform1f(material.uniform_power, this._power);
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
+    gl.uniform1f(material.getUniform(expression.toString(), 'uniform_power'), this._power);
   }
 
   set Kd(value) {

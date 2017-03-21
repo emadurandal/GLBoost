@@ -13,11 +13,11 @@ export class FragmentSimpleShaderSource {
     return shaderText;
   }
 
-  prepare_FragmentSimpleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_FragmentSimpleShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    shaderProgram.opacity = gl.getUniformLocation(shaderProgram, 'opacity');
+    material.setUniform(expression.toString(), 'opacity', gl.getUniformLocation(shaderProgram, 'opacity'));
 
     return vertexAttribsAsResult;
   }

@@ -20,15 +20,15 @@ export default class ParticleShaderSource {
     return shaderText;
   }
 
-  prepare_ParticleShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_ParticleShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
     var vertexAttribsAsResult = [];
 
     shaderProgram['vertexAttribute_' + 'particleCenterPos'] = gl.getAttribLocation(shaderProgram, 'aVertex_' + 'particleCenterPos');
     gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + 'particleCenterPos']);
     vertexAttribsAsResult.push('particleCenterPos');
 
-    material.uniform_projectionMatrix = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
-    material.uniform_modelViewMatrix = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+    material.setUniform(expression.toString(), 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+    material.setUniform(expression.toString(), 'uniform_modelViewMatrix', gl.getUniformLocation(shaderProgram, 'modelViewMatrix'));
     material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     material._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
 

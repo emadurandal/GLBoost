@@ -50,8 +50,8 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
   _setBlendWeightToGlslProgram(blendTarget, weight) {
-    var gl = this._glContext.gl;
-    var materials = [this._materialForBlend];
+    let gl = this._glContext.gl;
+    let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
       gl.useProgram(materials[i].shaderInstance.glslProgram);
       gl.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight);
