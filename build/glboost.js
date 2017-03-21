@@ -5418,6 +5418,7 @@
         vertexAttribsAsResult.push('barycentricCoord');
 
         material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+        gl.uniform1i(material.uniform_isWireframe, 0);
 
         material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
         gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
@@ -7091,6 +7092,26 @@
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             var hitChild = this.searchElement(userflavorName, children[i]);
+            if (hitChild) {
+              return hitChild;
+            }
+          }
+        }
+        return null;
+      }
+    }, {
+      key: 'searchElementByNameAndType',
+      value: function searchElementByNameAndType(userflavorName, type) {
+        var element = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this;
+
+        if (element.userFlavorName === userflavorName && element instanceof type) {
+          return element;
+        }
+
+        if (element instanceof M_Group) {
+          var children = element.getChildren();
+          for (var i = 0; i < children.length; i++) {
+            var hitChild = this.searchElementByNameAndType(userflavorName, type, children[i]);
             if (hitChild) {
               return hitChild;
             }
@@ -10377,7 +10398,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -10440,7 +10461,7 @@
          }
          */
 
-        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
       }
     }]);
     return Particle;
@@ -10812,7 +10833,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -10838,7 +10859,7 @@
 
         this._materialForBlend.shaderClass = BlendShapeShader;
 
-        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, mesh);
+        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, mesh);
       }
     }, {
       key: '_setBlendWeightToGlslProgram',
@@ -12657,7 +12678,7 @@
           // register joints hierarchy to skeletal mesh
           var skeletalMeshes = group.searchElementsByType(M_SkeletalMesh);
           skeletalMeshes.forEach(function (skeletalMesh) {
-            var rootJointGroup = group.searchElement(skeletalMesh.rootJointName);
+            var rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
             if (!rootJointGroup) {
               // This is a countermeasure when skeleton node does not exist in scene.nodes.
               rootJointGroup = _this3._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);

@@ -5418,6 +5418,7 @@
         vertexAttribsAsResult.push('barycentricCoord');
 
         material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+        gl.uniform1i(material.uniform_isWireframe, 0);
 
         material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
         gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
@@ -8614,7 +8615,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -8677,7 +8678,7 @@
          }
          */
 
-        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
+        babelHelpers.get(Particle.prototype.__proto__ || Object.getPrototypeOf(Particle.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, renderPasses, mesh);
       }
     }]);
     return Particle;
@@ -9099,7 +9100,7 @@
       }
     }, {
       key: 'prepareToRender',
-      value: function prepareToRender(existCamera_f, pointLight, meshMaterial, mesh) {
+      value: function prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
         // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
 
         if (meshMaterial) {
@@ -9125,7 +9126,7 @@
 
         this._materialForBlend.shaderClass = BlendShapeShader;
 
-        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, existCamera_f, pointLight, meshMaterial, mesh);
+        babelHelpers.get(BlendShapeGeometry.prototype.__proto__ || Object.getPrototypeOf(BlendShapeGeometry.prototype), 'prepareToRender', this).call(this, expression, existCamera_f, pointLight, meshMaterial, mesh);
       }
     }, {
       key: '_setBlendWeightToGlslProgram',

@@ -53,6 +53,7 @@ export class WireframeShaderSource {
     vertexAttribsAsResult.push('barycentricCoord');
 
     material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+    gl.uniform1i( material.uniform_isWireframe, 0);
 
     material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
     gl.uniform1f( material.uniform_wireframeThicknessThreshold, 0.04);
