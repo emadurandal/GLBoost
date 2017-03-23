@@ -82,8 +82,8 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
     this._time = 0;
   }
 
-  setUniforms(gl, glslProgram, material) {
-    super.setUniforms(gl, glslProgram, material);
+  setUniforms(gl, glslProgram, expression, material) {
+    super.setUniforms(gl, glslProgram, expression, material);
 
     gl.uniform1f(glslProgram.time, this._time);
   }

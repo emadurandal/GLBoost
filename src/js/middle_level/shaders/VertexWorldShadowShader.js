@@ -60,20 +60,20 @@ export default class VertexWorldShadowShaderSource {
       }
     });
 
-    material.setUniform(expression.toString(), 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';
-    material.setUniform(expression.toString(), 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
     material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
-      material.setUniform(expression.toString(), 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
+      material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
       material._semanticsDic['VIEW'] = 'viewMatrix';
-      material.setUniform(expression.toString(), 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+      material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      material.setUniform(expression.toString(), 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
-      material.setUniform(expression.toString(), 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
     let textureUnitIndex = 0;
@@ -81,7 +81,7 @@ export default class VertexWorldShadowShaderSource {
       //if (lights[i].camera && lights[i].camera.texture) {
 
       // matrices
-      material.setUniform(expression.toString(), 'uniform_depthPVMatrix_' + textureUnitIndex, gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
+      material.setUniform(shaderProgram.hashId, 'uniform_depthPVMatrix_' + textureUnitIndex, gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
 
       textureUnitIndex++;
       //}
