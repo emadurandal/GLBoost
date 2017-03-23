@@ -329,6 +329,10 @@ export default class Shader extends GLBoostObject {
 
   }
 
+  setUniformsAsTearDown() {
+
+  }
+
   _getShader(gl, theSource, type) {
     var shader;
 

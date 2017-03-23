@@ -220,12 +220,11 @@ export default class ClassicMaterial extends GLBoostObject {
     return result;
   }
 
-  tearDownTexture(textureName) {
+  tearDownTexture(textureName, textureUnitIndex) {
     let texture = this.getTexture(textureName);
     if (texture) {
-      texture.tearDown();
+      texture.tearDown(textureUnitIndex);
     }
-
   }
 
   setUpStates() {
