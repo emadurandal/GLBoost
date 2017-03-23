@@ -4047,10 +4047,8 @@
         for (var i = 0; i < materials.length; i++) {
           var material = materials[i];
           var materialUpdateStateString = material.getUpdateStateString();
-          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            this._glslProgram = material.shaderInstance.glslProgram;
-            gl.useProgram(this._glslProgram);
-          }
+          this._glslProgram = material.shaderInstance.glslProgram;
+          gl.useProgram(this._glslProgram);
           var glslProgram = this._glslProgram;
 
           if (!isVAOBound) {
@@ -4122,6 +4120,8 @@
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
             if (material) {
               material.setUpStates();
+
+              this._setUpOrTearDownTextures(false, material);
               if (!this._setUpOrTearDownTextures(true, material)) {
                 MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
                 return;
@@ -4142,7 +4142,6 @@
           material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
 
           this._tearDownOtherTextures(lights);
-          this._setUpOrTearDownTextures(false, material);
 
           material.tearDownStates();
 
@@ -12422,9 +12421,6 @@
             // depthTexture
             var depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
             material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
-            // set texture unit i+1 to the sampler
-            gl.uniform1i(depthTextureUniformLocation, i + 1); // +1 because 0 is used for diffuse texture
-
             lights[i].camera.texture.textureUnitIndex = i + 1; // +1 because 0 is used for diffuse texture
           }
         }
@@ -12468,6 +12464,24 @@
             gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
           } else {
             gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
+          }
+        }
+
+        for (var _i2 = 0; _i2 < lights.length; _i2++) {
+          if (lights[_i2].camera && lights[_i2].camera.texture) {
+            // set depthTexture unit i+1 to the sampler
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + _i2), _i2 + 1); // +1 because 0 is used for diffuse texture
+          }
+        }
+      }
+    }, {
+      key: 'setUniformsAsTearDown',
+      value: function setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(LambertShader.prototype.__proto__ || Object.getPrototypeOf(LambertShader.prototype), 'setUniformsAsTearDown', this).call(this, gl, glslProgram, expression, material);
+        for (var i = 0; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            // set depthTexture unit i+1 to the sampler
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0); // +1 because 0 is used for diffuse texture
           }
         }
       }

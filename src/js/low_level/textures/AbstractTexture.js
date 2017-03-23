@@ -54,8 +54,11 @@ export default class AbstractTexture extends GLBoostObject {
    * [en] unbind the texture. <br />
    * [ja] テクスチャをバインド解除します。
    */
-  tearDown() {
+  tearDown(textureUnitIndex) {
     var gl = this._glContext.gl;
+
+    var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+    gl.activeTexture(gl['TEXTURE'+index]);
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 

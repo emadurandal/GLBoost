@@ -4,6 +4,7 @@ import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Geometry from '../../low_level/geometries/Geometry';
 import Shader from '../../low_level/shaders/Shader';
+import MiscUtil from '../../low_level/misc/MiscUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -105,29 +106,15 @@ export default class DrawKickerWorld {
       if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
         if (material) {
           material.setUpStates();
-          isMaterialSetupDone = true;
-          if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-            // do nothing
-          } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-            let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
-            let textureName = textureSamplerDic.textureName;
-            let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-            isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
-          } else {
-            // it must be an Array...
-            material._semanticsDic['TEXTURE'].forEach((uniformName) => {
-              let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-              let textureName = textureSamplerDic.textureName;
-              let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-              isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
-            });
+
+          this._setUpOrTearDownTextures(false, material);
+          if (!this._setUpOrTearDownTextures(true, material)) {
+            MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
+            return;
           }
         }
       }
 
-      if (!isMaterialSetupDone) {
-        return;
-      }
 
       this._setupOtherTextures(lights);
 
@@ -138,6 +125,8 @@ export default class DrawKickerWorld {
       } else {
         gl.drawArrays(gl[primitiveType], 0, vertexN);
       }
+
+      material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
 
       this._tearDownOtherTextures(lights);
 
@@ -150,6 +139,33 @@ export default class DrawKickerWorld {
 
     DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     DrawKickerWorld._lastGeometry = geometryName;
+  }
+
+  _setUpOrTearDownTextures(isSetUp, material) {
+    let methodName = 'tearDownTexture';
+    if (isSetUp) {
+      methodName = 'setUpTexture';
+    }
+
+    let isTextureProcessDone = true;
+    if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
+      // do nothing
+    } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
+      let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+      let textureName = textureSamplerDic.textureName;
+      let textureUnitIndex = textureSamplerDic.textureUnitIndex;
+      isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+    } else {
+      // it must be an Array...
+      material._semanticsDic['TEXTURE'].forEach((uniformName) => {
+        let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
+        let textureName = textureSamplerDic.textureName;
+        let textureUnitIndex = textureSamplerDic.textureUnitIndex;
+        isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+      });
+    }
+
+    return isTextureProcessDone;
   }
 
   _setupOtherTextures(lights) {

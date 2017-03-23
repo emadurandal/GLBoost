@@ -4047,10 +4047,8 @@
         for (var i = 0; i < materials.length; i++) {
           var material = materials[i];
           var materialUpdateStateString = material.getUpdateStateString();
-          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            this._glslProgram = material.shaderInstance.glslProgram;
-            gl.useProgram(this._glslProgram);
-          }
+          this._glslProgram = material.shaderInstance.glslProgram;
+          gl.useProgram(this._glslProgram);
           var glslProgram = this._glslProgram;
 
           if (!isVAOBound) {
@@ -4122,6 +4120,8 @@
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
             if (material) {
               material.setUpStates();
+
+              this._setUpOrTearDownTextures(false, material);
               if (!this._setUpOrTearDownTextures(true, material)) {
                 MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
                 return;
@@ -4142,7 +4142,6 @@
           material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
 
           this._tearDownOtherTextures(lights);
-          this._setUpOrTearDownTextures(false, material);
 
           material.tearDownStates();
 
