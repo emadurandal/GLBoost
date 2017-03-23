@@ -74,9 +74,6 @@ export class SPVPhongShaderSource {
         // depthTexture
         let depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
-        // set texture unit i+1 to the sampler
-        gl.uniform1i(depthTextureUniformLocation, i+1);  // +1 because 0 is used for diffuse texture
-
         lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
       }
     }
@@ -119,6 +116,23 @@ export default class SPVPhongShader extends SPVDecalShader {
         gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
       } else {
         gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
+      }
+    }
+
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // set depthTexture unit i+1 to the sampler
+        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), i+1);  // +1 because 0 is used for diffuse texture
+      }
+    }
+  }
+
+  setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniformsAsTearDown(gl, glslProgram, expression, material);
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // set depthTexture unit i+1 to the sampler
+        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0);  // +1 because 0 is used for diffuse texture
       }
     }
   }

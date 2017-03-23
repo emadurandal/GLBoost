@@ -2359,6 +2359,9 @@
       key: 'setUniforms',
       value: function setUniforms() {}
     }, {
+      key: 'setUniformsAsTearDown',
+      value: function setUniformsAsTearDown() {}
+    }, {
       key: '_getShader',
       value: function _getShader(gl, theSource, type) {
         var shader;
@@ -4035,20 +4038,20 @@
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
       value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
-        var _this = this;
-
         var isVAOBound = false;
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
         }
 
-        var _loop = function _loop(i) {
+        for (var i = 0; i < materials.length; i++) {
           var material = materials[i];
           var materialUpdateStateString = material.getUpdateStateString();
-          _this._glslProgram = material.shaderInstance.glslProgram;
-          gl.useProgram(_this._glslProgram);
-          var glslProgram = _this._glslProgram;
+          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
+            this._glslProgram = material.shaderInstance.glslProgram;
+            gl.useProgram(this._glslProgram);
+          }
+          var glslProgram = this._glslProgram;
 
           if (!isVAOBound) {
             if (DrawKickerWorld._lastGeometry !== geometryName) {
@@ -4112,41 +4115,21 @@
           var isMaterialSetupDone = true;
 
           if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
-
+            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
             material.shaderInstance.dirty = needTobeStillDirty ? true : false;
           }
 
           if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
             if (material) {
               material.setUpStates();
-              isMaterialSetupDone = true;
-              if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-                // do nothing
-              } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-                var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
-                var textureName = textureSamplerDic.textureName;
-                var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-                isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
-              } else {
-                // it must be an Array...
-                material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
-                  var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-                  var textureName = textureSamplerDic.textureName;
-                  var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-                  isMaterialSetupDone = material.setUpTexture(textureName, textureUnitIndex);
-                });
+              if (!this._setUpOrTearDownTextures(true, material)) {
+                MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
+                return;
               }
             }
           }
 
-          if (!isMaterialSetupDone) {
-            return {
-              v: void 0
-            };
-          }
-
-          _this._setupOtherTextures(lights);
+          this._setupOtherTextures(lights);
 
           if (iboArrayDic[geometryName].length > 0) {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
@@ -4156,25 +4139,48 @@
             gl.drawArrays(gl[primitiveType], 0, vertexN);
           }
 
-          _this._tearDownOtherTextures(lights);
+          material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+
+          this._tearDownOtherTextures(lights);
+          this._setUpOrTearDownTextures(false, material);
 
           material.tearDownStates();
 
           DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
-        };
-
-        for (var i = 0; i < materials.length; i++) {
-          var needTobeStillDirty;
-
-          var _ret = _loop(i);
-
-          if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
         }
 
         //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
         DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
         DrawKickerWorld._lastGeometry = geometryName;
+      }
+    }, {
+      key: '_setUpOrTearDownTextures',
+      value: function _setUpOrTearDownTextures(isSetUp, material) {
+        var methodName = 'tearDownTexture';
+        if (isSetUp) {
+          methodName = 'setUpTexture';
+        }
+
+        var isTextureProcessDone = true;
+        if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
+          // do nothing
+        } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
+          var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+          var textureName = textureSamplerDic.textureName;
+          var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+          isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+        } else {
+          // it must be an Array...
+          material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
+            var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
+            var textureName = textureSamplerDic.textureName;
+            var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+            isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+          });
+        }
+
+        return isTextureProcessDone;
       }
     }, {
       key: '_setupOtherTextures',
@@ -5759,10 +5765,10 @@
       }
     }, {
       key: 'tearDownTexture',
-      value: function tearDownTexture(textureName) {
+      value: function tearDownTexture(textureName, textureUnitIndex) {
         var texture = this.getTexture(textureName);
         if (texture) {
-          texture.tearDown();
+          texture.tearDown(textureUnitIndex);
         }
       }
     }, {
@@ -6728,8 +6734,11 @@
 
     }, {
       key: 'tearDown',
-      value: function tearDown() {
+      value: function tearDown(textureUnitIndex) {
         var gl = this._glContext.gl;
+
+        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+        gl.activeTexture(gl['TEXTURE' + index]);
         gl.bindTexture(gl.TEXTURE_2D, null);
       }
     }, {
@@ -8211,10 +8220,10 @@
       }
     }, {
       key: 'tearDownTexture',
-      value: function tearDownTexture(textureName) {
+      value: function tearDownTexture(textureName, textureUnitIndex) {
         var texture = this.getTexture(textureName);
         if (texture) {
-          texture.tearDown();
+          texture.tearDown(textureUnitIndex);
         }
       }
     }, {
