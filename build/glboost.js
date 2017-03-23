@@ -8308,14 +8308,14 @@
           }
         });
 
-        material.setUniform(expression.toString(), 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
-        material.setUniform(expression.toString(), 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
+        material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+        material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
 
         if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
           if (material.getOneTexture()) {
             material.uniformTextureSamplerDic['uTexture'] = {};
             var uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
-            material.setUniform(expression.toString(), 'uTexture', uTexture);
+            material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
             material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
             material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
@@ -8351,7 +8351,7 @@
         babelHelpers.get(SPVDecalShader.prototype.__proto__ || Object.getPrototypeOf(SPVDecalShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
 
         var baseColor = material.baseColor;
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
 
         var texture = material.getOneTexture();
 
@@ -8359,7 +8359,7 @@
         if (texture) {
           rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
         }
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
       }
     }]);
     return SPVDecalShader;
@@ -8572,17 +8572,17 @@
       }
     }, {
       key: 'setUniform',
-      value: function setUniform(expressionName, uniformLocationName, uniformLocation) {
-        if (!this._shaderUniformLocationsOfExpressions[expressionName]) {
-          this._shaderUniformLocationsOfExpressions[expressionName] = {};
+      value: function setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
+        if (!this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram]) {
+          this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] = {};
         }
 
-        this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName] = uniformLocation;
+        this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName] = uniformLocation;
       }
     }, {
       key: 'getUniform',
-      value: function getUniform(expressionName, uniformLocationName) {
-        return this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName];
+      value: function getUniform(hashIdOfGLSLProgram, uniformLocationName) {
+        return this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName];
       }
     }, {
       key: 'shaderClass',
@@ -14176,15 +14176,15 @@
 
         var vertexAttribsAsResult = [];
 
-        material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+        material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
         var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
-          material.setUniform(expression.toString(), 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+          material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
           if (lights[i].camera && lights[i].camera.texture) {
             // depthTexture
             var depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
-            material.setUniform(expression.toString(), 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+            material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
             // set texture unit i+1 to the sampler
             gl.uniform1i(depthTextureUniformLocation, i + 1); // +1 because 0 is used for diffuse texture
 
@@ -14216,21 +14216,21 @@
         babelHelpers.get(SPVLambertShader.prototype.__proto__ || Object.getPrototypeOf(SPVLambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
 
         var Kd = material.diffuseColor;
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
 
         for (var j = 0; j < lights.length; j++) {
           if (lights[j].camera && lights[j].camera.texture) {
             var cameraMatrix = lights[j].camera.lookAtRHMatrix();
             var projectionMatrix = lights[j].camera.projectionRHMatrix();
-            gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_depthPVMatrix_' + j), false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
+            gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_' + j), false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
           }
         }
 
         for (var i = 0; i < lights.length; i++) {
           if (lights[i].camera && lights[i].camera.texture) {
-            gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 1);
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
           } else {
-            gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 0);
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
           }
         }
       }
@@ -14305,19 +14305,19 @@
 
         var vertexAttribsAsResult = [];
 
-        material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
-        material.setUniform(expression.toString(), 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
-        material.setUniform(expression.toString(), 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
+        material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+        material.setUniform(shaderProgram.hashId, 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
+        material.setUniform(shaderProgram.hashId, 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
 
-        material.setUniform(expression.toString(), 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
+        material.setUniform(shaderProgram.hashId, 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
 
         for (var i = 0; i < lights.length; i++) {
 
-          material.setUniform(expression.toString(), 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+          material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
           if (lights[i].camera && lights[i].camera.texture) {
             // depthTexture
             var depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, 'uDepthTexture[' + i + ']');
-            material.setUniform(expression.toString(), 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+            material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
             // set texture unit i+1 to the sampler
             gl.uniform1i(depthTextureUniformLocation, i + 1); // +1 because 0 is used for diffuse texture
 
@@ -14353,23 +14353,23 @@
 
         var Kd = material.diffuseColor;
         var Ks = material.specularColor;
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
-        gl.uniform1f(material.getUniform(expression.toString(), 'uniform_power'), this._power);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
+        gl.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_power'), this._power);
 
         for (var j = 0; j < lights.length; j++) {
           if (lights[j].camera && lights[j].camera.texture) {
             var cameraMatrix = lights[j].camera.lookAtRHMatrix();
             var projectionMatrix = lights[j].camera.projectionRHMatrix();
-            gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_depthPVMatrix_' + j), false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
+            gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_' + j), false, Matrix44$1.multiply(projectionMatrix, cameraMatrix).flatten());
           }
         }
 
         for (var i = 0; i < lights.length; i++) {
           if (lights[i].camera && lights[i].camera.texture) {
-            gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 1);
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
           } else {
-            gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 0);
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
           }
         }
       }

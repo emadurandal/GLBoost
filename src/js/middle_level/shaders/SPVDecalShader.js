@@ -72,14 +72,14 @@ export class SPVDecalShaderSource {
       }
     });
 
-    material.setUniform(expression.toString(), 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
-    material.setUniform(expression.toString(), 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
+    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+    material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       if (material.getOneTexture()) {
         material.uniformTextureSamplerDic['uTexture'] = {};
         let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
-        material.setUniform(expression.toString(), 'uTexture', uTexture);
+        material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
         material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
@@ -106,7 +106,7 @@ export default class SPVDecalShader extends WireframeShader {
     super.setUniforms(gl, glslProgram, expression, material);
 
     let baseColor = material.baseColor;
-    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
 
     var texture = material.getOneTexture();
 
@@ -114,7 +114,7 @@ export default class SPVDecalShader extends WireframeShader {
     if (texture) {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
     }
-    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
 
   }
 }

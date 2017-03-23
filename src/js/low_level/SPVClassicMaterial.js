@@ -274,16 +274,16 @@ export default class SPVClassicMaterial extends GLBoostObject {
     }
   }
 
-  setUniform(expressionName, uniformLocationName, uniformLocation) {
-    if (!this._shaderUniformLocationsOfExpressions[expressionName]) {
-      this._shaderUniformLocationsOfExpressions[expressionName] = {};
+  setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
+    if (!this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram]) {
+      this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] = {};
     }
 
-    this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName] = uniformLocation;
+    this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName] = uniformLocation;
   }
 
-  getUniform(expressionName, uniformLocationName) {
-    return this._shaderUniformLocationsOfExpressions[expressionName][uniformLocationName];
+  getUniform(hashIdOfGLSLProgram, uniformLocationName) {
+    return this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName];
   }
 }
 
