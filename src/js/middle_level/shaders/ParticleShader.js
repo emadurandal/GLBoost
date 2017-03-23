@@ -27,8 +27,8 @@ export default class ParticleShaderSource {
     gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + 'particleCenterPos']);
     vertexAttribsAsResult.push('particleCenterPos');
 
-    material.setUniform(expression.toString(), 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
-    material.setUniform(expression.toString(), 'uniform_modelViewMatrix', gl.getUniformLocation(shaderProgram, 'modelViewMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_modelViewMatrix', gl.getUniformLocation(shaderProgram, 'modelViewMatrix'));
     material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     material._semanticsDic['MODELVIEW'] = 'modelViewMatrix';
 

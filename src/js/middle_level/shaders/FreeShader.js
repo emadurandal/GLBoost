@@ -85,7 +85,7 @@ export default class FreeShader extends Shader {
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
         case 'JOINTMATRIX':
-          material.setUniform(expression.toString(), 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
+          material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
         case 'TEXTURE':
           if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
             material._semanticsDic[this._uniforms[uniformName]] = uniformName;
@@ -101,7 +101,7 @@ export default class FreeShader extends Shader {
           continue;
       }
 
-      material.setUniform(expression.toString(), 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
+      material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
 
     }
 
@@ -118,13 +118,13 @@ export default class FreeShader extends Shader {
       let value = this._uniforms[uniformName];
 
       if (typeof value === 'number') {
-        gl.uniform1f(material.getUniform(expression.toString(), 'uniform_' + uniformName), value);
+        gl.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value);
       } else if (value instanceof Vector2) {
-        gl.uniform2f(material.getUniform(expression.toString(), 'uniform_' + uniformName), value.x, value.y);
+        gl.uniform2f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y);
       } else if (value instanceof Vector3) {
-        gl.uniform3f(material.getUniform(expression.toString(), 'uniform_' + uniformName), value.x, value.y, value.z);
+        gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z);
       } else if (value instanceof Vector4) {
-        gl.uniform4f(material.getUniform(expression.toString(), 'uniform_' + uniformName), value.x, value.y, value.z, value.w);
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z, value.w);
       }
     }
   }

@@ -47,11 +47,11 @@ export class PhongShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
-    material.setUniform(expression.toString(), 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
-    material.setUniform(expression.toString(), 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
+    material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram.hashId, 'uniform_Ks', gl.getUniformLocation(shaderProgram, 'Ks'));
+    material.setUniform(shaderProgram.hashId, 'uniform_power', gl.getUniformLocation(shaderProgram, 'power'));
 
-    material.setUniform(expression.toString(), 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
+    material.setUniform(shaderProgram.hashId, 'uniform_viewPosition', gl.getUniformLocation(shaderProgram, 'viewPosition'));
 
     return vertexAttribsAsResult;
   }
@@ -74,9 +74,9 @@ export default class PhongShader extends DecalShader {
 
     var Kd = material.diffuseColor;
     var Ks = material.specularColor;
-    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
-    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
-    gl.uniform1f(material.getUniform(expression.toString(), 'uniform_power'), this._power);
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w);
+    gl.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_power'), this._power);
   }
 
   set Kd(value) {

@@ -418,12 +418,13 @@ export default class Shader extends GLBoostObject {
       programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
       // register it to shaderHashTable.
-      var indexStr = null;
+      let indexStr = null;
       if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
         indexStr = hash + '_' + hashTable[hash].collisionN;
       } else {
         indexStr = hash;
       }
+      programToReturn.hashId = indexStr;
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
       Shader._shaderHashTable[canvasId] = hashTable;
 
@@ -520,33 +521,33 @@ export default class Shader extends GLBoostObject {
     return !GLBoost.isThisGLVersion_2(gl) ? `  gl_FragData[${i}] = rt${i};\n` : '';
   }
 
-  static trySettingMatrix44ToUniform(gl, expression, material, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix44ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_'+semanticsDir[semantics]), false, matrixArray);
+      gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_'+uniformName), false, matrixArray);
+      gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), false, matrixArray);
     });
   }
 
-  static trySettingMatrix33ToUniform(gl, expression, material, semanticsDir, semantics, matrixArray) {
+  static trySettingMatrix33ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
     if (typeof semanticsDir[semantics] === 'undefined') {
       return;
     }
     if (typeof semanticsDir[semantics] === 'string') {
-      gl.uniformMatrix3fv(material.getUniform(expression.toString(), 'uniform_'+semanticsDir[semantics]), false, matrixArray);
+      gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), false, matrixArray);
       return;
     }
 
     // it must be an Array...
     semanticsDir[semantics].forEach((uniformName)=>{
-      gl.uniformMatrix3fv(material.getUniform(expression.toString(), 'uniform_'+uniformName), false, matrixArray);
+      gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), false, matrixArray);
     });
   }
 

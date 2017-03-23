@@ -102,16 +102,16 @@ export class LambertShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(expression.toString(), 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
     let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
-      material.setUniform(expression.toString(), 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
       if (lights[i].camera && lights[i].camera.texture) {
         // depthTexture
         let depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
-        material.setUniform(expression.toString(), 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+        material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
         // set texture unit i+1 to the sampler
         gl.uniform1i(depthTextureUniformLocation, i+1);  // +1 because 0 is used for diffuse texture
 
@@ -136,22 +136,22 @@ export default class LambertShader extends DecalShader {
     super.setUniforms(gl, glslProgram, expression, material);
 
     let Kd = material.diffuseColor;
-    gl.uniform4f(material.getUniform(expression.toString(), 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
 
 
     for (let j = 0; j < lights.length; j++) {
       if (lights[j].camera && lights[j].camera.texture) {
         let cameraMatrix = lights[j].camera.lookAtRHMatrix();
         let projectionMatrix = lights[j].camera.projectionRHMatrix();
-        gl.uniformMatrix4fv(material.getUniform(expression.toString(), 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
+        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
       }
     }
 
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
-        gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 1);
+        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
       } else {
-        gl.uniform1i(material.getUniform(expression.toString(), 'uniform_isShadowCasting' + i), 0);
+        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
       }
     }
   }
