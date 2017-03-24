@@ -87,7 +87,7 @@ export default class SPVLambertShader extends SPVDecalShader {
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material);
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);

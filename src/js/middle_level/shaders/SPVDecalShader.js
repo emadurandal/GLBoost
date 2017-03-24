@@ -102,8 +102,8 @@ export default class SPVDecalShader extends WireframeShader {
     SPVDecalShader.mixin(SPVDecalShaderSource);
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
@@ -115,7 +115,6 @@ export default class SPVDecalShader extends WireframeShader {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
     }
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
-
   }
 }
 

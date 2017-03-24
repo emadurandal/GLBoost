@@ -95,7 +95,7 @@ export default class SPVPhongShader extends SPVDecalShader {
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material);
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     let Ks = material.specularColor;
