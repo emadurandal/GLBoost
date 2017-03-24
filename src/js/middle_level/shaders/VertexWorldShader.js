@@ -14,16 +14,29 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 viewMatrix;\n';
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
+
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+      shaderText +=      'uniform vec4 AABBCenterPosition;\n';
+      shaderText +=      'uniform float unfoldUVRatio;\n';
+    }
+
     return shaderText;
   }
 
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  vec4 uvPosition = vec4((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0, 0.0, 1.0)+AABBCenterPosition;\n';
+      shaderText += '  vec4 preTransformedPosition = uvPosition * unfoldUVRatio + vec4(aVertex_position, 1.0) * (1.0-unfoldUVRatio);\n';
+    } else {
+      shaderText += '  vec4 preTransformedPosition = vec4(aVertex_position, 1.0);\n';
+    }
     if (existCamera_f) {
       shaderText +=   '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-      shaderText +=   '  gl_Position = pvwMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  gl_Position = pvwMatrix * preTransformedPosition;\n';
     } else {
-      shaderText +=   '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  gl_Position = worldMatrix * preTransformedPosition;\n';
     }
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
@@ -81,6 +94,12 @@ export default class VertexWorldShaderSource {
     for(let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
       material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+    }
+
+    if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+      material.setUniform(shaderProgram.hashId, 'uniform_AABBLengthCenterToCorner', gl.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+      material.setUniform(shaderProgram.hashId, 'uniform_AABBCenterPosition', gl.getUniformLocation(shaderProgram, 'AABBCenterPosition'));
+      material.setUniform(shaderProgram.hashId, 'uniform_unfoldUVRatio', gl.getUniformLocation(shaderProgram, 'unfoldUVRatio'));
     }
 
     return vertexAttribsAsResult;
