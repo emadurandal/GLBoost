@@ -80,7 +80,19 @@ export default class Geometry extends GLBoostObject {
 
     // for Wireframe
     this._vertices.barycentricCoord = [];
-    if (this._indicesArray) {
+    if (!this._indicesArray) {
+      for (let i=0; i<this._vertices.position.length; i++) {
+        let bary = null;
+        if (i % 3 === 0) {
+          bary = new Vector3(1, 0, 0);
+        } else if (i % 3 === 1) {
+          bary = new Vector3(0, 1, 0);
+        } else if (i % 3 === 2) {
+          bary = new Vector3(0, 0, 1);
+        }
+        this._vertices.barycentricCoord[i] = bary;
+      }
+    } else {
       for (let i=0; i<this._indicesArray.length; i++) {
         let indices = this._indicesArray[i];
         for (let j=0; j<indices.length; j++) {

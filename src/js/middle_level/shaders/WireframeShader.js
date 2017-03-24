@@ -100,8 +100,6 @@ export default class WireframeShader extends Shader {
     if (uniformLocationUnfoldUVRatio) {
       gl.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio);
     }
-
-
   }
 
   set unfoldUVRatio(value) {

@@ -25,3 +25,9 @@ import HalfLambertShader from './shaders/HalfLambertShader';
 import HalfLambertAndWrapLightingShader from './shaders/HalfLambertAndWrapLightingShader';
 import DepthDisplayShader from './shaders/DepthDisplayShader';
 import PassThroughShader from './shaders/PassThroughShader';
+
+import SPVClassicMaterial from '../low_level/SPVClassicMaterial';
+import SPVLambertShader from './shaders/SPVLambertShader';
+import SPVPhongShader from './shaders/SPVPhongShader';
+import SPVDecalShader from './shaders/SPVDecalShader';
+import SPVGLTFLoader from './loader/SPVGLTFLoader';
