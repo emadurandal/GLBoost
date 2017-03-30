@@ -14,7 +14,6 @@ export default class L_AbstractCamera extends L_Element {
     this._center = lookat.center;
     this._up = lookat.up;
 
-
     this._cameraController = null;
 
     this._dirtyView = true;
@@ -41,10 +40,14 @@ export default class L_AbstractCamera extends L_Element {
       this._translateInner = results[0];
       this._centerInner = results[1];
       this._upInner = results[2];
+      this._zNearInner = results[3];
+      this._zFarInner = results[4];
     } else {
       this._translateInner = super.translate.clone();
       this._centerInner = this._center.clone();
       this._upInner = this._up.clone();
+      this._zNearInner = this.this._zFar.clone();
+      this._zFarInner = this.this._zNear.clone();
     }
   }
 
