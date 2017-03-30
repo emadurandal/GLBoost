@@ -3,6 +3,7 @@ import Vector4 from '../../math/Vector4';
 import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
+import MathUtil from '../../math/MathUtil';
 
 export default class L_SPVCameraController extends GLBoostObject {
   constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
@@ -38,7 +39,9 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._target = null;
 
     this._lengthCenterToCorner = 10;
+    this._lengthOfCenterToEye = 10;
     this._scaleOfTraslation = 5.0;
+    this._foyvBias = 1.0;
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -59,6 +62,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       if (typeof evt.buttons !== 'undefined') {
         this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);
+          camera._needUpdateProjection();
         });
       }
       return false;
@@ -87,7 +91,7 @@ export default class L_SPVCameraController extends GLBoostObject {
           this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
           this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
 
-          let scale = this._lengthCenterToCorner * this._scaleOfTraslation;
+          let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
           if (evt.shiftKey) {
             this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
           } else {
@@ -101,6 +105,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
         this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);
+          camera._needUpdateProjection();
         });
 
         if (!button_l || !this._enableRotation) {
@@ -126,6 +131,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
+        camera._needUpdateProjection();
       });
 
     };
@@ -138,6 +144,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
+        camera._needUpdateProjection();
       });
     };
 
@@ -160,6 +167,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       }
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
+        camera._needUpdateProjection();
       });
     };
 
@@ -182,10 +190,6 @@ export default class L_SPVCameraController extends GLBoostObject {
     let newCenterVec = null;
     let newUpVec = null;
 
-    //if (this._isKeyUp) {
-
-    //}
-
     if (this._isKeyUp || !this._isForceGrab) {
       this._eyeVec = camera.eye;
       this._centerVec = camera.center;
@@ -193,7 +197,8 @@ export default class L_SPVCameraController extends GLBoostObject {
     }
 
     if (this._isSymmetryMode) {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy)));
+      this._lengthOfCenterToEye = centerToEyeVec.length();
       let horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
       let horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
       if (horizontalSign >= 0) {
@@ -229,7 +234,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._verticalAngleOfVectors *= verticalSign;
 
     } else {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y);
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy)));
       let rotateM_X = Matrix33.rotateX(this._rot_y);
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM = rotateM_Y.multiply(rotateM_X);
@@ -243,9 +248,13 @@ export default class L_SPVCameraController extends GLBoostObject {
 
       newEyeVec.add(this._mouseTranslateVec);
       newCenterVec.add(this._mouseTranslateVec);
-
     }
-    return [newEyeVec, newCenterVec, newUpVec];
+
+    let newZNear = camera.zNear * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy));
+    let newZFar = camera.zFar * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy));
+    this._foyvBias = Math.tan(MathUtil.degreeToRadian(camera.fovy));
+
+    return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
