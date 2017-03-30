@@ -123,7 +123,7 @@ export default class Geometry extends GLBoostObject {
       }
 
       let barycentricCoords = this._vertices.barycentricCoord;
-      this._vertices.barycentricCoord = new Float32Array(this._vertices.position.length);
+      this._vertices.barycentricCoord = new Float32Array(barycentricCoords.length);
       this._vertices.barycentricCoord.set(barycentricCoords);
 
     } else {
