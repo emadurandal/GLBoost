@@ -45,7 +45,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  prepare_WireframeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
     shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
@@ -73,9 +73,13 @@ export default class WireframeShader extends Shader {
     }
     WireframeShader.mixin(FragmentSimpleShaderSource);
     WireframeShader.mixin(WireframeShaderSource);
+
+    this._unfoldUVRatio = 0.0;
+
   }
 
-  setUniforms(gl, glslProgram, material) {
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
     let isWifeframe = false;
 
     if (typeof material.isWireframe !== 'undefined') {
@@ -83,7 +87,29 @@ export default class WireframeShader extends Shader {
     }
 
     gl.uniform1i( material.uniform_isWireframe, isWifeframe);
+
+    let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
+    if (uniformLocationAABBLengthCenterToCorner) {
+      gl.uniform1f(uniformLocationAABBLengthCenterToCorner, mesh.geometry.AABB.lengthCenterToCorner);
+    }
+    let uniformLocationAABBCenterPosition = material.getUniform(glslProgram.hashId, 'uniform_AABBCenterPosition');
+    if (uniformLocationAABBCenterPosition) {
+      gl.uniform4f(uniformLocationAABBCenterPosition, mesh.geometry.AABB.centerPoint.x, mesh.geometry.AABB.centerPoint.y, mesh.geometry.AABB.centerPoint.z, 0.0);
+    }
+    let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
+    if (uniformLocationUnfoldUVRatio) {
+      gl.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio);
+    }
   }
+
+  set unfoldUVRatio(value) {
+    this._unfoldUVRatio = value;
+  }
+
+  get unfoldUVRatio() {
+    return this._unfoldUVRatio;
+  }
+
 }
 
 GLBoost['WireframeShader'] = WireframeShader;
