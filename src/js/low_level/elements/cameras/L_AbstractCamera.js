@@ -46,8 +46,8 @@ export default class L_AbstractCamera extends L_Element {
       this._translateInner = super.translate.clone();
       this._centerInner = this._center.clone();
       this._upInner = this._up.clone();
-      this._zNearInner = this.this._zFar.clone();
-      this._zFarInner = this.this._zNear.clone();
+      this._zNearInner = this._zFar;
+      this._zFarInner = this._zNear;
     }
   }
 
