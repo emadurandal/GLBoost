@@ -8,6 +8,7 @@ import M_Mesh from '../elements/meshes/M_Mesh';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_SkeletalGeometry from '../geometries/M_SkeletalGeometry';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
+import M_FrustumCamera from '../elements/cameras/M_FrustumCamera';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import M_PointLight from '../elements/lights/M_PointLight';
@@ -67,6 +68,10 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
 
   createPerspectiveCamera(lookat, perspective) {
     return new M_PerspectiveCamera(this, true, lookat, perspective);
+  }
+
+  createFrustumCamera(lookat, perspective) {
+    return new M_FrustumCamera(this, true, lookat, perspective);
   }
 
   createOrthoCamera(lookat, ortho) {

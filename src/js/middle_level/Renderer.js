@@ -80,9 +80,10 @@ export default class Renderer extends GLBoostObject {
       if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
-        gl.viewport(0, 0, glContext.width, glContext.height);
+        let deltaWidth = glContext.height*camera.aspect - glContext.width;
+        gl.viewport(-deltaWidth/2, 0, glContext.height*camera.aspect, glContext.height);
       }
-      
+
       this._clearBuffer(gl, renderPass);
 
       // draw opacity meshes.
@@ -164,8 +165,6 @@ export default class Renderer extends GLBoostObject {
   resize(width, height) {
     this._glContext.width = width;
     this._glContext.height = height;
-
-    this._glContext.gl.viewport(0, 0, width, height);
   }
 
 }
