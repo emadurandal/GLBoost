@@ -6144,7 +6144,9 @@
       _this._lengthCenterToCorner = 10;
       _this._lengthOfCenterToEye = 10;
       _this._scaleOfTraslation = 5.0;
+      _this._scaleOfLengthCameraToCenter = 0.5;
       _this._foyvBias = 1.0;
+      _this._zFarAdjustingFactorBasedOnAABB = 1.0;
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -6286,6 +6288,15 @@
     }
 
     babelHelpers.createClass(L_SPVCameraController, [{
+      key: '_getFovyFromCamera',
+      value: function _getFovyFromCamera(camera) {
+        if (camera.fovy) {
+          return camera.fovy;
+        } else {
+          return MathUtil.radianToDegree(2 * Math.atan(Math.abs(camera.top - camera.bottom) / (2 * camera.zNear)));
+        }
+      }
+    }, {
       key: 'convert',
       value: function convert(camera) {
         var newEyeVec = null;
@@ -6298,8 +6309,10 @@
           this._upVec = camera.up;
         }
 
+        var fovy = this._getFovyFromCamera(camera);
+
         if (this._isSymmetryMode) {
-          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0 / Math.tan(MathUtil.degreeToRadian(camera.fovy)));
+          var centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0 / Math.tan(MathUtil.degreeToRadian(fovy / 2.0)));
           this._lengthOfCenterToEye = centerToEyeVec.length();
           var horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
           var horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
@@ -6335,7 +6348,7 @@
           }
           this._verticalAngleOfVectors *= verticalSign;
         } else {
-          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0 / Math.tan(MathUtil.degreeToRadian(camera.fovy)));
+          var _centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0 / Math.tan(MathUtil.degreeToRadian(fovy / 2.0)));
           var _rotateM_X = Matrix33.rotateX(this._rot_y);
           var _rotateM_Y = Matrix33.rotateY(this._rot_x);
           var _rotateM = _rotateM_Y.multiply(_rotateM_X);
@@ -6351,11 +6364,26 @@
           newCenterVec.add(this._mouseTranslateVec);
         }
 
-        var newZNear = camera.zNear * 1.0 / Math.tan(MathUtil.degreeToRadian(camera.fovy));
-        var newZFar = camera.zFar * 1.0 / Math.tan(MathUtil.degreeToRadian(camera.fovy));
-        this._foyvBias = Math.tan(MathUtil.degreeToRadian(camera.fovy));
+        var newZNear = camera.zNear;
+        var newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+        if (this._target) {
+          newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
+        }
+
+        this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy / 2.0));
 
         return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
+      }
+    }, {
+      key: '_getTargetAABB',
+      value: function _getTargetAABB() {
+        var targetAABB = null;
+        if (typeof this._target.updateAABB !== 'undefined') {
+          targetAABB = this._target.updateAABB();
+        } else {
+          targetAABB = this._target.AABB;
+        }
+        return targetAABB;
       }
     }, {
       key: '_updateTargeting',
@@ -6364,15 +6392,10 @@
           return [eyeVec, centerVec, upVec];
         }
 
-        var targetAABB = null;
-        if (typeof this._target.updateAABB !== 'undefined') {
-          targetAABB = this._target.updateAABB();
-        } else {
-          targetAABB = this._target.AABB;
-        }
+        var targetAABB = this._getTargetAABB();
 
         this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2);
+        var lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin(fovy * Math.PI / 180 / 2) * this._scaleOfLengthCameraToCenter;
 
         var newCenterVec = targetAABB.centerPoint;
 
@@ -6448,7 +6471,7 @@
         var _this2 = this;
 
         this._camaras.forEach(function (camera) {
-          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+          var vectors = _this2._updateTargeting(camera, camera.eye, camera.center, camera.up, _this2._getFovyFromCamera(camera));
           camera.eye = vectors[0];
           camera.center = vectors[1];
           camera.up = vectors[2];
@@ -6472,6 +6495,14 @@
       set: function set(object) {
         this._target = object;
         this.updateTargeting();
+      }
+    }, {
+      key: 'zFarAdjustingFactorBasedOnAABB',
+      set: function set(value) {
+        this._zFarAdjustingFactorBasedOnAABB = value;
+      },
+      get: function get() {
+        return this._zFarAdjustingFactorBasedOnAABB;
       }
     }]);
     return L_SPVCameraController;
