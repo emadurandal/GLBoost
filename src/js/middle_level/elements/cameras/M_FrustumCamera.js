@@ -1,11 +1,11 @@
 import M_AbstractCamera from './M_AbstractCamera';
-import L_OrthoCamera from '../../../low_level/elements/cameras/L_OrthoCamera';
+import L_FrustumCamera from '../../../low_level/elements/cameras/L_FrustumCamera';
 
-export default class M_OrthoCamera extends M_AbstractCamera {
-  constructor(glBoostContext, toRegister, lookat, ortho) {
+export default class M_FrustumCamera extends M_AbstractCamera {
+  constructor(glBoostContext, toRegister, lookat, perspective) {
     super(glBoostContext, toRegister);
 
-    this._lowLevelCamera = new L_OrthoCamera(this, false, lookat, ortho);
+    this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
     this._lowLevelCamera._middleLevelCamera = this;
   }
 
@@ -39,20 +39,20 @@ export default class M_OrthoCamera extends M_AbstractCamera {
     return this._lowLevelCamera.right;
   }
 
-  set bottom(value) {
-    this._lowLevelCamera.bottom = value;
-  }
-
-  get bottom() {
-    return this._lowLevelCamera.bottom;
-  }
-
   set top(value) {
     this._lowLevelCamera.top = value;
   }
 
   get top() {
     return this._lowLevelCamera.top;
+  }
+
+  set bottom(value) {
+    this._lowLevelCamera.bottom = value;
+  }
+
+  get bottom() {
+    return this._lowLevelCamera.bottom;
   }
 
   set zNear(value) {

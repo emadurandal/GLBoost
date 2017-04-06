@@ -41,7 +41,9 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._lengthCenterToCorner = 10;
     this._lengthOfCenterToEye = 10;
     this._scaleOfTraslation = 5.0;
+    this._scaleOfLengthCameraToCenter = 0.5;
     this._foyvBias = 1.0;
+    this._zFarAdjustingFactorBasedOnAABB = 1.0;
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
@@ -183,7 +185,13 @@ export default class L_SPVCameraController extends GLBoostObject {
     }
   }
 
-
+  _getFovyFromCamera(camera) {
+    if (camera.fovy) {
+      return camera.fovy;
+    } else {
+      return MathUtil.radianToDegree(2 * Math.atan(Math.abs(camera.top - camera.bottom) / (2 * camera.zNear)));
+    }
+  }
 
   convert(camera) {
     let newEyeVec = null;
@@ -196,8 +204,10 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._upVec = camera.up;
     }
 
+    let fovy = this._getFovyFromCamera(camera);
+
     if (this._isSymmetryMode) {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy)));
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
       this._lengthOfCenterToEye = centerToEyeVec.length();
       let horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
       let horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
@@ -234,7 +244,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._verticalAngleOfVectors *= verticalSign;
 
     } else {
-      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy)));
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
       let rotateM_X = Matrix33.rotateX(this._rot_y);
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM = rotateM_Y.multiply(rotateM_X);
@@ -250,11 +260,25 @@ export default class L_SPVCameraController extends GLBoostObject {
       newCenterVec.add(this._mouseTranslateVec);
     }
 
-    let newZNear = camera.zNear * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy));
-    let newZFar = camera.zFar * 1.0/Math.tan(MathUtil.degreeToRadian(camera.fovy));
-    this._foyvBias = Math.tan(MathUtil.degreeToRadian(camera.fovy));
+    let newZNear = camera.zNear;
+    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+    if (this._target) {
+      newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
+    }
+
+    this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy/2.0));
 
     return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
+  }
+
+  _getTargetAABB() {
+    let targetAABB = null;
+    if (typeof this._target.updateAABB !== 'undefined') {
+      targetAABB = this._target.updateAABB();
+    } else {
+      targetAABB = this._target.AABB;
+    }
+    return targetAABB;
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
@@ -262,15 +286,10 @@ export default class L_SPVCameraController extends GLBoostObject {
       return [eyeVec, centerVec, upVec];
     }
 
-    let targetAABB = null;
-    if (typeof this._target.updateAABB !== 'undefined') {
-      targetAABB = this._target.updateAABB();
-    } else {
-      targetAABB = this._target.AABB;
-    }
+    let targetAABB = this._getTargetAABB();
 
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-    let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2);
+    let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
     let newCenterVec = targetAABB.centerPoint;
 
@@ -346,7 +365,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   updateTargeting() {
     this._camaras.forEach((camera)=>{
-      let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, camera.fovy);
+      let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, this._getFovyFromCamera(camera));
       camera.eye = vectors[0];
       camera.center = vectors[1];
       camera.up = vectors[2];
@@ -361,4 +380,13 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._target = object;
     this.updateTargeting();
   }
+
+  set zFarAdjustingFactorBasedOnAABB(value) {
+    this._zFarAdjustingFactorBasedOnAABB = value;
+  }
+
+  get zFarAdjustingFactorBasedOnAABB() {
+    return this._zFarAdjustingFactorBasedOnAABB;
+  }
+
 }

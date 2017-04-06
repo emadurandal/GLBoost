@@ -195,11 +195,23 @@ export default class Vector3 {
     return this;
   }
 
+  multiplyVector(vec) {
+    this.x *= vec.x;
+    this.y *= vec.y;
+    this.z *= vec.z;
+
+    return this;
+  }
+
   /**
    * 除算（static版）
    */
   static multiply(vec3, val) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
+  }
+
+  static multiplyVector(vec3, vec) {
+    return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
   }
 
   static angleOfVectors(lhv, rhv) {
