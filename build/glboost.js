@@ -4499,7 +4499,7 @@
           }
 
           var barycentricCoords = this._vertices.barycentricCoord;
-          this._vertices.barycentricCoord = new Float32Array(this._vertices.position.length);
+          this._vertices.barycentricCoord = new Float32Array(barycentricCoords.length);
           this._vertices.barycentricCoord.set(barycentricCoords);
         } else {
           allVertexAttribs.forEach(function (attribName) {
@@ -5079,7 +5079,12 @@
           if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
             gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
           } else {
-            gl.viewport(0, 0, glContext.width, glContext.height);
+            if (camera) {
+              var deltaWidth = glContext.height * camera.aspect - glContext.width;
+              gl.viewport(-deltaWidth / 2, 0, glContext.height * camera.aspect, glContext.height);
+            } else {
+              gl.viewport(0, 0, glContext.width, glContext.height);
+            }
           }
 
           _this2._clearBuffer(gl, renderPass);
@@ -5165,8 +5170,6 @@
       value: function resize(width, height) {
         this._glContext.width = width;
         this._glContext.height = height;
-
-        this._glContext.gl.viewport(0, 0, width, height);
       }
     }, {
       key: 'glContext',
@@ -6324,10 +6327,14 @@
           this._translateInner = results[0];
           this._centerInner = results[1];
           this._upInner = results[2];
+          this._zNearInner = results[3];
+          this._zFarInner = results[4];
         } else {
           this._translateInner = babelHelpers.get(L_AbstractCamera.prototype.__proto__ || Object.getPrototypeOf(L_AbstractCamera.prototype), 'translate', this).clone();
           this._centerInner = this._center.clone();
           this._upInner = this._up.clone();
+          this._zNearInner = this._zNear;
+          this._zFarInner = this._zFar;
         }
       }
     }, {
@@ -6606,6 +6613,11 @@
       get: function get() {
         return this._ymag;
       }
+    }, {
+      key: 'aspect',
+      get: function get() {
+        return (this.right - this.left) / (this.top - this.bottom);
+      }
     }], [{
       key: 'orthoRHMatrix',
       value: function orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
@@ -6824,8 +6836,231 @@
       get: function get() {
         return this._lowLevelCamera.zFar;
       }
+    }, {
+      key: 'aspect',
+      get: function get() {
+        return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
+      }
     }]);
     return M_OrthoCamera;
+  }(M_AbstractCamera);
+
+  var L_FrustumCamera = function (_L_AbstractCamera) {
+    babelHelpers.inherits(L_FrustumCamera, _L_AbstractCamera);
+
+    function L_FrustumCamera(glBoostContext, toRegister, lookat, frustum) {
+      babelHelpers.classCallCheck(this, L_FrustumCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_FrustumCamera.__proto__ || Object.getPrototypeOf(L_FrustumCamera)).call(this, glBoostContext, toRegister, lookat));
+
+      _this._left = frustum.left;
+      _this._right = frustum.right;
+      _this._top = frustum.top;
+      _this._bottom = frustum.bottom;
+      _this._zNear = frustum.zNear;
+      _this._zFar = frustum.zFar;
+
+      _this._zNearInner = frustum.zNear;
+      _this._zFarInner = frustum.zFar;
+
+      _this._dirtyProjection = true;
+      _this._updateCountAsCameraProjection = 0;
+      return _this;
+    }
+
+    babelHelpers.createClass(L_FrustumCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._dirtyProjection = true;
+        this._updateCountAsCameraProjection++;
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        if (this._dirtyProjection) {
+          this._projectionMatrix = L_FrustumCamera.frustumRHMatrix(this._left, this._right, this._top, this._bottom, this._zNearInner, this._zFarInner);
+          this._dirtyProjection = false;
+          return this._projectionMatrix.clone();
+        } else {
+          return this._projectionMatrix.clone();
+        }
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        if (this._left === value) {
+          return;
+        }
+        this._left = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        if (this._right === value) {
+          return;
+        }
+        this._right = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._right;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        if (this._top === value) {
+          return;
+        }
+        this._top = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._top;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        if (this._bottom === value) {
+          return;
+        }
+        this._bottom = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._bottom;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        if (this._zNear === value) {
+          return;
+        }
+        this._zNear = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        if (this._zFar === value) {
+          return;
+        }
+        this._zFar = value;
+        this._needUpdateProjection();
+      },
+      get: function get() {
+        return this._zFar;
+      }
+    }, {
+      key: 'aspect',
+      get: function get() {
+        return (this.right - this.left) / (this.top - this.bottom);
+      }
+    }], [{
+      key: 'frustumRHMatrix',
+      value: function frustumRHMatrix(left, right, top, bottom, zNear, zFar) {
+        return new Matrix44$1(2 * zNear / (right - left), 0.0, (right + left) / (right - left), 0.0, 0.0, 2 * zNear / (top - bottom), (top + bottom) / (top - bottom), 0.0, 0.0, 0.0, -(zFar + zNear) / (zFar - zNear), -1 * 2 * zFar * zNear / (zFar - zNear), 0.0, 0.0, -1.0, 0.0);
+      }
+    }]);
+    return L_FrustumCamera;
+  }(L_AbstractCamera);
+
+  var M_FrustumCamera = function (_M_AbstractCamera) {
+    babelHelpers.inherits(M_FrustumCamera, _M_AbstractCamera);
+
+    function M_FrustumCamera(glBoostContext, toRegister, lookat, perspective) {
+      babelHelpers.classCallCheck(this, M_FrustumCamera);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_FrustumCamera.__proto__ || Object.getPrototypeOf(M_FrustumCamera)).call(this, glBoostContext, toRegister));
+
+      _this._lowLevelCamera = new L_FrustumCamera(_this, false, lookat, perspective);
+      _this._lowLevelCamera._middleLevelCamera = _this;
+      return _this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    babelHelpers.createClass(M_FrustumCamera, [{
+      key: '_needUpdateProjection',
+      value: function _needUpdateProjection() {
+        this._lowLevelCamera._needUpdateProjection();
+      }
+    }, {
+      key: 'projectionRHMatrix',
+      value: function projectionRHMatrix() {
+        return this._lowLevelCamera.projectionRHMatrix();
+      }
+    }, {
+      key: 'updateCountAsCameraProjection',
+      get: function get() {
+        return this._lowLevelCamera.updateCountAsCameraProjection;
+      }
+    }, {
+      key: 'left',
+      set: function set(value) {
+        this._lowLevelCamera.left = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.left;
+      }
+    }, {
+      key: 'right',
+      set: function set(value) {
+        this._lowLevelCamera.right = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.right;
+      }
+    }, {
+      key: 'top',
+      set: function set(value) {
+        this._lowLevelCamera.top = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.top;
+      }
+    }, {
+      key: 'bottom',
+      set: function set(value) {
+        this._lowLevelCamera.bottom = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.bottom;
+      }
+    }, {
+      key: 'zNear',
+      set: function set(value) {
+        this._lowLevelCamera.zNear = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zNear;
+      }
+    }, {
+      key: 'zFar',
+      set: function set(value) {
+        this._lowLevelCamera.zFar = value;
+      },
+      get: function get() {
+        return this._lowLevelCamera.zFar;
+      }
+    }, {
+      key: 'aspect',
+      get: function get() {
+        return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
+      }
+    }]);
+    return M_FrustumCamera;
   }(M_AbstractCamera);
 
   var L_PerspectiveCamera = function (_L_AbstractCamera) {
@@ -6840,6 +7075,9 @@
       _this._aspect = perspective.aspect;
       _this._zNear = perspective.zNear;
       _this._zFar = perspective.zFar;
+
+      _this._zNearInner = perspective.zNear;
+      _this._zFarInner = perspective.zFar;
 
       _this._dirtyProjection = true;
       _this._updateCountAsCameraProjection = 0;
@@ -6856,7 +7094,7 @@
       key: 'projectionRHMatrix',
       value: function projectionRHMatrix() {
         if (this._dirtyProjection) {
-          this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+          this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
           this._dirtyProjection = false;
           return this._projectionMatrix.clone();
         } else {
@@ -10282,6 +10520,11 @@
         return new L_PerspectiveCamera(this, true, lookat, perspective);
       }
     }, {
+      key: 'createFrustumCamera',
+      value: function createFrustumCamera(lookat, perspective) {
+        return new L_FrustumCamera(this, true, lookat, perspective);
+      }
+    }, {
       key: 'createOrthoCamera',
       value: function createOrthoCamera(lookat, ortho) {
         return new L_OrthoCamera(this, true, lookat, ortho);
@@ -10476,6 +10719,11 @@
       key: 'createPerspectiveCamera',
       value: function createPerspectiveCamera(lookat, perspective) {
         return new M_PerspectiveCamera(this, true, lookat, perspective);
+      }
+    }, {
+      key: 'createFrustumCamera',
+      value: function createFrustumCamera(lookat, perspective) {
+        return new M_FrustumCamera(this, true, lookat, perspective);
       }
     }, {
       key: 'createOrthoCamera',
