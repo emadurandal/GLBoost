@@ -80,8 +80,12 @@ export default class Renderer extends GLBoostObject {
       if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
-        let deltaWidth = glContext.height*camera.aspect - glContext.width;
-        gl.viewport(-deltaWidth/2, 0, glContext.height*camera.aspect, glContext.height);
+        if (camera) {
+          let deltaWidth = glContext.height*camera.aspect - glContext.width;
+          gl.viewport(-deltaWidth/2, 0, glContext.height*camera.aspect, glContext.height);
+        } else {
+          gl.viewport(0, 0, glContext.width, glContext.height);
+        }
       }
 
       this._clearBuffer(gl, renderPass);
