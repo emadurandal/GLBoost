@@ -22,6 +22,7 @@ export default class SPVClassicMaterial extends GLBoostObject {
     this._states = null;
     this._shaderUniformLocationsOfExpressions = {};
     this._isWireframe = false;
+    this._isWireframeOnShade = false;
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -199,6 +200,14 @@ export default class SPVClassicMaterial extends GLBoostObject {
     return this._isWireframe;
   }
 
+  set isWireframeOnShade(flag) {
+    this._isWireframeOnShade = flag;
+  }
+
+  get isWireframeOnShade() {
+    return this._isWireframeOnShade;
+  }
+
   set name(name) {
     this._name = name;
   }
@@ -237,40 +246,28 @@ export default class SPVClassicMaterial extends GLBoostObject {
   }
 
   setUpStates() {
-    var gl = this._gl;
-
-    if (this._states) {
-      Renderer.disableAllGLState(gl);
-
-      if (this._states.enable) {
-        this._states.enable.forEach((state)=>{
-          gl.enable(state);
-        });
-      }
-      if (this._states.functions) {
-        for (let functionName in this._states.functions) {
-          gl[functionName].apply(gl, this._states.functions[functionName]);
-        }
-      }
+    switch (this._glBoostContext.globalStatesUsage) {
+      case GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING:
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_IGNORE:
+        this._glBoostContext.disableAllGLState();
+        this._setUpMaterialStates();
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE:
+        this._glBoostContext.disableAllGLState();
+        this._glBoostContext.reflectGlobalGLState();
+        this._setUpMaterialStates();
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE:
+        this._glBoostContext.disableAllGLState();
+        this._glBoostContext.reflectGlobalGLState();
+        break;
+      default:
+        break;
     }
   }
 
   tearDownStates() {
-    var gl = this._gl;
-
-    if (this._states) {
-      if (this._states.enable) {
-        this._states.enable.forEach((state)=>{
-          gl.disable(state);
-        });
-      }
-      if (this._states.functions) {
-        for (let functionName in this._stateFunctionsToReset) {
-          gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
-        }
-      }
-      Renderer.reflectGlobalGLState(gl);
-    }
   }
 
   setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {

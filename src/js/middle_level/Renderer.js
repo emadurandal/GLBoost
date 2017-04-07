@@ -13,37 +13,9 @@ export default class Renderer extends GLBoostObject {
 
     var gl = this._glContext.gl;
 
-    Renderer.reflectGlobalGLState(gl);
+    this._glBoostContext.reflectGlobalGLState();
 
     gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
-
-  }
-
-  static reflectGlobalGLState(gl) {
-
-    gl.enable( gl.DEPTH_TEST );
-    gl.depthFunc( gl.LEQUAL );
-
-    gl.enable( gl.BLEND );
-    gl.blendEquation( gl.FUNC_ADD );
-    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-
-    gl.clearDepth( 1 );
-    gl.clearStencil( 0 );
-  }
-
-  static disableAllGLState(gl) {
-    let states = [
-      3042,
-      2884,
-      2929,
-      32823,
-      32926
-    ];
-
-    states.forEach((state)=>{
-      gl.disable(state);
-    });
   }
 
   /**

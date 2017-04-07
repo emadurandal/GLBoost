@@ -26,6 +26,7 @@ export class WireframeShaderSource {
     shaderText += `${in_} vec3 barycentricCoord;\n`;
 
     shaderText += 'uniform bool isWireframe;\n';
+    shaderText += 'uniform bool isWireframeOnShade;\n';
     shaderText += 'uniform float wireframeThicknessThreshold;\n';
 
     return shaderText;
@@ -37,6 +38,9 @@ export class WireframeShaderSource {
     shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
     shaderText += 'if ( isWireframe ) {\n';
     shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+    shaderText += '    if ( isWireframeOnShade ) {\n';
+    shaderText += '      discard;\n';
+    shaderText += '    }\n';
     shaderText += '  } else {\n';
     shaderText += '    rt0.xyz = grayColor;\n';
     shaderText += '  }\n';
@@ -54,6 +58,9 @@ export class WireframeShaderSource {
 
     material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
     gl.uniform1i( material.uniform_isWireframe, 0);
+
+    material.uniform_isWireframeOnShade = gl.getUniformLocation(shaderProgram, 'isWireframeOnShade');
+    gl.uniform1i( material.uniform_isWireframeOnShade, 0);
 
     material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
     gl.uniform1f( material.uniform_wireframeThicknessThreshold, 0.04);
@@ -81,12 +88,18 @@ export default class WireframeShader extends Shader {
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
     let isWifeframe = false;
+    let isWireframeOnShade = false;
 
     if (typeof material.isWireframe !== 'undefined') {
       isWifeframe = material.isWireframe;
     }
 
-    gl.uniform1i( material.uniform_isWireframe, isWifeframe);
+    if (typeof material.isWireframeOnShade !== 'undefined') {
+      isWireframeOnShade = material.isWireframeOnShade;
+    }
+
+    gl.uniform1i(material.uniform_isWireframe, isWifeframe);
+    gl.uniform1i(material.uniform_isWireframeOnShade, isWireframeOnShade);
 
     let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
     if (uniformLocationAABBLengthCenterToCorner) {

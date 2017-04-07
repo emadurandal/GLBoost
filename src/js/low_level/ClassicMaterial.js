@@ -227,12 +227,10 @@ export default class ClassicMaterial extends GLBoostObject {
     }
   }
 
-  setUpStates() {
-    var gl = this._gl;
+  _setUpMaterialStates() {
+    let gl = this._gl;
 
     if (this._states) {
-      Renderer.disableAllGLState(gl);
-
       if (this._states.enable) {
         this._states.enable.forEach((state)=>{
           gl.enable(state);
@@ -244,24 +242,32 @@ export default class ClassicMaterial extends GLBoostObject {
         }
       }
     }
+
+  }
+
+  setUpStates() {
+    switch (this._glBoostContext.globalStatesUsage) {
+      case GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING:
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_IGNORE:
+        this._glBoostContext.disableAllGLState();
+        this._setUpMaterialStates();
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE:
+        this._glBoostContext.disableAllGLState();
+        this._glBoostContext.reflectGlobalGLState();
+        this._setUpMaterialStates();
+        break;
+      case GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE:
+        this._glBoostContext.disableAllGLState();
+        this._glBoostContext.reflectGlobalGLState();
+        break;
+      default:
+        break;
+    }
   }
 
   tearDownStates() {
-    var gl = this._gl;
-
-    if (this._states) {
-      if (this._states.enable) {
-        this._states.enable.forEach((state)=>{
-          gl.disable(state);
-        });
-      }
-      if (this._states.functions) {
-        for (let functionName in this._stateFunctionsToReset) {
-          gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
-        }
-      }
-      Renderer.reflectGlobalGLState(gl);
-    }
   }
 
   setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
