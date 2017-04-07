@@ -151,4 +151,8 @@ export default class L_OrthoCamera extends L_AbstractCamera {
   get ymag() {
     return this._ymag;
   }
+
+  get aspect() {
+    return (this.right - this.left) / (this.top - this.bottom);
+  }
 }

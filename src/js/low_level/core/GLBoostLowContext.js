@@ -4,6 +4,7 @@ import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import ClassicMaterial from '../ClassicMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
+import L_FrustumCamera from '../elements/cameras/L_FrustumCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
 import L_CameraController from '../auxiliaries/camera_controllers/L_CameraController'
 import MutableTexture from '../textures/MutableTexture';
@@ -77,6 +78,10 @@ export default class GLBoostLowContext {
 
   createPerspectiveCamera(lookat, perspective) {
     return new L_PerspectiveCamera(this, true, lookat, perspective);
+  }
+
+  createFrustumCamera(lookat, perspective) {
+    return new L_FrustumCamera(this, true, lookat, perspective);
   }
 
   createOrthoCamera(lookat, ortho) {
