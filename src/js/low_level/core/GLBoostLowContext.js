@@ -29,6 +29,16 @@ export default class GLBoostLowContext {
     } else {
       this._glContext = GLContext.getInstance(canvas);
     }
+
+    this._globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+    this._defaultGlobalStates = [
+      3042, // gl.BLEND
+      2929  // gl.DEPTH_TEST
+    ];
+
+    this.restoreGlobalStatesToDefault();
+
   }
 
   _setName() {
@@ -189,6 +199,59 @@ export default class GLBoostLowContext {
 
   get belongingCanvasId() {
     return this._glContext.belongingCanvasId;
+  }
+
+  set globalStatesUsage(usageMode) {
+    this._globalStatesUsage = usageMode;
+  }
+
+  get globalStatesUsage() {
+    return this._globalStatesUsage;
+  }
+
+  reflectGlobalGLState() {
+    let gl = this._glContext.gl;
+
+    this.currentGlobalStates.forEach((state)=>{
+      gl.enable(state);
+    });
+
+    gl.depthFunc( gl.LEQUAL );
+
+    gl.blendEquation( gl.FUNC_ADD );
+    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
+    gl.clearDepth( 1 );
+    gl.clearStencil( 0 );
+  }
+
+  disableAllGLState() {
+    let states = [
+      3042, // gl.BLEND
+      2884, // gl.CULL_FACE
+      2929, // gl.DEPTH_TEST
+      32823, // gl.POLYGON_OFFSET_FILL
+      32926, // gl.SAMPLE_ALPHA_TO_COVERAGE
+    ];
+
+    let glContext = this._glContext;
+    let gl = glContext.gl;
+
+    states.forEach((state)=>{
+      gl.disable(state);
+    });
+  }
+
+  set currentGlobalStates(states) {
+    this._currentGlobalStates = states.concat();
+  }
+
+  get currentGlobalStates() {
+    return this._currentGlobalStates.concat();
+  }
+
+  restoreGlobalStatesToDefault() {
+    this._currentGlobalStates = this._defaultGlobalStates.concat();
   }
 
 }

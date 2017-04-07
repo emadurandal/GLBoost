@@ -163,6 +163,11 @@
     GLBoost['REPEAT'] = 'REPEAT';
     GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
     GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
+    GLBoost['GLOBAL_STATES_USAGE_DO_NOTHING'] = 'GLOBAL_STATES_USAGE_DO_NOTHING';
+    GLBoost['GLOBAL_STATES_USAGE_IGNORE'] = 'GLOBAL_STATES_USAGE_IGNORE';
+    GLBoost['GLOBAL_STATES_USAGE_INCLUSIVE'] = 'GLOBAL_STATES_USAGE_INCLUSIVE';
+    GLBoost['GLOBAL_STATES_USAGE_EXCLUSIVE'] = 'GLOBAL_STATES_USAGE_EXCLUSIVE';
+
     GLBoost['LOG_GENERAL'] = 'LOG_GENERAL';
     GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
     GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
@@ -5441,6 +5446,545 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
+  var VertexWorldShaderSource = function () {
+    function VertexWorldShaderSource() {
+      babelHelpers.classCallCheck(this, VertexWorldShaderSource);
+    }
+
+    babelHelpers.createClass(VertexWorldShaderSource, [{
+      key: 'VSDefine_VertexWorldShaderSource',
+      value: function VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 v_normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+
+        shaderText += 'uniform mat4 worldMatrix;\n';
+        shaderText += 'uniform mat4 viewMatrix;\n';
+        shaderText += 'uniform mat4 projectionMatrix;\n';
+        shaderText += 'uniform mat3 normalMatrix;\n';
+
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += 'uniform float AABBLengthCenterToCorner;\n';
+          shaderText += 'uniform vec4 AABBCenterPosition;\n';
+          shaderText += 'uniform float unfoldUVRatio;\n';
+        }
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexWorldShaderSource',
+      value: function VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += '  vec4 uvPosition = vec4((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0, 0.0, 1.0)+AABBCenterPosition;\n';
+          shaderText += '  vec4 preTransformedPosition = uvPosition * unfoldUVRatio + vec4(aVertex_position, 1.0) * (1.0-unfoldUVRatio);\n';
+        } else {
+          shaderText += '  vec4 preTransformedPosition = vec4(aVertex_position, 1.0);\n';
+        }
+        if (existCamera_f) {
+          shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+          shaderText += '  gl_Position = pvwMatrix * preTransformedPosition;\n';
+        } else {
+          shaderText += '  gl_Position = worldMatrix * preTransformedPosition;\n';
+        }
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
+        }
+        shaderText += '  position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexWorldShaderSource',
+      value: function FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        if (lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 v_normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_VertexWorldShaderSource',
+      value: function FSShade_VertexWorldShaderSource(f, gl, lights) {
+        var shaderText = '';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexWorldShaderSource',
+      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        if (existCamera_f) {
+          material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
+          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
+        }
+
+        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+          material.setUniform(shaderProgram.hashId, 'uniform_AABBLengthCenterToCorner', gl.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+          material.setUniform(shaderProgram.hashId, 'uniform_AABBCenterPosition', gl.getUniformLocation(shaderProgram, 'AABBCenterPosition'));
+          material.setUniform(shaderProgram.hashId, 'uniform_unfoldUVRatio', gl.getUniformLocation(shaderProgram, 'unfoldUVRatio'));
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexWorldShaderSource;
+  }();
+
+  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
+
+  var FragmentSimpleShaderSource = function () {
+    function FragmentSimpleShaderSource() {
+      babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
+    }
+
+    babelHelpers.createClass(FragmentSimpleShaderSource, [{
+      key: 'FSDefine_FragmentSimpleShaderSource',
+      value: function FSDefine_FragmentSimpleShaderSource(in_, f) {
+        var shaderText = 'uniform float opacity;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_FragmentSimpleShaderSource',
+      value: function FSShade_FragmentSimpleShaderSource(f, gl) {
+        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_FragmentSimpleShaderSource',
+      value: function prepare_FragmentSimpleShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        material.setUniform(shaderProgram.hashId, 'opacity', gl.getUniformLocation(shaderProgram, 'opacity'));
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return FragmentSimpleShaderSource;
+  }();
+
+  var SimpleShader = function (_Shader) {
+    babelHelpers.inherits(SimpleShader, _Shader);
+
+    function SimpleShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, SimpleShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SimpleShader.__proto__ || Object.getPrototypeOf(SimpleShader)).call(this, glBoostContext));
+
+      SimpleShader.mixin(basicShader);
+      SimpleShader.mixin(FragmentSimpleShaderSource);
+      return _this;
+    }
+
+    return SimpleShader;
+  }(Shader);
+
+  GLBoost['SimpleShader'] = SimpleShader;
+
+  var VertexWorldShadowShaderSource = function () {
+    function VertexWorldShadowShaderSource() {
+      babelHelpers.classCallCheck(this, VertexWorldShadowShaderSource);
+    }
+
+    babelHelpers.createClass(VertexWorldShadowShaderSource, [{
+      key: 'VSDefine_VertexWorldShadowShaderSource',
+      value: function VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
+        var shaderText = '';
+        var textureUnitIndex = 0;
+        //for (let i=0; i<lights.length; i++) {
+        //if (lights[i].camera && lights[i].camera.texture) {
+        shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
+        shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
+        textureUnitIndex++;
+        //}
+        //}
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexWorldShadowShaderSource',
+      value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
+
+        //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
+        for (var i = 0; i < lights.length; i++) {
+          shaderText += '  { // ' + i + '\n';
+          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
+          //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
+          shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ' + i + '\n';
+          shaderText += '  } // ' + i + '\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexWorldShadowShaderSource',
+      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_VertexWorldShadowShaderSource',
+      value: function FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
+        var shaderText = '';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexWorldShadowShaderSource',
+      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
+        material._semanticsDic['WORLD'] = 'worldMatrix';
+        material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
+        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+        if (existCamera_f) {
+          material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
+          material._semanticsDic['VIEW'] = 'viewMatrix';
+          material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
+          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
+        }
+
+        var textureUnitIndex = 0;
+        for (var _i = 0; _i < lights.length; _i++) {
+          //if (lights[i].camera && lights[i].camera.texture) {
+
+          // matrices
+          material.setUniform(shaderProgram.hashId, 'uniform_depthPVMatrix_' + textureUnitIndex, gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
+
+          textureUnitIndex++;
+          //}
+          //shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexWorldShadowShaderSource;
+  }();
+
+  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
+
+  var WireframeShaderSource = function () {
+    function WireframeShaderSource() {
+      babelHelpers.classCallCheck(this, WireframeShaderSource);
+    }
+
+    babelHelpers.createClass(WireframeShaderSource, [{
+      key: 'VSDefine_WireframeShaderSource',
+      value: function VSDefine_WireframeShaderSource(in_, out_, f) {
+        var shaderText = '';
+        shaderText += in_ + ' vec3 aVertex_barycentricCoord;\n';
+        shaderText += out_ + ' vec3 barycentricCoord;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_WireframeShaderSource',
+      value: function VSTransform_WireframeShaderSource(existCamera_f, f) {
+        var shaderText = '';
+
+        shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_WireframeShaderSource',
+      value: function FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += in_ + ' vec3 barycentricCoord;\n';
+
+        shaderText += 'uniform bool isWireframe;\n';
+        shaderText += 'uniform bool isWireframeOnShade;\n';
+        shaderText += 'uniform float wireframeThicknessThreshold;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_WireframeShaderSource',
+      value: function FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+
+        shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
+        shaderText += 'if ( isWireframe ) {\n';
+        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+        shaderText += '    if ( isWireframeOnShade ) {\n';
+        shaderText += '      discard;\n';
+        shaderText += '    }\n';
+        shaderText += '  } else {\n';
+        shaderText += '    rt0.xyz = grayColor;\n';
+        shaderText += '  }\n';
+        shaderText += '}\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_WireframeShaderSource',
+      value: function prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
+        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
+        vertexAttribsAsResult.push('barycentricCoord');
+
+        material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+        gl.uniform1i(material.uniform_isWireframe, 0);
+
+        material.uniform_isWireframeOnShade = gl.getUniformLocation(shaderProgram, 'isWireframeOnShade');
+        gl.uniform1i(material.uniform_isWireframeOnShade, 0);
+
+        material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
+        gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return WireframeShaderSource;
+  }();
+
+  var WireframeShader = function (_Shader) {
+    babelHelpers.inherits(WireframeShader, _Shader);
+
+    function WireframeShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, WireframeShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (WireframeShader.__proto__ || Object.getPrototypeOf(WireframeShader)).call(this, glBoostContext));
+
+      WireframeShader.mixin(basicShader);
+      if (basicShader === VertexWorldShaderSource) {
+        WireframeShader.mixin(VertexWorldShadowShaderSource);
+      }
+      WireframeShader.mixin(FragmentSimpleShaderSource);
+      WireframeShader.mixin(WireframeShaderSource);
+
+      _this._unfoldUVRatio = 0.0;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(WireframeShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(WireframeShader.prototype.__proto__ || Object.getPrototypeOf(WireframeShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
+        var isWifeframe = false;
+        var isWireframeOnShade = false;
+
+        if (typeof material.isWireframe !== 'undefined') {
+          isWifeframe = material.isWireframe;
+        }
+
+        if (typeof material.isWireframeOnShade !== 'undefined') {
+          isWireframeOnShade = material.isWireframeOnShade;
+        }
+
+        gl.uniform1i(material.uniform_isWireframe, isWifeframe);
+        gl.uniform1i(material.uniform_isWireframeOnShade, isWireframeOnShade);
+
+        var uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
+        if (uniformLocationAABBLengthCenterToCorner) {
+          gl.uniform1f(uniformLocationAABBLengthCenterToCorner, mesh.geometry.AABB.lengthCenterToCorner);
+        }
+        var uniformLocationAABBCenterPosition = material.getUniform(glslProgram.hashId, 'uniform_AABBCenterPosition');
+        if (uniformLocationAABBCenterPosition) {
+          gl.uniform4f(uniformLocationAABBCenterPosition, mesh.geometry.AABB.centerPoint.x, mesh.geometry.AABB.centerPoint.y, mesh.geometry.AABB.centerPoint.z, 0.0);
+        }
+        var uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
+        if (uniformLocationUnfoldUVRatio) {
+          gl.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio);
+        }
+      }
+    }, {
+      key: 'unfoldUVRatio',
+      set: function set(value) {
+        this._unfoldUVRatio = value;
+      },
+      get: function get() {
+        return this._unfoldUVRatio;
+      }
+    }]);
+    return WireframeShader;
+  }(Shader);
+
+  GLBoost['WireframeShader'] = WireframeShader;
+
+  var DecalShaderSource = function () {
+    function DecalShaderSource() {
+      babelHelpers.classCallCheck(this, DecalShaderSource);
+    }
+
+    babelHelpers.createClass(DecalShaderSource, [{
+      key: 'VSDefine_DecalShaderSource',
+      value: function VSDefine_DecalShaderSource(in_, out_, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 aVertex_color;\n';
+          shaderText += out_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+          shaderText += out_ + ' vec2 texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_DecalShaderSource',
+      value: function VSTransform_DecalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  color = aVertex_color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += '  texcoord = aVertex_texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_DecalShaderSource',
+      value: function FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += in_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost.TEXCOORD)) {
+          shaderText += in_ + ' vec2 texcoord;\n\n';
+        }
+        if (material.hasAnyTextures()) {
+          shaderText += 'uniform sampler2D uTexture;\n';
+        }
+        shaderText += 'uniform vec4 materialBaseColor;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_DecalShaderSource',
+      value: function FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+        var textureFunc = Shader._texture_func(gl);
+        if (Shader._exist(f, GLBoost.COLOR)) {
+          shaderText += '  rt0 *= color;\n';
+        }
+        shaderText += '    rt0 *= materialBaseColor;\n';
+        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
+        }
+        //shaderText += '    float shadowRatio = 0.0;\n';
+
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_DecalShaderSource',
+      value: function prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+
+        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+          if (material.getOneTexture()) {
+            material.uniformTextureSamplerDic['uTexture'] = {};
+            var uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
+            material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
+            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+
+            // set texture unit 0 to the sampler
+            gl.uniform1i(uTexture, 0);
+            material._semanticsDic['TEXTURE'] = 'uTexture';
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return DecalShaderSource;
+  }();
+
+  var DecalShader = function (_WireframeShader) {
+    babelHelpers.inherits(DecalShader, _WireframeShader);
+
+    function DecalShader(glBoostContext) {
+      babelHelpers.classCallCheck(this, DecalShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
+
+      DecalShader.mixin(DecalShaderSource);
+      return _this;
+    }
+
+    babelHelpers.createClass(DecalShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, expression, material) {
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+      }
+    }]);
+    return DecalShader;
+  }(WireframeShader);
+
+  GLBoost['DecalShader'] = DecalShader;
+
   var VertexLocalShaderSource = function () {
     function VertexLocalShaderSource() {
       babelHelpers.classCallCheck(this, VertexLocalShaderSource);
@@ -5775,106 +6319,6 @@
   DrawKickerLocal._lastMaterialUpdateStateString = null;
   DrawKickerLocal._lastGeometry = null;
   DrawKickerLocal._lastRenderPassIndex = -1;
-
-  var VertexWorldShaderSource = function () {
-    function VertexWorldShaderSource() {
-      babelHelpers.classCallCheck(this, VertexWorldShaderSource);
-    }
-
-    babelHelpers.createClass(VertexWorldShaderSource, [{
-      key: 'VSDefine_VertexWorldShaderSource',
-      value: function VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = in_ + ' vec3 aVertex_position;\n';
-
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 v_normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-
-        shaderText += 'uniform mat4 worldMatrix;\n';
-        shaderText += 'uniform mat4 viewMatrix;\n';
-        shaderText += 'uniform mat4 projectionMatrix;\n';
-        shaderText += 'uniform mat3 normalMatrix;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexWorldShaderSource',
-      value: function VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-        if (existCamera_f) {
-          shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-          shaderText += '  gl_Position = pvwMatrix * vec4(aVertex_position, 1.0);\n';
-        } else {
-          shaderText += '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
-        }
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
-        }
-        shaderText += '  position = worldMatrix * vec4(aVertex_position, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexWorldShaderSource',
-      value: function FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-
-        if (lights.length > 0) {
-          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        }
-
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 v_normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_VertexWorldShaderSource',
-      value: function FSShade_VertexWorldShaderSource(f, gl, lights) {
-        var shaderText = '';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexWorldShaderSource',
-      value: function prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
-        material._semanticsDic['WORLD'] = 'worldMatrix';
-        material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
-        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
-        if (existCamera_f) {
-          material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
-          material._semanticsDic['VIEW'] = 'viewMatrix';
-          material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
-          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
-          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexWorldShaderSource;
-  }();
-
-  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
   var singleton$2 = Symbol();
   var singletonEnforcer$2 = Symbol();
@@ -6886,22 +7330,21 @@
 
       var gl = _this._glContext.gl;
 
-      Renderer.reflectGlobalGLState(gl);
+      _this._glBoostContext.reflectGlobalGLState();
 
       gl.clearColor(_clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha);
-
       return _this;
     }
 
+    /**
+     * en: draw elements of the scene.<br>
+     * ja: sceneが持つオブジェクトを描画します
+     * @param {Scene} scene a instance of Scene class
+     */
+
+
     babelHelpers.createClass(Renderer, [{
       key: 'draw',
-
-
-      /**
-       * en: draw elements of the scene.<br>
-       * ja: sceneが持つオブジェクトを描画します
-       * @param {Scene} scene a instance of Scene class
-       */
       value: function draw(expression) {
         var _this2 = this;
 
@@ -7030,402 +7473,9 @@
       get: function get() {
         return this._glContext.gl;
       }
-    }], [{
-      key: 'reflectGlobalGLState',
-      value: function reflectGlobalGLState(gl) {
-
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
-
-        gl.enable(gl.BLEND);
-        gl.blendEquation(gl.FUNC_ADD);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-        gl.clearDepth(1);
-        gl.clearStencil(0);
-      }
-    }, {
-      key: 'disableAllGLState',
-      value: function disableAllGLState(gl) {
-        var states = [3042, 2884, 2929, 32823, 32926];
-
-        states.forEach(function (state) {
-          gl.disable(state);
-        });
-      }
     }]);
     return Renderer;
   }(GLBoostObject);
-
-  var FragmentSimpleShaderSource = function () {
-    function FragmentSimpleShaderSource() {
-      babelHelpers.classCallCheck(this, FragmentSimpleShaderSource);
-    }
-
-    babelHelpers.createClass(FragmentSimpleShaderSource, [{
-      key: 'FSDefine_FragmentSimpleShaderSource',
-      value: function FSDefine_FragmentSimpleShaderSource(in_, f) {
-        var shaderText = 'uniform float opacity;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_FragmentSimpleShaderSource',
-      value: function FSShade_FragmentSimpleShaderSource(f, gl) {
-        var shaderText = 'rt0 = vec4(1.0, 1.0, 1.0, opacity);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_FragmentSimpleShaderSource',
-      value: function prepare_FragmentSimpleShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        material.setUniform(shaderProgram.hashId, 'opacity', gl.getUniformLocation(shaderProgram, 'opacity'));
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return FragmentSimpleShaderSource;
-  }();
-
-  var SimpleShader = function (_Shader) {
-    babelHelpers.inherits(SimpleShader, _Shader);
-
-    function SimpleShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, SimpleShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SimpleShader.__proto__ || Object.getPrototypeOf(SimpleShader)).call(this, glBoostContext));
-
-      SimpleShader.mixin(basicShader);
-      SimpleShader.mixin(FragmentSimpleShaderSource);
-      return _this;
-    }
-
-    return SimpleShader;
-  }(Shader);
-
-  GLBoost['SimpleShader'] = SimpleShader;
-
-  var VertexWorldShadowShaderSource = function () {
-    function VertexWorldShadowShaderSource() {
-      babelHelpers.classCallCheck(this, VertexWorldShadowShaderSource);
-    }
-
-    babelHelpers.createClass(VertexWorldShadowShaderSource, [{
-      key: 'VSDefine_VertexWorldShadowShaderSource',
-      value: function VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = '';
-        var textureUnitIndex = 0;
-        //for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
-        shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
-        textureUnitIndex++;
-        //}
-        //}
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexWorldShadowShaderSource',
-      value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-
-        shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
-
-        //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-        for (var i = 0; i < lights.length; i++) {
-          shaderText += '  { // ' + i + '\n';
-          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
-          //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
-          shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ' + i + '\n';
-          shaderText += '  } // ' + i + '\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexWorldShadowShaderSource',
-      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_VertexWorldShadowShaderSource',
-      value: function FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
-        var shaderText = '';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexWorldShadowShaderSource',
-      value: function prepare_VertexWorldShadowShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
-        material._semanticsDic['WORLD'] = 'worldMatrix';
-        material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
-        material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
-        if (existCamera_f) {
-          material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
-          material._semanticsDic['VIEW'] = 'viewMatrix';
-          material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
-          material._semanticsDic['PROJECTION'] = 'projectionMatrix';
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
-          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
-        }
-
-        var textureUnitIndex = 0;
-        for (var _i = 0; _i < lights.length; _i++) {
-          //if (lights[i].camera && lights[i].camera.texture) {
-
-          // matrices
-          material.setUniform(shaderProgram.hashId, 'uniform_depthPVMatrix_' + textureUnitIndex, gl.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
-
-          textureUnitIndex++;
-          //}
-          //shaderProgram['isShadowCasting' + i] = gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexWorldShadowShaderSource;
-  }();
-
-  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
-
-  var WireframeShaderSource = function () {
-    function WireframeShaderSource() {
-      babelHelpers.classCallCheck(this, WireframeShaderSource);
-    }
-
-    babelHelpers.createClass(WireframeShaderSource, [{
-      key: 'VSDefine_WireframeShaderSource',
-      value: function VSDefine_WireframeShaderSource(in_, out_, f) {
-        var shaderText = '';
-        shaderText += in_ + ' vec3 aVertex_barycentricCoord;\n';
-        shaderText += out_ + ' vec3 barycentricCoord;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_WireframeShaderSource',
-      value: function VSTransform_WireframeShaderSource(existCamera_f, f) {
-        var shaderText = '';
-
-        shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_WireframeShaderSource',
-      value: function FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-
-        shaderText += in_ + ' vec3 barycentricCoord;\n';
-
-        shaderText += 'uniform bool isWireframe;\n';
-        shaderText += 'uniform float wireframeThicknessThreshold;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_WireframeShaderSource',
-      value: function FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
-        var shaderText = '';
-
-        shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
-        shaderText += 'if ( isWireframe ) {\n';
-        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-        shaderText += '  } else {\n';
-        shaderText += '    rt0.xyz = grayColor;\n';
-        shaderText += '  }\n';
-        shaderText += '}\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_WireframeShaderSource',
-      value: function prepare_WireframeShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-        shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
-        vertexAttribsAsResult.push('barycentricCoord');
-
-        material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
-        gl.uniform1i(material.uniform_isWireframe, 0);
-
-        material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
-        gl.uniform1f(material.uniform_wireframeThicknessThreshold, 0.04);
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return WireframeShaderSource;
-  }();
-
-  var WireframeShader = function (_Shader) {
-    babelHelpers.inherits(WireframeShader, _Shader);
-
-    function WireframeShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, WireframeShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (WireframeShader.__proto__ || Object.getPrototypeOf(WireframeShader)).call(this, glBoostContext));
-
-      WireframeShader.mixin(basicShader);
-      if (basicShader === VertexWorldShaderSource) {
-        WireframeShader.mixin(VertexWorldShadowShaderSource);
-      }
-      WireframeShader.mixin(FragmentSimpleShaderSource);
-      WireframeShader.mixin(WireframeShaderSource);
-      return _this;
-    }
-
-    return WireframeShader;
-  }(Shader);
-
-  GLBoost['WireframeShader'] = WireframeShader;
-
-  var DecalShaderSource = function () {
-    function DecalShaderSource() {
-      babelHelpers.classCallCheck(this, DecalShaderSource);
-    }
-
-    babelHelpers.createClass(DecalShaderSource, [{
-      key: 'VSDefine_DecalShaderSource',
-      value: function VSDefine_DecalShaderSource(in_, out_, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 aVertex_color;\n';
-          shaderText += out_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
-          shaderText += out_ + ' vec2 texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_DecalShaderSource',
-      value: function VSTransform_DecalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  color = aVertex_color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += '  texcoord = aVertex_texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_DecalShaderSource',
-      value: function FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += in_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += in_ + ' vec2 texcoord;\n\n';
-        }
-        if (material.hasAnyTextures()) {
-          shaderText += 'uniform sampler2D uTexture;\n';
-        }
-        shaderText += 'uniform vec4 materialBaseColor;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_DecalShaderSource',
-      value: function FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
-        var shaderText = '';
-        var textureFunc = Shader._texture_func(gl);
-        if (Shader._exist(f, GLBoost.COLOR)) {
-          shaderText += '  rt0 *= color;\n';
-        }
-        shaderText += '    rt0 *= materialBaseColor;\n';
-        if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
-        }
-        //shaderText += '    float shadowRatio = 0.0;\n';
-
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_DecalShaderSource',
-      value: function prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
-
-        if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-          if (material.getOneTexture()) {
-            material.uniformTextureSamplerDic['uTexture'] = {};
-            var uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
-            material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
-            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-
-            material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
-
-            // set texture unit 0 to the sampler
-            gl.uniform1i(uTexture, 0);
-            material._semanticsDic['TEXTURE'] = 'uTexture';
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return DecalShaderSource;
-  }();
-
-  var DecalShader = function (_WireframeShader) {
-    babelHelpers.inherits(DecalShader, _WireframeShader);
-
-    function DecalShader(glBoostContext) {
-      babelHelpers.classCallCheck(this, DecalShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
-
-      DecalShader.mixin(DecalShaderSource);
-      return _this;
-    }
-
-    babelHelpers.createClass(DecalShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material) {
-
-        var baseColor = material.baseColor;
-        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
-      }
-    }]);
-    return DecalShader;
-  }(WireframeShader);
-
-  GLBoost['DecalShader'] = DecalShader;
 
   var ClassicMaterial = function (_GLBoostObject) {
     babelHelpers.inherits(ClassicMaterial, _GLBoostObject);
@@ -7591,13 +7641,11 @@
         }
       }
     }, {
-      key: 'setUpStates',
-      value: function setUpStates() {
+      key: '_setUpMaterialStates',
+      value: function _setUpMaterialStates() {
         var gl = this._gl;
 
         if (this._states) {
-          Renderer.disableAllGLState(gl);
-
           if (this._states.enable) {
             this._states.enable.forEach(function (state) {
               gl.enable(state);
@@ -7611,24 +7659,31 @@
         }
       }
     }, {
-      key: 'tearDownStates',
-      value: function tearDownStates() {
-        var gl = this._gl;
-
-        if (this._states) {
-          if (this._states.enable) {
-            this._states.enable.forEach(function (state) {
-              gl.disable(state);
-            });
-          }
-          if (this._states.functions) {
-            for (var functionName in this._stateFunctionsToReset) {
-              gl[functionName].apply(gl, this._stateFunctionsToReset[functionName]);
-            }
-          }
-          Renderer.reflectGlobalGLState(gl);
+      key: 'setUpStates',
+      value: function setUpStates() {
+        switch (this._glBoostContext.globalStatesUsage) {
+          case GLBoost$1.GLOBAL_STATES_USAGE_DO_NOTHING:
+            break;
+          case GLBoost$1.GLOBAL_STATES_USAGE_IGNORE:
+            this._glBoostContext.disableAllGLState();
+            this._setUpMaterialStates();
+            break;
+          case GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE:
+            this._glBoostContext.disableAllGLState();
+            this._glBoostContext.reflectGlobalGLState();
+            this._setUpMaterialStates();
+            break;
+          case GLBoost$1.GLOBAL_STATES_USAGE_EXCLUSIVE:
+            this._glBoostContext.disableAllGLState();
+            this._glBoostContext.reflectGlobalGLState();
+            break;
+          default:
+            break;
         }
       }
+    }, {
+      key: 'tearDownStates',
+      value: function tearDownStates() {}
     }, {
       key: 'setUniform',
       value: function setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
@@ -8692,6 +8747,14 @@
       } else {
         this._glContext = GLContext.getInstance(canvas);
       }
+
+      this._globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+      this._defaultGlobalStates = [3042, // gl.BLEND
+      2929 // gl.DEPTH_TEST
+      ];
+
+      this.restoreGlobalStatesToDefault();
     }
 
     babelHelpers.createClass(GLBoostLowContext, [{
@@ -8869,6 +8932,44 @@
         return depthTexture;
       }
     }, {
+      key: 'reflectGlobalGLState',
+      value: function reflectGlobalGLState() {
+        var gl = this._glContext.gl;
+
+        this.currentGlobalStates.forEach(function (state) {
+          gl.enable(state);
+        });
+
+        gl.depthFunc(gl.LEQUAL);
+
+        gl.blendEquation(gl.FUNC_ADD);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        gl.clearDepth(1);
+        gl.clearStencil(0);
+      }
+    }, {
+      key: 'disableAllGLState',
+      value: function disableAllGLState() {
+        var states = [3042, // gl.BLEND
+        2884, // gl.CULL_FACE
+        2929, // gl.DEPTH_TEST
+        32823, // gl.POLYGON_OFFSET_FILL
+        32926];
+
+        var glContext = this._glContext;
+        var gl = glContext.gl;
+
+        states.forEach(function (state) {
+          gl.disable(state);
+        });
+      }
+    }, {
+      key: 'restoreGlobalStatesToDefault',
+      value: function restoreGlobalStatesToDefault() {
+        this._currentGlobalStates = this._defaultGlobalStates.concat();
+      }
+    }, {
       key: 'glContext',
       get: function get() {
         return this._glContext;
@@ -8877,6 +8978,22 @@
       key: 'belongingCanvasId',
       get: function get() {
         return this._glContext.belongingCanvasId;
+      }
+    }, {
+      key: 'globalStatesUsage',
+      set: function set(usageMode) {
+        this._globalStatesUsage = usageMode;
+      },
+      get: function get() {
+        return this._globalStatesUsage;
+      }
+    }, {
+      key: 'currentGlobalStates',
+      set: function set(states) {
+        this._currentGlobalStates = states.concat();
+      },
+      get: function get() {
+        return this._currentGlobalStates.concat();
       }
     }]);
     return GLBoostLowContext;
