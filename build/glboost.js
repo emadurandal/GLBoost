@@ -8833,6 +8833,24 @@
         }
       }
     }, {
+      key: '_setUpMaterialStates',
+      value: function _setUpMaterialStates() {
+        var gl = this._gl;
+
+        if (this._states) {
+          if (this._states.enable) {
+            this._states.enable.forEach(function (state) {
+              gl.enable(state);
+            });
+          }
+          if (this._states.functions) {
+            for (var functionName in this._states.functions) {
+              gl[functionName].apply(gl, this._states.functions[functionName]);
+            }
+          }
+        }
+      }
+    }, {
       key: 'setUpStates',
       value: function setUpStates() {
         switch (this._glBoostContext.globalStatesUsage) {

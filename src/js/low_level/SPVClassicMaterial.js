@@ -245,6 +245,24 @@ export default class SPVClassicMaterial extends GLBoostObject {
     }
   }
 
+  _setUpMaterialStates() {
+    let gl = this._gl;
+
+    if (this._states) {
+      if (this._states.enable) {
+        this._states.enable.forEach((state)=>{
+          gl.enable(state);
+        });
+      }
+      if (this._states.functions) {
+        for (let functionName in this._states.functions) {
+          gl[functionName].apply(gl, this._states.functions[functionName]);
+        }
+      }
+    }
+
+  }
+
   setUpStates() {
     switch (this._glBoostContext.globalStatesUsage) {
       case GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING:
