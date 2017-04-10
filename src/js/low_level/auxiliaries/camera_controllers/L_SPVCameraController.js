@@ -47,6 +47,8 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+    this._shiftCameraTo = null;
+
     // Enable Flags
     this._enableRotation = true;
 
@@ -199,8 +201,8 @@ export default class L_SPVCameraController extends GLBoostObject {
     let newUpVec = null;
 
     if (this._isKeyUp || !this._isForceGrab) {
-      this._eyeVec = camera.eye;
-      this._centerVec = camera.center;
+      this._eyeVec = (this._shiftCameraTo !== null) ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
+      this._centerVec = (this._shiftCameraTo !== null) ? this._shiftCameraTo : camera.center;
       this._upVec = camera.up;
     }
 
@@ -389,4 +391,11 @@ export default class L_SPVCameraController extends GLBoostObject {
     return this._zFarAdjustingFactorBasedOnAABB;
   }
 
+  set shiftCameraTo(value) {
+    this._shiftCameraTo = value;
+  }
+
+  get shiftCameraTo() {
+    return this._shiftCameraTo;
+  }
 }

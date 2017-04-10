@@ -2823,6 +2823,7 @@
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
           shaderText += '  vec4 uvPosition = vec4((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0, 0.0, 1.0)+AABBCenterPosition;\n';
           shaderText += '  vec4 preTransformedPosition = uvPosition * unfoldUVRatio + vec4(aVertex_position, 1.0) * (1.0-unfoldUVRatio);\n';
+          shaderText += '  preTransformedPosition.y = (AABBLengthCenterToCorner-preTransformedPosition.y) * unfoldUVRatio + preTransformedPosition.y * (1.0-unfoldUVRatio);\n';
         } else {
           shaderText += '  vec4 preTransformedPosition = vec4(aVertex_position, 1.0);\n';
         }
@@ -3152,6 +3153,8 @@
 
       _this._unfoldUVRatio = 0.0;
 
+      _this._AABB = null;
+
       return _this;
     }
 
@@ -3173,13 +3176,15 @@
         gl.uniform1i(material.uniform_isWireframe, isWifeframe);
         gl.uniform1i(material.uniform_isWireframeOnShade, isWireframeOnShade);
 
+        var AABB = this._AABB !== null ? this._AABB : mesh.geometry.AABB;
+
         var uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
         if (uniformLocationAABBLengthCenterToCorner) {
-          gl.uniform1f(uniformLocationAABBLengthCenterToCorner, mesh.geometry.AABB.lengthCenterToCorner);
+          gl.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner);
         }
         var uniformLocationAABBCenterPosition = material.getUniform(glslProgram.hashId, 'uniform_AABBCenterPosition');
         if (uniformLocationAABBCenterPosition) {
-          gl.uniform4f(uniformLocationAABBCenterPosition, mesh.geometry.AABB.centerPoint.x, mesh.geometry.AABB.centerPoint.y, mesh.geometry.AABB.centerPoint.z, 0.0);
+          gl.uniform4f(uniformLocationAABBCenterPosition, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, 0.0);
         }
         var uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
         if (uniformLocationUnfoldUVRatio) {
@@ -3193,6 +3198,14 @@
       },
       get: function get() {
         return this._unfoldUVRatio;
+      }
+    }, {
+      key: 'AABB',
+      set: function set(aabb) {
+        this._AABB = aabb;
+      },
+      get: function get() {
+        return this._AABB;
       }
     }]);
     return WireframeShader;
@@ -6158,6 +6171,8 @@
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+      _this._shiftCameraTo = null;
+
       // Enable Flags
       _this._enableRotation = true;
 
@@ -6312,8 +6327,8 @@
         var newUpVec = null;
 
         if (this._isKeyUp || !this._isForceGrab) {
-          this._eyeVec = camera.eye;
-          this._centerVec = camera.center;
+          this._eyeVec = this._shiftCameraTo !== null ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
+          this._centerVec = this._shiftCameraTo !== null ? this._shiftCameraTo : camera.center;
           this._upVec = camera.up;
         }
 
@@ -6511,6 +6526,14 @@
       },
       get: function get() {
         return this._zFarAdjustingFactorBasedOnAABB;
+      }
+    }, {
+      key: 'shiftCameraTo',
+      set: function set(value) {
+        this._shiftCameraTo = value;
+      },
+      get: function get() {
+        return this._shiftCameraTo;
       }
     }]);
     return L_SPVCameraController;
@@ -7330,6 +7353,8 @@
 
       _this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
 
+      _this._shiftCameraTo = null;
+
       _this._onMouseDown = function (evt) {
         var rect = evt.target.getBoundingClientRect();
         _this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -7481,8 +7506,8 @@
         var newUpVec = null;
 
         if (this._isKeyUp || !this._isForceGrab) {
-          this._eyeVec = camera.eye;
-          this._centerVec = camera.center;
+          this._eyeVec = this._shiftCameraTo !== null ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
+          this._centerVec = this._shiftCameraTo !== null ? this._shiftCameraTo : camera.center;
           this._upVec = camera.up;
         }
 
@@ -7649,6 +7674,14 @@
       },
       get: function get() {
         return this._zFarAdjustingFactorBasedOnAABB;
+      }
+    }, {
+      key: 'shiftCameraTo',
+      set: function set(value) {
+        this._shiftCameraTo = value;
+      },
+      get: function get() {
+        return this._shiftCameraTo;
       }
     }]);
     return L_CameraController;
