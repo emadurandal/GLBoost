@@ -83,6 +83,8 @@ export default class WireframeShader extends Shader {
 
     this._unfoldUVRatio = 0.0;
 
+    this._AABB = null;
+
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
@@ -101,13 +103,15 @@ export default class WireframeShader extends Shader {
     gl.uniform1i(material.uniform_isWireframe, isWifeframe);
     gl.uniform1i(material.uniform_isWireframeOnShade, isWireframeOnShade);
 
+    let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
     let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
     if (uniformLocationAABBLengthCenterToCorner) {
-      gl.uniform1f(uniformLocationAABBLengthCenterToCorner, mesh.geometry.AABB.lengthCenterToCorner);
+      gl.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner);
     }
     let uniformLocationAABBCenterPosition = material.getUniform(glslProgram.hashId, 'uniform_AABBCenterPosition');
     if (uniformLocationAABBCenterPosition) {
-      gl.uniform4f(uniformLocationAABBCenterPosition, mesh.geometry.AABB.centerPoint.x, mesh.geometry.AABB.centerPoint.y, mesh.geometry.AABB.centerPoint.z, 0.0);
+      gl.uniform4f(uniformLocationAABBCenterPosition, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, 0.0);
     }
     let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
     if (uniformLocationUnfoldUVRatio) {
@@ -121,6 +125,14 @@ export default class WireframeShader extends Shader {
 
   get unfoldUVRatio() {
     return this._unfoldUVRatio;
+  }
+
+  set AABB(aabb) {
+    this._AABB = aabb;
+  }
+
+  get AABB() {
+    return this._AABB;
   }
 
 }
