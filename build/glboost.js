@@ -2821,9 +2821,8 @@
       value: function VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
         var shaderText = '';
         if (Shader._exist(f, GLBoost.TEXCOORD)) {
-          shaderText += '  vec4 uvPosition = vec4((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0, 0.0, 1.0)+AABBCenterPosition;\n';
+          shaderText += '  vec4 uvPosition = vec4(-(aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0, 0.0, 1.0)+AABBCenterPosition;\n';
           shaderText += '  vec4 preTransformedPosition = uvPosition * unfoldUVRatio + vec4(aVertex_position, 1.0) * (1.0-unfoldUVRatio);\n';
-          shaderText += '  preTransformedPosition.y = (AABBLengthCenterToCorner-preTransformedPosition.y) * unfoldUVRatio + preTransformedPosition.y * (1.0-unfoldUVRatio);\n';
         } else {
           shaderText += '  vec4 preTransformedPosition = vec4(aVertex_position, 1.0);\n';
         }
