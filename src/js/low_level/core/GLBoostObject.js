@@ -1,4 +1,4 @@
-import GLBoostMonitor from './GLBoostMonitor';
+import L_GLBoostMonitor from './L_GLBoostMonitor';
 
 export default class GLBoostObject {
   constructor(glBoostContext, toRegister = true) {
@@ -8,7 +8,7 @@ export default class GLBoostObject {
     this._setName();
     this._glBoostContext = glBoostContext;
     this._glContext = glBoostContext.glContext;
-    this._glBoostMonitor = GLBoostMonitor.getInstance();
+    this._glBoostMonitor = glBoostContext._glBoostMonitor;
     this._toRegister = toRegister;
     if (this._toRegister) {
       this._glBoostMonitor.registerGLBoostObject(this);

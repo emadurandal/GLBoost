@@ -1,7 +1,7 @@
 import GLContextWebGL1Impl from '../impl/GLContextWebGL1Impl';
 import GLContextWebGL2Impl from '../impl/GLContextWebGL2Impl';
 import GLExtensionsManager from './GLExtensionsManager';
-import GLBoostMonitor from './GLBoostMonitor';
+import L_GLBoostMonitor from './L_GLBoostMonitor';
 
 export default class GLContext {
 
@@ -28,7 +28,7 @@ export default class GLContext {
       this._height = canvas.height;
     }
 
-    this._monitor = GLBoostMonitor.getInstance();
+    this._monitor = L_GLBoostMonitor.getInstance();
   }
 
   static getInstance(canvas, gl, width, height) {

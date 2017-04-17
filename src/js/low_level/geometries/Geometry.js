@@ -595,6 +595,42 @@ export default class Geometry extends GLBoostObject {
     return this._AABB;
   }
 
+  isIndexed() {
+    return Geometry._iboArrayDic[this.toString()].length > 0;
+  }
+
+  getTriangleCount(mesh) {
+    let gl = this._glContext.gl;
+    let materials = this._getAppropriateMaterials(mesh);
+    let count = 0;
+    for (let i=0; i<materials.length;i++) {
+      let material = materials[i];
+      if (gl[this._primitiveType] === gl.TRIANGLES) {
+        if (this.isIndexed()) {
+          count += material.getVertexN(this.toString()) / 3;
+        } else {
+          count += this._vertexN / 3;
+        }
+      } else if (gl[this._primitiveType] === gl.TRIANGLE_STRIP) {
+        if (this.isIndexed()) {
+          count += material.getVertexN(this.toString()) - 2;
+        } else {
+          count += this._vertexN - 2;
+        }
+      }
+    }
+    return count;
+  }
+
+  getVertexCount() {
+    let gl = this._glContext.gl;
+    let count = 0;
+    if (this._vertices) {
+      count = this._vertices.position.length;
+    }
+    return count;
+  }
+
 }
 Geometry._vaoDic = {};
 Geometry._iboArrayDic = {};
