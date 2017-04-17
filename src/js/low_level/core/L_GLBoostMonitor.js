@@ -1,21 +1,22 @@
+import GLBoost from '../../globals';
 import MiscUtil from '../misc/MiscUtil';
 
 let singleton = Symbol();
-let singletonEnforcer = Symbol();
 
-export default class GLBoostMonitor {
+export default class L_GLBoostMonitor {
   constructor(enforcer) {
-    if (enforcer !== singletonEnforcer) {
+    if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
       throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
     }
 
     this._glBoostObjects = {};
     this._glResources = [];
+    L_GLBoostMonitor._singletonEnforcer = Symbol();
   }
 
   static getInstance() {
     if (!this[singleton]) {
-      this[singleton] = new GLBoostMonitor(singletonEnforcer);
+      this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
     }
     return this[singleton];
   }
@@ -138,4 +139,4 @@ export default class GLBoostMonitor {
 
 }
 
-GLBoost['GLBoostMonitor'] = GLBoostMonitor;
+GLBoost['L_GLBoostMonitor'] = L_GLBoostMonitor;

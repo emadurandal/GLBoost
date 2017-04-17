@@ -1,5 +1,5 @@
 import GLBoost from '../globals';
-import Renderer from '../middle_level/Renderer';
+import AbstractTexture from './textures/AbstractTexture';
 import Vector4 from './math/Vector4';
 import DecalShader from '../middle_level/shaders/DecalShader';
 import GLBoostObject from './core/GLBoostObject';
@@ -105,6 +105,20 @@ export default class ClassicMaterial extends GLBoostObject {
       return this._textureDic[userFlavorName];
     }
     return null;
+  }
+
+  getTextureNum() {
+    let count = 0;
+    for (let userFlavorName in this._textureDic) {
+      if (this._textureDic[userFlavorName] instanceof AbstractTexture) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  getTextureUserFlavorNames() {
+    return Object.keys(this._textureDic);
   }
 
   setAllTextureContributionRate(rateVec4) {

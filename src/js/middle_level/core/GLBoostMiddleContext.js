@@ -1,4 +1,5 @@
 import GLBoostLowContext from '../../low_level/core/GLBoostLowContext';
+import M_GLBoostMonitor from '../core/M_GLBoostMonitor';
 import Expression from '../expressions/Expression';
 import RenderPass from '../expressions/RenderPass';
 import Renderer from '../Renderer';
@@ -19,6 +20,8 @@ import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 export default class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, gl, width, height) {
     super(canvas, gl, width, height);
+
+    this._glBoostMonitor = M_GLBoostMonitor.getInstance();
   }
 
   createScene() {
