@@ -1,3 +1,4 @@
+import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
 import WireframeShader from './WireframeShader';
@@ -76,13 +77,14 @@ export class SPVDecalShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      if (material.getOneTexture()) {
+      let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+      if (diffuseTexture) {
         material.uniformTextureSamplerDic['uTexture'] = {};
         let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
         material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
-        material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
 
         // set texture unit 0 to the sampler
         gl.uniform1i( uTexture, 0);
@@ -108,13 +110,20 @@ export default class SPVDecalShader extends WireframeShader {
     let baseColor = material.baseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
 
-    var texture = material.getOneTexture();
+    var texture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
 
     var rateVec4 = new Vector4(1, 1, 1, 1);
     if (texture) {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
     }
+
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+
+    let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+    if (diffuseTexture) {
+      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+    }
+
   }
 }
 

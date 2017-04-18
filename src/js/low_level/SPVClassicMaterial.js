@@ -9,6 +9,7 @@ export default class SPVClassicMaterial extends GLBoostObject {
     super(glBoostContext);
 
     this._textureDic = {};
+    this._texturePurposeDic = {};
     this._textureContributionRateDic = {};
     this._gl = this._glContext.gl;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -92,14 +93,25 @@ export default class SPVClassicMaterial extends GLBoostObject {
     return this._shaderInstance;
   }
 
-  setTexture(texture) {
+  setTexture(texture, purpose) {
     this._textureDic[texture.userFlavorName] = texture;
+    this._texturePurposeDic[(typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE)] = texture.userFlavorName;
     this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._updateCount();
+  }
+
+  setTexturePurpose(userFlavorNameOfTexture, purpose) {
+    this._texturePurposeDic[userFlavorNameOfTexture] = purpose;
     this._updateCount();
   }
 
   getTexture(userFlavorName) {
     return this._textureDic[userFlavorName];
+  }
+
+  getTextureFromPurpose(purpose) {
+    let userFlavorName = this._texturePurposeDic[purpose];
+    return this.getTexture(userFlavorName);
   }
 
   getOneTexture() {
@@ -127,10 +139,12 @@ export default class SPVClassicMaterial extends GLBoostObject {
     for (let userFlavorName in this._textureContributionRateDic) {
       this._textureContributionRateDic[userFlavorName] = rateVec4;
     }
+    this._updateCount();
   }
 
   setTextureContributionRate(textureUserFlavorName, rateVec4) {
     this._textureContributionRateDic[textureUserFlavorName] = rateVec4;
+    this._updateCount();
   }
 
   getTextureContributionRate(textureUserFlavorName) {

@@ -639,7 +639,7 @@ export default class GLTFLoader {
           }
           if (typeof value === 'string') {
             let textureStr = value;
-            material.setTexture(textures[textureStr]);
+            material.setTexture(textures[textureStr], valueName);
           }
         }
       };

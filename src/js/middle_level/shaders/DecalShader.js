@@ -1,3 +1,4 @@
+import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 import WireframeShader from './WireframeShader';
 
@@ -72,13 +73,14 @@ export class DecalShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      if (material.getOneTexture()) {
+      let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+      if (diffuseTexture) {
         material.uniformTextureSamplerDic['uTexture'] = {};
         let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
         material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
-        material.uniformTextureSamplerDic['uTexture'].textureName = material.getOneTexture().userFlavorName;
+        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
 
         // set texture unit 0 to the sampler
         gl.uniform1i( uTexture, 0);
@@ -102,6 +104,11 @@ export default class DecalShader extends WireframeShader {
 
     let baseColor = material.baseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+
+    let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+    if (diffuseTexture) {
+      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+    }
   }
 }
 
