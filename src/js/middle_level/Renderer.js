@@ -65,7 +65,9 @@ export default class Renderer extends GLBoostObject {
       // draw opacity meshes.
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
-        mesh.draw(expression, lights, camera, renderPass.scene, index);
+        if (mesh.isVisible) {
+          mesh.draw(expression, lights, camera, renderPass.scene, index);
+        }
       });
 
       if (camera) {
@@ -74,7 +76,9 @@ export default class Renderer extends GLBoostObject {
       // draw transparent meshes.
       var transparentMeshes = renderPass.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
-        mesh.draw(expression, lights, camera, renderPass.scene, index);
+        if (mesh.isVisible) {
+          mesh.draw(expression, lights, camera, renderPass.scene, index);
+        }
       });
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);

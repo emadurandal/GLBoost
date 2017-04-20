@@ -30,6 +30,10 @@ export default class DrawKickerLocal {
 
     for (let i=0; i<materials.length;i++) {
       let material = materials[i];
+      if (!material.isVisible) {
+        continue;
+      }
+
       let materialUpdateStateString = material.getUpdateStateString();
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
         this._glslProgram = material.shaderInstance.glslProgram;

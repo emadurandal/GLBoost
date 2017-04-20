@@ -3,7 +3,7 @@ import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLExtensionsManager from './GLExtensionsManager';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
-import ClassicMaterial from '../ClassicMaterial';
+import ClassicMaterial from '../materials/ClassicMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_FrustumCamera from '../elements/cameras/L_FrustumCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
