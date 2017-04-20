@@ -32,6 +32,10 @@ export default class DrawKickerWorld {
 
     for (let i=0; i<materials.length;i++) {
       let material = materials[i];
+      if (!material.isVisible) {
+        continue;
+      }
+
       let materialUpdateStateString = material.getUpdateStateString();
       this._glslProgram = material.shaderInstance.glslProgram;
       gl.useProgram(this._glslProgram);

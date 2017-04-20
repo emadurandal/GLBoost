@@ -5,7 +5,7 @@ import Vector2 from '../low_level/math/Vector2';
 import Vector3 from '../low_level/math/Vector3';
 import Vector4 from '../low_level/math/Vector4';
 import GLBoostContext from '../low_level/core/GLBoostLowContext';
-import ClassicMaterial from '../low_level/ClassicMaterial';
+import ClassicMaterial from '../low_level/materials/ClassicMaterial';
 import Texture from '../low_level/textures/Texture';
 import BlendShapeGeometry from '../low_level/geometries/BlendShapeGeometry';
 import ObjLoader from './loader/ObjLoader';

@@ -28,6 +28,7 @@ export default class M_Element extends L_Element {
 
     this._camera = null;
     this._customFunction = null;
+    this._isVisible = true;
   }
 
 
@@ -578,5 +579,13 @@ export default class M_Element extends L_Element {
 
     instance._camera = this._camera;
     instance._customFunction = this._customFunction;
+  }
+
+  set isVisible(flg) {
+    this._isVisible = flg;
+  }
+
+  get isVisible() {
+    return this._isVisible;
   }
 }

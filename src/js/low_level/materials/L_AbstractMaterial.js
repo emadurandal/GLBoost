@@ -1,12 +1,16 @@
-import GLBoost from '../globals';
-import AbstractTexture from './textures/AbstractTexture';
-import Vector4 from './math/Vector4';
-import DecalShader from '../middle_level/shaders/DecalShader';
-import GLBoostObject from './core/GLBoostObject';
+import GLBoost from '../../globals';
+import AbstractTexture from '../textures/AbstractTexture';
+import Vector4 from '../math/Vector4';
+import DecalShader from '../../middle_level/shaders/DecalShader';
+import GLBoostObject from '../core/GLBoostObject';
 
-export default class ClassicMaterial extends GLBoostObject {
+export default class L_AbstractMaterial extends GLBoostObject {
   constructor(glBoostContext) {
     super(glBoostContext);
+
+    if (this.constructor === L_AbstractMaterial) {
+      throw new TypeError('Cannot construct L_AbstractMaterial instances directly.');
+    }
 
     this._textureDic = {};
     this._texturePurposeDic = {};
@@ -22,6 +26,7 @@ export default class ClassicMaterial extends GLBoostObject {
     this._vertexNofGeometries = {};
     this._states = null;
     this._shaderUniformLocationsOfExpressions = {};
+    this._isVisibleForGeometiesAssginedByThisMaterial = true;
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -309,6 +314,14 @@ export default class ClassicMaterial extends GLBoostObject {
   getUniform(hashIdOfGLSLProgram, uniformLocationName) {
     return this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName];
   }
+
+  set isVisible(flg) {
+    this._isVisibleForGeometiesAssginedByThisMaterial = flg;
+  }
+
+  get isVisible() {
+    return this._isVisibleForGeometiesAssginedByThisMaterial;
+  }
 }
 
-GLBoost['ClassicMaterial'] = ClassicMaterial;
+GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;
