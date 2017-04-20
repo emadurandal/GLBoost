@@ -606,7 +606,9 @@ export default class SPVGLTFLoader {
 
   _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
     let materialJson = json.materials[materialStr];
+    material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
+
     if (this._isKHRMaterialsCommon(materialJson)) {
       materialJson = materialJson.extensions.KHR_materials_common;
     }

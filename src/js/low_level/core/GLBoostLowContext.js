@@ -19,7 +19,7 @@ import Particle from '../primitives/Particle';
 import MiscUtil from '../misc/MiscUtil';
 import GLBoost from '../../globals';
 import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
-import SPVClassicMaterial from '../SPVClassicMaterial';
+import SPVClassicMaterial from '../materials/SPVClassicMaterial';
 
 export default class GLBoostLowContext {
   constructor(canvas, gl, width, height) {
