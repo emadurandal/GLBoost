@@ -108,10 +108,9 @@
 
       if (tick > 60) {
         switchSceneGraph();
+        expression.prepareToRender();
         tick = 0;
       }
-
-      expression.prepareToRender();
 
       var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
       var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
