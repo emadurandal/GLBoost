@@ -2,6 +2,7 @@ import M_PointLight from '../elements/lights/M_PointLight';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
+import Matrix33 from '../../low_level/math/Matrix33';
 import Geometry from '../../low_level/geometries/Geometry';
 import Shader from '../../low_level/shaders/Shader';
 import MiscUtil from '../../low_level/misc/MiscUtil';
@@ -24,7 +25,7 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {    var isVAOBound = false;
+  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -53,14 +54,34 @@ export default class DrawKickerWorld {
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
       gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
 
-      let world_m = mesh.transformMatrixAccumulatedAncestry;
+      let world_m;
+      let normal_m;
+      if (mesh.isAffectedByWorldMatrix) {
+        world_m = mesh.transformMatrixAccumulatedAncestry;
+        normal_m = mesh.normalMatrixAccumulatedAncestry;
+      } else {
+        world_m = Matrix44.identity();
+        normal_m = Matrix33.identity();
+      }
+
       Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      let normal_m = mesh.normalMatrixAccumulatedAncestry;
       Shader.trySettingMatrix33ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
       if (camera) {
-        let cameraMatrix = camera.lookAtRHMatrix();
-        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-        let projectionMatrix = camera.projectionRHMatrix();
+        let viewMatrix;
+        if (mesh.isAffectedByViewMatrix) {
+          let cameraMatrix = camera.lookAtRHMatrix();
+          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+        } else {
+          viewMatrix = Matrix44.identity();
+        }
+
+        let projectionMatrix;
+        if (mesh.isAffectedByProjectionMatrix) {
+          projectionMatrix = camera.projectionRHMatrix();
+        } else {
+          projectionMatrix = Matrix44.identity();
+        }
+
         Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
@@ -124,7 +145,9 @@ export default class DrawKickerWorld {
 
       if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-        gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+        let vertexN = material.getVertexN(geometry);
+        let indexBitSize = glem.elementIndexBitSize(gl);
+        gl.drawElements(gl[primitiveType], vertexN, indexBitSize, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(gl[primitiveType], 0, vertexN);

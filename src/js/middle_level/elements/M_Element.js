@@ -20,7 +20,10 @@ export default class M_Element extends L_Element {
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
     this._animationLine = {};
     this._transparentByUser = false;
-    this.opacity = 1.0;
+    this._opacity = 1.0;
+    this._isAffectedByWorldMatrix = true;
+    this._isAffectedByViewMatrix = true;
+    this._isAffectedByProjectionMatrix = true;
 
     this._activeAnimationLineName = null;
     this._currentAnimationInputValues = {};
@@ -588,4 +591,29 @@ export default class M_Element extends L_Element {
   get isVisible() {
     return this._isVisible;
   }
+
+  set isAffectedByWorldMatrix(flg) {
+    this._isAffectedByWorldMatrix = flg;
+  }
+
+  get isAffectedByWorldMatrix() {
+    return this._isAffectedByWorldMatrix;
+  }
+
+  set isAffectedByViewMatrix(flg) {
+    this._isAffectedByViewMatrix = flg;
+  }
+
+  get isAffectedByViewMatrix() {
+    return this._isAffectedByViewMatrix;
+  }
+
+  set isAffectedByProjectionMatrix(flg) {
+    this._isAffectedByProjectionMatrix = flg;
+  }
+
+  get isAffectedByProjectionMatrix() {
+    return this._isAffectedByProjectionMatrix;
+  }
+
 }
