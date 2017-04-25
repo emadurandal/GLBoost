@@ -16,7 +16,6 @@ import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
 import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
-import MiscUtil from '../misc/MiscUtil';
 import GLBoost from '../../globals';
 import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
 import SPVClassicMaterial from '../materials/SPVClassicMaterial';

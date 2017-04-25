@@ -54,10 +54,25 @@ export default class DrawKickerLocal {
       gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
 
       if (camera) {
-        var viewMatrix = camera.lookAtRHMatrix();
-        var projectionMatrix = camera.projectionRHMatrix();
-        var world_m = mesh.transformMatrixAccumulatedAncestry;
-        var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
+        let world_m;
+        if (mesh.isAffectedByWorldMatrix) {
+          world_m = mesh.transformMatrixAccumulatedAncestry;
+        } else {
+          world_m = Matrix44.identity();
+        }
+        let viewMatrix;
+        if (mesh.isAffectedByViewMatrix) {
+          viewMatrix = camera.lookAtRHMatrix();
+        } else {
+          viewMatrix = Matrix44.identity();
+        }
+        let projectionMatrix;
+        if (mesh.isAffectedByProjectionMatrix) {
+          projectionMatrix = camera.projectionRHMatrix();
+        } else {
+          projectionMatrix = Matrix44.identity();
+        }
+        let pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
         Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
         Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
       }
