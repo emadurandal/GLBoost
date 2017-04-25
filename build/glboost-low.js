@@ -1756,6 +1756,36 @@
 
   GLBoost$1['Vector3'] = Vector3;
 
+  var ArrayUtil = function () {
+    function ArrayUtil() {
+      babelHelpers.classCallCheck(this, ArrayUtil);
+    }
+
+    babelHelpers.createClass(ArrayUtil, null, [{
+      key: 'merge',
+      value: function merge() {
+        var key,
+            result = false;
+        if (arguments && arguments.length > 0) {
+          result = [];
+          for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
+              for (key in arguments[i]) {
+                if (isFinite(key)) {
+                  result.push(arguments[i][key]);
+                } else {
+                  result[key] = arguments[i][key];
+                }
+              }
+            }
+          }
+        }
+        return result;
+      }
+    }]);
+    return ArrayUtil;
+  }();
+
   var GLExtensionsManager = function () {
     function GLExtensionsManager(glContext) {
       babelHelpers.classCallCheck(this, GLExtensionsManager);
@@ -2794,6 +2824,1215 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
+  var VertexLocalShaderSource = function () {
+    function VertexLocalShaderSource() {
+      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
+    }
+
+    babelHelpers.createClass(VertexLocalShaderSource, [{
+      key: 'VSDefine_VertexLocalShaderSource',
+      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
+        var shaderText = in_ + ' vec3 aVertex_position;\n';
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 aVertex_normal;\n';
+          shaderText += out_ + ' vec3 v_normal;\n';
+        }
+        shaderText += out_ + ' vec4 position;\n';
+        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_VertexLocalShaderSource',
+      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (existCamera_f) {
+          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+          shaderText += '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
+        } else {
+          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
+        }
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += '  v_normal = aVertex_normal;\n';
+        }
+        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_VertexLocalShaderSource',
+      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+        if (lights.length > 0) {
+          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
+          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
+        }
+        if (Shader._exist(f, GLBoost.NORMAL)) {
+          shaderText += in_ + ' vec3 v_normal;\n';
+        }
+        shaderText += in_ + ' vec4 position;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_VertexLocalShaderSource',
+      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        if (existCamera_f) {
+          material.setUniform(shaderProgram.hashId, 'uniform_modelViewProjectionMatrix', gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
+          material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
+        }
+
+        for (var i = 0; i < lights.length; i++) {
+          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
+          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return VertexLocalShaderSource;
+  }();
+
+  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
+
+  var AnimationUtil = function () {
+    function AnimationUtil() {
+      babelHelpers.classCallCheck(this, AnimationUtil);
+    }
+
+    babelHelpers.createClass(AnimationUtil, null, [{
+      key: "lerp",
+      value: function lerp(start, end, ratio, componentN) {
+        if (componentN === 1) {
+          return start * (1 - ratio) + end * ratio;
+        } else {
+          if (start instanceof Quaternion) {
+            return Quaternion.qlerp(start, end, ratio);
+          } else {
+            return start.multiply(1 - ratio).add(end.multiply(ratio));
+          }
+        }
+      }
+    }, {
+      key: "interpolate",
+      value: function interpolate(inputArray, outputArray, input, componentN) {
+        if (input < inputArray[0]) {
+          return outputArray[0].clone(); // out of range!
+        }
+        if (inputArray[inputArray.length - 1] <= input) {
+          return outputArray[outputArray.length - 1].clone(); // out of range!
+        }
+
+        for (var i = 0; i < inputArray.length; i++) {
+          if (typeof inputArray[i + 1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i + 1]) {
+            var ratio = (input - inputArray[i]) / (inputArray[i + 1] - inputArray[i]);
+            var resultValue = this.lerp(outputArray[i].clone(), outputArray[i + 1].clone(), ratio, componentN);
+            return resultValue;
+          }
+        }
+        return outputArray[0].clone(); // out of range!
+      }
+    }]);
+    return AnimationUtil;
+  }();
+
+  var L_Element = function (_GLBoostObject) {
+    babelHelpers.inherits(L_Element, _GLBoostObject);
+
+    function L_Element(glBoostContext) {
+      var toRegister = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      babelHelpers.classCallCheck(this, L_Element);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (L_Element.__proto__ || Object.getPrototypeOf(L_Element)).call(this, glBoostContext, toRegister));
+
+      _this._translate = Vector3.zero();
+      _this._scale = new Vector3(1, 1, 1);
+
+      _this._rotate = Vector3.zero();
+      _this._quaternion = new Quaternion(0, 0, 0, 1);
+      _this._matrix = Matrix44$1.identity();
+
+      _this._finalMatrix = Matrix44$1.identity();
+
+      _this._dirtyAsElement = true;
+      _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
+
+      return _this;
+    }
+
+    babelHelpers.createClass(L_Element, [{
+      key: '_needUpdate',
+      value: function _needUpdate() {
+        this._dirtyAsElement = true;
+      }
+    }, {
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(mat) {
+        this._matrix = mat.clone();
+        this._currentCalcMode = 'matrix';
+        this._needUpdate();
+      }
+    }, {
+      key: '_copy',
+      value: function _copy(instance) {
+        babelHelpers.get(L_Element.prototype.__proto__ || Object.getPrototypeOf(L_Element.prototype), '_copy', this).call(this, instance);
+
+        instance._translate = this._translate.clone();
+        instance._scale = this._scale.clone();
+        instance._rotate = this._rotate.clone();
+        instance._quaternion = this._quaternion.clone();
+        instance._matrix = this._matrix.clone();
+        instance._finalMatrix = this._finalMatrix.clone();
+        instance._dirtyAsElement = this._dirtyAsElement;
+        instance._currentCalcMode = this._currentCalcMode;
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        if (this._currentCalcMode === 'matrix') {
+          this.matrix.m03 = vec.x;
+          this.matrix.m13 = vec.y;
+          this.matrix.m23 = vec.z;
+        }
+        this._translate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._translate;
+      }
+    }, {
+      key: 'rotate',
+      set: function set(vec) {
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
+          this._needUpdate();
+        }
+        if (this._rotate.isEqual(vec)) {
+          return;
+        }
+        this._rotate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._rotate;
+      }
+    }, {
+      key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
+        }
+        this._scale = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._scale;
+      }
+    }, {
+      key: 'matrix',
+      get: function get() {
+        return this._matrix;
+      }
+    }, {
+      key: 'quaternion',
+      set: function set(quat) {
+        if (this._currentCalcMode !== 'quaternion') {
+          this._currentCalcMode = 'quaternion';
+          this._needUpdate();
+        }
+        if (this._quaternion.isEqual(quat)) {
+          return;
+        }
+        this._quaternion = quat;
+        this._needUpdate();
+      },
+      get: function get() {
+        return this._quaternion;
+      }
+    }, {
+      key: 'transformMatrix',
+      get: function get() {
+        if (this._dirtyAsElement) {
+          var matrix = Matrix44$1.identity();
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+
+          this._dirtyAsElement = false;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'currentCalcMode',
+      set: function set(mode) {
+        this._currentCalcMode = mode;
+      },
+      get: function get() {
+        return this._currentCalcMode;
+      }
+    }]);
+    return L_Element;
+  }(GLBoostObject);
+
+  var M_Element = function (_L_Element) {
+    babelHelpers.inherits(M_Element, _L_Element);
+
+    function M_Element(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_Element);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_Element.__proto__ || Object.getPrototypeOf(M_Element)).call(this, glBoostContext));
+
+      _this._parent = null;
+      _this._invMatrix = Matrix44$1.identity();
+      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
+      _this._calculatedInverseMatrix = false;
+      _this._updateCountAsElement = 0;
+      _this._accumulatedAncestryNameWithUpdateInfoString = '';
+      _this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
+      _this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+      _this._animationLine = {};
+      _this._transparentByUser = false;
+      _this._opacity = 1.0;
+      _this._isAffectedByWorldMatrix = true;
+      _this._isAffectedByViewMatrix = true;
+      _this._isAffectedByProjectionMatrix = true;
+
+      _this._activeAnimationLineName = null;
+      _this._currentAnimationInputValues = {};
+      _this._toInheritCurrentAnimationInputValue = true;
+
+      _this._camera = null;
+      _this._customFunction = null;
+      _this._isVisible = true;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_Element, [{
+      key: '_needUpdate',
+      value: function _needUpdate() {
+        this._dirtyAsElement = true;
+        this._calculatedInverseMatrix = false;
+        this._updateCountAsElement++;
+      }
+    }, {
+      key: 'setCurrentAnimationValue',
+
+
+      /**
+       * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+       * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+       * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
+       * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
+       */
+      value: function setCurrentAnimationValue(inputName, inputValue) {
+        this._setDirtyToAnimatedElement(inputName);
+        this._currentAnimationInputValues[inputName] = inputValue;
+      }
+    }, {
+      key: '_getCurrentAnimationInputValue',
+      value: function _getCurrentAnimationInputValue(inputName) {
+        var value = this._currentAnimationInputValues[inputName];
+        if (typeof value !== 'undefined') {
+          return value;
+        } else if (this._toInheritCurrentAnimationInputValue) {
+          return this._parent._getCurrentAnimationInputValue(inputName);
+        } else {
+          return -1;
+        }
+      }
+    }, {
+      key: 'removeCurrentAnimationValue',
+      value: function removeCurrentAnimationValue(inputName) {
+        delete this._currentAnimationInputValues[inputName];
+      }
+    }, {
+      key: '_setDirtyToAnimatedElement',
+      value: function _setDirtyToAnimatedElement(inputName) {
+        if (this.hasAnimation(inputName)) {
+          this._needUpdate();
+        }
+      }
+    }, {
+      key: '_getAnimatedTransformValue',
+      value: function _getAnimatedTransformValue(value, animation, type) {
+        if (typeof animation !== 'undefined' && animation[type]) {
+          return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+        } else {
+          //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
+          if (type == 'quaternion') {
+            //        return new Quaternion(0, 0, 0, 1);
+          }
+          return this['_' + type];
+        }
+      }
+    }, {
+      key: 'getTranslateAt',
+      value: function getTranslateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
+      }
+    }, {
+      key: 'getTranslateNotAnimated',
+      value: function getTranslateNotAnimated() {
+        return this._translate;
+      }
+    }, {
+      key: 'getRotateAt',
+      value: function getRotateAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
+      }
+    }, {
+      key: 'getRotateNotAnimated',
+      value: function getRotateNotAnimated() {
+        return this._rotate;
+      }
+    }, {
+      key: 'getQuaternionNotAnimated',
+      value: function getQuaternionNotAnimated() {
+        return this._quaternion;
+      }
+    }, {
+      key: 'getQuaternionAt',
+      value: function getQuaternionAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
+      }
+    }, {
+      key: 'getScaleAt',
+      value: function getScaleAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
+      }
+    }, {
+      key: 'getScaleNotAnimated',
+      value: function getScaleNotAnimated() {
+        return this._scale;
+      }
+    }, {
+      key: 'getMatrixAt',
+      value: function getMatrixAt(lineName, value) {
+        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
+      }
+    }, {
+      key: 'getMatrixNotAnimated',
+      value: function getMatrixNotAnimated() {
+        return this._matrix;
+      }
+    }, {
+      key: 'getTransformMatrixOnlyRotateOn',
+      value: function getTransformMatrixOnlyRotateOn(value) {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.getMatrixAt('time', value);
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44$1.rotateX(this.getRotate('time', value).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', value).z));
+        }
+
+        return rotationMatrix.clone();
+      }
+    }, {
+      key: '_accumulateMyAndParentNameWithUpdateInfo',
+      value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.toStringWithUpdateInfo();
+        } else {
+          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentTransformMatrices',
+      value: function _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44$1.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44$1.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentTransformMatricesInInverseOrder',
+      value: function _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrix;
+          } else {
+            return Matrix44$1.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44$1.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrix;
+          }
+          return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
+        }
+      }
+    }, {
+      key: '_multiplyMyAndParentRotateMatrices',
+      value: function _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+        if (currentElem._parent === null) {
+          if (withMySelf) {
+            return currentElem.transformMatrixOnlyRotate;
+          } else {
+            return Matrix44$1.identity();
+          }
+        } else {
+          var currentMatrix = Matrix44$1.identity();
+          if (withMySelf) {
+            currentMatrix = currentElem.transformMatrixOnlyRotate;
+          }
+          return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+        }
+      }
+    }, {
+      key: '_accumulateMyAndParentOpacity',
+      value: function _accumulateMyAndParentOpacity(currentElem) {
+        if (currentElem._parent === null) {
+          return currentElem.opacity;
+        } else {
+          return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
+        }
+      }
+    }, {
+      key: 'toStringWithUpdateInfo',
+
+
+      // used by library (not Application)
+      value: function toStringWithUpdateInfo() {
+        //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
+        return this._instanceName + this._updateCountAsElement; // faster
+      }
+    }, {
+      key: 'setAnimationAtLine',
+      value: function setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+        var outputComponentN = 0;
+        if (outputArray[0] instanceof Vector2) {
+          outputComponentN = 2;
+        } else if (outputArray[0] instanceof Vector3) {
+          outputComponentN = 3;
+        } else if (outputArray[0] instanceof Vector4) {
+          outputComponentN = 4;
+        } else if (outputArray[0] instanceof Quaternion) {
+          outputComponentN = 4;
+        } else {
+          outputComponentN = 1;
+        }
+        if (!this._animationLine[lineName]) {
+          this._animationLine[lineName] = {};
+        }
+        this._animationLine[lineName][attributeName] = {
+          input: inputArray,
+          output: outputArray,
+          outputAttribute: attributeName,
+          outputComponentN: outputComponentN
+        };
+      }
+    }, {
+      key: 'setActiveAnimationLine',
+      value: function setActiveAnimationLine(lineName) {
+        this._activeAnimationLineName = lineName;
+      }
+    }, {
+      key: 'hasAnimation',
+      value: function hasAnimation(lineName) {
+        if (this._animationLine[lineName]) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'prepareToRender',
+      value: function prepareToRender() {}
+    }, {
+      key: '_copy',
+      value: function _copy(instance) {
+        babelHelpers.get(M_Element.prototype.__proto__ || Object.getPrototypeOf(M_Element.prototype), '_copy', this).call(this, instance);
+
+        instance._parent = this._parent;
+        instance._invMatrix = this._invMatrix.clone();
+        instance._matrixGetMode = this._matrixGetMode;
+        instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
+        instance._updateCountAsElement = this._updateCountAsElement;
+        instance._accumulatedAncestryNameWithUpdateInfoString = this._accumulatedAncestryNameWithUpdateInfoString;
+        instance._accumulatedAncestryNameWithUpdateInfoStringNormal = this._accumulatedAncestryNameWithUpdateInfoStringNormal;
+        instance._accumulatedAncestryNameWithUpdateInfoStringInv = this._accumulatedAncestryNameWithUpdateInfoStringInv;
+        instance._animationLine = {};
+
+        for (var lineName in this._animationLine) {
+          instance._animationLine[lineName] = {};
+          for (var attributeName in this._animationLine[lineName]) {
+            instance._animationLine[lineName][attributeName] = {};
+            instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
+
+            var instanceOutput = [];
+            var thisOutput = this._animationLine[lineName][attributeName].output;
+            for (var i = 0; i < thisOutput.length; i++) {
+              instanceOutput.push(typeof thisOutput[i] === 'number' ? thisOutput[i] : thisOutput[i].clone());
+            }
+            instance._animationLine[lineName][attributeName].output = instanceOutput;
+
+            instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
+
+            instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
+          }
+        }
+
+        instance._transparentByUser = this._transparentByUser;
+        instance.opacity = this.opacity;
+        instance._activeAnimationLineName = this._activeAnimationLineName;
+
+        instance._currentAnimationInputValues = {};
+        for (var inputName in this._currentAnimationInputValues) {
+          instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
+        }
+
+        instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
+
+        instance._camera = this._camera;
+        instance._customFunction = this._customFunction;
+      }
+    }, {
+      key: 'updateCountAsElement',
+      get: function get() {
+        return this._updateCountAsElement;
+      }
+    }, {
+      key: 'toInheritCurrentAnimationInputValue',
+      set: function set(flg) {
+        this._toInheritCurrentAnimationInputValue = flg;
+      },
+      get: function get() {
+        return this._toInheritCurrentAnimationInputValue;
+      }
+    }, {
+      key: 'translate',
+      set: function set(vec) {
+        if (this._translate.isEqual(vec)) {
+          return;
+        }
+        if (this._currentCalcMode === 'matrix') {
+          this.matrix.m03 = vec.x;
+          this.matrix.m13 = vec.y;
+          this.matrix.m23 = vec.z;
+        }
+        this._translate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._translate;
+        }
+      }
+    }, {
+      key: 'rotate',
+      set: function set(vec) {
+        if (this._currentCalcMode !== 'euler') {
+          this._currentCalcMode = 'euler';
+          this._needUpdate();
+        }
+        if (this._rotate.isEqual(vec)) {
+          return;
+        }
+        this._rotate = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._rotate;
+        }
+      }
+    }, {
+      key: 'quaternion',
+      set: function set(quat) {
+        if (this._currentCalcMode !== 'quaternion') {
+          this._currentCalcMode = 'quaternion';
+          this._needUpdate();
+        }
+        if (this._quaternion.isEqual(quat)) {
+          return;
+        }
+        this._quaternion = quat;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._quaternion;
+        }
+      }
+    }, {
+      key: 'scale',
+      set: function set(vec) {
+        if (this._scale.isEqual(vec)) {
+          return;
+        }
+        this._scale = vec;
+        this._needUpdate();
+      },
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._scale;
+        }
+      }
+    }, {
+      key: 'matrix',
+      get: function get() {
+        if (this._activeAnimationLineName) {
+          return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+        } else {
+          return this._matrix;
+        }
+      }
+    }, {
+      key: 'transformMatrix',
+      get: function get() {
+        var input = -1;
+        if (this._activeAnimationLineName !== null) {
+          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+        }
+        if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
+          var matrix = Matrix44$1.identity();
+
+          if (this._currentCalcMode === 'matrix') {
+            this._finalMatrix = matrix.multiply(this.matrix);
+            this._dirtyAsElement = false;
+            return this._finalMatrix.clone();
+          }
+
+          var rotationMatrix = null;
+          if (this._currentCalcMode === 'quaternion') {
+            rotationMatrix = this.quaternion.rotationMatrix;
+          } else {
+            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
+          }
+
+          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
+          this._finalMatrix.m03 = this.translate.x;
+          this._finalMatrix.m13 = this.translate.y;
+          this._finalMatrix.m23 = this.translate.z;
+
+          this._dirtyAsElement = false;
+          this._matrixGetMode = 'animated_' + input;
+        }
+
+        return this._finalMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixOnlyRotate',
+      get: function get() {
+
+        var rotationMatrix = null;
+        if (this._currentCalcMode === 'quaternion') {
+          rotationMatrix = this.quaternion.rotationMatrix;
+        } else if (this._currentCalcMode === 'matrix') {
+          rotationMatrix = this.matrix;
+          rotationMatrix.m03 = 0;
+          rotationMatrix.m13 = 0;
+          rotationMatrix.m23 = 0;
+          rotationMatrix.m30 = 0;
+          rotationMatrix.m31 = 0;
+          rotationMatrix.m32 = 0;
+        } else {
+          rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
+        }
+
+        return rotationMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixOnlyRotateOnInit',
+      get: function get() {
+        return this.getTransformMatrixOnlyRotateOn(0);
+      }
+    }, {
+      key: 'inverseTransformMatrix',
+      get: function get() {
+        if (!this._calculatedInverseMatrix) {
+          this._invMatrix = this.transformMatrix.invert();
+          this._calculatedInverseMatrix = true;
+        }
+        return this._invMatrix.clone();
+      }
+    }, {
+      key: 'transformMatrixAccumulatedAncestry',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._matrixAccumulatedAncestry.clone();
+      }
+    }, {
+      key: 'transformMatrixAccumulatedAncestryWithoutMySelf',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
+          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+        }
+
+        return this._matrixAccumulatedAncestry.clone();
+      }
+    }, {
+      key: 'normalMatrixAccumulatedAncestry',
+      get: function get() {
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+          var world_m = this._multiplyMyAndParentTransformMatrices(this, true);
+          this._normalMatrixAccumulatedAncestry = Matrix44$1.invert(world_m).transpose().toMatrix33();
+          this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
+        }
+
+        return this._normalMatrixAccumulatedAncestry.clone();
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
+      get: function get() {
+        if (this._parent === null) {
+          return Matrix44$1.identity();
+        }
+
+        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+        //console.log(tempString);
+        if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
+          this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
+          this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
+        }
+
+        return this._invMatrixAccumulatedAncestry.clone();
+      }
+    }, {
+      key: 'rotateMatrixAccumulatedAncestry',
+      get: function get() {
+        /*
+         var mat = this._multiplyMyAndParentTransformMatrices(this);
+         var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
+         var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
+         var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
+          return new Matrix44(
+         mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
+         mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
+         mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
+         0, 0, 0, 1
+         );*/
+        return this._multiplyMyAndParentRotateMatrices(this, true);
+      }
+    }, {
+      key: 'inverseTransformMatrixAccumulatedAncestry',
+      get: function get() {
+        return this._multiplyMyAndParentTransformMatrices(this, true).invert();
+      }
+    }, {
+      key: 'opacityAccumulatedAncestry',
+      get: function get() {
+        return this._accumulateMyAndParentOpacity(this);
+      }
+    }, {
+      key: 'opacity',
+      set: function set(opacity) {
+        this._opacity = opacity;
+      },
+      get: function get() {
+        return this._opacity;
+      }
+    }, {
+      key: 'transparent',
+      set: function set(flg) {
+        this._transparentByUser = flg;
+      }
+    }, {
+      key: 'dirty',
+      set: function set(flg) {
+        this._dirtyAsElement = flg;
+        if (flg) {
+          this._needUpdate();
+        }
+      }
+    }, {
+      key: 'parent',
+      get: function get() {
+        return this._parent;
+      }
+    }, {
+      key: 'camera',
+      set: function set(camera) {
+        this._camera = camera;
+      },
+      get: function get() {
+        return this._camera;
+      }
+    }, {
+      key: 'customFunction',
+      set: function set(func) {
+        this._customFunction = func;
+      },
+      get: function get() {
+        return this._customFunction;
+      }
+    }, {
+      key: 'isVisible',
+      set: function set(flg) {
+        this._isVisible = flg;
+      },
+      get: function get() {
+        return this._isVisible;
+      }
+    }, {
+      key: 'isAffectedByWorldMatrix',
+      set: function set(flg) {
+        this._isAffectedByWorldMatrix = flg;
+      },
+      get: function get() {
+        return this._isAffectedByWorldMatrix;
+      }
+    }, {
+      key: 'isAffectedByViewMatrix',
+      set: function set(flg) {
+        this._isAffectedByViewMatrix = flg;
+      },
+      get: function get() {
+        return this._isAffectedByViewMatrix;
+      }
+    }, {
+      key: 'isAffectedByProjectionMatrix',
+      set: function set(flg) {
+        this._isAffectedByProjectionMatrix = flg;
+      },
+      get: function get() {
+        return this._isAffectedByProjectionMatrix;
+      }
+    }]);
+    return M_Element;
+  }(L_Element);
+
+  /**
+   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
+   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
+  var M_AbstractLight = function (_M_Element) {
+    babelHelpers.inherits(M_AbstractLight, _M_Element);
+
+    function M_AbstractLight(glBoostContext) {
+      babelHelpers.classCallCheck(this, M_AbstractLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_AbstractLight.__proto__ || Object.getPrototypeOf(M_AbstractLight)).call(this, glBoostContext));
+
+      if (_this.constructor === M_AbstractLight) {
+        throw new TypeError('Cannot construct AbstractLight instances directly.');
+      }
+
+      _this._gl = _this._glContext.gl;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_AbstractLight, [{
+      key: 'prepareToRender',
+      value: function prepareToRender() {
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      }
+    }]);
+    return M_AbstractLight;
+  }(M_Element);
+
+  /**
+   * [en] This is a Directional Light class.<br>
+   * [ja] 平行光源クラスです。
+   */
+
+  var M_DirectionalLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_DirectionalLight, _M_AbstractLight);
+
+    /**
+     * [en] The constructor of DirectionalLight class. <br>
+     * [ja] DirectionalLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+     */
+    function M_DirectionalLight(glBoostContext, intensity, direction) {
+      babelHelpers.classCallCheck(this, M_DirectionalLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_DirectionalLight.__proto__ || Object.getPrototypeOf(M_DirectionalLight)).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+      _this._direction = direction;
+      return _this;
+    }
+
+    babelHelpers.createClass(M_DirectionalLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }, {
+      key: 'direction',
+      set: function set(vec) {
+        this._direction = vec;
+        if (this._camera) {
+          if (this._camera.customFunction) {
+            this._camera.customFunction(this);
+          }
+        }
+      },
+      get: function get() {
+        return this._direction;
+      }
+    }]);
+    return M_DirectionalLight;
+  }(M_AbstractLight);
+
+  /**
+   * [en] This is a Point Light class.<br>
+   * [ja] 点光源クラスです。
+   */
+
+  var M_PointLight = function (_M_AbstractLight) {
+    babelHelpers.inherits(M_PointLight, _M_AbstractLight);
+
+    /**
+     * [en] The constructor of PointLight class. <br>
+     * [ja] PointLightクラスのコンストラクタ
+     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
+     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+    function M_PointLight(glBoostContext, intensity) {
+      babelHelpers.classCallCheck(this, M_PointLight);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_PointLight.__proto__ || Object.getPrototypeOf(M_PointLight)).call(this, glBoostContext));
+
+      _this._intensity = intensity;
+
+      return _this;
+    }
+
+    babelHelpers.createClass(M_PointLight, [{
+      key: 'intensity',
+      set: function set(vec) {
+        this._intensity = vec;
+      },
+      get: function get() {
+        return this._intensity;
+      }
+    }]);
+    return M_PointLight;
+  }(M_AbstractLight);
+
+  var singleton$1 = Symbol();
+  var singletonEnforcer = Symbol();
+
+  var DrawKickerLocal = function () {
+    function DrawKickerLocal(enforcer) {
+      babelHelpers.classCallCheck(this, DrawKickerLocal);
+
+      if (enforcer !== singletonEnforcer) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+      this._glslProgram = null;
+    }
+
+    babelHelpers.createClass(DrawKickerLocal, [{
+      key: 'draw',
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+        var isVAOBound = false;
+        if (DrawKickerLocal._lastGeometry !== geometryName) {
+          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
+        }
+
+        for (var i = 0; i < materials.length; i++) {
+          var material = materials[i];
+          if (!material.isVisible) {
+            continue;
+          }
+
+          var materialUpdateStateString = material.getUpdateStateString();
+          if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
+            this._glslProgram = material.shaderInstance.glslProgram;
+            gl.useProgram(this._glslProgram);
+          }
+          var glslProgram = this._glslProgram;
+
+          if (!isVAOBound) {
+            if (DrawKickerLocal._lastGeometry !== geometryName) {
+              for (var attribName in vboDic) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
+                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+              }
+            }
+          }
+
+          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+          gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
+
+          if (camera) {
+            var world_m = void 0;
+            if (mesh.isAffectedByWorldMatrix) {
+              world_m = mesh.transformMatrixAccumulatedAncestry;
+            } else {
+              world_m = Matrix44.identity();
+            }
+            var viewMatrix = void 0;
+            if (mesh.isAffectedByViewMatrix) {
+              viewMatrix = camera.lookAtRHMatrix();
+            } else {
+              viewMatrix = Matrix44.identity();
+            }
+            var projectionMatrix = void 0;
+            if (mesh.isAffectedByProjectionMatrix) {
+              projectionMatrix = camera.projectionRHMatrix();
+            } else {
+              projectionMatrix = Matrix44.identity();
+            }
+            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION', pvm_m.flatten());
+          }
+
+          if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
+            if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
+              var cameraPosInLocalCoord = null;
+              if (camera) {
+                var cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+              } else {
+                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
+              }
+              gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+            }
+
+            for (var j = 0; j < lights.length; j++) {
+              if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j) && material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j)) {
+                var lightVec = null;
+                var isPointLight = -9999;
+                if (lights[j] instanceof M_PointLight) {
+                  lightVec = new Vector4(0, 0, 0, 1);
+                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  isPointLight = 1.0;
+                } else if (lights[j] instanceof M_DirectionalLight) {
+                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  lightVec.w = 0.0;
+                  isPointLight = 0.0;
+                }
+
+                var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+
+                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+              }
+            }
+          }
+
+          var isMaterialSetupDone = true;
+
+          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
+            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh);
+            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
+          }
+
+          if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
+            if (material) {
+              isMaterialSetupDone = material.setUpTexture();
+            }
+          }
+          if (!isMaterialSetupDone) {
+            return;
+          }
+
+          if (geometry.isIndexed()) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
+            gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+          } else {
+            gl.drawArrays(gl[primitiveType], 0, vertexN);
+          }
+
+          DrawKickerLocal._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
+        }
+
+        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        DrawKickerLocal._lastGeometry = geometryName;
+        DrawKickerLocal._lastRenderPassIndex = renderPassIndex;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton$1]) {
+          this[singleton$1] = new DrawKickerLocal(singletonEnforcer);
+        }
+        return this[singleton$1];
+      }
+    }]);
+    return DrawKickerLocal;
+  }();
+
+  DrawKickerLocal._lastMaterialUpdateStateString = null;
+  DrawKickerLocal._lastGeometry = null;
+  DrawKickerLocal._lastRenderPassIndex = -1;
+
   var VertexWorldShaderSource = function () {
     function VertexWorldShaderSource() {
       babelHelpers.classCallCheck(this, VertexWorldShaderSource);
@@ -2837,9 +4076,9 @@
         }
         if (existCamera_f) {
           shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-          shaderText += '  gl_Position = pvwMatrix * preTransformedPosition;\n';
+          shaderText += '  gl_Position = pvwMatrix * preTransformedPosition*vec4(0.9, 0.9, 0.9, 1.0);\n';
         } else {
-          shaderText += '  gl_Position = worldMatrix * preTransformedPosition;\n';
+          shaderText += '  gl_Position = worldMatrix * preTransformedPosition*vec4(0.9, 0.9, 0.9, 1.0);\n';
         }
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
@@ -2914,6 +4153,1211 @@
   }();
 
   GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
+
+  var singleton$2 = Symbol();
+  var singletonEnforcer$1 = Symbol();
+
+  var DrawKickerWorld = function () {
+    function DrawKickerWorld(enforcer) {
+      babelHelpers.classCallCheck(this, DrawKickerWorld);
+
+      if (enforcer !== singletonEnforcer$1) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+      this._glslProgram = null;
+    }
+
+    babelHelpers.createClass(DrawKickerWorld, [{
+      key: 'draw',
+      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+        var isVAOBound = false;
+        if (DrawKickerWorld._lastGeometry !== geometryName) {
+          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
+        }
+
+        for (var i = 0; i < materials.length; i++) {
+          var material = materials[i];
+          if (!material.isVisible) {
+            continue;
+          }
+
+          var materialUpdateStateString = material.getUpdateStateString();
+          this._glslProgram = material.shaderInstance.glslProgram;
+          gl.useProgram(this._glslProgram);
+          var glslProgram = this._glslProgram;
+
+          if (!isVAOBound) {
+            if (DrawKickerWorld._lastGeometry !== geometryName) {
+              for (var attribName in vboDic) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
+                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+              }
+            }
+          }
+
+          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
+          gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
+
+          var world_m = void 0;
+          var normal_m = void 0;
+          if (mesh.isAffectedByWorldMatrix) {
+            world_m = mesh.transformMatrixAccumulatedAncestry;
+            normal_m = mesh.normalMatrixAccumulatedAncestry;
+          } else {
+            world_m = Matrix44$1.identity();
+            normal_m = Matrix33.identity();
+          }
+
+          Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'WORLD', world_m.flatten());
+          Shader.trySettingMatrix33ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+          if (camera) {
+            var viewMatrix = void 0;
+            if (mesh.isAffectedByViewMatrix) {
+              var cameraMatrix = camera.lookAtRHMatrix();
+              viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+            } else {
+              viewMatrix = Matrix44$1.identity();
+            }
+
+            var projectionMatrix = void 0;
+            if (mesh.isAffectedByProjectionMatrix) {
+              projectionMatrix = camera.projectionRHMatrix();
+            } else {
+              projectionMatrix = Matrix44$1.identity();
+            }
+
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
+          }
+
+          if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
+            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
+            if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
+              var cameraPos = new Vector4(0, 0, 0, 1);
+              if (camera) {
+                cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+                //  console.log(cameraPos);
+              } else {
+                var _cameraPos = new Vector4(0, 0, 1, 1);
+              }
+              gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z);
+            }
+
+            for (var j = 0; j < lights.length; j++) {
+              if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j) && material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j)) {
+                var lightVec = null;
+                var isPointLight = -9999;
+                if (lights[j] instanceof M_PointLight) {
+                  lightVec = new Vector4(0, 0, 0, 1);
+                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  isPointLight = 1.0;
+                } else if (lights[j] instanceof M_DirectionalLight) {
+                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                  lightVec.w = 0.0;
+                  isPointLight = 0.0;
+                }
+
+                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j), lightVec.x, lightVec.y, lightVec.z, isPointLight);
+                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+              }
+            }
+          }
+
+          var isMaterialSetupDone = true;
+
+          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
+            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
+          }
+
+          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
+            if (material) {
+              material.setUpStates();
+
+              this._setUpOrTearDownTextures(false, material);
+              if (!this._setUpOrTearDownTextures(true, material)) {
+                MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
+                return;
+              }
+            }
+          }
+
+          this._setupOtherTextures(lights);
+
+          if (geometry.isIndexed()) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
+            var _vertexN = material.getVertexN(geometry);
+            var indexBitSize = glem.elementIndexBitSize(gl);
+            gl.drawElements(gl[primitiveType], _vertexN, indexBitSize, 0);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+          } else {
+            gl.drawArrays(gl[primitiveType], 0, vertexN);
+          }
+
+          material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+
+          this._tearDownOtherTextures(lights);
+
+          material.tearDownStates();
+
+          DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
+        }
+
+        //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
+        DrawKickerWorld._lastGeometry = geometryName;
+      }
+    }, {
+      key: '_setUpOrTearDownTextures',
+      value: function _setUpOrTearDownTextures(isSetUp, material) {
+        var methodName = 'tearDownTexture';
+        if (isSetUp) {
+          methodName = 'setUpTexture';
+        }
+
+        var isTextureProcessDone = true;
+        if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
+          // do nothing
+        } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
+          var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+          var textureName = textureSamplerDic.textureName;
+          var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+          isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+        } else {
+          // it must be an Array...
+          material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
+            var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
+            var textureName = textureSamplerDic.textureName;
+            var textureUnitIndex = textureSamplerDic.textureUnitIndex;
+            isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+          });
+        }
+
+        return isTextureProcessDone;
+      }
+    }, {
+      key: '_setupOtherTextures',
+      value: function _setupOtherTextures(lights) {
+        for (var i = 0; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.setUp();
+          }
+        }
+      }
+    }, {
+      key: '_tearDownOtherTextures',
+      value: function _tearDownOtherTextures(lights) {
+        for (var i = 0; i < lights.length; i++) {
+          if (lights[i].camera && lights[i].camera.texture) {
+            lights[i].camera.texture.tearDown();
+          }
+        }
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance() {
+        if (!this[singleton$2]) {
+          this[singleton$2] = new DrawKickerWorld(singletonEnforcer$1);
+        }
+        return this[singleton$2];
+      }
+    }]);
+    return DrawKickerWorld;
+  }();
+
+  DrawKickerWorld._lastMaterialUpdateStateString = null;
+  DrawKickerWorld._lastGeometry = null;
+  DrawKickerWorld._lastRenderPassIndex = -1;
+
+  var AABB = function () {
+    function AABB() {
+      babelHelpers.classCallCheck(this, AABB);
+
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+    }
+
+    babelHelpers.createClass(AABB, [{
+      key: 'clone',
+      value: function clone() {
+        var instance = new AABB();
+        instance._AABB_max = this._AABB_max.clone();
+        instance._AABB_min = this._AABB_min.clone();
+        instance._centerPoint = this._centerPoint !== null ? this._centerPoint.clone() : null;
+        instance._lengthCenterToCorner = this._lengthCenterToCorner;
+
+        return instance;
+      }
+    }, {
+      key: 'isVanilla',
+      value: function isVanilla() {
+        if (this._AABB_min.x == Number.MAX_VALUE && this._AABB_min.y == Number.MAX_VALUE && this._AABB_min.z == Number.MAX_VALUE && this._AABB_max.x == -Number.MAX_VALUE && this._AABB_max.y == -Number.MAX_VALUE && this._AABB_max.z == -Number.MAX_VALUE) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'addPosition',
+      value: function addPosition(positionVector) {
+        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
+        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
+        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
+
+        return positionVector;
+      }
+    }, {
+      key: 'addPositionWithArray',
+      value: function addPositionWithArray(array, index) {
+        this._AABB_min.x = array[index + 0] < this._AABB_min.x ? array[index + 0] : this._AABB_min.x;
+        this._AABB_min.y = array[index + 1] < this._AABB_min.y ? array[index + 1] : this._AABB_min.y;
+        this._AABB_min.z = array[index + 2] < this._AABB_min.z ? array[index + 2] : this._AABB_min.z;
+        this._AABB_max.x = this._AABB_max.x < array[index + 0] ? array[index + 0] : this._AABB_max.x;
+        this._AABB_max.y = this._AABB_max.y < array[index + 1] ? array[index + 1] : this._AABB_max.y;
+        this._AABB_max.z = this._AABB_max.z < array[index + 2] ? array[index + 2] : this._AABB_max.z;
+
+        return array;
+      }
+    }, {
+      key: 'updateAllInfo',
+      value: function updateAllInfo() {
+        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+
+        return this;
+      }
+    }, {
+      key: 'mergeAABB',
+      value: function mergeAABB(aabb) {
+        var isUpdated = false;
+
+        if (aabb.isVanilla()) {
+          return isUpdated;
+        }
+
+        if (this.isVanilla()) {
+          this._AABB_min.x = aabb.minPoint.x;
+          this._AABB_min.y = aabb.minPoint.y;
+          this._AABB_min.z = aabb.minPoint.z;
+          this._AABB_max.x = aabb.maxPoint.x;
+          this._AABB_max.y = aabb.maxPoint.y;
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+          return isUpdated;
+        }
+
+        if (aabb.minPoint.x < this._AABB_min.x) {
+          this._AABB_min.x = aabb.minPoint.x;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.y < this._AABB_min.y) {
+          this._AABB_min.y = aabb.minPoint.y;
+          isUpdated = true;
+        }
+        if (aabb.minPoint.z < this._AABB_min.z) {
+          this._AABB_min.z = aabb.minPoint.z;
+          isUpdated = true;
+        }
+        if (this._AABB_max.x < aabb.maxPoint.x) {
+          this._AABB_max.x = aabb.maxPoint.x;
+          isUpdated = true;
+        }
+        if (this._AABB_max.y < aabb.maxPoint.y) {
+          this._AABB_max.y = aabb.maxPoint.y;
+          isUpdated = true;
+        }
+        if (this._AABB_max.z < aabb.maxPoint.z) {
+          this._AABB_max.z = aabb.maxPoint.z;
+          isUpdated = true;
+        }
+        this.updateAllInfo();
+
+        return isUpdated;
+      }
+    }, {
+      key: 'toString',
+      value: function toString() {
+        return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n' + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
+      }
+    }, {
+      key: 'minPoint',
+      get: function get() {
+        return this._AABB_min;
+      }
+    }, {
+      key: 'maxPoint',
+      get: function get() {
+        return this._AABB_max;
+      }
+    }, {
+      key: 'centerPoint',
+      get: function get() {
+        return this._centerPoint;
+      }
+    }, {
+      key: 'lengthCenterToCorner',
+      get: function get() {
+        return this._lengthCenterToCorner;
+      }
+    }], [{
+      key: 'multiplyMatrix',
+      value: function multiplyMatrix(matrix, aabb) {
+        if (aabb.isVanilla()) {
+          return aabb.clone();
+        }
+        var newAabb = new AABB();
+
+        var AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+        var AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+        var AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+        var AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+        var AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+        var AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+        var AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+        var AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+        newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
+        newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
+        newAabb.updateAllInfo();
+
+        return newAabb;
+      }
+    }]);
+    return AABB;
+  }();
+
+  GLBoost$1['AABB'] = AABB;
+
+  var Geometry = function (_GLBoostObject) {
+    babelHelpers.inherits(Geometry, _GLBoostObject);
+
+    function Geometry(glBoostContext) {
+      babelHelpers.classCallCheck(this, Geometry);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (Geometry.__proto__ || Object.getPrototypeOf(Geometry)).call(this, glBoostContext));
+
+      _this._materials = [];
+      _this._vertexN = 0;
+      _this._vertices = null;
+      _this._indicesArray = null;
+      _this._performanceHint = null;
+      _this._defaultMaterial = glBoostContext.createClassicMaterial();
+      _this._vertexData = [];
+      _this._extraDataForShader = {};
+      _this._vboObj = {};
+      _this._AABB = new AABB();
+      _this._drawKicker = DrawKickerWorld.getInstance();
+
+      if (_this._drawKicker instanceof DrawKickerWorld) {} else if (_this._drawKicker instanceof DrawKickerLocal) {}
+      return _this;
+    }
+
+    /**
+     * 全ての頂点属性のリストを返す
+     */
+
+
+    babelHelpers.createClass(Geometry, [{
+      key: '_checkAndSetVertexComponentNumber',
+      value: function _checkAndSetVertexComponentNumber(allVertexAttribs) {
+        var _this2 = this;
+
+        allVertexAttribs.forEach(function (attribName) {
+          var element = _this2._vertices[attribName][0];
+          var componentN = MathUtil.compomentNumberOfVector(element);
+          if (componentN === 0) {
+            // if 0, it must be a number. so users must set components info.
+            return;
+          }
+          if (typeof _this2._vertices.components === 'undefined') {
+            _this2._vertices.components = {};
+          }
+          if (typeof _this2._vertices.componentType === 'undefined') {
+            _this2._vertices.componentType = {};
+          }
+
+          _this2._vertices.components[attribName] = componentN;
+          _this2._vertices.componentType[attribName] = 5126;
+        });
+      }
+    }, {
+      key: 'setVerticesData',
+      value: function setVerticesData(vertices, indicesArray) {
+        var _this3 = this;
+
+        var primitiveType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : GLBoost$1.TRIANGLES;
+        var performanceHint = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : GLBoost$1.STATIC_DRAW;
+
+        this._vertices = vertices;
+        this._indicesArray = indicesArray;
+
+        var vertexNum = 0;
+        if (typeof this._vertices.position.buffer !== 'undefined') {
+          vertexNum = this._vertices.position.length / 3;
+        } else {
+          vertexNum = this._vertices.position.length;
+        }
+
+        // for Wireframe
+        this._vertices.barycentricCoord = [];
+        if (!this._indicesArray) {
+          for (var i = 0; i < this._vertices.position.length; i++) {
+            var bary = null;
+            if (i % 3 === 0) {
+              bary = new Vector3(1, 0, 0);
+            } else if (i % 3 === 1) {
+              bary = new Vector3(0, 1, 0);
+            } else if (i % 3 === 2) {
+              bary = new Vector3(0, 0, 1);
+            }
+            this._vertices.barycentricCoord[i] = bary;
+          }
+        } else {
+          for (var _i = 0; _i < this._indicesArray.length; _i++) {
+            var indices = this._indicesArray[_i];
+            for (var j = 0; j < indices.length; j++) {
+              var _bary = null;
+              if (j % 3 === 0) {
+                _bary = new Vector3(1, 0, 0);
+              } else if (j % 3 === 1) {
+                _bary = new Vector3(0, 1, 0);
+              } else if (j % 3 === 2) {
+                _bary = new Vector3(0, 0, 1);
+              }
+              this._vertices.barycentricCoord[indices[j]] = _bary;
+            }
+          }
+        }
+        for (var _i2 = 0; _i2 < vertexNum; _i2++) {
+          if (typeof this._vertices.barycentricCoord[_i2] === 'undefined') {
+            this._vertices.barycentricCoord[_i2] = new Vector3(0, 0, 0); // Dummy Data
+          }
+        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+        this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
+        {
+          var vertexAttribArray = [];
+          for (var _i3 = 0; _i3 < this._vertices.barycentricCoord.length; _i3++) {
+            var element = this._vertices.barycentricCoord[_i3];
+            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          }
+          this._vertices.barycentricCoord = vertexAttribArray;
+        }
+
+        if (typeof this._vertices.position.buffer !== 'undefined') {
+          // position (and maybe others) are a TypedArray
+          var componentN = this._vertices.components.position;
+          var _vertexNum = this._vertices.position.length / componentN;
+          for (var _i4 = 0; _i4 < _vertexNum; _i4++) {
+            this._AABB.addPositionWithArray(this._vertices.position, _i4 * componentN);
+          }
+
+          var barycentricCoords = this._vertices.barycentricCoord;
+          this._vertices.barycentricCoord = new Float32Array(barycentricCoords.length);
+          this._vertices.barycentricCoord.set(barycentricCoords);
+        } else {
+          allVertexAttribs.forEach(function (attribName) {
+            if (attribName === 'barycentricCoord') {
+              return;
+            }
+            var vertexAttribArray = [];
+            _this3._vertices[attribName].forEach(function (elem, index) {
+              var element = _this3._vertices[attribName][index];
+              Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+              if (attribName === 'position') {
+                var _componentN = _this3._vertices.components[attribName];
+                _this3._AABB.addPositionWithArray(vertexAttribArray, index * _componentN);
+              }
+            });
+            _this3._vertices[attribName] = vertexAttribArray;
+          });
+        }
+
+        this._AABB.updateAllInfo();
+
+        this._primitiveType = primitiveType;
+
+        var gl = this._glContext.gl;
+        var hint = null;
+        switch (performanceHint) {
+          case GLBoost$1.STATIC_DRAW:
+            hint = gl.STATIC_DRAW;
+            break;
+          case GLBoost$1.STREAM_DRAW:
+            hint = gl.STREAM_DRAW;
+            break;
+          case GLBoost$1.DYNAMIC_DRAW:
+            hint = gl.DYNAMIC_DRAW;
+            break;
+        }
+        this._performanceHint = hint;
+      }
+    }, {
+      key: 'updateVerticesData',
+      value: function updateVerticesData(vertices) {
+        var _this4 = this;
+
+        var gl = this._glContext.gl;
+
+        var _loop = function _loop(attribName) {
+          var vertexAttribArray = [];
+          _this4._vertices[attribName].forEach(function (elem, index) {
+            var element = vertices[attribName][index];
+            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+
+            if (attribName === 'position') {
+              var componentN = _this4._vertices.components[attribName];
+              _this4._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
+            }
+            _this4._vertices[attribName] = vertexAttribArray;
+          });
+        };
+
+        for (var attribName in vertices) {
+          _loop(attribName);
+        }
+
+        this._AABB.updateAllInfo();
+
+        for (var _attribName in vertices) {
+          var float32AryVertexData = new Float32Array(this._vertices[_attribName]);
+          gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[_attribName]);
+          gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+          gl.bindBuffer(gl.ARRAY_BUFFER, null);
+        }
+      }
+    }, {
+      key: 'setUpVertexAttribs',
+      value: function setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
+        var _this5 = this;
+
+        var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+        // setup vertex layouts
+        allVertexAttribs.forEach(function (attribName) {
+          if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+            var vertexAttribName = null;
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
+            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], _this5._vertices.componentType[attribName], gl.FALSE, 0, 0);
+          }
+        });
+      }
+    }, {
+      key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
+      value: function prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights) {
+        var doSetupVertexAttribs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
+
+        var gl = this._glContext.gl;
+        var vertices = this._vertices;
+
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+        var _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
+
+        if (doSetupVertexAttribs) {
+          glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+
+        if (material.shaderInstance === null) {
+          var shaderClass = material.shaderClass;
+
+          var basicShaderSource = null;
+          if (this._drawKicker instanceof DrawKickerWorld) {
+            basicShaderSource = VertexWorldShaderSource;
+          } else if (this._drawKicker instanceof DrawKickerLocal) {
+            basicShaderSource = VertexLocalShaderSource;
+          }
+
+          material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
+        }
+        var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+        if (doSetupVertexAttribs) {
+          this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+        }
+
+        if (doSetupVertexAttribs) {
+          glem.bindVertexArray(gl, null);
+        }
+        this._setVertexNtoSingleMaterial(material, index);
+
+        return material;
+      }
+    }, {
+      key: '_setVertexNtoSingleMaterial',
+      value: function _setVertexNtoSingleMaterial(material, index) {
+        // if this mesh has only one material...
+        if (material.getVertexN(this) === 0) {
+          if (this._indicesArray && this._indicesArray.length > 0) {
+            material.setVertexN(this, this._indicesArray[index].length);
+          } else {
+            material.setVertexN(this, this._vertexN);
+          }
+        }
+      }
+    }, {
+      key: '_getAppropriateMaterials',
+      value: function _getAppropriateMaterials(mesh) {
+        var materials = null;
+        if (this._materials.length > 0) {
+          materials = this._materials;
+        } else if (mesh.material) {
+          materials = [mesh.material];
+        } else {
+          materials = [this._defaultMaterial];
+        }
+        return materials;
+      }
+    }, {
+      key: 'prepareToRender',
+      value: function prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
+        var _this6 = this;
+
+        var vertices = this._vertices;
+        var gl = this._glContext.gl;
+
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+
+        this._vertexN = vertices.position.length / vertices.components.position;
+
+        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+
+        // create VAO
+        if (Geometry._vaoDic[this.toString()]) {} else {
+          var vao = this._glContext.createVertexArray(this);
+          Geometry._vaoDic[this.toString()] = vao;
+        }
+        glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+
+        var doAfter = true;
+
+        allVertexAttribs.forEach(function (attribName) {
+          // create VBO
+          if (_this6._vboObj[attribName]) {
+            doAfter = false;
+          } else {
+            var vbo = _this6._glContext.createBuffer(_this6);
+            _this6._vboObj[attribName] = vbo;
+          }
+        });
+
+        var materials = this._getAppropriateMaterials(mesh);
+
+        for (var i = 0; i < materials.length; i++) {
+          this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
+        }
+
+        if (doAfter) {
+
+          allVertexAttribs.forEach(function (attribName) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this6._vboObj[attribName]);
+            if (typeof _this6._vertices[attribName].buffer !== 'undefined') {
+              gl.bufferData(gl.ARRAY_BUFFER, _this6._vertices[attribName], _this6._performanceHint);
+            } else {
+              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
+            }
+            //gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          });
+
+          Geometry._iboArrayDic[this.toString()] = [];
+          if (this._indicesArray) {
+            // create Index Buffer
+            for (var _i5 = 0; _i5 < this._indicesArray.length; _i5++) {
+              var ibo = this._glContext.createBuffer(this);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i5]), gl.STATIC_DRAW);
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+              Geometry._iboArrayDic[this.toString()][_i5] = ibo;
+              this._defaultMaterial.setVertexN(this._indicesArray[_i5].length);
+            }
+          }
+          glem.bindVertexArray(gl, null);
+        }
+        return true;
+      }
+    }, {
+      key: 'draw',
+      value: function draw(expression, lights, camera, mesh, scene, renderPassIndex) {
+        var gl = this._glContext.gl;
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+
+        var materials = this._getAppropriateMaterials(mesh);
+
+        var thisName = this.toString();
+
+        this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+      }
+    }, {
+      key: 'merge',
+      value: function merge(geometrys) {
+        var _this7 = this;
+
+        if (Array.isArray(geometrys)) {
+          (function () {
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this7._vertices[attribName].length;
+
+              var allGeomLength = 0;
+              geometrys.forEach(function (geometry) {
+                allGeomLength += geometry._vertices[attribName].length;
+              });
+              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+            });
+
+            var lastThisLengthDic = {};
+            allVertexAttribs.forEach(function (attribName) {
+              lastThisLengthDic[attribName] = 0;
+            });
+            geometrys.forEach(function (geometry, index) {
+              var typedSubArrayDic = {};
+              allVertexAttribs.forEach(function (attribName) {
+                var typedArray = typedArrayDic[attribName];
+
+                if (index === 0) {
+                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+                }
+
+                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
+                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+                lastThisLengthDic[attribName] = end;
+              });
+              _this7.mergeInner(geometry, typedSubArrayDic, index === 0);
+            });
+          })();
+        } else {
+          (function () {
+            var geometry = geometrys;
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this7._vertices[attribName].length;
+              var geomLength = geometry._vertices[attribName].length;
+
+              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+            });
+
+            _this7.mergeInner(geometry, typedArrayDic);
+          })();
+        }
+      }
+
+      /**
+       *
+       * @param geometry
+       */
+
+    }, {
+      key: 'mergeInner',
+      value: function mergeInner(geometry, typedArrayDic) {
+        var _this8 = this;
+
+        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var gl = this._glContext.gl;
+        var baseLen = this._vertices.position.length / this._vertices.components.position;;
+
+        if (this === geometry) {
+          console.assert('don\'t merge same geometry!');
+        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+        allVertexAttribs.forEach(function (attribName) {
+          var thisLength = _this8._vertices[attribName].length;
+          var geomLength = geometry._vertices[attribName].length;
+
+          var float32array = typedArrayDic[attribName];
+
+          if (isFirst) {
+            float32array.set(_this8._vertices[attribName], 0);
+          }
+          float32array.set(geometry._vertices[attribName], thisLength);
+
+          _this8._vertices[attribName] = float32array;
+
+          if (typeof _this8._vboObj[attribName] !== 'undefined') {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this8._vboObj[attribName]);
+            gl.bufferData(gl.ARRAY_BUFFER, _this8._vertices[attribName], _this8._performanceHint);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          }
+        });
+
+        var geometryIndicesN = geometry._indicesArray.length;
+        for (var i = 0; i < geometryIndicesN; i++) {
+          for (var j = 0; j < geometry._indicesArray[i].length; j++) {
+            geometry._indicesArray[i][j] += baseLen;
+          }
+          this._indicesArray.push(geometry._indicesArray[i]);
+          if (geometry._materials[i]) {
+            this._materials.push(geometry._materials[i]);
+          }
+        }
+        this._vertexN += geometry._vertexN;
+      }
+    }, {
+      key: 'mergeHarder',
+      value: function mergeHarder(geometrys) {
+        var _this9 = this;
+
+        if (Array.isArray(geometrys)) {
+          (function () {
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this9._vertices[attribName].length;
+
+              var allGeomLength = 0;
+              geometrys.forEach(function (geometry) {
+                allGeomLength += geometry._vertices[attribName].length;
+              });
+              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+            });
+
+            var lastThisLengthDic = {};
+            allVertexAttribs.forEach(function (attribName) {
+              lastThisLengthDic[attribName] = 0;
+            });
+            geometrys.forEach(function (geometry, index) {
+              var typedSubArrayDic = {};
+              allVertexAttribs.forEach(function (attribName) {
+                var typedArray = typedArrayDic[attribName];
+
+                if (index === 0) {
+                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+                }
+
+                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
+                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
+                lastThisLengthDic[attribName] = end;
+              });
+              _this9.mergeHarderInner(geometry, typedSubArrayDic, index === 0);
+            });
+          })();
+        } else {
+          (function () {
+            var geometry = geometrys;
+            var typedArrayDic = {};
+            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
+            allVertexAttribs.forEach(function (attribName) {
+              var thisLength = _this9._vertices[attribName].length;
+              var geomLength = geometry._vertices[attribName].length;
+
+              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
+            });
+
+            _this9.mergeHarderInner(geometry, typedArrayDic);
+          })();
+        }
+      }
+
+      /**
+       * take no thought geometry's materials
+       *
+       * @param geometry
+       */
+
+    }, {
+      key: 'mergeHarderInner',
+      value: function mergeHarderInner(geometry, typedArrayDic) {
+        var _this10 = this;
+
+        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var gl = this._glContext.gl;
+        var baseLen = this._vertices.position.length / this._vertices.components.position;
+        if (this === geometry) {
+          console.assert('don\'t merge same geometry!');
+        }
+
+        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+
+        allVertexAttribs.forEach(function (attribName) {
+          var thisLength = _this10._vertices[attribName].length;
+          var geomLength = geometry._vertices[attribName].length;
+
+          var float32array = typedArrayDic[attribName];
+
+          if (isFirst) {
+            float32array.set(_this10._vertices[attribName], 0);
+          }
+          float32array.set(geometry._vertices[attribName], thisLength);
+
+          _this10._vertices[attribName] = float32array;
+
+          if (typeof _this10._vboObj[attribName] !== 'undefined') {
+            gl.bindBuffer(gl.ARRAY_BUFFER, _this10._vboObj[attribName]);
+            gl.bufferData(gl.ARRAY_BUFFER, _this10._vertices[attribName], _this10._performanceHint);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          }
+        });
+
+        for (var i = 0; i < this._indicesArray.length; i++) {
+          var len = geometry._indicesArray[i].length;
+          for (var j = 0; j < len; j++) {
+            var idx = geometry._indicesArray[i][j];
+            this._indicesArray[i].push(baseLen + idx);
+          }
+          if (this._materials[i]) {
+            this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+          }
+        }
+        this._vertexN += geometry._vertexN;
+      }
+    }, {
+      key: 'setExtraDataForShader',
+      value: function setExtraDataForShader(name, value) {
+        this._extraDataForShader[name] = value;
+      }
+    }, {
+      key: 'getExtraDataForShader',
+      value: function getExtraDataForShader(name) {
+        return this._extraDataForShader[name];
+      }
+    }, {
+      key: 'isTransparent',
+      value: function isTransparent(mesh) {
+        var materials = this._getAppropriateMaterials(mesh);
+        var isTransparent = false;
+        materials.forEach(function (material) {
+          if (material.isTransparent()) {
+            isTransparent = true;
+          }
+        });
+        return isTransparent;
+      }
+    }, {
+      key: 'isIndexed',
+      value: function isIndexed() {
+        return Geometry._iboArrayDic[this.toString()].length > 0;
+      }
+    }, {
+      key: 'getTriangleCount',
+      value: function getTriangleCount(mesh) {
+        var gl = this._glContext.gl;
+        var materials = this._getAppropriateMaterials(mesh);
+        var count = 0;
+        for (var i = 0; i < materials.length; i++) {
+          var material = materials[i];
+          if (gl[this._primitiveType] === gl.TRIANGLES) {
+            if (this.isIndexed()) {
+              count += material.getVertexN(this.toString()) / 3;
+            } else {
+              count += this._vertexN / 3;
+            }
+          } else if (gl[this._primitiveType] === gl.TRIANGLE_STRIP) {
+            if (this.isIndexed()) {
+              count += material.getVertexN(this.toString()) - 2;
+            } else {
+              count += this._vertexN - 2;
+            }
+          }
+        }
+        return count;
+      }
+    }, {
+      key: 'getVertexCount',
+      value: function getVertexCount() {
+        var gl = this._glContext.gl;
+        var count = 0;
+        if (this._vertices) {
+          count = this._vertices.position.length;
+        }
+        return count;
+      }
+    }, {
+      key: 'materials',
+      set: function set(materials) {
+        this._materials = materials;
+      },
+      get: function get() {
+        return this._materials;
+      }
+    }, {
+      key: 'centerPosition',
+      get: function get() {
+        return this._AABB.centerPoint;
+      }
+    }, {
+      key: 'AABB',
+      get: function get() {
+        return this._AABB;
+      }
+    }], [{
+      key: '_allVertexAttribs',
+      value: function _allVertexAttribs(vertices) {
+        var attribNameArray = [];
+        for (var attribName in vertices) {
+          if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
+            attribNameArray.push(attribName);
+          }
+        }
+
+        return attribNameArray;
+      }
+    }, {
+      key: 'clearMaterialCache',
+      value: function clearMaterialCache() {
+        Geometry._lastMaterial = null;
+      }
+    }]);
+    return Geometry;
+  }(GLBoostObject);
+
+  Geometry._vaoDic = {};
+  Geometry._iboArrayDic = {};
+
+  var SPVScreen = function (_Geometry) {
+    babelHelpers.inherits(SPVScreen, _Geometry);
+
+    function SPVScreen(glBoostContext) {
+      var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        preset: null, // or 'one', 'two horizontal split', 'two vertical split', 'four'. If these are specified, 'screens' properties are ignored.
+        screens: [{
+          unit: 'ratio', // or 'pixel'
+          origin: new Vector2(-1, -1),
+          size: new Vector2(2, 2),
+          uDivision: 0,
+          vDivision: 0,
+          uUVRepeat: false,
+          vUVRepeat: false
+        }]
+      };
+      var customVertexAttributes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      babelHelpers.classCallCheck(this, SPVScreen);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVScreen.__proto__ || Object.getPrototypeOf(SPVScreen)).call(this, glBoostContext));
+
+      _this._setupVertexData(layout, customVertexAttributes);
+      return _this;
+    }
+
+    babelHelpers.createClass(SPVScreen, [{
+      key: '_setupVertexData',
+      value: function _setupVertexData(layout, customVertexAttributes) {
+
+        var screens = [];
+        if (layout.preset === 'one') {
+          screens[0] = {
+            unit: 'ratio', // or 'pixel'
+            origin: new Vector2(-1, -1),
+            size: new Vector2(2, 2),
+            uDivision: 0,
+            vDivision: 0,
+            uUVRepeat: false,
+            vUVRepeat: false
+          };
+        }
+
+        var positions = [];
+        var indices = [];
+        var colors = [];
+        var texcoords = [];
+        var normals = [];
+
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = screens[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var screen = _step.value;
+
+            this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, screen.uDivision + 1, screen.vDivision + 1, screen.uUVRepeat, screen.vUVRepeat);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        var object = {
+          position: positions,
+          color: colors,
+          texcoord: texcoords,
+          normal: normals
+        };
+
+        var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+        this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
+      }
+    }, {
+      key: '_setupQuad',
+      value: function _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
+        for (var i = 0; i <= vSpan; i++) {
+          for (var j = 0; j <= uSpan; j++) {
+            positions.push(new Vector3(originInRatioVec2.x + j / uSpan * sizeInRatioVec2.x, originInRatioVec2.y + i / vSpan * sizeInRatioVec2.y, 0));
+          }
+        }
+
+        for (var _i = 0; _i < vSpan; _i++) {
+          var degenerate_left_index = 0;
+          var degenerate_right_index = 0;
+          for (var _j = 0; _j <= uSpan; _j++) {
+            indices.push(_i * (uSpan + 1) + _j);
+            indices.push((_i + 1) * (uSpan + 1) + _j);
+            if (_j === 0) {
+              degenerate_left_index = (_i + 1) * (uSpan + 1) + _j;
+            } else if (_j === uSpan) {
+              degenerate_right_index = (_i + 1) * (uSpan + 1) + _j;
+            }
+          }
+          indices.push(degenerate_right_index);
+          indices.push(degenerate_left_index);
+        }
+
+        var vertexColor = new Vector4(1, 1, 1, 1);
+        for (var _i2 = 0; _i2 <= vSpan; _i2++) {
+          for (var _j2 = 0; _j2 <= uSpan; _j2++) {
+            colors.push(vertexColor);
+          }
+        }
+
+        for (var _i3 = 0; _i3 <= vSpan; _i3++) {
+          for (var _j3 = 0; _j3 <= uSpan; _j3++) {
+            var uSpanToDivide = uUVRepeat ? 1 : uSpan;
+            var vSpanToDivide = vUVRepeat ? 1 : vSpan;
+            texcoords.push(new Vector2(_j3 / uSpanToDivide, _i3 / vSpanToDivide));
+          }
+        }
+
+        var normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
+        for (var _i4 = 0; _i4 <= vSpan; _i4++) {
+          for (var _j4 = 0; _j4 <= uSpan; _j4++) {
+            normals.push(normal);
+          }
+        }
+      }
+    }]);
+    return SPVScreen;
+  }(Geometry);
+
+  GLBoost$1["SPVScreen"] = SPVScreen;
 
   var FragmentSimpleShaderSource = function () {
     function FragmentSimpleShaderSource() {
@@ -3843,7 +6287,7 @@
         }
         //shaderText += '    float shadowRatio = 0.0;\n';
 
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
       }
     }, {
@@ -4296,834 +6740,6 @@
   }(L_AbstractMaterial);
 
   GLBoost$1['SPVClassicMaterial'] = SPVClassicMaterial;
-
-  var AnimationUtil = function () {
-    function AnimationUtil() {
-      babelHelpers.classCallCheck(this, AnimationUtil);
-    }
-
-    babelHelpers.createClass(AnimationUtil, null, [{
-      key: "lerp",
-      value: function lerp(start, end, ratio, componentN) {
-        if (componentN === 1) {
-          return start * (1 - ratio) + end * ratio;
-        } else {
-          if (start instanceof Quaternion) {
-            return Quaternion.qlerp(start, end, ratio);
-          } else {
-            return start.multiply(1 - ratio).add(end.multiply(ratio));
-          }
-        }
-      }
-    }, {
-      key: "interpolate",
-      value: function interpolate(inputArray, outputArray, input, componentN) {
-        if (input < inputArray[0]) {
-          return outputArray[0].clone(); // out of range!
-        }
-        if (inputArray[inputArray.length - 1] <= input) {
-          return outputArray[outputArray.length - 1].clone(); // out of range!
-        }
-
-        for (var i = 0; i < inputArray.length; i++) {
-          if (typeof inputArray[i + 1] === "undefined") {
-            break;
-          }
-          if (inputArray[i] <= input && input < inputArray[i + 1]) {
-            var ratio = (input - inputArray[i]) / (inputArray[i + 1] - inputArray[i]);
-            var resultValue = this.lerp(outputArray[i].clone(), outputArray[i + 1].clone(), ratio, componentN);
-            return resultValue;
-          }
-        }
-        return outputArray[0].clone(); // out of range!
-      }
-    }]);
-    return AnimationUtil;
-  }();
-
-  var L_Element = function (_GLBoostObject) {
-    babelHelpers.inherits(L_Element, _GLBoostObject);
-
-    function L_Element(glBoostContext) {
-      var toRegister = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      babelHelpers.classCallCheck(this, L_Element);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (L_Element.__proto__ || Object.getPrototypeOf(L_Element)).call(this, glBoostContext, toRegister));
-
-      _this._translate = Vector3.zero();
-      _this._scale = new Vector3(1, 1, 1);
-
-      _this._rotate = Vector3.zero();
-      _this._quaternion = new Quaternion(0, 0, 0, 1);
-      _this._matrix = Matrix44$1.identity();
-
-      _this._finalMatrix = Matrix44$1.identity();
-
-      _this._dirtyAsElement = true;
-      _this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
-
-      return _this;
-    }
-
-    babelHelpers.createClass(L_Element, [{
-      key: '_needUpdate',
-      value: function _needUpdate() {
-        this._dirtyAsElement = true;
-      }
-    }, {
-      key: 'multiplyMatrix',
-      value: function multiplyMatrix(mat) {
-        this._matrix = mat.clone();
-        this._currentCalcMode = 'matrix';
-        this._needUpdate();
-      }
-    }, {
-      key: '_copy',
-      value: function _copy(instance) {
-        babelHelpers.get(L_Element.prototype.__proto__ || Object.getPrototypeOf(L_Element.prototype), '_copy', this).call(this, instance);
-
-        instance._translate = this._translate.clone();
-        instance._scale = this._scale.clone();
-        instance._rotate = this._rotate.clone();
-        instance._quaternion = this._quaternion.clone();
-        instance._matrix = this._matrix.clone();
-        instance._finalMatrix = this._finalMatrix.clone();
-        instance._dirtyAsElement = this._dirtyAsElement;
-        instance._currentCalcMode = this._currentCalcMode;
-      }
-    }, {
-      key: 'translate',
-      set: function set(vec) {
-        if (this._translate.isEqual(vec)) {
-          return;
-        }
-        if (this._currentCalcMode === 'matrix') {
-          this.matrix.m03 = vec.x;
-          this.matrix.m13 = vec.y;
-          this.matrix.m23 = vec.z;
-        }
-        this._translate = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        return this._translate;
-      }
-    }, {
-      key: 'rotate',
-      set: function set(vec) {
-        if (this._currentCalcMode !== 'euler') {
-          this._currentCalcMode = 'euler';
-          this._needUpdate();
-        }
-        if (this._rotate.isEqual(vec)) {
-          return;
-        }
-        this._rotate = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        return this._rotate;
-      }
-    }, {
-      key: 'scale',
-      set: function set(vec) {
-        if (this._scale.isEqual(vec)) {
-          return;
-        }
-        this._scale = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        return this._scale;
-      }
-    }, {
-      key: 'matrix',
-      get: function get() {
-        return this._matrix;
-      }
-    }, {
-      key: 'quaternion',
-      set: function set(quat) {
-        if (this._currentCalcMode !== 'quaternion') {
-          this._currentCalcMode = 'quaternion';
-          this._needUpdate();
-        }
-        if (this._quaternion.isEqual(quat)) {
-          return;
-        }
-        this._quaternion = quat;
-        this._needUpdate();
-      },
-      get: function get() {
-        return this._quaternion;
-      }
-    }, {
-      key: 'transformMatrix',
-      get: function get() {
-        if (this._dirtyAsElement) {
-          var matrix = Matrix44$1.identity();
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.matrix);
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.quaternion.rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.translate.x;
-          this._finalMatrix.m13 = this.translate.y;
-          this._finalMatrix.m23 = this.translate.z;
-
-          this._dirtyAsElement = false;
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'currentCalcMode',
-      set: function set(mode) {
-        this._currentCalcMode = mode;
-      },
-      get: function get() {
-        return this._currentCalcMode;
-      }
-    }]);
-    return L_Element;
-  }(GLBoostObject);
-
-  var M_Element = function (_L_Element) {
-    babelHelpers.inherits(M_Element, _L_Element);
-
-    function M_Element(glBoostContext) {
-      babelHelpers.classCallCheck(this, M_Element);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (M_Element.__proto__ || Object.getPrototypeOf(M_Element)).call(this, glBoostContext));
-
-      _this._parent = null;
-      _this._invMatrix = Matrix44$1.identity();
-      _this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-      _this._calculatedInverseMatrix = false;
-      _this._updateCountAsElement = 0;
-      _this._accumulatedAncestryNameWithUpdateInfoString = '';
-      _this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
-      _this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
-      _this._animationLine = {};
-      _this._transparentByUser = false;
-      _this.opacity = 1.0;
-
-      _this._activeAnimationLineName = null;
-      _this._currentAnimationInputValues = {};
-      _this._toInheritCurrentAnimationInputValue = true;
-
-      _this._camera = null;
-      _this._customFunction = null;
-      _this._isVisible = true;
-      return _this;
-    }
-
-    babelHelpers.createClass(M_Element, [{
-      key: '_needUpdate',
-      value: function _needUpdate() {
-        this._dirtyAsElement = true;
-        this._calculatedInverseMatrix = false;
-        this._updateCountAsElement++;
-      }
-    }, {
-      key: 'setCurrentAnimationValue',
-
-
-      /**
-       * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-       * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-       * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
-       * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
-       */
-      value: function setCurrentAnimationValue(inputName, inputValue) {
-        this._setDirtyToAnimatedElement(inputName);
-        this._currentAnimationInputValues[inputName] = inputValue;
-      }
-    }, {
-      key: '_getCurrentAnimationInputValue',
-      value: function _getCurrentAnimationInputValue(inputName) {
-        var value = this._currentAnimationInputValues[inputName];
-        if (typeof value !== 'undefined') {
-          return value;
-        } else if (this._toInheritCurrentAnimationInputValue) {
-          return this._parent._getCurrentAnimationInputValue(inputName);
-        } else {
-          return -1;
-        }
-      }
-    }, {
-      key: 'removeCurrentAnimationValue',
-      value: function removeCurrentAnimationValue(inputName) {
-        delete this._currentAnimationInputValues[inputName];
-      }
-    }, {
-      key: '_setDirtyToAnimatedElement',
-      value: function _setDirtyToAnimatedElement(inputName) {
-        if (this.hasAnimation(inputName)) {
-          this._needUpdate();
-        }
-      }
-    }, {
-      key: '_getAnimatedTransformValue',
-      value: function _getAnimatedTransformValue(value, animation, type) {
-        if (typeof animation !== 'undefined' && animation[type]) {
-          return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
-        } else {
-          //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
-          if (type == 'quaternion') {
-            //        return new Quaternion(0, 0, 0, 1);
-          }
-          return this['_' + type];
-        }
-      }
-    }, {
-      key: 'getTranslateAt',
-      value: function getTranslateAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
-      }
-    }, {
-      key: 'getTranslateNotAnimated',
-      value: function getTranslateNotAnimated() {
-        return this._translate;
-      }
-    }, {
-      key: 'getRotateAt',
-      value: function getRotateAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
-      }
-    }, {
-      key: 'getRotateNotAnimated',
-      value: function getRotateNotAnimated() {
-        return this._rotate;
-      }
-    }, {
-      key: 'getQuaternionNotAnimated',
-      value: function getQuaternionNotAnimated() {
-        return this._quaternion;
-      }
-    }, {
-      key: 'getQuaternionAt',
-      value: function getQuaternionAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
-      }
-    }, {
-      key: 'getScaleAt',
-      value: function getScaleAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
-      }
-    }, {
-      key: 'getScaleNotAnimated',
-      value: function getScaleNotAnimated() {
-        return this._scale;
-      }
-    }, {
-      key: 'getMatrixAt',
-      value: function getMatrixAt(lineName, value) {
-        return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
-      }
-    }, {
-      key: 'getMatrixNotAnimated',
-      value: function getMatrixNotAnimated() {
-        return this._matrix;
-      }
-    }, {
-      key: 'getTransformMatrixOnlyRotateOn',
-      value: function getTransformMatrixOnlyRotateOn(value) {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.getMatrixAt('time', value);
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44$1.rotateX(this.getRotate('time', value).x).multiply(Matrix44$1.rotateY(this.getRotateAt('time', value).y)).multiply(Matrix44$1.rotateZ(this.getRotateAt('time', value).z));
-        }
-
-        return rotationMatrix.clone();
-      }
-    }, {
-      key: '_accumulateMyAndParentNameWithUpdateInfo',
-      value: function _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
-        if (currentElem._parent === null) {
-          return currentElem.toStringWithUpdateInfo();
-        } else {
-          return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentTransformMatrices',
-      value: function _multiplyMyAndParentTransformMatrices(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrix;
-          } else {
-            return Matrix44$1.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44$1.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrix;
-          }
-          return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentTransformMatricesInInverseOrder',
-      value: function _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrix;
-          } else {
-            return Matrix44$1.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44$1.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrix;
-          }
-          return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
-        }
-      }
-    }, {
-      key: '_multiplyMyAndParentRotateMatrices',
-      value: function _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
-        if (currentElem._parent === null) {
-          if (withMySelf) {
-            return currentElem.transformMatrixOnlyRotate;
-          } else {
-            return Matrix44$1.identity();
-          }
-        } else {
-          var currentMatrix = Matrix44$1.identity();
-          if (withMySelf) {
-            currentMatrix = currentElem.transformMatrixOnlyRotate;
-          }
-          return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
-        }
-      }
-    }, {
-      key: '_accumulateMyAndParentOpacity',
-      value: function _accumulateMyAndParentOpacity(currentElem) {
-        if (currentElem._parent === null) {
-          return currentElem.opacity;
-        } else {
-          return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
-        }
-      }
-    }, {
-      key: 'toStringWithUpdateInfo',
-
-
-      // used by library (not Application)
-      value: function toStringWithUpdateInfo() {
-        //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
-        return this._instanceName + this._updateCountAsElement; // faster
-      }
-    }, {
-      key: 'setAnimationAtLine',
-      value: function setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
-        var outputComponentN = 0;
-        if (outputArray[0] instanceof Vector2) {
-          outputComponentN = 2;
-        } else if (outputArray[0] instanceof Vector3) {
-          outputComponentN = 3;
-        } else if (outputArray[0] instanceof Vector4) {
-          outputComponentN = 4;
-        } else if (outputArray[0] instanceof Quaternion) {
-          outputComponentN = 4;
-        } else {
-          outputComponentN = 1;
-        }
-        if (!this._animationLine[lineName]) {
-          this._animationLine[lineName] = {};
-        }
-        this._animationLine[lineName][attributeName] = {
-          input: inputArray,
-          output: outputArray,
-          outputAttribute: attributeName,
-          outputComponentN: outputComponentN
-        };
-      }
-    }, {
-      key: 'setActiveAnimationLine',
-      value: function setActiveAnimationLine(lineName) {
-        this._activeAnimationLineName = lineName;
-      }
-    }, {
-      key: 'hasAnimation',
-      value: function hasAnimation(lineName) {
-        if (this._animationLine[lineName]) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'prepareToRender',
-      value: function prepareToRender() {}
-    }, {
-      key: '_copy',
-      value: function _copy(instance) {
-        babelHelpers.get(M_Element.prototype.__proto__ || Object.getPrototypeOf(M_Element.prototype), '_copy', this).call(this, instance);
-
-        instance._parent = this._parent;
-        instance._invMatrix = this._invMatrix.clone();
-        instance._matrixGetMode = this._matrixGetMode;
-        instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
-        instance._updateCountAsElement = this._updateCountAsElement;
-        instance._accumulatedAncestryNameWithUpdateInfoString = this._accumulatedAncestryNameWithUpdateInfoString;
-        instance._accumulatedAncestryNameWithUpdateInfoStringNormal = this._accumulatedAncestryNameWithUpdateInfoStringNormal;
-        instance._accumulatedAncestryNameWithUpdateInfoStringInv = this._accumulatedAncestryNameWithUpdateInfoStringInv;
-        instance._animationLine = {};
-
-        for (var lineName in this._animationLine) {
-          instance._animationLine[lineName] = {};
-          for (var attributeName in this._animationLine[lineName]) {
-            instance._animationLine[lineName][attributeName] = {};
-            instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
-
-            var instanceOutput = [];
-            var thisOutput = this._animationLine[lineName][attributeName].output;
-            for (var i = 0; i < thisOutput.length; i++) {
-              instanceOutput.push(typeof thisOutput[i] === 'number' ? thisOutput[i] : thisOutput[i].clone());
-            }
-            instance._animationLine[lineName][attributeName].output = instanceOutput;
-
-            instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
-
-            instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
-          }
-        }
-
-        instance._transparentByUser = this._transparentByUser;
-        instance.opacity = this.opacity;
-        instance._activeAnimationLineName = this._activeAnimationLineName;
-
-        instance._currentAnimationInputValues = {};
-        for (var inputName in this._currentAnimationInputValues) {
-          instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
-        }
-
-        instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
-
-        instance._camera = this._camera;
-        instance._customFunction = this._customFunction;
-      }
-    }, {
-      key: 'updateCountAsElement',
-      get: function get() {
-        return this._updateCountAsElement;
-      }
-    }, {
-      key: 'toInheritCurrentAnimationInputValue',
-      set: function set(flg) {
-        this._toInheritCurrentAnimationInputValue = flg;
-      },
-      get: function get() {
-        return this._toInheritCurrentAnimationInputValue;
-      }
-    }, {
-      key: 'translate',
-      set: function set(vec) {
-        if (this._translate.isEqual(vec)) {
-          return;
-        }
-        if (this._currentCalcMode === 'matrix') {
-          this.matrix.m03 = vec.x;
-          this.matrix.m13 = vec.y;
-          this.matrix.m23 = vec.z;
-        }
-        this._translate = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._translate;
-        }
-      }
-    }, {
-      key: 'rotate',
-      set: function set(vec) {
-        if (this._currentCalcMode !== 'euler') {
-          this._currentCalcMode = 'euler';
-          this._needUpdate();
-        }
-        if (this._rotate.isEqual(vec)) {
-          return;
-        }
-        this._rotate = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._rotate;
-        }
-      }
-    }, {
-      key: 'quaternion',
-      set: function set(quat) {
-        if (this._currentCalcMode !== 'quaternion') {
-          this._currentCalcMode = 'quaternion';
-          this._needUpdate();
-        }
-        if (this._quaternion.isEqual(quat)) {
-          return;
-        }
-        this._quaternion = quat;
-        this._needUpdate();
-      },
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._quaternion;
-        }
-      }
-    }, {
-      key: 'scale',
-      set: function set(vec) {
-        if (this._scale.isEqual(vec)) {
-          return;
-        }
-        this._scale = vec;
-        this._needUpdate();
-      },
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._scale;
-        }
-      }
-    }, {
-      key: 'matrix',
-      get: function get() {
-        if (this._activeAnimationLineName) {
-          return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-        } else {
-          return this._matrix;
-        }
-      }
-    }, {
-      key: 'transformMatrix',
-      get: function get() {
-        var input = -1;
-        if (this._activeAnimationLineName !== null) {
-          input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-        }
-        if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
-          var matrix = Matrix44$1.identity();
-
-          if (this._currentCalcMode === 'matrix') {
-            this._finalMatrix = matrix.multiply(this.matrix);
-            this._dirtyAsElement = false;
-            return this._finalMatrix.clone();
-          }
-
-          var rotationMatrix = null;
-          if (this._currentCalcMode === 'quaternion') {
-            rotationMatrix = this.quaternion.rotationMatrix;
-          } else {
-            rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
-          }
-
-          this._finalMatrix = matrix.multiply(Matrix44$1.scale(this.scale)).multiply(rotationMatrix);
-          this._finalMatrix.m03 = this.translate.x;
-          this._finalMatrix.m13 = this.translate.y;
-          this._finalMatrix.m23 = this.translate.z;
-
-          this._dirtyAsElement = false;
-          this._matrixGetMode = 'animated_' + input;
-        }
-
-        return this._finalMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixOnlyRotate',
-      get: function get() {
-
-        var rotationMatrix = null;
-        if (this._currentCalcMode === 'quaternion') {
-          rotationMatrix = this.quaternion.rotationMatrix;
-        } else if (this._currentCalcMode === 'matrix') {
-          rotationMatrix = this.matrix;
-          rotationMatrix.m03 = 0;
-          rotationMatrix.m13 = 0;
-          rotationMatrix.m23 = 0;
-          rotationMatrix.m30 = 0;
-          rotationMatrix.m31 = 0;
-          rotationMatrix.m32 = 0;
-        } else {
-          rotationMatrix = Matrix44$1.rotateX(this.rotate.x).multiply(Matrix44$1.rotateY(this.rotate.y)).multiply(Matrix44$1.rotateZ(this.rotate.z));
-        }
-
-        return rotationMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixOnlyRotateOnInit',
-      get: function get() {
-        return this.getTransformMatrixOnlyRotateOn(0);
-      }
-    }, {
-      key: 'inverseTransformMatrix',
-      get: function get() {
-        if (!this._calculatedInverseMatrix) {
-          this._invMatrix = this.transformMatrix.invert();
-          this._calculatedInverseMatrix = true;
-        }
-        return this._invMatrix.clone();
-      }
-    }, {
-      key: 'transformMatrixAccumulatedAncestry',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
-          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
-        }
-
-        return this._matrixAccumulatedAncestry.clone();
-      }
-    }, {
-      key: 'transformMatrixAccumulatedAncestryWithoutMySelf',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-          this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
-          this._accumulatedAncestryNameWithUpdateInfoString = tempString;
-        }
-
-        return this._matrixAccumulatedAncestry.clone();
-      }
-    }, {
-      key: 'normalMatrixAccumulatedAncestry',
-      get: function get() {
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
-          var world_m = this._multiplyMyAndParentTransformMatrices(this, true);
-          this._normalMatrixAccumulatedAncestry = Matrix44$1.invert(world_m).transpose().toMatrix33();
-          this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
-        }
-
-        return this._normalMatrixAccumulatedAncestry.clone();
-      }
-    }, {
-      key: 'inverseTransformMatrixAccumulatedAncestryWithoutMySelf',
-      get: function get() {
-        if (this._parent === null) {
-          return Matrix44$1.identity();
-        }
-
-        var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-        //console.log(tempString);
-        if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
-          this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-          this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
-        }
-
-        return this._invMatrixAccumulatedAncestry.clone();
-      }
-    }, {
-      key: 'rotateMatrixAccumulatedAncestry',
-      get: function get() {
-        /*
-         var mat = this._multiplyMyAndParentTransformMatrices(this);
-         var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
-         var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
-         var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
-          return new Matrix44(
-         mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
-         mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
-         mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
-         0, 0, 0, 1
-         );*/
-        return this._multiplyMyAndParentRotateMatrices(this, true);
-      }
-    }, {
-      key: 'inverseTransformMatrixAccumulatedAncestry',
-      get: function get() {
-        return this._multiplyMyAndParentTransformMatrices(this, true).invert();
-      }
-    }, {
-      key: 'opacityAccumulatedAncestry',
-      get: function get() {
-        return this._accumulateMyAndParentOpacity(this);
-      }
-    }, {
-      key: 'opacity',
-      set: function set(opacity) {
-        this._opacity = opacity;
-      },
-      get: function get() {
-        return this._opacity;
-      }
-    }, {
-      key: 'transparent',
-      set: function set(flg) {
-        this._transparentByUser = flg;
-      }
-    }, {
-      key: 'dirty',
-      set: function set(flg) {
-        this._dirtyAsElement = flg;
-        if (flg) {
-          this._needUpdate();
-        }
-      }
-    }, {
-      key: 'parent',
-      get: function get() {
-        return this._parent;
-      }
-    }, {
-      key: 'camera',
-      set: function set(camera) {
-        this._camera = camera;
-      },
-      get: function get() {
-        return this._camera;
-      }
-    }, {
-      key: 'customFunction',
-      set: function set(func) {
-        this._customFunction = func;
-      },
-      get: function get() {
-        return this._customFunction;
-      }
-    }, {
-      key: 'isVisible',
-      set: function set(flg) {
-        this._isVisible = flg;
-      },
-      get: function get() {
-        return this._isVisible;
-      }
-    }]);
-    return M_Element;
-  }(L_Element);
 
   var M_AbstractCamera = function (_M_Element) {
     babelHelpers.inherits(M_AbstractCamera, _M_Element);
@@ -7037,1423 +8653,6 @@
     return ParticleShaderSource;
   }();
 
-  var ArrayUtil = function () {
-    function ArrayUtil() {
-      babelHelpers.classCallCheck(this, ArrayUtil);
-    }
-
-    babelHelpers.createClass(ArrayUtil, null, [{
-      key: 'merge',
-      value: function merge() {
-        var key,
-            result = false;
-        if (arguments && arguments.length > 0) {
-          result = [];
-          for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] && babelHelpers.typeof(arguments[i]) === 'object') {
-              for (key in arguments[i]) {
-                if (isFinite(key)) {
-                  result.push(arguments[i][key]);
-                } else {
-                  result[key] = arguments[i][key];
-                }
-              }
-            }
-          }
-        }
-        return result;
-      }
-    }]);
-    return ArrayUtil;
-  }();
-
-  var VertexLocalShaderSource = function () {
-    function VertexLocalShaderSource() {
-      babelHelpers.classCallCheck(this, VertexLocalShaderSource);
-    }
-
-    babelHelpers.createClass(VertexLocalShaderSource, [{
-      key: 'VSDefine_VertexLocalShaderSource',
-      value: function VSDefine_VertexLocalShaderSource(in_, out_, f) {
-        var shaderText = in_ + ' vec3 aVertex_position;\n';
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 aVertex_normal;\n';
-          shaderText += out_ + ' vec3 v_normal;\n';
-        }
-        shaderText += out_ + ' vec4 position;\n';
-        shaderText += 'uniform mat4 modelViewProjectionMatrix;\n';
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_VertexLocalShaderSource',
-      value: function VSTransform_VertexLocalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (existCamera_f) {
-          shaderText += '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
-          shaderText += '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
-        } else {
-          shaderText += '  gl_Position = vec4(aVertex_position, 1.0);\n';
-        }
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += '  v_normal = aVertex_normal;\n';
-        }
-        shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_VertexLocalShaderSource',
-      value: function FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (lights.length > 0) {
-          shaderText += 'uniform vec4 lightPosition[' + lights.length + '];\n';
-          shaderText += 'uniform vec4 lightDiffuse[' + lights.length + '];\n';
-        }
-        if (Shader._exist(f, GLBoost.NORMAL)) {
-          shaderText += in_ + ' vec3 v_normal;\n';
-        }
-        shaderText += in_ + ' vec4 position;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_VertexLocalShaderSource',
-      value: function prepare_VertexLocalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        if (existCamera_f) {
-          material.setUniform(shaderProgram.hashId, 'uniform_modelViewProjectionMatrix', gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
-          material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
-        }
-
-        for (var i = 0; i < lights.length; i++) {
-          material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
-          material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return VertexLocalShaderSource;
-  }();
-
-  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
-
-  /**
-   * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
-   * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var M_AbstractLight = function (_M_Element) {
-    babelHelpers.inherits(M_AbstractLight, _M_Element);
-
-    function M_AbstractLight(glBoostContext) {
-      babelHelpers.classCallCheck(this, M_AbstractLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (M_AbstractLight.__proto__ || Object.getPrototypeOf(M_AbstractLight)).call(this, glBoostContext));
-
-      if (_this.constructor === M_AbstractLight) {
-        throw new TypeError('Cannot construct AbstractLight instances directly.');
-      }
-
-      _this._gl = _this._glContext.gl;
-      return _this;
-    }
-
-    babelHelpers.createClass(M_AbstractLight, [{
-      key: 'prepareToRender',
-      value: function prepareToRender() {
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      }
-    }]);
-    return M_AbstractLight;
-  }(M_Element);
-
-  /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
-   */
-
-  var M_DirectionalLight = function (_M_AbstractLight) {
-    babelHelpers.inherits(M_DirectionalLight, _M_AbstractLight);
-
-    /**
-     * [en] The constructor of DirectionalLight class. <br>
-     * [ja] DirectionalLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
-     */
-    function M_DirectionalLight(glBoostContext, intensity, direction) {
-      babelHelpers.classCallCheck(this, M_DirectionalLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (M_DirectionalLight.__proto__ || Object.getPrototypeOf(M_DirectionalLight)).call(this, glBoostContext));
-
-      _this._intensity = intensity;
-      _this._direction = direction;
-      return _this;
-    }
-
-    babelHelpers.createClass(M_DirectionalLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }, {
-      key: 'direction',
-      set: function set(vec) {
-        this._direction = vec;
-        if (this._camera) {
-          if (this._camera.customFunction) {
-            this._camera.customFunction(this);
-          }
-        }
-      },
-      get: function get() {
-        return this._direction;
-      }
-    }]);
-    return M_DirectionalLight;
-  }(M_AbstractLight);
-
-  /**
-   * [en] This is a Point Light class.<br>
-   * [ja] 点光源クラスです。
-   */
-
-  var M_PointLight = function (_M_AbstractLight) {
-    babelHelpers.inherits(M_PointLight, _M_AbstractLight);
-
-    /**
-     * [en] The constructor of PointLight class. <br>
-     * [ja] PointLightクラスのコンストラクタ
-     * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-    function M_PointLight(glBoostContext, intensity) {
-      babelHelpers.classCallCheck(this, M_PointLight);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (M_PointLight.__proto__ || Object.getPrototypeOf(M_PointLight)).call(this, glBoostContext));
-
-      _this._intensity = intensity;
-
-      return _this;
-    }
-
-    babelHelpers.createClass(M_PointLight, [{
-      key: 'intensity',
-      set: function set(vec) {
-        this._intensity = vec;
-      },
-      get: function get() {
-        return this._intensity;
-      }
-    }]);
-    return M_PointLight;
-  }(M_AbstractLight);
-
-  var singleton$1 = Symbol();
-  var singletonEnforcer = Symbol();
-
-  var DrawKickerLocal = function () {
-    function DrawKickerLocal(enforcer) {
-      babelHelpers.classCallCheck(this, DrawKickerLocal);
-
-      if (enforcer !== singletonEnforcer) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-      this._glslProgram = null;
-    }
-
-    babelHelpers.createClass(DrawKickerLocal, [{
-      key: 'draw',
-      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
-        var isVAOBound = false;
-        if (DrawKickerLocal._lastGeometry !== geometryName) {
-          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-        }
-
-        for (var i = 0; i < materials.length; i++) {
-          var material = materials[i];
-          if (!material.isVisible) {
-            continue;
-          }
-
-          var materialUpdateStateString = material.getUpdateStateString();
-          if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-            this._glslProgram = material.shaderInstance.glslProgram;
-            gl.useProgram(this._glslProgram);
-          }
-          var glslProgram = this._glslProgram;
-
-          if (!isVAOBound) {
-            if (DrawKickerLocal._lastGeometry !== geometryName) {
-              for (var attribName in vboDic) {
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
-              }
-            }
-          }
-
-          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-          gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
-
-          if (camera) {
-            var viewMatrix = camera.lookAtRHMatrix();
-            var projectionMatrix = camera.projectionRHMatrix();
-            var world_m = mesh.transformMatrixAccumulatedAncestry;
-            var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION', pvm_m.flatten());
-          }
-
-          if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-            if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
-              var cameraPosInLocalCoord = null;
-              if (camera) {
-                var cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
-                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
-              } else {
-                cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
-              }
-              gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
-            }
-
-            for (var j = 0; j < lights.length; j++) {
-              if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j) && material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j)) {
-                var lightVec = null;
-                var isPointLight = -9999;
-                if (lights[j] instanceof M_PointLight) {
-                  lightVec = new Vector4(0, 0, 0, 1);
-                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  isPointLight = 1.0;
-                } else if (lights[j] instanceof M_DirectionalLight) {
-                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
-                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  lightVec.w = 0.0;
-                  isPointLight = 0.0;
-                }
-
-                var lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
-
-                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
-              }
-            }
-          }
-
-          var isMaterialSetupDone = true;
-
-          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh);
-            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-          }
-
-          if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
-            if (material) {
-              isMaterialSetupDone = material.setUpTexture();
-            }
-          }
-          if (!isMaterialSetupDone) {
-            return;
-          }
-
-          if (geometry.isIndexed()) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-            gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-          } else {
-            gl.drawArrays(gl[primitiveType], 0, vertexN);
-          }
-
-          DrawKickerLocal._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
-        }
-
-        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        DrawKickerLocal._lastGeometry = geometryName;
-        DrawKickerLocal._lastRenderPassIndex = renderPassIndex;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton$1]) {
-          this[singleton$1] = new DrawKickerLocal(singletonEnforcer);
-        }
-        return this[singleton$1];
-      }
-    }]);
-    return DrawKickerLocal;
-  }();
-
-  DrawKickerLocal._lastMaterialUpdateStateString = null;
-  DrawKickerLocal._lastGeometry = null;
-  DrawKickerLocal._lastRenderPassIndex = -1;
-
-  var singleton$2 = Symbol();
-  var singletonEnforcer$1 = Symbol();
-
-  var DrawKickerWorld = function () {
-    function DrawKickerWorld(enforcer) {
-      babelHelpers.classCallCheck(this, DrawKickerWorld);
-
-      if (enforcer !== singletonEnforcer$1) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-      this._glslProgram = null;
-    }
-
-    babelHelpers.createClass(DrawKickerWorld, [{
-      key: 'draw',
-      value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
-        var isVAOBound = false;
-        var isVAOBound = false;
-        if (DrawKickerWorld._lastGeometry !== geometryName) {
-          isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-        }
-
-        for (var i = 0; i < materials.length; i++) {
-          var material = materials[i];
-          if (!material.isVisible) {
-            continue;
-          }
-
-          var materialUpdateStateString = material.getUpdateStateString();
-          this._glslProgram = material.shaderInstance.glslProgram;
-          gl.useProgram(this._glslProgram);
-          var glslProgram = this._glslProgram;
-
-          if (!isVAOBound) {
-            if (DrawKickerWorld._lastGeometry !== geometryName) {
-              for (var attribName in vboDic) {
-                gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-                geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
-              }
-            }
-          }
-
-          var opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-          gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
-
-          var world_m = mesh.transformMatrixAccumulatedAncestry;
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'WORLD', world_m.flatten());
-          var normal_m = mesh.normalMatrixAccumulatedAncestry;
-          Shader.trySettingMatrix33ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
-          if (camera) {
-            var cameraMatrix = camera.lookAtRHMatrix();
-            var viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-            var projectionMatrix = camera.projectionRHMatrix();
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-            Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
-          }
-
-          if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
-            lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-            if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
-              var cameraPos = new Vector4(0, 0, 0, 1);
-              if (camera) {
-                cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
-                //  console.log(cameraPos);
-              } else {
-                var _cameraPos = new Vector4(0, 0, 1, 1);
-              }
-              gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z);
-            }
-
-            for (var j = 0; j < lights.length; j++) {
-              if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j) && material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j)) {
-                var lightVec = null;
-                var isPointLight = -9999;
-                if (lights[j] instanceof M_PointLight) {
-                  lightVec = new Vector4(0, 0, 0, 1);
-                  lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  isPointLight = 1.0;
-                } else if (lights[j] instanceof M_DirectionalLight) {
-                  lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
-                  lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                  lightVec.w = 0.0;
-                  isPointLight = 0.0;
-                }
-
-                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightPosition_' + j), lightVec.x, lightVec.y, lightVec.z, isPointLight);
-                gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_lightDiffuse_' + j), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
-              }
-            }
-          }
-
-          var isMaterialSetupDone = true;
-
-          if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-            var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
-            material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-          }
-
-          if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
-            if (material) {
-              material.setUpStates();
-
-              this._setUpOrTearDownTextures(false, material);
-              if (!this._setUpOrTearDownTextures(true, material)) {
-                MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
-                return;
-              }
-            }
-          }
-
-          this._setupOtherTextures(lights);
-
-          if (geometry.isIndexed()) {
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-            gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-          } else {
-            gl.drawArrays(gl[primitiveType], 0, vertexN);
-          }
-
-          material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
-
-          this._tearDownOtherTextures(lights);
-
-          material.tearDownStates();
-
-          DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
-        }
-
-        //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-        DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
-        DrawKickerWorld._lastGeometry = geometryName;
-      }
-    }, {
-      key: '_setUpOrTearDownTextures',
-      value: function _setUpOrTearDownTextures(isSetUp, material) {
-        var methodName = 'tearDownTexture';
-        if (isSetUp) {
-          methodName = 'setUpTexture';
-        }
-
-        var isTextureProcessDone = true;
-        if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-          // do nothing
-        } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-          var textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
-          var textureName = textureSamplerDic.textureName;
-          var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-          isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-        } else {
-          // it must be an Array...
-          material._semanticsDic['TEXTURE'].forEach(function (uniformName) {
-            var textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-            var textureName = textureSamplerDic.textureName;
-            var textureUnitIndex = textureSamplerDic.textureUnitIndex;
-            isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-          });
-        }
-
-        return isTextureProcessDone;
-      }
-    }, {
-      key: '_setupOtherTextures',
-      value: function _setupOtherTextures(lights) {
-        for (var i = 0; i < lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            lights[i].camera.texture.setUp();
-          }
-        }
-      }
-    }, {
-      key: '_tearDownOtherTextures',
-      value: function _tearDownOtherTextures(lights) {
-        for (var i = 0; i < lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            lights[i].camera.texture.tearDown();
-          }
-        }
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance() {
-        if (!this[singleton$2]) {
-          this[singleton$2] = new DrawKickerWorld(singletonEnforcer$1);
-        }
-        return this[singleton$2];
-      }
-    }]);
-    return DrawKickerWorld;
-  }();
-
-  DrawKickerWorld._lastMaterialUpdateStateString = null;
-  DrawKickerWorld._lastGeometry = null;
-  DrawKickerWorld._lastRenderPassIndex = -1;
-
-  var AABB = function () {
-    function AABB() {
-      babelHelpers.classCallCheck(this, AABB);
-
-      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
-      this._centerPoint = null;
-      this._lengthCenterToCorner = null;
-    }
-
-    babelHelpers.createClass(AABB, [{
-      key: 'clone',
-      value: function clone() {
-        var instance = new AABB();
-        instance._AABB_max = this._AABB_max.clone();
-        instance._AABB_min = this._AABB_min.clone();
-        instance._centerPoint = this._centerPoint !== null ? this._centerPoint.clone() : null;
-        instance._lengthCenterToCorner = this._lengthCenterToCorner;
-
-        return instance;
-      }
-    }, {
-      key: 'isVanilla',
-      value: function isVanilla() {
-        if (this._AABB_min.x == Number.MAX_VALUE && this._AABB_min.y == Number.MAX_VALUE && this._AABB_min.z == Number.MAX_VALUE && this._AABB_max.x == -Number.MAX_VALUE && this._AABB_max.y == -Number.MAX_VALUE && this._AABB_max.z == -Number.MAX_VALUE) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-    }, {
-      key: 'addPosition',
-      value: function addPosition(positionVector) {
-        this._AABB_min.x = positionVector.x < this._AABB_min.x ? positionVector.x : this._AABB_min.x;
-        this._AABB_min.y = positionVector.y < this._AABB_min.y ? positionVector.y : this._AABB_min.y;
-        this._AABB_min.z = positionVector.z < this._AABB_min.z ? positionVector.z : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < positionVector.x ? positionVector.x : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < positionVector.y ? positionVector.y : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < positionVector.z ? positionVector.z : this._AABB_max.z;
-
-        return positionVector;
-      }
-    }, {
-      key: 'addPositionWithArray',
-      value: function addPositionWithArray(array, index) {
-        this._AABB_min.x = array[index + 0] < this._AABB_min.x ? array[index + 0] : this._AABB_min.x;
-        this._AABB_min.y = array[index + 1] < this._AABB_min.y ? array[index + 1] : this._AABB_min.y;
-        this._AABB_min.z = array[index + 2] < this._AABB_min.z ? array[index + 2] : this._AABB_min.z;
-        this._AABB_max.x = this._AABB_max.x < array[index + 0] ? array[index + 0] : this._AABB_max.x;
-        this._AABB_max.y = this._AABB_max.y < array[index + 1] ? array[index + 1] : this._AABB_max.y;
-        this._AABB_max.z = this._AABB_max.z < array[index + 2] ? array[index + 2] : this._AABB_max.z;
-
-        return array;
-      }
-    }, {
-      key: 'updateAllInfo',
-      value: function updateAllInfo() {
-        this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-        this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
-
-        return this;
-      }
-    }, {
-      key: 'mergeAABB',
-      value: function mergeAABB(aabb) {
-        var isUpdated = false;
-
-        if (aabb.isVanilla()) {
-          return isUpdated;
-        }
-
-        if (this.isVanilla()) {
-          this._AABB_min.x = aabb.minPoint.x;
-          this._AABB_min.y = aabb.minPoint.y;
-          this._AABB_min.z = aabb.minPoint.z;
-          this._AABB_max.x = aabb.maxPoint.x;
-          this._AABB_max.y = aabb.maxPoint.y;
-          this._AABB_max.z = aabb.maxPoint.z;
-          isUpdated = true;
-          return isUpdated;
-        }
-
-        if (aabb.minPoint.x < this._AABB_min.x) {
-          this._AABB_min.x = aabb.minPoint.x;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.y < this._AABB_min.y) {
-          this._AABB_min.y = aabb.minPoint.y;
-          isUpdated = true;
-        }
-        if (aabb.minPoint.z < this._AABB_min.z) {
-          this._AABB_min.z = aabb.minPoint.z;
-          isUpdated = true;
-        }
-        if (this._AABB_max.x < aabb.maxPoint.x) {
-          this._AABB_max.x = aabb.maxPoint.x;
-          isUpdated = true;
-        }
-        if (this._AABB_max.y < aabb.maxPoint.y) {
-          this._AABB_max.y = aabb.maxPoint.y;
-          isUpdated = true;
-        }
-        if (this._AABB_max.z < aabb.maxPoint.z) {
-          this._AABB_max.z = aabb.maxPoint.z;
-          isUpdated = true;
-        }
-        this.updateAllInfo();
-
-        return isUpdated;
-      }
-    }, {
-      key: 'toString',
-      value: function toString() {
-        return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n' + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
-      }
-    }, {
-      key: 'minPoint',
-      get: function get() {
-        return this._AABB_min;
-      }
-    }, {
-      key: 'maxPoint',
-      get: function get() {
-        return this._AABB_max;
-      }
-    }, {
-      key: 'centerPoint',
-      get: function get() {
-        return this._centerPoint;
-      }
-    }, {
-      key: 'lengthCenterToCorner',
-      get: function get() {
-        return this._lengthCenterToCorner;
-      }
-    }], [{
-      key: 'multiplyMatrix',
-      value: function multiplyMatrix(matrix, aabb) {
-        if (aabb.isVanilla()) {
-          return aabb.clone();
-        }
-        var newAabb = new AABB();
-
-        var AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-        var AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-        var AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-        var AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-        var AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-        var AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-        var AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-        var AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-        newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
-        newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
-        newAabb.updateAllInfo();
-
-        return newAabb;
-      }
-    }]);
-    return AABB;
-  }();
-
-  GLBoost$1['AABB'] = AABB;
-
-  var Geometry = function (_GLBoostObject) {
-    babelHelpers.inherits(Geometry, _GLBoostObject);
-
-    function Geometry(glBoostContext) {
-      babelHelpers.classCallCheck(this, Geometry);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (Geometry.__proto__ || Object.getPrototypeOf(Geometry)).call(this, glBoostContext));
-
-      _this._materials = [];
-      _this._vertexN = 0;
-      _this._vertices = null;
-      _this._indicesArray = null;
-      _this._performanceHint = null;
-      _this._defaultMaterial = glBoostContext.createClassicMaterial();
-      _this._vertexData = [];
-      _this._extraDataForShader = {};
-      _this._vboObj = {};
-      _this._AABB = new AABB();
-      _this._drawKicker = DrawKickerWorld.getInstance();
-
-      if (_this._drawKicker instanceof DrawKickerWorld) {} else if (_this._drawKicker instanceof DrawKickerLocal) {}
-      return _this;
-    }
-
-    /**
-     * 全ての頂点属性のリストを返す
-     */
-
-
-    babelHelpers.createClass(Geometry, [{
-      key: '_checkAndSetVertexComponentNumber',
-      value: function _checkAndSetVertexComponentNumber(allVertexAttribs) {
-        var _this2 = this;
-
-        allVertexAttribs.forEach(function (attribName) {
-          var element = _this2._vertices[attribName][0];
-          var componentN = MathUtil.compomentNumberOfVector(element);
-          if (componentN === 0) {
-            // if 0, it must be a number. so users must set components info.
-            return;
-          }
-          if (typeof _this2._vertices.components === 'undefined') {
-            _this2._vertices.components = {};
-          }
-          if (typeof _this2._vertices.componentType === 'undefined') {
-            _this2._vertices.componentType = {};
-          }
-
-          _this2._vertices.components[attribName] = componentN;
-          _this2._vertices.componentType[attribName] = 5126;
-        });
-      }
-    }, {
-      key: 'setVerticesData',
-      value: function setVerticesData(vertices, indicesArray) {
-        var _this3 = this;
-
-        var primitiveType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : GLBoost$1.TRIANGLES;
-        var performanceHint = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : GLBoost$1.STATIC_DRAW;
-
-        this._vertices = vertices;
-        this._indicesArray = indicesArray;
-
-        var vertexNum = 0;
-        if (typeof this._vertices.position.buffer !== 'undefined') {
-          vertexNum = this._vertices.position.length / 3;
-        } else {
-          vertexNum = this._vertices.position.length;
-        }
-
-        // for Wireframe
-        this._vertices.barycentricCoord = [];
-        if (!this._indicesArray) {
-          for (var i = 0; i < this._vertices.position.length; i++) {
-            var bary = null;
-            if (i % 3 === 0) {
-              bary = new Vector3(1, 0, 0);
-            } else if (i % 3 === 1) {
-              bary = new Vector3(0, 1, 0);
-            } else if (i % 3 === 2) {
-              bary = new Vector3(0, 0, 1);
-            }
-            this._vertices.barycentricCoord[i] = bary;
-          }
-        } else {
-          for (var _i = 0; _i < this._indicesArray.length; _i++) {
-            var indices = this._indicesArray[_i];
-            for (var j = 0; j < indices.length; j++) {
-              var _bary = null;
-              if (j % 3 === 0) {
-                _bary = new Vector3(1, 0, 0);
-              } else if (j % 3 === 1) {
-                _bary = new Vector3(0, 1, 0);
-              } else if (j % 3 === 2) {
-                _bary = new Vector3(0, 0, 1);
-              }
-              this._vertices.barycentricCoord[indices[j]] = _bary;
-            }
-          }
-        }
-        for (var _i2 = 0; _i2 < vertexNum; _i2++) {
-          if (typeof this._vertices.barycentricCoord[_i2] === 'undefined') {
-            this._vertices.barycentricCoord[_i2] = new Vector3(0, 0, 0); // Dummy Data
-          }
-        }
-
-        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-        this._checkAndSetVertexComponentNumber(allVertexAttribs);
-
-        {
-          var vertexAttribArray = [];
-          for (var _i3 = 0; _i3 < this._vertices.barycentricCoord.length; _i3++) {
-            var element = this._vertices.barycentricCoord[_i3];
-            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-          }
-          this._vertices.barycentricCoord = vertexAttribArray;
-        }
-
-        if (typeof this._vertices.position.buffer !== 'undefined') {
-          // position (and maybe others) are a TypedArray
-          var componentN = this._vertices.components.position;
-          var _vertexNum = this._vertices.position.length / componentN;
-          for (var _i4 = 0; _i4 < _vertexNum; _i4++) {
-            this._AABB.addPositionWithArray(this._vertices.position, _i4 * componentN);
-          }
-
-          var barycentricCoords = this._vertices.barycentricCoord;
-          this._vertices.barycentricCoord = new Float32Array(barycentricCoords.length);
-          this._vertices.barycentricCoord.set(barycentricCoords);
-        } else {
-          allVertexAttribs.forEach(function (attribName) {
-            if (attribName === 'barycentricCoord') {
-              return;
-            }
-            var vertexAttribArray = [];
-            _this3._vertices[attribName].forEach(function (elem, index) {
-              var element = _this3._vertices[attribName][index];
-              Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-              if (attribName === 'position') {
-                var _componentN = _this3._vertices.components[attribName];
-                _this3._AABB.addPositionWithArray(vertexAttribArray, index * _componentN);
-              }
-            });
-            _this3._vertices[attribName] = vertexAttribArray;
-          });
-        }
-
-        this._AABB.updateAllInfo();
-
-        this._primitiveType = primitiveType;
-
-        var gl = this._glContext.gl;
-        var hint = null;
-        switch (performanceHint) {
-          case GLBoost$1.STATIC_DRAW:
-            hint = gl.STATIC_DRAW;
-            break;
-          case GLBoost$1.STREAM_DRAW:
-            hint = gl.STREAM_DRAW;
-            break;
-          case GLBoost$1.DYNAMIC_DRAW:
-            hint = gl.DYNAMIC_DRAW;
-            break;
-        }
-        this._performanceHint = hint;
-      }
-    }, {
-      key: 'updateVerticesData',
-      value: function updateVerticesData(vertices) {
-        var _this4 = this;
-
-        var gl = this._glContext.gl;
-
-        var _loop = function _loop(attribName) {
-          var vertexAttribArray = [];
-          _this4._vertices[attribName].forEach(function (elem, index) {
-            var element = vertices[attribName][index];
-            Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-
-            if (attribName === 'position') {
-              var componentN = _this4._vertices.components[attribName];
-              _this4._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
-            }
-            _this4._vertices[attribName] = vertexAttribArray;
-          });
-        };
-
-        for (var attribName in vertices) {
-          _loop(attribName);
-        }
-
-        this._AABB.updateAllInfo();
-
-        for (var _attribName in vertices) {
-          var float32AryVertexData = new Float32Array(this._vertices[_attribName]);
-          gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[_attribName]);
-          gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
-          gl.bindBuffer(gl.ARRAY_BUFFER, null);
-        }
-      }
-    }, {
-      key: 'setUpVertexAttribs',
-      value: function setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
-        var _this5 = this;
-
-        var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
-
-        // setup vertex layouts
-        allVertexAttribs.forEach(function (attribName) {
-          if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-            var vertexAttribName = null;
-            gl.bindBuffer(gl.ARRAY_BUFFER, _this5._vboObj[attribName]);
-            gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName], _this5._vertices.components[attribName], _this5._vertices.componentType[attribName], gl.FALSE, 0, 0);
-          }
-        });
-      }
-    }, {
-      key: 'prepareGLSLProgramAndSetVertexNtoMaterial',
-      value: function prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights) {
-        var doSetupVertexAttribs = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
-
-        var gl = this._glContext.gl;
-        var vertices = this._vertices;
-
-        var glem = GLExtensionsManager.getInstance(this._glContext);
-        var _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
-
-        if (doSetupVertexAttribs) {
-          glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-        }
-
-        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
-
-        if (material.shaderInstance === null) {
-          var shaderClass = material.shaderClass;
-
-          var basicShaderSource = null;
-          if (this._drawKicker instanceof DrawKickerWorld) {
-            basicShaderSource = VertexWorldShaderSource;
-          } else if (this._drawKicker instanceof DrawKickerLocal) {
-            basicShaderSource = VertexLocalShaderSource;
-          }
-
-          material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
-        }
-        var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
-        if (doSetupVertexAttribs) {
-          this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-        }
-
-        if (doSetupVertexAttribs) {
-          glem.bindVertexArray(gl, null);
-        }
-        this._setVertexNtoSingleMaterial(material, index);
-
-        return material;
-      }
-    }, {
-      key: '_setVertexNtoSingleMaterial',
-      value: function _setVertexNtoSingleMaterial(material, index) {
-        // if this mesh has only one material...
-        if (material.getVertexN(this) === 0) {
-          if (this._indicesArray && this._indicesArray.length > 0) {
-            material.setVertexN(this, this._indicesArray[index].length);
-          } else {
-            material.setVertexN(this, this._vertexN);
-          }
-        }
-      }
-    }, {
-      key: '_getAppropriateMaterials',
-      value: function _getAppropriateMaterials(mesh) {
-        var materials = null;
-        if (this._materials.length > 0) {
-          materials = this._materials;
-        } else if (mesh.material) {
-          materials = [mesh.material];
-        } else {
-          materials = [this._defaultMaterial];
-        }
-        return materials;
-      }
-    }, {
-      key: 'prepareToRender',
-      value: function prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
-        var _this6 = this;
-
-        var vertices = this._vertices;
-        var gl = this._glContext.gl;
-
-        var glem = GLExtensionsManager.getInstance(this._glContext);
-
-        this._vertexN = vertices.position.length / vertices.components.position;
-
-        var allVertexAttribs = Geometry._allVertexAttribs(vertices);
-
-        // create VAO
-        if (Geometry._vaoDic[this.toString()]) {} else {
-          var vao = this._glContext.createVertexArray(this);
-          Geometry._vaoDic[this.toString()] = vao;
-        }
-        glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-
-        var doAfter = true;
-
-        allVertexAttribs.forEach(function (attribName) {
-          // create VBO
-          if (_this6._vboObj[attribName]) {
-            doAfter = false;
-          } else {
-            var vbo = _this6._glContext.createBuffer(_this6);
-            _this6._vboObj[attribName] = vbo;
-          }
-        });
-
-        var materials = this._getAppropriateMaterials(mesh);
-
-        for (var i = 0; i < materials.length; i++) {
-          this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
-        }
-
-        if (doAfter) {
-
-          allVertexAttribs.forEach(function (attribName) {
-            gl.bindBuffer(gl.ARRAY_BUFFER, _this6._vboObj[attribName]);
-            if (typeof _this6._vertices[attribName].buffer !== 'undefined') {
-              gl.bufferData(gl.ARRAY_BUFFER, _this6._vertices[attribName], _this6._performanceHint);
-            } else {
-              gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(_this6._vertices[attribName]), _this6._performanceHint);
-            }
-            //gl.bindBuffer(gl.ARRAY_BUFFER, null);
-          });
-
-          Geometry._iboArrayDic[this.toString()] = [];
-          if (this._indicesArray) {
-            // create Index Buffer
-            for (var _i5 = 0; _i5 < this._indicesArray.length; _i5++) {
-              var ibo = this._glContext.createBuffer(this);
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
-              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[_i5]), gl.STATIC_DRAW);
-              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-              Geometry._iboArrayDic[this.toString()][_i5] = ibo;
-              this._defaultMaterial.setVertexN(this._indicesArray[_i5].length);
-            }
-          }
-          glem.bindVertexArray(gl, null);
-        }
-        return true;
-      }
-    }, {
-      key: 'draw',
-      value: function draw(expression, lights, camera, mesh, scene, renderPassIndex) {
-        var gl = this._glContext.gl;
-        var glem = GLExtensionsManager.getInstance(this._glContext);
-
-        var materials = this._getAppropriateMaterials(mesh);
-
-        var thisName = this.toString();
-
-        this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
-      }
-    }, {
-      key: 'merge',
-      value: function merge(geometrys) {
-        var _this7 = this;
-
-        if (Array.isArray(geometrys)) {
-          (function () {
-            var typedArrayDic = {};
-            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
-            allVertexAttribs.forEach(function (attribName) {
-              var thisLength = _this7._vertices[attribName].length;
-
-              var allGeomLength = 0;
-              geometrys.forEach(function (geometry) {
-                allGeomLength += geometry._vertices[attribName].length;
-              });
-              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
-            });
-
-            var lastThisLengthDic = {};
-            allVertexAttribs.forEach(function (attribName) {
-              lastThisLengthDic[attribName] = 0;
-            });
-            geometrys.forEach(function (geometry, index) {
-              var typedSubArrayDic = {};
-              allVertexAttribs.forEach(function (attribName) {
-                var typedArray = typedArrayDic[attribName];
-
-                if (index === 0) {
-                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
-                }
-
-                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
-                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
-                lastThisLengthDic[attribName] = end;
-              });
-              _this7.mergeInner(geometry, typedSubArrayDic, index === 0);
-            });
-          })();
-        } else {
-          (function () {
-            var geometry = geometrys;
-            var typedArrayDic = {};
-            var allVertexAttribs = Geometry._allVertexAttribs(_this7._vertices);
-            allVertexAttribs.forEach(function (attribName) {
-              var thisLength = _this7._vertices[attribName].length;
-              var geomLength = geometry._vertices[attribName].length;
-
-              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
-            });
-
-            _this7.mergeInner(geometry, typedArrayDic);
-          })();
-        }
-      }
-
-      /**
-       *
-       * @param geometry
-       */
-
-    }, {
-      key: 'mergeInner',
-      value: function mergeInner(geometry, typedArrayDic) {
-        var _this8 = this;
-
-        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        var gl = this._glContext.gl;
-        var baseLen = this._vertices.position.length / this._vertices.components.position;;
-
-        if (this === geometry) {
-          console.assert('don\'t merge same geometry!');
-        }
-
-        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-
-        allVertexAttribs.forEach(function (attribName) {
-          var thisLength = _this8._vertices[attribName].length;
-          var geomLength = geometry._vertices[attribName].length;
-
-          var float32array = typedArrayDic[attribName];
-
-          if (isFirst) {
-            float32array.set(_this8._vertices[attribName], 0);
-          }
-          float32array.set(geometry._vertices[attribName], thisLength);
-
-          _this8._vertices[attribName] = float32array;
-
-          if (typeof _this8._vboObj[attribName] !== 'undefined') {
-            gl.bindBuffer(gl.ARRAY_BUFFER, _this8._vboObj[attribName]);
-            gl.bufferData(gl.ARRAY_BUFFER, _this8._vertices[attribName], _this8._performanceHint);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-          }
-        });
-
-        var geometryIndicesN = geometry._indicesArray.length;
-        for (var i = 0; i < geometryIndicesN; i++) {
-          for (var j = 0; j < geometry._indicesArray[i].length; j++) {
-            geometry._indicesArray[i][j] += baseLen;
-          }
-          this._indicesArray.push(geometry._indicesArray[i]);
-          if (geometry._materials[i]) {
-            this._materials.push(geometry._materials[i]);
-          }
-        }
-        this._vertexN += geometry._vertexN;
-      }
-    }, {
-      key: 'mergeHarder',
-      value: function mergeHarder(geometrys) {
-        var _this9 = this;
-
-        if (Array.isArray(geometrys)) {
-          (function () {
-            var typedArrayDic = {};
-            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
-            allVertexAttribs.forEach(function (attribName) {
-              var thisLength = _this9._vertices[attribName].length;
-
-              var allGeomLength = 0;
-              geometrys.forEach(function (geometry) {
-                allGeomLength += geometry._vertices[attribName].length;
-              });
-              typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
-            });
-
-            var lastThisLengthDic = {};
-            allVertexAttribs.forEach(function (attribName) {
-              lastThisLengthDic[attribName] = 0;
-            });
-            geometrys.forEach(function (geometry, index) {
-              var typedSubArrayDic = {};
-              allVertexAttribs.forEach(function (attribName) {
-                var typedArray = typedArrayDic[attribName];
-
-                if (index === 0) {
-                  lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
-                }
-
-                var end = typeof geometrys[index + 1] !== 'undefined' ? lastThisLengthDic[attribName] + geometrys[index + 1]._vertices[attribName].length : void 0;
-                typedSubArrayDic[attribName] = typedArray.subarray(0, end);
-                lastThisLengthDic[attribName] = end;
-              });
-              _this9.mergeHarderInner(geometry, typedSubArrayDic, index === 0);
-            });
-          })();
-        } else {
-          (function () {
-            var geometry = geometrys;
-            var typedArrayDic = {};
-            var allVertexAttribs = Geometry._allVertexAttribs(_this9._vertices);
-            allVertexAttribs.forEach(function (attribName) {
-              var thisLength = _this9._vertices[attribName].length;
-              var geomLength = geometry._vertices[attribName].length;
-
-              typedArrayDic[attribName] = new Float32Array(thisLength + geomLength);
-            });
-
-            _this9.mergeHarderInner(geometry, typedArrayDic);
-          })();
-        }
-      }
-
-      /**
-       * take no thought geometry's materials
-       *
-       * @param geometry
-       */
-
-    }, {
-      key: 'mergeHarderInner',
-      value: function mergeHarderInner(geometry, typedArrayDic) {
-        var _this10 = this;
-
-        var isFirst = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-        var gl = this._glContext.gl;
-        var baseLen = this._vertices.position.length / this._vertices.components.position;
-        if (this === geometry) {
-          console.assert('don\'t merge same geometry!');
-        }
-
-        var allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-
-        allVertexAttribs.forEach(function (attribName) {
-          var thisLength = _this10._vertices[attribName].length;
-          var geomLength = geometry._vertices[attribName].length;
-
-          var float32array = typedArrayDic[attribName];
-
-          if (isFirst) {
-            float32array.set(_this10._vertices[attribName], 0);
-          }
-          float32array.set(geometry._vertices[attribName], thisLength);
-
-          _this10._vertices[attribName] = float32array;
-
-          if (typeof _this10._vboObj[attribName] !== 'undefined') {
-            gl.bindBuffer(gl.ARRAY_BUFFER, _this10._vboObj[attribName]);
-            gl.bufferData(gl.ARRAY_BUFFER, _this10._vertices[attribName], _this10._performanceHint);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
-          }
-        });
-
-        for (var i = 0; i < this._indicesArray.length; i++) {
-          var len = geometry._indicesArray[i].length;
-          for (var j = 0; j < len; j++) {
-            var idx = geometry._indicesArray[i][j];
-            this._indicesArray[i].push(baseLen + idx);
-          }
-          if (this._materials[i]) {
-            this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
-          }
-        }
-        this._vertexN += geometry._vertexN;
-      }
-    }, {
-      key: 'setExtraDataForShader',
-      value: function setExtraDataForShader(name, value) {
-        this._extraDataForShader[name] = value;
-      }
-    }, {
-      key: 'getExtraDataForShader',
-      value: function getExtraDataForShader(name) {
-        return this._extraDataForShader[name];
-      }
-    }, {
-      key: 'isTransparent',
-      value: function isTransparent(mesh) {
-        var materials = this._getAppropriateMaterials(mesh);
-        var isTransparent = false;
-        materials.forEach(function (material) {
-          if (material.isTransparent()) {
-            isTransparent = true;
-          }
-        });
-        return isTransparent;
-      }
-    }, {
-      key: 'isIndexed',
-      value: function isIndexed() {
-        return Geometry._iboArrayDic[this.toString()].length > 0;
-      }
-    }, {
-      key: 'getTriangleCount',
-      value: function getTriangleCount(mesh) {
-        var gl = this._glContext.gl;
-        var materials = this._getAppropriateMaterials(mesh);
-        var count = 0;
-        for (var i = 0; i < materials.length; i++) {
-          var material = materials[i];
-          if (gl[this._primitiveType] === gl.TRIANGLES) {
-            if (this.isIndexed()) {
-              count += material.getVertexN(this.toString()) / 3;
-            } else {
-              count += this._vertexN / 3;
-            }
-          } else if (gl[this._primitiveType] === gl.TRIANGLE_STRIP) {
-            if (this.isIndexed()) {
-              count += material.getVertexN(this.toString()) - 2;
-            } else {
-              count += this._vertexN - 2;
-            }
-          }
-        }
-        return count;
-      }
-    }, {
-      key: 'getVertexCount',
-      value: function getVertexCount() {
-        var gl = this._glContext.gl;
-        var count = 0;
-        if (this._vertices) {
-          count = this._vertices.position.length;
-        }
-        return count;
-      }
-    }, {
-      key: 'materials',
-      set: function set(materials) {
-        this._materials = materials;
-      },
-      get: function get() {
-        return this._materials;
-      }
-    }, {
-      key: 'centerPosition',
-      get: function get() {
-        return this._AABB.centerPoint;
-      }
-    }, {
-      key: 'AABB',
-      get: function get() {
-        return this._AABB;
-      }
-    }], [{
-      key: '_allVertexAttribs',
-      value: function _allVertexAttribs(vertices) {
-        var attribNameArray = [];
-        for (var attribName in vertices) {
-          if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
-            attribNameArray.push(attribName);
-          }
-        }
-
-        return attribNameArray;
-      }
-    }, {
-      key: 'clearMaterialCache',
-      value: function clearMaterialCache() {
-        Geometry._lastMaterial = null;
-      }
-    }]);
-    return Geometry;
-  }(GLBoostObject);
-
-  Geometry._vaoDic = {};
-  Geometry._iboArrayDic = {};
-
   /**
    * This Particle class handles particles expressions.
    * You can define particles behaviors in a custom vertex shader.
@@ -9578,6 +9777,11 @@
       key: 'createSPVClassicMaterial',
       value: function createSPVClassicMaterial() {
         return new SPVClassicMaterial(this);
+      }
+    }, {
+      key: 'createSPVScreen',
+      value: function createSPVScreen(layout, customVertexAttributes) {
+        return new SPVScreen(this, layout, customVertexAttributes);
       }
     }, {
       key: 'glContext',

@@ -20,6 +20,7 @@ import MiscUtil from '../misc/MiscUtil';
 import GLBoost from '../../globals';
 import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
 import SPVClassicMaterial from '../materials/SPVClassicMaterial';
+import SPVScreen from '../primitives/SPVScreen';
 
 export default class GLBoostLowContext {
   constructor(canvas, gl, width, height) {
@@ -265,6 +266,10 @@ export default class GLBoostLowContext {
 
   createSPVClassicMaterial() {
     return new SPVClassicMaterial(this);
+  }
+
+  createSPVScreen(layout, customVertexAttributes) {
+    return new SPVScreen(this, layout, customVertexAttributes);
   }
 }
 
