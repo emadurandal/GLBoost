@@ -4076,9 +4076,9 @@
         }
         if (existCamera_f) {
           shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-          shaderText += '  gl_Position = pvwMatrix * preTransformedPosition*vec4(0.9, 0.9, 0.9, 1.0);\n';
+          shaderText += '  gl_Position = pvwMatrix * preTransformedPosition;\n';
         } else {
-          shaderText += '  gl_Position = worldMatrix * preTransformedPosition*vec4(0.9, 0.9, 0.9, 1.0);\n';
+          shaderText += '  gl_Position = worldMatrix * preTransformedPosition;\n';
         }
         if (Shader._exist(f, GLBoost.NORMAL)) {
           shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
@@ -6287,7 +6287,7 @@
         }
         //shaderText += '    float shadowRatio = 0.0;\n';
 
-        shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
       }
     }, {

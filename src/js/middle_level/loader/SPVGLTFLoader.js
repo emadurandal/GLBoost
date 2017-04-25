@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
+import M_Group from '../elements/M_Group';
 import SPVDecalShader from '../shaders/SPVDecalShader';
 import SPVLambertShader from '../shaders/SPVLambertShader';
 import SPVPhongShader from '../shaders/SPVPhongShader';
