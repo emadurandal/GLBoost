@@ -3165,7 +3165,7 @@
         var value = this._currentAnimationInputValues[inputName];
         if (typeof value !== 'undefined') {
           return value;
-        } else if (this._toInheritCurrentAnimationInputValue) {
+        } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
           return this._parent._getCurrentAnimationInputValue(inputName);
         } else {
           return -1;

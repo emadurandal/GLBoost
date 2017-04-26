@@ -14,5 +14,6 @@ export default class M_ScreenMesh extends M_Mesh {
     this.isAffectedByWorldMatrix = false;
     this.isAffectedByViewMatrix = false;
     this.isAffectedByProjectionMatrix = false;
+    this.material = new ClassicMaterial(this._glBoostContext);
   }
 }

@@ -4500,7 +4500,7 @@
         var value = this._currentAnimationInputValues[inputName];
         if (typeof value !== 'undefined') {
           return value;
-        } else if (this._toInheritCurrentAnimationInputValue) {
+        } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
           return this._parent._getCurrentAnimationInputValue(inputName);
         } else {
           return -1;
@@ -8087,7 +8087,7 @@
         if (element instanceof M_Group) {
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
-            var hitChild = this.searchElement(userFlavorNameOrRegExp, queryType, children[i]);
+            var hitChild = this.searchElement(query, queryMeta, children[i]);
             if (hitChild) {
               return hitChild;
             }
@@ -8227,8 +8227,8 @@
         var queryMeta = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : { type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format: GLBoost.QUERY_FORMAT_STRING };
         var element = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this;
 
+        var objects = [];
         if (element instanceof M_Group) {
-          var objects = [];
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             var hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
@@ -8240,7 +8240,6 @@
         }
         if (type === L_AbstractMaterial && element instanceof M_Mesh) {
           var materials = element.getAppropriateMaterials();
-          var _objects = [];
           var _iteratorNormalCompletion2 = true;
           var _didIteratorError2 = false;
           var _iteratorError2 = undefined;
@@ -8250,7 +8249,7 @@
               var material = _step2.value;
 
               if (this._validateByQuery(material, query, queryMeta)) {
-                _objects.push(material);
+                objects.push(material);
               }
             }
           } catch (err) {
@@ -8268,10 +8267,11 @@
             }
           }
 
-          return _objects;
+          return objects;
         } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
           return [element];
         }
+        return objects;
       }
     }, {
       key: 'updateAABB',
@@ -9424,8 +9424,43 @@
         this._elements.forEach(function (elm) {
           _this2._cameras = _this2._cameras.concat(collectCameras(elm));
         });
-        if (this._cameras.length !== 0) {
+        if (this._cameras.length === 1) {
           this._cameras[0].setAsMainCamera(this);
+        } else {
+          // If there are two or more cameras present in the scene and the main camera is not explicitly specified,
+          // a camera chosen to be irresponsible is made the main camera.
+          var isNotMainCameraFound = true;
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this._cameras[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var camera = _step.value;
+
+              if (camera.isMainCamera(this)) {
+                isNotMainCameraFound = false;
+                break;
+              }
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          if (isNotMainCameraFound) {
+            this._cameras[0].setAsMainCamera(this); //
+          }
         }
 
         var collectMeshes = function collectMeshes(elem) {
