@@ -56,6 +56,7 @@ export class DecalShaderSource {
     //shaderText += '    float shadowRatio = 0.0;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
     return shaderText;
   }
 
@@ -98,6 +99,8 @@ export default class DecalShader extends WireframeShader {
     super(glBoostContext);
 
     DecalShader.mixin(DecalShaderSource);
+
+    this._lut = null;
   }
 
   setUniforms(gl, glslProgram, expression, material) {
@@ -109,6 +112,14 @@ export default class DecalShader extends WireframeShader {
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
     }
+  }
+
+  set lut(lut) {
+    this._lut = lut;
+  }
+
+  get lut() {
+    return this._lut;
   }
 }
 
