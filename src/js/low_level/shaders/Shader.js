@@ -567,6 +567,9 @@ export default class Shader extends GLBoostObject {
     super.readyForDiscard();
   }
 
+  getShaderParameter(material, parameterName) {
+    return this[parameterName] || material.shaderParameters[parameterName];
+  }
 }
 
 Shader._instances = new Object();

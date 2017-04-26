@@ -32,6 +32,34 @@ export default class Vector4 {
   toVector3() {
     return new Vector3(this.x, this.y, this.z);
   }
+
+  divide(val) {
+    console.assert(val != 0, "0 division!");
+    this.x /= val;
+    this.y /= val;
+    this.z /= val;
+    this.w /= val;
+
+    return this;
+  }
+
+  static divide(vec4, val) {
+    console.assert(val != 0, "0 division!");
+    return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+  }
+
+  divideVector(vec4) {
+    this.x /= vec4.x;
+    this.y /= vec4.y;
+    this.z /= vec4.z;
+    this.w /= vec4.w;
+
+    return this;
+  }
+
+  static divideVector(lvec4, rvec4) {
+    return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
+  }
 }
 
 GLBoost["Vector4"] = Vector4;

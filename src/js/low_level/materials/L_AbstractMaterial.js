@@ -27,6 +27,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._states = null;
     this._shaderUniformLocationsOfExpressions = {};
     this._isVisibleForGeometiesAssginedByThisMaterial = true;
+    this._globalStatesUsage = null;
+    this._shaderParametersForShaderInstance = {};
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -279,7 +281,11 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   setUpStates() {
-    switch (this._glBoostContext.globalStatesUsage) {
+    let globalStatesUsage = this._glBoostContext.globalStatesUsage;
+    if (this._globalStatesUsage) {
+      globalStatesUsage = this._globalStatesUsage;
+    }
+    switch (globalStatesUsage) {
       case GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING:
         break;
       case GLBoost.GLOBAL_STATES_USAGE_IGNORE:
@@ -321,6 +327,18 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   get isVisible() {
     return this._isVisibleForGeometiesAssginedByThisMaterial;
+  }
+
+  set globalStatesUsage(usage) {
+    this._globalStatesUsage = usage;
+  }
+
+  get globalStatesUsage() {
+    return this._globalStatesUsage;
+  }
+
+  get shaderParameters() {
+    return this._shaderParametersForShaderInstance;
   }
 }
 
