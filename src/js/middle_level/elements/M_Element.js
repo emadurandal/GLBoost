@@ -68,7 +68,7 @@ export default class M_Element extends L_Element {
     let value = this._currentAnimationInputValues[inputName];
     if (typeof value !== 'undefined') {
       return value;
-    } else if (this._toInheritCurrentAnimationInputValue) {
+    } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
       return this._parent._getCurrentAnimationInputValue(inputName);
     } else {
       return -1;

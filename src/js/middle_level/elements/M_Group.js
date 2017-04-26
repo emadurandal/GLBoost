@@ -98,7 +98,7 @@ export default class M_Group extends M_Element {
     if (element instanceof M_Group) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
-        let hitChild = this.searchElement(userFlavorNameOrRegExp, queryType, children[i]);
+        let hitChild = this.searchElement(query, queryMeta, children[i]);
         if (hitChild) {
           return hitChild;
         }
@@ -199,8 +199,8 @@ export default class M_Group extends M_Element {
   }
 
   searchGLBoostObjectsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+    let objects = [];
     if (element instanceof M_Group) {
-      let objects = [];
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         let hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
@@ -212,7 +212,6 @@ export default class M_Group extends M_Element {
     }
     if (type === L_AbstractMaterial && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
-      let objects = [];
       for (let material of materials) {
         if (this._validateByQuery(material, query, queryMeta)) {
           objects.push(material);
@@ -222,6 +221,7 @@ export default class M_Group extends M_Element {
     } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return [element];
     }
+    return objects;
   }
 
   updateAABB() {

@@ -112,8 +112,21 @@ export default class M_Scene extends M_Group {
     this._elements.forEach((elm)=> {
       this._cameras = this._cameras.concat(collectCameras(elm));
     });
-    if (this._cameras.length !== 0) {
+    if (this._cameras.length === 1) {
       this._cameras[0].setAsMainCamera(this);
+    } else {
+      // If there are two or more cameras present in the scene and the main camera is not explicitly specified,
+      // a camera chosen to be irresponsible is made the main camera.
+      let isNotMainCameraFound = true;
+      for (let camera of this._cameras) {
+        if (camera.isMainCamera(this)) {
+          isNotMainCameraFound = false;
+          break;
+        }
+      }
+      if (isNotMainCameraFound) {
+        this._cameras[0].setAsMainCamera(this); //
+      }
     }
 
 
