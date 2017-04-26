@@ -2540,10 +2540,42 @@
       value: function toVector3() {
         return new Vector3(this.x, this.y, this.z);
       }
+    }, {
+      key: 'divide',
+      value: function divide(val) {
+        console.assert(val != 0, "0 division!");
+        this.x /= val;
+        this.y /= val;
+        this.z /= val;
+        this.w /= val;
+
+        return this;
+      }
+    }, {
+      key: 'divideVector',
+      value: function divideVector(vec4) {
+        this.x /= vec4.x;
+        this.y /= vec4.y;
+        this.z /= vec4.z;
+        this.w /= vec4.w;
+
+        return this;
+      }
     }], [{
       key: 'zero',
       value: function zero() {
         return new Vector4(0, 0, 0, 1);
+      }
+    }, {
+      key: 'divide',
+      value: function divide(vec4, val) {
+        console.assert(val != 0, "0 division!");
+        return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+      }
+    }, {
+      key: 'divideVector',
+      value: function divideVector(lvec4, rvec4) {
+        return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
       }
     }]);
     return Vector4;
@@ -2960,6 +2992,11 @@
           this._glContext.deleteProgram(this, this._glslProgram);
         }
         babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
+      }
+    }, {
+      key: 'getShaderParameter',
+      value: function getShaderParameter(material, parameterName) {
+        return this[parameterName] || material.shaderParameters[parameterName];
       }
     }, {
       key: 'dirty',
@@ -3699,6 +3736,7 @@
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
         return shaderText;
       }
     }, {
@@ -3747,6 +3785,8 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (DecalShader.__proto__ || Object.getPrototypeOf(DecalShader)).call(this, glBoostContext));
 
       DecalShader.mixin(DecalShaderSource);
+
+      _this._lut = null;
       return _this;
     }
 
@@ -3761,6 +3801,14 @@
         if (diffuseTexture) {
           material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
         }
+      }
+    }, {
+      key: 'lut',
+      set: function set(lut) {
+        this._lut = lut;
+      },
+      get: function get() {
+        return this._lut;
       }
     }]);
     return DecalShader;
@@ -3795,6 +3843,8 @@
       _this._states = null;
       _this._shaderUniformLocationsOfExpressions = {};
       _this._isVisibleForGeometiesAssginedByThisMaterial = true;
+      _this._globalStatesUsage = null;
+      _this._shaderParametersForShaderInstance = {};
 
       _this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -3989,7 +4039,11 @@
     }, {
       key: 'setUpStates',
       value: function setUpStates() {
-        switch (this._glBoostContext.globalStatesUsage) {
+        var globalStatesUsage = this._glBoostContext.globalStatesUsage;
+        if (this._globalStatesUsage) {
+          globalStatesUsage = this._globalStatesUsage;
+        }
+        switch (globalStatesUsage) {
           case GLBoost$1.GLOBAL_STATES_USAGE_DO_NOTHING:
             break;
           case GLBoost$1.GLOBAL_STATES_USAGE_IGNORE:
@@ -4109,6 +4163,19 @@
       },
       get: function get() {
         return this._isVisibleForGeometiesAssginedByThisMaterial;
+      }
+    }, {
+      key: 'globalStatesUsage',
+      set: function set(usage) {
+        this._globalStatesUsage = usage;
+      },
+      get: function get() {
+        return this._globalStatesUsage;
+      }
+    }, {
+      key: 'shaderParameters',
+      get: function get() {
+        return this._shaderParametersForShaderInstance;
       }
     }]);
     return L_AbstractMaterial;
@@ -6820,31 +6887,38 @@
 
   GLBoost$1['M_Mesh'] = M_Mesh;
 
-  var M_ScreenMesh = function (_M_Mesh) {
-    babelHelpers.inherits(M_ScreenMesh, _M_Mesh);
+  var M_SPVScreenMesh = function (_M_Mesh) {
+    babelHelpers.inherits(M_SPVScreenMesh, _M_Mesh);
 
-    function M_ScreenMesh(glBoostContext) {
+    function M_SPVScreenMesh(glBoostContext) {
       var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { preset: 'one' };
       var customVertexAttributes = arguments[2];
-      babelHelpers.classCallCheck(this, M_ScreenMesh);
+      babelHelpers.classCallCheck(this, M_SPVScreenMesh);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, (M_ScreenMesh.__proto__ || Object.getPrototypeOf(M_ScreenMesh)).call(this, glBoostContext, null, null));
+      var _this = babelHelpers.possibleConstructorReturn(this, (M_SPVScreenMesh.__proto__ || Object.getPrototypeOf(M_SPVScreenMesh)).call(this, glBoostContext, null, null));
 
       _this._init(layout, customVertexAttributes);
       return _this;
     }
 
-    babelHelpers.createClass(M_ScreenMesh, [{
+    babelHelpers.createClass(M_SPVScreenMesh, [{
       key: '_init',
       value: function _init(layout, customVertexAttributes) {
+        var gl = this._glContext.gl;
         this.geometry = new SPVScreen(this._glBoostContext, layout, customVertexAttributes);
         this.isAffectedByWorldMatrix = false;
         this.isAffectedByViewMatrix = false;
         this.isAffectedByProjectionMatrix = false;
-        this.material = new ClassicMaterial$1(this._glBoostContext);
+
+        var material = new ClassicMaterial$1(this._glBoostContext);
+        material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+        material.states = {
+          "enable": [gl.BLEND]
+        };
+        this.geometry.materials = [material];
       }
     }]);
-    return M_ScreenMesh;
+    return M_SPVScreenMesh;
   }(M_Mesh);
 
   var Grid = function (_Geometry) {
@@ -9808,6 +9882,7 @@
         }
         shaderText += 'uniform vec4 materialBaseColor;\n';
         shaderText += 'uniform vec4 textureContributionRate;\n';
+        shaderText += 'uniform vec4 gamma;\n';
 
         return shaderText;
       }
@@ -9822,8 +9897,8 @@
         shaderText += '    rt0 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
+          shaderText += '  rt0 = pow(rt0, gamma);\n';
         }
-        //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
@@ -9843,6 +9918,7 @@
 
         material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
         material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
+        material.setUniform(shaderProgram.hashId, 'uniform_gamma', gl.getUniformLocation(shaderProgram, 'gamma'));
 
         if (Shader._exist(vertexAttribs, GLBoost$1.TEXCOORD)) {
           var diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
@@ -9876,6 +9952,7 @@
       var _this = babelHelpers.possibleConstructorReturn(this, (SPVDecalShader.__proto__ || Object.getPrototypeOf(SPVDecalShader)).call(this, glBoostContext));
 
       SPVDecalShader.mixin(SPVDecalShaderSource);
+
       return _this;
     }
 
@@ -9900,6 +9977,38 @@
         if (diffuseTexture) {
           material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
         }
+
+        var sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
+        var targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
+        var gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w);
+      }
+    }, {
+      key: 'handleArgument',
+      value: function handleArgument(value) {
+        if (value instanceof Vector4) {
+          return value;
+        } else if (value instanceof Vector3) {
+          return new Vector4(value.x, value.y, value.z, 1);
+        } else {
+          return new Vector4(value, value, value, 1);
+        }
+      }
+    }, {
+      key: 'sourceGamma',
+      set: function set(value) {
+        this._sourceGamma = value;
+      },
+      get: function get() {
+        return this._sourceGamma;
+      }
+    }, {
+      key: 'targetGamma',
+      set: function set(value) {
+        this._targetGamma = value;
+      },
+      get: function get() {
+        return this._targetGamma;
       }
     }]);
     return SPVDecalShader;
@@ -12361,7 +12470,7 @@
     }, {
       key: 'createSPVScreenMesh',
       value: function createSPVScreenMesh(screens, customVertexAttributes) {
-        return new M_ScreenMesh(this, screens, customVertexAttributes);
+        return new M_SPVScreenMesh(this, screens, customVertexAttributes);
       }
     }]);
     return GLBoostMiddleContext;

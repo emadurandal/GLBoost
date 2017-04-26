@@ -3,6 +3,7 @@ import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
 import WireframeShader from './WireframeShader';
 import Vector4 from '../../low_level/math/Vector4';
+import Vector3 from '../../low_level/math/Vector3';
 
 export class SPVDecalShaderSource {
   VSDefine_SPVDecalShaderSource(in_, out_, f) {
@@ -42,6 +43,7 @@ export class SPVDecalShaderSource {
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform vec4 textureContributionRate;\n';
+    shaderText += 'uniform vec4 gamma;\n';
 
     return shaderText;
   }
@@ -55,8 +57,8 @@ export class SPVDecalShaderSource {
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
+      shaderText += '  rt0 = pow(rt0, gamma);\n';
     }
-    //shaderText += '    float shadowRatio = 0.0;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     return shaderText;
@@ -75,6 +77,7 @@ export class SPVDecalShaderSource {
 
     material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
     material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
+    material.setUniform(shaderProgram.hashId, 'uniform_gamma', gl.getUniformLocation(shaderProgram, 'gamma'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
@@ -102,6 +105,7 @@ export default class SPVDecalShader extends WireframeShader {
     super(glBoostContext);
 
     SPVDecalShader.mixin(SPVDecalShaderSource);
+
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
@@ -124,6 +128,36 @@ export default class SPVDecalShader extends WireframeShader {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
     }
 
+    let sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
+    let targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
+    let gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
+    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w);
+  }
+
+  handleArgument(value) {
+    if (value instanceof Vector4) {
+      return value;
+    } else if (value instanceof Vector3) {
+      return new Vector4(value.x, value.y, value.z, 1);
+    } else {
+      return new Vector4(value, value, value, 1);
+    }
+  }
+
+  set sourceGamma(value) {
+    this._sourceGamma = value;
+  }
+
+  get sourceGamma() {
+    return this._sourceGamma;
+  }
+
+  set targetGamma(value) {
+    this._targetGamma = value;
+  }
+
+  get targetGamma() {
+    return this._targetGamma;
   }
 }
 
