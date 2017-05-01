@@ -106,6 +106,8 @@
     expression.renderPasses[0].scene = scene;
     expression.renderPasses[0].setClearDepth(1.0);
     expression.renderPasses[0].specifyRenderTargetTextures([depthTexture]);
+    expression.renderPasses[0].setViewportAsFittingToRenderTarget();
+
     function updateDepthCamera(light){
       scene.updateAABB();
       var aabb = scene.AABB;
