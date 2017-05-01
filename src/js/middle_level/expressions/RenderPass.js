@@ -15,10 +15,9 @@ export default class RenderPass extends GLBoostObject {
     this._drawBuffers = [this._glContext.gl.BACK];
     this._clearColor = null;
     this._clearDepth = null;  // default is 1.0
-    this._renderTargetColorTextures = null;
-    this._renderTargetDepthTexture = null;
+    this._renderTargetColorTextures = [];
+    this._renderTargetDepthTexture = [];
     this._expression = null;
-    this._fbo = null;
     this._viewport = null;
 
     this._customFunction = null;
@@ -87,7 +86,7 @@ export default class RenderPass extends GLBoostObject {
   }
 
   get fbo() {
-    if (this._renderTargetColorTextures) {
+    if (this._renderTargetColorTextures.length > 0) {
       return this._renderTargetColorTextures[0].fbo;
     } else if (this._renderTargetDepthTexture) {
       return this._renderTargetDepthTexture.fbo;
@@ -102,6 +101,25 @@ export default class RenderPass extends GLBoostObject {
 
   set viewport(vec4) {
     this._viewport = vec4;
+  }
+
+  setViewportAsFittingToRenderTarget() {
+    let width;
+    let height;
+    if (this._renderTargetColorTextures.length > 0) {
+      width = this._renderTargetColorTextures[0].width;
+      height = this._renderTargetColorTextures[0].height;
+    }
+    if (this._renderTargetDepthTexture) {
+      width = this._renderTargetDepthTexture.width;
+      height = this._renderTargetDepthTexture.height;
+    }
+    if (typeof width !== 'undefined' && typeof height !== 'undefined') {
+      this._viewport = new Vector4(0, 0, width, height);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   get renderTargetColorTextures() {
