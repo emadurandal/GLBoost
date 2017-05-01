@@ -49,7 +49,7 @@ export default class Renderer extends GLBoostObject {
       }
       glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-      if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+      if (renderPass.viewport) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
         if (camera) {

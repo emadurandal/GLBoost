@@ -93,6 +93,12 @@ export default class GLContext {
     return glResource;
   }
 
+  deleteRenderbuffer(glBoostObject, renderBuffer) {
+    this._monitor.deregisterWebGLResource(glBoostObject, renderBuffer);
+    this.gl.deleteRenderbuffer(renderBuffer);
+    renderBuffer = null;
+  }
+
   createShader(glBoostObject, shaderType) {
     var glResource = this.gl.createShader(shaderType);
     this._monitor.registerWebGLResource(glBoostObject, glResource);

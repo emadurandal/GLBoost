@@ -180,7 +180,7 @@ export default class M_Group extends M_Element {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
         let hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
-        if (hitChild.length > 0) {
+        if (hitChild) {
           return hitChild;
         }
       }

@@ -132,32 +132,33 @@ export default class GLBoostLowContext {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width;
     fbo.height = height;
+    fbo._glboostTextures = [];
 
-    var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
       let texture = new MutableTexture(this, fbo.width, fbo.height);
       texture.fbo = fbo;
-      renderTargetTextures.push(texture);
+      fbo._glboostTextures.push(texture);
     }
 
     // Create RenderBuffer
-    var renderbuffer = glContext.createRenderbuffer(this);
-    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    var renderBuffer = glContext.createRenderbuffer(this);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+    fbo.renderBuffer = renderBuffer;
 
     // Attach Buffers
-    renderTargetTextures.forEach((texture, i)=>{
+    fbo._glboostTextures.forEach((texture, i)=>{
       var glTexture = texture.glTextureResource;
       var attachimentId = glem.colorAttachiment(gl, i);
       texture.colorAttachment = attachimentId;
       gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
     });
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuffer);
 
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    return renderTargetTextures;
+    return fbo._glboostTextures.concat();
   }
 
   createDepthTexturesForRenderTarget(width, height) {
