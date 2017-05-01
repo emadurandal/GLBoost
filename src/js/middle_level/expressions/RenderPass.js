@@ -19,6 +19,7 @@ export default class RenderPass extends GLBoostObject {
     this._renderTargetDepthTexture = null;
     this._expression = null;
     this._fbo = null;
+    this._viewport = null;
 
     this._customFunction = null;
   }
@@ -96,14 +97,11 @@ export default class RenderPass extends GLBoostObject {
   }
 
   get viewport() {
-    var texture = null;
-    if (this._renderTargetColorTextures) {
-      texture = this._renderTargetColorTextures[0];
-    } else if (this._renderTargetDepthTexture) {
-      texture = this._renderTargetDepthTexture;
-    }
+    return this._viewport;
+  }
 
-    return new Vector4(0, 0, texture.width, texture.height);
+  set viewport(vec4) {
+    this._viewport = vec4;
   }
 
   get renderTargetColorTextures() {

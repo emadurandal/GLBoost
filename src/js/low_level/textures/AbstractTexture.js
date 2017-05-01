@@ -124,4 +124,26 @@ export default class AbstractTexture extends GLBoostObject {
   _getNearestPowerOfTwo(x) {
     return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
   }
+
+  readyForDiscard() {
+    if (this._texture) {
+      this._glContext.deleteTexture(this, this._texture);
+    }
+    if (this.fbo) {
+      for (let texture of this.fbo._glboostTextures) {
+        this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function(v, i) {
+          return (v !== this);
+        });
+      }
+      if (this.fbo._glboostTextures.length === 0) {
+        this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+        this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+        if (this.fbo.renderBuffer) {
+          this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+        }
+      }
+    }
+
+    super.readyForDiscard();
+  }
 }
