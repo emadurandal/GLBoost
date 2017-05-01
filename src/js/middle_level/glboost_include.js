@@ -31,3 +31,4 @@ import SPVLambertShader from './shaders/SPVLambertShader';
 import SPVPhongShader from './shaders/SPVPhongShader';
 import SPVDecalShader from './shaders/SPVDecalShader';
 import SPVGLTFLoader from './loader/SPVGLTFLoader';
+import H_SPVScreenLUT from '../high_level/post_effects/H_SPVScreenLUT';
