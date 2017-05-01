@@ -1,7 +1,6 @@
 import M_Mesh from '../meshes/M_Mesh';
 import SPVScreen from '../../../low_level/primitives/SPVScreen';
-import ClassicMaterial from '../../../low_level/materials/ClassicMaterial';
-import DecalShader from '../../shaders/DecalShader';
+import SPVClassicMaterial from '../../../low_level/materials/SPVClassicMaterial';
 
 export default class M_SPVScreenMesh extends M_Mesh {
   constructor(glBoostContext, layout = {preset: 'one'}, customVertexAttributes) {
@@ -16,7 +15,7 @@ export default class M_SPVScreenMesh extends M_Mesh {
     this.isAffectedByViewMatrix = false;
     this.isAffectedByProjectionMatrix = false;
 
-    let material = new ClassicMaterial(this._glBoostContext);
+    let material = new SPVClassicMaterial(this._glBoostContext);
     material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
     material.states = {
       "enable": [
