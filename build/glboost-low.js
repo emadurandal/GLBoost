@@ -2213,7 +2213,7 @@
     }, {
       key: 'instanceNameWithUserFlavor',
       get: function get() {
-        return this._instanceName + '#' + this._userFlavorName;
+        return this._instanceName + '__' + this._userFlavorName;
       }
     }, {
       key: 'isReadyForDiscard',
@@ -6048,6 +6048,13 @@
         return glResource;
       }
     }, {
+      key: 'deleteRenderbuffer',
+      value: function deleteRenderbuffer(glBoostObject, renderBuffer) {
+        this._monitor.deregisterWebGLResource(glBoostObject, renderBuffer);
+        this.gl.deleteRenderbuffer(renderBuffer);
+        renderBuffer = null;
+      }
+    }, {
       key: 'createShader',
       value: function createShader(glBoostObject, shaderType) {
         var glResource = this.gl.createShader(shaderType);
@@ -6269,6 +6276,51 @@
       key: '_getNearestPowerOfTwo',
       value: function _getNearestPowerOfTwo(x) {
         return Math.pow(2, Math.round(Math.log(x) / Math.LN2));
+      }
+    }, {
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        if (this._texture) {
+          this._glContext.deleteTexture(this, this._texture);
+        }
+        if (this.fbo) {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this.fbo._glboostTextures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var texture = _step.value;
+
+              this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function (v, i) {
+                return v !== this;
+              });
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          if (this.fbo._glboostTextures.length === 0) {
+            this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+            this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+            if (this.fbo.renderBuffer) {
+              this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+            }
+          }
+        }
+
+        babelHelpers.get(AbstractTexture.prototype.__proto__ || Object.getPrototypeOf(AbstractTexture.prototype), 'readyForDiscard', this).call(this);
       }
     }, {
       key: 'glTextureResource',
@@ -9767,32 +9819,33 @@
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width;
         fbo.height = height;
+        fbo._glboostTextures = [];
 
-        var renderTargetTextures = [];
         for (var i = 0; i < textureNum; i++) {
           var texture = new MutableTexture(this, fbo.width, fbo.height);
           texture.fbo = fbo;
-          renderTargetTextures.push(texture);
+          fbo._glboostTextures.push(texture);
         }
 
         // Create RenderBuffer
-        var renderbuffer = glContext.createRenderbuffer(this);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        var renderBuffer = glContext.createRenderbuffer(this);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+        fbo.renderBuffer = renderBuffer;
 
         // Attach Buffers
-        renderTargetTextures.forEach(function (texture, i) {
+        fbo._glboostTextures.forEach(function (texture, i) {
           var glTexture = texture.glTextureResource;
           var attachimentId = glem.colorAttachiment(gl, i);
           texture.colorAttachment = attachimentId;
           gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
         });
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuffer);
 
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        return renderTargetTextures;
+        return fbo._glboostTextures.concat();
       }
     }, {
       key: 'createDepthTexturesForRenderTarget',

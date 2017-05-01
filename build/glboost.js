@@ -190,6 +190,151 @@
 
   var GLBoost$1 = global.GLBoost;
 
+  var GLExtensionsManager = function () {
+    function GLExtensionsManager(glContext) {
+      babelHelpers.classCallCheck(this, GLExtensionsManager);
+
+      var gl = glContext.gl;
+
+      if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
+        this._extVAO = gl.getExtension('OES_vertex_array_object');
+
+        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
+
+        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
+
+        this._extEIUI = gl.getExtension('OES_element_index_uint');
+
+        this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
+      }
+
+      GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+    }
+
+    babelHelpers.createClass(GLExtensionsManager, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          return gl.createVertexArray();
+        } else if (this._extVAO) {
+          return this._extVAO.createVertexArrayOES();
+        } else {
+          return null;
+        }
+      }
+    }, {
+      key: 'bindVertexArray',
+      value: function bindVertexArray(gl, vao) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.bindVertexArray(vao);
+          return true;
+        } else if (this._extVAO) {
+          this._extVAO.bindVertexArrayOES(vao);
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: 'drawBuffers',
+      value: function drawBuffers(gl, buffers) {
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          gl.drawBuffers(buffers);
+          return true;
+        } else if (this._extDBs) {
+          this.extDBs.drawBuffersWEBGL(buffers);
+          return true;
+        } else {
+          if (buffers[0] === gl.NONE) {
+            gl.colorMask(false, false, false, false);
+          } else {
+            gl.colorMask(true, true, true, true);
+          }
+          return false;
+        }
+      }
+    }, {
+      key: 'colorAttachiment',
+      value: function colorAttachiment(gl, index) {
+        return this._extDBs ? this._extDBs['COLOR_ATTACHMENT' + index + '_WEBGL'] : gl['COLOR_ATTACHMENT' + index];
+      }
+    }, {
+      key: 'elementIndexBitSize',
+      value: function elementIndexBitSize(gl) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return gl.UNSIGNED_INT;
+        } else {
+          return gl.UNSIGNED_SHORT;
+        }
+      }
+    }, {
+      key: 'createUintArrayForElementIndex',
+      value: function createUintArrayForElementIndex(gl, array) {
+        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+          return new Uint32Array(array);
+        } else {
+          return new Uint16Array(array);
+        }
+      }
+    }, {
+      key: 'extVAO',
+      get: function get() {
+        return this._extVAO;
+      }
+    }, {
+      key: 'extDBs',
+      get: function get() {
+        return this._extDBs;
+      }
+    }, {
+      key: 'extTFA',
+      get: function get() {
+        return this._extTFA;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(glContext) {
+        if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
+          return GLExtensionsManager._instances[glContext.belongingCanvasId];
+        }
+        return new GLExtensionsManager(glContext);
+      }
+    }]);
+    return GLExtensionsManager;
+  }();
+
+  GLExtensionsManager._instances = new Object();
+
+  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
+
+  var Hash = function () {
+    function Hash() {
+      babelHelpers.classCallCheck(this, Hash);
+    }
+
+    babelHelpers.createClass(Hash, null, [{
+      key: "toCRC32",
+      value: function toCRC32(str) {
+        var crc = 0,
+            x = 0,
+            y = 0;
+        var table = Hash._crc32table;
+
+        crc = crc ^ -1;
+        for (var i = 0, iTop = str.length; i < iTop; ++i) {
+          y = (crc ^ str.charCodeAt(i)) & 0xff;
+          x = "0x" + table[y];
+          crc = crc >>> 8 ^ x;
+        }
+
+        return (crc ^ -1) >>> 0;
+      }
+    }]);
+    return Hash;
+  }();
+
+  Hash._crc32table = "00000000 77073096 EE0E612C 990951BA 076DC419 706AF48F E963A535 9E6495A3 0EDB8832 79DCB8A4 E0D5E91E 97D2D988 09B64C2B 7EB17CBD E7B82D07 90BF1D91 1DB71064 6AB020F2 F3B97148 84BE41DE 1ADAD47D 6DDDE4EB F4D4B551 83D385C7 136C9856 646BA8C0 FD62F97A 8A65C9EC 14015C4F 63066CD9 FA0F3D63 8D080DF5 3B6E20C8 4C69105E D56041E4 A2677172 3C03E4D1 4B04D447 D20D85FD A50AB56B 35B5A8FA 42B2986C DBBBC9D6 ACBCF940 32D86CE3 45DF5C75 DCD60DCF ABD13D59 26D930AC 51DE003A C8D75180 BFD06116 21B4F4B5 56B3C423 CFBA9599 B8BDA50F 2802B89E 5F058808 C60CD9B2 B10BE924 2F6F7C87 58684C11 C1611DAB B6662D3D 76DC4190 01DB7106 98D220BC EFD5102A 71B18589 06B6B51F 9FBFE4A5 E8B8D433 7807C9A2 0F00F934 9609A88E E10E9818 7F6A0DBB 086D3D2D 91646C97 E6635C01 6B6B51F4 1C6C6162 856530D8 F262004E 6C0695ED 1B01A57B 8208F4C1 F50FC457 65B0D9C6 12B7E950 8BBEB8EA FCB9887C 62DD1DDF 15DA2D49 8CD37CF3 FBD44C65 4DB26158 3AB551CE A3BC0074 D4BB30E2 4ADFA541 3DD895D7 A4D1C46D D3D6F4FB 4369E96A 346ED9FC AD678846 DA60B8D0 44042D73 33031DE5 AA0A4C5F DD0D7CC9 5005713C 270241AA BE0B1010 C90C2086 5768B525 206F85B3 B966D409 CE61E49F 5EDEF90E 29D9C998 B0D09822 C7D7A8B4 59B33D17 2EB40D81 B7BD5C3B C0BA6CAD EDB88320 9ABFB3B6 03B6E20C 74B1D29A EAD54739 9DD277AF 04DB2615 73DC1683 E3630B12 94643B84 0D6D6A3E 7A6A5AA8 E40ECF0B 9309FF9D 0A00AE27 7D079EB1 F00F9344 8708A3D2 1E01F268 6906C2FE F762575D 806567CB 196C3671 6E6B06E7 FED41B76 89D32BE0 10DA7A5A 67DD4ACC F9B9DF6F 8EBEEFF9 17B7BE43 60B08ED5 D6D6A3E8 A1D1937E 38D8C2C4 4FDFF252 D1BB67F1 A6BC5767 3FB506DD 48B2364B D80D2BDA AF0A1B4C 36034AF6 41047A60 DF60EFC3 A867DF55 316E8EEF 4669BE79 CB61B38C BC66831A 256FD2A0 5268E236 CC0C7795 BB0B4703 220216B9 5505262F C5BA3BBE B2BD0B28 2BB45A92 5CB36A04 C2D7FFA7 B5D0CF31 2CD99E8B 5BDEAE1D 9B64C2B0 EC63F226 756AA39C 026D930A 9C0906A9 EB0E363F 72076785 05005713 95BF4A82 E2B87A14 7BB12BAE 0CB61B38 92D28E9B E5D5BE0D 7CDCEFB7 0BDBDF21 86D3D2D4 F1D4E242 68DDB3F8 1FDA836E 81BE16CD F6B9265B 6FB077E1 18B74777 88085AE6 FF0F6A70 66063BCA 11010B5C 8F659EFF F862AE69 616BFFD3 166CCF45 A00AE278 D70DD2EE 4E048354 3903B3C2 A7672661 D06016F7 4969474D 3E6E77DB AED16A4A D9D65ADC 40DF0B66 37D83BF0 A9BCAE53 DEBB9EC5 47B2CF7F 30B5FFE9 BDBDF21C CABAC28A 53B39330 24B4A3A6 BAD03605 CDD70693 54DE5729 23D967BF B3667A2E C4614AB8 5D681B02 2A6F2B94 B40BBE37 C30C8EA1 5A05DF1B 2D02EF8D".split(' ');
+
   var MiscUtil = function () {
     function MiscUtil() {
       babelHelpers.classCallCheck(this, MiscUtil);
@@ -440,7 +585,7 @@
     }, {
       key: 'instanceNameWithUserFlavor',
       get: function get() {
-        return this._instanceName + '#' + this._userFlavorName;
+        return this._instanceName + '__' + this._userFlavorName;
       }
     }, {
       key: 'isReadyForDiscard',
@@ -453,537 +598,640 @@
 
   GLBoostObject.classInfoDic = {};
 
-  var GLContextImpl = function () {
-    function GLContextImpl(canvas, parent) {
-      babelHelpers.classCallCheck(this, GLContextImpl);
+  var Shader = function (_GLBoostObject) {
+    babelHelpers.inherits(Shader, _GLBoostObject);
 
-      //    if (new.target === GLContextImpl) {
-      if (this.constructor === GLContextImpl) {
-        throw new TypeError("Cannot construct GLContextImpl instances directly");
-      }
+    function Shader(glBoostContext) {
+      babelHelpers.classCallCheck(this, Shader);
 
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
+      var _this = babelHelpers.possibleConstructorReturn(this, (Shader.__proto__ || Object.getPrototypeOf(Shader)).call(this, glBoostContext));
 
-      if (canvas === void 0) {
-        throw new Error("Failed to create WebGL Context due to no canvas object.");
-      }
-
-      this._canvas = canvas;
+      _this._glslProgram = null;
+      _this._dirty = true;
+      return _this;
     }
 
-    babelHelpers.createClass(GLContextImpl, [{
-      key: "init",
-      value: function init(glVersionString, ContextType, gl) {
-
-        if (gl) {
-          this._gl = gl;
-        } else {
-
-          var _gl = this._canvas.getContext(glVersionString);
-
-          if (!_gl) {
-            _gl = this._canvas.getContext('experimental-' + glVersionString);
-            if (!_gl) {
-              throw new Error("This platform doesn't support WebGL.");
+    babelHelpers.createClass(Shader, [{
+      key: '_removeDuplicatedLine',
+      value: function _removeDuplicatedLine(shaderString) {
+        var splittedShaderLines = shaderString.split('\n');
+        for (var i = 0; i < splittedShaderLines.length; i++) {
+          splittedShaderLines[i] += '\n';
+          for (var j = 0; j < i; j++) {
+            if (splittedShaderLines[j] === splittedShaderLines[i]) {
+              splittedShaderLines[j] = '//                                                            commented out because of duplicated: ' + splittedShaderLines[i];
             }
           }
-
-          if (!_gl instanceof ContextType) {
-            throw new Error("Unexpected rendering context.");
-          }
-
-          this._gl = _gl;
         }
+
+        var processedShaderString = '';
+        for (var _i = 0; _i < splittedShaderLines.length; _i++) {
+          processedShaderString += splittedShaderLines[_i];
+        }
+
+        return processedShaderString;
       }
     }, {
-      key: "gl",
-      get: function get() {
-        return this._gl;
-      },
-      set: function set(gl) {
-        this._gl = gl;
+      key: '_getVertexShaderString',
+      value: function _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
+        var _this2 = this;
+
+        var f = functions;
+        var shaderText = '';
+
+        var in_ = Shader._in_onVert(gl);
+        var out_ = Shader._out_onVert(gl);
+
+        shaderText += Shader._glslVer(gl);
+        shaderText += 'precision highp float;\n';
+
+        /// define variables
+        // start defining variables. first, sub class Shader, ...
+        // seconds, define variables as mixin shaders
+        var vsDefineShaderText = '';
+        this._classNamesOfVSDefine.forEach(function (className) {
+          var method = _this2['VSDefine_' + className];
+          if (method) {
+            vsDefineShaderText += '//                                                            VSDefine_' + className + ' //\n';
+            vsDefineShaderText += method.bind(_this2, in_, out_, f, lights, material, extraData)();
+          }
+        });
+        shaderText += this._removeDuplicatedLine(vsDefineShaderText);
+
+        // begin of main function
+        shaderText += 'void main(void) {\n';
+
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfVSMethodDefine.forEach(function (className) {
+          var method = _this2['VSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
+          }
+        });
+
+        /// Transform
+        // start transforming. first, sub class Shader, ...
+        // seconds, transform as mixin Shaders
+        this._classNamesOfVSTransform.forEach(function (className) {
+          var method = _this2['VSTransform_' + className];
+          if (method) {
+            shaderText += '//                                                            VSTransform_' + className + ' //\n';
+            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
+          }
+        });
+
+        /// Shading
+        // start shading. first, sub class Shader, ...
+        // seconds, shade as mixin Shaders
+        this._classNamesOfVSShade.forEach(function (className) {
+          var method = _this2['VSShade_' + className];
+          if (method) {
+            shaderText += '//                                                            VSShade_' + className + ' //\n';
+            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
+          }
+        });
+
+        // end of main function
+        shaderText += '}\n';
+
+        return shaderText;
       }
     }, {
-      key: "canvas",
-      get: function get() {
-        return this._canvas;
-      }
-    }]);
-    return GLContextImpl;
-  }();
+      key: '_getFragmentShaderString',
+      value: function _getFragmentShaderString(gl, functions, lights, material, extraData) {
+        var _this3 = this;
 
-  var GLContextWebGL2Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+        var f = functions;
+        var shaderText = '';
 
-    function GLContextWebGL2Impl(canvas, parent, gl) {
-      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+        var in_ = Shader._in_onFrag(gl);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
+        shaderText += Shader._glslVer(gl);
+        var maxDrawBuffers = this._getMaxDrawBuffers();
+        if (maxDrawBuffers > 1) {
+          shaderText += Shader._glsl1DrawBufferExt(gl);
+        }
+        shaderText += 'precision mediump float;\n';
 
-      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext, gl);
+        for (var i = 0; i < maxDrawBuffers; i++) {
+          shaderText += Shader._set_outColor_onFrag(gl, i);
+        }
 
-      return _this;
-    }
+        /// define variables
+        // start defining variables. first, sub class Shader, ...
+        // seconds, define variables as mixin shaders
+        var fsDefineShaderText = '';
+        this._classNamesOfFSDefine.forEach(function (className) {
+          var method = _this3['FSDefine_' + className];
+          if (method) {
+            fsDefineShaderText += '//                                                            FSDefine_' + className + ' //\n';
+            fsDefineShaderText += method.bind(_this3, in_, f, lights, material, extraData)();
+          }
+        });
+        shaderText += this._removeDuplicatedLine(fsDefineShaderText);
 
-    return GLContextWebGL2Impl;
-  }(GLContextImpl);
+        /// define methods
+        // start defining methods. first, sub class Shader, ...
+        // seconds, define methods as mixin Shaders
+        this._classNamesOfFSMethodDefine.forEach(function (className) {
+          var method = _this3['FSMethodDefine_' + className];
+          if (method) {
+            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
+            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
+          }
+        });
 
-  var GLContextWebGL1Impl = function (_GLContextImpl) {
-    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+        // begin of main function
+        shaderText += 'void main(void) {\n';
 
-    function GLContextWebGL1Impl(canvas, parent, gl) {
-      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+        /// Shading
+        // start shading. first, sub class Shaders, ...
+        // second, shade as mixin Shaders
+        this._classNamesOfFSShade.forEach(function (className) {
+          var method = _this3['FSShade_' + className];
+          if (method) {
+            shaderText += '//                                                            FSShade_' + className + ' //\n';
+            shaderText += method.bind(_this3, f, gl, lights, material, extraData)();
+          }
+        });
 
-      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
-
-      if (gl) {
-        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', null, gl);
-      } else {
-        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext, gl);
-      }
-      return _this;
-    }
-
-    return GLContextWebGL1Impl;
-  }(GLContextImpl);
-
-  var GLExtensionsManager = function () {
-    function GLExtensionsManager(glContext) {
-      babelHelpers.classCallCheck(this, GLExtensionsManager);
-
-      var gl = glContext.gl;
-
-      if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
-        this._extVAO = gl.getExtension('OES_vertex_array_object');
-
-        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
-
-        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
-
-        this._extEIUI = gl.getExtension('OES_element_index_uint');
-
-        this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
-      }
-
-      GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
-    }
-
-    babelHelpers.createClass(GLExtensionsManager, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(gl) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          return gl.createVertexArray();
-        } else if (this._extVAO) {
-          return this._extVAO.createVertexArrayOES();
+        // end of main function
+        if (maxDrawBuffers > 1) {
+          for (var _i2 = 0; _i2 < maxDrawBuffers; _i2++) {
+            shaderText += Shader._set_glFragData_inGLVer1(gl, _i2);
+          }
         } else {
+          shaderText += Shader._set_glFragColor_inGLVer1(gl);
+        }
+        shaderText += '}\n';
+
+        return shaderText;
+      }
+    }, {
+      key: '_prepareAssetsForShaders',
+      value: function _prepareAssetsForShaders(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
+        var _this4 = this;
+
+        var temp = [];
+
+        gl.useProgram(shaderProgram);
+        this._classNamesOfPrepare.forEach(function (className) {
+          var method = _this4['prepare_' + className];
+          if (method) {
+            var verAttirbs = method.bind(_this4, gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
+            temp = temp.concat(verAttirbs);
+          }
+        });
+        var set = new Set(temp);
+
+        var vertexAttribsAsResult = [];
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = set[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var elem = _step.value;
+
+            vertexAttribsAsResult.push(elem);
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }, {
+      key: 'setUniforms',
+      value: function setUniforms() {}
+    }, {
+      key: 'setUniformsAsTearDown',
+      value: function setUniformsAsTearDown() {}
+    }, {
+      key: '_getShader',
+      value: function _getShader(gl, theSource, type) {
+        var shader;
+
+        if (type == 'x-shader/x-fragment') {
+          shader = this._glContext.createShader(this, gl.FRAGMENT_SHADER);
+        } else if (type == 'x-shader/x-vertex') {
+          shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
+        } else {
+          // Unknown shader type
           return null;
         }
-      }
-    }, {
-      key: 'bindVertexArray',
-      value: function bindVertexArray(gl, vao) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          gl.bindVertexArray(vao);
-          return true;
-        } else if (this._extVAO) {
-          this._extVAO.bindVertexArrayOES(vao);
-          return true;
-        } else {
-          return false;
+
+        gl.shaderSource(shader, theSource);
+
+        // Compile the shader program
+        gl.compileShader(shader);
+
+        // See if it compiled successfully
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+          return null;
         }
+
+        return shader;
       }
     }, {
-      key: 'drawBuffers',
-      value: function drawBuffers(gl, buffers) {
-        if (GLBoost$1.isThisGLVersion_2(gl)) {
-          gl.drawBuffers(buffers);
-          return true;
-        } else if (this._extDBs) {
-          this.extDBs.drawBuffersWEBGL(buffers);
-          return true;
-        } else {
-          if (buffers[0] === gl.NONE) {
-            gl.colorMask(false, false, false, false);
+      key: '_initShaders',
+      value: function _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
+
+        var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
+        var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
+
+        // Create the shader program
+        var shaderProgram = this._glContext.createProgram(this);
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        this._glContext.deleteShader(this, vertexShader);
+        this._glContext.deleteShader(this, fragmentShader);
+
+        // If creating the shader program failed, alert
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+          alert('Unable to initialize the shader program.');
+        }
+
+        gl.useProgram(shaderProgram);
+
+        return shaderProgram;
+      }
+    }, {
+      key: 'getShaderProgram',
+      value: function getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material) {
+        var extraData = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
+
+        var gl = this._glContext.gl;
+        var canvasId = this._glContext.belongingCanvasId;
+
+        lights = this.getDefaultPointLightIfNotExist(lights);
+
+        var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
+        var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material, extraData);
+
+        // lookup shaderHashTable
+        var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
+        var hash = Hash.toCRC32(baseText);
+        if (!Shader._shaderHashTable[canvasId]) {
+          Shader._shaderHashTable[canvasId] = {};
+        }
+        var programToReturn = null;
+        var hashTable = Shader._shaderHashTable[canvasId];
+        if (hash in hashTable) {
+          if (hashTable[hash].code === baseText) {
+            programToReturn = hashTable[hash].program;
           } else {
-            gl.colorMask(true, true, true, true);
+            for (var i = 0; i < hashTable[hash].collisionN; i++) {
+              if (hashTable[hash + '_' + i].code === baseText) {
+                programToReturn = hashTable[hash + '_' + i].program;
+                break;
+              }
+            }
+            hashTable[hash].collisionN++;
           }
-          return false;
         }
-      }
-    }, {
-      key: 'colorAttachiment',
-      value: function colorAttachiment(gl, index) {
-        return this._extDBs ? this._extDBs['COLOR_ATTACHMENT' + index + '_WEBGL'] : gl['COLOR_ATTACHMENT' + index];
-      }
-    }, {
-      key: 'elementIndexBitSize',
-      value: function elementIndexBitSize(gl) {
-        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-          return gl.UNSIGNED_INT;
+
+        if (programToReturn === null || !gl.isProgram(programToReturn)) {
+          // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
+          programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+
+          // register it to shaderHashTable.
+          var indexStr = null;
+          if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
+            indexStr = hash + '_' + hashTable[hash].collisionN;
+          } else {
+            indexStr = hash;
+          }
+          programToReturn.hashId = indexStr;
+          hashTable[indexStr] = { code: baseText, program: programToReturn, collisionN: 0 };
+          Shader._shaderHashTable[canvasId] = hashTable;
         } else {
-          return gl.UNSIGNED_SHORT;
+          //gl.useProgram(programToReturn);
         }
+        this._glslProgram = programToReturn;
+
+        material._semanticsDic = {};
+        material.uniformTextureSamplerDic = {};
+        programToReturn._material = material;
+        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, expression, vertexAttribs, existCamera_f, lights, material, extraData);
+
+        return programToReturn;
       }
     }, {
-      key: 'createUintArrayForElementIndex',
-      value: function createUintArrayForElementIndex(gl, array) {
-        if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-          return new Uint32Array(array);
+      key: 'getDefaultPointLightIfNotExist',
+      value: function getDefaultPointLightIfNotExist(lights) {
+
+        if (lights.length === 0) {
+          if (Shader._defaultLight === null) {
+            Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
+          }
+          return [Shader._defaultLight];
         } else {
-          return new Uint16Array(array);
+          return lights;
         }
       }
     }, {
-      key: 'extVAO',
-      get: function get() {
-        return this._extVAO;
+      key: '_getMaxDrawBuffers',
+      value: function _getMaxDrawBuffers() {
+        var gl = this._glContext.gl;
+        var isWebGL2 = Shader.isThisGLVersion_2(gl);
+        if (isWebGL2) {
+          return gl.getParameter(gl.MAX_DRAW_BUFFERS);
+        }
+
+        var glem = GLExtensionsManager.getInstance(this._glContext);
+        if (glem.extDBs) {
+          return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
+        } else {
+          return 1;
+        }
       }
     }, {
-      key: 'extDBs',
-      get: function get() {
-        return this._extDBs;
+      key: '_sampler2DShadow_func',
+      value: function _sampler2DShadow_func() {
+        var gl = this._glContext.gl;
+        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
       }
     }, {
-      key: 'extTFA',
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        if (this._glslProgram) {
+          this._glContext.deleteProgram(this, this._glslProgram);
+        }
+        babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
+      }
+    }, {
+      key: 'getShaderParameter',
+      value: function getShaderParameter(material, parameterName) {
+        return this[parameterName] || material.shaderParameters[parameterName];
+      }
+    }, {
+      key: 'dirty',
       get: function get() {
-        return this._extTFA;
+        return this._dirty;
+      },
+      set: function set(flg) {
+        this._dirty = flg;
+      }
+    }, {
+      key: 'glslProgram',
+      get: function get() {
+        return this._glslProgram;
       }
     }], [{
-      key: 'getInstance',
-      value: function getInstance(glContext) {
-        if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
-          return GLExtensionsManager._instances[glContext.belongingCanvasId];
-        }
-        return new GLExtensionsManager(glContext);
+      key: 'initMixinMethodArray',
+      value: function initMixinMethodArray() {
+        this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
+        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
+        this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
+        this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
+
+        this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
+        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
+        this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
+
+        this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
       }
-    }]);
-    return GLExtensionsManager;
-  }();
+    }, {
+      key: 'mixin',
+      value: function mixin(source) {
 
-  GLExtensionsManager._instances = new Object();
+        // create mixin method Array
+        this.initMixinMethodArray();
 
-  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
-
-  var GLContext = function () {
-    function GLContext(canvas, gl, width, height) {
-      babelHelpers.classCallCheck(this, GLContext);
-
-
-      if (typeof gl !== 'undefined' && gl !== null) {
-        this.impl = new GLContextWebGL1Impl(canvas, this, gl);
-        this._width = width;
-        this._height = height;
-        GLContext._instances['nocanvas'] = this;
-      } else {
-        if (GLContext._instances[canvas.id] instanceof GLContext) {
-          return GLContext._instances[canvas.id];
+        // register mixin methods to Array
+        if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSDefine.push(source.name);
         }
-
-        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
-          this.impl = new GLContextWebGL1Impl(canvas, this);
-        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
-          this.impl = new GLContextWebGL2Impl(canvas, this);
+        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSMethodDefine.push(source.name);
         }
-
-        GLContext._instances[canvas.id] = this;
-        this._width = canvas.width;
-        this._height = canvas.height;
-      }
-
-      this._monitor = L_GLBoostMonitor.getInstance();
-    }
-
-    babelHelpers.createClass(GLContext, [{
-      key: 'createVertexArray',
-      value: function createVertexArray(glBoostObject) {
-        var gl = this.gl;
-        var glem = GLExtensionsManager.getInstance(this);
-        var glResource = glem.createVertexArray(gl);
-        if (glResource) {
-          this._monitor.registerWebGLResource(glBoostObject, glResource);
+        if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSTransform.push(source.name);
+        }
+        if (this.prototype._classNamesOfVSShade.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfVSShade.push(source.name);
+        }
+        if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfFSDefine.push(source.name);
+        }
+        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfFSMethodDefine.push(source.name);
+        }
+        if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfFSShade.push(source.name);
+        }
+        if (this.prototype._classNamesOfPrepare.indexOf(source.name) === -1) {
+          this.prototype._classNamesOfPrepare.push(source.name);
         }
 
-        return glResource;
+        // mixin
+        var target = this.prototype;source = source.prototype;
+        Object.getOwnPropertyNames(source).forEach(function (name) {
+          if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(source, name));
+        });
       }
     }, {
-      key: 'createBuffer',
-      value: function createBuffer(glBoostObject) {
-        var glResource = this.gl.createBuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
+      key: 'swapMixin',
+      value: function swapMixin(current, newone) {
+        // register mixin methods to Array
+        var matchIdx = this.prototype._classNamesOfVSDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfVSShade.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSShade[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSShade[matchIdx] = newone.name;
+        }
+        matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
+        }
+
+        // mixin
+        var target = this.prototype;newone = newone.prototype;
+        Object.getOwnPropertyNames(newone).forEach(function (name) {
+          if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(newone, name));
+        });
       }
     }, {
-      key: 'createFramebuffer',
-      value: function createFramebuffer(glBoostObject) {
-        var glResource = this.gl.createFramebuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteFramebuffer',
-      value: function deleteFramebuffer(glBoostObject, frameBuffer) {
-        this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
-        this.gl.deleteFramebuffer(frameBuffer);
-        frameBuffer = null;
-      }
-    }, {
-      key: 'createRenderbuffer',
-      value: function createRenderbuffer(glBoostObject) {
-        var glResource = this.gl.createRenderbuffer();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'createShader',
-      value: function createShader(glBoostObject, shaderType) {
-        var glResource = this.gl.createShader(shaderType);
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteShader',
-      value: function deleteShader(glBoostObject, shader) {
-        this._monitor.deregisterWebGLResource(glBoostObject, shader);
-        this.gl.deleteShader(shader);
-        shader = null;
-      }
-    }, {
-      key: 'createProgram',
-      value: function createProgram(glBoostObject) {
-        var glResource = this.gl.createProgram();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteProgram',
-      value: function deleteProgram(glBoostObject, program) {
-        this._monitor.deregisterWebGLResource(glBoostObject, program);
-        this.gl.deleteProgram(program);
-      }
-    }, {
-      key: 'createTexture',
-      value: function createTexture(glBoostObject) {
-        var glResource = this.gl.createTexture();
-        this._monitor.registerWebGLResource(glBoostObject, glResource);
-        return glResource;
-      }
-    }, {
-      key: 'deleteTexture',
-      value: function deleteTexture(glBoostObject, texture) {
-        this._monitor.deregisterWebGLResource(glBoostObject, texture);
-        this.gl.deleteTexture(texture);
-        texture = null;
-      }
-    }, {
-      key: 'gl',
-      get: function get() {
-        return this.impl.gl;
-      },
-      set: function set(gl) {
-        this.impl.gl = gl;
-      }
-    }, {
-      key: 'belongingCanvasId',
-      get: function get() {
-        if (this.impl.canvas) {
-          return this.impl.canvas.id;
-        } else {
-          return 'nocanvas';
+      key: 'removeMixin',
+      value: function removeMixin(source) {
+        var matchIdx = this.prototype._classNamesOfVSDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfVSShade.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfVSShade.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfFSShade.splice(matchIdx, 1);
+        }
+        matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
+        if (matchIdx !== -1) {
+          this.prototype._classNamesOfPrepare.splice(matchIdx, 1);
         }
       }
     }, {
-      key: 'canvas',
-      get: function get() {
-        return this.impl.canvas;
+      key: '_exist',
+      value: function _exist(functions, attribute) {
+        return functions.indexOf(attribute) >= 0;
       }
     }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      },
-      set: function set(width) {
-        if (this.impl.canvas) {
-          this.impl.canvas.width = width;
-        }
-        this._width = width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      },
-      set: function set(height) {
-        if (this.impl.canvas) {
-          this.impl.canvas.height = height;
-        }
-        this._height = height;
-      }
-    }], [{
-      key: 'getInstance',
-      value: function getInstance(canvas, gl, width, height) {
-        if (typeof canvas === 'string') {
-          canvas = window.document.querySelector(canvas);
-        }
-        return new GLContext(canvas, gl, width, height);
-      }
-    }]);
-    return GLContext;
-  }();
-
-  GLContext._instances = new Object();
-
-  /**
-   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
-   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-
-  var AbstractTexture = function (_GLBoostObject) {
-    babelHelpers.inherits(AbstractTexture, _GLBoostObject);
-
-    /**
-     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
-     *
-     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-    function AbstractTexture(glBoostContext) {
-      babelHelpers.classCallCheck(this, AbstractTexture);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (AbstractTexture.__proto__ || Object.getPrototypeOf(AbstractTexture)).call(this, glBoostContext));
-
-      if (_this.constructor === AbstractTexture) {
-        throw new TypeError('Cannot construct AbstractTexture instances directly.');
-      }
-
-      _this._textureUnitIndex = 0;
-      return _this;
-    }
-
-    /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
-     *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
-     */
-
-
-    babelHelpers.createClass(AbstractTexture, [{
-      key: 'setUp',
-
-
-      /**
-       * [en] bind the texture. <br />
-       * [ja] テクスチャをバインドします。
-       */
-      value: function setUp(textureUnitIndex) {
-        var gl = this._glContext.gl;
-        if (this._texture === null) {
+      key: 'isThisGLVersion_2',
+      value: function isThisGLVersion_2(gl) {
+        if (typeof WebGL2RenderingContext === 'undefined') {
           return false;
         }
-        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-        gl.activeTexture(gl['TEXTURE' + index]);
-        gl.bindTexture(gl.TEXTURE_2D, this._texture);
-
-        return true;
-      }
-
-      /**
-       * [en] unbind the texture. <br />
-       * [ja] テクスチャをバインド解除します。
-       */
-
-    }, {
-      key: 'tearDown',
-      value: function tearDown(textureUnitIndex) {
-        var gl = this._glContext.gl;
-
-        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-        gl.activeTexture(gl['TEXTURE' + index]);
-        gl.bindTexture(gl.TEXTURE_2D, null);
+        return gl instanceof WebGL2RenderingContext;
       }
     }, {
-      key: 'getTexturePixelData',
-      value: function getTexturePixelData() {
-        // Create a framebuffer backed by the texture
-        var framebuffer = this._glContext.createFramebuffer(this);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
-
-        // Read the contents of the framebuffer (data stores the pixel data)
-        var data = new Uint8Array(this.width * this.height * 4);
-        gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-        this._glContext.deleteFramebuffer(this, framebuffer);
-
-        return data;
+      key: '_glslVer',
+      value: function _glslVer(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? '#version 300 es\n' : '';
       }
     }, {
-      key: '_getResizedCanvas',
-      value: function _getResizedCanvas(image) {
-        var canvas = document.createElement("canvas");
-        canvas.width = this._getNearestPowerOfTwo(image.width);
-        canvas.height = this._getNearestPowerOfTwo(image.height);
+      key: '_glsl1DrawBufferExt',
+      value: function _glsl1DrawBufferExt(gl) {
+        return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_draw_buffers : require\n' : '';
+      }
+    }, {
+      key: '_in_onVert',
+      value: function _in_onVert(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
+      }
+    }, {
+      key: '_out_onVert',
+      value: function _out_onVert(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'out' : 'varying';
+      }
+    }, {
+      key: '_in_onFrag',
+      value: function _in_onFrag(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'varying';
+      }
+    }, {
+      key: '_texture_func',
+      value: function _texture_func(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
+      }
+    }, {
+      key: '_textureProj_func',
+      value: function _textureProj_func(gl) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+      }
+    }, {
+      key: '_set_outColor_onFrag',
+      value: function _set_outColor_onFrag(gl, i) {
+        return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = ' + i + ') out vec4 rt' + i + ';\n' : 'vec4 rt' + i + ';\n';
+      }
+    }, {
+      key: '_set_glFragColor_inGLVer1',
+      value: function _set_glFragColor_inGLVer1(gl) {
+        return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
+      }
+    }, {
+      key: '_set_glFragData_inGLVer1',
+      value: function _set_glFragData_inGLVer1(gl, i) {
+        return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragData[' + i + '] = rt' + i + ';\n' : '';
+      }
+    }, {
+      key: 'trySettingMatrix44ToUniform',
+      value: function trySettingMatrix44ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
+        if (typeof semanticsDir[semantics] === 'undefined') {
+          return;
+        }
+        if (typeof semanticsDir[semantics] === 'string') {
+          gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + semanticsDir[semantics]), false, matrixArray);
+          return;
+        }
 
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        // it must be an Array...
+        semanticsDir[semantics].forEach(function (uniformName) {
+          gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + uniformName), false, matrixArray);
+        });
+      }
+    }, {
+      key: 'trySettingMatrix33ToUniform',
+      value: function trySettingMatrix33ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
+        if (typeof semanticsDir[semantics] === 'undefined') {
+          return;
+        }
+        if (typeof semanticsDir[semantics] === 'string') {
+          gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + semanticsDir[semantics]), false, matrixArray);
+          return;
+        }
 
-        return canvas;
-      }
-      /**
-       * [en] check whether or not this texture size is power of two. <br />
-       * [ja] テクスチャサイズが２の累乗かどうかを返します
-       *
-       * @param {number} x [en] texture size. [ja] テクスチャサイズ
-       * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
-       */
-
-    }, {
-      key: '_isPowerOfTwo',
-      value: function _isPowerOfTwo(x) {
-        return (x & x - 1) == 0;
-      }
-
-      /**
-       * [en] get a value nearest power of two. <br />
-       * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
-       *
-       * @param {number} x [en] texture size. [ja] テクスチャサイズ
-       * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
-       */
-
-    }, {
-      key: '_getNearestPowerOfTwo',
-      value: function _getNearestPowerOfTwo(x) {
-        return Math.pow(2, Math.round(Math.log(x) / Math.LN2));
-      }
-    }, {
-      key: 'glTextureResource',
-      get: function get() {
-        return this._texture;
-      }
-    }, {
-      key: 'width',
-      get: function get() {
-        return this._width;
-      }
-    }, {
-      key: 'height',
-      get: function get() {
-        return this._height;
-      }
-    }, {
-      key: 'textureUnitIndex',
-      set: function set(index) {
-        this._textureUnitIndex = index;
-      },
-      get: function get() {
-        return this._textureUnitIndex;
+        // it must be an Array...
+        semanticsDir[semantics].forEach(function (uniformName) {
+          gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + uniformName), false, matrixArray);
+        });
       }
     }]);
-    return AbstractTexture;
+    return Shader;
   }(GLBoostObject);
+
+  Shader._instances = new Object();
+  Shader._shaderHashTable = {};
+  Shader._defaultLight = null;
 
   var Matrix33 = function () {
     function Matrix33(m) {
@@ -2583,669 +2831,6 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
-  var Hash = function () {
-    function Hash() {
-      babelHelpers.classCallCheck(this, Hash);
-    }
-
-    babelHelpers.createClass(Hash, null, [{
-      key: "toCRC32",
-      value: function toCRC32(str) {
-        var crc = 0,
-            x = 0,
-            y = 0;
-        var table = Hash._crc32table;
-
-        crc = crc ^ -1;
-        for (var i = 0, iTop = str.length; i < iTop; ++i) {
-          y = (crc ^ str.charCodeAt(i)) & 0xff;
-          x = "0x" + table[y];
-          crc = crc >>> 8 ^ x;
-        }
-
-        return (crc ^ -1) >>> 0;
-      }
-    }]);
-    return Hash;
-  }();
-
-  Hash._crc32table = "00000000 77073096 EE0E612C 990951BA 076DC419 706AF48F E963A535 9E6495A3 0EDB8832 79DCB8A4 E0D5E91E 97D2D988 09B64C2B 7EB17CBD E7B82D07 90BF1D91 1DB71064 6AB020F2 F3B97148 84BE41DE 1ADAD47D 6DDDE4EB F4D4B551 83D385C7 136C9856 646BA8C0 FD62F97A 8A65C9EC 14015C4F 63066CD9 FA0F3D63 8D080DF5 3B6E20C8 4C69105E D56041E4 A2677172 3C03E4D1 4B04D447 D20D85FD A50AB56B 35B5A8FA 42B2986C DBBBC9D6 ACBCF940 32D86CE3 45DF5C75 DCD60DCF ABD13D59 26D930AC 51DE003A C8D75180 BFD06116 21B4F4B5 56B3C423 CFBA9599 B8BDA50F 2802B89E 5F058808 C60CD9B2 B10BE924 2F6F7C87 58684C11 C1611DAB B6662D3D 76DC4190 01DB7106 98D220BC EFD5102A 71B18589 06B6B51F 9FBFE4A5 E8B8D433 7807C9A2 0F00F934 9609A88E E10E9818 7F6A0DBB 086D3D2D 91646C97 E6635C01 6B6B51F4 1C6C6162 856530D8 F262004E 6C0695ED 1B01A57B 8208F4C1 F50FC457 65B0D9C6 12B7E950 8BBEB8EA FCB9887C 62DD1DDF 15DA2D49 8CD37CF3 FBD44C65 4DB26158 3AB551CE A3BC0074 D4BB30E2 4ADFA541 3DD895D7 A4D1C46D D3D6F4FB 4369E96A 346ED9FC AD678846 DA60B8D0 44042D73 33031DE5 AA0A4C5F DD0D7CC9 5005713C 270241AA BE0B1010 C90C2086 5768B525 206F85B3 B966D409 CE61E49F 5EDEF90E 29D9C998 B0D09822 C7D7A8B4 59B33D17 2EB40D81 B7BD5C3B C0BA6CAD EDB88320 9ABFB3B6 03B6E20C 74B1D29A EAD54739 9DD277AF 04DB2615 73DC1683 E3630B12 94643B84 0D6D6A3E 7A6A5AA8 E40ECF0B 9309FF9D 0A00AE27 7D079EB1 F00F9344 8708A3D2 1E01F268 6906C2FE F762575D 806567CB 196C3671 6E6B06E7 FED41B76 89D32BE0 10DA7A5A 67DD4ACC F9B9DF6F 8EBEEFF9 17B7BE43 60B08ED5 D6D6A3E8 A1D1937E 38D8C2C4 4FDFF252 D1BB67F1 A6BC5767 3FB506DD 48B2364B D80D2BDA AF0A1B4C 36034AF6 41047A60 DF60EFC3 A867DF55 316E8EEF 4669BE79 CB61B38C BC66831A 256FD2A0 5268E236 CC0C7795 BB0B4703 220216B9 5505262F C5BA3BBE B2BD0B28 2BB45A92 5CB36A04 C2D7FFA7 B5D0CF31 2CD99E8B 5BDEAE1D 9B64C2B0 EC63F226 756AA39C 026D930A 9C0906A9 EB0E363F 72076785 05005713 95BF4A82 E2B87A14 7BB12BAE 0CB61B38 92D28E9B E5D5BE0D 7CDCEFB7 0BDBDF21 86D3D2D4 F1D4E242 68DDB3F8 1FDA836E 81BE16CD F6B9265B 6FB077E1 18B74777 88085AE6 FF0F6A70 66063BCA 11010B5C 8F659EFF F862AE69 616BFFD3 166CCF45 A00AE278 D70DD2EE 4E048354 3903B3C2 A7672661 D06016F7 4969474D 3E6E77DB AED16A4A D9D65ADC 40DF0B66 37D83BF0 A9BCAE53 DEBB9EC5 47B2CF7F 30B5FFE9 BDBDF21C CABAC28A 53B39330 24B4A3A6 BAD03605 CDD70693 54DE5729 23D967BF B3667A2E C4614AB8 5D681B02 2A6F2B94 B40BBE37 C30C8EA1 5A05DF1B 2D02EF8D".split(' ');
-
-  var Shader = function (_GLBoostObject) {
-    babelHelpers.inherits(Shader, _GLBoostObject);
-
-    function Shader(glBoostContext) {
-      babelHelpers.classCallCheck(this, Shader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (Shader.__proto__ || Object.getPrototypeOf(Shader)).call(this, glBoostContext));
-
-      _this._glslProgram = null;
-      _this._dirty = true;
-      return _this;
-    }
-
-    babelHelpers.createClass(Shader, [{
-      key: '_removeDuplicatedLine',
-      value: function _removeDuplicatedLine(shaderString) {
-        var splittedShaderLines = shaderString.split('\n');
-        for (var i = 0; i < splittedShaderLines.length; i++) {
-          splittedShaderLines[i] += '\n';
-          for (var j = 0; j < i; j++) {
-            if (splittedShaderLines[j] === splittedShaderLines[i]) {
-              splittedShaderLines[j] = '//                                                            commented out because of duplicated: ' + splittedShaderLines[i];
-            }
-          }
-        }
-
-        var processedShaderString = '';
-        for (var _i = 0; _i < splittedShaderLines.length; _i++) {
-          processedShaderString += splittedShaderLines[_i];
-        }
-
-        return processedShaderString;
-      }
-    }, {
-      key: '_getVertexShaderString',
-      value: function _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
-        var _this2 = this;
-
-        var f = functions;
-        var shaderText = '';
-
-        var in_ = Shader._in_onVert(gl);
-        var out_ = Shader._out_onVert(gl);
-
-        shaderText += Shader._glslVer(gl);
-        shaderText += 'precision highp float;\n';
-
-        /// define variables
-        // start defining variables. first, sub class Shader, ...
-        // seconds, define variables as mixin shaders
-        var vsDefineShaderText = '';
-        this._classNamesOfVSDefine.forEach(function (className) {
-          var method = _this2['VSDefine_' + className];
-          if (method) {
-            vsDefineShaderText += '//                                                            VSDefine_' + className + ' //\n';
-            vsDefineShaderText += method.bind(_this2, in_, out_, f, lights, material, extraData)();
-          }
-        });
-        shaderText += this._removeDuplicatedLine(vsDefineShaderText);
-
-        // begin of main function
-        shaderText += 'void main(void) {\n';
-
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfVSMethodDefine.forEach(function (className) {
-          var method = _this2['VSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
-          }
-        });
-
-        /// Transform
-        // start transforming. first, sub class Shader, ...
-        // seconds, transform as mixin Shaders
-        this._classNamesOfVSTransform.forEach(function (className) {
-          var method = _this2['VSTransform_' + className];
-          if (method) {
-            shaderText += '//                                                            VSTransform_' + className + ' //\n';
-            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
-          }
-        });
-
-        /// Shading
-        // start shading. first, sub class Shader, ...
-        // seconds, shade as mixin Shaders
-        this._classNamesOfVSShade.forEach(function (className) {
-          var method = _this2['VSShade_' + className];
-          if (method) {
-            shaderText += '//                                                            VSShade_' + className + ' //\n';
-            shaderText += method.bind(_this2, existCamera_f, f, lights, material, extraData)();
-          }
-        });
-
-        // end of main function
-        shaderText += '}\n';
-
-        return shaderText;
-      }
-    }, {
-      key: '_getFragmentShaderString',
-      value: function _getFragmentShaderString(gl, functions, lights, material, extraData) {
-        var _this3 = this;
-
-        var f = functions;
-        var shaderText = '';
-
-        var in_ = Shader._in_onFrag(gl);
-
-        shaderText += Shader._glslVer(gl);
-        var maxDrawBuffers = this._getMaxDrawBuffers();
-        if (maxDrawBuffers > 1) {
-          shaderText += Shader._glsl1DrawBufferExt(gl);
-        }
-        shaderText += 'precision mediump float;\n';
-
-        for (var i = 0; i < maxDrawBuffers; i++) {
-          shaderText += Shader._set_outColor_onFrag(gl, i);
-        }
-
-        /// define variables
-        // start defining variables. first, sub class Shader, ...
-        // seconds, define variables as mixin shaders
-        var fsDefineShaderText = '';
-        this._classNamesOfFSDefine.forEach(function (className) {
-          var method = _this3['FSDefine_' + className];
-          if (method) {
-            fsDefineShaderText += '//                                                            FSDefine_' + className + ' //\n';
-            fsDefineShaderText += method.bind(_this3, in_, f, lights, material, extraData)();
-          }
-        });
-        shaderText += this._removeDuplicatedLine(fsDefineShaderText);
-
-        /// define methods
-        // start defining methods. first, sub class Shader, ...
-        // seconds, define methods as mixin Shaders
-        this._classNamesOfFSMethodDefine.forEach(function (className) {
-          var method = _this3['FSMethodDefine_' + className];
-          if (method) {
-            shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
-            shaderText += method.bind(_this3, in_, f, lights, material, extraData)();
-          }
-        });
-
-        // begin of main function
-        shaderText += 'void main(void) {\n';
-
-        /// Shading
-        // start shading. first, sub class Shaders, ...
-        // second, shade as mixin Shaders
-        this._classNamesOfFSShade.forEach(function (className) {
-          var method = _this3['FSShade_' + className];
-          if (method) {
-            shaderText += '//                                                            FSShade_' + className + ' //\n';
-            shaderText += method.bind(_this3, f, gl, lights, material, extraData)();
-          }
-        });
-
-        // end of main function
-        if (maxDrawBuffers > 1) {
-          for (var _i2 = 0; _i2 < maxDrawBuffers; _i2++) {
-            shaderText += Shader._set_glFragData_inGLVer1(gl, _i2);
-          }
-        } else {
-          shaderText += Shader._set_glFragColor_inGLVer1(gl);
-        }
-        shaderText += '}\n';
-
-        return shaderText;
-      }
-    }, {
-      key: '_prepareAssetsForShaders',
-      value: function _prepareAssetsForShaders(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
-        var _this4 = this;
-
-        var temp = [];
-
-        gl.useProgram(shaderProgram);
-        this._classNamesOfPrepare.forEach(function (className) {
-          var method = _this4['prepare_' + className];
-          if (method) {
-            var verAttirbs = method.bind(_this4, gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas)();
-            temp = temp.concat(verAttirbs);
-          }
-        });
-        var set = new Set(temp);
-
-        var vertexAttribsAsResult = [];
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = set[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var elem = _step.value;
-
-            vertexAttribsAsResult.push(elem);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }, {
-      key: 'setUniforms',
-      value: function setUniforms() {}
-    }, {
-      key: 'setUniformsAsTearDown',
-      value: function setUniformsAsTearDown() {}
-    }, {
-      key: '_getShader',
-      value: function _getShader(gl, theSource, type) {
-        var shader;
-
-        if (type == 'x-shader/x-fragment') {
-          shader = this._glContext.createShader(this, gl.FRAGMENT_SHADER);
-        } else if (type == 'x-shader/x-vertex') {
-          shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
-        } else {
-          // Unknown shader type
-          return null;
-        }
-
-        gl.shaderSource(shader, theSource);
-
-        // Compile the shader program
-        gl.compileShader(shader);
-
-        // See if it compiled successfully
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-          alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
-          return null;
-        }
-
-        return shader;
-      }
-    }, {
-      key: '_initShaders',
-      value: function _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
-        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
-        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
-        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
-        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
-
-        var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
-        var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
-
-        // Create the shader program
-        var shaderProgram = this._glContext.createProgram(this);
-        gl.attachShader(shaderProgram, vertexShader);
-        gl.attachShader(shaderProgram, fragmentShader);
-        gl.linkProgram(shaderProgram);
-        this._glContext.deleteShader(this, vertexShader);
-        this._glContext.deleteShader(this, fragmentShader);
-
-        // If creating the shader program failed, alert
-        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-          alert('Unable to initialize the shader program.');
-        }
-
-        gl.useProgram(shaderProgram);
-
-        return shaderProgram;
-      }
-    }, {
-      key: 'getShaderProgram',
-      value: function getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material) {
-        var extraData = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : {};
-
-        var gl = this._glContext.gl;
-        var canvasId = this._glContext.belongingCanvasId;
-
-        lights = this.getDefaultPointLightIfNotExist(lights);
-
-        var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
-        var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material, extraData);
-
-        // lookup shaderHashTable
-        var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
-        var hash = Hash.toCRC32(baseText);
-        if (!Shader._shaderHashTable[canvasId]) {
-          Shader._shaderHashTable[canvasId] = {};
-        }
-        var programToReturn = null;
-        var hashTable = Shader._shaderHashTable[canvasId];
-        if (hash in hashTable) {
-          if (hashTable[hash].code === baseText) {
-            programToReturn = hashTable[hash].program;
-          } else {
-            for (var i = 0; i < hashTable[hash].collisionN; i++) {
-              if (hashTable[hash + '_' + i].code === baseText) {
-                programToReturn = hashTable[hash + '_' + i].program;
-                break;
-              }
-            }
-            hashTable[hash].collisionN++;
-          }
-        }
-
-        if (programToReturn === null || !gl.isProgram(programToReturn)) {
-          // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-          programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
-
-          // register it to shaderHashTable.
-          var indexStr = null;
-          if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
-            indexStr = hash + '_' + hashTable[hash].collisionN;
-          } else {
-            indexStr = hash;
-          }
-          programToReturn.hashId = indexStr;
-          hashTable[indexStr] = { code: baseText, program: programToReturn, collisionN: 0 };
-          Shader._shaderHashTable[canvasId] = hashTable;
-        } else {
-          //gl.useProgram(programToReturn);
-        }
-        this._glslProgram = programToReturn;
-
-        material._semanticsDic = {};
-        material.uniformTextureSamplerDic = {};
-        programToReturn._material = material;
-        programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, expression, vertexAttribs, existCamera_f, lights, material, extraData);
-
-        return programToReturn;
-      }
-    }, {
-      key: 'getDefaultPointLightIfNotExist',
-      value: function getDefaultPointLightIfNotExist(lights) {
-
-        if (lights.length === 0) {
-          if (Shader._defaultLight === null) {
-            Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
-          }
-          return [Shader._defaultLight];
-        } else {
-          return lights;
-        }
-      }
-    }, {
-      key: '_getMaxDrawBuffers',
-      value: function _getMaxDrawBuffers() {
-        var gl = this._glContext.gl;
-        var isWebGL2 = Shader.isThisGLVersion_2(gl);
-        if (isWebGL2) {
-          return gl.getParameter(gl.MAX_DRAW_BUFFERS);
-        }
-
-        var glem = GLExtensionsManager.getInstance(this._glContext);
-        if (glem.extDBs) {
-          return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
-        } else {
-          return 1;
-        }
-      }
-    }, {
-      key: '_sampler2DShadow_func',
-      value: function _sampler2DShadow_func() {
-        var gl = this._glContext.gl;
-        return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
-      }
-    }, {
-      key: 'readyForDiscard',
-      value: function readyForDiscard() {
-        if (this._glslProgram) {
-          this._glContext.deleteProgram(this, this._glslProgram);
-        }
-        babelHelpers.get(Shader.prototype.__proto__ || Object.getPrototypeOf(Shader.prototype), 'readyForDiscard', this).call(this);
-      }
-    }, {
-      key: 'getShaderParameter',
-      value: function getShaderParameter(material, parameterName) {
-        return this[parameterName] || material.shaderParameters[parameterName];
-      }
-    }, {
-      key: 'dirty',
-      get: function get() {
-        return this._dirty;
-      },
-      set: function set(flg) {
-        this._dirty = flg;
-      }
-    }, {
-      key: 'glslProgram',
-      get: function get() {
-        return this._glslProgram;
-      }
-    }], [{
-      key: 'initMixinMethodArray',
-      value: function initMixinMethodArray() {
-        this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
-        this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
-        this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
-        this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
-
-        this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
-        this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
-        this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
-
-        this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
-      }
-    }, {
-      key: 'mixin',
-      value: function mixin(source) {
-
-        // create mixin method Array
-        this.initMixinMethodArray();
-
-        // register mixin methods to Array
-        if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSMethodDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSTransform.push(source.name);
-        }
-        if (this.prototype._classNamesOfVSShade.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfVSShade.push(source.name);
-        }
-        if (this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfFSDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfFSMethodDefine.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfFSMethodDefine.push(source.name);
-        }
-        if (this.prototype._classNamesOfFSShade.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfFSShade.push(source.name);
-        }
-        if (this.prototype._classNamesOfPrepare.indexOf(source.name) === -1) {
-          this.prototype._classNamesOfPrepare.push(source.name);
-        }
-
-        // mixin
-        var target = this.prototype;source = source.prototype;
-        Object.getOwnPropertyNames(source).forEach(function (name) {
-          if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(source, name));
-        });
-      }
-    }, {
-      key: 'swapMixin',
-      value: function swapMixin(current, newone) {
-        // register mixin methods to Array
-        var matchIdx = this.prototype._classNamesOfVSDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfVSShade.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSShade[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSShade[matchIdx] = newone.name;
-        }
-        matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
-        }
-
-        // mixin
-        var target = this.prototype;newone = newone.prototype;
-        Object.getOwnPropertyNames(newone).forEach(function (name) {
-          if (name !== 'constructor') Object.defineProperty(target, name, Object.getOwnPropertyDescriptor(newone, name));
-        });
-      }
-    }, {
-      key: 'removeMixin',
-      value: function removeMixin(source) {
-        var matchIdx = this.prototype._classNamesOfVSDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfVSShade.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfVSShade.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfFSMethodDefine.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSMethodDefine.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfFSShade.splice(matchIdx, 1);
-        }
-        matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
-        if (matchIdx !== -1) {
-          this.prototype._classNamesOfPrepare.splice(matchIdx, 1);
-        }
-      }
-    }, {
-      key: '_exist',
-      value: function _exist(functions, attribute) {
-        return functions.indexOf(attribute) >= 0;
-      }
-    }, {
-      key: 'isThisGLVersion_2',
-      value: function isThisGLVersion_2(gl) {
-        if (typeof WebGL2RenderingContext === 'undefined') {
-          return false;
-        }
-        return gl instanceof WebGL2RenderingContext;
-      }
-    }, {
-      key: '_glslVer',
-      value: function _glslVer(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? '#version 300 es\n' : '';
-      }
-    }, {
-      key: '_glsl1DrawBufferExt',
-      value: function _glsl1DrawBufferExt(gl) {
-        return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_draw_buffers : require\n' : '';
-      }
-    }, {
-      key: '_in_onVert',
-      value: function _in_onVert(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
-      }
-    }, {
-      key: '_out_onVert',
-      value: function _out_onVert(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'out' : 'varying';
-      }
-    }, {
-      key: '_in_onFrag',
-      value: function _in_onFrag(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'varying';
-      }
-    }, {
-      key: '_texture_func',
-      value: function _texture_func(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'texture' : 'texture2D';
-      }
-    }, {
-      key: '_textureProj_func',
-      value: function _textureProj_func(gl) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
-      }
-    }, {
-      key: '_set_outColor_onFrag',
-      value: function _set_outColor_onFrag(gl, i) {
-        return GLBoost.isThisGLVersion_2(gl) ? 'layout(location = ' + i + ') out vec4 rt' + i + ';\n' : 'vec4 rt' + i + ';\n';
-      }
-    }, {
-      key: '_set_glFragColor_inGLVer1',
-      value: function _set_glFragColor_inGLVer1(gl) {
-        return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragColor = rt0;\n' : '';
-      }
-    }, {
-      key: '_set_glFragData_inGLVer1',
-      value: function _set_glFragData_inGLVer1(gl, i) {
-        return !GLBoost.isThisGLVersion_2(gl) ? '  gl_FragData[' + i + '] = rt' + i + ';\n' : '';
-      }
-    }, {
-      key: 'trySettingMatrix44ToUniform',
-      value: function trySettingMatrix44ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
-        if (typeof semanticsDir[semantics] === 'undefined') {
-          return;
-        }
-        if (typeof semanticsDir[semantics] === 'string') {
-          gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + semanticsDir[semantics]), false, matrixArray);
-          return;
-        }
-
-        // it must be an Array...
-        semanticsDir[semantics].forEach(function (uniformName) {
-          gl.uniformMatrix4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + uniformName), false, matrixArray);
-        });
-      }
-    }, {
-      key: 'trySettingMatrix33ToUniform',
-      value: function trySettingMatrix33ToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, matrixArray) {
-        if (typeof semanticsDir[semantics] === 'undefined') {
-          return;
-        }
-        if (typeof semanticsDir[semantics] === 'string') {
-          gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + semanticsDir[semantics]), false, matrixArray);
-          return;
-        }
-
-        // it must be an Array...
-        semanticsDir[semantics].forEach(function (uniformName) {
-          gl.uniformMatrix3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_' + uniformName), false, matrixArray);
-        });
-      }
-    }]);
-    return Shader;
-  }(GLBoostObject);
-
-  Shader._instances = new Object();
-  Shader._shaderHashTable = {};
-  Shader._defaultLight = null;
-
   var VertexWorldShaderSource = function () {
     function VertexWorldShaderSource() {
       babelHelpers.classCallCheck(this, VertexWorldShaderSource);
@@ -3672,6 +3257,653 @@
   }(Shader);
 
   GLBoost['WireframeShader'] = WireframeShader;
+
+  var SPVDecalShaderSource = function () {
+    function SPVDecalShaderSource() {
+      babelHelpers.classCallCheck(this, SPVDecalShaderSource);
+    }
+
+    babelHelpers.createClass(SPVDecalShaderSource, [{
+      key: 'VSDefine_SPVDecalShaderSource',
+      value: function VSDefine_SPVDecalShaderSource(in_, out_, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost$1.COLOR)) {
+          shaderText += in_ + ' vec4 aVertex_color;\n';
+          shaderText += out_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
+          shaderText += out_ + ' vec2 texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'VSTransform_SPVDecalShaderSource',
+      value: function VSTransform_SPVDecalShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost$1.COLOR)) {
+          shaderText += '  color = aVertex_color;\n';
+        }
+        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+          shaderText += '  texcoord = aVertex_texcoord;\n';
+        }
+        return shaderText;
+      }
+    }, {
+      key: 'FSDefine_SPVDecalShaderSource',
+      value: function FSDefine_SPVDecalShaderSource(in_, f, lights, material, extraData) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost$1.COLOR)) {
+          shaderText += in_ + ' vec4 color;\n';
+        }
+        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+          shaderText += in_ + ' vec2 texcoord;\n\n';
+        }
+        if (material.hasAnyTextures()) {
+          shaderText += 'uniform sampler2D uTexture;\n';
+        }
+        shaderText += 'uniform vec4 materialBaseColor;\n';
+        shaderText += 'uniform vec4 textureContributionRate;\n';
+        shaderText += 'uniform vec4 gamma;\n';
+
+        return shaderText;
+      }
+    }, {
+      key: 'FSShade_SPVDecalShaderSource',
+      value: function FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
+        var shaderText = '';
+        var textureFunc = Shader._texture_func(gl);
+        if (Shader._exist(f, GLBoost$1.COLOR)) {
+          shaderText += '  rt0 *= color;\n';
+        }
+        shaderText += '    rt0 *= materialBaseColor;\n';
+        if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
+          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
+          shaderText += '  rt0 = pow(rt0, gamma);\n';
+        }
+
+        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+        return shaderText;
+      }
+    }, {
+      key: 'prepare_SPVDecalShaderSource',
+      value: function prepare_SPVDecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+        var vertexAttribsAsResult = [];
+        vertexAttribs.forEach(function (attribName) {
+          if (attribName === GLBoost$1.COLOR || attribName === GLBoost$1.TEXCOORD) {
+            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        });
+
+        material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+        material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
+        material.setUniform(shaderProgram.hashId, 'uniform_gamma', gl.getUniformLocation(shaderProgram, 'gamma'));
+
+        if (Shader._exist(vertexAttribs, GLBoost$1.TEXCOORD)) {
+          var diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+          if (diffuseTexture) {
+            material.uniformTextureSamplerDic['uTexture'] = {};
+            var uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
+            material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
+            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+
+            material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+
+            // set texture unit 0 to the sampler
+            gl.uniform1i(uTexture, 0);
+            material._semanticsDic['TEXTURE'] = 'uTexture';
+          }
+        }
+
+        return vertexAttribsAsResult;
+      }
+    }]);
+    return SPVDecalShaderSource;
+  }();
+
+  var SPVDecalShader = function (_WireframeShader) {
+    babelHelpers.inherits(SPVDecalShader, _WireframeShader);
+
+    function SPVDecalShader(glBoostContext) {
+      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
+      babelHelpers.classCallCheck(this, SPVDecalShader);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVDecalShader.__proto__ || Object.getPrototypeOf(SPVDecalShader)).call(this, glBoostContext));
+
+      SPVDecalShader.mixin(SPVDecalShaderSource);
+
+      return _this;
+    }
+
+    babelHelpers.createClass(SPVDecalShader, [{
+      key: 'setUniforms',
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(SPVDecalShader.prototype.__proto__ || Object.getPrototypeOf(SPVDecalShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
+
+        var baseColor = material.baseColor;
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+
+        var texture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+
+        var rateVec4 = new Vector4(1, 1, 1, 1);
+        if (texture) {
+          rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
+        }
+
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+
+        var diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+        if (diffuseTexture) {
+          material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+        }
+
+        var sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
+        var targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
+        var gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
+        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w);
+      }
+    }, {
+      key: 'handleArgument',
+      value: function handleArgument(value) {
+        if (value instanceof Vector4) {
+          return value;
+        } else if (value instanceof Vector3) {
+          return new Vector4(value.x, value.y, value.z, 1);
+        } else {
+          return new Vector4(value, value, value, 1);
+        }
+      }
+    }, {
+      key: 'sourceGamma',
+      set: function set(value) {
+        this._sourceGamma = value;
+      },
+      get: function get() {
+        return this._sourceGamma;
+      }
+    }, {
+      key: 'targetGamma',
+      set: function set(value) {
+        this._targetGamma = value;
+      },
+      get: function get() {
+        return this._targetGamma;
+      }
+    }]);
+    return SPVDecalShader;
+  }(WireframeShader);
+
+  GLBoost$1['SPVDecalShader'] = SPVDecalShader;
+
+  var GLContextImpl = function () {
+    function GLContextImpl(canvas, parent) {
+      babelHelpers.classCallCheck(this, GLContextImpl);
+
+      //    if (new.target === GLContextImpl) {
+      if (this.constructor === GLContextImpl) {
+        throw new TypeError("Cannot construct GLContextImpl instances directly");
+      }
+
+      if (!(parent instanceof GLContext)) {
+        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
+      }
+
+      if (canvas === void 0) {
+        throw new Error("Failed to create WebGL Context due to no canvas object.");
+      }
+
+      this._canvas = canvas;
+    }
+
+    babelHelpers.createClass(GLContextImpl, [{
+      key: "init",
+      value: function init(glVersionString, ContextType, gl) {
+
+        if (gl) {
+          this._gl = gl;
+        } else {
+
+          var _gl = this._canvas.getContext(glVersionString);
+
+          if (!_gl) {
+            _gl = this._canvas.getContext('experimental-' + glVersionString);
+            if (!_gl) {
+              throw new Error("This platform doesn't support WebGL.");
+            }
+          }
+
+          if (!_gl instanceof ContextType) {
+            throw new Error("Unexpected rendering context.");
+          }
+
+          this._gl = _gl;
+        }
+      }
+    }, {
+      key: "gl",
+      get: function get() {
+        return this._gl;
+      },
+      set: function set(gl) {
+        this._gl = gl;
+      }
+    }, {
+      key: "canvas",
+      get: function get() {
+        return this._canvas;
+      }
+    }]);
+    return GLContextImpl;
+  }();
+
+  var GLContextWebGL2Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL2Impl, _GLContextImpl);
+
+    function GLContextWebGL2Impl(canvas, parent, gl) {
+      babelHelpers.classCallCheck(this, GLContextWebGL2Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL2Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl)).call(this, canvas, parent));
+
+      babelHelpers.get(GLContextWebGL2Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL2Impl.prototype), 'init', _this).call(_this, 'webgl2', WebGL2RenderingContext, gl);
+
+      return _this;
+    }
+
+    return GLContextWebGL2Impl;
+  }(GLContextImpl);
+
+  var GLContextWebGL1Impl = function (_GLContextImpl) {
+    babelHelpers.inherits(GLContextWebGL1Impl, _GLContextImpl);
+
+    function GLContextWebGL1Impl(canvas, parent, gl) {
+      babelHelpers.classCallCheck(this, GLContextWebGL1Impl);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (GLContextWebGL1Impl.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl)).call(this, canvas, parent));
+
+      if (gl) {
+        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', null, gl);
+      } else {
+        babelHelpers.get(GLContextWebGL1Impl.prototype.__proto__ || Object.getPrototypeOf(GLContextWebGL1Impl.prototype), 'init', _this).call(_this, 'webgl', WebGLRenderingContext, gl);
+      }
+      return _this;
+    }
+
+    return GLContextWebGL1Impl;
+  }(GLContextImpl);
+
+  var GLContext = function () {
+    function GLContext(canvas, gl, width, height) {
+      babelHelpers.classCallCheck(this, GLContext);
+
+
+      if (typeof gl !== 'undefined' && gl !== null) {
+        this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+        this._width = width;
+        this._height = height;
+        GLContext._instances['nocanvas'] = this;
+      } else {
+        if (GLContext._instances[canvas.id] instanceof GLContext) {
+          return GLContext._instances[canvas.id];
+        }
+
+        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
+          this.impl = new GLContextWebGL1Impl(canvas, this);
+        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
+          this.impl = new GLContextWebGL2Impl(canvas, this);
+        }
+
+        GLContext._instances[canvas.id] = this;
+        this._width = canvas.width;
+        this._height = canvas.height;
+      }
+
+      this._monitor = L_GLBoostMonitor.getInstance();
+    }
+
+    babelHelpers.createClass(GLContext, [{
+      key: 'createVertexArray',
+      value: function createVertexArray(glBoostObject) {
+        var gl = this.gl;
+        var glem = GLExtensionsManager.getInstance(this);
+        var glResource = glem.createVertexArray(gl);
+        if (glResource) {
+          this._monitor.registerWebGLResource(glBoostObject, glResource);
+        }
+
+        return glResource;
+      }
+    }, {
+      key: 'createBuffer',
+      value: function createBuffer(glBoostObject) {
+        var glResource = this.gl.createBuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'createFramebuffer',
+      value: function createFramebuffer(glBoostObject) {
+        var glResource = this.gl.createFramebuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteFramebuffer',
+      value: function deleteFramebuffer(glBoostObject, frameBuffer) {
+        this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
+        this.gl.deleteFramebuffer(frameBuffer);
+        frameBuffer = null;
+      }
+    }, {
+      key: 'createRenderbuffer',
+      value: function createRenderbuffer(glBoostObject) {
+        var glResource = this.gl.createRenderbuffer();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteRenderbuffer',
+      value: function deleteRenderbuffer(glBoostObject, renderBuffer) {
+        this._monitor.deregisterWebGLResource(glBoostObject, renderBuffer);
+        this.gl.deleteRenderbuffer(renderBuffer);
+        renderBuffer = null;
+      }
+    }, {
+      key: 'createShader',
+      value: function createShader(glBoostObject, shaderType) {
+        var glResource = this.gl.createShader(shaderType);
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteShader',
+      value: function deleteShader(glBoostObject, shader) {
+        this._monitor.deregisterWebGLResource(glBoostObject, shader);
+        this.gl.deleteShader(shader);
+        shader = null;
+      }
+    }, {
+      key: 'createProgram',
+      value: function createProgram(glBoostObject) {
+        var glResource = this.gl.createProgram();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteProgram',
+      value: function deleteProgram(glBoostObject, program) {
+        this._monitor.deregisterWebGLResource(glBoostObject, program);
+        this.gl.deleteProgram(program);
+      }
+    }, {
+      key: 'createTexture',
+      value: function createTexture(glBoostObject) {
+        var glResource = this.gl.createTexture();
+        this._monitor.registerWebGLResource(glBoostObject, glResource);
+        return glResource;
+      }
+    }, {
+      key: 'deleteTexture',
+      value: function deleteTexture(glBoostObject, texture) {
+        this._monitor.deregisterWebGLResource(glBoostObject, texture);
+        this.gl.deleteTexture(texture);
+        texture = null;
+      }
+    }, {
+      key: 'gl',
+      get: function get() {
+        return this.impl.gl;
+      },
+      set: function set(gl) {
+        this.impl.gl = gl;
+      }
+    }, {
+      key: 'belongingCanvasId',
+      get: function get() {
+        if (this.impl.canvas) {
+          return this.impl.canvas.id;
+        } else {
+          return 'nocanvas';
+        }
+      }
+    }, {
+      key: 'canvas',
+      get: function get() {
+        return this.impl.canvas;
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      },
+      set: function set(width) {
+        if (this.impl.canvas) {
+          this.impl.canvas.width = width;
+        }
+        this._width = width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      },
+      set: function set(height) {
+        if (this.impl.canvas) {
+          this.impl.canvas.height = height;
+        }
+        this._height = height;
+      }
+    }], [{
+      key: 'getInstance',
+      value: function getInstance(canvas, gl, width, height) {
+        if (typeof canvas === 'string') {
+          canvas = window.document.querySelector(canvas);
+        }
+        return new GLContext(canvas, gl, width, height);
+      }
+    }]);
+    return GLContext;
+  }();
+
+  GLContext._instances = new Object();
+
+  /**
+   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
+   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+
+  var AbstractTexture = function (_GLBoostObject) {
+    babelHelpers.inherits(AbstractTexture, _GLBoostObject);
+
+    /**
+     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
+     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     *
+     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+    function AbstractTexture(glBoostContext) {
+      babelHelpers.classCallCheck(this, AbstractTexture);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (AbstractTexture.__proto__ || Object.getPrototypeOf(AbstractTexture)).call(this, glBoostContext));
+
+      if (_this.constructor === AbstractTexture) {
+        throw new TypeError('Cannot construct AbstractTexture instances directly.');
+      }
+
+      _this._textureUnitIndex = 0;
+      return _this;
+    }
+
+    /**
+     * [en] get the WebGL texture resource within this class. <br />
+     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     *
+     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     */
+
+
+    babelHelpers.createClass(AbstractTexture, [{
+      key: 'setUp',
+
+
+      /**
+       * [en] bind the texture. <br />
+       * [ja] テクスチャをバインドします。
+       */
+      value: function setUp(textureUnitIndex) {
+        var gl = this._glContext.gl;
+        if (this._texture === null) {
+          return false;
+        }
+        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+        gl.activeTexture(gl['TEXTURE' + index]);
+        gl.bindTexture(gl.TEXTURE_2D, this._texture);
+
+        return true;
+      }
+
+      /**
+       * [en] unbind the texture. <br />
+       * [ja] テクスチャをバインド解除します。
+       */
+
+    }, {
+      key: 'tearDown',
+      value: function tearDown(textureUnitIndex) {
+        var gl = this._glContext.gl;
+
+        var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+        gl.activeTexture(gl['TEXTURE' + index]);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+      }
+    }, {
+      key: 'getTexturePixelData',
+      value: function getTexturePixelData() {
+        // Create a framebuffer backed by the texture
+        var framebuffer = this._glContext.createFramebuffer(this);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
+
+        // Read the contents of the framebuffer (data stores the pixel data)
+        var data = new Uint8Array(this.width * this.height * 4);
+        gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+        this._glContext.deleteFramebuffer(this, framebuffer);
+
+        return data;
+      }
+    }, {
+      key: '_getResizedCanvas',
+      value: function _getResizedCanvas(image) {
+        var canvas = document.createElement("canvas");
+        canvas.width = this._getNearestPowerOfTwo(image.width);
+        canvas.height = this._getNearestPowerOfTwo(image.height);
+
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        return canvas;
+      }
+      /**
+       * [en] check whether or not this texture size is power of two. <br />
+       * [ja] テクスチャサイズが２の累乗かどうかを返します
+       *
+       * @param {number} x [en] texture size. [ja] テクスチャサイズ
+       * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+       */
+
+    }, {
+      key: '_isPowerOfTwo',
+      value: function _isPowerOfTwo(x) {
+        return (x & x - 1) == 0;
+      }
+
+      /**
+       * [en] get a value nearest power of two. <br />
+       * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+       *
+       * @param {number} x [en] texture size. [ja] テクスチャサイズ
+       * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+       */
+
+    }, {
+      key: '_getNearestPowerOfTwo',
+      value: function _getNearestPowerOfTwo(x) {
+        return Math.pow(2, Math.round(Math.log(x) / Math.LN2));
+      }
+    }, {
+      key: 'readyForDiscard',
+      value: function readyForDiscard() {
+        if (this._texture) {
+          this._glContext.deleteTexture(this, this._texture);
+        }
+        if (this.fbo) {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = this.fbo._glboostTextures[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var texture = _step.value;
+
+              this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function (v, i) {
+                return v !== this;
+              });
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          if (this.fbo._glboostTextures.length === 0) {
+            this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+            this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+            if (this.fbo.renderBuffer) {
+              this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+            }
+          }
+        }
+
+        babelHelpers.get(AbstractTexture.prototype.__proto__ || Object.getPrototypeOf(AbstractTexture.prototype), 'readyForDiscard', this).call(this);
+      }
+    }, {
+      key: 'glTextureResource',
+      get: function get() {
+        return this._texture;
+      }
+    }, {
+      key: 'width',
+      get: function get() {
+        return this._width;
+      }
+    }, {
+      key: 'height',
+      get: function get() {
+        return this._height;
+      }
+    }, {
+      key: 'textureUnitIndex',
+      set: function set(index) {
+        this._textureUnitIndex = index;
+      },
+      get: function get() {
+        return this._textureUnitIndex;
+      }
+    }]);
+    return AbstractTexture;
+  }(GLBoostObject);
 
   var DecalShaderSource = function () {
     function DecalShaderSource() {
@@ -4183,18 +4415,41 @@
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
 
-  var ClassicMaterial$1 = function (_L_AbstractMaterial) {
-    babelHelpers.inherits(ClassicMaterial, _L_AbstractMaterial);
+  var SPVClassicMaterial = function (_L_AbstractMaterial) {
+    babelHelpers.inherits(SPVClassicMaterial, _L_AbstractMaterial);
 
-    function ClassicMaterial(glBoostContext) {
-      babelHelpers.classCallCheck(this, ClassicMaterial);
-      return babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
+    function SPVClassicMaterial(glBoostContext) {
+      babelHelpers.classCallCheck(this, SPVClassicMaterial);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (SPVClassicMaterial.__proto__ || Object.getPrototypeOf(SPVClassicMaterial)).call(this, glBoostContext));
+
+      _this._shaderClass = SPVDecalShader;
+      _this._isWireframe = false;
+      _this._isWireframeOnShade = false;
+      return _this;
     }
 
-    return ClassicMaterial;
+    babelHelpers.createClass(SPVClassicMaterial, [{
+      key: 'isWireframe',
+      set: function set(flag) {
+        this._isWireframe = flag;
+      },
+      get: function get() {
+        return this._isWireframe;
+      }
+    }, {
+      key: 'isWireframeOnShade',
+      set: function set(flag) {
+        this._isWireframeOnShade = flag;
+      },
+      get: function get() {
+        return this._isWireframeOnShade;
+      }
+    }]);
+    return SPVClassicMaterial;
   }(L_AbstractMaterial);
 
-  GLBoost$1['ClassicMaterial'] = ClassicMaterial$1;
+  GLBoost$1['SPVClassicMaterial'] = SPVClassicMaterial;
 
   var ArrayUtil = function () {
     function ArrayUtil() {
@@ -6910,16 +7165,38 @@
         this.isAffectedByViewMatrix = false;
         this.isAffectedByProjectionMatrix = false;
 
-        var material = new ClassicMaterial$1(this._glBoostContext);
+        var material = new SPVClassicMaterial(this._glBoostContext);
         material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
         material.states = {
           "enable": [gl.BLEND]
         };
         this.geometry.materials = [material];
+        this._material = material;
+      }
+    }, {
+      key: 'material',
+      set: function set(obj) {
+        this._material = obj;
+      },
+      get: function get() {
+        return this._material;
       }
     }]);
     return M_SPVScreenMesh;
   }(M_Mesh);
+
+  var ClassicMaterial$1 = function (_L_AbstractMaterial) {
+    babelHelpers.inherits(ClassicMaterial, _L_AbstractMaterial);
+
+    function ClassicMaterial(glBoostContext) {
+      babelHelpers.classCallCheck(this, ClassicMaterial);
+      return babelHelpers.possibleConstructorReturn(this, (ClassicMaterial.__proto__ || Object.getPrototypeOf(ClassicMaterial)).call(this, glBoostContext));
+    }
+
+    return ClassicMaterial;
+  }(L_AbstractMaterial);
+
+  GLBoost$1['ClassicMaterial'] = ClassicMaterial$1;
 
   var Grid = function (_Geometry) {
     babelHelpers.inherits(Grid, _Geometry);
@@ -8256,7 +8533,7 @@
           var children = element.getChildren();
           for (var i = 0; i < children.length; i++) {
             var hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
-            if (hitChild.length > 0) {
+            if (hitChild) {
               return hitChild;
             }
           }
@@ -8454,10 +8731,10 @@
       _this._drawBuffers = [_this._glContext.gl.BACK];
       _this._clearColor = null;
       _this._clearDepth = null; // default is 1.0
-      _this._renderTargetColorTextures = null;
-      _this._renderTargetDepthTexture = null;
+      _this._renderTargetColorTextures = [];
+      _this._renderTargetDepthTexture = [];
       _this._expression = null;
-      _this._fbo = null;
+      _this._viewport = null;
 
       _this._customFunction = null;
       return _this;
@@ -8498,6 +8775,26 @@
         });
 
         this._renderTargetDepthTexture = depthRenderTargetTextures[0];
+      }
+    }, {
+      key: 'setViewportAsFittingToRenderTarget',
+      value: function setViewportAsFittingToRenderTarget() {
+        var width = void 0;
+        var height = void 0;
+        if (this._renderTargetColorTextures.length > 0) {
+          width = this._renderTargetColorTextures[0].width;
+          height = this._renderTargetColorTextures[0].height;
+        }
+        if (this._renderTargetDepthTexture) {
+          width = this._renderTargetDepthTexture.width;
+          height = this._renderTargetDepthTexture.height;
+        }
+        if (typeof width !== 'undefined' && typeof height !== 'undefined') {
+          this._viewport = new Vector4(0, 0, width, height);
+          return true;
+        } else {
+          return false;
+        }
       }
     }, {
       key: 'setClearColor',
@@ -8605,7 +8902,7 @@
     }, {
       key: 'fbo',
       get: function get() {
-        if (this._renderTargetColorTextures) {
+        if (this._renderTargetColorTextures.length > 0) {
           return this._renderTargetColorTextures[0].fbo;
         } else if (this._renderTargetDepthTexture) {
           return this._renderTargetDepthTexture.fbo;
@@ -8616,14 +8913,10 @@
     }, {
       key: 'viewport',
       get: function get() {
-        var texture = null;
-        if (this._renderTargetColorTextures) {
-          texture = this._renderTargetColorTextures[0];
-        } else if (this._renderTargetDepthTexture) {
-          texture = this._renderTargetDepthTexture;
-        }
-
-        return new Vector4(0, 0, texture.width, texture.height);
+        return this._viewport;
+      },
+      set: function set(vec4) {
+        this._viewport = vec4;
       }
     }, {
       key: 'renderTargetColorTextures',
@@ -8779,7 +9072,7 @@
           }
           glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-          if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+          if (renderPass.viewport) {
             gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
           } else {
             if (camera) {
@@ -9498,7 +9791,7 @@
         this._elements.forEach(function (elm) {
           _this2._cameras = _this2._cameras.concat(collectCameras(elm));
         });
-        if (this._cameras.length === 1) {
+        if (this._cameras.length === 0) {} else if (this._cameras.length === 1) {
           this._cameras[0].setAsMainCamera(this);
         } else {
           // If there are two or more cameras present in the scene and the main camera is not explicitly specified,
@@ -9835,222 +10128,6 @@
   }(L_GLBoostMonitor);
 
   GLBoost$1['M_GLBoostMonitor'] = M_GLBoostMonitor;
-
-  var SPVDecalShaderSource = function () {
-    function SPVDecalShaderSource() {
-      babelHelpers.classCallCheck(this, SPVDecalShaderSource);
-    }
-
-    babelHelpers.createClass(SPVDecalShaderSource, [{
-      key: 'VSDefine_SPVDecalShaderSource',
-      value: function VSDefine_SPVDecalShaderSource(in_, out_, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost$1.COLOR)) {
-          shaderText += in_ + ' vec4 aVertex_color;\n';
-          shaderText += out_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-          shaderText += in_ + ' vec2 aVertex_texcoord;\n';
-          shaderText += out_ + ' vec2 texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'VSTransform_SPVDecalShaderSource',
-      value: function VSTransform_SPVDecalShaderSource(existCamera_f, f) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost$1.COLOR)) {
-          shaderText += '  color = aVertex_color;\n';
-        }
-        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-          shaderText += '  texcoord = aVertex_texcoord;\n';
-        }
-        return shaderText;
-      }
-    }, {
-      key: 'FSDefine_SPVDecalShaderSource',
-      value: function FSDefine_SPVDecalShaderSource(in_, f, lights, material, extraData) {
-        var shaderText = '';
-        if (Shader._exist(f, GLBoost$1.COLOR)) {
-          shaderText += in_ + ' vec4 color;\n';
-        }
-        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-          shaderText += in_ + ' vec2 texcoord;\n\n';
-        }
-        if (material.hasAnyTextures()) {
-          shaderText += 'uniform sampler2D uTexture;\n';
-        }
-        shaderText += 'uniform vec4 materialBaseColor;\n';
-        shaderText += 'uniform vec4 textureContributionRate;\n';
-        shaderText += 'uniform vec4 gamma;\n';
-
-        return shaderText;
-      }
-    }, {
-      key: 'FSShade_SPVDecalShaderSource',
-      value: function FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
-        var shaderText = '';
-        var textureFunc = Shader._texture_func(gl);
-        if (Shader._exist(f, GLBoost$1.COLOR)) {
-          shaderText += '  rt0 *= color;\n';
-        }
-        shaderText += '    rt0 *= materialBaseColor;\n';
-        if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-          shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
-          shaderText += '  rt0 = pow(rt0, gamma);\n';
-        }
-
-        //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-        return shaderText;
-      }
-    }, {
-      key: 'prepare_SPVDecalShaderSource',
-      value: function prepare_SPVDecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-        var vertexAttribsAsResult = [];
-        vertexAttribs.forEach(function (attribName) {
-          if (attribName === GLBoost$1.COLOR || attribName === GLBoost$1.TEXCOORD) {
-            shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        });
-
-        material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
-        material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
-        material.setUniform(shaderProgram.hashId, 'uniform_gamma', gl.getUniformLocation(shaderProgram, 'gamma'));
-
-        if (Shader._exist(vertexAttribs, GLBoost$1.TEXCOORD)) {
-          var diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-          if (diffuseTexture) {
-            material.uniformTextureSamplerDic['uTexture'] = {};
-            var uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
-            material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
-            material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-
-            material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-
-            // set texture unit 0 to the sampler
-            gl.uniform1i(uTexture, 0);
-            material._semanticsDic['TEXTURE'] = 'uTexture';
-          }
-        }
-
-        return vertexAttribsAsResult;
-      }
-    }]);
-    return SPVDecalShaderSource;
-  }();
-
-  var SPVDecalShader = function (_WireframeShader) {
-    babelHelpers.inherits(SPVDecalShader, _WireframeShader);
-
-    function SPVDecalShader(glBoostContext) {
-      var basicShader = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : VertexWorldShaderSource;
-      babelHelpers.classCallCheck(this, SPVDecalShader);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SPVDecalShader.__proto__ || Object.getPrototypeOf(SPVDecalShader)).call(this, glBoostContext));
-
-      SPVDecalShader.mixin(SPVDecalShaderSource);
-
-      return _this;
-    }
-
-    babelHelpers.createClass(SPVDecalShader, [{
-      key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-        babelHelpers.get(SPVDecalShader.prototype.__proto__ || Object.getPrototypeOf(SPVDecalShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
-
-        var baseColor = material.baseColor;
-        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
-
-        var texture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-
-        var rateVec4 = new Vector4(1, 1, 1, 1);
-        if (texture) {
-          rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
-        }
-
-        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
-
-        var diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-        if (diffuseTexture) {
-          material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        }
-
-        var sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
-        var targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
-        var gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
-        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w);
-      }
-    }, {
-      key: 'handleArgument',
-      value: function handleArgument(value) {
-        if (value instanceof Vector4) {
-          return value;
-        } else if (value instanceof Vector3) {
-          return new Vector4(value.x, value.y, value.z, 1);
-        } else {
-          return new Vector4(value, value, value, 1);
-        }
-      }
-    }, {
-      key: 'sourceGamma',
-      set: function set(value) {
-        this._sourceGamma = value;
-      },
-      get: function get() {
-        return this._sourceGamma;
-      }
-    }, {
-      key: 'targetGamma',
-      set: function set(value) {
-        this._targetGamma = value;
-      },
-      get: function get() {
-        return this._targetGamma;
-      }
-    }]);
-    return SPVDecalShader;
-  }(WireframeShader);
-
-  GLBoost$1['SPVDecalShader'] = SPVDecalShader;
-
-  var SPVClassicMaterial = function (_L_AbstractMaterial) {
-    babelHelpers.inherits(SPVClassicMaterial, _L_AbstractMaterial);
-
-    function SPVClassicMaterial(glBoostContext) {
-      babelHelpers.classCallCheck(this, SPVClassicMaterial);
-
-      var _this = babelHelpers.possibleConstructorReturn(this, (SPVClassicMaterial.__proto__ || Object.getPrototypeOf(SPVClassicMaterial)).call(this, glBoostContext));
-
-      _this._shaderClass = SPVDecalShader;
-      _this._isWireframe = false;
-      _this._isWireframeOnShade = false;
-      return _this;
-    }
-
-    babelHelpers.createClass(SPVClassicMaterial, [{
-      key: 'isWireframe',
-      set: function set(flag) {
-        this._isWireframe = flag;
-      },
-      get: function get() {
-        return this._isWireframe;
-      }
-    }, {
-      key: 'isWireframeOnShade',
-      set: function set(flag) {
-        this._isWireframeOnShade = flag;
-      },
-      get: function get() {
-        return this._isWireframeOnShade;
-      }
-    }]);
-    return SPVClassicMaterial;
-  }(L_AbstractMaterial);
-
-  GLBoost$1['SPVClassicMaterial'] = SPVClassicMaterial;
 
   var L_SPVCameraController = function (_GLBoostObject) {
     babelHelpers.inherits(L_SPVCameraController, _GLBoostObject);
@@ -12211,32 +12288,33 @@
         gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
         fbo.width = width;
         fbo.height = height;
+        fbo._glboostTextures = [];
 
-        var renderTargetTextures = [];
         for (var i = 0; i < textureNum; i++) {
           var texture = new MutableTexture(this, fbo.width, fbo.height);
           texture.fbo = fbo;
-          renderTargetTextures.push(texture);
+          fbo._glboostTextures.push(texture);
         }
 
         // Create RenderBuffer
-        var renderbuffer = glContext.createRenderbuffer(this);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+        var renderBuffer = glContext.createRenderbuffer(this);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+        fbo.renderBuffer = renderBuffer;
 
         // Attach Buffers
-        renderTargetTextures.forEach(function (texture, i) {
+        fbo._glboostTextures.forEach(function (texture, i) {
           var glTexture = texture.glTextureResource;
           var attachimentId = glem.colorAttachiment(gl, i);
           texture.colorAttachment = attachimentId;
           gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
         });
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuffer);
 
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-        return renderTargetTextures;
+        return fbo._glboostTextures.concat();
       }
     }, {
       key: 'createDepthTexturesForRenderTarget',
@@ -16698,5 +16776,49 @@
   }();
 
   GLBoost$1["SPVGLTFLoader"] = SPVGLTFLoader;
+
+  var H_SPVScreenLUT = function (_M_SPVScreenMesh) {
+    babelHelpers.inherits(H_SPVScreenLUT, _M_SPVScreenMesh);
+
+    function H_SPVScreenLUT(glBoostContext, inputTexture) {
+      babelHelpers.classCallCheck(this, H_SPVScreenLUT);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (H_SPVScreenLUT.__proto__ || Object.getPrototypeOf(H_SPVScreenLUT)).call(this, glBoostContext, { preset: 'one' }, null));
+
+      if (inputTexture) {
+        _this.inputTexture = inputTexture;
+      }
+      return _this;
+    }
+
+    babelHelpers.createClass(H_SPVScreenLUT, [{
+      key: 'inputTexture',
+      set: function set(inputTexture) {
+        this.geometry.materials[0].setTexture(inputTexture);
+      },
+      get: function get() {
+        return this.geometry.materials[0].getOneTexture();
+      }
+    }, {
+      key: 'sourceGamma',
+      set: function set(value) {
+        this.geometry.materials[0].shaderParameters.sourceGamma = value;
+      },
+      get: function get() {
+        return this.geometry.materials[0].shaderParameters.sourceGamma;
+      }
+    }, {
+      key: 'targetGamma',
+      set: function set(value) {
+        this.geometry.materials[0].shaderParameters.targetGamma = value;
+      },
+      get: function get() {
+        return this.geometry.materials[0].shaderParameters.targetGamma;
+      }
+    }]);
+    return H_SPVScreenLUT;
+  }(M_SPVScreenMesh);
+
+  GLBoost$1["H_SPVScreenLUT"] = H_SPVScreenLUT;
 
 }));
