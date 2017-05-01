@@ -23,5 +23,14 @@ export default class M_SPVScreenMesh extends M_Mesh {
       ]
     };
     this.geometry.materials = [material];
+    this._material = material;
+  }
+
+  set material(obj) {
+    this._material = obj;
+  }
+
+  get material() {
+    return this._material;
   }
 }
