@@ -62,7 +62,6 @@ export class SPVLambertShaderSource {
 
     material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
-    let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
       if (lights[i].camera && lights[i].camera.texture) {
