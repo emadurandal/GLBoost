@@ -11,7 +11,8 @@ export default class SPVScreen extends Geometry {
                 preset: null, // or 'one', 'two horizontal split', 'two vertical split', 'four'. If these are specified, 'screens' properties are ignored.
                 screens: [
                   {
-                    unit: 'ratio', // or 'pixel'
+                    unit: 'ratio', // 'pixel'
+                    range: 'positive', // 'positive-negative'
                     origin: new Vector2(-1, -1),
                     size: new Vector2(2, 2),
                     uDivision: 0,
@@ -50,6 +51,9 @@ export default class SPVScreen extends Geometry {
     let normals = [];
 
     for (let screen of screens) {
+      if (screen.unit === 'pixel') {
+        
+      }
       this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, screen.uDivision+1, screen.vDivision+1, screen.uUVRepeat, screen.vUVRepeat);
     }
 
