@@ -3,49 +3,14 @@ import DecalShader from './DecalShader';
 import Matrix44 from '../../low_level/math/Matrix44';
 
 export class LambertShaderSource {
-  /*
-  VSDefine_LambertShaderSource(in_, out_, f, lights, material, extraData) {
-    var shaderText = '';
-
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += `${out_} vec4 projectedPosByLight[${textureUnitIndex+1}];\n`;
-        shaderText +=      `uniform mat4 viewMatrixFromLight[${textureUnitIndex+1}];\n`;
-        shaderText +=      `uniform mat4 projectionMatrixFromLight[${textureUnitIndex+1}];\n`;
-        textureUnitIndex++;
-      }
-    }
-    return shaderText;
-  }
-
-  VSTransform_LambertShaderSource(existCamera_f, f, lights, material, extraData) {
-    var shaderText = '';
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += `mat4 pvwLightMatrix = projectionMatrixFromLight[${textureUnitIndex}] * viewMatrixFromLight[${textureUnitIndex}] * worldMatrix;\n`;
-        shaderText += `projectedPosByLight[${textureUnitIndex}] = pvwLightMatrix * vec4(aVertex_position, 1.0);\n`;
-        textureUnitIndex++;
-      }
-    }
-    return shaderText;
-  }*/
 
   FSDefine_LambertShaderSource(in_, f, lights) {
     
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
     shaderText += `uniform vec4 Kd;\n`;
-
-    //for (let i=0; i<lights.length; i++) {
-    //  if (lights[i].camera && lights[i].camera.texture) {
     shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
-
     shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
-
-      //}
-    //}
     shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
     shaderText += `${in_} vec4 temp[1];\n`;
 
@@ -56,13 +21,6 @@ export class LambertShaderSource {
     var shaderText = '';
 
     var textureProjFunc = Shader._textureProj_func(gl);
-
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        textureUnitIndex++;
-      }
-    }
 
     shaderText += '  float depthBias = 0.005;\n';
 
@@ -104,7 +62,6 @@ export class LambertShaderSource {
 
     material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
-    let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 

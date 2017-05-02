@@ -53,10 +53,10 @@ export default class Renderer extends GLBoostObject {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
         if (camera) {
-          let deltaWidth = glContext.height*camera.aspect - glContext.width;
-          gl.viewport(-deltaWidth/2, 0, glContext.height*camera.aspect, glContext.height);
+          let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
+          gl.viewport(-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight);
         } else {
-          gl.viewport(0, 0, glContext.width, glContext.height);
+          gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
         }
       }
 
@@ -143,8 +143,8 @@ export default class Renderer extends GLBoostObject {
    * @param {number} height en: height to resize, ja:リサイズする高さ
    */
   resize(width, height) {
-    this._glContext.width = width;
-    this._glContext.height = height;
+    this._glContext.canvasWidth = width;
+    this._glContext.canvasHeight = height;
   }
 
 }

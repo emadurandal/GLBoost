@@ -9,8 +9,8 @@ export default class GLContext {
 
     if (typeof gl !== 'undefined' && gl !== null) {
       this.impl = new GLContextWebGL1Impl(canvas, this, gl);
-      this._width = width;
-      this._height = height;
+      this._canvasWidth = width;
+      this._canvasHeight = height;
       GLContext._instances['nocanvas'] = this;
     } else {
       if (GLContext._instances[canvas.id] instanceof GLContext) {
@@ -24,8 +24,8 @@ export default class GLContext {
       }
 
       GLContext._instances[canvas.id] = this;
-      this._width = canvas.width;
-      this._height = canvas.height;
+      this._canvasWidth = canvas.width;
+      this._canvasHeight = canvas.height;
     }
 
     this._monitor = L_GLBoostMonitor.getInstance();
@@ -134,26 +134,26 @@ export default class GLContext {
     texture = null;
   }
 
-  get width() {
-    return this._width;
+  get canvasWidth() {
+    return this._canvasWidth;
   }
 
-  set width(width) {
+  set canvasWidth(width) {
     if (this.impl.canvas) {
       this.impl.canvas.width = width;
     }
-    this._width = width;
+    this._canvasWidth = width;
   }
 
-  get height() {
-    return this._height;
+  get canvasHeight() {
+    return this._canvasHeight;
   }
 
-  set height(height) {
+  set canvasHeight(height) {
     if (this.impl.canvas) {
       this.impl.canvas.height = height;
     }
-    this._height = height;
+    this._canvasHeight = height;
   }
 
 }

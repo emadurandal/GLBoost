@@ -35,6 +35,10 @@ export default class GLBoostObject {
     return this._instanceName;
   }
 
+  get instanceName() {
+    return this._instanceName;
+  }
+
   get belongingCanvasId() {
     return this._glBoostContext.belongingCanvasId;
   }
