@@ -34,6 +34,7 @@ export default class SPVScreen extends Geometry {
     if (layout.preset === 'one') {
       screens[0] = {
         unit: 'ratio', // or 'pixel'
+        range: 'positive-negative',
         origin: new Vector2(-1, -1),
         size: new Vector2(2, 2),
         uDivision: 0,
@@ -51,9 +52,27 @@ export default class SPVScreen extends Geometry {
     let normals = [];
 
     for (let screen of screens) {
+      let originX = screen.origin.x;
+      let originY = screen.origin.y;
+      let sizeX = screen.size.x;
+      let sizeY = screen.size.y;
+
       if (screen.unit === 'pixel') {
-        
+        originX = originX/this._glBoostContext.canvasWidth;
+        originY = originY/this._glBoostContext.canvasHeight;
+        sizeX = sizeX/this._glBoostContext.canvasWidth;
+        sizeY = sizeY/this._glBoostContext.canvasHeight;
       }
+      if (screen.range === 'positive') {
+        originX = (originX-0.5)*2;
+        originY = (originY-0.5)*2;
+        sizeX = sizeX*2;
+        sizeY = sizeY*2;
+      }
+
+      screen.origin = new Vector2(originX, originY);
+      screen.size = new Vector2(sizeX, sizeY);
+
       this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, screen.uDivision+1, screen.vDivision+1, screen.uUVRepeat, screen.vUVRepeat);
     }
 

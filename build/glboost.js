@@ -570,6 +570,11 @@
         instance._userFlavorName = this._userFlavorName;
       }
     }, {
+      key: 'instanceName',
+      get: function get() {
+        return this._instanceName;
+      }
+    }, {
       key: 'belongingCanvasId',
       get: function get() {
         return this._glBoostContext.belongingCanvasId;
@@ -3541,8 +3546,8 @@
 
       if (typeof gl !== 'undefined' && gl !== null) {
         this.impl = new GLContextWebGL1Impl(canvas, this, gl);
-        this._width = width;
-        this._height = height;
+        this._canvasWidth = width;
+        this._canvasHeight = height;
         GLContext._instances['nocanvas'] = this;
       } else {
         if (GLContext._instances[canvas.id] instanceof GLContext) {
@@ -3556,8 +3561,8 @@
         }
 
         GLContext._instances[canvas.id] = this;
-        this._width = canvas.width;
-        this._height = canvas.height;
+        this._canvasWidth = canvas.width;
+        this._canvasHeight = canvas.height;
       }
 
       this._monitor = L_GLBoostMonitor.getInstance();
@@ -3674,26 +3679,26 @@
         return this.impl.canvas;
       }
     }, {
-      key: 'width',
+      key: 'canvasWidth',
       get: function get() {
-        return this._width;
+        return this._canvasWidth;
       },
       set: function set(width) {
         if (this.impl.canvas) {
           this.impl.canvas.width = width;
         }
-        this._width = width;
+        this._canvasWidth = width;
       }
     }, {
-      key: 'height',
+      key: 'canvasHeight',
       get: function get() {
-        return this._height;
+        return this._canvasHeight;
       },
       set: function set(height) {
         if (this.impl.canvas) {
           this.impl.canvas.height = height;
         }
-        this._height = height;
+        this._canvasHeight = height;
       }
     }], [{
       key: 'getInstance',
@@ -6766,7 +6771,8 @@
       var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
         preset: null, // or 'one', 'two horizontal split', 'two vertical split', 'four'. If these are specified, 'screens' properties are ignored.
         screens: [{
-          unit: 'ratio', // or 'pixel'
+          unit: 'ratio', // 'pixel'
+          range: 'positive', // 'positive-negative'
           origin: new Vector2(-1, -1),
           size: new Vector2(2, 2),
           uDivision: 0,
@@ -6792,6 +6798,7 @@
         if (layout.preset === 'one') {
           screens[0] = {
             unit: 'ratio', // or 'pixel'
+            range: 'positive-negative',
             origin: new Vector2(-1, -1),
             size: new Vector2(2, 2),
             uDivision: 0,
@@ -6814,6 +6821,27 @@
         try {
           for (var _iterator = screens[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var screen = _step.value;
+
+            var originX = screen.origin.x;
+            var originY = screen.origin.y;
+            var sizeX = screen.size.x;
+            var sizeY = screen.size.y;
+
+            if (screen.unit === 'pixel') {
+              originX = originX / this._glBoostContext.canvasWidth;
+              originY = originY / this._glBoostContext.canvasHeight;
+              sizeX = sizeX / this._glBoostContext.canvasWidth;
+              sizeY = sizeY / this._glBoostContext.canvasHeight;
+            }
+            if (screen.range === 'positive') {
+              originX = (originX - 0.5) * 2;
+              originY = (originY - 0.5) * 2;
+              sizeX = sizeX * 2;
+              sizeY = sizeY * 2;
+            }
+
+            screen.origin = new Vector2(originX, originY);
+            screen.size = new Vector2(sizeX, sizeY);
 
             this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, screen.uDivision + 1, screen.vDivision + 1, screen.uUVRepeat, screen.vUVRepeat);
           }
@@ -9076,10 +9104,10 @@
             gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w);
           } else {
             if (camera) {
-              var deltaWidth = glContext.height * camera.aspect - glContext.width;
-              gl.viewport(-deltaWidth / 2, 0, glContext.height * camera.aspect, glContext.height);
+              var deltaWidth = glContext.canvasHeight * camera.aspect - glContext.canvasWidth;
+              gl.viewport(-deltaWidth / 2, 0, glContext.canvasHeight * camera.aspect, glContext.canvasHeight);
             } else {
-              gl.viewport(0, 0, glContext.width, glContext.height);
+              gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
             }
           }
 
@@ -9168,8 +9196,8 @@
        * @param {number} height en: height to resize, ja:リサイズする高さ
        */
       value: function resize(width, height) {
-        this._glContext.width = width;
-        this._glContext.height = height;
+        this._glContext.canvasWidth = width;
+        this._glContext.canvasHeight = height;
       }
     }, {
       key: 'glContext',
@@ -13507,48 +13535,13 @@
 
     babelHelpers.createClass(LambertShaderSource, [{
       key: 'FSDefine_LambertShaderSource',
-
-      /*
-      VSDefine_LambertShaderSource(in_, out_, f, lights, material, extraData) {
-        var shaderText = '';
-         let textureUnitIndex = 0;
-        for (let i=0; i<lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            shaderText += `${out_} vec4 projectedPosByLight[${textureUnitIndex+1}];\n`;
-            shaderText +=      `uniform mat4 viewMatrixFromLight[${textureUnitIndex+1}];\n`;
-            shaderText +=      `uniform mat4 projectionMatrixFromLight[${textureUnitIndex+1}];\n`;
-            textureUnitIndex++;
-          }
-        }
-        return shaderText;
-      }
-       VSTransform_LambertShaderSource(existCamera_f, f, lights, material, extraData) {
-        var shaderText = '';
-        let textureUnitIndex = 0;
-        for (let i=0; i<lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            shaderText += `mat4 pvwLightMatrix = projectionMatrixFromLight[${textureUnitIndex}] * viewMatrixFromLight[${textureUnitIndex}] * worldMatrix;\n`;
-            shaderText += `projectedPosByLight[${textureUnitIndex}] = pvwLightMatrix * vec4(aVertex_position, 1.0);\n`;
-            textureUnitIndex++;
-          }
-        }
-        return shaderText;
-      }*/
-
       value: function FSDefine_LambertShaderSource(in_, f, lights) {
 
         var sampler2D = this._sampler2DShadow_func();
         var shaderText = '';
         shaderText += 'uniform vec4 Kd;\n';
-
-        //for (let i=0; i<lights.length; i++) {
-        //  if (lights[i].camera && lights[i].camera.texture) {
         shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
-
         shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
-
-        //}
-        //}
         shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
         shaderText += in_ + ' vec4 temp[1];\n';
 
@@ -13561,27 +13554,20 @@
 
         var textureProjFunc = Shader._textureProj_func(gl);
 
-        var textureUnitIndex = 0;
-        for (var i = 0; i < lights.length; i++) {
-          if (lights[i].camera && lights[i].camera.texture) {
-            textureUnitIndex++;
-          }
-        }
-
         shaderText += '  float depthBias = 0.005;\n';
 
         shaderText += '  vec4 surfaceColor = rt0;\n';
         shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
         shaderText += '  vec3 normal = normalize(v_normal);\n';
-        for (var _i = 0; _i < lights.length; _i++) {
+        for (var i = 0; i < lights.length; i++) {
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-          shaderText += '    vec3 light = normalize(lightPosition[' + _i + '].xyz - position.xyz * lightPosition[' + _i + '].w);\n';
+          shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
 
-          shaderText += '    if (isShadowCasting[' + _i + '] == 1) {// ' + _i + '\n';
+          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
 
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + _i + '], v_shadowCoord[' + _i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + _i + '].z - depthBias) / v_shadowCoord[' + _i + '].w) {\n';
+          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
+          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
           shaderText += '        light *= 0.5;\n';
           shaderText += '      }\n';
 
@@ -13591,7 +13577,7 @@
           shaderText += '    }\n';
 
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-          shaderText += '    rt0 += Kd * lightDiffuse[' + _i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '    rt0 += Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '  }\n';
         }
         //shaderText += '  rt0.a = 1.0;\n';
@@ -13609,7 +13595,6 @@
 
         material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
-        var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
           material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
@@ -13663,10 +13648,10 @@
           }
         }
 
-        for (var _i2 = 0; _i2 < lights.length; _i2++) {
-          if (lights[_i2].camera && lights[_i2].camera.texture) {
+        for (var _i = 0; _i < lights.length; _i++) {
+          if (lights[_i].camera && lights[_i].camera.texture) {
             // set depthTexture unit i+1 to the sampler
-            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + _i2), _i2 + 1); // +1 because 0 is used for diffuse texture
+            gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + _i), _i + 1); // +1 because 0 is used for diffuse texture
           }
         }
       }
@@ -15399,7 +15384,6 @@
 
         material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
 
-        var textureUnitIndex = 0;
         for (var i = 0; i < lights.length; i++) {
           material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
           if (lights[i].camera && lights[i].camera.texture) {
@@ -16780,10 +16764,12 @@
   var H_SPVScreenLUT = function (_M_SPVScreenMesh) {
     babelHelpers.inherits(H_SPVScreenLUT, _M_SPVScreenMesh);
 
-    function H_SPVScreenLUT(glBoostContext, inputTexture) {
+    function H_SPVScreenLUT(glBoostContext) {
+      var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : { preset: 'one' };
+      var inputTexture = arguments[2];
       babelHelpers.classCallCheck(this, H_SPVScreenLUT);
 
-      var _this = babelHelpers.possibleConstructorReturn(this, (H_SPVScreenLUT.__proto__ || Object.getPrototypeOf(H_SPVScreenLUT)).call(this, glBoostContext, { preset: 'one' }, null));
+      var _this = babelHelpers.possibleConstructorReturn(this, (H_SPVScreenLUT.__proto__ || Object.getPrototypeOf(H_SPVScreenLUT)).call(this, glBoostContext, layout, null));
 
       if (inputTexture) {
         _this.inputTexture = inputTexture;

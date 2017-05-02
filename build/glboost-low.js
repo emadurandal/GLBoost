@@ -2198,6 +2198,11 @@
         instance._userFlavorName = this._userFlavorName;
       }
     }, {
+      key: 'instanceName',
+      get: function get() {
+        return this._instanceName;
+      }
+    }, {
       key: 'belongingCanvasId',
       get: function get() {
         return this._glBoostContext.belongingCanvasId;
@@ -5267,7 +5272,8 @@
       var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
         preset: null, // or 'one', 'two horizontal split', 'two vertical split', 'four'. If these are specified, 'screens' properties are ignored.
         screens: [{
-          unit: 'ratio', // or 'pixel'
+          unit: 'ratio', // 'pixel'
+          range: 'positive', // 'positive-negative'
           origin: new Vector2(-1, -1),
           size: new Vector2(2, 2),
           uDivision: 0,
@@ -5293,6 +5299,7 @@
         if (layout.preset === 'one') {
           screens[0] = {
             unit: 'ratio', // or 'pixel'
+            range: 'positive-negative',
             origin: new Vector2(-1, -1),
             size: new Vector2(2, 2),
             uDivision: 0,
@@ -5315,6 +5322,27 @@
         try {
           for (var _iterator = screens[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var screen = _step.value;
+
+            var originX = screen.origin.x;
+            var originY = screen.origin.y;
+            var sizeX = screen.size.x;
+            var sizeY = screen.size.y;
+
+            if (screen.unit === 'pixel') {
+              originX = originX / this._glBoostContext.canvasWidth;
+              originY = originY / this._glBoostContext.canvasHeight;
+              sizeX = sizeX / this._glBoostContext.canvasWidth;
+              sizeY = sizeY / this._glBoostContext.canvasHeight;
+            }
+            if (screen.range === 'positive') {
+              originX = (originX - 0.5) * 2;
+              originY = (originY - 0.5) * 2;
+              sizeX = sizeX * 2;
+              sizeY = sizeY * 2;
+            }
+
+            screen.origin = new Vector2(originX, originY);
+            screen.size = new Vector2(sizeX, sizeY);
 
             this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, screen.uDivision + 1, screen.vDivision + 1, screen.uUVRepeat, screen.vUVRepeat);
           }
@@ -5985,8 +6013,8 @@
 
       if (typeof gl !== 'undefined' && gl !== null) {
         this.impl = new GLContextWebGL1Impl(canvas, this, gl);
-        this._width = width;
-        this._height = height;
+        this._canvasWidth = width;
+        this._canvasHeight = height;
         GLContext._instances['nocanvas'] = this;
       } else {
         if (GLContext._instances[canvas.id] instanceof GLContext) {
@@ -6000,8 +6028,8 @@
         }
 
         GLContext._instances[canvas.id] = this;
-        this._width = canvas.width;
-        this._height = canvas.height;
+        this._canvasWidth = canvas.width;
+        this._canvasHeight = canvas.height;
       }
 
       this._monitor = L_GLBoostMonitor.getInstance();
@@ -6118,26 +6146,26 @@
         return this.impl.canvas;
       }
     }, {
-      key: 'width',
+      key: 'canvasWidth',
       get: function get() {
-        return this._width;
+        return this._canvasWidth;
       },
       set: function set(width) {
         if (this.impl.canvas) {
           this.impl.canvas.width = width;
         }
-        this._width = width;
+        this._canvasWidth = width;
       }
     }, {
-      key: 'height',
+      key: 'canvasHeight',
       get: function get() {
-        return this._height;
+        return this._canvasHeight;
       },
       set: function set(height) {
         if (this.impl.canvas) {
           this.impl.canvas.height = height;
         }
-        this._height = height;
+        this._canvasHeight = height;
       }
     }], [{
       key: 'getInstance',
