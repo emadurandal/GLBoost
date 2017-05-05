@@ -2378,6 +2378,19 @@
       value: function clone() {
         return new Vector2(this.x, this.y);
       }
+    }, {
+      key: "multiply",
+      value: function multiply(val) {
+        this.x *= val;
+        this.y *= val;
+
+        return this;
+      }
+    }], [{
+      key: "multiply",
+      value: function multiply(vec2, val) {
+        return new Vector2(vec2.x * val, vec2.y * val);
+      }
     }]);
     return Vector2;
   }();
@@ -2658,11 +2671,6 @@
 
         return this;
       }
-
-      /**
-       * 除算（static版）
-       */
-
     }, {
       key: 'toVector4',
       value: function toVector4() {
@@ -4756,6 +4764,11 @@
         return this._finalMatrix.clone();
       }
     }, {
+      key: 'normalMatrix',
+      get: function get() {
+        return Matrix44$1.invert(this.transformMatrix).transpose().toMatrix33();
+      }
+    }, {
       key: 'currentCalcMode',
       set: function set(mode) {
         this._currentCalcMode = mode;
@@ -4787,6 +4800,7 @@
       _this._transparentByUser = false;
       _this._opacity = 1.0;
       _this._isAffectedByWorldMatrix = true;
+      _this._isAffectedByWorldMatrixAccumulatedAncestry = true;
       _this._isAffectedByViewMatrix = true;
       _this._isAffectedByProjectionMatrix = true;
 
@@ -5403,6 +5417,14 @@
         return this._isAffectedByWorldMatrix;
       }
     }, {
+      key: 'isAffectedByWorldMatrixAccumulatedAncestry',
+      set: function set(flg) {
+        this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
+      },
+      get: function get() {
+        return this._isAffectedByWorldMatrixAccumulatedAncestry;
+      }
+    }, {
       key: 'isAffectedByViewMatrix',
       set: function set(flg) {
         this._isAffectedByViewMatrix = flg;
@@ -5590,7 +5612,11 @@
           if (camera) {
             var world_m = void 0;
             if (mesh.isAffectedByWorldMatrix) {
-              world_m = mesh.transformMatrixAccumulatedAncestry;
+              if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
+                world_m = mesh.transformMatrixAccumulatedAncestry;
+              } else {
+                world_m = mesh.transformMatrix;
+              }
             } else {
               world_m = Matrix44.identity();
             }
@@ -5742,8 +5768,13 @@
           var world_m = void 0;
           var normal_m = void 0;
           if (mesh.isAffectedByWorldMatrix) {
-            world_m = mesh.transformMatrixAccumulatedAncestry;
-            normal_m = mesh.normalMatrixAccumulatedAncestry;
+            if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
+              world_m = mesh.transformMatrixAccumulatedAncestry;
+              normal_m = mesh.normalMatrixAccumulatedAncestry;
+            } else {
+              world_m = mesh.transformMatrix;
+              normal_m = mesh.normalMatrix;
+            }
           } else {
             world_m = Matrix44$1.identity();
             normal_m = Matrix33.identity();
@@ -6793,8 +6824,10 @@
     babelHelpers.createClass(SPVScreen, [{
       key: '_setupVertexData',
       value: function _setupVertexData(layout, customVertexAttributes) {
-
         var screens = [];
+        if (layout.screens) {
+          screens = layout.screens;
+        }
         if (layout.preset === 'one') {
           screens[0] = {
             unit: 'ratio', // or 'pixel'
@@ -6828,10 +6861,10 @@
             var sizeY = screen.size.y;
 
             if (screen.unit === 'pixel') {
-              originX = originX / this._glBoostContext.canvasWidth;
-              originY = originY / this._glBoostContext.canvasHeight;
-              sizeX = sizeX / this._glBoostContext.canvasWidth;
-              sizeY = sizeY / this._glBoostContext.canvasHeight;
+              originX = originX / this._glContext.canvasWidth;
+              originY = originY / this._glContext.canvasHeight;
+              sizeX = sizeX / this._glContext.canvasWidth;
+              sizeY = sizeY / this._glContext.canvasHeight;
             }
             if (screen.range === 'positive') {
               originX = (originX - 0.5) * 2;
@@ -10302,7 +10335,7 @@
         evt.preventDefault();
         _this._wheel_y += evt.deltaY / 600;
         _this._wheel_y = Math.min(_this._wheel_y, 3);
-        _this._wheel_y = Math.max(_this._wheel_y, 0.4);
+        _this._wheel_y = Math.max(_this._wheel_y, 0.2);
 
         _this._camaras.forEach(function (camera) {
           camera._needUpdateView(false);
@@ -10363,8 +10396,8 @@
         var newUpVec = null;
 
         if (this._isKeyUp || !this._isForceGrab) {
-          this._eyeVec = this._shiftCameraTo !== null ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
-          this._centerVec = this._shiftCameraTo !== null ? this._shiftCameraTo : camera.center;
+          this._eyeVec = this._shiftCameraTo !== null ? Vector3.add(camera.eye, this._shiftCameraTo) : camera.eye;
+          this._centerVec = this._shiftCameraTo !== null ? Vector3.add(camera.center, this._shiftCameraTo) : camera.center;
           this._upVec = camera.up;
         }
 
@@ -10507,15 +10540,6 @@
         this.setDolly(1);
       }
     }, {
-      key: 'setDolly',
-      value: function setDolly(value) {
-        this._wheel_y = value;
-
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-        });
-      }
-    }, {
       key: 'resetTrack',
       value: function resetTrack() {
         this._mouseTranslateVec = new Vector3(0, 0, 0);
@@ -10540,6 +10564,18 @@
       key: 'addCamera',
       value: function addCamera(camera) {
         this._camaras.add(camera);
+      }
+    }, {
+      key: 'dolly',
+      set: function set(value) {
+        this._wheel_y = value;
+
+        this._camaras.forEach(function (camera) {
+          camera._needUpdateView(false);
+        });
+      },
+      get: function get() {
+        return this._wheel_y;
       }
     }, {
       key: 'enableRotation',
@@ -16806,5 +16842,114 @@
   }(M_SPVScreenMesh);
 
   GLBoost$1["H_SPVScreenLUT"] = H_SPVScreenLUT;
+
+  var H_SPVUIRectangle = function (_M_SPVScreenMesh) {
+    babelHelpers.inherits(H_SPVUIRectangle, _M_SPVScreenMesh);
+
+    function H_SPVUIRectangle(glBoostContext) {
+      var layout = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {
+        preset: null,
+        screens: [{
+          unit: 'ratio', // 'pixel'
+          range: 'positive', // 'positive-negative'
+          origin: new Vector2(0, 0),
+          size: new Vector2(1, 1),
+          uDivision: 0,
+          vDivision: 0,
+          uUVRepeat: false,
+          vUVRepeat: false
+        }]
+      };
+      var inputTexture = arguments[2];
+      babelHelpers.classCallCheck(this, H_SPVUIRectangle);
+
+      var _this = babelHelpers.possibleConstructorReturn(this, (H_SPVUIRectangle.__proto__ || Object.getPrototypeOf(H_SPVUIRectangle)).call(this, glBoostContext, layout, null));
+
+      _this.scale = new Vector3(0, 0, 1);
+
+      _this.innerColor = new Vector4(1, 0.5, 0.5, 0.8);
+      _this._origin = new Vector2(0, 0);
+      _this._size = new Vector2(0, 0);
+      _this._rangeFromOrigin = null;
+
+      _this.isAffectedByWorldMatrix = true;
+      _this.isAffectedByWorldMatrixAccumulatedAncestry = false;
+
+      _this._reverseOriginY = false;
+      return _this;
+    }
+
+    babelHelpers.createClass(H_SPVUIRectangle, [{
+      key: 'updateShape',
+      value: function updateShape() {
+        var rangeFromOrigin = 0;
+        if (!this.rangeFromOrigin) {
+          rangeFromOrigin = new Vector2(this._glContext.canvasWidth, this._glContext.canvasHeight);
+        }
+
+        var originY = this._origin.y;
+        var sizeY = this._size.y;
+        if (this._reverseOriginY) {
+          originY = -this._origin.y + rangeFromOrigin.y * 2;
+          //normalizedSize.y = - normalizedSize.y;
+          sizeY = -this._size.y;
+        }
+
+        var normalizedSize = new Vector3(this._size.x / rangeFromOrigin.x, sizeY / rangeFromOrigin.y, 1);
+        var normalizedOrigin = new Vector3((this._origin.x - rangeFromOrigin.x) / rangeFromOrigin.x, (originY - rangeFromOrigin.y) / rangeFromOrigin.y, 1);
+        normalizedOrigin.x += normalizedSize.x;
+        normalizedOrigin.y += normalizedSize.y;
+
+        this.scale = normalizedSize;
+        this.translate = normalizedOrigin;
+      }
+    }, {
+      key: 'innerColor',
+      set: function set(color) {
+        this.geometry.materials[0].baseColor = color;
+      },
+      get: function get() {
+        return this.geometry.materials[0].baseColor;
+      }
+    }, {
+      key: 'origin',
+      set: function set(vec2) {
+        this._origin = vec2;
+        this.updateShape();
+      },
+      get: function get() {
+        return this._origin;
+      }
+    }, {
+      key: 'size',
+      set: function set(vec2) {
+        this._size = vec2;
+        this.updateShape();
+      },
+      get: function get() {
+        return this._size;
+      }
+    }, {
+      key: 'rangeFromOrigin',
+      set: function set(vec2) {
+        this._rangeFromOrigin = vec2;
+        this.updateShape();
+      },
+      get: function get() {
+        return this._rangeFromOrigin;
+      }
+    }, {
+      key: 'reverseOriginY',
+      set: function set(flg) {
+        this._reverseOriginY = flg;
+      },
+      get: function get() {
+        return this._reverseOriginY;
+      }
+    }]);
+    return H_SPVUIRectangle;
+  }(M_SPVScreenMesh);
+
+  GLBoost$1["H_SPVUIRectangle"] = H_SPVUIRectangle;
 
 }));

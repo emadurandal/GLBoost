@@ -144,7 +144,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       evt.preventDefault();
       this._wheel_y += evt.deltaY / 600;
       this._wheel_y = Math.min(this._wheel_y, 3);
-      this._wheel_y = Math.max(this._wheel_y, 0.4);
+      this._wheel_y = Math.max(this._wheel_y, 0.2);
 
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
@@ -201,8 +201,8 @@ export default class L_SPVCameraController extends GLBoostObject {
     let newUpVec = null;
 
     if (this._isKeyUp || !this._isForceGrab) {
-      this._eyeVec = (this._shiftCameraTo !== null) ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
-      this._centerVec = (this._shiftCameraTo !== null) ? this._shiftCameraTo : camera.center;
+      this._eyeVec = (this._shiftCameraTo !== null) ? Vector3.add(camera.eye, this._shiftCameraTo) : camera.eye;
+      this._centerVec = (this._shiftCameraTo !== null) ? Vector3.add(camera.center, this._shiftCameraTo) : camera.center;
       this._upVec = camera.up;
     }
 
@@ -341,12 +341,16 @@ export default class L_SPVCameraController extends GLBoostObject {
     this.setDolly(1);
   }
 
-  setDolly(value) {
+  set dolly(value) {
     this._wheel_y = value;
 
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
     });
+  }
+
+  get dolly() {
+    return this._wheel_y;
   }
 
   resetTrack() {
