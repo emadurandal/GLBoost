@@ -29,8 +29,10 @@ export default class SPVScreen extends Geometry {
   }
 
   _setupVertexData(layout, customVertexAttributes) {
-
     let screens = [];
+    if (layout.screens) {
+      screens = layout.screens;
+    }
     if (layout.preset === 'one') {
       screens[0] = {
         unit: 'ratio', // or 'pixel'
@@ -58,10 +60,10 @@ export default class SPVScreen extends Geometry {
       let sizeY = screen.size.y;
 
       if (screen.unit === 'pixel') {
-        originX = originX/this._glBoostContext.canvasWidth;
-        originY = originY/this._glBoostContext.canvasHeight;
-        sizeX = sizeX/this._glBoostContext.canvasWidth;
-        sizeY = sizeY/this._glBoostContext.canvasHeight;
+        originX = originX/this._glContext.canvasWidth;
+        originY = originY/this._glContext.canvasHeight;
+        sizeX = sizeX/this._glContext.canvasWidth;
+        sizeY = sizeY/this._glContext.canvasHeight;
       }
       if (screen.range === 'positive') {
         originX = (originX-0.5)*2;

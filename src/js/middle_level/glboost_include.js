@@ -32,3 +32,4 @@ import SPVPhongShader from './shaders/SPVPhongShader';
 import SPVDecalShader from './shaders/SPVDecalShader';
 import SPVGLTFLoader from './loader/SPVGLTFLoader';
 import H_SPVScreenLUT from '../high_level/post_effects/H_SPVScreenLUT';
+import H_SPVUIRectangle from '../high_level/user_interfaces/H_SPVUIRectangle';
