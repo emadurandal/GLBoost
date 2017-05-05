@@ -56,7 +56,11 @@ export default class DrawKickerLocal {
       if (camera) {
         let world_m;
         if (mesh.isAffectedByWorldMatrix) {
-          world_m = mesh.transformMatrixAccumulatedAncestry;
+          if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
+            world_m = mesh.transformMatrixAccumulatedAncestry;
+          } else {
+            world_m = mesh.transformMatrix;
+          }
         } else {
           world_m = Matrix44.identity();
         }

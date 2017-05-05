@@ -22,6 +22,7 @@ export default class M_Element extends L_Element {
     this._transparentByUser = false;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
+    this._isAffectedByWorldMatrixAccumulatedAncestry = true;
     this._isAffectedByViewMatrix = true;
     this._isAffectedByProjectionMatrix = true;
 
@@ -598,6 +599,14 @@ export default class M_Element extends L_Element {
 
   get isAffectedByWorldMatrix() {
     return this._isAffectedByWorldMatrix;
+  }
+
+  set isAffectedByWorldMatrixAccumulatedAncestry(flg) {
+    this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
+  }
+
+  get isAffectedByWorldMatrixAccumulatedAncestry() {
+    return this._isAffectedByWorldMatrixAccumulatedAncestry;
   }
 
   set isAffectedByViewMatrix(flg) {

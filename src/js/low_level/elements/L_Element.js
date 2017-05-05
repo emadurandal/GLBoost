@@ -126,6 +126,10 @@ export default class L_Element extends GLBoostObject {
     return this._finalMatrix.clone();
   }
 
+  get normalMatrix() {
+    return Matrix44.invert(this.transformMatrix).transpose().toMatrix33();
+  }
+
   set currentCalcMode(mode) {
     this._currentCalcMode = mode;
   }
