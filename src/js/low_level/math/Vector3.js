@@ -203,9 +203,6 @@ export default class Vector3 {
     return this;
   }
 
-  /**
-   * 除算（static版）
-   */
   static multiply(vec3, val) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }

@@ -57,8 +57,13 @@ export default class DrawKickerWorld {
       let world_m;
       let normal_m;
       if (mesh.isAffectedByWorldMatrix) {
-        world_m = mesh.transformMatrixAccumulatedAncestry;
-        normal_m = mesh.normalMatrixAccumulatedAncestry;
+        if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
+          world_m = mesh.transformMatrixAccumulatedAncestry;
+          normal_m = mesh.normalMatrixAccumulatedAncestry;
+        } else {
+          world_m = mesh.transformMatrix;
+          normal_m = mesh.normalMatrix;
+        }
       } else {
         world_m = Matrix44.identity();
         normal_m = Matrix33.identity();
