@@ -209,6 +209,8 @@
       }
 
       GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+
+      this._glContext = glContext;
     }
 
     babelHelpers.createClass(GLExtensionsManager, [{
@@ -221,6 +223,8 @@
         } else {
           return null;
         }
+
+        this._glContext.checkGLError();
       }
     }, {
       key: 'bindVertexArray',
@@ -234,6 +238,8 @@
         } else {
           return false;
         }
+
+        this._glContext.checkGLError();
       }
     }, {
       key: 'drawBuffers',
@@ -252,6 +258,8 @@
           }
           return false;
         }
+
+        this._glContext.checkGLError();
       }
     }, {
       key: 'colorAttachiment',
@@ -1182,6 +1190,27 @@
       key: '_textureProj_func',
       value: function _textureProj_func(gl) {
         return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+      }
+    }, {
+      key: '_generateShadowingStr',
+      value: function _generateShadowingStr(gl, i) {
+        var shadowingText = '';
+        shadowingText += 'float visibility = 1.0;\n';
+        shadowingText += 'float visibilitySpecular = 1.0;\n';
+        shadowingText += 'if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
+        if (GLBoost.isThisGLVersion_2(gl)) {
+          shadowingText += 'visibilitySpecular = textureProj(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']);\n';
+          shadowingText += 'visibility = visibilitySpecular + 0.25;\n';
+        } else {
+          shadowingText += 'float depth = texture2DProj(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
+          shadowingText += 'if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
+          shadowingText += '  visibility = 0.25;\n';
+          shadowingText += '  visibilitySpecular = 0.0;\n';
+          shadowingText += '}\n';
+        }
+        shadowingText += '}\n';
+
+        return shadowingText;
       }
     }, {
       key: '_set_outColor_onFrag',
@@ -3029,9 +3058,6 @@
         //if (lights[i].camera && lights[i].camera.texture) {
         shaderText += 'uniform mat4 depthPVMatrix[' + lights.length + '];\n';
         shaderText += out_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
-        textureUnitIndex++;
-        //}
-        //}
 
         return shaderText;
       }
@@ -3039,23 +3065,32 @@
       key: 'VSTransform_VertexWorldShadowShaderSource',
       value: function VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
         var shaderText = '';
+        var gl = this._glContext.gl;
 
         shaderText += 'mat4 biasMatrix = mat4(\n      0.5, 0.0, 0.0, 0.0,\n      0.0, 0.5, 0.0, 0.0,\n      0.0, 0.0, 0.5, 0.0,\n      0.5, 0.5, 0.5, 1.0\n    );\n';
 
         //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
         for (var i = 0; i < lights.length; i++) {
           shaderText += '  { // ' + i + '\n';
-          shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
+          if (GLBoost.isThisGLVersion_2(gl)) {
+            shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
+          } else {
+            shaderText += '    mat4 depthBiasPV = biasMatrix * depthPVMatrix[' + i + ']; // ' + i + '\n';
+          }
           //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
           shaderText += '    v_shadowCoord[' + i + '] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ' + i + '\n';
+          //shaderText += `    v_shadowCoord[${i}].y = 1.0 - v_shadowCoord[${i}].y; // ${i}\n`;
           shaderText += '  } // ' + i + '\n';
         }
+
         return shaderText;
       }
     }, {
       key: 'FSDefine_VertexWorldShadowShaderSource',
-      value: function FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+      value: function FSDefine_VertexWorldShadowShaderSource(f, gl, lights) {
         var shaderText = '';
+
+        shaderText += 'uniform float depthBias;\n';
 
         return shaderText;
       }
@@ -3094,6 +3129,10 @@
           material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_' + i, gl.getUniformLocation(shaderProgram, 'lightPosition[' + i + ']'));
           material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_' + i, gl.getUniformLocation(shaderProgram, 'lightDiffuse[' + i + ']'));
         }
+
+        material.setUniform(shaderProgram.hashId, 'uniform_depthBias', gl.getUniformLocation(shaderProgram, 'depthBias'));
+        var uniformLocationDepthBias = material.getUniform(shaderProgram.hashId, 'uniform_depthBias');
+        gl.uniform1f(uniformLocationDepthBias, 0.005);
 
         var textureUnitIndex = 0;
         for (var _i = 0; _i < lights.length; _i++) {
@@ -3220,6 +3259,7 @@
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
         babelHelpers.get(WireframeShader.prototype.__proto__ || Object.getPrototypeOf(WireframeShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
+
         var isWifeframe = false;
         var isWireframeOnShade = false;
 
@@ -3247,6 +3287,13 @@
         var uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
         if (uniformLocationUnfoldUVRatio) {
           gl.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio);
+        }
+
+        babelHelpers.get(WireframeShader.prototype.__proto__ || Object.getPrototypeOf(WireframeShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
+
+        var uniformLocationDepthBias = material.getUniform(glslProgram.hashId, 'uniform_depthBias');
+        if (uniformLocationDepthBias && material.shaderParameters.depthBias) {
+          gl.uniform1f(uniformLocationDepthBias, material.shaderParameters.depthBias);
         }
       }
     }, {
@@ -3566,9 +3613,9 @@
           return GLContext._instances[canvas.id];
         }
 
-        if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
+        if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 1) {
           this.impl = new GLContextWebGL1Impl(canvas, this);
-        } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
+        } else if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 2) {
           this.impl = new GLContextWebGL2Impl(canvas, this);
         }
 
@@ -3581,6 +3628,28 @@
     }
 
     babelHelpers.createClass(GLContext, [{
+      key: 'checkGLError',
+      value: function checkGLError() {
+        if (GLBoost$1.VALUE_LOG_GL_ERROR === false) {
+          return;
+        }
+
+        var gl = this.impl.gl;
+        var errorCode = gl.getError();
+        if (errorCode !== 0) {
+          (function () {
+            var errorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION', 'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+            var errorMessages = ['An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.', 'A numeric argument is out of range. The command is ignored and the error flag is set.', 'The specified command is not allowed for the current state. The command is ignored and the error flag is set.', 'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.', 'Not enough memory is left to execute the command.', 'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'];
+
+            errorTypes.forEach(function (errorType, i) {
+              if (gl[errorType] === errorCode) {
+                MiscUtil.consoleLog('LOG_GL_ERROR', 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+              }
+            });
+          })();
+        }
+      }
+    }, {
       key: 'createVertexArray',
       value: function createVertexArray(glBoostObject) {
         var gl = this.gl;
@@ -3590,6 +3659,8 @@
           this._monitor.registerWebGLResource(glBoostObject, glResource);
         }
 
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3597,6 +3668,9 @@
       value: function createBuffer(glBoostObject) {
         var glResource = this.gl.createBuffer();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3604,6 +3678,9 @@
       value: function createFramebuffer(glBoostObject) {
         var glResource = this.gl.createFramebuffer();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3611,6 +3688,9 @@
       value: function deleteFramebuffer(glBoostObject, frameBuffer) {
         this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
         this.gl.deleteFramebuffer(frameBuffer);
+
+        this.checkGLError();
+
         frameBuffer = null;
       }
     }, {
@@ -3618,6 +3698,9 @@
       value: function createRenderbuffer(glBoostObject) {
         var glResource = this.gl.createRenderbuffer();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3625,6 +3708,9 @@
       value: function deleteRenderbuffer(glBoostObject, renderBuffer) {
         this._monitor.deregisterWebGLResource(glBoostObject, renderBuffer);
         this.gl.deleteRenderbuffer(renderBuffer);
+
+        this.checkGLError();
+
         renderBuffer = null;
       }
     }, {
@@ -3632,6 +3718,9 @@
       value: function createShader(glBoostObject, shaderType) {
         var glResource = this.gl.createShader(shaderType);
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3639,6 +3728,9 @@
       value: function deleteShader(glBoostObject, shader) {
         this._monitor.deregisterWebGLResource(glBoostObject, shader);
         this.gl.deleteShader(shader);
+
+        this.checkGLError();
+
         shader = null;
       }
     }, {
@@ -3646,6 +3738,9 @@
       value: function createProgram(glBoostObject) {
         var glResource = this.gl.createProgram();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3653,12 +3748,17 @@
       value: function deleteProgram(glBoostObject, program) {
         this._monitor.deregisterWebGLResource(glBoostObject, program);
         this.gl.deleteProgram(program);
+
+        this.checkGLError();
       }
     }, {
       key: 'createTexture',
       value: function createTexture(glBoostObject) {
         var glResource = this.gl.createTexture();
         this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+        this.checkGLError();
+
         return glResource;
       }
     }, {
@@ -3666,6 +3766,9 @@
       value: function deleteTexture(glBoostObject, texture) {
         this._monitor.deregisterWebGLResource(glBoostObject, texture);
         this.gl.deleteTexture(texture);
+
+        this.checkGLError();
+
         texture = null;
       }
     }, {
@@ -4045,7 +4148,8 @@
 
     babelHelpers.createClass(DecalShader, [{
       key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material) {
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(DecalShader.prototype.__proto__ || Object.getPrototypeOf(DecalShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
 
         var baseColor = material.baseColor;
         gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
@@ -5748,6 +5852,9 @@
     babelHelpers.createClass(DrawKickerWorld, [{
       key: 'draw',
       value: function draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+
+        console.log('gl.getError: ' + gl.getError());
+
         var isVAOBound = false;
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -12415,7 +12522,13 @@
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
 
         // Create MutableTexture for Depth Texture
-        var depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0, gl.DEPTH_COMPONENT, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+
+        var depthComponetInternal = gl.DEPTH_COMPONENT;
+        if (GLBoost$1.isThisGLVersion_2(gl)) {
+          depthComponetInternal = gl.DEPTH_COMPONENT16;
+        }
+
+        var depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0, depthComponetInternal, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
         depthTexture.fbo = fbo;
 
         /// Attach Buffers
@@ -12801,6 +12914,10 @@
         shaderText += 'uniform vec4 Kd;\n';
         shaderText += 'uniform vec4 Ks;\n';
         shaderText += 'uniform float power;\n';
+        var sampler2D = this._sampler2DShadow_func();
+        shaderText += 'uniform mediump ' + sampler2D + ' uDepthTexture[' + lights.length + '];\n';
+        shaderText += in_ + ' vec4 v_shadowCoord[' + lights.length + '];\n';
+        shaderText += 'uniform int isShadowCasting[' + lights.length + '];\n';
 
         return shaderText;
       }
@@ -12812,26 +12929,32 @@
         shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
         shaderText += '  vec3 normal = normalize(v_normal);\n';
 
-        shaderText += '  for (int i=0; i<' + lights.length + '; i++) {\n';
-        // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-        shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-        shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-        shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
-        shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
-        shaderText += '    vec3 reflect = reflect(-light, normal);\n';
-        shaderText += '    float specular = pow(max(dot(reflect, view), 0.0), power);\n';
-        shaderText += '    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n';
-        shaderText += '  }\n';
-
-        shaderText += 'if ( isWireframe ) {\n';
-        shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-        shaderText += '  } else {\n';
-        shaderText += '    rt0.xyz = grayColor;\n';
-        shaderText += '  }\n';
-        shaderText += '}\n';
+        for (var i = 0; i < lights.length; i++) {
+          shaderText += '  {\n';
+          // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+          shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
+          shaderText += Shader._generateShadowingStr(gl, i);
+          shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
+          shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
+          shaderText += '    vec3 reflect = reflect(-light, normal);\n';
+          shaderText += '    float specular = pow(max(dot(reflect, view), 0.0), power);\n';
+          shaderText += '    rt0 += vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[' + i + '] * vec4(specular, specular, specular, 0.0);\n';
+          shaderText += '  }\n';
+          //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
+          //shaderText += '  rt0.a = 1.0;\n';
+        }
+        /*
+            shaderText += 'if ( isWireframe ) {\n';
+            shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
+            shaderText += '  } else {\n';
+            shaderText += '    rt0.xyz = grayColor;\n';
+            shaderText += '  }\n';
+            shaderText += '}\n';
         //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
-        //shaderText += '  rt0.a = 1.0;\n';
-
+            //shaderText += '  rt0.a = 1.0;\n';
+        
+        */
 
         return shaderText;
       }
@@ -12870,8 +12993,8 @@
 
     babelHelpers.createClass(PhongShader, [{
       key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material) {
-        babelHelpers.get(PhongShader.prototype.__proto__ || Object.getPrototypeOf(PhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(PhongShader.prototype.__proto__ || Object.getPrototypeOf(PhongShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
 
         var Kd = material.diffuseColor;
         var Ks = material.specularColor;
@@ -13577,6 +13700,7 @@
   GLBoost$1['VALUE_LOG_SHADER_CODE'] = true;
   GLBoost$1['VALUE_LOG_GLBOOST_OBJECT_LIFECYCLE'] = true;
   GLBoost$1['VALUE_LOG_GL_RESOURCE_LIFECYCLE'] = true;
+  GLBoost$1['VALUE_LOG_GL_ERROR'] = true;
 
   var LambertShaderSource = function () {
     function LambertShaderSource() {
@@ -13602,10 +13726,6 @@
       value: function FSShade_LambertShaderSource(f, gl, lights) {
         var shaderText = '';
 
-        var textureProjFunc = Shader._textureProj_func(gl);
-
-        shaderText += '  float depthBias = 0.005;\n';
-
         shaderText += '  vec4 surfaceColor = rt0;\n';
         shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
         shaderText += '  vec3 normal = normalize(v_normal);\n';
@@ -13613,21 +13733,9 @@
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
           shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
-
-          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
-
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
-          shaderText += '        light *= 0.5;\n';
-          shaderText += '      }\n';
-
-          //shaderText += `        float visibility = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}], depthBias).x;\n`;
-          //shaderText += `        light *= visibility > 0.5 ? 1.0 : 0.0;\n`;
-
-          shaderText += '    }\n';
-
+          shaderText += Shader._generateShadowingStr(gl, i);
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
-          shaderText += '    rt0 += Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
+          shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '  }\n';
         }
         //shaderText += '  rt0.a = 1.0;\n';
@@ -13677,7 +13785,7 @@
     babelHelpers.createClass(LambertShader, [{
       key: 'setUniforms',
       value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-        babelHelpers.get(LambertShader.prototype.__proto__ || Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
+        babelHelpers.get(LambertShader.prototype.__proto__ || Object.getPrototypeOf(LambertShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
 
         var Kd = material.diffuseColor;
         gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
@@ -15243,6 +15351,15 @@
     }
 
     babelHelpers.createClass(DepthDisplayShaderSource, [{
+      key: 'VSTransform_DepthDisplayShaderSource',
+      value: function VSTransform_DepthDisplayShaderSource(existCamera_f, f) {
+        var shaderText = '';
+        if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+          shaderText += '  texcoord.y = 1.0 - texcoord.y;\n';
+        }
+        return shaderText;
+      }
+    }, {
       key: 'FSShade_DepthDisplayShaderSource',
       value: function FSShade_DepthDisplayShaderSource(f, gl, lights) {
         var shaderText = '';
@@ -15275,7 +15392,7 @@
     return DepthDisplayShader;
   }(DecalShader);
 
-  GLBoost['DepthDisplayShader'] = DepthDisplayShader;
+  GLBoost$1['DepthDisplayShader'] = DepthDisplayShader;
 
   var PassThroughShaderSource = function () {
     function PassThroughShaderSource() {
@@ -15394,8 +15511,6 @@
       value: function FSShade_SPVLambertShaderSource(f, gl, lights) {
         var shaderText = '';
 
-        var textureProjFunc = Shader._textureProj_func(gl);
-
         shaderText += '  float depthBias = 0.005;\n';
 
         shaderText += '  vec4 surfaceColor = rt0;\n';
@@ -15405,14 +15520,7 @@
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
           shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
-          shaderText += '    float visibility = 1.0; // ' + i + '\n';
-          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
-          shaderText += '        visibility *= 0.25;\n';
-          shaderText += '      }\n';
-          shaderText += '    }\n';
-
+          shaderText += Shader._generateShadowingStr(gl, i);
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
           shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '  }\n';
@@ -15546,16 +15654,7 @@
           shaderText += '  {\n';
           // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
           shaderText += '    vec3 light = normalize(lightPosition[' + i + '].xyz - position.xyz * lightPosition[' + i + '].w);\n';
-          shaderText += '    float visibility = 1.0; // ' + i + '\n';
-          shaderText += '    float visibilitySpecular = 1.0; // ' + i + '\n';
-          shaderText += '    if (isShadowCasting[' + i + '] == 1) {// ' + i + '\n';
-          shaderText += '      float depth = ' + textureProjFunc + '(uDepthTexture[' + i + '], v_shadowCoord[' + i + ']).r;\n';
-          shaderText += '      if (depth < (v_shadowCoord[' + i + '].z - depthBias) / v_shadowCoord[' + i + '].w) {\n';
-          shaderText += '        visibility *= 0.25;\n';
-          shaderText += '        visibilitySpecular *= 0.0;\n';
-          shaderText += '      }\n';
-          shaderText += '    }\n';
-
+          shaderText += Shader._generateShadowingStr(gl, i);
           shaderText += '    float diffuse = max(dot(light, normal), 0.0);\n';
           shaderText += '    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[' + i + '] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n';
           shaderText += '    vec3 view = normalize(viewPosition - position.xyz);\n';
