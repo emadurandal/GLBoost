@@ -3332,8 +3332,12 @@
         shaderText += '    rt0 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
-          shaderText += '  rt0 = pow(rt0, gamma);\n';
         }
+        shaderText += '    if (rt0.a < 0.05) {\n';
+        shaderText += '      discard;\n';
+        shaderText += '    }\n';
+
+        shaderText += '  rt0 = pow(rt0, gamma);\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
@@ -3978,6 +3982,10 @@
         if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
+        shaderText += '    if (rt0.a < 0.05) {\n';
+        shaderText += '      discard;\n';
+        shaderText += '    }\n';
+
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
@@ -5367,7 +5375,10 @@
         return this._opacity;
       }
     }, {
-      key: 'transparent',
+      key: 'isTransparent',
+      get: function get() {
+        return this._transparentByUser;
+      },
       set: function set(flg) {
         this._transparentByUser = flg;
       }
@@ -7141,13 +7152,6 @@
         this._transformedDepth = transformedCenterPosition.z;
       }
     }, {
-      key: 'isTransparent',
-      value: function isTransparent() {
-        var isTransparent = this._opacity < 1.0 || this._transparentByUser ? true : false;
-        isTransparent |= this.geometry.isTransparent(this);
-        return isTransparent;
-      }
-    }, {
       key: 'getAppropriateMaterials',
       value: function getAppropriateMaterials() {
         return this.geometry._getAppropriateMaterials(this);
@@ -7188,6 +7192,16 @@
       key: 'transformedDepth',
       get: function get() {
         return this._transformedDepth;
+      }
+    }, {
+      key: 'isTransparent',
+      get: function get() {
+        var isTransparent = this._opacity < 1.0 || this._transparentByUser ? true : false;
+        isTransparent |= this.geometry.isTransparent(this);
+        return isTransparent;
+      },
+      set: function set(flg) {
+        this._transparentByUser = flg;
       }
     }, {
       key: 'AABBInWorld',
@@ -8898,7 +8912,7 @@
         this._opacityMeshes = [];
         this._transparentMeshes = [];
         this._meshes.forEach(function (mesh) {
-          if (mesh.isTransparent()) {
+          if (mesh.isTransparent) {
             _this3._transparentMeshes.push(mesh);
           } else {
             _this3._opacityMeshes.push(mesh);

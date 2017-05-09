@@ -3747,7 +3747,10 @@
         return this._opacity;
       }
     }, {
-      key: 'transparent',
+      key: 'isTransparent',
+      get: function get() {
+        return this._transparentByUser;
+      },
       set: function set(flg) {
         this._transparentByUser = flg;
       }
@@ -5824,8 +5827,12 @@
         shaderText += '    rt0 *= materialBaseColor;\n';
         if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
-          shaderText += '  rt0 = pow(rt0, gamma);\n';
         }
+        shaderText += '    if (rt0.a < 0.05) {\n';
+        shaderText += '      discard;\n';
+        shaderText += '    }\n';
+
+        shaderText += '  rt0 = pow(rt0, gamma);\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
         return shaderText;
@@ -6470,6 +6477,10 @@
         if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
           shaderText += '  rt0 *= ' + textureFunc + '(uTexture, texcoord);\n';
         }
+        shaderText += '    if (rt0.a < 0.05) {\n';
+        shaderText += '      discard;\n';
+        shaderText += '    }\n';
+
         //shaderText += '    float shadowRatio = 0.0;\n';
 
         //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
