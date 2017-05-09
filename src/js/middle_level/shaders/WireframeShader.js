@@ -32,9 +32,28 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
     var shaderText = '';
 
+    //shaderText += 'float mesh_width = 1.0;\n';
+
+    shaderText += `
+    float edge_factor(vec3 bary3) {     
+                               float mesh_width = 4.0;
+        //vec3 bary3 = vec3(bary.x, bary.y, 1.0-bary.x-bary.y);         
+        vec3 d = fwidth(bary3);
+        vec3 a3 = smoothstep(vec3(0.0,0.0,0.0), d*mesh_width, bary3);  
+        //a3 = vec3(1.0, 1.0, 1.0) - edge_mask + edge_mask*a3;           
+        return min(min(a3.x, a3.y), a3.z);                             
+    }
+    `;
+
+    return shaderText;
+  }
+
+  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+    var shaderText = '';
+/*
     shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
     shaderText += 'if ( isWireframe ) {\n';
     shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
@@ -44,6 +63,11 @@ export class WireframeShaderSource {
     shaderText += '  } else {\n';
     shaderText += '    rt0.xyz = grayColor;\n';
     shaderText += '  }\n';
+    shaderText += '}\n';
+*/
+    shaderText += 'if ( isWireframe ) {\n';
+      shaderText += 'vec4 mesh_color = vec4(0.0, 0.0, 0.0, 1.0);\n';
+      shaderText += 'rt0 = mix(mesh_color, rt0, edge_factor(barycentricCoord));\n';
     shaderText += '}\n';
 
     return shaderText;

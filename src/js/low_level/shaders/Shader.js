@@ -236,6 +236,7 @@ export default class Shader extends GLBoostObject {
     if (maxDrawBuffers > 1) {
       shaderText += Shader._glsl1DrawBufferExt(gl);
     }
+    shaderText += Shader._glsl1StdDerivativeExt(gl);
     shaderText +=   'precision mediump float;\n';
 
     for (let i=0; i<maxDrawBuffers; i++) {
@@ -489,6 +490,9 @@ export default class Shader extends GLBoostObject {
 
   static _glsl1DrawBufferExt(gl) {
     return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_draw_buffers : require\n' : '';
+  }
+  static _glsl1StdDerivativeExt(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_OES_standard_derivatives : require\n' : '';
   }
 
   static _in_onVert(gl) {
