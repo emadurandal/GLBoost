@@ -200,10 +200,14 @@ export default class M_Mesh extends M_Element {
     return this._transformedDepth;
   }
 
-  isTransparent() {
+  get isTransparent() {
     let isTransparent = (this._opacity < 1.0 || this._transparentByUser) ? true : false;
     isTransparent |= this.geometry.isTransparent(this);
     return isTransparent;
+  }
+
+  set isTransparent(flg) {
+    this._transparentByUser = flg;
   }
 
   get AABBInWorld() {

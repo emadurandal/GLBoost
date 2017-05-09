@@ -461,7 +461,11 @@ export default class M_Element extends L_Element {
     return this._opacity;
   }
 
-  set transparent(flg) {
+  get isTransparent() {
+    return this._transparentByUser;
+  }
+
+  set isTransparent(flg) {
     this._transparentByUser = flg;
   }
 
