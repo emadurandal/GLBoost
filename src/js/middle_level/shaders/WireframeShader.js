@@ -27,7 +27,7 @@ export class WireframeShaderSource {
 
     shaderText += 'uniform bool isWireframe;\n';
     shaderText += 'uniform bool isWireframeOnShade;\n';
-    shaderText += 'uniform float wireframeThicknessThreshold;\n';
+    shaderText += 'uniform float wireframeWidth;\n';
 
     return shaderText;
   }
@@ -38,12 +38,9 @@ export class WireframeShaderSource {
     //shaderText += 'float mesh_width = 1.0;\n';
 
     shaderText += `
-    float edge_factor(vec3 bary3) {     
-                               float mesh_width = 4.0;
-        //vec3 bary3 = vec3(bary.x, bary.y, 1.0-bary.x-bary.y);         
+    float edge_factor(vec3 bary3, float wireframeWidth) {     
         vec3 d = fwidth(bary3);
-        vec3 a3 = smoothstep(vec3(0.0,0.0,0.0), d*mesh_width, bary3);  
-        //a3 = vec3(1.0, 1.0, 1.0) - edge_mask + edge_mask*a3;           
+        vec3 a3 = smoothstep(vec3(0.0,0.0,0.0), d*wireframeWidth, bary3);  
         return min(min(a3.x, a3.y), a3.z);                             
     }
     `;
@@ -52,22 +49,12 @@ export class WireframeShaderSource {
   }
 
   FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
-    var shaderText = '';
-/*
-    shaderText += 'vec3 grayColor = vec3(0.5, 0.5, 0.5);\n';
+    let shaderText = '';
+
     shaderText += 'if ( isWireframe ) {\n';
-    shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';
-    shaderText += '    if ( isWireframeOnShade ) {\n';
-    shaderText += '      discard;\n';
-    shaderText += '    }\n';
-    shaderText += '  } else {\n';
-    shaderText += '    rt0.xyz = grayColor;\n';
-    shaderText += '  }\n';
-    shaderText += '}\n';
-*/
-    shaderText += 'if ( isWireframe ) {\n';
-      shaderText += 'vec4 mesh_color = vec4(0.0, 0.0, 0.0, 1.0);\n';
-      shaderText += 'rt0 = mix(mesh_color, rt0, edge_factor(barycentricCoord));\n';
+    shaderText += '  vec4 mesh_color = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  float factor = edge_factor(barycentricCoord, wireframeWidth);\n';
+    shaderText += '  rt0 = mix(mesh_color, rt0, factor);\n';
     shaderText += '}\n';
 
     return shaderText;
@@ -80,14 +67,17 @@ export class WireframeShaderSource {
     gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
     vertexAttribsAsResult.push('barycentricCoord');
 
-    material.uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
-    gl.uniform1i( material.uniform_isWireframe, 0);
+    let uniform_isWireframe = gl.getUniformLocation(shaderProgram, 'isWireframe');
+    material.setUniform(shaderProgram.hashId, 'uniform_isWireframe', uniform_isWireframe);
+    gl.uniform1i( uniform_isWireframe, 0);
 
-    material.uniform_isWireframeOnShade = gl.getUniformLocation(shaderProgram, 'isWireframeOnShade');
-    gl.uniform1i( material.uniform_isWireframeOnShade, 0);
+    let uniform_isWireframeOnShade = gl.getUniformLocation(shaderProgram, 'isWireframeOnShade');
+    material.setUniform(shaderProgram.hashId, 'uniform_isWireframeOnShade', uniform_isWireframeOnShade);
+    gl.uniform1i( uniform_isWireframeOnShade, 0);
 
-    material.uniform_wireframeThicknessThreshold = gl.getUniformLocation(shaderProgram, 'wireframeThicknessThreshold');
-    gl.uniform1f( material.uniform_wireframeThicknessThreshold, 0.04);
+    let uniform_wireframeWidth = gl.getUniformLocation(shaderProgram, 'wireframeWidth');
+    material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidth', uniform_wireframeWidth);
+    gl.uniform1f( uniform_wireframeWidth, 1.0);
 
     return vertexAttribsAsResult;
   }
@@ -125,8 +115,14 @@ export default class WireframeShader extends Shader {
       isWireframeOnShade = material.isWireframeOnShade;
     }
 
-    gl.uniform1i(material.uniform_isWireframe, isWifeframe);
-    gl.uniform1i(material.uniform_isWireframeOnShade, isWireframeOnShade);
+    let uniformLocationIsWireframe = material.getUniform(glslProgram.hashId, 'uniform_isWireframe');
+    if (uniformLocationIsWireframe) {
+      gl.uniform1i(uniformLocationIsWireframe, isWifeframe);
+    }
+    let uniformLocationIsWireframeOnShade = material.getUniform(glslProgram.hashId, 'uniform_isWireframeOnShade');
+    if (uniformLocationIsWireframeOnShade) {
+      gl.uniform1i(uniformLocationIsWireframeOnShade, isWireframeOnShade);
+    }
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
 
@@ -146,8 +142,11 @@ export default class WireframeShader extends Shader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let uniformLocationDepthBias = material.getUniform(glslProgram.hashId, 'uniform_depthBias');
-    if (uniformLocationDepthBias && material.shaderParameters.depthBias) {
-      gl.uniform1f(uniformLocationDepthBias, material.shaderParameters.depthBias);
+    if (uniformLocationDepthBias) {
+      let depthBias = this.getShaderParameter(material, 'depthBias');
+      if (depthBias) {
+        gl.uniform1f(uniformLocationDepthBias, depthBias);
+      }
     }
   }
 
