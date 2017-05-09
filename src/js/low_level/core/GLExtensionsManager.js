@@ -20,6 +20,8 @@ export default class GLExtensionsManager {
     }
 
     GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+
+    this._glContext = glContext;
   }
   static getInstance(glContext) {
     if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
@@ -48,6 +50,8 @@ export default class GLExtensionsManager {
     } else {
       return null;
     }
+
+    this._glContext.checkGLError();
   }
 
   bindVertexArray(gl, vao) {
@@ -60,6 +64,8 @@ export default class GLExtensionsManager {
     } else {
       return false;
     }
+
+    this._glContext.checkGLError();
   }
 
   drawBuffers(gl, buffers) {
@@ -77,6 +83,8 @@ export default class GLExtensionsManager {
       }
       return false;
     }
+
+    this._glContext.checkGLError();
   }
 
   colorAttachiment(gl, index) {

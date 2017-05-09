@@ -31,7 +31,6 @@ export default class SimpleShader extends Shader {
     SimpleShader.mixin(basicShader);
     SimpleShader.mixin(FragmentSimpleShaderSource);
   }
-
 }
 
 

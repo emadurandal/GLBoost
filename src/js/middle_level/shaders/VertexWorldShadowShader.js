@@ -8,15 +8,13 @@ export default class VertexWorldShadowShaderSource {
       //if (lights[i].camera && lights[i].camera.texture) {
     shaderText +=      `uniform mat4 depthPVMatrix[${lights.length}];\n`;
     shaderText +=       `${out_} vec4 v_shadowCoord[${lights.length}];\n`;
-    textureUnitIndex++;
-      //}
-    //}
 
     return shaderText;
   }
 
   VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
+    let gl = this._glContext.gl;
 
     shaderText += `mat4 biasMatrix = mat4(
       0.5, 0.0, 0.0, 0.0,
@@ -28,20 +26,27 @@ export default class VertexWorldShadowShaderSource {
     //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
-      shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
+      if (GLBoost.isThisGLVersion_2(gl)) {
+        shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
+      } else {
+        shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
+      }
       //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
       shaderText += `    v_shadowCoord[${i}] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ${i}\n`;
+      //shaderText += `    v_shadowCoord[${i}].y = 1.0 - v_shadowCoord[${i}].y; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
+
     return shaderText;
   }
 
-  FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+  FSDefine_VertexWorldShadowShaderSource(f, gl, lights) {
     var shaderText = '';
 
+    shaderText += 'uniform float depthBias;\n';
+
     return shaderText;
   }
-
 
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
     var shaderText = '';
@@ -76,6 +81,10 @@ export default class VertexWorldShadowShaderSource {
       material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
+    material.setUniform(shaderProgram.hashId, 'uniform_depthBias', gl.getUniformLocation(shaderProgram, 'depthBias'));
+    let uniformLocationDepthBias = material.getUniform(shaderProgram  .hashId, 'uniform_depthBias');
+    gl.uniform1f(uniformLocationDepthBias, 0.005);
+
     let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
       //if (lights[i].camera && lights[i].camera.texture) {
@@ -90,6 +99,7 @@ export default class VertexWorldShadowShaderSource {
 
     return vertexAttribsAsResult;
   }
+
 }
 
 GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;

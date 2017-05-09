@@ -20,10 +20,6 @@ export class LambertShaderSource {
   FSShade_LambertShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    var textureProjFunc = Shader._textureProj_func(gl);
-
-    shaderText += '  float depthBias = 0.005;\n';
-
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
@@ -31,21 +27,9 @@ export class LambertShaderSource {
       shaderText += `  {\n`;
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
       shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w);\n`;
-
-      shaderText += `    if (isShadowCasting[${i}] == 1) {// ${i}\n`;
-
-      shaderText += `      float depth = ${textureProjFunc}(uDepthTexture[${i}], v_shadowCoord[${i}]).r;\n`;
-      shaderText += `      if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) {\n`;
-      shaderText += `        light *= 0.5;\n`;
-      shaderText += `      }\n`;
-
-      //shaderText += `        float visibility = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}], depthBias).x;\n`;
-      //shaderText += `        light *= visibility > 0.5 ? 1.0 : 0.0;\n`;
-
-      shaderText += `    }\n`;
-
+      shaderText +=      Shader._generateShadowingStr(gl, i);
       shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
-      shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `  }\n`;
     }
     //shaderText += '  rt0.a = 1.0;\n';
@@ -87,7 +71,7 @@ export default class LambertShader extends DecalShader {
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material);
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);

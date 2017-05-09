@@ -183,8 +183,14 @@ export default class GLBoostLowContext {
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
 
     // Create MutableTexture for Depth Texture
+
+    let depthComponetInternal = gl.DEPTH_COMPONENT;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      depthComponetInternal = gl.DEPTH_COMPONENT16;
+    }
+
     let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
-      gl.DEPTH_COMPONENT, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT,
+      depthComponetInternal, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT,
       gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
 
