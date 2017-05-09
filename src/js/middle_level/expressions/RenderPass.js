@@ -184,7 +184,7 @@ export default class RenderPass extends GLBoostObject {
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._meshes.forEach((mesh)=>{
-      if (mesh.isTransparent()) {
+      if (mesh.isTransparent) {
         this._transparentMeshes.push(mesh);
       } else {
         this._opacityMeshes.push(mesh);
