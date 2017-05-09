@@ -17,6 +17,8 @@ export default class GLExtensionsManager {
       this._extEIUI = gl.getExtension('OES_element_index_uint');
 
       this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
+
+      this._extStdDerivatives = gl.getExtension("OES_standard_derivatives");
     }
 
     GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
