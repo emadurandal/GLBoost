@@ -26,6 +26,9 @@ export default class DrawKickerWorld {
   }
 
   draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+
+    console.log('gl.getError: ' + gl.getError());
+
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);

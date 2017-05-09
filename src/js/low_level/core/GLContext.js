@@ -1,3 +1,5 @@
+import GLBoost from '../../globals';
+import MiscUtil from '../misc/MiscUtil';
 import GLContextWebGL1Impl from '../impl/GLContextWebGL1Impl';
 import GLContextWebGL2Impl from '../impl/GLContextWebGL2Impl';
 import GLExtensionsManager from './GLExtensionsManager';
@@ -58,6 +60,33 @@ export default class GLContext {
     return this.impl.canvas;
   }
 
+  checkGLError() {
+    if (GLBoost.VALUE_LOG_GL_ERROR === false) {
+      return;
+    }
+
+    let gl = this.impl.gl;
+    let errorCode = gl.getError();
+    if (errorCode !== 0) {
+      let errorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
+        'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+      let errorMessages = [
+        'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
+        'A numeric argument is out of range. The command is ignored and the error flag is set.',
+        'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
+        'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
+        'Not enough memory is left to execute the command.',
+        'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
+      ];
+
+      errorTypes.forEach((errorType, i)=>{
+        if (gl[errorType] === errorCode) {
+          MiscUtil.consoleLog('LOG_GL_ERROR', 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+        }
+      });
+    }
+  }
+
   createVertexArray(glBoostObject) {
     var gl = this.gl;
     var glem = GLExtensionsManager.getInstance(this);
@@ -66,71 +95,106 @@ export default class GLContext {
       this._monitor.registerWebGLResource(glBoostObject, glResource);
     }
 
+    this.checkGLError();
+
     return glResource;
   }
 
   createBuffer(glBoostObject) {
     var glResource = this.gl.createBuffer();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   createFramebuffer(glBoostObject) {
     var glResource = this.gl.createFramebuffer();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   deleteFramebuffer(glBoostObject, frameBuffer) {
     this._monitor.deregisterWebGLResource(glBoostObject, frameBuffer);
     this.gl.deleteFramebuffer(frameBuffer);
+
+    this.checkGLError();
+
     frameBuffer = null;
   }
 
   createRenderbuffer(glBoostObject) {
     var glResource = this.gl.createRenderbuffer();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   deleteRenderbuffer(glBoostObject, renderBuffer) {
     this._monitor.deregisterWebGLResource(glBoostObject, renderBuffer);
     this.gl.deleteRenderbuffer(renderBuffer);
+
+    this.checkGLError();
+
     renderBuffer = null;
   }
 
   createShader(glBoostObject, shaderType) {
     var glResource = this.gl.createShader(shaderType);
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   deleteShader(glBoostObject, shader) {
     this._monitor.deregisterWebGLResource(glBoostObject, shader);
     this.gl.deleteShader(shader);
+
+    this.checkGLError();
+
     shader = null;
   }
 
   createProgram(glBoostObject) {
     var glResource = this.gl.createProgram();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   deleteProgram(glBoostObject, program) {
     this._monitor.deregisterWebGLResource(glBoostObject, program);
     this.gl.deleteProgram(program);
+
+    this.checkGLError();
+
   }
 
   createTexture(glBoostObject) {
     var glResource = this.gl.createTexture();
     this._monitor.registerWebGLResource(glBoostObject, glResource);
+
+    this.checkGLError();
+
     return glResource;
   }
 
   deleteTexture(glBoostObject, texture) {
     this._monitor.deregisterWebGLResource(glBoostObject, texture);
     this.gl.deleteTexture(texture);
+
+    this.checkGLError();
+
     texture = null;
   }
 

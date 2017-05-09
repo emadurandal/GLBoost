@@ -89,6 +89,7 @@ export default class WireframeShader extends Shader {
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+
     let isWifeframe = false;
     let isWireframeOnShade = false;
 
@@ -116,6 +117,13 @@ export default class WireframeShader extends Shader {
     let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
     if (uniformLocationUnfoldUVRatio) {
       gl.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio);
+    }
+
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+
+    let uniformLocationDepthBias = material.getUniform(glslProgram.hashId, 'uniform_depthBias');
+    if (uniformLocationDepthBias && material.shaderParameters.depthBias) {
+      gl.uniform1f(uniformLocationDepthBias, material.shaderParameters.depthBias);
     }
   }
 

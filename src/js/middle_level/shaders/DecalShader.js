@@ -107,7 +107,8 @@ export default class DecalShader extends WireframeShader {
     this._lut = null;
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
     gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
