@@ -639,7 +639,11 @@ export default class SPVGLTFLoader {
           }
           if (typeof value === 'string') {
             let textureStr = value;
-            material.setTexture(textures[textureStr], valueName);
+            let texturePurpose;
+            if (valueName === 'diffuse') {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
+            }
+            material.setTexture(textures[textureStr], texturePurpose);
           }
         }
       };
