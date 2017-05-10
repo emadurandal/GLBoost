@@ -63,7 +63,7 @@ export default class FreeShader extends Shader {
     });
 
     let textureCount = 0;
-    gl.useProgram(shaderProgram);
+    this._glContext.useProgram(shaderProgram);
 
     for (let uniformName in this._uniforms) {
       if (this._uniforms[uniformName] === 'TEXTURE') {

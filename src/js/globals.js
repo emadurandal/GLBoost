@@ -12,62 +12,78 @@ var global = ('global',eval)('this');
     global.GLBoost = GLBoost;
   }
 
-  GLBoost['POSITION'] = 'position';
-  GLBoost['COLOR'] = 'color';
-  GLBoost['NORMAL'] = 'normal';
-  GLBoost['TEXCOORD'] = 'texcoord';
-  GLBoost['JOINT'] = 'joint';
-  GLBoost['WEIGHT'] = 'weight';
-  GLBoost['POINTS'] = 'POINTS';
-  GLBoost['LINES'] = 'LINES';
-  GLBoost['LINE_STRIP'] = 'LINE_STRIP';
-  GLBoost['LINE_LOOP'] = 'LINE_LOOP';
-  GLBoost['TRIANGLES'] = 'TRIANGLES';
-  GLBoost['TRIANGLE_STRIP'] = 'TRIANGLE_STRIP';
-  GLBoost['STATIC_DRAW'] = 'STATIC_DRAW';
-  GLBoost['STREAM_DRAW'] = 'STREAM_DRAW';
-  GLBoost['DYNAMIC_DRAW'] = 'DYNAMIC_DRAW';
-  GLBoost['BLENDTARGET1'] = 'shapetarget_1';
-  GLBoost['BLENDTARGET2'] = 'shapetarget_2';
-  GLBoost['BLENDTARGET3'] = 'shapetarget_3';
-  GLBoost['BLENDTARGET4'] = 'shapetarget_4';
-  GLBoost['BLENDTARGET5'] = 'shapetarget_5';
-  GLBoost['BLENDTARGET6'] = 'shapetarget_6';
-  GLBoost['BLENDTARGET7'] = 'shapetarget_7';
-  GLBoost['BLENDTARGET8'] = 'shapetarget_8';
-  GLBoost['BLENDTARGET9'] = 'shapetarget_9';
-  GLBoost['BLENDTARGET10'] = 'shapetarget_10';
-  GLBoost['RADIAN'] = 'radian';
-  GLBoost['DEGREE'] = 'degree';
-  GLBoost['RENDER_TARGET_NONE_COLOR'] = 0; // gl.NONE
-  GLBoost['COLOR_ATTACHMENT0'] = 0x8CE0; // gl.COLOR_ATTACHMENT0
-  GLBoost['UNPACK_FLIP_Y_WEBGL'] = 'UNPACK_FLIP_Y_WEBGL';
-  GLBoost['TEXTURE_MAG_FILTER'] = 'TEXTURE_MAG_FILTER';
-  GLBoost['TEXTURE_MIN_FILTER'] = 'TEXTURE_MIN_FILTER';
-  GLBoost['LINEAR'] = 'LINEAR';
-  GLBoost['LINEAR_MIPMAP_LINEAR'] = 'LINEAR_MIPMAP_LINEAR';
-  GLBoost['NEAREST'] = 'NEAREST';
-  GLBoost['TEXTURE_WRAP_S'] = 'TEXTURE_WRAP_S';
-  GLBoost['TEXTURE_WRAP_T'] = 'TEXTURE_WRAP_T';
-  GLBoost['REPEAT'] = 'REPEAT';
-  GLBoost['CLAMP_TO_EDGE'] = 'CLAMP_TO_EDGE';
-  GLBoost['MIRRORED_REPEAT'] = 'MIRRORED_REPEAT';
-  GLBoost['TEXTURE_PURPOSE_DIFFUSE'] = 'diffuse';
-  GLBoost['QUERY_TYPE_INSTANCE_NAME'] = 'QUERY_TYPE_INSTANCE_NAME';
-  GLBoost['QUERY_TYPE_USER_FLAVOR_NAME'] = 'QUERY_TYPE_USER_FLAVOR_NAME';
-  GLBoost['QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR'] = 'QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR';
-  GLBoost['QUERY_FORMAT_STRING'] = 'QUERY_FORMAT_STRING';
-  GLBoost['QUERY_FORMAT_REGEXP'] = 'QUERY_FORMAT_REGEXP';
+  (function(){
+    GLBoost.GLBOOST_CONSTANT_NAMES = [];
+    let c = {
+      count: 0,
+      define: function (constantName) {
+        GLBoost[constantName] = this.count;
+        GLBoost.GLBOOST_CONSTANT_NAMES[this.count] = constantName;
+        this.count++;
+      }
+    };
 
-  GLBoost['GLOBAL_STATES_USAGE_DO_NOTHING'] = 'GLOBAL_STATES_USAGE_DO_NOTHING';
-  GLBoost['GLOBAL_STATES_USAGE_IGNORE'] = 'GLOBAL_STATES_USAGE_IGNORE';
-  GLBoost['GLOBAL_STATES_USAGE_INCLUSIVE'] = 'GLOBAL_STATES_USAGE_INCLUSIVE';
-  GLBoost['GLOBAL_STATES_USAGE_EXCLUSIVE'] = 'GLOBAL_STATES_USAGE_EXCLUSIVE';
+    c.define('POSITION');
+    c.define('COLOR');
+    c.define('NORMAL');
+    c.define('TEXCOORD');
+    c.define('JOINT');
+    c.define('WEIGHT');
+    c.define('POINTS');
+    c.define('LINES');
+    c.define('LINE_STRIP');
+    c.define('LINE_LOOP');
+    c.define('TRIANGLES');
+    c.define('TRIANGLE_STRIP');
+    c.define('STATIC_DRAW');
+    c.define('STREAM_DRAW');
+    c.define('DYNAMIC_DRAW');
+    c.define('BLENDTARGET1');
+    c.define('BLENDTARGET2');
+    c.define('BLENDTARGET3');
+    c.define('BLENDTARGET4');
+    c.define('BLENDTARGET5');
+    c.define('BLENDTARGET6');
+    c.define('BLENDTARGET7');
+    c.define('BLENDTARGET8');
+    c.define('BLENDTARGET9');
+    c.define('BLENDTARGET10');
+    c.define('RADIAN');
+    c.define('DEGREE');
+    c.define('RENDER_TARGET_NONE_COLOR'); // gl.NONE
+    c.define('COLOR_ATTACHMENT0'); // gl.COLOR_ATTACHMENT0
+    c.define('UNPACK_FLIP_Y_WEBGL');
+    c.define('TEXTURE_MAG_FILTER');
+    c.define('TEXTURE_MIN_FILTER');
+    c.define('LINEAR');
+    c.define('LINEAR_MIPMAP_LINEAR');
+    c.define('NEAREST');
+    c.define('TEXTURE_WRAP_S');
+    c.define('TEXTURE_WRAP_T');
+    c.define('REPEAT');
+    c.define('CLAMP_TO_EDGE');
+    c.define('MIRRORED_REPEAT');
+    c.define('TEXTURE_PURPOSE_DIFFUSE');
+    c.define('QUERY_TYPE_INSTANCE_NAME');
+    c.define('QUERY_TYPE_USER_FLAVOR_NAME');
+    c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
+    c.define('QUERY_FORMAT_STRING');
+    c.define('QUERY_FORMAT_REGEXP');
 
-  GLBoost['LOG_GENERAL'] = 'LOG_GENERAL';
-  GLBoost['LOG_SHADER_CODE'] = 'LOG_SHADER_CODE';
-  GLBoost['LOG_GLBOOST_OBJECT_LIFECYCLE'] = 'LOG_GLBOOST_OBJECT_LIFECYCLE';
-  GLBoost['LOG_GL_RESOURCE_LIFECYCLE'] = 'LOG_GL_RESOURCE_LIFECYCLE';
+    c.define('GLOBAL_STATES_USAGE_DO_NOTHING');
+    c.define('GLOBAL_STATES_USAGE_IGNORE');
+    c.define('GLOBAL_STATES_USAGE_INCLUSIVE');
+    c.define('GLOBAL_STATES_USAGE_EXCLUSIVE');
+
+    c.define('LOG_GENERAL');
+    c.define('LOG_SHADER_CODE');
+    c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
+    c.define('LOG_GL_RESOURCE_LIFECYCLE');
+    c.define('LOG_GL_ERROR');
+    c.define('LOG_OMISSION_PROCESSING');
+
+  })();
+
 
   GLBoost.isThisGLVersion_2 = function(gl) {
     if (typeof WebGL2RenderingContext === 'undefined') {

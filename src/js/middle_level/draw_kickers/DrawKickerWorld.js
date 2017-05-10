@@ -40,7 +40,7 @@ export default class DrawKickerWorld {
 
       let materialUpdateStateString = material.getUpdateStateString();
       this._glslProgram = material.shaderInstance.glslProgram;
-      gl.useProgram(this._glslProgram);
+      material._glContext.useProgram(this._glslProgram);
       let glslProgram = this._glslProgram;
 
       if (!isVAOBound) {
