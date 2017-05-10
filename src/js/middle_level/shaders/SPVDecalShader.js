@@ -79,22 +79,22 @@ export class SPVDecalShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
-    material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', gl.getUniformLocation(shaderProgram, 'textureContributionRate'));
-    material.setUniform(shaderProgram.hashId, 'uniform_gamma', gl.getUniformLocation(shaderProgram, 'gamma'));
+    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
+    material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
+    material.setUniform(shaderProgram.hashId, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
       if (diffuseTexture) {
         material.uniformTextureSamplerDic['uTexture'] = {};
-        let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
+        let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
         material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
         material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
 
         // set texture unit 0 to the sampler
-        gl.uniform1i( uTexture, 0);
+        this._glContext.uniform1i( uTexture, 0, true);
         material._semanticsDic['TEXTURE'] = 'uTexture';
       }
     }
@@ -116,7 +116,7 @@ export default class SPVDecalShader extends WireframeShader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
 
     var texture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
 
@@ -125,7 +125,7 @@ export default class SPVDecalShader extends WireframeShader {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
     }
 
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w, true);
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
@@ -135,7 +135,7 @@ export default class SPVDecalShader extends WireframeShader {
     let sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
     let targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
     let gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w, true);
   }
 
   handleArgument(value) {
