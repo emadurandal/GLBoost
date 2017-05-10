@@ -13,7 +13,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
 
     this._textureDic = {};
-    this._texturePurposeDic = {};
+    this._texturePurposeDic = [];
     this._textureContributionRateDic = {};
     this._gl = this._glContext.gl;
     this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);

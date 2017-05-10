@@ -75,7 +75,7 @@ export default class VertexWorldShaderSource {
     var vertexAttribsAsResult = [];
 
     vertexAttribs.forEach((attribName)=>{
-      if (attribName === GLBoost.POSITION || attribName === GLBoost.NORMAL) {
+      if (attribName === 'position' || attribName === 'normal') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
         gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
         vertexAttribsAsResult.push(attribName);

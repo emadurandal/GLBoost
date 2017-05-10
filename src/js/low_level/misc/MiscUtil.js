@@ -19,7 +19,7 @@ export default class MiscUtil {
   }
   
   static consoleLog(logType, text) {
-    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost['VALUE_' + logType]) {
+    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[logType]) {
       console.log(text);
     }
   }

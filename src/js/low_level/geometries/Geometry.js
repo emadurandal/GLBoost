@@ -150,22 +150,10 @@ export default class Geometry extends GLBoostObject {
 
     this._AABB.updateAllInfo();
 
-    this._primitiveType = primitiveType;
-
-    var gl = this._glContext.gl;
-    var hint = null;
-    switch (performanceHint) {
-      case GLBoost.STATIC_DRAW:
-        hint = gl.STATIC_DRAW;
-        break;
-      case GLBoost.STREAM_DRAW:
-        hint = gl.STREAM_DRAW;
-        break;
-      case GLBoost.DYNAMIC_DRAW:
-        hint = gl.DYNAMIC_DRAW;
-        break;
-    }
-    this._performanceHint = hint;
+    this._primitiveType = GLBoost.getValueOfGLBoostConstant(primitiveType);
+    let performanceHintStr = GLBoost.getValueOfGLBoostConstant(performanceHint);
+    let gl = this._glContext.gl;
+    this._performanceHint = gl[performanceHintStr];
   }
 
   updateVerticesData(vertices) {

@@ -1,3 +1,4 @@
+import GLBoost from '../../globals';
 import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';
 import MiscUtil from '../misc/MiscUtil';
@@ -459,7 +460,8 @@ export default class Shader extends GLBoostObject {
     }
   }
 
-  static _exist(functions, attribute) {
+  static _exist(functions, glboostConstantForAttributeType) {
+    let attribute = GLBoost.getValueOfGLBoostConstant(glboostConstantForAttributeType);
     return functions.indexOf(attribute) >= 0;
   }
 

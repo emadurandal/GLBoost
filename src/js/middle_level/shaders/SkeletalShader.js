@@ -36,7 +36,7 @@ export default class SkeletalShaderSource {
     let vertexAttribsAsResult = [];
 
     vertexAttribs.forEach((attribName)=>{
-      if (attribName === GLBoost.JOINT || attribName === GLBoost.WEIGHT) {
+      if (attribName === 'joint' || attribName === 'weight') {
         vertexAttribsAsResult.push(attribName);
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
         gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
