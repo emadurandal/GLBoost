@@ -68,14 +68,14 @@ export default class FreeShader extends Shader {
     for (let uniformName in this._uniforms) {
       if (this._uniforms[uniformName] === 'TEXTURE') {
         material.uniformTextureSamplerDic[uniformName] = {};
-        let textureUniformLocation = gl.getUniformLocation(shaderProgram, uniformName);
+        let textureUniformLocation = this._glContext.getUniformLocation(shaderProgram, uniformName);
         if (textureUniformLocation < 0) {
           continue;
         }
         material.uniformTextureSamplerDic[uniformName].textureName = this._textureNames[uniformName];
         material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
 
-        gl.uniform1i(textureUniformLocation, textureCount);
+        this._glContext.uniform1i(textureUniformLocation, textureCount, true);
 
         textureCount++;
       }
@@ -85,7 +85,7 @@ export default class FreeShader extends Shader {
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
         case 'JOINTMATRIX':
-          material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
+          material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
         case 'TEXTURE':
           if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
             material._semanticsDic[this._uniforms[uniformName]] = uniformName;
@@ -101,7 +101,7 @@ export default class FreeShader extends Shader {
           continue;
       }
 
-      material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, gl.getUniformLocation(shaderProgram, uniformName));
+      material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
 
     }
 
@@ -118,13 +118,13 @@ export default class FreeShader extends Shader {
       let value = this._uniforms[uniformName];
 
       if (typeof value === 'number') {
-        gl.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value);
+        this._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value, true);
       } else if (value instanceof Vector2) {
-        gl.uniform2f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y);
+        this._glContext.uniform2f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, true);
       } else if (value instanceof Vector3) {
-        gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z);
+        this._glContext.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z, true);
       } else if (value instanceof Vector4) {
-        gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z, value.w);
+        this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
       }
     }
   }

@@ -54,7 +54,7 @@ export default class BlendShapeGeometry extends Geometry {
     let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
       this._glContext.useProgram(materials[i].shaderInstance.glslProgram);
-      gl.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight);
+      this._glContext.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight, true);
     }
   }
 

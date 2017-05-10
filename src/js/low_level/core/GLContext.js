@@ -182,7 +182,7 @@ export default class GLContext {
       return;
     }
 
-    if (program.glslProgramsSelfUsageCount !== this.glslProgramsLatestUsageCount) {
+    if (program.glslProgramsSelfUsageCount < this.glslProgramsLatestUsageCount) {
       this.gl.useProgram(program);
       this.checkGLError();
       this._glslProgramsLatestUsageCount++;
@@ -191,7 +191,8 @@ export default class GLContext {
       return;
     }
 
-    MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING, 'LOG_OMISSION_PROCESSING: gl.useProgram');
+    MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
+      'LOG_OMISSION_PROCESSING: gl.useProgram call has been omitted since this glsl program is already in use.');
   }
 
   deleteProgram(glBoostObject, program) {
@@ -201,6 +202,90 @@ export default class GLContext {
     this.checkGLError();
 
   }
+
+  getUniformLocation(glslProgram, uniformVariableName) {
+    let uniformLocation = this.gl.getUniformLocation(glslProgram, uniformVariableName);
+    this.checkGLError();
+    if (uniformLocation) {
+      uniformLocation.glslProgram = glslProgram;
+      uniformLocation.glslProgramUsageCountWhenLastSet = -1;
+    }
+
+    return uniformLocation;
+  }
+
+  _setUniformValues(uniformFuncStr, args, forceUpdate) {
+    let uniformLocation = args[0];
+    if (!uniformLocation) {
+      MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
+        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)');
+
+      return
+    }
+
+    if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
+      MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
+        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
+
+      return;
+    }
+    if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
+      // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
+      this.gl[uniformFuncStr].apply(this.gl, args);
+      this.checkGLError();
+
+      return;
+    }
+
+    if (forceUpdate) {
+      this.gl[uniformFuncStr].apply(this.gl, args);
+      this.checkGLError();
+    } else {
+      MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
+        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
+    }
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+  uniform4f(uniformLocation, x, y, z, w, forceUpdate) {
+    this._setUniformValues('uniform4f', [uniformLocation, x, y, z, w], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
+  uniform3f(uniformLocation, x, y, z, forceUpdate) {
+    this._setUniformValues('uniform3f', [uniformLocation, x, y, z], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
+  uniform2f(uniformLocation, x, y, forceUpdate) {
+    this._setUniformValues('uniform2f', [uniformLocation, x, y], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
+  uniform1f(uniformLocation, x, forceUpdate) {
+    this._setUniformValues('uniform1f', [uniformLocation, x], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+  uniform4i(uniformLocation, x, y, z, w, forceUpdate) {
+    this._setUniformValues('uniform4i', [uniformLocation, x, y, z, w], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
+  uniform3i(uniformLocation, x, y, z, forceUpdate) {
+    this._setUniformValues('uniform3i', [uniformLocation, x, y, z], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
+  uniform2i(uniformLocation, x, y, forceUpdate) {
+    this._setUniformValues('uniform2i', [uniformLocation, x, y], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
+  uniform1i(uniformLocation, x, forceUpdate) {
+    this._setUniformValues('uniform1i', [uniformLocation, x], forceUpdate);
+  }
+
 
   createTexture(glBoostObject) {
     var glResource = this.gl.createTexture();
