@@ -118,7 +118,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
     for (let i=0; i<materials.length;i++) {
       var glslProgram = materials[i].shaderInstance.glslProgram;
-      gl.useProgram(glslProgram);
+      this._glContext.useProgram(glslProgram);
       Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
     }
 

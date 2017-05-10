@@ -37,7 +37,7 @@ export default class DrawKickerLocal {
       let materialUpdateStateString = material.getUpdateStateString();
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
         this._glslProgram = material.shaderInstance.glslProgram;
-        gl.useProgram(this._glslProgram);
+        material._glContext.useProgram(this._glslProgram);
       }
       let glslProgram = this._glslProgram;
 

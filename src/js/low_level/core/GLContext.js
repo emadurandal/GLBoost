@@ -31,6 +31,7 @@ export default class GLContext {
     }
 
     this._monitor = L_GLBoostMonitor.getInstance();
+    this._glslProgramsLatestUsageCount = 0;
   }
 
   static getInstance(canvas, gl, width, height) {
@@ -81,7 +82,7 @@ export default class GLContext {
 
       errorTypes.forEach((errorType, i)=>{
         if (gl[errorType] === errorCode) {
-          MiscUtil.consoleLog('LOG_GL_ERROR', 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+          MiscUtil.consoleLog(GLBoost.LOG_GL_ERROR, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
         }
       });
     }
@@ -172,6 +173,27 @@ export default class GLContext {
     return glResource;
   }
 
+  useProgram(program) {
+    if (!program) {
+      this.gl.useProgram(program);
+      this.checkGLError();
+      this._glslProgramsLatestUsageCount++;
+
+      return;
+    }
+
+    if (program.glslProgramsSelfUsageCount !== this.glslProgramsLatestUsageCount) {
+      this.gl.useProgram(program);
+      this.checkGLError();
+      this._glslProgramsLatestUsageCount++;
+      program.glslProgramsSelfUsageCount = this._glslProgramsLatestUsageCount;
+
+      return;
+    }
+
+    MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING, 'LOG_OMISSION_PROCESSING: gl.useProgram');
+  }
+
   deleteProgram(glBoostObject, program) {
     this._monitor.deregisterWebGLResource(glBoostObject, program);
     this.gl.deleteProgram(program);
@@ -218,6 +240,10 @@ export default class GLContext {
       this.impl.canvas.height = height;
     }
     this._canvasHeight = height;
+  }
+
+  get glslProgramsLatestUsageCount() {
+    return this._glslProgramsLatestUsageCount;
   }
 
 }

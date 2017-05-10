@@ -300,7 +300,7 @@ export default class Shader extends GLBoostObject {
   _prepareAssetsForShaders(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var temp = [];
 
-    gl.useProgram(shaderProgram);
+    this._glContext.useProgram(shaderProgram);
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
@@ -382,7 +382,7 @@ export default class Shader extends GLBoostObject {
       alert('Unable to initialize the shader program.');
     }
 
-    gl.useProgram(shaderProgram);
+    this._glContext.useProgram(shaderProgram);
 
     return shaderProgram;
   }
@@ -430,12 +430,13 @@ export default class Shader extends GLBoostObject {
         indexStr = hash;
       }
       programToReturn.hashId = indexStr;
+      programToReturn.glslProgramsSelfUsageCount = -1;
+
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
       Shader._shaderHashTable[canvasId] = hashTable;
 
-    } else {
-      //gl.useProgram(programToReturn);
     }
+
     this._glslProgram = programToReturn;
 
     material._semanticsDic = {};
