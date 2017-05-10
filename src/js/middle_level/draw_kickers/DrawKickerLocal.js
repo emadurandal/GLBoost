@@ -135,10 +135,10 @@ export default class DrawKickerLocal {
 
       if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-        gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+        gl.drawElements(primitiveType, material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
-        gl.drawArrays(gl[primitiveType], 0, vertexN);
+        gl.drawArrays(primitiveType, 0, vertexN);
       }
 
 

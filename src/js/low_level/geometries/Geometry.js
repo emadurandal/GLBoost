@@ -157,14 +157,12 @@ export default class Geometry extends GLBoostObject {
       });
     }
 
-
-
-
     this._AABB.updateAllInfo();
 
-    this._primitiveType = GLBoost.getValueOfGLBoostConstant(primitiveType);
-    let performanceHintStr = GLBoost.getValueOfGLBoostConstant(performanceHint);
     let gl = this._glContext.gl;
+    let primitiveTypeStr = GLBoost.getValueOfGLBoostConstant(primitiveType);
+    this._primitiveType = gl[primitiveTypeStr];
+    let performanceHintStr = GLBoost.getValueOfGLBoostConstant(performanceHint);
     this._performanceHint = gl[performanceHintStr];
   }
 
@@ -593,13 +591,13 @@ export default class Geometry extends GLBoostObject {
     let count = 0;
     for (let i=0; i<materials.length;i++) {
       let material = materials[i];
-      if (gl[this._primitiveType] === gl.TRIANGLES) {
+      if (this._primitiveType === gl.TRIANGLES) {
         if (this.isIndexed()) {
           count += material.getVertexN(this.toString()) / 3;
         } else {
           count += this._vertexN / 3;
         }
-      } else if (gl[this._primitiveType] === gl.TRIANGLE_STRIP) {
+      } else if (this._primitiveType === gl.TRIANGLE_STRIP) {
         if (this.isIndexed()) {
           count += material.getVertexN(this.toString()) - 2;
         } else {

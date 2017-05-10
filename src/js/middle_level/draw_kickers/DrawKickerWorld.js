@@ -153,10 +153,10 @@ export default class DrawKickerWorld {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
         let vertexN = material.getVertexN(geometry);
         let indexBitSize = glem.elementIndexBitSize(gl);
-        gl.drawElements(gl[primitiveType], vertexN, indexBitSize, 0);
+        gl.drawElements(primitiveType, vertexN, indexBitSize, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
-        gl.drawArrays(gl[primitiveType], 0, vertexN);
+        gl.drawArrays(primitiveType, 0, vertexN);
       }
 
       material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
