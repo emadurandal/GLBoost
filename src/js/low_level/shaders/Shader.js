@@ -21,6 +21,7 @@ export default class Shader extends GLBoostObject {
     this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
     this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
     this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
+    this.prototype._classNamesOfFSPostEffect = this.prototype._classNamesOfFSPostEffect ? this.prototype._classNamesOfFSPostEffect : [];
 
     this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
   }
@@ -52,6 +53,10 @@ export default class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfFSShade.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSShade.push(source.name);
     }
+    if(this.prototype._classNamesOfFSPostEffect.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSPostEffect.push(source.name);
+    }
+
     if(this.prototype._classNamesOfPrepare.indexOf(source.name) === -1){
       this.prototype._classNamesOfPrepare.push(source.name);
     }
@@ -93,6 +98,10 @@ export default class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSShade[matchIdx] = newone.name;
     }
+    matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSPostEffect[matchIdx] = newone.name;
+    }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
@@ -133,6 +142,10 @@ export default class Shader extends GLBoostObject {
     matchIdx = this.prototype._classNamesOfFSShade.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSShade.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSPostEffect.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
     if(matchIdx !== -1){
@@ -218,7 +231,6 @@ export default class Shader extends GLBoostObject {
       }
     });
 
-
     // end of main function
     shaderText +=   '}\n';
 
@@ -281,6 +293,17 @@ export default class Shader extends GLBoostObject {
       var method = this['FSShade_' + className];
       if (method) {
         shaderText += '//                                                            FSShade_' + className + ' //\n';
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
+      }
+    });
+
+    /// PostEffect
+    // start posteffect. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
+    this._classNamesOfFSPostEffect.forEach((className)=> {
+      let method = this['FSPostEffect_' + className];
+      if (method) {
+        shaderText += '//                                                            FSPostEffect_' + className + ' //\n';
         shaderText += method.bind(this, f, gl, lights, material, extraData)();
       }
     });
