@@ -14,21 +14,28 @@ var global = ('global',eval)('this');
 
   (function(){
     GLBoost.GLBOOST_CONSTANT_NAMES = [];
+    GLBoost.GLBOOST_CONSTANT_VALUES = [];
     let c = {
       count: 0,
-      define: function (constantName) {
-        GLBoost[constantName] = this.count;
-        GLBoost.GLBOOST_CONSTANT_NAMES[this.count] = constantName;
+      define: function (constantName, constantValue) {
+        let count = this.count;
+        GLBoost[constantName] = count;
+        GLBoost.GLBOOST_CONSTANT_NAMES[count] = constantName;
+        GLBoost.GLBOOST_CONSTANT_VALUES[count] =
+          (typeof constantValue !== 'undefined') ? constantValue:constantName;
         this.count++;
       }
     };
 
-    c.define('POSITION');
-    c.define('COLOR');
-    c.define('NORMAL');
-    c.define('TEXCOORD');
-    c.define('JOINT');
-    c.define('WEIGHT');
+    /// Define GLBoost Constants.
+    // Do not directly use integers set in these constants.
+    // These may be changed each time constants are added in the future.
+    c.define('POSITION', 'position');
+    c.define('COLOR', 'color');
+    c.define('NORMAL', 'normal');
+    c.define('TEXCOORD', 'texcoord');
+    c.define('JOINT', 'joint');
+    c.define('WEIGHT', 'weight');
     c.define('POINTS');
     c.define('LINES');
     c.define('LINE_STRIP');
@@ -38,20 +45,20 @@ var global = ('global',eval)('this');
     c.define('STATIC_DRAW');
     c.define('STREAM_DRAW');
     c.define('DYNAMIC_DRAW');
-    c.define('BLENDTARGET1');
-    c.define('BLENDTARGET2');
-    c.define('BLENDTARGET3');
-    c.define('BLENDTARGET4');
-    c.define('BLENDTARGET5');
-    c.define('BLENDTARGET6');
-    c.define('BLENDTARGET7');
-    c.define('BLENDTARGET8');
-    c.define('BLENDTARGET9');
-    c.define('BLENDTARGET10');
-    c.define('RADIAN');
-    c.define('DEGREE');
-    c.define('RENDER_TARGET_NONE_COLOR'); // gl.NONE
-    c.define('COLOR_ATTACHMENT0'); // gl.COLOR_ATTACHMENT0
+    c.define('BLENDTARGET1', 'shapetarget_1');
+    c.define('BLENDTARGET2', 'shapetarget_2');
+    c.define('BLENDTARGET3', 'shapetarget_3');
+    c.define('BLENDTARGET4', 'shapetarget_4');
+    c.define('BLENDTARGET5', 'shapetarget_5');
+    c.define('BLENDTARGET6', 'shapetarget_6');
+    c.define('BLENDTARGET7', 'shapetarget_7');
+    c.define('BLENDTARGET8', 'shapetarget_8');
+    c.define('BLENDTARGET9', 'shapetarget_9');
+    c.define('BLENDTARGET10', 'shapetarget_10');
+    c.define('RADIAN', 'radian');
+    c.define('DEGREE', 'degree');
+    c.define('RENDER_TARGET_NONE_COLOR', 0); // gl.NONE
+    c.define('COLOR_ATTACHMENT0', 0x8CE0); // gl.COLOR_ATTACHMENT0
     c.define('UNPACK_FLIP_Y_WEBGL');
     c.define('TEXTURE_MAG_FILTER');
     c.define('TEXTURE_MIN_FILTER');
@@ -63,7 +70,7 @@ var global = ('global',eval)('this');
     c.define('REPEAT');
     c.define('CLAMP_TO_EDGE');
     c.define('MIRRORED_REPEAT');
-    c.define('TEXTURE_PURPOSE_DIFFUSE');
+    c.define('TEXTURE_PURPOSE_DIFFUSE', 'diffuse');
     c.define('QUERY_TYPE_INSTANCE_NAME');
     c.define('QUERY_TYPE_USER_FLAVOR_NAME');
     c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
@@ -90,6 +97,13 @@ var global = ('global',eval)('this');
       return false;
     }
     return gl instanceof WebGL2RenderingContext;
+  };
+
+  GLBoost.getNameOfGLBoostConstant = function(glboostConstant) {
+    return GLBoost.GLBOOST_CONSTANT_NAMES[glboostConstant];
+  };
+  GLBoost.getValueOfGLBoostConstant = function(glboostConstant) {
+    return GLBoost.GLBOOST_CONSTANT_VALUES[glboostConstant];
   };
 
 })(global);
