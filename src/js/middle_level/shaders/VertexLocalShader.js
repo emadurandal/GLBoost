@@ -55,13 +55,13 @@ export default class VertexLocalShaderSource {
     });
 
     if (existCamera_f) {
-      material.setUniform(shaderProgram.hashId, 'uniform_modelViewProjectionMatrix', gl.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
+      material.setUniform(shaderProgram.hashId, 'uniform_modelViewProjectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
       material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
-      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
     return vertexAttribsAsResult;

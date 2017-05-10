@@ -53,7 +53,7 @@ export default class DrawKickerWorld {
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
+      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity, true);
 
       let world_m;
       let normal_m;
@@ -103,7 +103,7 @@ export default class DrawKickerWorld {
           } else {
             let cameraPos = new Vector4(0, 0, 1, 1);
           }
-          gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z);
+          material._glContext.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
@@ -121,8 +121,8 @@ export default class DrawKickerWorld {
               isPointLight = 0.0;
             }
 
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight);
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight, true);
+            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
           }
         }
       }

@@ -51,7 +51,7 @@ export default class DrawKickerLocal {
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
+      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity, true);
 
       if (camera) {
         let world_m;
@@ -91,7 +91,7 @@ export default class DrawKickerLocal {
           } else {
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
           }
-          gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+          material._glContext.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
@@ -110,9 +110,9 @@ export default class DrawKickerLocal {
             }
 
             let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight, true);
 
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
           }
         }
       }

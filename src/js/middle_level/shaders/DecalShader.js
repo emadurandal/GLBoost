@@ -75,20 +75,20 @@ export class DecalShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', gl.getUniformLocation(shaderProgram, 'materialBaseColor'));
+    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
       if (diffuseTexture) {
         material.uniformTextureSamplerDic['uTexture'] = {};
-        let uTexture = gl.getUniformLocation(shaderProgram, 'uTexture');
+        let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
         material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
 
         material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
 
         // set texture unit 0 to the sampler
-        gl.uniform1i( uTexture, 0);
+        this._glContext.uniform1i( uTexture, 0, true);
         material._semanticsDic['TEXTURE'] = 'uTexture';
       }
     }
@@ -111,7 +111,7 @@ export default class DecalShader extends WireframeShader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {

@@ -43,7 +43,7 @@ export default class SkeletalShaderSource {
       }
     });
 
-    let skinTransformMatricesUniformLocation = gl.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+    let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
     material.setUniform(shaderProgram.hashId, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
     material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
     // とりあえず単位行列で初期化

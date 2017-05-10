@@ -17,7 +17,7 @@ export class FragmentSimpleShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram.hashId, 'opacity', gl.getUniformLocation(shaderProgram, 'opacity'));
+    material.setUniform(shaderProgram.hashId, 'opacity', this._glContext.getUniformLocation(shaderProgram, 'opacity'));
 
     return vertexAttribsAsResult;
   }

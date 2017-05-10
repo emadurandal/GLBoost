@@ -82,26 +82,26 @@ export default class VertexWorldShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', gl.getUniformLocation(shaderProgram, 'worldMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';
-    material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', gl.getUniformLocation(shaderProgram, 'normalMatrix'));
+    material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
     material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
-      material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', gl.getUniformLocation(shaderProgram, 'viewMatrix'));
+      material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
       material._semanticsDic['VIEW'] = 'viewMatrix';
-      material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', gl.getUniformLocation(shaderProgram, 'projectionMatrix'));
+      material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
 
     for(let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, gl.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
-      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, gl.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
+      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      material.setUniform(shaderProgram.hashId, 'uniform_AABBLengthCenterToCorner', gl.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
-      material.setUniform(shaderProgram.hashId, 'uniform_AABBCenterPosition', gl.getUniformLocation(shaderProgram, 'AABBCenterPosition'));
-      material.setUniform(shaderProgram.hashId, 'uniform_unfoldUVRatio', gl.getUniformLocation(shaderProgram, 'unfoldUVRatio'));
+      material.setUniform(shaderProgram.hashId, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+      material.setUniform(shaderProgram.hashId, 'uniform_AABBCenterPosition', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPosition'));
+      material.setUniform(shaderProgram.hashId, 'uniform_unfoldUVRatio', this._glContext.getUniformLocation(shaderProgram, 'unfoldUVRatio'));
     }
 
     return vertexAttribsAsResult;

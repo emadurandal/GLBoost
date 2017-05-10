@@ -44,14 +44,14 @@ export class LambertShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
 
     for (let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
       if (lights[i].camera && lights[i].camera.texture) {
         // depthTexture
-        let depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
+        let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
         lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
       }
@@ -74,7 +74,7 @@ export default class LambertShader extends DecalShader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
 
 
     for (let j = 0; j < lights.length; j++) {
@@ -87,16 +87,16 @@ export default class LambertShader extends DecalShader {
 
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1, true);
       } else {
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0, true);
       }
     }
 
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         // set depthTexture unit i+1 to the sampler
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), i+1);  // +1 because 0 is used for diffuse texture
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), i+1, true);  // +1 because 0 is used for diffuse texture
       }
     }
   }
@@ -106,7 +106,7 @@ export default class LambertShader extends DecalShader {
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         // set depthTexture unit i+1 to the sampler
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0);  // +1 because 0 is used for diffuse texture
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
       }
     }
   }
