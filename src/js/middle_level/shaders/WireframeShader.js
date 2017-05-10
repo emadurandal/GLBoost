@@ -35,26 +35,28 @@ export class WireframeShaderSource {
   FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
     var shaderText = '';
 
-    //shaderText += 'float mesh_width = 1.0;\n';
-
     shaderText += `
-    float edge_factor(vec3 bary3, float wireframeWidth) {     
+    float edgeRatio(vec3 bary3, float wireframeWidth) {     
         vec3 d = fwidth(bary3);
-        vec3 a3 = smoothstep(vec3(0.0,0.0,0.0), d*wireframeWidth, bary3);  
-        return min(min(a3.x, a3.y), a3.z);                             
+        vec3 x = bary3+vec3(1.0 - wireframeWidth)*d;
+        vec3 a3 = smoothstep(vec3(0.0), d, x);
+        float factor = min(min(a3.x, a3.y), a3.z);
+        
+        return clamp((1.0 - factor), 0.0, 1.0);
     }
     `;
 
     return shaderText;
   }
 
-  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += 'if ( isWireframe ) {\n';
-    shaderText += '  vec4 mesh_color = vec4(0.0, 0.0, 0.0, 1.0);\n';
-    shaderText += '  float factor = edge_factor(barycentricCoord, wireframeWidth);\n';
-    shaderText += '  rt0 = mix(mesh_color, rt0, factor);\n';
+    shaderText += '  vec4 wireframeColor = vec4(1.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  float edgeRatio = edgeRatio(barycentricCoord, wireframeWidth);\n';
+    shaderText += '  rt0 = mix(rt0, wireframeColor, edgeRatio);\n';
+    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * edgeRatio);\n';
     shaderText += '}\n';
 
     return shaderText;
@@ -106,13 +108,12 @@ export default class WireframeShader extends Shader {
 
     let isWifeframe = false;
     let isWireframeOnShade = false;
+    let wireframeWidth = 0.0;
 
     if (typeof material.isWireframe !== 'undefined') {
       isWifeframe = material.isWireframe;
-    }
-
-    if (typeof material.isWireframeOnShade !== 'undefined') {
       isWireframeOnShade = material.isWireframeOnShade;
+      wireframeWidth = material.wireframeWidth;
     }
 
     let uniformLocationIsWireframe = material.getUniform(glslProgram.hashId, 'uniform_isWireframe');
@@ -122,6 +123,10 @@ export default class WireframeShader extends Shader {
     let uniformLocationIsWireframeOnShade = material.getUniform(glslProgram.hashId, 'uniform_isWireframeOnShade');
     if (uniformLocationIsWireframeOnShade) {
       this._glContext.uniform1i(uniformLocationIsWireframeOnShade, isWireframeOnShade, true);
+    }
+    let uniformLocationWireframeWidth = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidth');
+    if (uniformLocationWireframeWidth) {
+      this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
     }
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
