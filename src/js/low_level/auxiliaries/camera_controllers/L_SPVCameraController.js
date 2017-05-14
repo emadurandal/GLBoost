@@ -52,6 +52,8 @@ export default class L_SPVCameraController extends GLBoostObject {
     // Enable Flags
     this._enableRotation = true;
 
+    this._userMouseEventHandler = null;
+
     this._onMouseDown = (evt) => {
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -138,6 +140,9 @@ export default class L_SPVCameraController extends GLBoostObject {
         camera._needUpdateProjection();
       });
 
+      if (this._userMouseEventHandler) {
+        this._userMouseEventHandler();
+      }
     };
 
     this._onMouseWheel = (evt) => {
@@ -150,6 +155,10 @@ export default class L_SPVCameraController extends GLBoostObject {
         camera._needUpdateView(false);
         camera._needUpdateProjection();
       });
+
+      if (this._userMouseEventHandler) {
+        this._userMouseEventHandler();
+      }
     };
 
     this._onContexMenu = (evt) => {
@@ -402,4 +411,21 @@ export default class L_SPVCameraController extends GLBoostObject {
   get shiftCameraTo() {
     return this._shiftCameraTo;
   }
+
+  get lengthOfCenterToEye() {
+    return this._lengthOfCenterToEye;
+  }
+
+  get foyvBias() {
+    return this._foyvBias;
+  }
+
+  set userMouseEventHandler(handler) {
+    this._userMouseEventHandler = handler;
+  }
+
+  get userMouseEventHandler() {
+    return this._userMouseEventHandler;
+  }
+
 }
