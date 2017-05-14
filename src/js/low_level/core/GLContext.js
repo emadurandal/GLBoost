@@ -223,6 +223,8 @@ export default class GLContext {
       return
     }
 
+//    this.gl[uniformFuncStr].apply(this.gl, args);
+
     if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
       MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
         'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');

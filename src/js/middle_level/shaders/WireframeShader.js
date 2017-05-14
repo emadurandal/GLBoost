@@ -21,22 +21,22 @@ export class WireframeShaderSource {
   }
 
   FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
-    var shaderText = '';
+    let shaderText = '';
 
     shaderText += `${in_} vec3 barycentricCoord;\n`;
 
     shaderText += 'uniform bool isWireframe;\n';
-    shaderText += 'uniform bool isWireframeOnShade;\n';
+    //shaderText += 'uniform bool isWireframeOnShade;\n';
     shaderText += 'uniform float wireframeWidth;\n';
 
     return shaderText;
   }
 
   FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
-    var shaderText = '';
+    let shaderText = '';
 
     shaderText += `
-    float edgeRatio(vec3 bary3, float wireframeWidth) {     
+    float edge_ratio(vec3 bary3, float wireframeWidth) {     
         vec3 d = fwidth(bary3);
         vec3 x = bary3+vec3(1.0 - wireframeWidth)*d;
         vec3 a3 = smoothstep(vec3(0.0), d, x);
@@ -53,9 +53,9 @@ export class WireframeShaderSource {
     let shaderText = '';
 
     shaderText += 'if ( isWireframe ) {\n';
-    shaderText += '  vec4 wireframeColor = vec4(1.0, 0.0, 0.0, 1.0);\n';
-    shaderText += '  float edgeRatio = edgeRatio(barycentricCoord, wireframeWidth);\n';
-    shaderText += '  rt0 = mix(rt0, wireframeColor, edgeRatio);\n';
+    shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
+    shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidth);\n';
+    shaderText += '  rt0 = mix(rt0, wireframeColor, vec4(edgeRatio));\n';
     shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * edgeRatio);\n';
     shaderText += '}\n';
 
