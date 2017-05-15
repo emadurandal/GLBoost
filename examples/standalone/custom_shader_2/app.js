@@ -176,8 +176,8 @@
 
     babelHelpers.createClass(MyCustomShader, [{
       key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material) {
-        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
 
         gl.uniform1f(glslProgram.time, this._time);
       }
