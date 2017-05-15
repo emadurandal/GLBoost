@@ -112,8 +112,9 @@ export default class FreeShader extends Shader {
     return this._attributes;
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+    
     for (let uniformName in this._uniforms) {
       let value = this._uniforms[uniformName];
 

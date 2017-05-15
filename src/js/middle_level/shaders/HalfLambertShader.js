@@ -50,8 +50,8 @@ export default class HalfLambertShader extends DecalShader {
     HalfLambertShader.mixin(HalfLambertShaderSource);
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);

@@ -71,40 +71,77 @@ export default class Geometry extends GLBoostObject {
     this._vertices = vertices;
     this._indicesArray = indicesArray;
 
+    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
     let vertexNum = 0;
+    let positionElementNum = 0;
+    let positionElementNumPerVertex = this._vertices.components.position;
+
     if (typeof this._vertices.position.buffer !== 'undefined') {
-      vertexNum = this._vertices.position.length / 3;
+      vertexNum = this._vertices.position.length / positionElementNumPerVertex;
+      positionElementNum = this._vertices.position.length;
     } else {
-      vertexNum = this._vertices.position.length;
+      vertexNum = this._vertices.position.length; // vertices must be type of Vector3
+      positionElementNum = this._vertices.position.length * positionElementNumPerVertex;
     }
 
     // for Wireframe
-    this._vertices.barycentricCoord = [];
-    if (this._indicesArray) {
+    this._vertices.barycentricCoord = new Float32Array(vertexNum*positionElementNumPerVertex);
+    this._vertices.components.barycentricCoord = 3;
+    this._vertices.componentType.barycentricCoord = 5126; // gl.FLOAT
+    if (!this._indicesArray) {
+      for (let i=0; i<vertexNum; i++) {
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+      }
+    } else {
       for (let i=0; i<this._indicesArray.length; i++) {
-        let indices = this._indicesArray[i];
-        for (let j=0; j<indices.length; j++) {
-          let bary = null;
-          if (j % 3 === 0) {
-            bary = new Vector3(1, 0, 0);
-          } else if (j % 3 === 1) {
-            bary = new Vector3(0, 1, 0);
-          } else if (j % 3 === 2) {
-            bary = new Vector3(0, 0, 1);
-          }
-          this._vertices.barycentricCoord[indices[j]] = bary;
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length; j++) {
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
         }
       }
     }
+
+    allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    this._checkAndSetVertexComponentNumber(allVertexAttribs);
+
+    // vector to array
+    allVertexAttribs.forEach((attribName)=> {
+      if (attribName === 'barycentricCoord') {
+        return;
+      }
+      if (typeof this._vertices[attribName].buffer !== 'undefined') {
+        return;
+      }
+      let vertexAttribArray = [];
+      this._vertices[attribName].forEach((elem, index) => {
+        let element = this._vertices[attribName][index];
+        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+      });
+      this._vertices[attribName] = vertexAttribArray;
+
+    });
+
+    /*
     for (let i=0; i<vertexNum; i++) {
       if (typeof this._vertices.barycentricCoord[i] === 'undefined') {
         this._vertices.barycentricCoord[i] = new Vector3(0, 0, 0); // Dummy Data
       }
     }
+    */
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
-    this._checkAndSetVertexComponentNumber(allVertexAttribs);
+    allVertexAttribs.forEach((attribName)=> {
+      if (typeof this._vertices[attribName].buffer === 'undefined') {
+        this._vertices[attribName] = new Float32Array(this._vertices[attribName]);
+      }
+    });
 
+/*
     {
       let vertexAttribArray = [];
       for (let i=0; i<this._vertices.barycentricCoord.length; i++) {
@@ -113,37 +150,14 @@ export default class Geometry extends GLBoostObject {
       }
       this._vertices.barycentricCoord = vertexAttribArray;
     }
+*/
 
-    if (typeof this._vertices.position.buffer !== 'undefined') {
+//    if (typeof this._vertices.position.buffer !== 'undefined') {
       // position (and maybe others) are a TypedArray
-      let componentN = this._vertices.components.position;
-      let vertexNum = this._vertices.position.length / componentN;
       for (let i=0; i<vertexNum; i++) {
-        this._AABB.addPositionWithArray(this._vertices.position, i * componentN);
+        this._AABB.addPositionWithArray(this._vertices.position, i * positionElementNumPerVertex);
       }
-
-      let barycentricCoords = this._vertices.barycentricCoord;
-      this._vertices.barycentricCoord = new Float32Array(barycentricCoords.length);
-      this._vertices.barycentricCoord.set(barycentricCoords);
-
-    } else {
-      allVertexAttribs.forEach((attribName)=> {
-        if (attribName === 'barycentricCoord') {
-          return;
-        }
-        let vertexAttribArray = [];
-        this._vertices[attribName].forEach((elem, index) => {
-          let element = this._vertices[attribName][index];
-          Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-          if (attribName === 'position') {
-            let componentN = this._vertices.components[attribName];
-            this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
-          }
-        });
-        this._vertices[attribName] = vertexAttribArray;
-
-      });
-    }
+///    }
 
     this._AABB.updateAllInfo();
 
@@ -191,7 +205,7 @@ export default class Geometry extends GLBoostObject {
         let vertexAttribName = null;
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-          this._vertices.components[attribName], this._vertices.componentType[attribName], gl.FALSE, 0, 0);
+          this._vertices.components[attribName], this._vertices.componentType[attribName], false, 0, 0);
       }
     });
   }
@@ -301,11 +315,11 @@ export default class Geometry extends GLBoostObject {
 
       allVertexAttribs.forEach((attribName)=> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-        if (typeof this._vertices[attribName].buffer !== 'undefined') {
+//        if (typeof this._vertices[attribName].buffer !== 'undefined') {
           gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
-        } else {
-          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
-        }
+//        } else {
+//          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
+//        }
         //gl.bindBuffer(gl.ARRAY_BUFFER, null);
       });
 
