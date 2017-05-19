@@ -78,6 +78,23 @@ export default class VertexWorldShadowShaderSource {
       material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
 
+    for (let i=0; i<lights.length; i++) {
+      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+
+      if (lights[i].camera && lights[i].camera.texture) {
+        // depthTexture
+        let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
+        material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+
+        let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+        let index = i;
+        if (diffuseTexture) {
+          index = i + 1;
+        }
+        lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+      }
+    }
+
     let uniform_depthBias = this._glContext.getUniformLocation(shaderProgram, 'depthBias');
     material.setUniform(shaderProgram.hashId, 'uniform_depthBias', uniform_depthBias);
     this._glContext.uniform1f(uniform_depthBias, 0.005, true);

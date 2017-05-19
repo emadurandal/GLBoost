@@ -1,6 +1,8 @@
 import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 import WireframeShader from './WireframeShader';
+import Matrix44 from '../../low_level/math/Matrix44';
+
 
 export class DecalShaderSource {
   VSDefine_DecalShaderSource(in_, out_, f) {
@@ -116,6 +118,32 @@ export default class DecalShader extends WireframeShader {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+    }
+
+
+    // For Shadow
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        let cameraMatrix = lights[i].camera.lookAtRHMatrix();
+        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+        let projectionMatrix = lights[i].camera.projectionRHMatrix();
+        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+i), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
+      }
+
+      if (lights[i].camera && lights[i].camera.texture) {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1, true);
+      } else {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0, true);
+      }
+
+      if (lights[i].camera && lights[i].camera.texture) {
+        let uniformLocation = material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i);
+        let index = lights[i].camera.texture.textureUnitIndex;
+
+        this._glContext.uniform1i(uniformLocation, index, true);
+      } else {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);
+      }
     }
   }
 
