@@ -541,20 +541,23 @@ export default class Shader extends GLBoostObject {
 
   static _generateShadowingStr(gl, i, isShadowEnabledAsTexture) {
     let shadowingText = '';
+    shadowingText += `float visibilityForShadow = 0.0;\n`;
     shadowingText += `float visibility = 1.0;\n`;
     shadowingText += `float visibilitySpecular = 1.0;\n`;
     shadowingText += `if (isShadowCasting[${i}] == 1) {// ${i}\n`;
+    shadowingText += `vec4 shadowCoord = v_shadowCoord[${i}];\n`;
+    shadowingText += `shadowCoord.z -= depthBias;\n`;
+
     if (GLBoost.isThisGLVersion_2(gl)) {
       if (isShadowEnabledAsTexture) {
-        shadowingText += `visibilitySpecular = textureProj(uDepthTexture[${i}], v_shadowCoord[${i}]);\n`;
-        shadowingText += `visibility = visibilitySpecular + 0.25;\n`;
+        shadowingText += `visibilitySpecular = textureProj(uDepthTexture[${i}], shadowCoord);\n`;
+        shadowingText += `visibility = visibilitySpecular + visibilityForShadow;\n`;
       }
     } else {
-      shadowingText += `float depth = 1.0;\n`;
       if (isShadowEnabledAsTexture) {
-        shadowingText += `depth = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}]).r;\n`;
-        shadowingText += `if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) {\n`;
-        shadowingText += `  visibility = 0.25;\n`;
+        shadowingText += `float depth = texture2DProj(uDepthTexture[${i}], shadowCoord).r;\n`;
+        shadowingText += `if (depth < shadowCoord.z) {\n`;
+        shadowingText += `  visibility = visibilityForShadow;\n`;
         shadowingText += `  visibilitySpecular = 0.0;\n`;
         shadowingText += `}\n`;
       }

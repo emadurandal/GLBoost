@@ -49,8 +49,8 @@ export default class BlendShapeGeometry extends Geometry {
     super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
-  _setBlendWeightToGlslProgram(blendTarget, weight) {
-    let gl = this._glContext.gl;
+  _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+    let blendTarget = GLBoost.getValueOfGLBoostConstant(blendTargetNumber);
     let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
       this._glContext.useProgram(materials[i].shaderInstance.glslProgram);

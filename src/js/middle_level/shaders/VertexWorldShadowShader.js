@@ -23,7 +23,6 @@ export default class VertexWorldShadowShaderSource {
       0.5, 0.5, 0.5, 1.0
     );\n`;
 
-    //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       if (GLBoost.isThisGLVersion_2(gl)) {
@@ -31,9 +30,7 @@ export default class VertexWorldShadowShaderSource {
       } else {
         shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
       }
-      //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
       shaderText += `    v_shadowCoord[${i}] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ${i}\n`;
-      //shaderText += `    v_shadowCoord[${i}].y = 1.0 - v_shadowCoord[${i}].y; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
 

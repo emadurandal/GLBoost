@@ -20,6 +20,8 @@ export class LambertShaderSource {
   FSShade_LambertShaderSource(f, gl, lights) {
     var shaderText = '';
 
+    //shaderText += `float depthForDisplay;\n`;
+
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
@@ -32,11 +34,14 @@ export class LambertShaderSource {
       //shaderText +=      'float visibility = 1.0;\n';
       shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
       shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+
+      //shaderText += `    rt0 = vec4(depthForDisplay, depthForDisplay, depthForDisplay, 1.0);\n`;
+
       shaderText += `  }\n`;
     }
     //shaderText += '  rt0.a = 1.0;\n';
     // shaderText += '  rt0 = surfaceColor;\n';
-    //shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+//    shaderText += '  rt0 = vec4(v_shadowCoord[0].xy, 0.0, 1.0);\n';
 
 
     return shaderText;
@@ -55,7 +60,13 @@ export class LambertShaderSource {
         // depthTexture
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
-        lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
+
+        let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+        let index = i;
+        if (diffuseTexture) {
+          index = i + 1;
+        }
+        lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
       }
     }
 
@@ -82,8 +93,9 @@ export default class LambertShader extends DecalShader {
     for (let j = 0; j < lights.length; j++) {
       if (lights[j].camera && lights[j].camera.texture) {
         let cameraMatrix = lights[j].camera.lookAtRHMatrix();
+        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
         let projectionMatrix = lights[j].camera.projectionRHMatrix();
-        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
+        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
       }
     }
 
@@ -97,8 +109,12 @@ export default class LambertShader extends DecalShader {
 
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
-        // set depthTexture unit i+1 to the sampler
-        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), i+1, true);  // +1 because 0 is used for diffuse texture
+        let uniformLocation = material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i);
+        let index = lights[i].camera.texture.textureUnitIndex;
+
+        this._glContext.uniform1i(uniformLocation, index, true);
+      } else {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);
       }
     }
   }

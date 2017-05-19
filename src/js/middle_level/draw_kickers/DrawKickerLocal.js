@@ -119,17 +119,11 @@ export default class DrawKickerLocal {
 
       let isMaterialSetupDone = true;
 
-      if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
+      {
         var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-      }
 
-      if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
-        if (material) {
-          isMaterialSetupDone = material.setUpTexture();
-        }
-      }
-      if (!isMaterialSetupDone) {
+        isMaterialSetupDone = material.setUpTexture();
         return;
       }
 
