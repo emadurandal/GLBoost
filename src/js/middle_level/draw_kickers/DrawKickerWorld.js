@@ -129,22 +129,23 @@ export default class DrawKickerWorld {
 
       let isMaterialSetupDone = true;
 
-      if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString) {
-        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+      //if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
+      {
+        let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-      }
+      //} else {
+//        debugger;
+      //}
 
-      if (materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
-        if (material) {
-          material.setUpStates();
+        material.setUpStates();
 
-          this._setUpOrTearDownTextures(false, material);
-          if (!this._setUpOrTearDownTextures(true, material)) {
-            MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
-            return;
-          }
+        this._setUpOrTearDownTextures(false, material);
+        if (!this._setUpOrTearDownTextures(true, material)) {
+          MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
+          return;
         }
       }
+
 
 
       this._setupOtherTextures(lights);

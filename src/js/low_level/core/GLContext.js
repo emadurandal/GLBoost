@@ -62,7 +62,10 @@ export default class GLContext {
   }
 
   checkGLError() {
-    if (GLBoost.VALUE_LOG_GL_ERROR === false) {
+    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
+      return;
+    }
+    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_GL_ERROR] === false) {
       return;
     }
 
@@ -220,7 +223,7 @@ export default class GLContext {
       MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
         'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)');
 
-      return
+      return;
     }
 
 //    this.gl[uniformFuncStr].apply(this.gl, args);

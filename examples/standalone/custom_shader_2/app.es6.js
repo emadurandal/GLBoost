@@ -83,8 +83,8 @@ class MyCustomShader extends GLBoost.DecalShader {
     this._time = 0;
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     gl.uniform1f(glslProgram.time, this._time);
   }

@@ -131,7 +131,6 @@ export default class ObjLoader {
       if (matchArray[1].toLowerCase() === "map_kd")
       {
         matchArray = mtlTextRows[i].match(/(\w+) ([\w:\/\-\.]+)/);
-        //var texture = glBoostContext.createTexture(basePath + matchArray[2], matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
         var texture = glBoostContext.createTexture(null, matchArray[2], {'UNPACK_FLIP_Y_WEBGL': true});
         let promise = texture.generateTextureFromUri(basePath + matchArray[2], false);
         promisesToLoadTexture.push(promise);

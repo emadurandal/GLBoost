@@ -23,7 +23,6 @@ export default class VertexWorldShadowShaderSource {
       0.5, 0.5, 0.5, 1.0
     );\n`;
 
-    //shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       if (GLBoost.isThisGLVersion_2(gl)) {
@@ -31,9 +30,7 @@ export default class VertexWorldShadowShaderSource {
       } else {
         shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
       }
-      //shaderText += `    mat4 depthBiasPV = depthPVMatrix[${i}];\n`;
       shaderText += `    v_shadowCoord[${i}] = depthBiasPV * worldMatrix * vec4(aVertex_position, 1.0); // ${i}\n`;
-      //shaderText += `    v_shadowCoord[${i}].y = 1.0 - v_shadowCoord[${i}].y; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
 
@@ -79,6 +76,23 @@ export default class VertexWorldShadowShaderSource {
     for(let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
       material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+    }
+
+    for (let i=0; i<lights.length; i++) {
+      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+
+      if (lights[i].camera && lights[i].camera.texture) {
+        // depthTexture
+        let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
+        material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+
+        let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+        let index = i;
+        if (diffuseTexture) {
+          index = i + 1;
+        }
+        lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+      }
     }
 
     let uniform_depthBias = this._glContext.getUniformLocation(shaderProgram, 'depthBias');

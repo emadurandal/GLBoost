@@ -53,8 +53,8 @@ export default class HalfLambertAndWrapLightingShader extends DecalShader {
     this._wrap = new Vector3(0.6, 0.3, 0.0);
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     var Kd = material.diffuseColor;
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);

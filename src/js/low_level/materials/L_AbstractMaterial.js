@@ -204,6 +204,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   set states(states) {
     this._states = states;
+    this._updateCount();
   }
 
   get states() {
@@ -227,6 +228,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   set name(name) {
     this._name = name;
+    this._updateCount();
   }
 
   get name() {
@@ -235,6 +237,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   setVertexN(geom, num) {
     this._vertexNofGeometries[geom] = num;
+    this._updateCount();
   }
 
   getVertexN(geom) {
@@ -315,6 +318,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
 
     this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName] = uniformLocation;
+
+    this._updateCount();
   }
 
   getUniform(hashIdOfGLSLProgram, uniformLocationName) {
@@ -323,6 +328,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   set isVisible(flg) {
     this._isVisibleForGeometiesAssginedByThisMaterial = flg;
+    this._updateCount();
   }
 
   get isVisible() {
@@ -331,6 +337,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   set globalStatesUsage(usage) {
     this._globalStatesUsage = usage;
+    this._updateCount();
   }
 
   get globalStatesUsage() {

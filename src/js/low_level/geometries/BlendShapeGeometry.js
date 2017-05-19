@@ -22,9 +22,9 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
 
-  draw(lights, camera, mesh, scene, renderPass_index) {
+  draw(expression, lights, camera, mesh, scene, renderPass_index) {
     this._currentRenderPassIndex = renderPass_index;
-    super.draw(lights, camera, mesh, scene, renderPass_index);
+    super.draw(expression, lights, camera, mesh, scene, renderPass_index);
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
@@ -49,8 +49,8 @@ export default class BlendShapeGeometry extends Geometry {
     super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
-  _setBlendWeightToGlslProgram(blendTarget, weight) {
-    let gl = this._glContext.gl;
+  _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+    let blendTarget = GLBoost.getValueOfGLBoostConstant(blendTargetNumber);
     let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
       this._glContext.useProgram(materials[i].shaderInstance.glslProgram);
