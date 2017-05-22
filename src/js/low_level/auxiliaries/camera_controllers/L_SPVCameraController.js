@@ -347,7 +347,7 @@ export default class L_SPVCameraController extends GLBoostObject {
   }
 
   resetDolly() {
-    this.setDolly(1);
+    this.dolly = 1;
   }
 
   set dolly(value) {

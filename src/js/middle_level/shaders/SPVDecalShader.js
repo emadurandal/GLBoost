@@ -4,6 +4,8 @@ import VertexWorldShaderSource from './VertexWorldShader';
 import WireframeShader from './WireframeShader';
 import Vector4 from '../../low_level/math/Vector4';
 import Vector3 from '../../low_level/math/Vector3';
+import Matrix44 from '../../low_level/math/Matrix44';
+
 
 export class SPVDecalShaderSource {
   VSDefine_SPVDecalShaderSource(in_, out_, f) {
@@ -132,10 +134,47 @@ export default class SPVDecalShader extends WireframeShader {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
     }
 
+
+    // For Shadow
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        let cameraMatrix = lights[i].camera.lookAtRHMatrix();
+        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+        let projectionMatrix = lights[i].camera.projectionRHMatrix();
+        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+i), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
+      }
+
+      if (lights[i].camera && lights[i].camera.texture && lights[i].isCastingShadow) {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1, true);
+      } else {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0, true);
+      }
+
+      if (lights[i].camera && lights[i].camera.texture) {
+        let uniformLocation = material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i);
+        let index = lights[i].camera.texture.textureUnitIndex;
+
+        this._glContext.uniform1i(uniformLocation, index, true);
+      } else {
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);
+      }
+    }
+
+
     let sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
     let targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
     let gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w, true);
+  }
+
+  setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // set depthTexture unit i+1 to the sampler
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
+      }
+    }
   }
 
   handleArgument(value) {
