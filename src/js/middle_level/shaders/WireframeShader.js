@@ -59,6 +59,10 @@ export class WireframeShaderSource {
     shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * edgeRatio);\n';
     shaderText += '}\n';
 
+    shaderText += '    if (rt0.a < 0.05) {\n';
+    shaderText += '      discard;\n';
+    shaderText += '    }\n';
+
     return shaderText;
   }
 
@@ -72,10 +76,6 @@ export class WireframeShaderSource {
     let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
     material.setUniform(shaderProgram.hashId, 'uniform_isWireframe', uniform_isWireframe);
     this._glContext.uniform1i( uniform_isWireframe, 0, true);
-
-    let uniform_isWireframeOnShade = material._glContext.getUniformLocation(shaderProgram, 'isWireframeOnShade');
-    material.setUniform(shaderProgram.hashId, 'uniform_isWireframeOnShade', uniform_isWireframeOnShade);
-    this._glContext.uniform1i( uniform_isWireframeOnShade, 0, true);
 
     let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
     material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidth', uniform_wireframeWidth);
@@ -120,9 +120,8 @@ export default class WireframeShader extends Shader {
     if (uniformLocationIsWireframe) {
       this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
     }
-    let uniformLocationIsWireframeOnShade = material.getUniform(glslProgram.hashId, 'uniform_isWireframeOnShade');
-    if (uniformLocationIsWireframeOnShade) {
-      this._glContext.uniform1i(uniformLocationIsWireframeOnShade, isWireframeOnShade, true);
+    if (isWifeframe && !isWireframeOnShade) {
+      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_opacity'), 0.0, true);
     }
     let uniformLocationWireframeWidth = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidth');
     if (uniformLocationWireframeWidth) {

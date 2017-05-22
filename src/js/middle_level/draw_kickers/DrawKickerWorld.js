@@ -53,7 +53,7 @@ export default class DrawKickerWorld {
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity, true);
+      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_opacity'), opacity, true);
 
       let world_m;
       let normal_m;

@@ -67,6 +67,111 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
+  _calcBaryCentricCoord(vertexNum, positionElementNumPerVertex) {
+    this._vertices.barycentricCoord = new Float32Array(vertexNum*positionElementNumPerVertex);
+    this._vertices.components.barycentricCoord = 3;
+    this._vertices.componentType.barycentricCoord = 5126; // gl.FLOAT
+    if (!this._indicesArray) {
+      for (let i=0; i<vertexNum; i++) {
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+        this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+      }
+    } else {
+      for (let i=0; i<this._indicesArray.length; i++) {
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length; j++) {
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+        }
+      }
+    }
+  }
+
+  _calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2) {
+    let cp0 = [
+      new Vector3(
+        pos0Vec3.x,
+        uv0Vec2.x,
+        uv0Vec2.y
+      ),
+      new Vector3(
+        pos0Vec3.y,
+        uv0Vec2.x,
+        uv0Vec2.y
+      ),
+      new Vector3(
+        pos0Vec3.z,
+        uv0Vec2.x,
+        uv0Vec2.y
+      )
+    ];
+
+    let cp1 = [
+      new Vector3(
+        pos1Vec3.x,
+        uv1Vec2.x,
+        uv1Vec2.y
+      ),
+      new Vector3(
+        pos1Vec3.y,
+        uv1Vec2.x,
+        uv1Vec2.y
+      ),
+      new Vector3(
+        pos1Vec3.z,
+        uv1Vec2.x,
+        uv1Vec2.y
+      )
+    ];
+
+    let cp2 = [
+      new Vector3(
+        pos2Vec3.x,
+        uv2Vec2.x,
+        uv2Vec2.y
+      ),
+      new Vector3(
+        pos2Vec3.z,
+        uv2Vec2.x,
+        uv2Vec2.y
+      ),
+      new Vector3(
+        pos2Vec3.y,
+        uv2Vec2.x,
+        uv2Vec2.y
+      )
+    ];
+  }
+
+  _calcTangent(vertexNum, positionElementNumPerVertex) {
+    let texcoordElementNumPerVertex = 2;
+    if ( this._vertices.texcoord ) {
+      if (!this._indicesArray) {
+        for (let i=0; i<vertexNum; i++) {
+
+
+
+
+          //this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = ;   // 1 0 0  1 0 0  1 0 0
+          this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+          this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+        }
+      } else {
+        for (let i=0; i<this._indicesArray.length; i++) {
+          let vertexIndices = this._indicesArray[i];
+          for (let j=0; j<vertexIndices.length; j++) {
+            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+          }
+        }
+      }
+    }
+
+  }
+
   setVerticesData(vertices, indicesArray, primitiveType = GLBoost.TRIANGLES, performanceHint = GLBoost.STATIC_DRAW) {
     this._vertices = vertices;
     this._indicesArray = indicesArray;
@@ -87,25 +192,7 @@ export default class Geometry extends GLBoostObject {
     }
 
     // for Wireframe
-    this._vertices.barycentricCoord = new Float32Array(vertexNum*positionElementNumPerVertex);
-    this._vertices.components.barycentricCoord = 3;
-    this._vertices.componentType.barycentricCoord = 5126; // gl.FLOAT
-    if (!this._indicesArray) {
-      for (let i=0; i<vertexNum; i++) {
-        this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-        this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-        this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
-      }
-    } else {
-      for (let i=0; i<this._indicesArray.length; i++) {
-        let vertexIndices = this._indicesArray[i];
-        for (let j=0; j<vertexIndices.length; j++) {
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
-        }
-      }
-    }
+    this._calcBaryCentricCoord(vertexNum, positionElementNumPerVertex);
 
     allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
@@ -113,6 +200,9 @@ export default class Geometry extends GLBoostObject {
     // vector to array
     allVertexAttribs.forEach((attribName)=> {
       if (attribName === 'barycentricCoord') {
+        return;
+      }
+      if (attribName === 'tangent') {
         return;
       }
       if (typeof this._vertices[attribName].buffer !== 'undefined') {
@@ -127,13 +217,8 @@ export default class Geometry extends GLBoostObject {
 
     });
 
-    /*
-    for (let i=0; i<vertexNum; i++) {
-      if (typeof this._vertices.barycentricCoord[i] === 'undefined') {
-        this._vertices.barycentricCoord[i] = new Vector3(0, 0, 0); // Dummy Data
-      }
-    }
-    */
+    // for Tangent
+    this._calcTangent(vertexNum, positionElementNumPerVertex);
 
     allVertexAttribs.forEach((attribName)=> {
       if (typeof this._vertices[attribName].buffer === 'undefined') {
@@ -141,23 +226,10 @@ export default class Geometry extends GLBoostObject {
       }
     });
 
-/*
-    {
-      let vertexAttribArray = [];
-      for (let i=0; i<this._vertices.barycentricCoord.length; i++) {
-        let element = this._vertices.barycentricCoord[i];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
-      }
-      this._vertices.barycentricCoord = vertexAttribArray;
-    }
-*/
 
-//    if (typeof this._vertices.position.buffer !== 'undefined') {
-      // position (and maybe others) are a TypedArray
-      for (let i=0; i<vertexNum; i++) {
-        this._AABB.addPositionWithArray(this._vertices.position, i * positionElementNumPerVertex);
-      }
-///    }
+    for (let i=0; i<vertexNum; i++) {
+      this._AABB.addPositionWithArray(this._vertices.position, i * positionElementNumPerVertex);
+    }
 
     this._AABB.updateAllInfo();
 
