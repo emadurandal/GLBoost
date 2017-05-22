@@ -60,9 +60,6 @@ export class SPVDecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
     }
-    shaderText += '    if (rt0.a < 0.05) {\n';
-    shaderText += '      discard;\n';
-    shaderText += '    }\n';
 
     shaderText += '  rt0 = pow(rt0, gamma);\n';
 
