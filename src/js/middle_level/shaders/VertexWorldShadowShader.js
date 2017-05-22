@@ -6,6 +6,7 @@ export default class VertexWorldShadowShaderSource {
     let textureUnitIndex = 0;
     //for (let i=0; i<lights.length; i++) {
       //if (lights[i].camera && lights[i].camera.texture) {
+
     shaderText +=      `uniform mat4 depthPVMatrix[${lights.length}];\n`;
     shaderText +=       `${out_} vec4 v_shadowCoord[${lights.length}];\n`;
 
@@ -81,7 +82,8 @@ export default class VertexWorldShadowShaderSource {
     for (let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
-      if (lights[i].camera && lights[i].camera.texture) {
+      if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
+
         // depthTexture
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);

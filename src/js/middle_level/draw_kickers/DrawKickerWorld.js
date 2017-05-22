@@ -204,7 +204,7 @@ export default class DrawKickerWorld {
 
   _setupOtherTextures(lights) {
     for(let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
+      if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
         lights[i].camera.texture.setUp();
       }
     }
@@ -212,7 +212,7 @@ export default class DrawKickerWorld {
 
   _tearDownOtherTextures(lights) {
     for(let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
+      if (lights[i].camera && lights[i].camera.texture)  {// && lights[i].isCastingShadow) {
         lights[i].camera.texture.tearDown();
       }
     }
