@@ -26,24 +26,26 @@ export default class VertexWorldShaderSource {
 
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
+
+    shaderText += '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
       shaderText += '  uvScaled.y = - uvScaled.y;\n';
       shaderText += '  vec4 uvPosition = vec4(uvScaled, 0.0, 1.0)+AABBCenterPosition;\n';
-      shaderText += '  vec4 preTransformedPosition = uvPosition * unfoldUVRatio + vec4(aVertex_position, 1.0) * (1.0-unfoldUVRatio);\n';
-    } else {
-      shaderText += '  vec4 preTransformedPosition = vec4(aVertex_position, 1.0);\n';
+      shaderText += '  gl_Position.xy = uvPosition.xy * unfoldUVRatio + gl_Position.xy * (1.0-unfoldUVRatio);\n';
     }
+
     if (existCamera_f) {
-      shaderText +=   '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-      shaderText +=   '  gl_Position = pvwMatrix * preTransformedPosition;\n';
-    } else {
-      shaderText +=   '  gl_Position = worldMatrix * preTransformedPosition;\n';
+      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+      shaderText +=   '  gl_Position = pvMatrix * gl_Position;\n';
     }
+
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
     }
-    shaderText += '  position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+
+    shaderText += '  position = gl_Position;\n';
 
     return shaderText;
   }
