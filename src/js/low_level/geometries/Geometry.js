@@ -100,9 +100,9 @@ export default class Geometry extends GLBoostObject {
       for (let i=0; i<this._indicesArray.length; i++) {
         let vertexIndices = this._indicesArray[i];
         for (let j=0; j<vertexIndices.length; j++) {
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
+          this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
         }
       }
     }

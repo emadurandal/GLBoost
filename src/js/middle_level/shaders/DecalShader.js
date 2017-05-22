@@ -147,6 +147,16 @@ export default class DecalShader extends WireframeShader {
     }
   }
 
+  setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+    for (let i=0; i<lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // set depthTexture unit i+1 to the sampler
+        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
+      }
+    }
+  }
+
   set lut(lut) {
     this._lut = lut;
   }

@@ -13,6 +13,8 @@ export default class M_AbstractLight extends M_Element {
     }
 
     this._gl = this._glContext.gl;
+
+    this._isCastingShadow = true;
   }
 
   prepareToRender() {
@@ -22,4 +24,13 @@ export default class M_AbstractLight extends M_Element {
       }
     }
   }
+
+  set isCastingShadow(flg) {
+    this._isCastingShadow = flg;
+  }
+
+  get isCastingShadow() {
+    return this._isCastingShadow;
+  }
+
 }
