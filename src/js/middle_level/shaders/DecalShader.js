@@ -55,9 +55,6 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
-    shaderText += '    if (rt0.a < 0.05) {\n';
-    shaderText += '      discard;\n';
-    shaderText += '    }\n';
 
     //shaderText += '    float shadowRatio = 0.0;\n';
 
