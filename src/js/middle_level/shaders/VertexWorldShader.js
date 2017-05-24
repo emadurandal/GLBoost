@@ -32,8 +32,8 @@ export default class VertexWorldShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
       shaderText += '  uvScaled.y = - uvScaled.y;\n';
-      shaderText += '  vec4 uvPosition = vec4(uvScaled, 0.0, 1.0)+AABBCenterPosition;\n';
-      shaderText += '  gl_Position.xy = uvPosition.xy * unfoldUVRatio + gl_Position.xy * (1.0-unfoldUVRatio);\n';
+      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+      shaderText += '  gl_Position = uvPosition * unfoldUVRatio + gl_Position * (1.0-unfoldUVRatio);\n';
     }
 
     if (existCamera_f) {
