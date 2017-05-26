@@ -218,7 +218,9 @@ export default class Geometry extends GLBoostObject {
   _calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex) {
 
     // This function still assumes gl.TRIANGLE_LIST only.
-
+    this._vertices.tangent = new Float32Array(vertexNum*positionElementNumPerVertex);
+    this._vertices.components.tangent = 3;
+    this._vertices.componentType.tangent = 5126; // gl.FLOAT
     let VerticesNum3 = 3;
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
@@ -300,9 +302,11 @@ export default class Geometry extends GLBoostObject {
     });
 
     // for Tangent
-    this._vertices.tangent = [];
-    this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex);
+    if (this._vertices.texcoord) {
+      this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex);
+    }
 
+    // Normal Array to Float32Array
     allVertexAttribs.forEach((attribName)=> {
       if (typeof this._vertices[attribName].buffer === 'undefined') {
         this._vertices[attribName] = new Float32Array(this._vertices[attribName]);

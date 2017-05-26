@@ -91,7 +91,7 @@ export default class DrawKickerLocal {
           } else {
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
           }
-          material._glContext.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
+          material._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, 1, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
