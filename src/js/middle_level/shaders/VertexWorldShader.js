@@ -28,6 +28,7 @@ export default class VertexWorldShaderSource {
     var shaderText = '';
 
     shaderText += '  gl_Position = worldMatrix * vec4(aVertex_position, 1.0);\n';
+    shaderText += '  position = gl_Position;\n';
 
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
@@ -44,8 +45,6 @@ export default class VertexWorldShaderSource {
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
     }
-
-    shaderText += '  position = gl_Position;\n';
 
     return shaderText;
   }
