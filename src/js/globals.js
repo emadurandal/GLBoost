@@ -34,6 +34,7 @@ var global = ('global',eval)('this');
     c.define('COLOR', 'color');
     c.define('NORMAL', 'normal');
     c.define('TEXCOORD', 'texcoord');
+    c.define('TANGENT', 'tangent');
     c.define('JOINT', 'joint');
     c.define('WEIGHT', 'weight');
     c.define('POINTS');

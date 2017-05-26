@@ -103,7 +103,7 @@ export default class DrawKickerWorld {
           } else {
             let cameraPos = new Vector4(0, 0, 1, 1);
           }
-          material._glContext.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
+          material._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
