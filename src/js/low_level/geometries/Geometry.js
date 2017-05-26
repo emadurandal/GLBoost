@@ -143,28 +143,109 @@ export default class Geometry extends GLBoostObject {
         uv2Vec2.y
       )
     ];
+
+    let u = [];
+    let v = [];
+
+    for ( let i = 0; i < 3; i++ ) {
+      let v1 = Vector3.subtract(cp1, cp0);
+      let v2 = Vector3.subtract(cp2, cp1);
+      let abc = Vector3.cross(v1, v2);
+
+      u[i] = - abc.y / abc.x;
+      v[i] = - abc.z / abc.x;
+    }
+
+    return (new Vector3(u[0], u[1], u[2])).normalize();
   }
 
-  _calcTangent(vertexNum, positionElementNumPerVertex) {
-    let texcoordElementNumPerVertex = 2;
+  _calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3) {
+    let pos0Vec3 = new Vector3(
+      this._vertices.position[pos0IndexBase],
+      this._vertices.position[pos0IndexBase + 1],
+      this._vertices.position[pos0IndexBase + 2]
+    );
+
+    let pos1Vec3 = new Vector3(
+      this._vertices.position[pos1IndexBase],
+      this._vertices.position[pos1IndexBase + 1],
+      this._vertices.position[pos1IndexBase + 2]
+    );
+
+    let pos2Vec3 = new Vector3(
+      this._vertices.position[pos2IndexBase],
+      this._vertices.position[pos2IndexBase + 1],
+      this._vertices.position[pos2IndexBase + 2]
+    );
+
+    let uv0Vec2 = new Vector3(
+      this._vertices.position[uv0IndexBase],
+      this._vertices.position[uv0IndexBase + 1],
+      this._vertices.position[uv0IndexBase + 2]
+    );
+
+    let uv1Vec2 = new Vector3(
+      this._vertices.position[uv1IndexBase],
+      this._vertices.position[uv1IndexBase + 1],
+      this._vertices.position[uv1IndexBase + 2]
+    );
+
+    let uv2Vec2 = new Vector3(
+      this._vertices.position[uv2IndexBase],
+      this._vertices.position[uv2IndexBase + 1],
+      this._vertices.position[uv2IndexBase + 2]
+    );
+
+    let tan0IndexBase = i * VerticesNum3;
+    let tan0Vec3 = this._calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2);
+    this._vertices.tangent[tan0IndexBase] = tan0Vec3.x;
+    this._vertices.tangent[tan0IndexBase + 1] = tan0Vec3.y;
+    this._vertices.tangent[tan0IndexBase + 2] = tan0Vec3.z;
+
+    let tan1IndexBase = (i + 1) * VerticesNum3;
+    let tan1Vec3 = this._calcTangentPerVertex(pos1Vec3, pos2Vec3, pos0Vec3, uv1Vec2, uv2Vec2, uv0Vec2);
+    this._vertices.tangent[tan1IndexBase] = tan1Vec3.x;
+    this._vertices.tangent[tan1IndexBase + 1] = tan1Vec3.y;
+    this._vertices.tangent[tan1IndexBase + 2] = tan1Vec3.z;
+
+    let tan2IndexBase = (i + 2) * VerticesNum3;
+    let tan2Vec3 = this._calcTangentPerVertex(pos2Vec3, pos0Vec3, pos1Vec3, uv2Vec2, uv0Vec2, uv1Vec2);
+    this._vertices.tangent[tan2IndexBase] = tan2Vec3.x;
+    this._vertices.tangent[tan2IndexBase + 1] = tan2Vec3.y;
+    this._vertices.tangent[tan2IndexBase + 2] = tan2Vec3.z;
+  }
+
+  _calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex) {
+
+    // This function still assumes gl.TRIANGLE_LIST only.
+
+    let VerticesNum3 = 3;
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i++) {
+        for (let i=0; i<vertexNum; i+=VerticesNum3) {
+          let pos0IndexBase = i * positionElementNumPerVertex;
+          let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
+          let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
+          let uv0IndexBase = i * texcoordElementNumPerVertex;
+          let uv1IndexBase = (i + 1) * texcoordElementNumPerVertex;
+          let uv2IndexBase = (i + 2) * texcoordElementNumPerVertex;
 
+          this._calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3);
 
-
-
-          //this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = ;   // 1 0 0  1 0 0  1 0 0
-          this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-          this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
         }
       } else {
         for (let i=0; i<this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j++) {
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+          for (let j=0; j<vertexIndices.length; j+=VerticesNum3) {
+            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
+            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
+            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+            let uv0IndexBase = vertexIndices[j    ]  * texcoordElementNumPerVertex;
+            let uv1IndexBase = vertexIndices[j + 1]  * texcoordElementNumPerVertex;
+            let uv2IndexBase = vertexIndices[j + 2]  * texcoordElementNumPerVertex;
+
+            this._calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3);
+
           }
         }
       }
@@ -182,6 +263,7 @@ export default class Geometry extends GLBoostObject {
     let vertexNum = 0;
     let positionElementNum = 0;
     let positionElementNumPerVertex = this._vertices.components.position;
+    let texcoordElementNumPerVertex = this._vertices.components.texcoord;
 
     if (typeof this._vertices.position.buffer !== 'undefined') {
       vertexNum = this._vertices.position.length / positionElementNumPerVertex;
@@ -218,7 +300,8 @@ export default class Geometry extends GLBoostObject {
     });
 
     // for Tangent
-    this._calcTangent(vertexNum, positionElementNumPerVertex);
+    this._vertices.tangent = [];
+    this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex);
 
     allVertexAttribs.forEach((attribName)=> {
       if (typeof this._vertices[attribName].buffer === 'undefined') {
