@@ -6,7 +6,6 @@ export class SPVPhongShaderSource {
 
   FSDefine_SPVPhongShaderSource(in_, f, lights) {
     var shaderText = '';
-    shaderText += `uniform vec3 viewPosition;\n`;
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec4 Ks;\n`;
     shaderText += `uniform float power;\n`;
@@ -31,14 +30,13 @@ export class SPVPhongShaderSource {
     for (let i=0; i<lights.length; i++) {
       let isShadowEnabledAsTexture = (lights[i].camera && lights[i].camera.texture) ? true:false;
       shaderText += `  {\n`;
-      // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-      shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w);\n`;
+      shaderText += `    vec3 lightDirection = normalize(v_lightDirection[${i}]);\n`;
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
+      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
       shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
-      shaderText += `    vec3 view = normalize(viewPosition - position.xyz);\n`;
-      shaderText += `    vec3 reflect = reflect(-light, normal);\n`;
-      shaderText += `    float specular = pow(max(dot(reflect, view), 0.0), power);\n`;
+      shaderText += `    vec3 viewDirection = normalize(v_viewDirection);\n`;
+      shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
+      shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
       shaderText += `    rt0 += vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
       shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
@@ -56,8 +54,6 @@ export class SPVPhongShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
     material.setUniform(shaderProgram.hashId, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
     material.setUniform(shaderProgram.hashId, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
-
-    material.setUniform(shaderProgram.hashId, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition'));
 
     return vertexAttribsAsResult;
   }
