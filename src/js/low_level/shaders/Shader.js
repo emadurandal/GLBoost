@@ -542,8 +542,6 @@ export default class Shader extends GLBoostObject {
   static _generateShadowingStr(gl, i, isShadowEnabledAsTexture) {
     let shadowingText = '';
     shadowingText += `float visibilityForShadow = 0.25;\n`;
-    shadowingText += `float visibility = 1.0;\n`;
-    shadowingText += `float visibilitySpecular = 1.0;\n`;
     shadowingText += `if (isShadowCasting[${i}] == 1) {// ${i}\n`;
     shadowingText += `vec4 shadowCoord = v_shadowCoord[${i}];\n`;
     shadowingText += `shadowCoord.z -= depthBias;\n`;
