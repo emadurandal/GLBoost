@@ -24,6 +24,7 @@ export default class VertexWorldShadowShaderSource {
       0.5, 0.5, 0.5, 1.0
     );\n`;
 
+
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       if (GLBoost.isThisGLVersion_2(gl)) {
@@ -48,6 +49,10 @@ export default class VertexWorldShadowShaderSource {
 
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
     var shaderText = '';
+
+    shaderText += `float visibility = 1.0;\n`;
+    shaderText += `float visibilitySpecular = 1.0;\n`;
+
     return shaderText;
   }
 
