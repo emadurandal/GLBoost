@@ -444,7 +444,6 @@ export default class Shader extends GLBoostObject {
 
     if (programToReturn === null || !gl.isProgram(programToReturn)) {
     // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
       // register it to shaderHashTable.
       let indexStr = null;
@@ -453,6 +452,10 @@ export default class Shader extends GLBoostObject {
       } else {
         indexStr = hash;
       }
+
+      MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
+      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+
       programToReturn.hashId = indexStr;
       programToReturn.glslProgramsSelfUsageCount = -1;
 
@@ -541,7 +544,7 @@ export default class Shader extends GLBoostObject {
 
   static _generateShadowingStr(gl, i, isShadowEnabledAsTexture) {
     let shadowingText = '';
-    shadowingText += `float visibilityForShadow = 0.25;\n`;
+    shadowingText += `float visibilityForShadow = 0.75;\n`;
     shadowingText += `if (isShadowCasting[${i}] == 1) {// ${i}\n`;
     shadowingText += `vec4 shadowCoord = v_shadowCoord[${i}];\n`;
     shadowingText += `shadowCoord.z -= depthBias;\n`;
@@ -623,8 +626,13 @@ export default class Shader extends GLBoostObject {
     super.readyForDiscard();
   }
 
-  getShaderParameter(material, parameterName) {
-    return this[parameterName] || material.shaderParameters[parameterName];
+  getShaderParameter(material, parameterName, defaultValue) {
+    if (typeof this[parameterName] !== 'undefined') {
+      return this[parameterName];
+    } else if (typeof material.shaderParameters[parameterName] !== 'undefined') {
+      return material.shaderParameters[parameterName];
+    }
+    return defaultValue;
   }
 }
 

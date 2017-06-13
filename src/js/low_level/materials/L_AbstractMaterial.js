@@ -74,15 +74,19 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return this.toString() + '_updateCount_' + this._countOfUpdate;
   }
 
-  set shaderClass(shaderClass) {
-    if (this._shaderClass === shaderClass) {
-      return;
-    }
+  setShaderClassWithForceUpdate(shaderClass) {
     this._shaderClass = shaderClass;
     if (this._shaderInstance) {
       this._shaderInstance.readyForDiscard();
     }
     this._shaderInstance = null;
+  }
+
+  set shaderClass(shaderClass) {
+    if (this._shaderClass === shaderClass) {
+      return;
+    }
+    this.setShaderClassWithForceUpdate(shaderClass);
   }
 
   get shaderClass() {

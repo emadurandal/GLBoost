@@ -147,7 +147,7 @@ export default class WireframeShader extends Shader {
 
     let uniformLocationDepthBias = material.getUniform(glslProgram.hashId, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
-      let depthBias = this.getShaderParameter(material, 'depthBias');
+      let depthBias = this.getShaderParameter(material, 'depthBias', false);
       if (depthBias) {
         this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
       }
