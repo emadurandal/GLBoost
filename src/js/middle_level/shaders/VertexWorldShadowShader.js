@@ -78,12 +78,7 @@ export default class VertexWorldShadowShaderSource {
       material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
-
-    for(let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
-      material.setUniform(shaderProgram.hashId, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
-    }
-
+    
     for (let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
