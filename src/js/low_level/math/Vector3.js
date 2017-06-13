@@ -223,6 +223,19 @@ export default class Vector3 {
     return sita;
   }
 
+  divideVector(vec3) {
+    this.x /= vec3.x;
+    this.y /= vec3.y;
+    this.z /= vec3.z;
+
+    return this;
+  }
+
+  static divideVector(lvec3, rvec3) {
+    return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
+  }
+
+
   toVector4() {
     return new Vector4(this.x, this.y, this.z, 1.0);
   }
