@@ -61,7 +61,7 @@ export class SPVDecalShaderSource {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
     }
 
-    shaderText += '  rt0 = pow(rt0, gamma);\n';
+    shaderText += '  rt0.xyz = gamma.w > 0.5 ? pow(rt0.xyz, gamma.xyz) : rt0.xyz;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     return shaderText;
@@ -158,10 +158,12 @@ export default class SPVDecalShader extends WireframeShader {
     }
 
 
-    let sourceGamma = this.getShaderParameter(material, 'sourceGamma') || new Vector4(1, 1, 1, 1);
-    let targetGamma = this.getShaderParameter(material, 'targetGamma') || new Vector4(1, 1, 1, 1);
-    let gamma = Vector4.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, gamma.w, true);
+    let sourceGamma = this.getShaderParameter(material, 'sourceGamma', new Vector3(1, 1, 1));
+    let targetGamma = this.getShaderParameter(material, 'targetGamma', new Vector3(1, 1, 1));
+    let isGammaEnable = this.getShaderParameter(material, 'isGammaEnable', true);
+
+    let gamma = Vector3.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
   }
 
   setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
