@@ -33,6 +33,8 @@ export default class M_Element extends L_Element {
     this._camera = null;
     this._customFunction = null;
     this._isVisible = true;
+
+    this._gizmos = [];
   }
 
 
@@ -627,6 +629,19 @@ export default class M_Element extends L_Element {
 
   get isAffectedByProjectionMatrix() {
     return this._isAffectedByProjectionMatrix;
+  }
+
+  set gizmoScale(scale) {
+    for (let gizmo of this._gizmos) {
+      gizmo.scale = new Vector3(scale, scale, scale);
+    }
+  }
+
+  get gizmoScale() {
+    if (this._gizmos.length === 0) {
+      return 1.0;
+    }
+    return this._gizmos[0].scale.x;
   }
 
 }

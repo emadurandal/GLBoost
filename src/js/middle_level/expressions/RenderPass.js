@@ -10,6 +10,7 @@ export default class RenderPass extends GLBoostObject {
 
     this._scene = null;
     this._meshes = [];
+    this._gizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._drawBuffers = [this._glContext.gl.BACK];
@@ -45,6 +46,10 @@ export default class RenderPass extends GLBoostObject {
 
   get transparentMeshes() {
     return this._transparentMeshes;
+  }
+
+  get gizmos() {
+    return this._gizmos;
   }
 
   specifyRenderTargetTextures(renderTargetTextures) {
@@ -175,9 +180,14 @@ export default class RenderPass extends GLBoostObject {
     };
 
     this._meshes = [];
+    this._gizmos = [];
     if (this._scene) {
       this._scene.getChildren().forEach((elm)=> {
+        // collect meshes
         this._meshes = this._meshes.concat(collectMeshes(elm));
+
+        // collect gizmos from elements
+        Array.prototype.push.apply(this._gizmos, elm._gizmos);
       });
     }
 

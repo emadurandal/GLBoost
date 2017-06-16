@@ -81,6 +81,12 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
+      let gizmos = renderPass.gizmos;
+      for (let gizmo of gizmos) {
+        gizmo.draw(expression, lights, camera, renderPass.scene, index);
+      }
+
+
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
