@@ -172,6 +172,23 @@ export default class Shader extends GLBoostObject {
     return processedShaderString;
   }
 
+  _addLineNumber(shaderString) {
+    let shaderTextLines = shaderString.split(/\r\n|\r|\n/);
+    let shaderTextWithLineNumber = '';
+    for (let i=0; i<shaderTextLines.length; i++) {
+      let lineIndex = i+1;
+      let splitter = ' : ';
+      if (lineIndex<10) {
+        splitter = '  : ';
+      } else if (lineIndex>=100) {
+        splitter = ': ';
+      }
+      shaderTextWithLineNumber += lineIndex + splitter + shaderTextLines[i] + '\n';
+    }
+
+    return shaderTextWithLineNumber;
+  }
+
   _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
     var f = functions;
     var shaderText = '';
@@ -232,7 +249,7 @@ export default class Shader extends GLBoostObject {
     });
 
     // end of main function
-    shaderText +=   '}\n';
+    shaderText +=   '}';
 
     return shaderText;
   }
@@ -316,7 +333,7 @@ export default class Shader extends GLBoostObject {
     } else {
       shaderText += Shader._set_glFragColor_inGLVer1(gl);
     }
-    shaderText +=   '}\n';
+    shaderText +=   '}';
 
     return shaderText;
   }
@@ -386,9 +403,9 @@ export default class Shader extends GLBoostObject {
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, this._addLineNumber(vertexShaderStr));
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, this._addLineNumber(fragmentShaderStr));
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
