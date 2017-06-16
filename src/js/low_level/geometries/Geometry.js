@@ -47,6 +47,17 @@ export default class Geometry extends GLBoostObject {
     return attribNameArray;
   }
 
+  _allVertexAttribs(vertices) {
+    var attribNameArray = [];
+    for (var attribName in vertices) {
+      if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
+        attribNameArray.push(attribName);
+      }
+    }
+
+    return attribNameArray;
+  }
+
   _checkAndSetVertexComponentNumber(allVertexAttribs) {
     allVertexAttribs.forEach((attribName)=> {
       let element = this._vertices[attribName][0];

@@ -644,4 +644,14 @@ export default class M_Element extends L_Element {
     return this._gizmos[0].scale.x;
   }
 
+  set isGizmoVisible(flg) {
+    for (let gizmo of this._gizmos) {
+      gizmo.isVisible = flg;
+    }
+  }
+
+  get isGizmoVisible() {
+    this._gizmos[0].isVisible;
+  }
+
 }

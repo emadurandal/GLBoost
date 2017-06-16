@@ -35,6 +35,10 @@ export default class GLBoostObject {
     return this._instanceName;
   }
 
+  get className() {
+    return this.constructor.name;
+  }
+
   get instanceName() {
     return this._instanceName;
   }

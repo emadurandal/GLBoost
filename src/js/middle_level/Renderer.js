@@ -83,7 +83,9 @@ export default class Renderer extends GLBoostObject {
 
       let gizmos = renderPass.gizmos;
       for (let gizmo of gizmos) {
-        gizmo.draw(expression, lights, camera, renderPass.scene, index);
+        if (gizmo.isVisible) {
+          gizmo.draw(expression, lights, camera, renderPass.scene, index);
+        }
       }
 
 
