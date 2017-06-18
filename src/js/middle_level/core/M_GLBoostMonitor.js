@@ -22,7 +22,7 @@ export default class M_GLBoostMonitor extends L_GLBoostMonitor {
     let objects = [];
     if (typeof arg === 'undefined') {
       objects = this._glBoostObjects;
-    } else if (typeof (arg) == "string") {
+    } else if (typeof (arg) === "string") {
       for (let key in this._glBoostObjects) {
         if (this._glBoostObjects.hasOwnProperty(key) && this._glBoostObjects[key].userFlavorName === arg) {
           objects.push(this._glBoostObjects[key]);

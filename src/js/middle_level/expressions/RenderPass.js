@@ -13,13 +13,15 @@ export default class RenderPass extends GLBoostObject {
     this._gizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
-    this._drawBuffers = [this._glContext.gl.BACK];
+    this._drawBuffers = [this._glContext.gl.NONE];
     this._clearColor = null;
     this._clearDepth = null;  // default is 1.0
     this._renderTargetColorTextures = [];
     this._renderTargetDepthTexture = [];
     this._expression = null;
     this._viewport = null;
+    this._isRenderTargetTexturesIfSet = true;
+    this._isEnableToDraw = true;
 
     this._customFunction = null;
   }
@@ -87,7 +89,15 @@ export default class RenderPass extends GLBoostObject {
   }
 
   get buffersToDraw() {
-    return this._drawBuffers;
+    return this.isRenderTargetTexturesIfSet ? this._drawBuffers : [this._glContext.gl.NONE];
+  }
+
+  set isRenderTargetTexturesIfSet(flg) {
+    this._isRenderTargetTexturesIfSet = flg;
+  }
+
+  get isRenderTargetTexturesIfSet() {
+    return this._isRenderTargetTexturesIfSet;
   }
 
   get fbo() {
@@ -222,6 +232,14 @@ export default class RenderPass extends GLBoostObject {
       return 0;
     });
 
+  }
+
+  set isEnableToDraw(flg) {
+    this._isEnableToDraw = flg;
+  }
+
+  get isEnableToDraw() {
+    return this._isEnableToDraw;
   }
 
 }

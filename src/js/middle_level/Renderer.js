@@ -25,7 +25,7 @@ export default class Renderer extends GLBoostObject {
    */
   draw(expression) {
     expression.renderPasses.forEach((renderPass, index)=>{
-      if (!renderPass.scene) {
+      if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
 
@@ -42,12 +42,14 @@ export default class Renderer extends GLBoostObject {
 
       let lights = renderPass.scene.lights;
 
-      if (renderPass.fbo) {
+      // set render target buffers for each RenderPass.
+      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
         gl.bindTexture(gl.TEXTURE_2D, null);
         Geometry.clearMaterialCache();
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+      } else {
+        glem.drawBuffers(gl, [gl.BACK]);
       }
-      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
       if (renderPass.viewport) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
