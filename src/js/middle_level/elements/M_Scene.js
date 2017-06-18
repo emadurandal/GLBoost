@@ -160,8 +160,14 @@ export default class M_Scene extends M_Group {
         });
       } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(expression, existCamera_f, this._lights);
+        for (let gizmo of elem._gizmos) {
+          gizmo.prepareToRender(expression, existCamera_f, this._lights);
+        }
       } else if (elem instanceof M_Element) {
         elem.prepareToRender();
+        for (let gizmo of elem._gizmos) {
+          gizmo.prepareToRender(expression, existCamera_f, []);
+        }
       } else {
         return;
       }

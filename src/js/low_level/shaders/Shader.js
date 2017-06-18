@@ -402,10 +402,12 @@ export default class Shader extends GLBoostObject {
   }
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
+    let vertexShaderStrWithLineNumber = this._addLineNumber(vertexShaderStr);
+    let fragmentShaderStrWithLineNumber = this._addLineNumber(vertexShaderStr);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, this._addLineNumber(vertexShaderStr));
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStrWithLineNumber);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, this._addLineNumber(fragmentShaderStr));
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStrWithLineNumber);
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
@@ -424,6 +426,10 @@ export default class Shader extends GLBoostObject {
     }
 
     this._glContext.useProgram(shaderProgram);
+
+
+    shaderProgram.vertexShaderSource = vertexShaderStrWithLineNumber;
+    shaderProgram.fragmentShaderSource = fragmentShaderStrWithLineNumber;
 
     return shaderProgram;
   }

@@ -1,9 +1,8 @@
 import M_PointLight from '../elements/lights/M_PointLight';
-import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
+//import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Matrix33 from '../../low_level/math/Matrix33';
-import Geometry from '../../low_level/geometries/Geometry';
 import Shader from '../../low_level/shaders/Shader';
 import MiscUtil from '../../low_level/misc/MiscUtil';
 
@@ -47,7 +46,7 @@ export default class DrawKickerWorld {
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           for (let attribName in vboDic) {
             gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-            geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+            geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
           }
         }
       }
@@ -114,7 +113,7 @@ export default class DrawKickerWorld {
               lightVec = new Vector4(0, 0, 0, 1);
               lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
               isPointLight = 1.0;
-            } else if (lights[j] instanceof M_DirectionalLight) {
+            } else if (lights[j].className === 'M_DirectionalLight') {
               lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
