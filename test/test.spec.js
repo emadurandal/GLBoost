@@ -1,16 +1,23 @@
 import firefox from 'selenium-webdriver/firefox';
 import t from 'selenium-webdriver/testing';
 import { expect } from 'chai';
+import httpServer from 'http-server/lib/http-server';
 var driver;
+var server;
 
 t.describe('GLBoost', () => {
-  t.before(function() {
-    driver = new firefox.Driver();
-    driver.get( 'http://localhost:3000/test/bootstrap.html');
+  t.before(function(done) {
+    server = httpServer.createServer();
+    server.listen(3000, 'localhost', () => {
+      driver = new firefox.Driver();
+      driver.get( 'http://localhost:3000/test/bootstrap.html');
+      done();
+    });
   });
 
   t.after(function() {
     driver.quit();
+    server.close();
   });
 
   t.it('init GLBoost renderer properly (WebGL1)', () => {
