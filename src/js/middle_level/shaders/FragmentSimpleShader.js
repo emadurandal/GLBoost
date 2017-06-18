@@ -2,6 +2,8 @@ import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
 
 export class FragmentSimpleShaderSource {
+  // In the context within these member methods,
+  // this is the instance of the corresponding shader class.
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     var shaderText =      'uniform float opacity;\n';

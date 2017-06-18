@@ -138,11 +138,8 @@ export default class DrawKickerWorld {
 
         material.setUpStates();
 
-        this._setUpOrTearDownTextures(false, material);
-        if (!this._setUpOrTearDownTextures(true, material)) {
-          MiscUtil.consoleLog(GLBoost.LOG_GLBOOST, 'Textures are not ready yet.');
-          return;
-        }
+//        this._setUpOrTearDownTextures(false, material);
+        this._setUpOrTearDownTextures(true, material);
       }
 
 
@@ -182,7 +179,7 @@ export default class DrawKickerWorld {
 
     let isTextureProcessDone = true;
     if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-      // do nothing
+      material._glBoostContext.defaultDummyTexture.setUp(0);
     } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
       let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
       let textureName = textureSamplerDic.textureName;

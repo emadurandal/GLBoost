@@ -103,9 +103,18 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   setTexture(texture, purpose) {
+    if (!texture) {
+      return;
+    }
     this._textureDic[texture.userFlavorName] = texture;
     this._texturePurposeDic[(typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE)] = texture.userFlavorName;
     this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._updateCount();
+  }
+
+  removeTexture(userFlavorName) {
+    delete this._textureDic[userFlavorName];
+    delete this._textureContributionRateDic[userFlavorName];
     this._updateCount();
   }
 
@@ -171,6 +180,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   set baseColor(vec) {
+    if (!vec) {
+      return;
+    }
+
     this._baseColor = vec;
     this._updateCount();
   }
@@ -180,6 +193,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   set diffuseColor(vec) {
+    if (!vec) {
+      return;
+    }
+
     this._diffuseColor = vec;
     this._updateCount();
   }
@@ -189,6 +206,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   set specularColor(vec) {
+    if (!vec) {
+      return;
+    }
+
     this._specularColor = vec;
     this._updateCount();
   }
@@ -198,6 +219,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   set ambientColor(vec) {
+    if (!vec) {
+      return;
+    }
+
     this._ambientColor = vec;
     this._updateCount();
   }
@@ -248,18 +273,23 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
   }
 
+  /**
+   * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
+   * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
+   */
   setUpTexture(textureName, textureUnitIndex) {
     var gl = this._gl;
-    var result = false;
     let texture = this.getTexture(textureName);
+    let isCalledWebGLBindTexture = true;
+
     if (texture) {
-      result = texture.setUp(textureUnitIndex);
+      isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
+      return isCalledWebGLBindTexture;
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
-      result = true;
+      isCalledWebGLBindTexture = true;
+      return isCalledWebGLBindTexture;
     }
-
-    return result;
   }
 
   tearDownTexture(textureName, textureUnitIndex) {

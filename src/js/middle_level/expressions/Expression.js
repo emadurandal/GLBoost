@@ -34,7 +34,7 @@ export default class Expression extends GLBoostObject {
   }
 
   prepareToRender() {
-    this._renderPasses.forEach((renderPass)=>{
+    this._renderPasses.forEach((renderPass, index)=>{
       renderPass.prepareToRender(this);
     });
   }

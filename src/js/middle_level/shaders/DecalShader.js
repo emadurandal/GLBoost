@@ -5,6 +5,9 @@ import Matrix44 from '../../low_level/math/Matrix44';
 
 
 export class DecalShaderSource {
+  // In the context within these member methods,
+  // this is the instance of the corresponding shader class.
+
   VSDefine_DecalShaderSource(in_, out_, f) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
@@ -37,9 +40,7 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    if (material.hasAnyTextures()) {
-      shaderText += 'uniform sampler2D uTexture;\n';
-    }
+    shaderText += 'uniform sampler2D uTexture;\n';
     shaderText += 'uniform vec4 materialBaseColor;\n';
 
     return shaderText;
@@ -52,7 +53,7 @@ export class DecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
 
@@ -76,20 +77,21 @@ export class DecalShaderSource {
 
     material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
 
-    if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
-      if (diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'] = {};
-        let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-        material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
-        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+    let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+    if (!diffuseTexture) {
+      diffuseTexture = this._glBoostContext.defaultDummyTexture;
+    }
 
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+    let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
+    material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
+    // set texture unit 0 to the sampler
+    this._glContext.uniform1i( uTexture, 0, true);
 
-        // set texture unit 0 to the sampler
-        this._glContext.uniform1i( uTexture, 0, true);
-        material._semanticsDic['TEXTURE'] = 'uTexture';
-      }
+    material.uniformTextureSamplerDic['uTexture'] = {};
+    if (material.hasAnyTextures()) {
+      material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      material._semanticsDic['TEXTURE'] = 'uTexture';
     }
 
     return vertexAttribsAsResult;
