@@ -34,10 +34,8 @@ If you want to watch examples in local. Go to GLBoost top directory by terminal 
 
 ```
 $ cd GLBoost
-$ ruby -run -e httpd -- --port 3000 ./
+$ npm start
 ```
-
-Then, access http://localhost:3000/examples by your web browser.
 
 ## Key features
 
@@ -191,14 +189,6 @@ $ npm run esdoc
 (Note: The documentation coverage is still very low. We address the resolution of this problem.)
 
 ### Test
-
-`1.` launch local web server. for example...
-
-```bash
-$ ruby -run -e httpd -- --port 3000 ./
-```
-
-`2.` Run Test command.
 
 ```bash
 $ npm run test
