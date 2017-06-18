@@ -6,10 +6,10 @@ export default class InputUtil {
 
 
   static whichButton(evt) {
-    if (evt.which) {
-      return (evt.which < 2) ? "left" : ((evt.which == 2) ? "middle" : "right");
+    if (typeof evt.which !== `undefined`) {
+      return (evt.which === 1) ? "left" : ((evt.which === 3) ? "right" : "middle");
     } else {
-      return (evt.button < 2) ? "left" : ((evt.button == 4) ? "middle" : "right");
+      return (evt.button === 1) ? "left" : ((evt.button === 4) ? "middle" : "right");
     }
   }
 }
