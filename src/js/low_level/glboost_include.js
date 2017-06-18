@@ -5,7 +5,7 @@ import GLBoostContext from './core/GLBoostLowContext';
 import ClassicMaterial from './ClassicMaterial';
 import Texture from './textures/Texture';
 import BlendShapeGeometry from './geometries/BlendShapeGeometry';
-import InitialSettings from '../InitialSettings';
+import '../InitialSettings';
 import Plane from './primitives/Plane';
 import Cube from './primitives/Cube';
 import Sphere from './primitives/Sphere';
