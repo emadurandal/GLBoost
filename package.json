@@ -19,7 +19,7 @@
     "standalone:custom_shader_2": "rollup -c examples/standalone/custom_shader_2/rollup.config.js",
     "standalone:particles": "rollup -c examples/standalone/particles/rollup.config.js",
     "standalone:multiple_render_targets": "rollup -c examples/for_phina/multiple_render_targets/rollup.config.js",
-    "start": "http-server examples -p 3000 -o"
+    "start": "http-server -p 3000 -o"
   },
   "repository": {
     "type": "git",
