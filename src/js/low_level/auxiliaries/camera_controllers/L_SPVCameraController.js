@@ -4,6 +4,7 @@ import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
 import MathUtil from '../../math/MathUtil';
+import InputUtil from '../../misc/InputUtil';
 
 export default class L_SPVCameraController extends GLBoostObject {
   constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
@@ -65,12 +66,11 @@ export default class L_SPVCameraController extends GLBoostObject {
 
       this._isKeyUp = false;
 
-      if (typeof evt.buttons !== 'undefined') {
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
-      }
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+
       return false;
     };
 
@@ -89,36 +89,32 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._movedMouseXOnCanvas = evt.clientX - rect.left;
       this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
-      if (typeof evt.buttons !== 'undefined') {
-        let data = evt.buttons;
-        let button_l = ((data & 0x0001) ? true : false);
-        let button_c = ((data & 0x0004) ? true : false);
-        if (button_c) {
-          this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
-          this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
+      let button_l = ((InputUtil.whichButton(evt) === 'left') ? true : false);
+      let button_c = ((InputUtil.whichButton(evt) === 'middle') ? true : false);
+      if (button_c) {
+        this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
+        this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
 
-          let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
-          if (evt.shiftKey) {
-            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
-          } else {
-            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
-          }
-          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
-
-          this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
-          this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
+        let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
+        if (evt.shiftKey) {
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
+        } else {
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
         }
+        this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
 
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
-
-        if (!button_l || !this._enableRotation) {
-          return;
-        }
+        this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
+        this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
       }
 
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+
+      if (!button_l || !this._enableRotation) {
+        return;
+      }
 
       // calc rotation angle
       let delta_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) * this._efficiency;
