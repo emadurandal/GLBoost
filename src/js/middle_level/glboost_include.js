@@ -9,7 +9,7 @@ import ClassicMaterial from '../low_level/materials/ClassicMaterial';
 import Texture from '../low_level/textures/Texture';
 import BlendShapeGeometry from '../low_level/geometries/BlendShapeGeometry';
 import ObjLoader from './loader/ObjLoader';
-import InitialSettings from '../InitialSettings';
+import '../InitialSettings';
 import Plane from '../low_level/primitives/Plane';
 import Cube from '../low_level/primitives/Cube';
 import Sphere from '../low_level/primitives/Sphere';
