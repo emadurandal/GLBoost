@@ -1,6 +1,9 @@
 import Shader from '../../low_level/shaders/Shader';
 
 export default class VertexWorldShadowShaderSource {
+  // In the context within these member methods,
+  // this is the instance of the corresponding shader class.
+
   VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
     var shaderText =   '';
     let textureUnitIndex = 0;

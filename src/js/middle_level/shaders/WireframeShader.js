@@ -4,6 +4,9 @@ import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
 
 export class WireframeShaderSource {
+  // In the context within these member methods,
+  // this is the instance of the corresponding shader class.
+
   VSDefine_WireframeShaderSource(in_, out_, f) {
     var shaderText = '';
     shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;

@@ -35,8 +35,8 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] bind the texture. <br />
-   * [ja] テクスチャをバインドします。
+   * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
+   * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
    */
   setUp(textureUnitIndex) {
     var gl = this._glContext.gl;

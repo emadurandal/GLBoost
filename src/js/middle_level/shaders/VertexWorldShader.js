@@ -1,6 +1,9 @@
 import Shader from '../../low_level/shaders/Shader';
 
 export default class VertexWorldShaderSource {
+  // In the context within these member methods,
+  // this is the instance of the corresponding shader class.
+
   VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
     var shaderText =   `${in_} vec3 aVertex_position;\n`;
 
