@@ -44,6 +44,7 @@ export default class VertexWorldShaderSource {
 
     shaderText += '  vec4 positionInWorld = worldMatrix * vec4(aVertex_position, 1.0);\n';
     shaderText += '  vec3 viewDirection_world = viewPosition_world.xyz - positionInWorld.xyz;\n';
+    shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  vec3 normal_world = normalMatrix * aVertex_normal;\n';

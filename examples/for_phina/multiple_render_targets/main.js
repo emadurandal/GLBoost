@@ -7,6 +7,8 @@ for(var i = 0; pair[i] ; i++) {
 
 GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 
+GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING = true;
+
 var SCREEN_WIDTH = 512;
 var SCREEN_HEIGHT = 512;
 
