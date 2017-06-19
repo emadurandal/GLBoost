@@ -7,6 +7,8 @@ export default class M_PointLightGizmo extends M_Gizmo {
     super(glBoostContext, null, null);
     this._init(radius);
     this._masterElement = null;
+
+    this.isVisible = false;
   }
 
   _init(radius) {
