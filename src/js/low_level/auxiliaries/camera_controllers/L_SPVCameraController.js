@@ -143,9 +143,8 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._onMouseWheel = (evt) => {
       evt.preventDefault();
-      this._wheel_y += evt.deltaY / 600;
-      this._wheel_y = Math.min(this._wheel_y, 3);
-      this._wheel_y = Math.max(this._wheel_y, 0.2);
+      this.dolly += evt.deltaY / 600;
+
 
       this._camaras.forEach(function (camera) {
         camera._needUpdateView(false);
@@ -264,11 +263,12 @@ export default class L_SPVCameraController extends GLBoostObject {
       newCenterVec.add(this._mouseTranslateVec);
     }
 
-    let newZNear = camera.zNear;
-    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+    let newZNear = camera.zNear;// * this._wheel_y;
+    let newZFar = newZNear + Vector3.subtract(newCenterVec, newEyeVec).length();
     if (this._target) {
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
+    //newZFar *= this._wheel_y;
 
     this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy/2.0));
 
@@ -356,6 +356,8 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   set dolly(value) {
     this._wheel_y = value;
+    this._wheel_y = Math.min(this._wheel_y, 3);
+    this._wheel_y = Math.max(this._wheel_y, 0.17);
 
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
