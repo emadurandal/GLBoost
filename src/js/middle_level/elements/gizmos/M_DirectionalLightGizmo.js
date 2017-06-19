@@ -1,17 +1,17 @@
 import M_Gizmo from './M_Gizmo';
-import Sphere from '../../../low_level/primitives/Sphere';
+import Arrow from '../../../low_level/primitives/Arrow';
 import ClassicMaterial from '../../../low_level/materials/ClassicMaterial';
 
-export default class M_PointLightGizmo extends M_Gizmo {
-  constructor(glBoostContext, radius) {
+export default class M_DirectionalLightGizmo extends M_Gizmo {
+  constructor(glBoostContext, length) {
     super(glBoostContext, null, null);
-    this._init(radius);
+    this._init(length);
 
-    this.isVisible = false;
+//    this.isVisible = false;
   }
 
-  _init(radius) {
-    this.geometry = new Sphere(this._glBoostContext, radius, 10, 10);
+  _init(length) {
+    this.geometry = new Arrow(this._glBoostContext, length);
     this.material = new ClassicMaterial(this._glBoostContext);
   }
 

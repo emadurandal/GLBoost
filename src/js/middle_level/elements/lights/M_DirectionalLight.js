@@ -1,6 +1,5 @@
 import M_AbstractLight from './M_AbstractLight';
-//import M_PointLightGizmo from '../gizmos/M_PointLightGizmo';
-import M_PointLightGizmo from '../gizmos/M_PointLightGizmo';
+import M_DirectionalLightGizmo from '../gizmos/M_DirectionalLightGizmo';
 
 /**
  * [en] This is a Directional Light class.<br>
@@ -20,7 +19,8 @@ export default class M_DirectionalLight extends M_AbstractLight {
     this._intensity = intensity;
     this._direction = direction;
 
-    let gizmo = new M_PointLightGizmo(glBoostContext, 1);
+//    let gizmo = new M_PointLightGizmo(glBoostContext, 1);
+    let gizmo = new M_DirectionalLightGizmo(glBoostContext, 10);
     gizmo.masterElement = this;
     this._gizmos.push(gizmo);
 
