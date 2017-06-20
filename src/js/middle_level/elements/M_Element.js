@@ -35,6 +35,7 @@ export default class M_Element extends L_Element {
     this._isVisible = true;
 
     this._gizmos = [];
+    this._masterElement = null;
   }
 
 
@@ -239,13 +240,18 @@ export default class M_Element extends L_Element {
         return this._finalMatrix.clone();
       }
 
-      var rotationMatrix = null;
+      var rotationMatrix = Matrix44.identity();
       if (this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.quaternion.rotationMatrix;
       } else {
+/*
         rotationMatrix = Matrix44.rotateX(this.rotate.x).
         multiply(Matrix44.rotateY(this.rotate.y)).
         multiply(Matrix44.rotateZ(this.rotate.z));
+        */
+        rotationMatrix.rotateZ(this.rotate.z).
+        multiply(Matrix44.rotateY(this.rotate.y)).
+        multiply(Matrix44.rotateX(this.rotate.x));
       }
 
       this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
@@ -289,7 +295,7 @@ export default class M_Element extends L_Element {
 
   getTransformMatrixOnlyRotateOn(value) {
 
-    var rotationMatrix = null;
+    var rotationMatrix = Matrix44.identity();
     if (this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
     } else if (this._currentCalcMode === 'matrix') {
@@ -301,9 +307,14 @@ export default class M_Element extends L_Element {
       rotationMatrix.m31 = 0;
       rotationMatrix.m32 = 0;
     } else {
+      /*
       rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
       multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
       multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+       */
+      rotationMatrix.rotateZ(this.getRotate('time', value).z).
+      multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
+      multiply(Matrix44.rotateX(this.getRotateAt('time', value).x));
     }
 
     return rotationMatrix.clone();
@@ -357,7 +368,7 @@ export default class M_Element extends L_Element {
     }
   }
 
-  get transformMatrixAccumulatedAncestry() {
+  get _transformMatrixAccumulatedAncestry() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
     if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
@@ -365,7 +376,11 @@ export default class M_Element extends L_Element {
       this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     }
 
-    return this._matrixAccumulatedAncestry.clone();
+    return this._matrixAccumulatedAncestry.clone();;
+  }
+
+  get transformMatrixAccumulatedAncestry() {
+    return this._transformMatrixAccumulatedAncestry;
   }
 
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
@@ -654,4 +669,21 @@ export default class M_Element extends L_Element {
     this._gizmos[0].isVisible;
   }
 
+  set masterElement(element) {
+    this._masterElement = element;
+  }
+
+  get masterElement() {
+    return this._masterElement;
+  }
+
+  // Use master element's transformMatrixAccumulatedAncestry.
+  get transformMatrixAccumulatedAncestry() {
+    if (this._masterElement) {
+      return Matrix44.multiply(this._masterElement.transformMatrixAccumulatedAncestry, this._transformMatrixAccumulatedAncestry);
+    }
+     return this._transformMatrixAccumulatedAncestry;
+    //return this.transformMatrix;
+
+  }
 }

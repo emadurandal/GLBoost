@@ -1,26 +1,14 @@
-import M_Mesh from '../meshes/M_Mesh';
+import M_Group from '../M_Group';
 
-export default class M_Gizmo extends M_Mesh {
+export default class M_Gizmo extends M_Group {
   constructor(glBoostContext) {
     super(glBoostContext, null, null);
 
-    this._masterElement = null;
+    this._mesh = null;
   }
 
-  set masterElement(element) {
-    this._masterElement = element;
-  }
-
-  get masterElement() {
-    return this._masterElement;
-  }
-
-  // Use master element's transformMatrixAccumulatedAncestry.
-  get transformMatrixAccumulatedAncestry() {
-    if (this._masterElement) {
-      return this._masterElement.transformMatrixAccumulatedAncestry;
-    }
-    return super.transformMatrixAccumulatedAncestry;
+  get mesh() {
+    return this._mesh;
   }
 
 }
