@@ -14,7 +14,7 @@ export default class M_DirectionalLightGizmo extends M_Gizmo {
   _init(glBoostContext, length) {
     this._material = new ClassicMaterial(this._glBoostContext);
     this._mesh = new M_Mesh(glBoostContext,
-      new Arrow(this._glBoostContext, length),
+      new Arrow(this._glBoostContext, length, 3),
       this._material);
 
     this.addChild(this._mesh);
