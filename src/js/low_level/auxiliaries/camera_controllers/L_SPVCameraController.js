@@ -5,6 +5,8 @@ import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
 import MathUtil from '../../math/MathUtil';
 import InputUtil from '../../misc/InputUtil';
+import AABB from '../../math/AABB';
+
 
 export default class L_SPVCameraController extends GLBoostObject {
   constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
@@ -266,7 +268,7 @@ export default class L_SPVCameraController extends GLBoostObject {
     let newZNear = camera.zNear;// * this._wheel_y;
     let newZFar = newZNear + Vector3.subtract(newCenterVec, newEyeVec).length();
     if (this._target) {
-      newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
+      newZFar += this._getTargetAABBInWorld().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
     //newZFar *= this._wheel_y;
 
@@ -275,13 +277,16 @@ export default class L_SPVCameraController extends GLBoostObject {
     return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
   }
 
-  _getTargetAABB() {
+  _getTargetAABBInWorld() {
     let targetAABB = null;
     if (typeof this._target.updateAABB !== 'undefined') {
       targetAABB = this._target.updateAABB();
     } else {
       targetAABB = this._target.AABB;
     }
+
+    let targetAABBInWorld = AABB.multiplyMatrix(this._target.transformMatrixAccumulatedAncestry, targetAABB);
+
     return targetAABB;
   }
 
@@ -290,7 +295,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       return [eyeVec, centerVec, upVec];
     }
 
-    let targetAABB = this._getTargetAABB();
+    let targetAABB = this._getTargetAABBInWorld();
 
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
     let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
