@@ -666,7 +666,7 @@ export default class M_Element extends L_Element {
   }
 
   get isGizmoVisible() {
-    this._gizmos[0].isVisible;
+    return this._gizmos[0].isVisible;
   }
 
   set masterElement(element) {
@@ -684,6 +684,5 @@ export default class M_Element extends L_Element {
     }
      return this._transformMatrixAccumulatedAncestry;
     //return this.transformMatrix;
-
   }
 }

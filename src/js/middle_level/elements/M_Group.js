@@ -224,6 +224,9 @@ export default class M_Group extends M_Element {
     return objects;
   }
 
+  /*
+   * Note that it's in world space
+   */
   updateAABB() {
     var aabb = (function mergeAABBRecursively(elem) {
       if (elem instanceof M_Group) {
@@ -240,22 +243,33 @@ export default class M_Group extends M_Element {
         //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
       }
       if (elem instanceof M_Mesh) {
-        let aabb = elem.AABBInWorld;
+        let aabb = elem.rawAABBInLocal;
         //console.log(aabb.toString());
         return aabb;
       }
 
       return null;
     })(this);
-    this.AABB.mergeAABB(aabb);
+    this._AABB = new AABB();
+    this._AABB.mergeAABB(aabb);
+    this._AABB.updateAllInfo();
 
-    let newAABB = this.AABB;
+    let world_m = this.transformMatrixAccumulatedAncestry;
+    let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
 
-    return newAABB;
+//    this._AABB = aabbInWorld;
+
+    return aabbInWorld;
   }
 
+  /*
+   * Note that it's in local space
+   */
   get AABB() {
-    return this._AABB;
+    let world_m = this.transformMatrixAccumulatedAncestry;
+    //let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
+    //return aabbInWorld;
+    return this._AABB;//.clone();
   }
 
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {

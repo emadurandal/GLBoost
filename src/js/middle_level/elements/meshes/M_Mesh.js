@@ -212,7 +212,15 @@ export default class M_Mesh extends M_Element {
 
   get AABBInWorld() {
     var world_m = this.transformMatrixAccumulatedAncestry;
-    return AABB.multiplyMatrix(world_m, this._geometry.AABB);
+    return AABB.multiplyMatrix(world_m, this._geometry.rawAABB);
+  }
+
+  get AABBInLocal() {
+    return this._geometry.rawAABB;//.clone();
+  }
+
+  get rawAABBInLocal() {
+    return this._geometry.rawAABB;
   }
 
   getAppropriateMaterials() {
