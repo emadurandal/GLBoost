@@ -750,6 +750,10 @@ export default class Geometry extends GLBoostObject {
   }
 
   get AABB() {
+    return this._AABB;//.clone();
+  }
+
+  get rawAABB() {
     return this._AABB;
   }
 
