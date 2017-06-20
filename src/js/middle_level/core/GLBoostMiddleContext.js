@@ -82,8 +82,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createDirectionalLight(intensity, direction) {
-    return new M_DirectionalLight(this, intensity, direction);
+  createDirectionalLight(intensity, direction, length) {
+    return new M_DirectionalLight(this, intensity, direction, length);
   }
 
   createPointLight(intensity) {

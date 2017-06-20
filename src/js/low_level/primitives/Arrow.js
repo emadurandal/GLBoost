@@ -15,23 +15,24 @@ export default class Arrow extends Geometry {
     let arrowheadWidth = length/10;
     let arrowheadLength = length/7.5;
     let stickLength = length - arrowheadLength;
+    let halfLength = length/2;
 
     let positions = [
       // Stick part
-      new Vector3(0, 0, 0),
-      new Vector3(stickLength, 0, 0),
+      new Vector3(0, 0, 0+halfLength),
+      new Vector3(0, 0, -stickLength+halfLength),
 
       // 1st line of a triangle
-      new Vector3(stickLength, -arrowheadWidth, 0),
-      new Vector3(stickLength, arrowheadWidth, 0),
+      new Vector3(arrowheadWidth, 0, -stickLength+halfLength),
+      new Vector3(-arrowheadWidth, 0, -stickLength+halfLength),
 
       // 2nd line of a triangle
-      new Vector3(stickLength, arrowheadWidth, 0),
-      new Vector3(length, 0, 0),
+      new Vector3(-arrowheadWidth, 0, -stickLength+halfLength),
+      new Vector3(0, 0, -length+halfLength),
 
       // 3rd line of a triangle
-      new Vector3(length, 0, 0),
-      new Vector3(stickLength, -arrowheadWidth, 0),
+      new Vector3(0, 0, -length+halfLength),
+      new Vector3(arrowheadWidth, 0, -stickLength+halfLength),
     ];
 
     this.setVerticesData({
