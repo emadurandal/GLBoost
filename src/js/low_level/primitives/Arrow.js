@@ -20,22 +20,26 @@ export default class Arrow extends Geometry {
     let positions = [];
 
     for (let i=0; i<lineCount; i++) {
-      let lineOffset = i - lineCount/2;
+      let lineOffset = (i - lineCount/2) * arrowheadWidth;
+      let lineOtherOffset = arrowheadWidth;
+      if( ( i % 2 ) !== 1 ) {
+        lineOtherOffset = -lineOtherOffset;
+      }
       // Stick part
-      positions.push(new Vector3(0, lineOffset, halfLength));
-      positions.push(new Vector3(0, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -stickLength+halfLength));
 
       // 1st line of a triangle
-      positions.push(new Vector3(arrowheadWidth, lineOffset, -stickLength+halfLength));
-      positions.push(new Vector3(-arrowheadWidth, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
 
       // 2nd line of a triangle
-      positions.push(new Vector3(-arrowheadWidth, lineOffset, -stickLength+halfLength));
-      positions.push(new Vector3(0, lineOffset, -length+halfLength));
+      positions.push(new Vector3(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -length+halfLength));
 
       // 3rd line of a triangle
-      positions.push(new Vector3(0, lineOffset, -length+halfLength));
-      positions.push(new Vector3(arrowheadWidth, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -length+halfLength));
+      positions.push(new Vector3(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
     }
 
     this.setVerticesData({
