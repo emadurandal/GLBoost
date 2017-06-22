@@ -40,7 +40,9 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    shaderText += 'uniform sampler2D uTexture;\n';
+    if (material.hasAnyTextures()) {
+      shaderText += 'uniform sampler2D uTexture;\n';
+    }
     shaderText += 'uniform vec4 materialBaseColor;\n';
 
     return shaderText;
@@ -53,7 +55,7 @@ export class DecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
     }
 
