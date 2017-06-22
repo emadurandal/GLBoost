@@ -37,7 +37,11 @@ export class SPVPhongShaderSource {
       shaderText += `    vec3 viewDirection = normalize(v_viewDirection);\n`;
       shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
-      shaderText += `    rt0 += vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
+
+      shaderText += `    vec4 enlighten = Ks * lightDiffuse[${i}];\n`;
+      shaderText += `    enlighten *= vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    enlighten *= vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0);\n`;
+      shaderText += `    rt0 += enlighten;\n`;
       shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
