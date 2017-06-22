@@ -403,7 +403,7 @@ export default class Shader extends GLBoostObject {
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
     let vertexShaderStrWithLineNumber = this._addLineNumber(vertexShaderStr);
-    let fragmentShaderStrWithLineNumber = this._addLineNumber(vertexShaderStr);
+    let fragmentShaderStrWithLineNumber = this._addLineNumber(fragmentShaderStr);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStrWithLineNumber);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
