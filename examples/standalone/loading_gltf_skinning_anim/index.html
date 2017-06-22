@@ -73,7 +73,7 @@
   var gtime = 0/30;
   var gtimeDelta = 1/60;
 
-  var glTFLoader = GLBoost.GLTFLoader.getInstance();
+  var glTFLoader = GLBoost.SPVGLTFLoader.getInstance();
   var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', null);
 
   promise.then(function(group) {
