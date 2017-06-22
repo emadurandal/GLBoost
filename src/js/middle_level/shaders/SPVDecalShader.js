@@ -43,7 +43,9 @@ export class SPVDecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    shaderText += 'uniform sampler2D uTexture;\n';
+    if (material.hasAnyTextures()) {
+      shaderText += 'uniform sampler2D uTexture;\n';
+    }
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform vec4 textureContributionRate;\n';
     shaderText += 'uniform vec4 gamma;\n';
@@ -58,7 +60,7 @@ export class SPVDecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
     }
 
