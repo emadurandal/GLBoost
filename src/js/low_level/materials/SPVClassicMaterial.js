@@ -10,6 +10,7 @@ export default class SPVClassicMaterial extends L_AbstractMaterial {
     this._isWireframe = false;
     this._isWireframeOnShade = false;
     this._wireframeWidth = 1.0;
+    this._wireframeWidthRelativeScale = 1.0;
   }
 
   set isWireframe(flag) {
@@ -34,6 +35,14 @@ export default class SPVClassicMaterial extends L_AbstractMaterial {
 
   get wireframeWidth() {
     return this._wireframeWidth;
+  }
+
+  set wireframeWidthRelativeScale(scale) {
+    this._wireframeWidthRelativeScale = scale;
+  }
+
+  get wireframeWidthRelativeScale() {
+    return this._wireframeWidthRelativeScale;
   }
 }
 
