@@ -31,6 +31,7 @@ export class WireframeShaderSource {
     shaderText += 'uniform bool isWireframe;\n';
     //shaderText += 'uniform bool isWireframeOnShade;\n';
     shaderText += 'uniform float wireframeWidth;\n';
+    shaderText += 'uniform float wireframeWidthRelativeScale;\n';
 
     return shaderText;
   }
@@ -39,9 +40,9 @@ export class WireframeShaderSource {
     let shaderText = '';
 
     shaderText += `
-    float edge_ratio(vec3 bary3, float wireframeWidth) {     
+    float edge_ratio(vec3 bary3, float wireframeWidth, float wireframeWidthRelativeScale) {     
         vec3 d = fwidth(bary3);
-        vec3 x = bary3+vec3(1.0 - wireframeWidth)*d;
+        vec3 x = bary3+vec3((1.0 - wireframeWidth*wireframeWidthRelativeScale))*d;
         vec3 a3 = smoothstep(vec3(0.0), d, x);
         float factor = min(min(a3.x, a3.y), a3.z);
         
@@ -55,14 +56,17 @@ export class WireframeShaderSource {
   FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += 'if ( isWireframe ) {\n';
+    shaderText += 'float threshold = 0.001;\n';
+    shaderText += 'if ( isWireframe ) {\n'; 
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
-    shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidth);\n';
-    shaderText += '  rt0 = mix(rt0, wireframeColor, vec4(edgeRatio));\n';
-    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * edgeRatio);\n';
+    shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidth, wireframeWidthRelativeScale);\n';
+    shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidth * wireframeWidthRelativeScale/4.0);\n';
+    // if r0.a is 0.0, it is wireframe not on shaded
+    shaderText += '  rt0.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
+    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidth * wireframeWidthRelativeScale/1.0));\n';
     shaderText += '}\n';
 
-    shaderText += '    if (rt0.a < 0.05) {\n';
+    shaderText += '    if (rt0.a < threshold) {\n';
     shaderText += '      discard;\n';
     shaderText += '    }\n';
 
@@ -83,6 +87,10 @@ export class WireframeShaderSource {
     let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
     material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidth', uniform_wireframeWidth);
     this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
+
+    let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
+    material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
+    this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
 
     return vertexAttribsAsResult;
   }
@@ -112,11 +120,13 @@ export default class WireframeShader extends Shader {
     let isWifeframe = false;
     let isWireframeOnShade = false;
     let wireframeWidth = 0.0;
+    let wireframeWidthRelativeScale = 0.0;
 
     if (typeof material.isWireframe !== 'undefined') {
       isWifeframe = material.isWireframe;
       isWireframeOnShade = material.isWireframeOnShade;
       wireframeWidth = material.wireframeWidth;
+      wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
     }
 
     let uniformLocationIsWireframe = material.getUniform(glslProgram.hashId, 'uniform_isWireframe');
@@ -129,6 +139,10 @@ export default class WireframeShader extends Shader {
     let uniformLocationWireframeWidth = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidth');
     if (uniformLocationWireframeWidth) {
       this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
+    }
+    let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidthRelativeScale');
+    if (uniformLocationWireframeWidthRelativeScale) {
+      this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
     }
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
