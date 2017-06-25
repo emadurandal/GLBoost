@@ -25,6 +25,24 @@ export default class JointPrimitive extends Geometry {
       if( ( i % 2 ) !== 1 ) {
         lineOtherOffset = -lineOtherOffset;
       }
+
+
+      // Stick part
+      positions.push(new Vector3(-halfLength, lineOtherOffset, lineOffset));
+      positions.push(new Vector3(stickLength-halfLength, lineOtherOffset , lineOffset));
+
+      // 1st line of a triangle
+      positions.push(new Vector3(stickLength-halfLength, arrowheadWidth+lineOtherOffset, lineOffset));
+      positions.push(new Vector3(stickLength-halfLength, -arrowheadWidth+lineOtherOffset, lineOffset));
+
+      // 2nd line of a triangle
+      positions.push(new Vector3(stickLength-halfLength, -arrowheadWidth+lineOtherOffset, lineOffset));
+      positions.push(new Vector3(length-halfLength, lineOtherOffset, lineOffset));
+
+      // 3rd line of a triangle
+      positions.push(new Vector3(length-halfLength, lineOtherOffset, lineOffset));
+      positions.push(new Vector3(stickLength-halfLength, arrowheadWidth+lineOtherOffset, lineOffset));
+
 /*
       // Stick part
       positions.push(new Vector3(halfLength, lineOtherOffset, lineOffset));
@@ -41,7 +59,7 @@ export default class JointPrimitive extends Geometry {
       // 3rd line of a triangle
       positions.push(new Vector3(-length+halfLength, lineOtherOffset, lineOffset));
       positions.push(new Vector3(-stickLength+halfLength, arrowheadWidth+lineOtherOffset, lineOffset));
-
+/*
       // Stick part
       positions.push(new Vector3(lineOtherOffset, -halfLength, lineOffset));
       positions.push(new Vector3(lineOtherOffset, stickLength-halfLength, lineOffset));
@@ -59,7 +77,7 @@ export default class JointPrimitive extends Geometry {
       positions.push(new Vector3(arrowheadWidth+lineOtherOffset, stickLength-halfLength, lineOffset));
 */
 
-
+/*
       // Stick part
       positions.push(new Vector3(lineOtherOffset, lineOffset, halfLength));
       positions.push(new Vector3(lineOtherOffset, lineOffset, -stickLength+halfLength));
@@ -75,7 +93,7 @@ export default class JointPrimitive extends Geometry {
       // 3rd line of a triangle
       positions.push(new Vector3(lineOtherOffset, lineOffset, -length+halfLength));
       positions.push(new Vector3(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
-
+*/
     }
 
     this.setVerticesData({
