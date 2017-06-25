@@ -1,4 +1,5 @@
 import M_Mesh from '../elements/meshes/M_Mesh';
+import M_Element from '../elements/M_Element';
 import M_Group from '../elements/M_Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 import Vector4 from '../../low_level/math/Vector4';
@@ -173,16 +174,16 @@ export default class RenderPass extends GLBoostObject {
   }
 
   prepareToRender(expression) {
-    let collectMeshes = function(elem) {
+    let collectElements = function(elem, elementsType) {
       if (elem instanceof M_Group) {
         var children = elem.getChildren();
         var meshes = [];
         children.forEach(function(child) {
-          var childMeshes = collectMeshes(child);
+          var childMeshes = collectElements(child, elementsType);
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof M_Mesh) {
+      } else if (elem instanceof elementsType) {
         return [elem];
       } else {
         return [];
@@ -192,12 +193,18 @@ export default class RenderPass extends GLBoostObject {
     this._meshes = [];
     this._gizmos = [];
     if (this._scene) {
+      let elements = [];
       this._scene.getChildren().forEach((elm)=> {
         // collect meshes
-        this._meshes = this._meshes.concat(collectMeshes(elm));
+        this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
+
+        // collect meshes
+        elements = elements.concat(collectElements(elm, M_Element));
 
         // collect gizmos from elements
-        Array.prototype.push.apply(this._gizmos, elm._gizmos);
+        for (let element of elements) {
+          Array.prototype.push.apply(this._gizmos, element._gizmos);
+        }
       });
     }
 
