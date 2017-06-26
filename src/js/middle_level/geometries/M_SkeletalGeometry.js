@@ -6,6 +6,8 @@ import M_Group from '../elements/M_Group';
 import Matrix44 from '../../low_level/math/Matrix44';
 import FreeShader from '../shaders/FreeShader';
 import Shader from '../../low_level/shaders/Shader';
+import Vector3 from '../../low_level/math/Vector3';
+import Vector4 from '../../low_level/math/Vector4';
 
 export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
@@ -73,7 +75,32 @@ export default class M_SkeletalGeometry extends Geometry {
           let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
           //console.log(thisLoopMatrix.toStringApproximately());
           if (j > 0) {
+
             tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
+            /*
+            let origin = Matrix44.invert(skeletalMesh.bindShapeMatrix).getTranslate().length();
+            let length = Vector3.lengthBtw(tempMatrices[j - 1].getTranslate(), thisLoopMatrix.getTransalte());
+            jointsHierarchy[j].scaleJoint = length-origin;// * skeletalMesh.bindShapeMatrix.m00;// * skeletalMesh.bindShapeMatrix.m00;
+            */
+
+            let currentMatrix = jointsHierarchy[j].parent.transformMatrix.clone();
+            let parentMatrix = Matrix44.identity();//jointsHierarchy[j-1].parent.transformMatrix.clone();
+            /*
+            scaleMatrix.m00 *= skeletalMesh.bindShapeMatrix.m00;
+            scaleMatrix.m11 *= skeletalMesh.bindShapeMatrix.m11;
+            scaleMatrix.m22 *= skeletalMesh.bindShapeMatrix.m22;
+*/
+            let parentPoint = parentMatrix.multiplyVector(Vector4.zero()).toVector3();
+            let length = Vector3.lengthBtw(parentPoint, currentMatrix.multiplyVector(parentPoint.toVector4()).toVector3());
+
+            let scl = Vector3.lengthBtw(parentMatrix.getTranslate(), currentMatrix.getTranslate());
+            //jointsHierarchy[j - 1].scale = new Vector3(length, length, length);
+
+            if (j === jointsHierarchy.length-1) {
+              jointsHierarchy[j].isVisible = false;
+            } else {
+              jointsHierarchy[j].isVisible = true;
+            }
           } else {
             let upperGroupsAccumulatedMatrix = Matrix44.identity();
             if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {

@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import Vector4 from './Vector4';
+import Vector3 from './Vector3';
 import Matrix33 from './Matrix33';
 import MathUtil from './MathUtil';
 
@@ -94,6 +95,10 @@ export default class Matrix44 {
       0, 0, 1, vec.z,
       0, 0, 0, 1
     );
+  }
+
+  getTranslate() {
+    return new Vector3(this.m03, this.m13, this.m23);
   }
 
   static translate(vec) {

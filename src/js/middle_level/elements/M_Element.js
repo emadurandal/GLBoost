@@ -266,6 +266,45 @@ export default class M_Element extends L_Element {
     return this._finalMatrix.clone();
   }
 
+  get rotateScaleTranslate() {
+    var input = -1;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+    if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
+      var matrix = Matrix44.identity();
+
+      if (this._currentCalcMode === 'matrix') {
+        this._finalMatrix = matrix.multiply(this.matrix);
+        this._dirtyAsElement = false;
+        return this._finalMatrix.clone();
+      }
+
+      var rotationMatrix = Matrix44.identity();
+      if (this._currentCalcMode === 'quaternion') {
+        rotationMatrix = this.quaternion.rotationMatrix;
+      } else {
+        /*
+         rotationMatrix = Matrix44.rotateX(this.rotate.x).
+         multiply(Matrix44.rotateY(this.rotate.y)).
+         multiply(Matrix44.rotateZ(this.rotate.z));
+         */
+        rotationMatrix.rotateZ(this.rotate.z).
+        multiply(Matrix44.rotateY(this.rotate.y)).
+        multiply(Matrix44.rotateX(this.rotate.x));
+      }
+
+      Matrix44.translate(this.translate);
+
+      this._finalMatrix = Matrix44.translate(this.translate).multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
+
+      this._dirtyAsElement = false;
+      this._matrixGetMode = 'animated_' + input;
+    }
+
+    return this._finalMatrix.clone();
+  }
+
 
   get transformMatrixOnlyRotate() {
 
@@ -685,4 +724,5 @@ export default class M_Element extends L_Element {
      return this._transformMatrixAccumulatedAncestry;
     //return this.transformMatrix;
   }
+
 }
