@@ -25,6 +25,8 @@ export default class Vector3 {
     return new Vector3(0, 0, 0);
   }
 
+
+
   clone() {
     return new Vector3(this.x, this.y, this.z);
   }
