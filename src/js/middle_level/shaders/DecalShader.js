@@ -96,6 +96,22 @@ export class DecalShaderSource {
       material._semanticsDic['TEXTURE'] = 'uTexture';
     }
 
+
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
+    if (uNormalTexture) {
+      material.setUniform(shaderProgram.hashId, 'uNormalTexture', normalTexture);
+      // set texture unit 1 to the normal texture sampler
+      this._glContext.uniform1i( uNormalTexture, 1, true);
+
+      material.uniformTextureSamplerDic['uNormalTexture'] = {};
+      if (material.hasAnyTextures()) {
+        material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
+        material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
+        material._semanticsDic['TEXTURE'].push('uNormalTexture');
+      }
+    }
+
     return vertexAttribsAsResult;
   }
 }

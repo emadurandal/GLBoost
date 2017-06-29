@@ -591,6 +591,19 @@ export default class Shader extends GLBoostObject {
     return shadowingText;
   };
 
+  static _getNormalStr(gl, material) {
+    let shaderText = '';
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    if (normalTexture) {
+      let textureFunc = Shader._texture_func(gl);
+      shaderText += `  vec3 normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
+      //shaderText += `  normal.y = 1.0 - normal.x - normal.z;\n`;
+    } else {
+      shaderText += '  vec3 normal = normalize(v_normal);\n';
+    }
+    return shaderText;
+  }
+
   _sampler2DShadow_func() {
     var gl = this._glContext.gl;
     return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';

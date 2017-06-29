@@ -29,6 +29,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._isVisibleForGeometiesAssginedByThisMaterial = true;
     this._globalStatesUsage = null;
     this._shaderParametersForShaderInstance = {};
+    this._semanticsDic = {};
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -107,7 +108,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
       return;
     }
     this._textureDic[texture.userFlavorName] = texture;
-    this._texturePurposeDic[(typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE)] = texture.userFlavorName;
+    let index = (typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+    this._texturePurposeDic[index] = texture.userFlavorName;
     this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._updateCount();
   }
@@ -119,7 +121,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   setTexturePurpose(userFlavorNameOfTexture, purpose) {
-    this._texturePurposeDic[userFlavorNameOfTexture] = purpose;
+    this._texturePurposeDic[purpose] = userFlavorNameOfTexture;
     this._updateCount();
   }
 
@@ -286,7 +288,9 @@ export default class L_AbstractMaterial extends GLBoostObject {
       isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
       return isCalledWebGLBindTexture;
     } else {
-      gl.bindTexture(gl.TEXTURE_2D, null);
+      this._glBoostContext.defaultDummyTexture.setUp(0);
+
+//      gl.bindTexture(gl.TEXTURE_2D, null);
       isCalledWebGLBindTexture = true;
       return isCalledWebGLBindTexture;
     }
@@ -381,6 +385,25 @@ export default class L_AbstractMaterial extends GLBoostObject {
   get shaderParameters() {
     return this._shaderParametersForShaderInstance;
   }
+
+  addSemanticsDic(uniform, uniformName) {
+    if (typeof this._semanticsDic[uniform] === 'undefined') {
+      this._semanticsDic[uniform] = uniformName;
+    } else if (typeof this._semanticsDic[uniform] === 'string') {
+      let tmpSemanticsStr = this._semanticsDic[uniform];
+      this._semanticsDic[uniform] = [];
+      this._semanticsDic[uniform].push(tmpSemanticsStr);
+      this._semanticsDic[uniform].push(uniformName);
+    } else {
+      // it must be Array
+      this._semanticsDic[uniform].push(uniformName);
+    }
+  }
+
+  removeSemanticsDic(uniform) {
+    delete this._semanticsDic[uniform];
+  }
+
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;
