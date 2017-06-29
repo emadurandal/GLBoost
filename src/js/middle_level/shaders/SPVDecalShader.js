@@ -53,6 +53,22 @@ export class SPVDecalShaderSource {
     return shaderText;
   }
 
+  FSMethodDefine_SPVDecalShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += `
+    float grayscale(vec4 color) {     
+      float r = color.r * 0.22;
+      float g = color.g * 0.66;
+      float b = color.b * 0.11;
+        
+      return r + g + b;
+    }
+    `;
+
+    return shaderText;
+  }
+
   FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
     var textureFunc = Shader._texture_func(gl);

@@ -14,6 +14,7 @@ export class SPVPhongShaderSource {
     shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
     shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
     shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
+    shaderText += `uniform bool toUseSurfaceColorAsSpecularMap;\n`;
 
     return shaderText;
   }
@@ -36,7 +37,12 @@ export class SPVPhongShaderSource {
       shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `    vec3 viewDirection = normalize(v_viewDirection);\n`;
       shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
+
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
+      shaderText += `    if (toUseSurfaceColorAsSpecularMap) {\n`;
+      shaderText += `      specular *= grayscale(surfaceColor) + 0.5;\n`;
+      shaderText += `    };\n`;
+
 
       shaderText += `    vec4 enlighten = Ks * lightDiffuse[${i}];\n`;
       shaderText += `    enlighten *= vec4(specular, specular, specular, 0.0);\n`;
@@ -58,6 +64,7 @@ export class SPVPhongShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
     material.setUniform(shaderProgram.hashId, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
     material.setUniform(shaderProgram.hashId, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
+    material.setUniform(shaderProgram.hashId, 'uniform_toUseSurfaceColorAsSpecularMap', this._glContext.getUniformLocation(shaderProgram, 'toUseSurfaceColorAsSpecularMap'));
 
     return vertexAttribsAsResult;
   }
@@ -72,7 +79,7 @@ export default class SPVPhongShader extends SPVDecalShader {
     SPVPhongShader.mixin(SPVPhongShaderSource);
 
     this._power = 64.0;
-
+    this._toUseSurfaceColorAsSpecularMap = true;
   }
 
   setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
@@ -83,7 +90,7 @@ export default class SPVPhongShader extends SPVDecalShader {
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
     this._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_power'), this._power, true);
-
+    this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_toUseSurfaceColorAsSpecularMap'), this._toUseSurfaceColorAsSpecularMap, true);
   }
 
   set Kd(value) {
