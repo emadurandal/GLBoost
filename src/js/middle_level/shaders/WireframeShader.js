@@ -66,6 +66,13 @@ export class WireframeShaderSource {
     shaderText += '      discard;\n';
     shaderText += '    }\n';
 
+    /*
+    //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += '  rt0 = vec4(normalize(v_normal)*0.5+0.5, 1.0);\n';
+    }
+    */
+
     return shaderText;
   }
 

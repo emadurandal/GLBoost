@@ -22,6 +22,7 @@ export default class VertexWorldShaderSource {
     /// These are assumed as in World coordinate
     shaderText += `uniform vec4 viewPosition;\n`;
     shaderText += `${out_} vec3 v_viewDirection;\n`;
+    shaderText += `${out_} vec3 v_tangent;\n`;
 
     // for Lighting
     if(lights.length > 0) {
@@ -47,29 +48,45 @@ export default class VertexWorldShaderSource {
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += '  v_normal = normalMatrix * aVertex_normal;\n';
+      shaderText += '  vec3 normal_world = normalMatrix * aVertex_normal;\n';
+
       if (Shader._exist(f, GLBoost.TANGENT)) {
 
         // world space to tangent space
+        shaderText += '  vec3 tangent_world = normalMatrix * aVertex_tangent;\n';
+        shaderText += '  vec3 binormal_world = cross(normal_world, tangent_world);\n';
+        shaderText += '  tangent_world = cross(binormal_world, normal_world);\n';
+        shaderText += '      v_tangent = tangent_world;\n';
 
-        shaderText += '  vec3 viewDirectionTangent = v_viewDirection;\n';
+        /*
+        shaderText += `  mat3 tbnMat_world_to_tangent = mat3(
+          tangent_world.x, binormal_world.x, normal_world.x,
+          tangent_world.y, binormal_world.y, normal_world.y,
+          tangent_world.z, binormal_world.z, normal_world.z
+        );
+        `;
+*/
 
-        shaderText += '  vec3 tangent = normalMatrix * aVertex_tangent;\n';
-        shaderText += '  vec3 binormal = cross(v_normal, tangent);\n';
+        shaderText += `  mat3 tbnMat_world_to_tangent = mat3(
+          tangent_world.x, tangent_world.y, tangent_world.z,
+          binormal_world.x, binormal_world.y, binormal_world.z,
+          normal_world.x, normal_world.y, normal_world.z
+        );
+        `;
+
 
         shaderText += '  // move v_viewDirection from World space to Tangent space. \n';
         shaderText += '  viewDirectionTangent.x = dot(tangent, v_viewDirection);\n';
         shaderText += '  viewDirectionTangent.y = dot(binormal, v_viewDirection);\n';
         shaderText += '  viewDirectionTangent.z = dot(v_normal, v_viewDirection);\n';
 
-        shaderText += '  v_viewDirection = mix(v_viewDirection, viewDirectionTangent, 0.0);\n';
+        shaderText += '  vec3 viewDirection_tangent = tbnMat_world_to_tangent * viewDirection_world;\n';
 
-        shaderText += '  vec3 normalTangent = v_normal;\n';
-        shaderText += '  normalTangent.x = dot(tangent, v_normal);\n';
-        shaderText += '  normalTangent.y = dot(binormal, v_normal);\n';
-        shaderText += '  normalTangent.z = dot(v_normal, v_normal);\n';
+        shaderText += '  v_viewDirection = mix(viewDirection_world, viewDirection_tangent, 0.0);\n';
 
-        shaderText += '  v_normal = mix(v_normal, normalTangent, 0.0);\n';
+        shaderText += '  vec3 normal_tangent = tbnMat_world_to_tangent * normal_world;\n';
+
+        shaderText += '  v_normal = mix(normal_world, normal_tangent, 0.0);\n';
 
       } else {
         shaderText += '  v_viewDirection = viewDirection_world;\n';
@@ -80,27 +97,25 @@ export default class VertexWorldShaderSource {
     shaderText += '  v_viewDirection = normalize(v_viewDirection);\n';
 
 
-    shaderText += `  vec3 lightDirectionTangent = vec3(0.0);\n`;
+    shaderText += `  vec3 lightDirection_tangent;\n`;
+    shaderText += `  vec3 lightDirection_world;\n`;
+
     for (let i=0; i<lights.length; i++) {
       // if PointLight: lightPosition_world[i].w === 1.0      if DirectionalLight: lightPosition_world[i].w === 0.0
       shaderText += `  lightDirection_world = normalize(lightPosition_world[${i}].xyz - positionInWorld.xyz * lightPosition_world[${i}].w);\n`;
-      shaderText += `  lightDirection_view = (viewMatrix * vec4(lightDirection_world, 1.0)).xyz;\n`;
       if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `  // move lightDirection_view from World space to Tangent space. \n`;
-
-//        shaderText += `  lightDirection_tangent.x = dot(tangent_view, lightDirection_view);\n`;
-//        shaderText += `  lightDirection_tangent.y = dot(binormal, lightDirection_view);\n`;
-//        shaderText += `  lightDirection_tangent.z = dot(v_normal, lightDirection_view);\n`;
+        shaderText += `  // move lightDirection_world from World space to Tangent space. \n`;
 
         if (Shader._exist(f, GLBoost.TANGENT)) {
           // world space to tangent space
-          shaderText += `  lightDirection_tangent = tbnMat_view_to_tangent * lightDirection_view;\n`;
+          shaderText += `  lightDirection_tangent = tbnMat_world_to_tangent * lightDirection_world;\n`;
           shaderText += `  v_lightDirection[${i}] = mix(lightDirection_world, lightDirection_tangent, 0.0);\n`;
         } else {
           shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
         }
         shaderText += `  v_lightDirection[${i}] = normalize(v_lightDirection[${i}]);\n`;
       }
+
     }
 
     shaderText += '  vec4 interpolatedPositionInWorld = positionInWorld;\n';
@@ -134,6 +149,7 @@ export default class VertexWorldShaderSource {
       shaderText += `${in_} vec3 v_normal;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
+    shaderText += `${in_} vec3 v_tangent;\n`;
 
     return shaderText;
   }

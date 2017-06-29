@@ -8,6 +8,7 @@ import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShade
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
+import Vector2 from '../../low_level/math/Vector2';
 
 
 export default class Geometry extends GLBoostObject {
@@ -144,12 +145,12 @@ export default class Geometry extends GLBoostObject {
         uv2Vec2.y
       ),
       new Vector3(
-        pos2Vec3.z,
+        pos2Vec3.y,
         uv2Vec2.x,
         uv2Vec2.y
       ),
       new Vector3(
-        pos2Vec3.y,
+        pos2Vec3.z,
         uv2Vec2.x,
         uv2Vec2.y
       )
@@ -159,9 +160,15 @@ export default class Geometry extends GLBoostObject {
     let v = [];
 
     for ( let i = 0; i < 3; i++ ) {
-      let v1 = Vector3.subtract(cp1, cp0);
-      let v2 = Vector3.subtract(cp2, cp1);
+      let v1 = Vector3.subtract(cp1[i], cp0[i]);
+      let v2 = Vector3.subtract(cp2[i], cp1[i]);
       let abc = Vector3.cross(v1, v2);
+
+      let validate = Math.abs(abc.x) < Number.EPSILON;
+      if (validate) {
+        console.assert(validate, "Polygons or polygons on UV are degenerate!");
+        return new Vector3(0, 0, 0);
+      }
 
       u[i] = - abc.y / abc.x;
       v[i] = - abc.z / abc.x;
@@ -170,7 +177,7 @@ export default class Geometry extends GLBoostObject {
     return (new Vector3(u[0], u[1], u[2])).normalize();
   }
 
-  _calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3) {
+  _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, componentNum3) {
     let pos0Vec3 = new Vector3(
       this._vertices.position[pos0IndexBase],
       this._vertices.position[pos0IndexBase + 1],
@@ -189,53 +196,59 @@ export default class Geometry extends GLBoostObject {
       this._vertices.position[pos2IndexBase + 2]
     );
 
-    let uv0Vec2 = new Vector3(
-      this._vertices.position[uv0IndexBase],
-      this._vertices.position[uv0IndexBase + 1],
-      this._vertices.position[uv0IndexBase + 2]
+    let uv0Vec2 = new Vector2(
+      this._vertices.texcoord[uv0IndexBase],
+      this._vertices.texcoord[uv0IndexBase + 1]
     );
 
-    let uv1Vec2 = new Vector3(
-      this._vertices.position[uv1IndexBase],
-      this._vertices.position[uv1IndexBase + 1],
-      this._vertices.position[uv1IndexBase + 2]
+    let uv1Vec2 = new Vector2(
+      this._vertices.texcoord[uv1IndexBase],
+      this._vertices.texcoord[uv1IndexBase + 1]
     );
 
-    let uv2Vec2 = new Vector3(
-      this._vertices.position[uv2IndexBase],
-      this._vertices.position[uv2IndexBase + 1],
-      this._vertices.position[uv2IndexBase + 2]
+    let uv2Vec2 = new Vector2(
+      this._vertices.texcoord[uv2IndexBase],
+      this._vertices.texcoord[uv2IndexBase + 1]
     );
 
-    let tan0IndexBase = i * VerticesNum3;
+    let tan0IndexBase = (i    ) * componentNum3;
+    let tan1IndexBase = (i + 1) * componentNum3;
+    let tan2IndexBase = (i + 2) * componentNum3;
+    if (vertexIndices) {
+      tan0IndexBase = vertexIndices[i] * componentNum3;
+      tan1IndexBase = vertexIndices[i + 1] * componentNum3;
+      tan2IndexBase = vertexIndices[i + 2] * componentNum3;
+    }
+
     let tan0Vec3 = this._calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2);
     this._vertices.tangent[tan0IndexBase] = tan0Vec3.x;
     this._vertices.tangent[tan0IndexBase + 1] = tan0Vec3.y;
     this._vertices.tangent[tan0IndexBase + 2] = tan0Vec3.z;
 
-    let tan1IndexBase = (i + 1) * VerticesNum3;
     let tan1Vec3 = this._calcTangentPerVertex(pos1Vec3, pos2Vec3, pos0Vec3, uv1Vec2, uv2Vec2, uv0Vec2);
     this._vertices.tangent[tan1IndexBase] = tan1Vec3.x;
     this._vertices.tangent[tan1IndexBase + 1] = tan1Vec3.y;
     this._vertices.tangent[tan1IndexBase + 2] = tan1Vec3.z;
 
-    let tan2IndexBase = (i + 2) * VerticesNum3;
     let tan2Vec3 = this._calcTangentPerVertex(pos2Vec3, pos0Vec3, pos1Vec3, uv2Vec2, uv0Vec2, uv1Vec2);
     this._vertices.tangent[tan2IndexBase] = tan2Vec3.x;
     this._vertices.tangent[tan2IndexBase + 1] = tan2Vec3.y;
     this._vertices.tangent[tan2IndexBase + 2] = tan2Vec3.z;
   }
 
-  _calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex) {
+  _calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex, primitiveType) {
 
-    // This function still assumes gl.TRIANGLE_LIST only.
     this._vertices.tangent = new Float32Array(vertexNum*positionElementNumPerVertex);
     this._vertices.components.tangent = 3;
     this._vertices.componentType.tangent = 5126; // gl.FLOAT
-    let VerticesNum3 = 3;
+
+    let incrementNum = 3; // gl.TRIANGLES
+    if (primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+      //incrementNum = 1;
+    }
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i+=VerticesNum3) {
+        for (let i=0; i<vertexNum; i+=incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -243,26 +256,27 @@ export default class Geometry extends GLBoostObject {
           let uv1IndexBase = (i + 1) * texcoordElementNumPerVertex;
           let uv2IndexBase = (i + 2) * texcoordElementNumPerVertex;
 
-          this._calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3);
+          this._calcTangentFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum);
 
         }
       } else {
         for (let i=0; i<this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j+=VerticesNum3) {
-            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+          for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex; /// ０つ目の頂点
+            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
+            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
             let uv0IndexBase = vertexIndices[j    ]  * texcoordElementNumPerVertex;
             let uv1IndexBase = vertexIndices[j + 1]  * texcoordElementNumPerVertex;
             let uv2IndexBase = vertexIndices[j + 2]  * texcoordElementNumPerVertex;
 
-            this._calcTangentFor3Vertices(i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, VerticesNum3);
+            this._calcTangentFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum);
 
           }
         }
       }
     }
+
 
   }
 
@@ -314,7 +328,7 @@ export default class Geometry extends GLBoostObject {
 
     // for Tangent
     if (this._vertices.texcoord) {
-      this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex);
+      this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex, primitiveType);
     }
 
     // Normal Array to Float32Array
