@@ -87,17 +87,7 @@ export default class FreeShader extends Shader {
         case 'JOINTMATRIX':
           material.setUniform(shaderProgram.hashId, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
         case 'TEXTURE':
-          if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'undefined') {
-            material._semanticsDic[this._uniforms[uniformName]] = uniformName;
-          } else if (typeof material._semanticsDic[this._uniforms[uniformName]] === 'string') {
-            let tmpSemanticsStr = material._semanticsDic[this._uniforms[uniformName]];
-            material._semanticsDic[this._uniforms[uniformName]] = [];
-            material._semanticsDic[this._uniforms[uniformName]].push(tmpSemanticsStr);
-            material._semanticsDic[this._uniforms[uniformName]].push(uniformName);
-          } else {
-            // it must be Array
-            material._semanticsDic[this._uniforms[uniformName]].push(uniformName);
-          }
+          material.addSemanticsDic(this._uniforms[uniformName], uniformName);
           continue;
       }
 

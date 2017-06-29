@@ -72,6 +72,7 @@ var global = ('global',eval)('this');
     c.define('CLAMP_TO_EDGE');
     c.define('MIRRORED_REPEAT');
     c.define('TEXTURE_PURPOSE_DIFFUSE', 'diffuse');
+    c.define('TEXTURE_PURPOSE_NORMAL', 'normal');
     c.define('QUERY_TYPE_INSTANCE_NAME');
     c.define('QUERY_TYPE_USER_FLAVOR_NAME');
     c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');

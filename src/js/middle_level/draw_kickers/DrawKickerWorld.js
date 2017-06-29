@@ -179,7 +179,6 @@ export default class DrawKickerWorld {
 
     let isTextureProcessDone = true;
     if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-      material._glBoostContext.defaultDummyTexture.setUp(0);
     } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
       let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
       let textureName = textureSamplerDic.textureName;
