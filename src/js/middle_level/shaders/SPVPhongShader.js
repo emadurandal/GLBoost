@@ -19,14 +19,14 @@ export class SPVPhongShaderSource {
     return shaderText;
   }
 
-  FSShade_SPVPhongShaderSource(f, gl, lights) {
+  FSShade_SPVPhongShaderSource(f, gl, lights, material, extraData) {
     var textureProjFunc = Shader._textureProj_func(gl);
 
     var shaderText = '';
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
+    shaderText += Shader._getNormalStr(gl, material);
 
     for (let i=0; i<lights.length; i++) {
       let isShadowEnabledAsTexture = (lights[i].camera && lights[i].camera.texture) ? true:false;

@@ -642,6 +642,8 @@ export default class SPVGLTFLoader {
             let texturePurpose;
             if (valueName === 'diffuse') {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
+            } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_NORMAL;
             }
             material.setTexture(textures[textureStr], texturePurpose);
           }

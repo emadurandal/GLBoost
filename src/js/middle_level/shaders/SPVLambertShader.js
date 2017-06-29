@@ -4,7 +4,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 
 export class SPVLambertShaderSource {
 
-  FSDefine_SPVLambertShaderSource(in_, f, lights) {
+  FSDefine_SPVLambertShaderSource(in_, f, lights, material, extraData) {
     
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
@@ -20,12 +20,12 @@ export class SPVLambertShaderSource {
     return shaderText;
   }
 
-  FSShade_SPVLambertShaderSource(f, gl, lights) {
+  FSShade_SPVLambertShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
+    shaderText += Shader._getNormalStr(gl, material);
     for (let i=0; i<lights.length; i++) {
       let isShadowEnabledAsTexture = (lights[i].camera && lights[i].camera.texture) ? true:false;
       shaderText += `  {\n`;
@@ -53,6 +53,7 @@ export class SPVLambertShaderSource {
     var vertexAttribsAsResult = [];
 
     material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
+
 
     return vertexAttribsAsResult;
   }

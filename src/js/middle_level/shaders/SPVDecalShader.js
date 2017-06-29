@@ -46,6 +46,12 @@ export class SPVDecalShaderSource {
     if (material.hasAnyTextures()) {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
+
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    if (normalTexture) {
+      shaderText += `uniform mediump sampler2D uNormalTexture;\n`;
+    }
+
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform vec4 textureContributionRate;\n';
     shaderText += 'uniform vec4 gamma;\n';
@@ -108,14 +114,31 @@ export class SPVDecalShaderSource {
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
     material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
-    // set texture unit 0 to the sampler
+    // set texture unit 0 to the decal texture sampler
     this._glContext.uniform1i( uTexture, 0, true);
+
+    material._semanticsDic['TEXTURE'] = [];
 
     material.uniformTextureSamplerDic['uTexture'] = {};
     if (material.hasAnyTextures()) {
       material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-      material._semanticsDic['TEXTURE'] = 'uTexture';
+      material._semanticsDic['TEXTURE'].push('uTexture');
+    }
+
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
+    if (uNormalTexture) {
+      material.setUniform(shaderProgram.hashId, 'uNormalTexture', normalTexture);
+      // set texture unit 1 to the normal texture sampler
+      this._glContext.uniform1i( uNormalTexture, 1, true);
+
+      material.uniformTextureSamplerDic['uNormalTexture'] = {};
+      if (material.hasAnyTextures()) {
+        material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
+        material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
+        material._semanticsDic['TEXTURE'].push('uNormalTexture');
+      }
     }
 
     return vertexAttribsAsResult;
@@ -146,10 +169,15 @@ export default class SPVDecalShader extends WireframeShader {
 
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w, true);
 
+    /*
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
     }
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    if (normalTexture) {
+      material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
+    }*/
 
 
     // For Shadow
