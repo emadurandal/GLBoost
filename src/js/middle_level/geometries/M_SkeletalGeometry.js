@@ -25,32 +25,7 @@ export default class M_SkeletalGeometry extends Geometry {
       var materials = [];
     }
 
-
-    var calcParentJointsMatricesRecursively = (joint)=> {
-      let children = joint.parent.parent.getChildren();
-      let parentJoint = null;
-      for (let i=0; i<children.length; i++) {
-        if (children[i] instanceof M_Joint) {
-          parentJoint = children[i];
-        }
-      }
-
-      let results = [];
-      if (parentJoint) {
-        let result = calcParentJointsMatricesRecursively(parentJoint);
-        if (Array.isArray(result)) {
-          Array.prototype.push.apply(results, result);
-        }
-
-        results.push(parentJoint);
-
-        return results;
-      }
-
-      return null;
-    };
-
-    var joints = skeletalMesh._joints;//skeletalMesh.jointsHierarchy.searchElementsByType(M_Joint);
+    var joints = skeletalMesh._joints;
     var matrices = [];
     var globalJointTransform = [];
 
@@ -62,67 +37,58 @@ export default class M_SkeletalGeometry extends Geometry {
     }
 
     if (areThereAnyJointsWhichHaveAnimation) {
+
       for (let i=0; i<joints.length; i++) {
-        let jointsHierarchy = calcParentJointsMatricesRecursively(joints[i]);
-        if (jointsHierarchy == null) {
-          jointsHierarchy = [];
-        }
-        jointsHierarchy.push(joints[i]);
-        //console.log(jointsHierarchy);
         let tempMatrices = [];
 
-        for (let j = 0; j < jointsHierarchy.length; j++) {
-          let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;
-          //console.log(thisLoopMatrix.toStringApproximately());
+        for (let j = 0; j < joints[i].jointsOfParentHierarchies.length; j++) {
+          let thisLoopMatrix = joints[i].jointsOfParentHierarchies[j].parent.transformMatrix;
           if (j > 0) {
 
             tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-            /*
-            let origin = Matrix44.invert(skeletalMesh.bindShapeMatrix).getTranslate().length();
-            let length = Vector3.lengthBtw(tempMatrices[j - 1].getTranslate(), thisLoopMatrix.getTransalte());
-            jointsHierarchy[j].scaleJoint = length-origin;// * skeletalMesh.bindShapeMatrix.m00;// * skeletalMesh.bindShapeMatrix.m00;
-            */
 
-            let currentMatrix = jointsHierarchy[j].parent.transformMatrix.clone();
-            let parentMatrix = Matrix44.identity();//jointsHierarchy[j-1].parent.transformMatrix.clone();
-            /*
-            scaleMatrix.m00 *= skeletalMesh.bindShapeMatrix.m00;
-            scaleMatrix.m11 *= skeletalMesh.bindShapeMatrix.m11;
-            scaleMatrix.m22 *= skeletalMesh.bindShapeMatrix.m22;
-*/
-            let parentPoint = parentMatrix.multiplyVector(Vector4.zero()).toVector3();
-            let length = Vector3.lengthBtw(parentPoint, currentMatrix.multiplyVector(parentPoint.toVector4()).toVector3());
-
-            let scl = Vector3.lengthBtw(parentMatrix.getTranslate(), currentMatrix.getTranslate());
-            //jointsHierarchy[j - 1].scale = new Vector3(length, length, length);
-
-            if (j === jointsHierarchy.length-1) {
-              jointsHierarchy[j].isVisible = false;
+            if (j === joints[i].jointsOfParentHierarchies.length - 1) {
+              joints[i].jointsOfParentHierarchies[j].isVisible = false;
             } else {
-              jointsHierarchy[j].isVisible = true;
+              joints[i].jointsOfParentHierarchies[j].isVisible = true;
             }
           } else {
             let upperGroupsAccumulatedMatrix = Matrix44.identity();
-            if (typeof jointsHierarchy[0].parent.parent != 'undefined' && jointsHierarchy[0].parent.parent instanceof M_Group) {
+            if (typeof joints[i].jointsOfParentHierarchies[0].parent.parent !== 'undefined' && joints[i].jointsOfParentHierarchies[0].parent.parent instanceof M_Group) {
               // if there are group hierarchies above the root joint ...
               upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
             }
             tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
           }
+
         }
-        globalJointTransform[i] = tempMatrices[jointsHierarchy.length - 1];
+
+        globalJointTransform[i] = tempMatrices[joints[i].jointsOfParentHierarchies.length - 1];
+      }
+
+      for (let i=0; i<joints.length; i++) {
+
+        let backOfJointMatrix = globalJointTransform[i].clone();
+        let tipOfJointMatrix = null;
+        let childJoints = joints[i].childJoints;
+        if (childJoints.length > 0) {
+          tipOfJointMatrix = Matrix44.multiply(backOfJointMatrix, childJoints[0].parent.transformMatrix);
+        } else {
+          tipOfJointMatrix = backOfJointMatrix.clone();
+        }
+        let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+        let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+        let length = Vector3.lengthBtw(backOfJointPos, tipOfJointPos);
+
+        joints[i].length = new Vector3(length, length, length);
 
       }
+
       for (let i=0; i<joints.length; i++) {
         matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
         let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
-//        M_Joint.registerCalculatedTransforms(joints[i].instanceName, Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix));
-        //M_Joint.registerCalculatedTransforms(joints[i].instanceName, matrices[i].clone());
-
         matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
         matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
-
-//        M_Joint.registerCalculatedTransforms(joints[i].instanceName, joints[i].parent.transformMatrixAccumulatedAncestry.clone());
       }
     } else {
       for (let i=0; i<joints.length; i++) {

@@ -51,6 +51,15 @@ export default class M_Group extends M_Element {
     return this._elements;
   }
 
+  getAnyJointAsChild() {
+    for (let element of this._elements) {
+      if (element.className === 'M_Joint') {
+        return element;
+      }
+    }
+    return null;
+  }
+
   _setDirtyToAnimatedElement(inputName) {
     if (this.hasAnimation(inputName)) {
       this._needUpdate();
