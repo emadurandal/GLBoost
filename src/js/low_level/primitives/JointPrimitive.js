@@ -45,16 +45,16 @@ export default class JointPrimitive extends Geometry {
       positions.push(new Vector3(arrowheadLength, -arrowheadWidth, -arrowheadWidth));
 
       // Long Pyramid
-      positions.push(new Vector3(stickLength, 0, 0));
+      positions.push(new Vector3(length, 0, 0));
       positions.push(new Vector3(arrowheadLength, arrowheadWidth, arrowheadWidth));
 
-      positions.push(new Vector3(stickLength, 0, 0));
+      positions.push(new Vector3(length, 0, 0));
       positions.push(new Vector3(arrowheadLength, -arrowheadWidth, arrowheadWidth));
 
-      positions.push(new Vector3(stickLength, 0, 0));
+      positions.push(new Vector3(length, 0, 0));
       positions.push(new Vector3(arrowheadLength, arrowheadWidth, -arrowheadWidth));
 
-      positions.push(new Vector3(stickLength, 0, 0));
+      positions.push(new Vector3(length, 0, 0));
       positions.push(new Vector3(arrowheadLength, -arrowheadWidth, -arrowheadWidth));
 
 

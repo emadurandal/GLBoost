@@ -19,16 +19,60 @@ export default class M_SkeletalMesh extends M_Mesh {
 
     this._joints = [];
 
+    // sort joints according to jointNames
     for (let i=0; i<this._jointNames.length; i++) {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
           this._joints.push(joints[j]);
-          //this._inverseBindMatrices.push(this._rawInverseBindMatrices[j]);
         }
       }
     }
-    //this._joints = joints;
 
+    const calcParentJointsMatricesRecursively = (joint)=> {
+      let children = joint.parent.parent.getChildren();
+      let parentJoint = null;
+      for (let i=0; i<children.length; i++) {
+        if (children[i] instanceof M_Joint) {
+          parentJoint = children[i];
+        }
+      }
+
+      let results = [];
+      if (parentJoint) {
+        let result = calcParentJointsMatricesRecursively(parentJoint);
+        if (Array.isArray(result)) {
+          Array.prototype.push.apply(results, result);
+        }
+
+        results.push(parentJoint);
+
+        return results;
+      }
+
+      return null;
+    };
+
+    let jointsParentHierarchies = null;
+    for (let i=0; i<this._joints.length; i++) {
+      jointsParentHierarchies = calcParentJointsMatricesRecursively(this._joints[i]);
+      if (jointsParentHierarchies == null) {
+        jointsParentHierarchies = [];
+      }
+      jointsParentHierarchies.push(this._joints[i]);
+
+      let children = this._joints[i].parent.getChildren();
+      let childJoints = [];
+      for (let child of children) {
+        if (child.className === 'M_Group') {
+          let childJoint = child.getAnyJointAsChild();
+          if (childJoint) {
+            childJoints.push(childJoint);
+          }
+        }
+      }
+      this._joints[i].childJoints = childJoints;
+      this._joints[i].jointsOfParentHierarchies = jointsParentHierarchies;
+    }
     super.prepareToRender(expression, existCamera_f, lights, renderPasses);
   }
 
