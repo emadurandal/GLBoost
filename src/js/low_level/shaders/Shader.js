@@ -591,15 +591,23 @@ export default class Shader extends GLBoostObject {
     return shadowingText;
   };
 
-  static _getNormalStr(gl, material) {
+  static _getNormalStr(gl, material, f) {
     let shaderText = '';
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-    if (normalTexture) {
+    shaderText += '  vec3 normal = normalize(v_normal);\n';
+
+    if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
+      //shaderText += '  vec3 normalizedPos = normalize(v_position);\n';
+      shaderText += 'if (isFlatShading) {\n';
+      shaderText += '  vec3 dx = dFdx(v_position);\n';
+      shaderText += '  vec3 dy = dFdy(v_position);\n';
+      shaderText += '  normal = normalize(cross(dx, dy));\n';
+      shaderText += '}\n';
+    } else if (normalTexture && Shader._exist(f, GLBoost.TANGENT)) {
       let textureFunc = Shader._texture_func(gl);
-      shaderText += `  vec3 normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
+      shaderText += `  normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
       //shaderText += `  normal.y = 1.0 - normal.x - normal.z;\n`;
     } else {
-      shaderText += '  vec3 normal = normalize(v_normal);\n';
     }
     return shaderText;
   }

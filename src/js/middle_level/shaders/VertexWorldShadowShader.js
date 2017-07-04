@@ -35,7 +35,7 @@ export default class VertexWorldShadowShaderSource {
       } else {
         shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
       }
-      shaderText += `    v_shadowCoord[${i}] = depthBiasPV * positionInWorld; // ${i}\n`;
+      shaderText += `    v_shadowCoord[${i}] = depthBiasPV * position_world; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
 
