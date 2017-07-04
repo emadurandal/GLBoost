@@ -32,8 +32,6 @@ export class WireframeShaderSource {
     //shaderText += 'uniform bool isWireframeOnShade;\n';
     shaderText += 'uniform float wireframeWidth;\n';
 
-    shaderText += 'uniform bool isFlatShading;\n';
-
     return shaderText;
   }
 
@@ -97,11 +95,6 @@ export class WireframeShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
     this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
 
-
-    let uniform_isFlatShading = material._glContext.getUniformLocation(shaderProgram, 'isFlatShading');
-    material.setUniform(shaderProgram.hashId, 'uniform_isFlatShading', uniform_isFlatShading);
-    this._glContext.uniform1i( uniform_isFlatShading, 0, true);
-
     return vertexAttribsAsResult;
   }
 }
@@ -131,16 +124,10 @@ export default class WireframeShader extends Shader {
     let isWireframeOnShade = false;
     let wireframeWidth = 0.0;
 
-    let isFlatShading = false;
-
     if (typeof material.isWireframe !== 'undefined') {
       isWifeframe = material.isWireframe;
       isWireframeOnShade = material.isWireframeOnShade;
       wireframeWidth = material.wireframeWidth;
-    }
-
-    if (typeof material.isFlatShading !== 'undefined') {
-      isFlatShading = material.isFlatShading;
     }
 
     let uniformLocationIsWireframe = material.getUniform(glslProgram.hashId, 'uniform_isWireframe');
@@ -153,11 +140,6 @@ export default class WireframeShader extends Shader {
     let uniformLocationWireframeWidth = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidth');
     if (uniformLocationWireframeWidth) {
       this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
-    }
-
-    let uniformLocationIsFlatShading = material.getUniform(glslProgram.hashId, 'uniform_isFlatShading');
-    if (uniformLocationIsFlatShading) {
-      this._glContext.uniform1i(uniformLocationIsFlatShading, isFlatShading, true);
     }
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
