@@ -30,7 +30,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = L_FrustumCamera.frustumRHMatrix(this._left, this._right, this._top, this._bottom, this._zNearInner, this._zFarInner);
+      this._projectionMatrix = L_FrustumCamera.frustumRHMatrix(this._leftInner, this._rightInner, this._topInner, this._bottomInner, this._zNearInner, this._zFarInner);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {
