@@ -120,7 +120,7 @@ export class SPVDecalShaderSource {
     material._semanticsDic['TEXTURE'] = [];
 
     material.uniformTextureSamplerDic['uTexture'] = {};
-    if (material.hasAnyTextures()) {
+    if (material.hasAnyTextures() || diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
       material._semanticsDic['TEXTURE'].push('uTexture');
