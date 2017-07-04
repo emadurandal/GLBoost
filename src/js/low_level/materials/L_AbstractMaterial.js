@@ -404,6 +404,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     delete this._semanticsDic[uniform];
   }
 
+
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;
