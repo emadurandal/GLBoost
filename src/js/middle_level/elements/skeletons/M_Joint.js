@@ -18,14 +18,25 @@ export default class M_Joint extends M_Element {
     this._jointsOfParentHierarchies = [];
 
     this.length = new Vector3(length, length, length);
+
+    this._isCalculatedLength = false;
   }
 
   set length(vec3) {
     this._gizmo._mesh.scale = vec3;
+    this._isCalculatedLength = true;
   }
 
   get length() {
     return this._gizmo._mesh.scale.clone().x;
+  }
+
+  clearIsCalculatedLengthFlag() {
+    this._isCalculatedLength = false;
+  }
+
+  get isCalculatedLength() {
+    return this._isCalculatedLength;
   }
 
   set isVisible(flg) {

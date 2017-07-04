@@ -67,6 +67,9 @@ export default class M_SkeletalGeometry extends Geometry {
       }
 
       for (let i=0; i<joints.length; i++) {
+        if (joints[i].isCalculatedLength) {
+          break;
+        }
 
         let backOfJointMatrix = globalJointTransform[i].clone();
         let tipOfJointMatrix = null;
