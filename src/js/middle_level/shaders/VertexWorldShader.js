@@ -49,12 +49,12 @@ export default class VertexWorldShaderSource {
     shaderText += '  v_position = position_world.xyz;\n';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += '  vec3 normal_world = normalMatrix * aVertex_normal;\n';
+      shaderText += '  vec3 normal_world = normalMatrix * normal_local;\n';
 
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading) {
 
         // world space to tangent space
-        shaderText += '  vec3 tangent_world = normalMatrix * aVertex_tangent;\n';
+        shaderText += '  vec3 tangent_world = normalMatrix * tangent_local;\n';
         shaderText += '  vec3 binormal_world = cross(normal_world, tangent_world);\n';
         shaderText += '  tangent_world = cross(binormal_world, normal_world);\n';
         shaderText += '      v_position = v_position;\n';
@@ -70,16 +70,16 @@ export default class VertexWorldShaderSource {
 
         shaderText += '  vec3 viewDirection_tangent = tbnMat_world_to_tangent * viewDirection_world;\n';
 
-//        shaderText += '  v_viewDirection = viewDirection_world;\n';
-        shaderText += '  v_viewDirection = viewDirection_tangent;\n';
+        shaderText += '  v_viewDirection = viewDirection_world;\n';
+//        shaderText += '  v_viewDirection = viewDirection_tangent;\n';
 
         shaderText += '  vec3 normal_tangent = tbnMat_world_to_tangent * normal_world;\n';
 
-//        shaderText += '  v_normal = normal_world;\n';
-        shaderText += '  v_normal = normal_tangent;\n';
+        shaderText += '  v_normal = normal_world;\n';
+//        shaderText += '  v_normal = normal_tangent;\n';
 
-//        shaderText +=   '  v_position = position_world.xyz;\n';
-//        shaderText +=   '  v_position = tbnMat_world_to_tangent * normalMatrix * aVertex_position;\n'; // it means position_tangent
+        //shaderText +=   '  v_position = position_world.xyz;\n';
+        //shaderText +=   '  v_position = tbnMat_world_to_tangent * normalMatrix * aVertex_position;\n'; // it means position_tangent
 
 
       } else {
@@ -103,8 +103,8 @@ export default class VertexWorldShaderSource {
         if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading) {
           // world space to tangent space
           shaderText += `  lightDirection_tangent = tbnMat_world_to_tangent * lightDirection_world;\n`;
-//          shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
-          shaderText += `  v_lightDirection[${i}] = lightDirection_tangent;\n`;
+          shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
+//          shaderText += `  v_lightDirection[${i}] = lightDirection_tangent;\n`;
         } else {
           shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
         }

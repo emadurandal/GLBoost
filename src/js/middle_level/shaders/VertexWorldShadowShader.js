@@ -53,9 +53,6 @@ export default class VertexWorldShadowShaderSource {
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    shaderText += `float visibility = 1.0;\n`;
-    shaderText += `float visibilitySpecular = 1.0;\n`;
-
     return shaderText;
   }
 
