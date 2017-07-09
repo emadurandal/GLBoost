@@ -417,11 +417,11 @@ export default class M_Element extends L_Element {
 
     return this._matrixAccumulatedAncestry.clone();;
   }
-
+/*
   get transformMatrixAccumulatedAncestry() {
     return this._transformMatrixAccumulatedAncestry;
   }
-
+*/
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
@@ -719,10 +719,26 @@ export default class M_Element extends L_Element {
   // Use master element's transformMatrixAccumulatedAncestry.
   get transformMatrixAccumulatedAncestry() {
     if (this._masterElement) {
-      return Matrix44.multiply(this._masterElement.transformMatrixAccumulatedAncestry, this._transformMatrixAccumulatedAncestry);
+      return Matrix44.multiply(this._masterElement._transformMatrixAccumulatedAncestry, this._transformMatrixAccumulatedAncestry);
     }
      return this._transformMatrixAccumulatedAncestry;
     //return this.transformMatrix;
+  }
+
+  getLastInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = - Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
+      if (inputLatestValueAtThisAttribute > latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
   }
 
 }

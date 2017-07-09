@@ -233,6 +233,32 @@ export default class M_Group extends M_Element {
     return objects;
   }
 
+  getLengthOfAnimationInputValue(inputLineName, element = this) {
+
+    if (element instanceof M_Group) {
+      let latestInputValue = element.getLastInputValueOfAnimation(inputLineName);
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChildOrInputValue = this.getLengthOfAnimationInputValue(inputLineName, children[i]);
+
+        if (hitChildOrInputValue instanceof M_Element) {
+          let lastInputValueOfThisElement = hitChildOrInputValue.getLastInputValueOfAnimation(inputLineName);
+          if (lastInputValueOfThisElement > latestInputValue) {
+            latestInputValue = lastInputValueOfThisElement;
+          }
+        } else {
+          let lastInputValueOfThisElement = hitChildOrInputValue;
+          if (lastInputValueOfThisElement > latestInputValue) {
+            latestInputValue = lastInputValueOfThisElement;
+          }
+        }
+      }
+      return latestInputValue;
+    }
+
+    return element.getLastInputValueOfAnimation(inputLineName);
+  }
+
   /*
    * Note that it's in world space
    */
