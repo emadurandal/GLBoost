@@ -24,6 +24,7 @@ export default class M_SkeletalMesh extends M_Mesh {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
           this._joints.push(joints[j]);
+          break;
         }
       }
     }
