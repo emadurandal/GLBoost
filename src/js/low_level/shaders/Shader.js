@@ -15,8 +15,8 @@ export default class Shader extends GLBoostObject {
   static initMixinMethodArray() {
     this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
     this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
+    this.prototype._classNamesOfVSPreProcess = this.prototype._classNamesOfVSPreProcess ? this.prototype._classNamesOfVSPreProcess : [];
     this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
-    this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
     this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
     this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
@@ -38,11 +38,11 @@ export default class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1){
       this.prototype._classNamesOfVSMethodDefine.push(source.name);
     }
+    if(this.prototype._classNamesOfVSPreProcess.indexOf(source.name) === -1){
+      this.prototype._classNamesOfVSPreProcess.push(source.name);
+    }
     if(this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1){
       this.prototype._classNamesOfVSTransform.push(source.name);
-    }
-    if(this.prototype._classNamesOfVSShade.indexOf(source.name) === -1){
-      this.prototype._classNamesOfVSShade.push(source.name);
     }
     if(this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSDefine.push(source.name);
@@ -78,13 +78,13 @@ export default class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
     }
+    matchIdx = this.prototype._classNamesOfVSPreProcess.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSPreProcess[matchIdx] = newone.name;
+    }
     matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
-    }
-    matchIdx = this.prototype._classNamesOfVSShade.indexOf(current.name);
-    if(matchIdx !== -1){
-      this.prototype._classNamesOfVSShade[matchIdx] = newone.name;
     }
     matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
     if(matchIdx !== -1){
@@ -121,15 +121,15 @@ export default class Shader extends GLBoostObject {
     }
     matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
     if(matchIdx !== -1){
-      this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
+      this.prototype._classNamesOfVSMethodDefineVSPreProcess.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfVSPreProcess.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSPreProcess.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
-    }
-    matchIdx = this.prototype._classNamesOfVSShade.indexOf(source.name);
-    if(matchIdx !== -1){
-      this.prototype._classNamesOfVSShade.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
     if(matchIdx !== -1){
@@ -198,6 +198,7 @@ export default class Shader extends GLBoostObject {
 
     shaderText +=   Shader._glslVer(gl);
     shaderText +=   'precision highp float;\n';
+    shaderText =   `${in_} vec3 aVertex_position;\n`;
 
     /// define variables
     // start defining variables. first, sub class Shader, ...
@@ -212,9 +213,6 @@ export default class Shader extends GLBoostObject {
     });
     shaderText += this._removeDuplicatedLine(vsDefineShaderText);
 
-    // begin of main function
-    shaderText +=   'void main(void) {\n';
-
     /// define methods
     // start defining methods. first, sub class Shader, ...
     // seconds, define methods as mixin Shaders
@@ -226,6 +224,24 @@ export default class Shader extends GLBoostObject {
       }
     });
 
+    // begin of main function
+    shaderText +=   'void main(void) {\n';
+    shaderText +=   'vec4 position_local = vec4(aVertex_position, 1.0);\n';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += 'vec3 normal_local = aVertex_normal;\n';
+    }
+
+    /// PreProcess
+    // start pre-processing. first, sub class Shader, ...
+    // seconds, pre-process as mixin Shaders
+    this._classNamesOfVSPreProcess.forEach((className)=> {
+      var method = this['VSPreProcess_' + className];
+      if (method) {
+        shaderText += '//                                                            VSPreProcess_' + className + ' //\n';
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
+      }
+    });
+
     /// Transform
     // start transforming. first, sub class Shader, ...
     // seconds, transform as mixin Shaders
@@ -233,17 +249,6 @@ export default class Shader extends GLBoostObject {
       var method = this['VSTransform_' + className];
       if (method) {
         shaderText += '//                                                            VSTransform_' + className + ' //\n';
-        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
-      }
-    });
-
-    /// Shading
-    // start shading. first, sub class Shader, ...
-    // seconds, shade as mixin Shaders
-    this._classNamesOfVSShade.forEach((className)=> {
-      var method = this['VSShade_' + className];
-      if (method) {
-        shaderText += '//                                                            VSShade_' + className + ' //\n';
         shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
       }
     });
