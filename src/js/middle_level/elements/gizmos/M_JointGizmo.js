@@ -13,7 +13,7 @@ export default class M_JointGizmo extends M_Gizmo {
 
 //    this.isVisible = false;
 
-    this.baseColor = new Vector4(0.0, 0.8, 0.8, 1);
+    this.baseColor = new Vector4(0.0, 1.0, 1.0, 0.25);
   }
 
   _init(glBoostContext, length) {
