@@ -5,7 +5,7 @@ export default class VertexWorldShaderSource {
   // this is the instance of the corresponding shader class.
 
   VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
-    var shaderText =   `${in_} vec3 aVertex_position;\n`;
+    let shaderText = '';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 aVertex_normal;\n`;
@@ -43,7 +43,7 @@ export default class VertexWorldShaderSource {
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
-    shaderText += '  vec4 position_world = worldMatrix * vec4(aVertex_position, 1.0);\n';
+    shaderText += '  vec4 position_world = worldMatrix * position_local;\n';
     shaderText += '  vec3 viewDirection_world = viewPosition_world.xyz - position_world.xyz;\n';
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
     shaderText += '  v_position = position_world.xyz;\n';
@@ -131,7 +131,7 @@ export default class VertexWorldShaderSource {
   }
 
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
-    var shaderText = '';
+    let shaderText = '';
 
     shaderText += `${in_} vec3 v_viewDirection;\n`;
     if(lights.length > 0) {

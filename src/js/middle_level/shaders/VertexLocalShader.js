@@ -2,7 +2,8 @@ import Shader from '../../low_level/shaders/Shader';
 
 export default class VertexLocalShaderSource {
   VSDefine_VertexLocalShaderSource(in_, out_, f) {
-    var shaderText =   `${in_} vec3 aVertex_position;\n`;
+    let shaderText = '';
+
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 aVertex_normal;\n`;
       shaderText += `${out_} vec3 v_normal;\n`;
@@ -15,10 +16,10 @@ export default class VertexLocalShaderSource {
   VSTransform_VertexLocalShaderSource(existCamera_f, f) {
     var shaderText = '';
     if (existCamera_f) {
-      shaderText +=   '  gl_Position = modelViewProjectionMatrix * vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  gl_Position = modelViewProjectionMatrix * position_local;\n';
       shaderText +=   '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
     } else {
-      shaderText +=   '  gl_Position = vec4(aVertex_position, 1.0);\n';
+      shaderText +=   '  gl_Position = position_local;\n';
     }
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  v_normal = aVertex_normal;\n';
