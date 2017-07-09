@@ -57,8 +57,6 @@ var camera = glBoostContext.createPerspectiveCamera(
 );
 scene.addChild( camera );
 
-var gtime = 0;
-
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/hierarchical_anim/hierarchical_anim2.gltf', null);
 promise.then(function(group) {
@@ -70,16 +68,16 @@ promise.then(function(group) {
   var expression = glBoostContext.createExpressionAndRenderPasses(1);
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
-
+  const animationLength = group.getLengthOfAnimationInputValue('time');
+  var lastAnimatedTime = Date.now();
   var render = function(){
-    scene.setCurrentAnimationValue('time', gtime);
+    var currentMillisecondDeltaFromStart = Date.now() - lastAnimatedTime;
+    scene.setCurrentAnimationValue('time', currentMillisecondDeltaFromStart/1000);
     renderer.clearCanvas();
     renderer.draw(expression);
 
-    gtime += 0.001;
-
-    if (gtime > 1) {
-      gtime = 0.0;
+    if (currentMillisecondDeltaFromStart/1000 > animationLength) {
+      lastAnimatedTime = Date.now();
     }
 
     var rotateMatrix = GLBoost.Matrix33.rotateY(-0.02);
