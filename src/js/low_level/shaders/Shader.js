@@ -153,6 +153,19 @@ export default class Shader extends GLBoostObject {
     }
   }
 
+  static isMixin(source) {
+
+    // create mixin method Array
+    this.initMixinMethodArray();
+
+    // register mixin methods to Array
+    if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   _removeDuplicatedLine(shaderString) {
     var splittedShaderLines = shaderString.split('\n');
     for (let i=0; i<splittedShaderLines.length; i++) {
@@ -233,6 +246,7 @@ export default class Shader extends GLBoostObject {
         shaderText += 'vec3 tangent_local = aVertex_tangent;\n';
       }
     }
+    shaderText +=   'bool isSkinning = false;\n';
 
     /// PreProcess
     // start pre-processing. first, sub class Shader, ...
@@ -589,10 +603,13 @@ export default class Shader extends GLBoostObject {
       }
     } else {
       if (isShadowEnabledAsTexture) {
+//        shadowingText += `  shadowCoord.y = 1.0 - shadowCoord.y;\n`;
         shadowingText += `float depth = texture2DProj(uDepthTexture[${i}], shadowCoord).r;\n`;
         shadowingText += `if (depth < shadowCoord.z) {\n`;
+//        shadowingText += `if (depth < 0.9) {\n`;
         shadowingText += `  visibility = visibilityForShadow;\n`;
         shadowingText += `  visibilitySpecular = 0.0;\n`;
+//        shadowingText += `  visibilityLevel = 0.0;\n`;
         shadowingText += `}\n`;
       }
     }
@@ -607,9 +624,20 @@ export default class Shader extends GLBoostObject {
     shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += '  vec3 dx = dFdx(v_position);\n';
-      shaderText += '  vec3 dy = dFdy(v_position);\n';
+      shaderText += '  vec3 dx = dFdx(v_position_world);\n';
+      shaderText += '  vec3 dy = dFdy(v_position_world);\n';
+
+      shaderText += '  vec3 viewDirection_world = normalize(v_viewDirection_world);\n';
+//      shaderText += '  normal = dot(viewDirection_world, cross(dx, dy)) >= 0.0 ? normalize(cross(dx, dy)) : normalize(cross(dy, dx));\n';
       shaderText += '  normal = normalize(cross(dx, dy));\n';
+
+      shaderText += '  if (dot(vec3(0.0, 0.0, 1.0), cross(dx, dy)) < 0.0) {\n';
+      shaderText += '   visibilityLevel = 0.0;\n';
+      shaderText += '  } else { \n';
+      shaderText += '   visibilityLevel = 0.5;\n';
+      shaderText += '  }\n';
+
+//      shaderText += '  normal *= -1.0;\n';
     } else if (normalTexture && Shader._exist(f, GLBoost.TANGENT)) {
       let textureFunc = Shader._texture_func(gl);
       shaderText += `  normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;

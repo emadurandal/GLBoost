@@ -144,7 +144,7 @@ export default class DecalShader extends WireframeShader {
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         let cameraMatrix = lights[i].camera.lookAtRHMatrix();
-        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+        let viewMatrix = cameraMatrix.clone();
         let projectionMatrix = lights[i].camera.projectionRHMatrix();
         gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+i), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
       }

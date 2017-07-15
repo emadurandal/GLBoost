@@ -67,6 +67,8 @@ export default class SkeletalShaderSource {
       }
     }
 
+    shaderText += 'isSkinning = true;\n';
+
     return shaderText;
   }
 

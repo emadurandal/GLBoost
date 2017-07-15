@@ -1,4 +1,4 @@
-import Shader from '../../low_level/shaders/Shader';
+import WireframeShader from './WireframeShader';
 
 export default class VertexWorldShadowShaderSource {
   // In the context within these member methods,
@@ -42,16 +42,27 @@ export default class VertexWorldShadowShaderSource {
     return shaderText;
   }
 
-  FSDefine_VertexWorldShadowShaderSource(f, gl, lights) {
-    var shaderText = '';
+  FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
 
     shaderText += 'uniform float depthBias;\n';
+    shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
 
     return shaderText;
   }
 
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
-    var shaderText = '';
+    let shaderText = '';
+
+    shaderText += 'float visibilityLevel = 1.0;\n';
+
+    return shaderText;
+  }
+
+  FSPostEffect_VertexWorldShadowShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+
+//    shaderText += 'rt0 = vec4(visibilityLevel, 1.0, 1.0, 1.0);\n';
 
     return shaderText;
   }
