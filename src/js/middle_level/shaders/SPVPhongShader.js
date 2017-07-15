@@ -12,7 +12,6 @@ export class SPVPhongShaderSource {
 
     var sampler2D = this._sampler2DShadow_func();
     shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
     shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
     shaderText += `uniform bool toUseSurfaceColorAsSpecularMap;\n`;
 
