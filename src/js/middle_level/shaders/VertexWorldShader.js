@@ -42,13 +42,23 @@ export default class VertexWorldShaderSource {
     return shaderText;
   }
 
+  VSPreProcess_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+    var shaderText = '';
+    shaderText += '  vec4 position_world;\n';
+    shaderText += '  vec3 normal_world;\n';
+    shaderText += '  vec3 tangent_world;\n';
+    return shaderText;
+  }
+
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
-    shaderText += '  vec4 position_world = worldMatrix * position_local;\n';
 //    shaderText += '  vec4 position_world = position_local;\n';
-    shaderText += '  if (isSkinning) {\n';
-//    shaderText += '    position_world = position_local;\n';
+    shaderText += '  if (!isSkinning) {\n';
+    shaderText += '    position_world = worldMatrix * position_local;\n';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += '  normal_world = normalMatrix * normal_local;\n';
+    }
     shaderText += '  }\n';
 
     shaderText += '  vec3 viewDirection_world = viewPosition_world.xyz - position_world.xyz;\n';
@@ -61,16 +71,12 @@ export default class VertexWorldShaderSource {
     //    shaderText += '  v_position_view.z *= -1.0;\n';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += '  vec3 normal_world = normalMatrix * normal_local;\n';
-//      shaderText += '  vec3 normal_world = normal_local;\n';
-      shaderText += '  if (isSkinning) {\n';
-//      shaderText += '    normal_world = normal_local;\n';
-      shaderText += '  }\n';
-
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading) {
-
         // world space to tangent space
-        shaderText += '  vec3 tangent_world = normalMatrix * tangent_local;\n';
+        shaderText += '  if (!isSkinning) {\n';
+        shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
+        shaderText += '  }\n';
+
         shaderText += '  vec3 binormal_world = cross(normal_world, tangent_world);\n';
         shaderText += '  tangent_world = cross(binormal_world, normal_world);\n';
 
