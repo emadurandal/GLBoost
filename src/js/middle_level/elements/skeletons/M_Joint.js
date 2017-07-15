@@ -8,10 +8,10 @@ export default class M_Joint extends M_Element {
   constructor(glBoostContext, length = 1.0) {
     super(glBoostContext);
 
-    this._gizmo = new M_JointGizmo(glBoostContext, length);
+    this._gizmo = new M_JointGizmo(glBoostContext, this, length);
     this._gizmos.push(this._gizmo);
 
-    this._gizmo._mesh.masterElement = this;
+    //this._gizmo._mesh.masterElement = this;
 
     M_Joint._calculatedTransforms = {};
     M_Joint._calculatedTranslates = {};
@@ -20,13 +20,21 @@ export default class M_Joint extends M_Element {
 
     this.length = new Vector3(length, length, length);
 
-    this._isCalculatedLength = false;
+    this._isCalculatedJointGizmo = false;
     this._jointPoseMatrix = Matrix44.identity();
     this._length = 1;
+
+    this._inverseBindMatrix = Matrix44.identity();
+
+    this._relativeVectorToJointTip = new Vector3(0, 0, 1);
   }
 
+  set inverseBindMatrix(mat4) {
+    this._inverseBindMatrix = mat4;
+  }
+/*
   set length(vec3) {
-//    this._gizmo._mesh.scale = vec3;
+    //this._gizmo._mesh.scale = vec3;
     this._length = vec3.x;
     this._isCalculatedLength = true;
   }
@@ -35,24 +43,34 @@ export default class M_Joint extends M_Element {
 //    return this._gizmo._mesh.scale.clone().x;
     return this._length;
   }
+  */
+
+  set relativeVectorToJointTip(vec3) {
+    this._relativeVectorToJointTip = vec3;
+    this._isCalculatedJointGizmo = true;
+  }
+
+  get relativeVectorToJointTip() {
+    return this._relativeVectorToJointTip;
+  }
 
   set jointPoseMatrix(matrix) {
-    matrix.m00 *= this._length;
-    matrix.m11 *= this._length;
-    matrix.m22 *= this._length;
-    this._gizmo._mesh.multiplyMatrix(matrix);
+
+//    this._gizmo._mesh.multiplyMatrix(matrix);
+    this._jointPoseMatrix = matrix;
   }
 
   get jointPoseMatrix() {
-    return this._gizmo._mesh.matrix;
+    return this._jointPoseMatrix;
   }
+
 
   clearIsCalculatedLengthFlag() {
-    this._isCalculatedLength = false;
+    this._isCalculatedJointGizmo = false;
   }
 
-  get isCalculatedLength() {
-    return this._isCalculatedLength;
+  get isCalculatedJointGizmo() {
+    return this._isCalculatedJointGizmo;
   }
 
   set isVisible(flg) {
@@ -89,17 +107,13 @@ export default class M_Joint extends M_Element {
     super._copy(instance);
   }
 
-
+/*
   // Use master element's transformMatrixAccumulatedAncestry.
-  get transformMatrixAccumulatedAncestry() {
-    /*
-    if (this._gizmo._mesh._masterElement) {
-//      return Matrix44.multiply(this._gizmo._mesh._masterElement._transformMatrixAccumulatedAncestry, this._gizmo._mesh._transformMatrixAccumulatedAncestry);
-      return Matrix44.multiply(this._masterElement.transformMatrixAccumulatedAncestry, Matrix44.identity());
-    }
-    */
-    return this._gizmo._mesh._transformMatrixAccumulatedAncestry;
+  get _transformMatrixAccumulatedAncestry() {
+
+    //return
+    return Matrix44.multiply(this._inverseBindMatrix, this._gizmo._mesh._transformMatrixAccumulatedAncestry);
     //return this.transformMatrix;
   }
-
+*/
 }

@@ -14,6 +14,14 @@ export default class L_Element extends GLBoostObject {
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._matrix = Matrix44.identity();
 
+    this._translateOnInit = this._translate.clone();
+    this._scaleOnInit = this._scale.clone();
+
+    this._rotateOnInit = this._rotate.clone();
+    this._quaternionOnInit = this._quaternion.clone();
+    this._matrixOnInit = this._matrix.clone();
+
+
     this._finalMatrix = Matrix44.identity();
 
     this._dirtyAsElement = true;

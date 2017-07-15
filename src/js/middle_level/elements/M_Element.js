@@ -75,7 +75,7 @@ export default class M_Element extends L_Element {
     } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
       return this._parent._getCurrentAnimationInputValue(inputName);
     } else {
-      return -1;
+      return (void 0);
     }
   }
 
@@ -90,7 +90,7 @@ export default class M_Element extends L_Element {
   }
 
   _getAnimatedTransformValue(value, animation, type) {
-    if (typeof animation !== 'undefined' && animation[type]) {
+    if (typeof animation !== 'undefined' && animation[type]) { //} && typeof value !== 'undefined') {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
       //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
@@ -227,11 +227,12 @@ export default class M_Element extends L_Element {
   }
 
   get transformMatrix() {
-    var input = -1;
+    let input = void 0;
     if (this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
-    if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
+//    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
+    if (true) {
       var matrix = Matrix44.identity();
 
       if (this._currentCalcMode === 'matrix') {
@@ -267,11 +268,11 @@ export default class M_Element extends L_Element {
   }
 
   get rotateScaleTranslate() {
-    var input = -1;
+    let input = void 0;
     if (this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
-    if (this._dirtyAsElement || input < 0 || this._matrixGetMode !== 'animated_' + input) {
+    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
 
       if (this._currentCalcMode === 'matrix') {
@@ -415,7 +416,7 @@ export default class M_Element extends L_Element {
       this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     }
 
-    return this._matrixAccumulatedAncestry.clone();;
+    return this._matrixAccumulatedAncestry.clone();
   }
 /*
   get transformMatrixAccumulatedAncestry() {
@@ -721,7 +722,7 @@ export default class M_Element extends L_Element {
     if (this._masterElement) {
       return Matrix44.multiply(this._masterElement._transformMatrixAccumulatedAncestry, this._transformMatrixAccumulatedAncestry);
     }
-     return this._transformMatrixAccumulatedAncestry;
+    return this._transformMatrixAccumulatedAncestry;
     //return this.transformMatrix;
   }
 

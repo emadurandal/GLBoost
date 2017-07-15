@@ -57,13 +57,24 @@ export default class SkeletalShaderSource {
     shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
     shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
 
-    shaderText += 'position_local = skinMat * position_local;\n';
+//    shaderText += 'position_local = skinMat * position_local;\n';
+    shaderText += 'position_world = skinMat * position_local;\n';
 
+    /*
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += 'mat3 skinNormalMatrix = toNormalMatrix(skinMat);\n';
       shaderText += 'normal_local = normalize(skinNormalMatrix * normal_local);\n';
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += 'tangent_local = normalize(skinNormalMatrix * tangent_local);\n';
+      }
+    }
+    */
+
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
+      shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
+      if (Shader._exist(f, GLBoost.TANGENT)) {
+        shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
       }
     }
 

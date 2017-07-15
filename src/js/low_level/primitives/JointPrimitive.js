@@ -20,7 +20,7 @@ export default class JointPrimitive extends Geometry {
     let positions = [];
 
     for (let i=0; i<lineCount; i++) {
-
+/*
       // Short Pyramid
       positions.push(new Vector3(0, 0, 0));
       positions.push(new Vector3(arrowheadLength, arrowheadWidth, arrowheadWidth));
@@ -57,7 +57,43 @@ export default class JointPrimitive extends Geometry {
       positions.push(new Vector3(length, 0, 0));
       positions.push(new Vector3(arrowheadLength, -arrowheadWidth, -arrowheadWidth));
 
+*/
 
+      // Short Pyramid
+      positions.push(new Vector3(0, 0, 0));
+      positions.push(new Vector3(arrowheadWidth, arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, 0));
+      positions.push(new Vector3(-arrowheadWidth, arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, 0));
+      positions.push(new Vector3(arrowheadWidth, -arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, 0));
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
+
+      // Plane
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(arrowheadWidth, -arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(-arrowheadWidth, arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(arrowheadWidth, -arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(-arrowheadWidth, arrowheadWidth, arrowheadLength));
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
+
+      // Long Pyramid
+      positions.push(new Vector3(0, 0, length));
+      positions.push(new Vector3(arrowheadWidth, arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, length));
+      positions.push(new Vector3(-arrowheadWidth, arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, length));
+      positions.push(new Vector3(arrowheadWidth, -arrowheadWidth, arrowheadLength));
+
+      positions.push(new Vector3(0, 0, length));
+      positions.push(new Vector3(-arrowheadWidth, -arrowheadWidth, arrowheadLength));
     }
 
     this.setVerticesData({

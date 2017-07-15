@@ -27,78 +27,91 @@ export default class M_SkeletalGeometry extends Geometry {
 
     var joints = skeletalMesh._joints;
     var matrices = [];
-    var globalJointTransform = [];
 
     let areThereAnyJointsWhichHaveAnimation = false;
+//    let areThereAnyJointsWhichHaveAnimation = true;
     for (let i=0; i<joints.length; i++) {
-      if (joints[i].parent._getCurrentAnimationInputValue(joints[i].parent._activeAnimationLineName) >= 0) {
+      if (typeof joints[i].parent._getCurrentAnimationInputValue(joints[i].parent._activeAnimationLineName) !== 'undefined') {
         areThereAnyJointsWhichHaveAnimation = true;
       }
     }
 
-    if (areThereAnyJointsWhichHaveAnimation) {
-
-      for (let i=0; i<joints.length; i++) {
-        let tempMatrices = [];
-
-        for (let j = 0; j < joints[i].jointsOfParentHierarchies.length; j++) {
-          let thisLoopMatrix = joints[i].jointsOfParentHierarchies[j].parent.transformMatrix;
-          if (j > 0) {
-
-            tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
-
-            if (j === joints[i].jointsOfParentHierarchies.length - 1) {
-              joints[i].jointsOfParentHierarchies[j].isVisible = false;
-            } else {
-              joints[i].jointsOfParentHierarchies[j].isVisible = true;
-            }
-          } else {
-            let upperGroupsAccumulatedMatrix = Matrix44.identity();
-            if (typeof joints[i].jointsOfParentHierarchies[0].parent.parent !== 'undefined' && joints[i].jointsOfParentHierarchies[0].parent.parent instanceof M_Group) {
-              // if there are group hierarchies above the root joint ...
-              upperGroupsAccumulatedMatrix = skeletalMesh.transformMatrixAccumulatedAncestry;
-            }
-            tempMatrices[j] = upperGroupsAccumulatedMatrix.multiply(thisLoopMatrix);
-          }
-
-        }
-
-        globalJointTransform[i] = tempMatrices[joints[i].jointsOfParentHierarchies.length - 1];
+    // 24 19
+    for (let i=0; i<joints.length; i++) {
+      if (i != 24) {
+        //joints[i].isVisible = false;
       }
+      for (let j = 0; j < joints[i].jointsOfParentHierarchies.length; j++) {
 
-      for (let i=0; i<joints.length; i++) {
-        if (joints[i].isCalculatedLength) {
+        if (j === joints[i].jointsOfParentHierarchies.length - 1) {
+//          joints[i].jointsOfParentHierarchies[j].isVisible = false;
+        } else {
+//          joints[i].jointsOfParentHierarchies[j].isVisible = true;
+        }
+/*
+        if (joints[i].isCalculatedJointGizmo) {
           break;
         }
 
-        let backOfJointMatrix = globalJointTransform[i].clone();
-        let tipOfJointMatrix = null;
-        let childJoints = joints[i].childJoints;
-        if (childJoints.length > 0) {
-          tipOfJointMatrix = Matrix44.multiply(backOfJointMatrix, childJoints[0].parent.transformMatrix);
-        } else {
-          tipOfJointMatrix = backOfJointMatrix.clone();
+        if (j>0) {
+          let backOfJointMatrix = Matrix44.identity();
+          let tipOfJointMatrix = Matrix44.identity();
+          let currentJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 1];
+          let parentJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 2];
+          tipOfJointMatrix = currentJoint.parent.transformMatrix;
+
+          let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+          let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+          parentJoint.relativeVectorToJointTip = Vector3.subtract(tipOfJointPos, backOfJointPos);
         }
-        let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-        let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-        let length = Vector3.lengthBtw(backOfJointPos, tipOfJointPos);
+        */
+      }
+    }
 
-        joints[i].length = new Vector3(length, length, length);
 
+    for (let i=0; i<joints.length; i++) {
+      if (joints[i].isCalculatedJointGizmo) {
+        break;
       }
 
-      for (let i=0; i<joints.length; i++) {
-        matrices[i] = Matrix44.multiply(Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry), globalJointTransform[i]);
-        let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
-        matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
-        //joints[i].jointPoseMatrix = matrices[i].clone();
-        matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
-        joints[i].jointPoseMatrix = matrices[i].clone();
+      let backOfJointMatrix = Matrix44.identity();
+      let tipOfJointMatrix = null;
+      let childJoints = joints[i].childJoints;
+      if (childJoints.length > 0) {
+        //backOfJointMatrix = childJoints[0].parent.transformMatrixAccumulatedAncestry;
+        tipOfJointMatrix = Matrix44.multiply(backOfJointMatrix, childJoints[0].transformMatrix);
+        //tipOfJointMatrix = childJoints[0].transformMatrixAccumulatedAncestry;
+      } else {
+        tipOfJointMatrix = backOfJointMatrix.clone();
       }
-    } else {
-      for (let i=0; i<joints.length; i++) {
-        matrices[i] = skeletalMesh.bindShapeMatrix;
+
+      let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero());//.toVector3();
+      let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero());//.toVector3();
+      //let backOfJointPos = joints[i].parent.transformMatrix.multiplyVector(Vector4.zero()).toVector3();
+      joints[i].relativeVectorToJointTip = Vector3.subtract(tipOfJointPos, backOfJointPos);
+/*
+      joints[i].relativeVectorToJointTip = Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry).multiplyVector(
+        Vector3.subtract(tipOfJointPos.toVector3(), backOfJointPos.toVector3()).toVector4()).toVector3();
+*/
+    }
+
+    for (let i=0; i<joints.length; i++) {
+//      matrices[i] = Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry);
+      matrices[i] = Matrix44.identity();
+      let globalJointTransform = null;
+      let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
+      if (areThereAnyJointsWhichHaveAnimation) {
+        globalJointTransform = joints[i].transformMatrixAccumulatedAncestry;
+      } else {
+        globalJointTransform = skeletalMesh.transformMatrixAccumulatedAncestry;
+        let inverseMat = Matrix44.multiply(Matrix44.invert(skeletalMesh.bindShapeMatrix), Matrix44.invert(inverseBindMatrix));
+        globalJointTransform = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, inverseMat);
       }
+      matrices[i] = Matrix44.multiply(matrices[i], globalJointTransform);
+      joints[i].jointPoseMatrix = matrices[i].clone();
+      matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
+      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+      //joints[i].jointPoseMatrix = matrices[i].clone();
     }
 
     var flatMatrices = [];
