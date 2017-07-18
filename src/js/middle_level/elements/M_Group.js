@@ -168,6 +168,15 @@ export default class M_Group extends M_Element {
       return element;
     }
 
+    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (gizmo instanceof type) {
+          return gizmo;
+        }
+      }
+    }
+
     if (element instanceof M_Group) {
       let children = element.getChildren();
       let results = [];
@@ -194,6 +203,16 @@ export default class M_Group extends M_Element {
         }
       }
     }
+
+    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (this._validateByQuery(gizmo, query, queryMeta)) {
+          return gizmo;
+        }
+      }
+    }
+
     if (type === L_AbstractMaterial && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
@@ -219,6 +238,17 @@ export default class M_Group extends M_Element {
       }
       return objects;
     }
+
+    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (this._validateByQuery(gizmo, query, queryMeta)) {
+          objects.push(gizmo);
+        }
+      }
+      return objects;
+    }
+
     if (type === L_AbstractMaterial && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
