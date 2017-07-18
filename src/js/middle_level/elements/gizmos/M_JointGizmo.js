@@ -70,3 +70,5 @@ export default class M_JointGizmo extends M_Gizmo {
     return Matrix44.multiply(this._joint.jointPoseMatrix, mat);
   }
 }
+
+GLBoost['M_JointGizmo'] = M_JointGizmo;
