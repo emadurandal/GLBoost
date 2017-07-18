@@ -24,7 +24,49 @@ export class SPVBlinnShaderSource {
   }
 
   FSMethodDefine_SPVBlinnShaderSource(in_, f, lights, material, extraData) {
-    
+    let shaderText = '';
+
+    shaderText += `
+    float angular_n_h(vec3 normalVec3, vec3 halfVec3) {
+      return acos(dot(normalVec3, halfVec3));
+    }
+    `;
+
+    shaderText += `
+    float d_phong(vec3 normalVec3, vec3 halfVec3, float c1) {
+      return pow(
+        cos(angular_n_h(normalVec3, halfVec3))
+        , c1
+      );
+    }
+    `;
+
+    shaderText += `
+    float d_torrance_sparrow(vec3 normalVec3, vec3 halfVec3, float c2) {
+      float ac2 = angular_n_h(normalVec3, halfVec3) * c2;
+      return exp(-1.0 * ac2 * ac2);
+    }
+    `;
+
+    shaderText += `
+    float d_torrance_reiz(vec3 normalVec3, vec3 halfVec3, float c3) {
+      float c3c3 = c3 * c3;
+      float cosx = cos(angular_n_h(normalVec3, halfVec3) * (c3c3 - 1));
+      float d = c3c3 / (cosx * cosx + 1.0);
+      float d*d;
+    }
+    `;
+
+    shaderText += `
+    float d_beckmann(vec3 normalVec3, vec3 halfVec3, float m) {
+      float dot_n_h = dot(normalVec3, halfVec3);
+      float co = 1.0 / (4 * m * m * dot_n_h * dot_n_h * dot_n_h * dot_n_h);
+      float expx = exp((dot_n_h * dot_n_h - 1.0) / (m * m * dot_n_h * dot_n_h));
+      return co * expx; 
+    }
+    `;
+
+    return shaderText;
   }
 
   FSShade_SPVBlinnShaderSource(f, gl, lights, material, extraData) {
