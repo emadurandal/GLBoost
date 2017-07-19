@@ -77,7 +77,7 @@ export default class SPVPhongShader extends SPVDecalShader {
     super(glBoostContext, basicShader);
     SPVPhongShader.mixin(SPVPhongShaderSource);
 
-    this._power = 64.0;
+    this._power = 38.0;
     this._toUseSurfaceColorAsSpecularMap = true;
   }
 
