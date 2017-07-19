@@ -40,9 +40,9 @@ export class WireframeShaderSource {
     let shaderText = '';
 
     shaderText += `
-    float edge_ratio(vec3 bary3, float wireframeWidth, float wireframeWidthRelativeScale) {     
+    float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
         vec3 d = fwidth(bary3);
-        vec3 x = bary3+vec3((1.0 - wireframeWidth*wireframeWidthRelativeScale))*d;
+        vec3 x = bary3+vec3(1.0 - wireframeWidthInner)*d;
         vec3 a3 = smoothstep(vec3(0.0), d, x);
         float factor = min(min(a3.x, a3.y), a3.z);
         
@@ -56,14 +56,15 @@ export class WireframeShaderSource {
   FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
+    shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
     shaderText += 'float threshold = 0.001;\n';
     shaderText += 'if ( isWireframe ) {\n'; 
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
-    shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidth, wireframeWidthRelativeScale);\n';
-    shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidth * wireframeWidthRelativeScale/4.0);\n';
+    shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
+    shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
     // if r0.a is 0.0, it is wireframe not on shaded
     shaderText += '  rt0.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
-    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidth * wireframeWidthRelativeScale/1.0));\n';
+    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
     shaderText += '}\n';
 
     shaderText += '    if (rt0.a < threshold) {\n';
