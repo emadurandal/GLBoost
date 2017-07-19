@@ -30,6 +30,7 @@ import SPVClassicMaterial from '../low_level/materials/SPVClassicMaterial';
 import SPVLambertShader from './shaders/SPVLambertShader';
 import SPVPhongShader from './shaders/SPVPhongShader';
 import SPVDecalShader from './shaders/SPVDecalShader';
+import SPVBlinnShader from './shaders/SPVBlinnShader';
 import SPVGLTFLoader from './loader/SPVGLTFLoader';
 import H_SPVScreenLUT from '../high_level/post_effects/H_SPVScreenLUT';
 import H_SPVUIRectangle from '../high_level/user_interfaces/H_SPVUIRectangle';
