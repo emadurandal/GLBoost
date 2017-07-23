@@ -303,22 +303,21 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
   }
 
-  _setUpMaterialStates() {
+  _setUpMaterialStates(states) {
     let gl = this._gl;
 
-    if (this._states) {
-      if (this._states.enable) {
-        this._states.enable.forEach((state)=>{
+    if (states) {
+      if (states.enable) {
+        states.enable.forEach((state)=>{
           gl.enable(state);
         });
       }
-      if (this._states.functions) {
-        for (let functionName in this._states.functions) {
-          gl[functionName].apply(gl, this._states.functions[functionName]);
+      if (states.functions) {
+        for (let functionName in states.functions) {
+          gl[functionName].apply(gl, states.functions[functionName]);
         }
       }
     }
-
   }
 
   setUpStates() {
@@ -330,16 +329,13 @@ export default class L_AbstractMaterial extends GLBoostObject {
       case GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING:
         break;
       case GLBoost.GLOBAL_STATES_USAGE_IGNORE:
-        this._glBoostContext.disableAllGLState();
-        this._setUpMaterialStates();
+        this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE:
-        this._glBoostContext.disableAllGLState();
         this._glBoostContext.reflectGlobalGLState();
-        this._setUpMaterialStates();
+        this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE:
-        this._glBoostContext.disableAllGLState();
         this._glBoostContext.reflectGlobalGLState();
         break;
       default:
@@ -348,6 +344,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   tearDownStates() {
+    this._glBoostContext.disableAllGLState();
+    this._setUpMaterialStates({
+      functions : this._stateFunctionsToReset
+    });
   }
 
   setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
