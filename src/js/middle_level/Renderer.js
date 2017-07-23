@@ -36,11 +36,14 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
+      let lights = renderPass.scene.lights;
+
+      renderPass.doSomethingBeforeRender(camera ? true:false, lights);
+
       var glContext = this._glContext;
       var gl = glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
-      let lights = renderPass.scene.lights;
 
       // set render target buffers for each RenderPass.
       if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
@@ -93,6 +96,8 @@ export default class Renderer extends GLBoostObject {
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
+
+      renderPass.doSomethingAfterRender(camera ? true:false, lights);
 
     });
   }

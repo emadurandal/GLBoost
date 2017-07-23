@@ -25,6 +25,11 @@ export default class RenderPass extends GLBoostObject {
     this._isEnableToDraw = true;
 
     this._customFunction = null;
+
+    this._webglStatesAssignDictionaries = [];
+    this._backupWebGLStatesOfMaterials = [];
+    this._shaderAssignDictionaries = [];
+    this._backupShadersOfInstances = [];
   }
 
   get expression() {
@@ -162,6 +167,73 @@ export default class RenderPass extends GLBoostObject {
     return this._clearDepth;
   }
 
+  setWebGLStatesAssignDictionaries(dictionaries) {
+    this._webglStatesAssignDictionaries = dictionaries;
+  }
+
+  setShaderAssignDictionaries(dictionaries) {
+    this._shaderAssignDictionaries = dictionaries;
+  }
+
+  _assignWebGLStates() {
+    if (this._webglStatesAssignDictionaries.length === 0) {
+      return;
+    }
+
+    for (let dic of this._webglStatesAssignDictionaries) {
+      for (let material of dic.materials) {
+        this._backupWebGLStatesOfMaterials.push({
+          material: material,
+          states: material.states
+        });
+        material.states = dic.states;
+      }
+    }
+  }
+
+  _restoreWebGLStates() {
+    if (this._backupWebGLStatesOfMaterials.length === 0) {
+      return;
+    }
+    for (let dic of this._backupWebGLStatesOfMaterials) {
+      dic.material.states = dic.states;
+    }
+  }
+
+  _assignShaders(existCamera_f, lights) {
+    if (this._shaderAssignDictionaries.length === 0) {
+      return;
+    }
+
+    for (let dic of this._shaderAssignDictionaries) {
+      for (let obj of dic.instances) {
+        obj.getAppropriateMaterials().forEach((material, index) => {
+          this._backupShadersOfInstances.push({
+            instance: obj,
+            backupShaderClass: material.shaderClass
+          });
+          material.setShaderClassWithForceUpdate(dic.shaderClass);
+          obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false);
+        });
+//        obj.geometry.prepareToRender(this.expression, existCamera_f, lights, obj.material, obj);
+      }
+    }
+  }
+
+  _restoreShaders(existCamera_f, lights) {
+    if (this._backupShadersOfInstances.length === 0) {
+      return;
+    }
+    for (let dic of this._backupShadersOfInstances) {
+      dic.instance.getAppropriateMaterials().forEach((material,index)=>{
+        material.setShaderClassWithForceUpdate(dic.backupShaderClass);
+        dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false);
+      });
+//      dic.instance.geometry.prepareToRender(this.expression, existCamera_f, lights, dic.instance.material, dic.instance);
+    }
+
+  }
+
   /**
    * this function is called final part of prepareToRender
    */
@@ -247,6 +319,18 @@ export default class RenderPass extends GLBoostObject {
 
   get isEnableToDraw() {
     return this._isEnableToDraw;
+  }
+
+  doSomethingBeforeRender(existCamera_f, lights) {
+    this._assignWebGLStates();
+    this._assignShaders(existCamera_f, lights);
+    // And call functions registered by user.
+  }
+
+  doSomethingAfterRender(existCamera_f, lights) {
+    this._restoreShaders(existCamera_f, lights);
+    this._restoreWebGLStates();
+    // And call functions registered by user.
   }
 
 }
