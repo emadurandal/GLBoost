@@ -11,8 +11,6 @@ export default class M_Joint extends M_Element {
     this._gizmo = new M_JointGizmo(glBoostContext, this, length);
     this._gizmos.push(this._gizmo);
 
-    //this._gizmo._mesh.masterElement = this;
-
     M_Joint._calculatedTransforms = {};
     M_Joint._calculatedTranslates = {};
     this._childJoints = [];
@@ -26,37 +24,45 @@ export default class M_Joint extends M_Element {
 
     this._inverseBindMatrix = Matrix44.identity();
 
-    this._relativeVectorToJointTip = new Vector3(0, 0, 1);
+    this._worldPositionOfThisJoint = new Vector3(0, 0, 0);
+    this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
+
+    this._skeletalMesh = null;
   }
 
   set inverseBindMatrix(mat4) {
     this._inverseBindMatrix = mat4;
   }
-/*
-  set length(vec3) {
-    //this._gizmo._mesh.scale = vec3;
-    this._length = vec3.x;
-    this._isCalculatedLength = true;
+
+  get inverseBindMatrix() {
+    return this._inverseBindMatrix;
   }
 
-  get length() {
-//    return this._gizmo._mesh.scale.clone().x;
-    return this._length;
-  }
-  */
-
-  set relativeVectorToJointTip(vec3) {
-    this._relativeVectorToJointTip = vec3;
-    this._isCalculatedJointGizmo = true;
+  set skeletalMesh(skeletalMesh) {
+    this._skeletalMesh = skeletalMesh;
   }
 
-  get relativeVectorToJointTip() {
-    return this._relativeVectorToJointTip;
+  get skeletalMesh() {
+    return this._skeletalMesh;
+  }
+
+  set worldPositionOfThisJoint(mat) {
+    this._gizmo.worldPositionOfThisJoint = mat;
+  }
+
+  get worldPositionOfThisJoint() {
+    return this._gizmo.worldPositionOfThisJoint;
+  }
+
+  set worldPositionOfParentJoint(mat) {
+    this._gizmo.worldPositionOfParentJoint = mat;
+  }
+
+  get worldPositionOfParentJoint() {
+    return this._gizmo.worldPositionOfParentJoint;
   }
 
   set jointPoseMatrix(matrix) {
-
-//    this._gizmo._mesh.multiplyMatrix(matrix);
     this._jointPoseMatrix = matrix;
   }
 
@@ -97,6 +103,10 @@ export default class M_Joint extends M_Element {
     return this._jointsOfParentHierarchies;
   }
 
+  updateGizmoDisplay() {
+    this._gizmo.update();
+  }
+
   clone() {
     let instance = new M_Joint(this._glBoostContext);
     this._copy(instance);
@@ -107,13 +117,4 @@ export default class M_Joint extends M_Element {
     super._copy(instance);
   }
 
-/*
-  // Use master element's transformMatrixAccumulatedAncestry.
-  get _transformMatrixAccumulatedAncestry() {
-
-    //return
-    return Matrix44.multiply(this._inverseBindMatrix, this._gizmo._mesh._transformMatrixAccumulatedAncestry);
-    //return this.transformMatrix;
-  }
-*/
 }

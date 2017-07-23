@@ -21,8 +21,9 @@ export default class M_JointGizmo extends M_Gizmo {
   _init(glBoostContext, joint, length) {
     this._joint = joint;
     this._material = new ClassicMaterial(this._glBoostContext);
+    this._primitive = new JointPrimitive(this._glBoostContext, length, 1);
     this._mesh = new M_Mesh(glBoostContext,
-      new JointPrimitive(this._glBoostContext, length, 1),
+      this._primitive,
       this._material);
     this._mesh.masterElement = this;
 //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
@@ -53,21 +54,27 @@ export default class M_JointGizmo extends M_Gizmo {
 
   // Use master element's transformMatrixAccumulatedAncestry.
   get _transformMatrixAccumulatedAncestry() {
-    let backToTipVec3 = this._joint.relativeVectorToJointTip;
-    let length = backToTipVec3.length();
+    return Matrix44.identity();
+  }
 
+  set worldPositionOfThisJoint(mat) {
+    this._primitive.worldPositionOfThisJoint = mat;
+  }
 
-    let theta = MathUtil.radianToDegree(Math.atan((backToTipVec3.y)/(Math.abs(backToTipVec3.x))));
-    let phi = MathUtil.radianToDegree((Math.atan(Math.sqrt(backToTipVec3.x*backToTipVec3.x+backToTipVec3.y*backToTipVec3.y)/Math.abs(backToTipVec3.z))));
+  get worldPositionOfThisJoint() {
+    return this._primitive.worldPositionOfThisJoint;
+  }
 
+  set worldPositionOfParentJoint(mat) {
+    this._primitive.worldPositionOfParentJoint = mat;
+  }
 
-//    let theta = MathUtil.radianToDegree(Math.atan((backToTipVec3.y)/((backToTipVec3.x))));
-//    let phi = - MathUtil.radianToDegree((Math.atan(Math.sqrt(backToTipVec3.x*backToTipVec3.x+backToTipVec3.y*backToTipVec3.y)/(backToTipVec3.z))));
-//    let theta = 0;
-//    let phi = 0;
-    let mat = Matrix44.rotateZ(theta).multiply(Matrix44.rotateY(phi)).multiply(Matrix44.scale(new Vector3(length, length, length)));
+  get worldPositionOfParentJoint() {
+    return this._primitive.worldPositionOfParentJoint;
+  }
 
-    return Matrix44.multiply(this._joint.jointPoseMatrix, mat);
+  update() {
+    this._primitive.update();
   }
 }
 

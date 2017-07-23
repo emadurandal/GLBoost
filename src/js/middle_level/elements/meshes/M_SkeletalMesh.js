@@ -25,6 +25,7 @@ export default class M_SkeletalMesh extends M_Mesh {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
           this._joints.push(joints[j]);
+          joints[j].skeletalMesh = this;
           joints[j].inverseBindMatrix = this._inverseBindMatrices[jointCount++];
           break;
         }
@@ -61,7 +62,7 @@ export default class M_SkeletalMesh extends M_Mesh {
       if (jointsParentHierarchies == null) {
         jointsParentHierarchies = [];
       }
-      jointsParentHierarchies.push(this._joints[i]);
+      //jointsParentHierarchies.push(this._joints[i]);
 
       let children = this._joints[i].parent.getChildren();
       let childJoints = [];
