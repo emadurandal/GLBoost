@@ -63,8 +63,6 @@ export class PhongShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
     material.setUniform(shaderProgram.hashId, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
 
-    material.setUniform(shaderProgram.hashId, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition'));
-
     return vertexAttribsAsResult;
   }
 }
