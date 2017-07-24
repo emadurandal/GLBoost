@@ -30,6 +30,10 @@ export default class RenderPass extends GLBoostObject {
     this._backupWebGLStatesOfMaterials = [];
     this._shaderAssignDictionaries = [];
     this._backupShadersOfInstances = [];
+
+    this._newShaderInstance = null;
+    this._backupShaderClassDic = {};
+
   }
 
   get expression() {
@@ -172,6 +176,8 @@ export default class RenderPass extends GLBoostObject {
   }
 
   setShaderAssignDictionaries(dictionaries) {
+    this._newShaderInstance = null;
+    this._backupShaderClassDic = {};
     this._shaderAssignDictionaries = dictionaries;
   }
 
@@ -200,22 +206,31 @@ export default class RenderPass extends GLBoostObject {
     }
   }
 
-  _assignShaders(existCamera_f, lights) {
+  _assignShaders(existCamera_f, lights, assumeThatAllMaterialsAreSame = true) {
     if (this._shaderAssignDictionaries.length === 0) {
       return;
     }
 
-    for (let dic of this._shaderAssignDictionaries) {
-      for (let obj of dic.instances) {
-        obj.getAppropriateMaterials().forEach((material, index) => {
-          this._backupShadersOfInstances.push({
-            instance: obj,
-            backupShaderClass: material.shaderClass
+    if (assumeThatAllMaterialsAreSame) {
+      for (let dic of this._shaderAssignDictionaries) {
+        for (let obj of dic.instances) {
+          obj.getAppropriateMaterials().forEach((material, index) => {
+            this._backupShadersOfInstances.push({
+              instance: obj,
+              backupShaderClass: material.shaderClass,
+              backupShaderInstance: material.shaderInstance
+            });
+            //material.setShaderClassWithForceUpdate(dic.shaderClass);
+
+            if (!this._newShaderInstance) {
+              let _material = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false, dic.shaderClass);
+              this._newShaderInstance = _material.shaderInstance;
+            }
+
+            material.shaderInstance = this._newShaderInstance;
           });
-          material.setShaderClassWithForceUpdate(dic.shaderClass);
-          obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false);
-        });
-//        obj.geometry.prepareToRender(this.expression, existCamera_f, lights, obj.material, obj);
+  //        obj.geometry.prepareToRender(this.expression, existCamera_f, lights, obj.material, obj);
+        }
       }
     }
   }
@@ -224,11 +239,21 @@ export default class RenderPass extends GLBoostObject {
     if (this._backupShadersOfInstances.length === 0) {
       return;
     }
+
     for (let dic of this._backupShadersOfInstances) {
       dic.instance.getAppropriateMaterials().forEach((material,index)=>{
         material.setShaderClassWithForceUpdate(dic.backupShaderClass);
-        dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false);
+//        material.shaderInstance = dic.backupShaderInstance;
+
+        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
+          let _material = dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, true, dic.backupShaderClass);
+          this._backupShaderClassDic[dic.backupShaderClass.name] = _material.shaderInstance;
+        }
+
+        material.shaderInstance = this._backupShaderClassDic[dic.backupShaderClass.name];
+
       });
+      //dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 1, existCamera_f, lights, true);
 //      dic.instance.geometry.prepareToRender(this.expression, existCamera_f, lights, dic.instance.material, dic.instance);
     }
 

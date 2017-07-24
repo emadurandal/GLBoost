@@ -394,32 +394,38 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true) {
-    var gl = this._glContext.gl;
-    var vertices = this._vertices;
+  _createShaderInstance(shaderClass) {
+    let basicShaderSource = null;
+    if (this._drawKicker instanceof DrawKickerWorld) {
+      basicShaderSource = VertexWorldShaderSource;
+    } else if (this._drawKicker instanceof DrawKickerLocal) {
+      basicShaderSource = VertexLocalShaderSource;
+    }
+    let shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
+    return shaderInstance;
+  }
 
-    var glem = GLExtensionsManager.getInstance(this._glContext);
-    var _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
+  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0) {
+    let gl = this._glContext.gl;
+    let vertices = this._vertices;
+
+    let glem = GLExtensionsManager.getInstance(this._glContext);
+    let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
 
     if (doSetupVertexAttribs) {
       glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
     }
 
-    var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+    let allVertexAttribs = Geometry._allVertexAttribs(vertices);
 
-    if (material.shaderInstance === null) {
-      let shaderClass = material.shaderClass;
 
-      let basicShaderSource = null;
-      if (this._drawKicker instanceof DrawKickerWorld) {
-        basicShaderSource = VertexWorldShaderSource;
-      } else if (this._drawKicker instanceof DrawKickerLocal) {
-        basicShaderSource = VertexLocalShaderSource;
-      }
-
-      material.shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
+    if (shaderClass) {
+      material.shaderInstance = this._createShaderInstance(shaderClass);
+    } else if (material.shaderInstance === null) {
+      material.shaderInstance = this._createShaderInstance(material.shaderClass);
     }
-    var glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+
+    let glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
     if (doSetupVertexAttribs) {
       this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
     }
