@@ -55,6 +55,7 @@ export class SPVDecalShaderSource {
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform vec4 textureContributionRate;\n';
     shaderText += 'uniform vec4 gamma;\n';
+    shaderText += 'uniform vec4 splitParameter;\n';
 
     return shaderText;
   }
@@ -92,6 +93,27 @@ export class SPVDecalShaderSource {
     return shaderText;
   }
 
+  FSPostEffect_SPVDecalShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+    shaderText += 'float splitCount = 4.0;\n';
+    shaderText += 'float slope = splitParameter.y/splitParameter.x;\n';
+    shaderText += 'float aspect = splitParameter.x/splitParameter.y;\n';
+    shaderText += 'float animationRatio = splitParameter.w;\n';
+    shaderText += 'float inverseAnimationRatio = 1.0 -splitParameter.w;\n';
+
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.5*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '} else \n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += '  rt0 = vec4(normalize(v_normal), 1.0);\n';
+    shaderText += '} else \n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.5*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += '  rt0 = vec4(1.0, 0.0, 1.0, 1.0);\n';
+    shaderText += '}\n';
+    return shaderText;
+  }
+
+
   prepare_SPVDecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
@@ -106,6 +128,7 @@ export class SPVDecalShaderSource {
     material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
     material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
     material.setUniform(shaderProgram.hashId, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
+    material.setUniform(shaderProgram.hashId, 'uniform_splitParameter', this._glContext.getUniformLocation(shaderProgram, 'splitParameter'));
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
@@ -215,6 +238,10 @@ export default class SPVDecalShader extends WireframeShader {
 
     let gamma = Vector3.divideVector(this.handleArgument(targetGamma), this.handleArgument(sourceGamma));
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
+
+    let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, 0.5, true);
+
   }
 
   setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
