@@ -73,6 +73,14 @@ export default class M_JointGizmo extends M_Gizmo {
     return this._primitive.worldPositionOfParentJoint;
   }
 
+  set width(value) {
+    this._primitive.width = value;
+  }
+
+  get width() {
+    return this._primitive.width;
+  }
+
   update() {
     this._primitive.update();
   }
