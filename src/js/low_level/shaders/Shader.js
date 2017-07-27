@@ -621,7 +621,7 @@ export default class Shader extends GLBoostObject {
   static _getNormalStr(gl, material, f) {
     let shaderText = '';
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-    shaderText += '  normal = normalize(v_normal);\n';
+    shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  vec3 dx = dFdx(v_position_world);\n';
