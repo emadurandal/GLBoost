@@ -78,7 +78,8 @@ export class SPVDecalShaderSource {
 
   FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
+
+    shaderText += Shader._getNormalStr(gl, material, f);
 
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
@@ -92,6 +93,11 @@ export class SPVDecalShaderSource {
     shaderText += '  rt0.xyz = gamma.w > 0.5 ? pow(rt0.xyz, gamma.xyz) : rt0.xyz;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
+    shaderText += 'if (splitParameter.w > 0.5) {\n';
+    shaderText += '  isWireframeInner = true;\n';
+    shaderText += '}\n';
+
     return shaderText;
   }
 
@@ -103,14 +109,18 @@ export class SPVDecalShaderSource {
     shaderText += 'float animationRatio = splitParameter.w;\n';
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
 
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.5*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-    shaderText += '} else \n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.35) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  rt0 = wireframeResult;\n';
+    shaderText += '}\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = vec4(normal*0.5+0.5, 1.0);\n';
-    shaderText += '} else \n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.5*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = vec4(1.0, 0.0, 1.0, 1.0);\n';
+    shaderText += '}\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.35) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  rt0 = vec4(texcoord.x, texcoord.y, 0.0, 1.0);\n';
+    } else {
+      shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+    }
     shaderText += '}\n';
     return shaderText;
   }
