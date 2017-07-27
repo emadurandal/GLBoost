@@ -2,6 +2,7 @@ import GLBoost from '../../../globals';
 import M_Mesh from './M_Mesh';
 import M_Joint from '../skeletons/M_Joint';
 import Matrix44 from '../../../low_level/math/Matrix44';
+import AABB from '../../../low_level/math/AABB';
 
 export default class M_SkeletalMesh extends M_Mesh {
   constructor(glBoostContext, geometry, material, rootJointName) {
@@ -78,6 +79,13 @@ export default class M_SkeletalMesh extends M_Mesh {
       this._joints[i].jointsOfParentHierarchies = jointsParentHierarchies;
     }
     super.prepareToRender(expression, existCamera_f, lights, renderPasses);
+
+
+    let lengthCenterToCorner = AABB.multiplyMatrix(this._joints[0].transformMatrixAccumulatedAncestry,
+      this.rawAABBInLocal).lengthCenterToCorner;
+    for (let i=0; i<this._joints.length; i++) {
+      this._joints[i].width = lengthCenterToCorner / 75;
+    }
   }
 
   set jointsHierarchy(jointsHierarchy) {

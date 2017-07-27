@@ -28,6 +28,7 @@ export default class M_Joint extends M_Element {
     this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
 
     this._skeletalMesh = null;
+
   }
 
   set inverseBindMatrix(mat4) {
@@ -60,6 +61,14 @@ export default class M_Joint extends M_Element {
 
   get worldPositionOfParentJoint() {
     return this._gizmo.worldPositionOfParentJoint;
+  }
+
+  set width(value) {
+    this._gizmo.width = value;
+  }
+
+  get width() {
+    return this._gizmo.width;
   }
 
   set jointPoseMatrix(matrix) {

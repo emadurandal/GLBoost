@@ -12,12 +12,13 @@ export default class JointPrimitive extends Geometry {
     this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
     this._vertexData = this._setupVertexData();
     this.setVerticesData(this._vertexData, null, GLBoost.LINES);
+    this._width = 1;
   }
 
   _setupVertexData() {
 
     let length = Vector3.lengthBtw(this._worldPositionOfThisJoint, this._worldPositionOfParentJoint);
-    let arrowWidth = length/10;
+    let arrowWidth = this._width;
     let arrowheadLength = length/7.5;
     let arrowStickLength = length - arrowheadLength;
 
@@ -108,6 +109,14 @@ export default class JointPrimitive extends Geometry {
 
   get worldPositionOfParentJoint() {
     return this._worldPositionOfParentJoint;
+  }
+
+  set width(value) {
+    this._width = value;
+  }
+
+  get width() {
+    return this._width;
   }
 
   update() {
