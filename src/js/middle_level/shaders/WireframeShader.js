@@ -52,18 +52,31 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
+  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += 'bool isWireframeInner = false;\n';
+
+    return shaderText;
+  }
+
   FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
     shaderText += 'float threshold = 0.001;\n';
-    shaderText += 'if ( isWireframe ) {\n'; 
+    shaderText += 'vec4 wireframeResult = rt0;\n';
+    shaderText += 'if ( isWireframeInner ) {\n';
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
     shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
     shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
     // if r0.a is 0.0, it is wireframe not on shaded
-    shaderText += '  rt0.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
-    shaderText += '  rt0.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+    shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
+    shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+    shaderText += '}\n';
+
+    shaderText += 'if ( isWireframe ) {\n';
+    shaderText += '  rt0 = wireframeResult;\n';
     shaderText += '}\n';
 
     shaderText += '    if (rt0.a < 0.05) {\n';
