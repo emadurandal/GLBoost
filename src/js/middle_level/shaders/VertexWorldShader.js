@@ -70,8 +70,12 @@ export default class VertexWorldShaderSource {
 
     //    shaderText += '  v_position_view.z *= -1.0;\n';
 
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading) {
+      shaderText += '  v_normal = normal_world;\n';
+      shaderText += '  v_viewDirection = viewDirection_world;\n';
+      if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
         // world space to tangent space
         shaderText += '  if (!isSkinning) {\n';
         shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
@@ -99,9 +103,6 @@ export default class VertexWorldShaderSource {
 //        shaderText += '  v_normal = normal_world;\n';
         shaderText += '  v_normal = normal_tangent;\n';
 
-      } else {
-        shaderText += '  v_viewDirection = viewDirection_world;\n';
-        shaderText += '  v_normal = normal_world;\n';
       }
       shaderText += '  v_normal = normalize(v_normal);\n';
     }
@@ -114,20 +115,19 @@ export default class VertexWorldShaderSource {
     for (let i=0; i<lights.length; i++) {
       // if PointLight: lightPosition_world[i].w === 1.0      if DirectionalLight: lightPosition_world[i].w === 0.0
       shaderText += `  lightDirection_world = normalize(lightPosition_world[${i}].xyz - position_world.xyz * lightPosition_world[${i}].w);\n`;
+      shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
       if (Shader._exist(f, GLBoost.NORMAL)) {
         shaderText += `  // move lightDirection_world from World space to Tangent space. \n`;
 
-        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading) {
+        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
           // world space to tangent space
           shaderText += `  lightDirection_tangent = tbnMat_world_to_tangent * lightDirection_world;\n`;
 //          shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
           shaderText += `  v_lightDirection[${i}] = lightDirection_tangent;\n`;
         } else {
-          shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
         }
-        shaderText += `  v_lightDirection[${i}] = normalize(v_lightDirection[${i}]);\n`;
       }
-
+      shaderText += `  v_lightDirection[${i}] = normalize(v_lightDirection[${i}]);\n`;
     }
 
     shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
