@@ -91,8 +91,8 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._movedMouseXOnCanvas = evt.clientX - rect.left;
       this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
-      let button_l = ((InputUtil.whichButton(evt) === 'left') ? true : false);
-      let button_c = ((InputUtil.whichButton(evt) === 'middle') ? true : false);
+      let button_l = (InputUtil.whichButton(evt) === 'left');
+      let button_c = (InputUtil.whichButton(evt) === 'middle') || (InputUtil.whichButton(evt) === 'right') || (evt.altKey && !evt.ctrlKey);
       if (button_c) {
         this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
         this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
