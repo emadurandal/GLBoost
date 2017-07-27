@@ -99,15 +99,15 @@ export class SPVDecalShaderSource {
     shaderText += 'float slope = splitParameter.y/splitParameter.x;\n';
     shaderText += 'float aspect = splitParameter.x/splitParameter.y;\n';
     shaderText += 'float animationRatio = splitParameter.w;\n';
-    shaderText += 'float inverseAnimationRatio = 1.0 -splitParameter.w;\n';
+    shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
 
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.5*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.5*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     shaderText += '} else \n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = vec4(normalize(v_normal), 1.0);\n';
     shaderText += '} else \n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.5*aspect)/aspect*animationRatio + gl_FragCoord.x*1.5*inverseAnimationRatio)) {\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.5*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = vec4(1.0, 0.0, 1.0, 1.0);\n';
     shaderText += '}\n';
     return shaderText;
@@ -240,7 +240,7 @@ export default class SPVDecalShader extends WireframeShader {
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
 
     let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, 0.5, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, 0.0, true);
 
   }
 
