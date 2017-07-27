@@ -209,11 +209,11 @@ export default class SPVDecalShader extends WireframeShader {
     }
 
 
-    let sourceGamma = this.getShaderParameter(material, 'sourceGamma', new Vector3(1, 1, 1));
-    let targetGamma = this.getShaderParameter(material, 'targetGamma', new Vector3(1, 1, 1));
+    let sourceGamma = this.getShaderParameter(material, 'sourceGammaForCorrection', new Vector3(1, 1, 1));
+    let targetGamma = this.getShaderParameter(material, 'targetGammaForCorrection', new Vector3(1, 1, 1));
     let isGammaEnable = this.getShaderParameter(material, 'isGammaEnable', true);
 
-    let gamma = Vector3.divideVector(this.handleArgument(sourceGamma), this.handleArgument(targetGamma));
+    let gamma = Vector3.divideVector(this.handleArgument(targetGamma), this.handleArgument(sourceGamma));
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
   }
 
@@ -237,19 +237,19 @@ export default class SPVDecalShader extends WireframeShader {
     }
   }
 
-  set sourceGamma(value) {
+  set sourceGammaForCorrection(value) {
     this._sourceGamma = value;
   }
 
-  get sourceGamma() {
+  get sourceGammaForCorrection() {
     return this._sourceGamma;
   }
 
-  set targetGamma(value) {
+  set targetGammaForCorrection(value) {
     this._targetGamma = value;
   }
 
-  get targetGamma() {
+  get targetGammaForCorrection() {
     return this._targetGamma;
   }
 }

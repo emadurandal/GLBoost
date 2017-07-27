@@ -18,20 +18,20 @@ export default class H_SPVScreenLUT extends M_SPVScreenMesh {
     return this.geometry.materials[0].getOneTexture();
   }
 
-  set sourceGamma(value) {
-    this.geometry.materials[0].shaderParameters.sourceGamma = value;
+  set sourceGammaForCorrection(value) {
+    this.geometry.materials[0].shaderParameters.sourceGammaForCorrection = value;
   }
 
-  get sourceGamma() {
-    return this.geometry.materials[0].shaderParameters.sourceGamma;
+  get sourceGammaForCorrection() {
+    return this.geometry.materials[0].shaderParameters.sourceGammaForCorrection;
   }
 
-  set targetGamma(value) {
-    this.geometry.materials[0].shaderParameters.targetGamma = value;
+  set targetGammaForCorrection(value) {
+    this.geometry.materials[0].shaderParameters.targetGammaForCorrection = value;
   }
 
-  get targetGamma() {
-    return this.geometry.materials[0].shaderParameters.targetGamma;
+  get targetGammaForCorrection() {
+    return this.geometry.materials[0].shaderParameters.targetGammaForCorrection;
   }
 
   set isGammaEnable(flag) {
