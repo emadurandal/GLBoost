@@ -78,6 +78,8 @@ export class SPVDecalShaderSource {
 
   FSShade_SPVDecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
+    shaderText += '  vec3 normal = normalize(v_normal);\n';
+
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt0 *= color;\n';
@@ -105,7 +107,7 @@ export class SPVDecalShaderSource {
     shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
     shaderText += '} else \n';
     shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = vec4(normalize(v_normal), 1.0);\n';
+    shaderText += '  rt0 = vec4(normal*0.5+0.5, 1.0);\n';
     shaderText += '} else \n';
     shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.5*aspect)/aspect + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = vec4(1.0, 0.0, 1.0, 1.0);\n';
@@ -240,7 +242,7 @@ export default class SPVDecalShader extends WireframeShader {
     this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
 
     let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, 0.0, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
 
   }
 
