@@ -42,6 +42,11 @@ export default class H_SPVScreenLUT extends M_SPVScreenMesh {
     return this.geometry.materials[0].shaderParameters.isGammaEnable;
   }
 
+  get material() {
+    return this.geometry.materials[0];
+  }
+
+
 }
 
 GLBoost["H_SPVScreenLUT"] = H_SPVScreenLUT;
