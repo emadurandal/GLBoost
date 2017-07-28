@@ -13,7 +13,7 @@ export default class M_JointGizmo extends M_Gizmo {
     super(glBoostContext, null, null);
     this._init(glBoostContext, joint, length);
 
-//    this.isVisible = false;
+    this.isVisible = false;
 
     this.baseColor = new Vector4(0.0, 1.0, 1.0, 0.25);
   }
@@ -57,16 +57,16 @@ export default class M_JointGizmo extends M_Gizmo {
     return Matrix44.identity();
   }
 
-  set worldPositionOfThisJoint(mat) {
-    this._primitive.worldPositionOfThisJoint = mat;
+  set worldPositionOfThisJoint(vec3) {
+    this._primitive.worldPositionOfThisJoint = vec3;
   }
 
   get worldPositionOfThisJoint() {
     return this._primitive.worldPositionOfThisJoint;
   }
 
-  set worldPositionOfParentJoint(mat) {
-    this._primitive.worldPositionOfParentJoint = mat;
+  set worldPositionOfParentJoint(vec3) {
+    this._primitive.worldPositionOfParentJoint = vec3;
   }
 
   get worldPositionOfParentJoint() {
@@ -84,6 +84,15 @@ export default class M_JointGizmo extends M_Gizmo {
   update() {
     this._primitive.update();
   }
+
+  set isVisible(flag) {
+    this._mesh.isVisible = flag;
+  }
+
+  get isVisible() {
+    return this._mesh.isVisible;
+  }
+
 }
 
 GLBoost['M_JointGizmo'] = M_JointGizmo;

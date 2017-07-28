@@ -20,13 +20,14 @@ export default class M_SkeletalMesh extends M_Mesh {
 
     this._joints = [];
 
-    // sort joints according to jointNames
+    // sort & choice joints according to jointNames for skinning
     let jointCount=0;
     for (let i=0; i<this._jointNames.length; i++) {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
           this._joints.push(joints[j]);
           joints[j].skeletalMesh = this;
+          joints[j].isVisible = true;
           joints[j].inverseBindMatrix = this._inverseBindMatrices[jointCount++];
           break;
         }
@@ -49,7 +50,12 @@ export default class M_SkeletalMesh extends M_Mesh {
           Array.prototype.push.apply(results, result);
         }
 
-        results.push(parentJoint);
+        for (let jointName of this._jointNames) {
+          if (parentJoint.userFlavorName === jointName) {
+            results.push(parentJoint);
+            return results;
+          }
+        }
 
         return results;
       }
@@ -65,17 +71,6 @@ export default class M_SkeletalMesh extends M_Mesh {
       }
       //jointsParentHierarchies.push(this._joints[i]);
 
-      let children = this._joints[i].parent.getChildren();
-      let childJoints = [];
-      for (let child of children) {
-        if (child.className === 'M_Group') {
-          let childJoint = child.getAnyJointAsChild();
-          if (childJoint) {
-            childJoints.push(child);
-          }
-        }
-      }
-      this._joints[i].childJoints = childJoints;
       this._joints[i].jointsOfParentHierarchies = jointsParentHierarchies;
     }
     super.prepareToRender(expression, existCamera_f, lights, renderPasses);

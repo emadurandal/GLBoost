@@ -388,7 +388,7 @@ export default class M_Element extends L_Element {
       if (withMySelf) {
         currentMatrix = currentElem.transformMatrix;
       }
-      return this._multiplyMyAndParentTransformMatrices(currentElem._parent, true).multiply(currentMatrix);
+      return Matrix44.multiply(this._multiplyMyAndParentTransformMatrices(currentElem._parent, true), currentMatrix);
     }
   }
 
@@ -474,7 +474,7 @@ export default class M_Element extends L_Element {
       if (withMySelf) {
         currentMatrix = currentElem.transformMatrixOnlyRotate;
       }
-      return this._multiplyMyAndParentRotateMatrices(currentElem._parent, true).multiply(currentMatrix);
+      return Matrix44.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
     }
   }
 
