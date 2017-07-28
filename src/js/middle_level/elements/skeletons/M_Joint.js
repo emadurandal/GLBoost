@@ -24,9 +24,6 @@ export default class M_Joint extends M_Element {
 
     this._inverseBindMatrix = Matrix44.identity();
 
-    this._worldPositionOfThisJoint = new Vector3(0, 0, 0);
-    this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
-
     this._skeletalMesh = null;
 
   }
@@ -47,16 +44,16 @@ export default class M_Joint extends M_Element {
     return this._skeletalMesh;
   }
 
-  set worldPositionOfThisJoint(mat) {
-    this._gizmo.worldPositionOfThisJoint = mat;
+  set worldPositionOfThisJoint(vec) {
+    this._gizmo.worldPositionOfThisJoint = vec;
   }
 
   get worldPositionOfThisJoint() {
     return this._gizmo.worldPositionOfThisJoint;
   }
 
-  set worldPositionOfParentJoint(mat) {
-    this._gizmo.worldPositionOfParentJoint = mat;
+  set worldPositionOfParentJoint(vec) {
+    this._gizmo.worldPositionOfParentJoint = vec;
   }
 
   get worldPositionOfParentJoint() {

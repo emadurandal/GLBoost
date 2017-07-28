@@ -55,30 +55,27 @@ export default class M_SkeletalGeometry extends Geometry {
     }
 
     for (let i=0; i<joints.length; i++) {
-      if (joints[i].isCalculatedJointGizmo) {
-//        break;
-      }
 
       let backOfJointMatrix = Matrix44.identity();
       let tipOfJointMatrix = null;
-      let childJoints = joints[i].childJoints;
+
+
+      tipOfJointMatrix = joints[i].jointPoseMatrix;
       if (i > 0) {
-        let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
-
-        tipOfJointMatrix = joints[i].jointPoseMatrix;
-        let backOfJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length-1];
+        let backOfJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 1];
         backOfJointMatrix = backOfJoint.jointPoseMatrix;
-
-        let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-        let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-
-        joints[i].worldPositionOfThisJoint = tipOfJointPos.clone();
-        joints[i].worldPositionOfParentJoint = backOfJointPos.clone();
-
       } else {
-        joints[i].worldPositionOfParentJoint = Vector3.zero();
-        joints[i].worldPositionOfThisJoint = new Vector3(0, 0, 0.00001);
+        backOfJointMatrix = joints[0].transformMatrixAccumulatedAncestry;//joints[0].parent.parent.transformMatrixAccumulatedAncestry;
       }
+
+
+      let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+
+      joints[i].worldPositionOfThisJoint = tipOfJointPos.clone();
+      joints[i].worldPositionOfParentJoint = backOfJointPos.clone();
+
+
       joints[i].updateGizmoDisplay();
     }
 
