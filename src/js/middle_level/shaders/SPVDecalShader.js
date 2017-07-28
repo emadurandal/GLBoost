@@ -103,25 +103,56 @@ export class SPVDecalShaderSource {
 
   FSPostEffect_SPVDecalShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
-    shaderText += 'float splitCount = 4.0;\n';
-    shaderText += 'float slope = splitParameter.y/splitParameter.x;\n';
-    shaderText += 'float aspect = splitParameter.x/splitParameter.y;\n';
+    shaderText += 'vec4 borderColor = vec4(0.2, 0.1, 0.1, 1.0);\n';
     shaderText += 'float animationRatio = splitParameter.w;\n';
+    shaderText += 'float slope = splitParameter.y/splitParameter.x/(animationRatio*animationRatio);\n';
+    shaderText += 'float aspect = splitParameter.x/splitParameter.y;\n';
+    shaderText += 'float borderMode = splitParameter.z;\n';
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
 
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.35) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = wireframeResult;\n';
-    shaderText += '}\n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = vec4(normal*0.5+0.5, 1.0);\n';
-    shaderText += '}\n';
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.35) + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.25)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  if (borderMode > 0.5) {\n';
+    shaderText += '    rt0 = rt0;\n';
+    shaderText += '  } else {\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  rt0 = vec4(texcoord.x, texcoord.y, 0.0, 1.0);\n';
     } else {
-      shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+      shaderText += '  rt0 = rt0;\n';
     }
+    shaderText += '  }\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (borderMode > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.24)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  rt0 = borderColor;\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  if (borderMode > 0.5) {\n';
+    shaderText += '    rt0 = rt0;\n';
+    shaderText += '  } else {\n';
+    shaderText += '    rt0 = vec4(normal*0.5+0.5, 1.0);\n';
+    shaderText += '  }\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (borderMode > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.01)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  rt0 = borderColor;\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.25)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  if (borderMode > 0.5) {\n';
+    shaderText += '    rt0 = rt0;\n';
+    shaderText += '  } else {\n';
+    shaderText += '    rt0 = wireframeResult;\n';
+    shaderText += '  }\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (splitParameter.z > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.26)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  rt0 = borderColor;\n';
     shaderText += '}\n';
+
+
+
+
     return shaderText;
   }
 
