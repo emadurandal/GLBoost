@@ -63,7 +63,11 @@ export default class M_SkeletalGeometry extends Geometry {
       tipOfJointMatrix = joints[i].jointPoseMatrix;
       if (i > 0) {
         let backOfJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 1];
-        backOfJointMatrix = backOfJoint.jointPoseMatrix;
+        if (backOfJoint) {
+          backOfJointMatrix = backOfJoint.jointPoseMatrix;
+        } else {
+          joints[i].isVisible = false;
+        }
       } else {
         backOfJointMatrix = joints[0].transformMatrixAccumulatedAncestry;//joints[0].parent.parent.transformMatrixAccumulatedAncestry;
       }

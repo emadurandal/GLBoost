@@ -24,7 +24,11 @@ export default class JointPrimitive extends Geometry {
 
     let positions = [];
 
-    const directionToParent = Vector3.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint).normalize();
+    let deltaVec = Vector3.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint);
+    let directionToParent = new Vector3(0, 1, 0);
+    if (!deltaVec.isEqual(Vector3.zero())) {
+      directionToParent = Vector3.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint).normalize();
+    }
     const arrowStickPosition = Vector3.add(this._worldPositionOfThisJoint, Vector3.multiply(directionToParent, arrowStickLength));
 
     let dummyVector = new Vector3(0, 1, 0);

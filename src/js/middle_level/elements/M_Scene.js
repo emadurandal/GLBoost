@@ -155,9 +155,14 @@ export default class M_Scene extends M_Group {
     let callPrepareToRenderMethodOfAllElements = (elem)=> {
       if (elem instanceof M_Group) {
         var children = elem.getChildren();
+
         children.forEach(function (child) {
           callPrepareToRenderMethodOfAllElements(child);
         });
+
+        for (let meshGizmo of elem._gizmos) {
+          meshGizmo.prepareToRender(expression, existCamera_f, []);
+        }
       } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(expression, existCamera_f, this._lights);
         for (let gizmo of elem._gizmos) {

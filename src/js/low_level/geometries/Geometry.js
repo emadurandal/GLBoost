@@ -372,11 +372,16 @@ export default class Geometry extends GLBoostObject {
     this._AABB.updateAllInfo();
 
     for (let attribName in vertices) {
-      let float32AryVertexData = new Float32Array(this._vertices[attribName]);
-      gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
-      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      if (this._vboObj[attribName]) {
+        let float32AryVertexData = new Float32Array(this._vertices[attribName]);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
+        gl.bufferSubData(gl.ARRAY_BUFFER, 0, float32AryVertexData);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      } else {
+        return false;
+      }
     }
+    return true;
 
   }
 
