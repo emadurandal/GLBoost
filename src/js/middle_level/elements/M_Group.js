@@ -2,6 +2,7 @@ import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
 import M_Mesh from './meshes/M_Mesh';
+import M_AABBGizmo from '../elements/gizmos/M_AABBGizmo';
 
 export default class M_Group extends M_Element {
   constructor(glBoostContext) {
@@ -9,6 +10,11 @@ export default class M_Group extends M_Element {
     this._elements = [];
     this._AABB = new AABB();
     this._isRootJointGroup = false;
+
+//    this._aabbGizmo = null;
+    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+    this._gizmos.push(this._aabbGizmo);
+
   }
 
   /**
@@ -324,6 +330,8 @@ export default class M_Group extends M_Element {
 
 //    this._AABB = aabbInWorld;
 
+    this._updateAABBGizmo();
+
     return aabbInWorld;
   }
 
@@ -380,5 +388,17 @@ export default class M_Group extends M_Element {
 
   get isVisible() {
     return this._isVisible;
+  }
+
+  _updateAABBGizmo() {
+    /*
+    if (this._aabbGizmo === null) {
+      this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+    }
+    */
+    let world_m = this.transformMatrixAccumulatedAncestry;
+    let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
+
+//    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
   }
 }
