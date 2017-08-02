@@ -326,7 +326,7 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
     this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
-    let newCenterVec = targetAABB.centerPoint;
+    let newCenterVec = Vector3.zero(); //targetAABB.centerPoint;
 
     let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
     let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
