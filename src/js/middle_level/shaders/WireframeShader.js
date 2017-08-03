@@ -67,7 +67,7 @@ export class WireframeShaderSource {
     shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
     shaderText += 'float threshold = 0.001;\n';
     shaderText += 'vec4 wireframeResult = rt0;\n';
-    shaderText += 'if ( isWireframeInner ) {\n';
+    shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
     shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
     shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';

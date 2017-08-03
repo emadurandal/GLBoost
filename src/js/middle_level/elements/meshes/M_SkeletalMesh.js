@@ -79,7 +79,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     let lengthCenterToCorner = AABB.multiplyMatrix(this._joints[0].transformMatrixAccumulatedAncestry,
       this.rawAABBInLocal).lengthCenterToCorner;
     for (let i=0; i<this._joints.length; i++) {
-      this._joints[i].width = lengthCenterToCorner / 75;
+      this._joints[i].width = lengthCenterToCorner / 100;
     }
   }
 
@@ -141,6 +141,17 @@ export default class M_SkeletalMesh extends M_Mesh {
       }
     })(instance, clonedRootElement, this._jointsHierarchy.userFlavorName));
   }
+
+  set isSkeletonVisible(flg) {
+    for (let joint of this._joints) {
+      joint.isGizmoVisible = flg;
+    }
+  }
+
+  get isSkeletonVisible() {
+    return this._joints[0].isGizmoVisible;
+  }
+
 }
 
 GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;
