@@ -726,7 +726,23 @@ export default class M_Element extends L_Element {
     //return this.transformMatrix;
   }
 
-  getLastInputValueOfAnimation(lineName) {
+  getStartInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[0];
+      if (inputLatestValueAtThisAttribute < latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
+  }
+
+  getEndInputValueOfAnimation(lineName) {
     let inputLine = this._animationLine[lineName];
     let latestInputValue = - Number.MAX_VALUE;
     if (typeof inputLine === 'undefined') {
