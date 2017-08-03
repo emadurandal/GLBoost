@@ -141,6 +141,17 @@ export default class M_SkeletalMesh extends M_Mesh {
       }
     })(instance, clonedRootElement, this._jointsHierarchy.userFlavorName));
   }
+
+  set isSkeletonVisible(flg) {
+    for (let joint of this._joints) {
+      joint.isGizmoVisible = flg;
+    }
+  }
+
+  get isSkeletonVisible() {
+    return this._joints[0].isGizmoVisible;
+  }
+
 }
 
 GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;
