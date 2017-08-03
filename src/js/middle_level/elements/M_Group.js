@@ -269,30 +269,57 @@ export default class M_Group extends M_Element {
     return objects;
   }
 
-  getLengthOfAnimationInputValue(inputLineName, element = this) {
+  getStartAnimationInputValue(inputLineName, element = this) {
 
     if (element instanceof M_Group) {
-      let latestInputValue = element.getLastInputValueOfAnimation(inputLineName);
+      let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
-        let hitChildOrInputValue = this.getLengthOfAnimationInputValue(inputLineName, children[i]);
+        let hitChildOrInputValue = this.getStartAnimationInputValue(inputLineName, children[i]);
 
         if (hitChildOrInputValue instanceof M_Element) {
-          let lastInputValueOfThisElement = hitChildOrInputValue.getLastInputValueOfAnimation(inputLineName);
-          if (lastInputValueOfThisElement > latestInputValue) {
-            latestInputValue = lastInputValueOfThisElement;
+          let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(inputLineName);
+          if (startInputValueOfThisElement < latestInputValue) {
+            latestInputValue = startInputValueOfThisElement;
           }
         } else {
-          let lastInputValueOfThisElement = hitChildOrInputValue;
-          if (lastInputValueOfThisElement > latestInputValue) {
-            latestInputValue = lastInputValueOfThisElement;
+          let startInputValueOfThisElement = hitChildOrInputValue;
+          if (startInputValueOfThisElement < latestInputValue) {
+            latestInputValue = startInputValueOfThisElement;
           }
         }
       }
       return latestInputValue;
     }
 
-    return element.getLastInputValueOfAnimation(inputLineName);
+    return element.getStartInputValueOfAnimation(inputLineName);
+  }
+
+
+  getEndAnimationInputValue(inputLineName, element = this) {
+
+    if (element instanceof M_Group) {
+      let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChildOrInputValue = this.getEndAnimationInputValue(inputLineName, children[i]);
+
+        if (hitChildOrInputValue instanceof M_Element) {
+          let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(inputLineName);
+          if (endInputValueOfThisElement > latestInputValue) {
+            latestInputValue = endInputValueOfThisElement;
+          }
+        } else {
+          let endInputValueOfThisElement = hitChildOrInputValue;
+          if (endInputValueOfThisElement > latestInputValue) {
+            latestInputValue = endInputValueOfThisElement;
+          }
+        }
+      }
+      return latestInputValue;
+    }
+
+    return element.getEndInputValueOfAnimation(inputLineName);
   }
 
   /*
