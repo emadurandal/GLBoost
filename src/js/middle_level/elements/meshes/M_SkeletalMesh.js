@@ -152,6 +152,17 @@ export default class M_SkeletalMesh extends M_Mesh {
     return this._joints[0].isGizmoVisible;
   }
 
+  get getRootJointsWorldPosition() {
+    const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
+    let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+    return rootJointPosWorld;
+  }
+
+  get getRootJointsWorldPositionAsBindPose() {
+    const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
+    let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+    return rootJointPosWorld;
+  }
 }
 
 GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;
