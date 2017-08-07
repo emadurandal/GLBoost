@@ -118,7 +118,7 @@ export default class GLTFLoader {
 
   _checkGLTFVersion(json) {
     let glTFVer = 1.0;
-    if (json.asset) {
+    if (json.asset && json.asset.version) {
       glTFVer = parseFloat(json.asset.version);
     }
     return glTFVer;
