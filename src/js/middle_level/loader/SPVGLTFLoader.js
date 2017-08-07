@@ -116,7 +116,7 @@ export default class SPVGLTFLoader {
 
   _checkGLTFVersion(json) {
     let glTFVer = 1.0;
-    if (json.asset) {
+    if (json.asset && json.asset.version) {
       glTFVer = parseFloat(json.asset.version);
     }
     return glTFVer;
@@ -275,6 +275,9 @@ export default class SPVGLTFLoader {
 
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
+      if (json.asset && json.asset.animationFps) {
+        rootGroup.animationFps = json.asset.animationFps;
+      }
 
       rootGroup.addChild(group)
     }
