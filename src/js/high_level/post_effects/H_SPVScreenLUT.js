@@ -8,6 +8,15 @@ export default class H_SPVScreenLUT extends M_SPVScreenMesh {
     if (inputTexture) {
       this.inputTexture = inputTexture;
     }
+
+  }
+
+  set isLensEffect(flag) {
+    this.geometry.materials[0].shaderParameters.isLensEffect = flag;
+  }
+
+  get isLensEffect() {
+    return this.geometry.materials[0].shaderParameters.isLensEffect;
   }
 
   set inputTexture(inputTexture) {
