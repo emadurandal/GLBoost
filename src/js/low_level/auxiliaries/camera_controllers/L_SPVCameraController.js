@@ -57,6 +57,10 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._userMouseEventHandler = null;
 
+    this._targetSkeletalMesh = null;
+
+    this._isTargetingToRootJointIfSkeletalTarget = false;
+
     this._onMouseDown = (evt) => {
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
@@ -326,7 +330,17 @@ export default class L_SPVCameraController extends GLBoostObject {
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
     this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
-    let newCenterVec = Vector3.zero(); //targetAABB.centerPoint;
+    //let newCenterVec = Vector3.zero(); //\\\targetAABB.centerPoint;
+    let newCenterVec = targetAABB.centerPoint;
+
+    if (this._targetSkeletalMesh && this._isTargetingToRootJointIfSkeletalTarget ) {
+      let posAtZero = this._targetSkeletalMesh.getRootJointsWorldPositionAt(0);
+      let posAtNow =  this._targetSkeletalMesh.rootJointsWorldPosition;
+      let deltaPosFromZero = Vector3.subtract(posAtNow, posAtZero);
+      newCenterVec = posAtZero;
+      deltaPosFromZero.y /= 4;
+      newCenterVec.add(deltaPosFromZero);
+    }
 
     let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
     let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
@@ -430,6 +444,13 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   set target(object) {
     this._target = object;
+
+    let meshes = this._target.searchElementsByType(GLBoost.M_SkeletalMesh);
+    if (meshes.length > 0) {
+      this._targetSkeletalMesh = meshes[0];
+    }
+
+
     this.updateTargeting();
   }
 
@@ -463,6 +484,14 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   get userMouseEventHandler() {
     return this._userMouseEventHandler;
+  }
+
+  set targetRootJointMode(flag) {
+    this._isTargetingToRootJointIfSkeletalTarget = flag;
+  }
+
+  get targetRootJointMode() {
+    return this._isTargetingToRootJointIfSkeletalTarget;
   }
 
 }
