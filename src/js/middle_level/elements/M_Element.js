@@ -231,37 +231,42 @@ export default class M_Element extends L_Element {
     if (this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
+
+    const matrix = this.getTransformMatrixAt(input);
+
+    return matrix;
+  }
+
+  getTransformMatrixAt(inputValue, lineName) {
+    let input = inputValue;
 //    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
     if (true) {
       var matrix = Matrix44.identity();
 
       if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
+        this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
 
       var rotationMatrix = Matrix44.identity();
       if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.quaternion.rotationMatrix;
+        rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
       } else {
-/*
-        rotationMatrix = Matrix44.rotateX(this.rotate.x).
-        multiply(Matrix44.rotateY(this.rotate.y)).
-        multiply(Matrix44.rotateZ(this.rotate.z));
-        */
-        rotationMatrix.rotateZ(this.rotate.z).
-        multiply(Matrix44.rotateY(this.rotate.y)).
-        multiply(Matrix44.rotateX(this.rotate.x));
+        let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
+        rotationMatrix.rotateZ(rotateVec.z).
+        multiply(Matrix44.rotateY(rotateVec.y)).
+        multiply(Matrix44.rotateX(rotateVec.x));
       }
 
-      this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
-      this._finalMatrix.m03 = this.translate.x;
-      this._finalMatrix.m13 = this.translate.y;
-      this._finalMatrix.m23 = this.translate.z;
+      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt(this._activeAnimationLineName, input))).multiply(rotationMatrix);
+      let translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
+      this._finalMatrix.m03 = translateVec.x;
+      this._finalMatrix.m13 = translateVec.y;
+      this._finalMatrix.m23 = translateVec.z;
 
-      this._dirtyAsElement = false;
-      this._matrixGetMode = 'animated_' + input;
+//      this._dirtyAsElement = false;
+//      this._matrixGetMode = 'animated_' + input;
     }
 
     return this._finalMatrix.clone();
