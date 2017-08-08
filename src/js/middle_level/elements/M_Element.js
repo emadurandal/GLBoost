@@ -782,29 +782,59 @@ export default class M_Element extends L_Element {
   }
 
   get transformMatrixAccumulatedAncestryForJoints() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(this, true);
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
+
+    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(input);
+
+    return matrix;
+
+  }
+
+  get transformMatrixAccumulatedAncestryAsForJointsBindPose() {
+    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
+
+    return matrix;
+  }
+
+
+  getTransformMatrixAccumulatedAncestryForJointsAt(inputValue) {
+    let input = inputValue;
+
+    let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempString);
+    //if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(this, true, input);
+      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+    //}
 
     return this._matrixAccumulatedAncestry.clone();
   }
 
-  _multiplyMyAndParentTransformMatricesForJoints(currentElem, withMySelf) {
+
+  _multiplyMyAndParentTransformMatricesForJoints(currentElem, withMySelf, inputValue) {
+    let input = inputValue;
+    if (typeof input === 'undefined') {
+      if (currentElem._activeAnimationLineName !== null) {
+        input = currentElem._getCurrentAnimationInputValue(currentElem._activeAnimationLineName);
+      }
+    }
+
     if (currentElem._parent === null) {
       if (withMySelf) {
-        return currentElem.rotateTranslate;
+        return currentElem.getRotateTranslateAt(input);
       } else {
         return Matrix44.identity();
       }
     } else {
       let currentMatrix = Matrix44.identity();
       if (withMySelf) {
-        currentMatrix = currentElem.rotateTranslate;
+        currentMatrix = currentElem.getRotateTranslateAt(input);
       }
-      return Matrix44.multiply(this._multiplyMyAndParentTransformMatricesForJoints(currentElem._parent, true), currentMatrix);
+      return Matrix44.multiply(this._multiplyMyAndParentTransformMatricesForJoints(currentElem._parent, true, inputValue), currentMatrix);
     }
   }
 

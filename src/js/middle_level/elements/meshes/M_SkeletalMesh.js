@@ -2,7 +2,10 @@ import GLBoost from '../../../globals';
 import M_Mesh from './M_Mesh';
 import M_Joint from '../skeletons/M_Joint';
 import Matrix44 from '../../../low_level/math/Matrix44';
+import Vector4 from '../../../low_level/math/Vector4';
+import Vector3 from '../../../low_level/math/Vector3';
 import AABB from '../../../low_level/math/AABB';
+
 
 export default class M_SkeletalMesh extends M_Mesh {
   constructor(glBoostContext, geometry, material, rootJointName) {
@@ -152,16 +155,33 @@ export default class M_SkeletalMesh extends M_Mesh {
     return this._joints[0].isGizmoVisible;
   }
 
-  get getRootJointsWorldPosition() {
-    const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
-    let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-    return rootJointPosWorld;
+  get rootJointsWorldPosition() {
+    if (this._joints.length > 0) {
+      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
+      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      return rootJointPosWorld;
+    }
+    return Vector3.zero();
   }
 
-  get getRootJointsWorldPositionAsBindPose() {
-    const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
-    let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-    return rootJointPosWorld;
+  getRootJointsWorldPositionAt(inputValue) {
+    if (this._joints.length > 0) {
+      const rootJointMatrix = this._joints[0].getTransformMatrixAccumulatedAncestryForJointsAt(inputValue);
+      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      return rootJointPosWorld;
+    }
+
+    return Vector3.zero();
+  }
+
+  get rootJointsWorldPositionAsBindPose() {
+    if (this._joints.length > 0) {
+      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryAsForJointsBindPose;
+      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      return rootJointPosWorld;
+    }
+
+    return Vector3.zero();
   }
 }
 
