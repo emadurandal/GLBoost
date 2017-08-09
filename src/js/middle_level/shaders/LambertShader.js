@@ -44,7 +44,7 @@ export class LambertShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
 
     return vertexAttribsAsResult;
   }
@@ -63,7 +63,7 @@ export default class LambertShader extends DecalShader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
 
   }
 

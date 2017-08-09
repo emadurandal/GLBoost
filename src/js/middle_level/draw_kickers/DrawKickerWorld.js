@@ -52,7 +52,7 @@ export default class DrawKickerWorld {
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      let query_result_uniform_opacity = material.getUniform(glslProgram.hashId, 'uniform_opacity');
+      let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
       material._glContext.uniform1f(query_result_uniform_opacity, opacity, true);
 
       let world_m;
@@ -70,8 +70,8 @@ export default class DrawKickerWorld {
         normal_m = Matrix33.identity();
       }
 
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      Shader.trySettingMatrix33ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
       if (camera) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
@@ -88,16 +88,16 @@ export default class DrawKickerWorld {
           projectionMatrix = Matrix44.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
 
         camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
 
-      if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
+      if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-        if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
+        if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 0, 1);
           if (camera) {
             cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
@@ -105,11 +105,11 @@ export default class DrawKickerWorld {
           } else {
             let cameraPos = new Vector4(0, 0, 1, 1);
           }
-          material._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
+          material._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
-          if (material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`)) {
+          if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
             let lightVec = null;
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
@@ -123,8 +123,8 @@ export default class DrawKickerWorld {
               isPointLight = 0.0;
             }
 
-            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight, true);
-            material._glContext.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight, true);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
           }
         }
       }

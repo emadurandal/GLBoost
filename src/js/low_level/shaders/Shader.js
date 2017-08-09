@@ -209,9 +209,9 @@ export default class Shader extends GLBoostObject {
     var in_ = Shader._in_onVert(gl);
     var out_ = Shader._out_onVert(gl);
 
-    shaderText +=   Shader._glslVer(gl);
+    shaderText =   Shader._glslVer(gl);
     shaderText +=   'precision highp float;\n';
-    shaderText =   `${in_} vec3 aVertex_position;\n`;
+    shaderText +=   `${in_} vec3 aVertex_position;\n`;
 
     /// define variables
     // start defining variables. first, sub class Shader, ...
@@ -511,7 +511,7 @@ export default class Shader extends GLBoostObject {
 
     this._glslProgram = programToReturn;
 
-    material._semanticsDic = {};
+    material._semanticsDic = {_glslProgram:programToReturn};
     material.uniformTextureSamplerDic = {};
     programToReturn._material = material;
     programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, expression, vertexAttribs, existCamera_f, lights, material, extraData);

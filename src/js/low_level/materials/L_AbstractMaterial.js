@@ -351,19 +351,20 @@ export default class L_AbstractMaterial extends GLBoostObject {
     });
   }
 
-  setUniform(hashIdOfGLSLProgram, uniformLocationName, uniformLocation) {
-    if (!this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram]) {
-      this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] = {};
+  setUniform(glslProgram, uniformLocationName, uniformLocation) {
+    if (!this._shaderUniformLocationsOfExpressions[glslProgram.hashId]) {
+      this._shaderUniformLocationsOfExpressions[glslProgram.hashId] = {};
     }
 
-    this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName] = uniformLocation;
+    this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
+    glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
 
     this._updateCount();
   }
 
-  getUniform(hashIdOfGLSLProgram, uniformLocationName) {
-    if (typeof this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] !== 'undefined') {
-      return this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram][uniformLocationName];
+  getUniform(glslProgram, uniformLocationName) {
+    if (typeof this._shaderUniformLocationsOfExpressions[glslProgram.hashId] !== 'undefined') {
+      return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
     }
 
 //    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');

@@ -184,32 +184,49 @@ export default class GLBoostLowContext {
     fbo.width = width;
     fbo.height = height;
 
+    /*
     // Create color RenderBuffer
     var colorBuffer = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, colorBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
+*/
 
     // Create MutableTexture for Depth Texture
-
-    let depthComponetInternal = gl.DEPTH_COMPONENT;
+    let format = gl.DEPTH_COMPONENT;
+    let internalFormat = gl.DEPTH_COMPONENT;
+    let type = gl.UNSIGNED_INT;
     if (GLBoost.isThisGLVersion_2(gl)) {
-      depthComponetInternal = gl.DEPTH_COMPONENT16;
+      type = gl.FLOAT;
+      format = gl.DEPTH_COMPONENT;
+      internalFormat = gl.DEPTH_COMPONENT32F;
+    } else if (glem.extDepthTex) {
+      type = glem.extDepthTex.UNSIGNED_INT_24_8_WEBGL;
+      format = gl.DEPTH_STENCIL;
+      internalFormat = gl.DEPTH_STENCIL;
     }
 
     let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
-      depthComponetInternal, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT,
+      internalFormat, format, type,
       gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
 
     /// Attach Buffers
     // color
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+//    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+    //gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, null);
 
     // depth
     var glTexture = depthTexture.glTextureResource;
     var attachimentId = gl.DEPTH_ATTACHMENT;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      attachimentId = gl.DEPTH_ATTACHMENT;
+    } else if (glem.extDepthTex) {
+      attachimentId = gl.DEPTH_STENCIL_ATTACHMENT;
+    }
     depthTexture.depthAttachment = attachimentId;
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+    console.log('FBO', gl.checkFramebufferStatus(gl.FRAMEBUFFER));
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 

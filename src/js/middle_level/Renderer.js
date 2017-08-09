@@ -46,13 +46,20 @@ export default class Renderer extends GLBoostObject {
 
 
       // set render target buffers for each RenderPass.
+      /*
       if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
         gl.bindTexture(gl.TEXTURE_2D, null);
-        Geometry.clearMaterialCache();
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
       } else {
         glem.drawBuffers(gl, [gl.BACK]);
       }
+      */
+      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+      }
+
+      glem.drawBuffers(gl, renderPass.buffersToDraw);
+      //glem.readBuffer(gl, renderPass.buffersToDraw);
 
       if (renderPass.viewport) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
@@ -111,12 +118,15 @@ export default class Renderer extends GLBoostObject {
     if (clearDepth) {
       gl.clearDepth(clearDepth);
     }
-    if (clearColor || clearDepth) {
+
+    if (renderPass.buffersToDraw[0] === gl.NONE) {
+      {
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+      }
+    } else if (clearColor || clearDepth) {
       gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     } else if (clearColor) {
       gl.clear( gl.COLOR_BUFFER_BIT );
-    } else {
-      gl.clear( gl.DEPTH_BUFFER_BIT );
     }
   }
 
