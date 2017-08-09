@@ -148,11 +148,11 @@ export class SPVBlinnShaderSource {
 
     let vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram.hashId, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
-    material.setUniform(shaderProgram.hashId, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
-    material.setUniform(shaderProgram.hashId, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
-    material.setUniform(shaderProgram.hashId, 'uniform_refractiveIndex', this._glContext.getUniformLocation(shaderProgram, 'refractiveIndex'));
-    material.setUniform(shaderProgram.hashId, 'uniform_toUseSurfaceColorAsSpecularMap', this._glContext.getUniformLocation(shaderProgram, 'toUseSurfaceColorAsSpecularMap'));
+    material.setUniform(shaderProgram, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
+    material.setUniform(shaderProgram, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
+    material.setUniform(shaderProgram, 'uniform_refractiveIndex', this._glContext.getUniformLocation(shaderProgram, 'refractiveIndex'));
+    material.setUniform(shaderProgram, 'uniform_toUseSurfaceColorAsSpecularMap', this._glContext.getUniformLocation(shaderProgram, 'toUseSurfaceColorAsSpecularMap'));
 
     return vertexAttribsAsResult;
   }
@@ -174,11 +174,11 @@ export default class SPVBlinnShader extends SPVDecalShader {
 
     let Kd = material.diffuseColor;
     let Ks = material.specularColor;
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
-    this._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_power'), this._power, true);
-    this._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_refractiveIndex'), this._refractiveIndex, true);
-    this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_toUseSurfaceColorAsSpecularMap'), this._toUseSurfaceColorAsSpecularMap, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
+    this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
+    this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_refractiveIndex'), this._refractiveIndex, true);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_toUseSurfaceColorAsSpecularMap'), this._toUseSurfaceColorAsSpecularMap, true);
   }
 
   set Kd(value) {

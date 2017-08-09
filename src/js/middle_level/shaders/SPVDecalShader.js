@@ -186,11 +186,11 @@ export class SPVDecalShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram.hashId, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
-    material.setUniform(shaderProgram.hashId, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
-    material.setUniform(shaderProgram.hashId, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
-    material.setUniform(shaderProgram.hashId, 'uniform_splitParameter', this._glContext.getUniformLocation(shaderProgram, 'splitParameter'));
-    material.setUniform(shaderProgram.hashId, 'uniform_isLensEffect', this._glContext.getUniformLocation(shaderProgram, 'isLensEffect'));
+    material.setUniform(shaderProgram, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
+    material.setUniform(shaderProgram, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
+    material.setUniform(shaderProgram, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
+    material.setUniform(shaderProgram, 'uniform_splitParameter', this._glContext.getUniformLocation(shaderProgram, 'splitParameter'));
+    material.setUniform(shaderProgram, 'uniform_isLensEffect', this._glContext.getUniformLocation(shaderProgram, 'isLensEffect'));
 
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
@@ -199,7 +199,7 @@ export class SPVDecalShaderSource {
     }
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-    material.setUniform(shaderProgram.hashId, 'uTexture', uTexture);
+    material.setUniform(shaderProgram, 'uTexture', uTexture);
     // set texture unit 0 to the decal texture sampler
     this._glContext.uniform1i( uTexture, 0, true);
 
@@ -215,7 +215,7 @@ export class SPVDecalShaderSource {
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
     let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
     if (uNormalTexture) {
-      material.setUniform(shaderProgram.hashId, 'uNormalTexture', normalTexture);
+      material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
       // set texture unit 1 to the normal texture sampler
       this._glContext.uniform1i( uNormalTexture, 1, true);
 
@@ -244,7 +244,7 @@ export default class SPVDecalShader extends WireframeShader {
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
 
     var texture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
 
@@ -253,7 +253,7 @@ export default class SPVDecalShader extends WireframeShader {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
     }
 
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w, true);
 
     /*
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
@@ -274,23 +274,23 @@ export default class SPVDecalShader extends WireframeShader {
         let viewMatrix = cameraMatrix.clone();
         let projectionMatrix = lights[i].camera.projectionRHMatrix();
 
-//        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+i), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
-        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+i), false, lights[i].camera._lastPVMatrixFromLight.flatten());
+//        gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44.multiply(projectionMatrix, viewMatrix).flatten());
+        gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, lights[i].camera._lastPVMatrixFromLight.flatten());
       }
 
       if (lights[i].camera && lights[i].camera.texture && lights[i].isCastingShadow) {
-        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1, true);
+        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 1, true);
       } else {
-        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0, true);
+        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 0, true);
       }
 
       if (lights[i].camera && lights[i].camera.texture) {
-        let uniformLocation = material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i);
+        let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
         let index = lights[i].camera.texture.textureUnitIndex;
 
         this._glContext.uniform1i(uniformLocation, index, true);
       } else {
-        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);
+        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
       }
     }
 
@@ -300,13 +300,13 @@ export default class SPVDecalShader extends WireframeShader {
     let isGammaEnable = this.getShaderParameter(material, 'isGammaEnable', true);
 
     let gamma = Vector3.divideVector(this.handleArgument(targetGamma), this.handleArgument(sourceGamma));
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
 
     let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
-    this._glContext.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
 
     let isLensEffect = this.getShaderParameter(material, 'isLensEffect', false);
-    this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isLensEffect'), isLensEffect, true);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isLensEffect'), isLensEffect, true);
 
   }
 
@@ -315,7 +315,7 @@ export default class SPVDecalShader extends WireframeShader {
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         // set depthTexture unit i+1 to the sampler
-        this._glContext.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
+        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
       }
     }
   }
