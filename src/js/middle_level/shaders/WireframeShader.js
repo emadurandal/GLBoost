@@ -101,15 +101,15 @@ export class WireframeShaderSource {
     vertexAttribsAsResult.push('barycentricCoord');
 
     let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
-    material.setUniform(shaderProgram.hashId, 'uniform_isWireframe', uniform_isWireframe);
+    material.setUniform(shaderProgram, 'uniform_isWireframe', uniform_isWireframe);
     this._glContext.uniform1i( uniform_isWireframe, 0, true);
 
     let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
-    material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidth', uniform_wireframeWidth);
+    material.setUniform(shaderProgram, 'uniform_wireframeWidth', uniform_wireframeWidth);
     this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
 
     let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
-    material.setUniform(shaderProgram.hashId, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
+    material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
     this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
 
     return vertexAttribsAsResult;
@@ -147,36 +147,40 @@ export default class WireframeShader extends Shader {
       wireframeWidth = material.wireframeWidth;
     }
 
-    let uniformLocationIsWireframe = material.getUniform(glslProgram.hashId, 'uniform_isWireframe');
+    let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
     if (uniformLocationIsWireframe) {
       this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
     }
     if (isWifeframe && !isWireframeOnShade) {
-      material._glContext.uniform1f(material.getUniform(glslProgram.hashId, 'uniform_opacity'), 0.0, true);
+      material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), 0.0, true);
     }
-    let uniformLocationWireframeWidth = material.getUniform(glslProgram.hashId, 'uniform_wireframeWidth');
+    let uniformLocationWireframeWidth = material.getUniform(glslProgram, 'uniform_wireframeWidth');
     if (uniformLocationWireframeWidth) {
       this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
+    }
+    let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram, 'uniform_wireframeWidthRelativeScale');
+    if (uniformLocationWireframeWidthRelativeScale) {
+      this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
     }
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
 
-    let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram.hashId, 'uniform_AABBLengthCenterToCorner');
+    let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
     if (uniformLocationAABBLengthCenterToCorner) {
       this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
     }
-        let uniformLocationAABBCenterPosition = material.getUniform(glslProgram.hashId, 'uniform_AABBCenterPosition');
+        let uniformLocationAABBCenterPosition = material.getUniform(glslProgram, 'uniform_AABBCenterPosition');
     if (uniformLocationAABBCenterPosition) {
       this._glContext.uniform4f(uniformLocationAABBCenterPosition, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, 0.0, true);
     }
-    let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram.hashId, 'uniform_unfoldUVRatio');
+    let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram, 'uniform_unfoldUVRatio');
     if (uniformLocationUnfoldUVRatio) {
       this._glContext.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio, true);
     }
 
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
-    let uniformLocationDepthBias = material.getUniform(glslProgram.hashId, 'uniform_depthBias');
+    let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
       let depthBias = this.getShaderParameter(material, 'depthBias', false);
       if (depthBias) {

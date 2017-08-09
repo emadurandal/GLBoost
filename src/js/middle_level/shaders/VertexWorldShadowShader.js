@@ -79,25 +79,25 @@ export default class VertexWorldShadowShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram.hashId, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
+    material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';
-    material.setUniform(shaderProgram.hashId, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
+    material.setUniform(shaderProgram, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
     material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
     if (existCamera_f) {
-      material.setUniform(shaderProgram.hashId, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
+      material.setUniform(shaderProgram, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
       material._semanticsDic['VIEW'] = 'viewMatrix';
-      material.setUniform(shaderProgram.hashId, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
+      material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
     
     for (let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+      material.setUniform(shaderProgram, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
       if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
 
         // depthTexture
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
-        material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+        material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
 
         let index = i;
 
@@ -115,7 +115,7 @@ export default class VertexWorldShadowShaderSource {
     }
 
     let uniform_depthBias = this._glContext.getUniformLocation(shaderProgram, 'depthBias');
-    material.setUniform(shaderProgram.hashId, 'uniform_depthBias', uniform_depthBias);
+    material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
     this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
     let textureUnitIndex = 0;
@@ -123,7 +123,7 @@ export default class VertexWorldShadowShaderSource {
       //if (lights[i].camera && lights[i].camera.texture) {
 
       // matrices
-      material.setUniform(shaderProgram.hashId, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
+      material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
 
       textureUnitIndex++;
       //}

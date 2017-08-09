@@ -759,10 +759,6 @@ export default class Geometry extends GLBoostObject {
     return this._extraDataForShader[name];
   }
 
-  static clearMaterialCache() {
-    Geometry._lastMaterial = null;
-  }
-
   isTransparent(mesh) {
     let materials = this._getAppropriateMaterials(mesh);
     let isTransparent = false;

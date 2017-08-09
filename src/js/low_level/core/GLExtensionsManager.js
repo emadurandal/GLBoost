@@ -44,6 +44,10 @@ export default class GLExtensionsManager {
     return this._extTFA;
   }
 
+  get extDepthTex() {
+    return this._extDepthTex;
+  }
+
   createVertexArray(gl) {
     if (GLBoost.isThisGLVersion_2(gl)) {
       return gl.createVertexArray();
@@ -71,23 +75,37 @@ export default class GLExtensionsManager {
   }
 
   drawBuffers(gl, buffers) {
+    let buffer = buffers;
     if (GLBoost.isThisGLVersion_2(gl)) {
       gl.drawBuffers(buffers);
-      return true;
+      buffer = buffer[0];
     } else if (this._extDBs) {
       this.extDBs.drawBuffersWEBGL(buffers);
-      return true;
+      buffer = buffer[0];
+    }
+
+    if (buffer === gl.NONE) {
+      gl.colorMask(false, false, false, false);
     } else {
-      if (buffers[0] === gl.NONE) {
-        gl.colorMask(false, false, false, false);
-      } else {
-        gl.colorMask(true, true, true, true);
-      }
-      return false;
+      gl.colorMask(true, true, true, true);
     }
 
     this._glContext.checkGLError();
   }
+
+  readBuffer(gl, buffers) {
+    let buffer = buffers;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      buffer = buffer[0];
+    } else if (this._extDBs) {
+      buffer = buffer[0];
+    }
+
+    gl.readBuffer(buffer);
+
+    this._glContext.checkGLError();
+  }
+
 
   colorAttachiment(gl, index) {
     return this._extDBs ?

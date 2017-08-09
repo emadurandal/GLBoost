@@ -21,7 +21,7 @@ export default class RenderPass extends GLBoostObject {
     this._renderTargetDepthTexture = [];
     this._expression = null;
     this._viewport = null;
-    this._isRenderTargetTexturesIfSet = true;
+    this._isRenderTargetTexturesIfSet = false;
     this._isEnableToDraw = true;
 
     this._customFunction = null;
@@ -96,10 +96,13 @@ export default class RenderPass extends GLBoostObject {
     });
 
     this._renderTargetDepthTexture = depthRenderTargetTextures[0];
+
+    this._isRenderTargetTexturesIfSet = true;
+
   }
 
   get buffersToDraw() {
-    return this.isRenderTargetTexturesIfSet ? this._drawBuffers : [this._glContext.gl.NONE];
+    return this.isRenderTargetTexturesIfSet ? this._drawBuffers : [this._glContext.gl.BACK];
   }
 
   set isRenderTargetTexturesIfSet(flg) {

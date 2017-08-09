@@ -237,11 +237,11 @@ export default class Particle extends Geometry {
         super.setUniforms(gl, glslProgram, expression, material, camera, mesh);
 
         if (this._cameraProjectionUpdateCount !== mesh.updateCountAsCameraProjection) {
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'PROJECTION', camera.projectionRHMatrix().flatten());
+          Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', camera.projectionRHMatrix().flatten());
         }
 
         if (this._cameraViewUpdateCount !== mesh.updateCountAsCameraView || this._meshTransformUpdateCount !== mesh.updateCountAsElement) {
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, material._semanticsDic, 'MODELVIEW', camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
+          Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', camera.lookAtRHMatrix().multiply(mesh.transformMatrix).flatten());
         }
 
         this._meshTransformUpdateCount = mesh.updateCountAsElement;
