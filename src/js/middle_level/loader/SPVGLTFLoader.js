@@ -12,6 +12,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import DataUtil from '../../low_level/misc/DataUtil';
+import MathUtil from "../../low_level/math/MathUtil";
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -338,8 +339,8 @@ export default class SPVGLTFLoader {
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
-            fovy: perspective.yfov,
-            aspect: perspective.aspectRatio,
+            fovy: MathUtil.radianToDegree(perspective.yfov),
+            aspect: perspective.aspectRatio ? perspective.aspectRatio : 1.5,
             zNear: perspective.znear,
             zFar: perspective.zfar
           }
