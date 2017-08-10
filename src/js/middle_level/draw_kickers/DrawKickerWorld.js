@@ -76,7 +76,8 @@ export default class DrawKickerWorld {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+//          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestry);
         } else {
           viewMatrix = Matrix44.identity();
         }

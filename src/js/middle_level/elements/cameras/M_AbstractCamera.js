@@ -106,4 +106,9 @@ export default class M_AbstractCamera extends M_Element {
   get upInner() {
     return this._lowLevelCamera.upInner;
   }
+
+
 }
+
+GLBoost['M_AbstractCamera'] = M_AbstractCamera;
+

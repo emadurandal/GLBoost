@@ -123,11 +123,6 @@ export default class M_Group extends M_Element {
   }
 
   searchElementByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
-    /*
-    if ((element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) && element instanceof type) {
-      return element;
-    }
-    */
     if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
