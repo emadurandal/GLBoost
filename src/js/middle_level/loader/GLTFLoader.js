@@ -337,8 +337,8 @@ export default class GLTFLoader {
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
-            fovy: perspective.yfov,
-            aspect: perspective.aspectRatio,
+            fovy: MathUtil.radianToDegree(perspective.yfov),
+            aspect: perspective.aspectRatio ? perspective.aspectRatio : 1.5,
             zNear: perspective.znear,
             zFar: perspective.zfar
           }
