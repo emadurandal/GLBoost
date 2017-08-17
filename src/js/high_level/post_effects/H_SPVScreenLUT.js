@@ -11,12 +11,20 @@ export default class H_SPVScreenLUT extends M_SPVScreenMesh {
 
   }
 
-  set isLensEffect(flag) {
-    this.geometry.materials[0].shaderParameters.isLensEffect = flag;
+  set isColorAberration(flag) {
+    this.geometry.materials[0].shaderParameters.isColorAberration = flag;
   }
 
-  get isLensEffect() {
-    return this.geometry.materials[0].shaderParameters.isLensEffect;
+  get isColorAberration() {
+    return this.geometry.materials[0].shaderParameters.isColorAberration;
+  }
+
+  set isVignette(flag) {
+    this.geometry.materials[0].shaderParameters.isVignette = flag;
+  }
+
+  get isVignette() {
+    return this.geometry.materials[0].shaderParameters.isVignette;
   }
 
   set inputTexture(inputTexture) {

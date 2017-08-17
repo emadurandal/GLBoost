@@ -56,7 +56,8 @@ export class SPVDecalShaderSource {
     shaderText += 'uniform vec4 textureContributionRate;\n';
     shaderText += 'uniform vec4 gamma;\n';
     shaderText += 'uniform vec4 splitParameter;\n';
-    shaderText += 'uniform bool isLensEffect;\n';
+    shaderText += 'uniform bool isColorAberration;\n';
+    shaderText += 'uniform bool isVignette;\n';
 
     return shaderText;
   }
@@ -88,7 +89,7 @@ export class SPVDecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += 'if (isLensEffect) {\n';
+      shaderText += 'if (isColorAberration) {\n';
       shaderText += `  float offsetTexel = 3.0;\n`;
       shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoord.x - offsetTexel/splitParameter.x, texcoord.y));\n`;
       shaderText += `  leftDecal = leftDecal * vec4(1.0, 0.0, 0.0, 1.0);\n`;
@@ -97,13 +98,17 @@ export class SPVDecalShaderSource {
       shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoord.x + offsetTexel/splitParameter.x, texcoord.y));\n`;
       shaderText += `  rightDecal = rightDecal * vec4(0.0, 0.0, 1.0, 1.0);\n`;
       shaderText += `  vec4 decalAberration = leftDecal + centerDecal - (leftDecal * centerDecal);\n`;
-      shaderText += `  decalAberration = decalAberration + rightDecal - (decalAberration * rightDecal);\n`;
-      shaderText += '  rt0 *= decalAberration * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
+      shaderText += `  rt0 *= decalAberration + rightDecal - (decalAberration * rightDecal);\n`;
+      shaderText += '} else {\n';
+      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
+      shaderText += '}\n';
+
+      shaderText += 'rt0 = rt0 * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
+
+      shaderText += 'if (isVignette) {\n';
       shaderText += '  vec2 pixelPos = vec2((gl_FragCoord.x*2.0/splitParameter.x - 1.0), (gl_FragCoord.y*2.0/splitParameter.y - 1.0));\n';
       shaderText += '  float lengthPixel = length(pixelPos);\n';
       shaderText += `  rt0.xyz = rt0.xyz * max((1.0 - pow(lengthPixel/1.5, 2.2)), 0.0);\n`;
-      shaderText += '} else {\n';
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
       shaderText += '}\n';
 
     }
@@ -190,7 +195,8 @@ export class SPVDecalShaderSource {
     material.setUniform(shaderProgram, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
     material.setUniform(shaderProgram, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
     material.setUniform(shaderProgram, 'uniform_splitParameter', this._glContext.getUniformLocation(shaderProgram, 'splitParameter'));
-    material.setUniform(shaderProgram, 'uniform_isLensEffect', this._glContext.getUniformLocation(shaderProgram, 'isLensEffect'));
+    material.setUniform(shaderProgram, 'uniform_isColorAberration', this._glContext.getUniformLocation(shaderProgram, 'isColorAberration'));
+    material.setUniform(shaderProgram, 'uniform_isVignette', this._glContext.getUniformLocation(shaderProgram, 'isVignette'));
 
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
@@ -305,8 +311,11 @@ export default class SPVDecalShader extends WireframeShader {
     let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
 
-    let isLensEffect = this.getShaderParameter(material, 'isLensEffect', false);
-    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isLensEffect'), isLensEffect, true);
+    let isColorAberration = this.getShaderParameter(material, 'isColorAberration', false);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isColorAberration'), isColorAberration, true);
+
+    let isVignette = this.getShaderParameter(material, 'isVignette', false);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isVignette'), isVignette, true);
 
   }
 
