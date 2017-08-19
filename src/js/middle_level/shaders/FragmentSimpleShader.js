@@ -6,12 +6,13 @@ export class FragmentSimpleShaderSource {
   // this is the instance of the corresponding shader class.
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
-    var shaderText =      'uniform float opacity;\n';
+    let shaderText =      'uniform float opacity;\n';
     return shaderText;
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
-    var shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    let shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+
     return shaderText;
   }
 
@@ -25,15 +26,20 @@ export class FragmentSimpleShaderSource {
   }
 }
 
-export default class SimpleShader extends Shader {
+export default class FragmentSimpleShader extends Shader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
-    SimpleShader.mixin(basicShader);
-    SimpleShader.mixin(FragmentSimpleShaderSource);
+    FragmentSimpleShader.mixin(basicShader);
+    FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
+  }
+
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+
   }
 }
 
 
-GLBoost['SimpleShader'] = SimpleShader;
+GLBoost['FragmentSimpleShader'] = FragmentSimpleShader;

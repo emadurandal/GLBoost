@@ -434,6 +434,7 @@ export default class Geometry extends GLBoostObject {
     if (doSetupVertexAttribs) {
       this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
     }
+    material.shaderInstance.vao = Geometry._vaoDic[this.toString()];
 
     if (doSetupVertexAttribs) {
       glem.bindVertexArray(gl, null);
@@ -466,7 +467,7 @@ export default class Geometry extends GLBoostObject {
     return materials;
   }
 
-  prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh) {
+  prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh, shaderClass = void 0) {
 
     var vertices = this._vertices;
     var gl = this._glContext.gl;
@@ -503,7 +504,7 @@ export default class Geometry extends GLBoostObject {
 
 
     for (let i=0; i<materials.length;i++) {
-      this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter);
+      this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
     }
 
     if (doAfter) {
@@ -532,7 +533,7 @@ export default class Geometry extends GLBoostObject {
       }
       glem.bindVertexArray(gl, null);
     }
-    return true;
+    return materials;
   }
 
   draw(expression, lights, camera, mesh, scene, renderPassIndex) {
