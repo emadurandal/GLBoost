@@ -1,4 +1,4 @@
-import Shader from '../../low_level/shaders/Shader';
+import FragmentSimpleShader from './FragmentSimpleShader';
 import VertexWorldShaderSource from './VertexWorldShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
@@ -116,16 +116,14 @@ export class WireframeShaderSource {
   }
 }
 
-export default class WireframeShader extends Shader {
+export default class WireframeShader extends FragmentSimpleShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
-    WireframeShader.mixin(basicShader);
     if (basicShader === VertexWorldShaderSource) {
       WireframeShader.mixin(VertexWorldShadowShaderSource);
     }
-    WireframeShader.mixin(FragmentSimpleShaderSource);
     WireframeShader.mixin(WireframeShaderSource);
 
     this._unfoldUVRatio = 0.0;
