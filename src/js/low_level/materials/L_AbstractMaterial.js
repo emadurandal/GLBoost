@@ -394,6 +394,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return this._shaderParametersForShaderInstance;
   }
 
+  set shaderParameters(shaderParameterDic) {
+    this._shaderParametersForShaderInstance = shaderParameterDic;
+  }
+
   addSemanticsDic(uniform, uniformName) {
     if (typeof this._semanticsDic[uniform] === 'undefined') {
       this._semanticsDic[uniform] = uniformName;
