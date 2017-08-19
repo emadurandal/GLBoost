@@ -24,11 +24,17 @@ export default class Renderer extends GLBoostObject {
    * @param {Scene} scene a instance of Scene class
    */
   draw(expression) {
+    let renderPassTag = '';
     expression.renderPasses.forEach((renderPass, index)=>{
       if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
-
+/*
+      if (renderPassTag !== renderPass.tag) {
+        renderPass.clearAssignShaders();
+      }
+      renderPassTag = renderPass.tag;
+*/
       var camera = false;
       renderPass.scene.cameras.forEach((elm)=> {
         if (elm.isMainCamera(renderPass.scene)) {
@@ -38,7 +44,7 @@ export default class Renderer extends GLBoostObject {
 
       let lights = renderPass.scene.lights;
 
-      renderPass.doSomethingBeforeRender(camera ? true:false, lights);
+      renderPass.preRender(camera ? true:false, lights);
 
       var glContext = this._glContext;
       var gl = glContext.gl;
@@ -104,7 +110,7 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      renderPass.doSomethingAfterRender(camera ? true:false, lights);
+      renderPass.postRender(camera ? true:false, lights);
 
     });
   }
