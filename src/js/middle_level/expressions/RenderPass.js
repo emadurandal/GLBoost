@@ -28,12 +28,43 @@ export default class RenderPass extends GLBoostObject {
 
     this._webglStatesAssignDictionaries = [];
     this._backupWebGLStatesOfMaterials = [];
+    this._shaderParametersAssignDictionaries = [];
+    this._backupShaderParametersOfMaterials = [];
     this._shaderAssignDictionaries = [];
     this._backupShadersOfInstances = [];
 
     this._newShaderInstance = null;
+    this._oldShaderClass = null;
     this._backupShaderClassDic = {};
 
+    this._doPreRender = true;
+    this._doPostRender = true;
+    this._tag = '';
+
+  }
+
+  set tag(name) {
+    this._tag = name;
+  }
+
+  get tag() {
+    return this._tag;
+  }
+
+  get doPreRender() {
+    return this._doPreRender;
+  }
+
+  set doPreRender(flg) {
+    this._doPreRender = flg;
+  }
+
+  get doPostRender() {
+    return this._doPostRender;
+  }
+
+  set doPostRender(flg) {
+    this._doPostRender = flg;
   }
 
   get expression() {
@@ -176,6 +207,11 @@ export default class RenderPass extends GLBoostObject {
 
   setWebGLStatesAssignDictionaries(dictionaries) {
     this._webglStatesAssignDictionaries = dictionaries;
+
+  }
+
+  setShaderParametersAssignDictionaries(dictionaries) {
+    this._shaderParametersAssignDictionaries = dictionaries;
   }
 
   setShaderAssignDictionaries(dictionaries) {
@@ -209,10 +245,43 @@ export default class RenderPass extends GLBoostObject {
     }
   }
 
+  _assignShaderParameters() {
+    if (this._shaderParametersAssignDictionaries.length === 0) {
+      return;
+    }
+
+
+    for (let dic of this._shaderParametersAssignDictionaries) {
+      for (let mesh of this._meshes) {
+        let materials = mesh.getAppropriateMaterials();
+        for (let material of materials) {
+          this._backupShaderParametersOfMaterials.push({
+            mesh: mesh,
+            shaderParameters: material.shaderParameters
+          });
+          material.shaderParameters = dic.shaderParameters;
+        }
+      }
+    }
+  }
+
+  _restoreShaderParameters() {
+    if (this._backupShaderParametersOfMaterials.length === 0) {
+      return;
+    }
+    for (let dic of this._backupShaderParametersOfMaterials) {
+      let materials = dic.mesh.getAppropriateMaterials();
+      for (let i=0; i<materials.length; i++) {
+        materials[0].shaderParameters = dic.shaderParameters;
+      }
+    }
+  }
+
   _assignShaders(existCamera_f, lights, assumeThatAllMaterialsAreSame = true) {
     if (this._shaderAssignDictionaries.length === 0) {
       return;
     }
+    //this.clearAssignShaders();
 
     if (assumeThatAllMaterialsAreSame) {
       for (let dic of this._shaderAssignDictionaries) {
@@ -223,19 +292,24 @@ export default class RenderPass extends GLBoostObject {
               backupShaderClass: material.shaderClass,
               backupShaderInstance: material.shaderInstance
             });
-            //material.setShaderClassWithForceUpdate(dic.shaderClass);
+
+            if (this._newShaderInstance &&  material.shaderClass.name !== this._oldShaderClass.name) {
+              this._newShaderInstance.readyForDiscard();
+              this._newShaderInstance = void 0;
+            }
 
             if (!this._newShaderInstance) {
-              let _material = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, false, dic.shaderClass);
-              this._newShaderInstance = _material.shaderInstance;
+              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+              this._oldShaderClass = material.shaderClass;
             }
 
             material.shaderInstance = this._newShaderInstance;
           });
-  //        obj.geometry.prepareToRender(this.expression, existCamera_f, lights, obj.material, obj);
         }
       }
     }
+
   }
 
   _restoreShaders(existCamera_f, lights) {
@@ -245,21 +319,35 @@ export default class RenderPass extends GLBoostObject {
 
     for (let dic of this._backupShadersOfInstances) {
       dic.instance.getAppropriateMaterials().forEach((material,index)=>{
-        material.setShaderClassWithForceUpdate(dic.backupShaderClass);
+        material.shaderClass = (dic.backupShaderClass);
 //        material.shaderInstance = dic.backupShaderInstance;
 
-        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
-          let _material = dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, index, existCamera_f, lights, true, dic.backupShaderClass);
-          this._backupShaderClassDic[dic.backupShaderClass.name] = _material.shaderInstance;
-        }
+//        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
+        let shaderInstance = dic.backupShaderInstance;
 
-        material.shaderInstance = this._backupShaderClassDic[dic.backupShaderClass.name];
+        /*
+        if(!shaderInstance) {
+          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+
+        }
+*/
+        material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
+
 
       });
-      //dic.instance.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 1, existCamera_f, lights, true);
-//      dic.instance.geometry.prepareToRender(this.expression, existCamera_f, lights, dic.instance.material, dic.instance);
+
     }
 
+  }
+
+  clearAssignShaders() {
+    for (let dic of this._shaderAssignDictionaries) {
+      if (dic._newShaderInstance) {
+        dic._newShaderInstance.readyForDiscard();
+      }
+      dic._newShaderInstance = void 0;
+    }
   }
 
   /**
@@ -349,15 +437,23 @@ export default class RenderPass extends GLBoostObject {
     return this._isEnableToDraw;
   }
 
-  doSomethingBeforeRender(existCamera_f, lights) {
-    this._assignWebGLStates();
+  preRender(existCamera_f, lights) {
+    if (!this.doPreRender) {
+      return;
+    }
+    //this._assignWebGLStates();
+   // this._assignShaderParameters();
     this._assignShaders(existCamera_f, lights);
     // And call functions registered by user.
   }
 
-  doSomethingAfterRender(existCamera_f, lights) {
+  postRender(existCamera_f, lights) {
+    if (!this.doPostRender) {
+      return;
+    }
     this._restoreShaders(existCamera_f, lights);
-    this._restoreWebGLStates();
+    //this._restoreWebGLStates();
+    //this._restoreShaderParameters();
     // And call functions registered by user.
   }
 
