@@ -31,6 +31,18 @@ export default class L_GLBoostMonitor {
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
   }
 
+
+  getGLBoostObjects(partOfGlBoostObjectClassName) {
+    let glBoostObjects = [];
+    for (let instanceName in this._glBoostObjects) {
+      if (instanceName.indexOf(partOfGlBoostObjectClassName)>0) {
+        glBoostObjects.push(this._glBoostObjects[instanceName]);
+      }
+    }
+
+    return glBoostObjects;
+  }
+
   printGLBoostObjects() {
     var objects = this._glBoostObjects;
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');
@@ -66,18 +78,30 @@ export default class L_GLBoostMonitor {
 
   registerWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
-    this._glResources.push([glBoostObject, glResourceName]);
+    this._glResources.push([glBoostObject, glResource]);
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
   deregisterWebGLResource(glBoostObject, glResource) {
     var glResourceName = glResource.constructor.name;
     this._glResources.forEach((glResource, i)=>{
-      if (glResource[0] === glBoostObject && glResource[1] === glResourceName) {
+      if (glResource[0] === glBoostObject && glResource[1].constructor.name === glResourceName) {
         this._glResources.splice(i,1);
       }
     });
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
+  }
+
+  getWebGLResources(webglResourceName) {
+    let webglResources = this._glResources.filter((glResourceArray)=>{
+      if (glResourceArray[1].constructor.name === webglResourceName) {
+        return true;
+      } else {
+        return false;
+      }
+    });//.map((glReourceArray)=>{return glReourceArray[1]});
+
+    return webglResources;
   }
 
   printWebGLResources() {

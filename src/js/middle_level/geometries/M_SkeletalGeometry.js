@@ -147,6 +147,6 @@ export default class M_SkeletalGeometry extends Geometry {
       }
     }
 
-    super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh);
+    return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh);
   }
 }
