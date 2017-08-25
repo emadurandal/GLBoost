@@ -320,7 +320,7 @@ export default class L_SPVCameraController extends GLBoostObject {
     return targetAABB;
   }
 
-  _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
+  _updateTargeting(camera, eyeVec, centerVec, upVec, fovy, doIgnoireArgFovy = false) {
     if (this._target === null) {
       return [eyeVec, centerVec, upVec];
     }
@@ -328,7 +328,12 @@ export default class L_SPVCameraController extends GLBoostObject {
     let targetAABB = this._getTargetAABBInWorld();
 
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-    this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+
+    let _fogy = fovy;
+    if (doIgnoireArgFovy) {
+      _fogy = this._lastFovy;
+    }
+    this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((_fogy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
     //let newCenterVec = Vector3.zero(); //\\\targetAABB.centerPoint;
     let newCenterVec = targetAABB.centerPoint;
@@ -429,9 +434,9 @@ export default class L_SPVCameraController extends GLBoostObject {
     return this._enableRotation;
   }
 
-  updateTargeting() {
+  updateTargeting(doIgnoireFovy = false) {
     this._camaras.forEach((camera)=>{
-      let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, this._getFovyFromCamera(camera));
+      let vectors = this._updateTargeting(camera, camera.eye, camera.center, camera.up, this._getFovyFromCamera(camera), doIgnoireFovy);
       camera.eye = vectors[0];
       camera.center = vectors[1];
       camera.up = vectors[2];
@@ -440,6 +445,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   addCamera(camera) {
     this._camaras.add(camera);
+    this._lastFovy = this._getFovyFromCamera(camera);
   }
 
   set target(object) {
