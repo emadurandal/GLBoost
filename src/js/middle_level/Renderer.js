@@ -29,12 +29,12 @@ export default class Renderer extends GLBoostObject {
       if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
-/*
+
       if (renderPassTag !== renderPass.tag) {
         renderPass.clearAssignShaders();
       }
       renderPassTag = renderPass.tag;
-*/
+
       var camera = false;
       renderPass.scene.cameras.forEach((elm)=> {
         if (elm.isMainCamera(renderPass.scene)) {

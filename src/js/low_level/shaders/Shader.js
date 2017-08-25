@@ -500,7 +500,7 @@ export default class Shader extends GLBoostObject {
 
       MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
       programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
-
+      programToReturn.createdAt = performance.now();
       programToReturn.hashId = indexStr;
       programToReturn.glslProgramsSelfUsageCount = -1;
 

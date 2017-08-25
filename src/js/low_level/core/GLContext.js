@@ -177,11 +177,13 @@ export default class GLContext {
   }
 
   useProgram(program) {
-    if (!program) {
+//    if (!program) {
       this.gl.useProgram(program);
+      this._currentProgramInuse = program;
+
       this.checkGLError();
       this._glslProgramsLatestUsageCount++;
-
+/*
       return;
     }
 
@@ -196,6 +198,7 @@ export default class GLContext {
 
     MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
       'LOG_OMISSION_PROCESSING: gl.useProgram call has been omitted since this glsl program is already in use.');
+      */
   }
 
   deleteProgram(glBoostObject, program) {
@@ -203,7 +206,13 @@ export default class GLContext {
     this.gl.deleteProgram(program);
 
     this.checkGLError();
+  }
 
+  deleteAllPrograms() {
+    let programObjs = this._monitor.getWebGLResources('WebGLProgram');
+    for (let programObj of programObjs) {
+      this.deleteProgram(programObj[0], programObj[1]);
+    }
   }
 
   getUniformLocation(glslProgram, uniformVariableName) {
@@ -227,13 +236,19 @@ export default class GLContext {
     }
 
 //    this.gl[uniformFuncStr].apply(this.gl, args);
-
+/*
     if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
       MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
         'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
 
       return;
     }
+*/
+    if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
+//       console.error('missmatch!')
+      return;
+    }
+
     if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
       // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
       this.gl[uniformFuncStr].apply(this.gl, args);

@@ -296,6 +296,8 @@ export default class RenderPass extends GLBoostObject {
             if (this._newShaderInstance &&  material.shaderClass.name !== this._oldShaderClass.name) {
               this._newShaderInstance.readyForDiscard();
               this._newShaderInstance = void 0;
+//              material.shaderInstance.readyForDiscard();
+//              material.shaderInstance = void 0;
             }
 
             if (!this._newShaderInstance) {
@@ -319,19 +321,19 @@ export default class RenderPass extends GLBoostObject {
 
     for (let dic of this._backupShadersOfInstances) {
       dic.instance.getAppropriateMaterials().forEach((material,index)=>{
-        material.shaderClass = (dic.backupShaderClass);
+//        material.shaderClass = (dic.backupShaderClass);
 //        material.shaderInstance = dic.backupShaderInstance;
 
 //        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
         let shaderInstance = dic.backupShaderInstance;
 
-        /*
+
         if(!shaderInstance) {
           let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
           shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
 
         }
-*/
+
         material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
 
 
