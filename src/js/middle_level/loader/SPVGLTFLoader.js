@@ -280,6 +280,21 @@ export default class SPVGLTFLoader {
         rootGroup.animationFps = json.asset.animationFps;
       }
 
+      // other information
+      if (json.asset && json.asset.spv_version) {
+        rootGroup.spv_version = json.asset.spv_version;
+      }
+      if (json.asset && json.asset.LastSaved_ApplicationVendor) {
+        rootGroup.LastSaved_ApplicationVendor = json.asset.LastSaved_ApplicationVendor;
+      }
+      if (json.asset && json.asset.LastSaved_ApplicationName) {
+        rootGroup.LastSaved_ApplicationName = json.asset.LastSaved_ApplicationName;
+      }
+      if (json.asset && json.asset.LastSaved_ApplicationVersion) {
+        rootGroup.LastSaved_ApplicationVersion = json.asset.LastSaved_ApplicationVersion;
+      }
+
+
       rootGroup.addChild(group)
     }
 
@@ -335,7 +350,7 @@ export default class SPVGLTFLoader {
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -350,7 +365,7 @@ export default class SPVGLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
