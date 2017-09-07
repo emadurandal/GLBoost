@@ -243,14 +243,15 @@ export default class M_Element extends L_Element {
     if (true) {
       var matrix = Matrix44.identity();
 
-      if (this._currentCalcMode === 'matrix') {
+      if (!input && this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
 
       var rotationMatrix = Matrix44.identity();
-      if (this._currentCalcMode === 'quaternion') {
+      // if input is truly, glTF animation's can be regarded as quaternion
+      if (input || this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
       } else {
         let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
@@ -280,14 +281,15 @@ export default class M_Element extends L_Element {
     if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
 
-      if (this._currentCalcMode === 'matrix') {
+      if (!input && this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.matrix);
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
 
       var rotationMatrix = Matrix44.identity();
-      if (this._currentCalcMode === 'quaternion') {
+      // if input is truly, glTF animation's can be regarded as quaternion
+      if (input || this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.quaternion.rotationMatrix;
       } else {
         /*
@@ -310,7 +312,7 @@ export default class M_Element extends L_Element {
 
     return this._finalMatrix.clone();
   }
-
+/*
   get transformMatrixForJoints() {
 
     var rotationMatrix = null;
@@ -333,13 +335,18 @@ export default class M_Element extends L_Element {
     return rotationMatrix.clone();
   }
 
+*/
 
   get transformMatrixOnlyRotate() {
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
 
     var rotationMatrix = null;
-    if (this._currentCalcMode === 'quaternion') {
+    if (input || this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.quaternion.rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
+    } else if (!input && this._currentCalcMode === 'matrix') {
       rotationMatrix = this.matrix;
       rotationMatrix.m03 = 0;
       rotationMatrix.m13 = 0;
@@ -361,11 +368,15 @@ export default class M_Element extends L_Element {
   }
 
   getTransformMatrixOnlyRotateOn(value) {
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
 
     var rotationMatrix = Matrix44.identity();
-    if (this._currentCalcMode === 'quaternion') {
+    if (input || this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
+    } else if (!input && this._currentCalcMode === 'matrix') {
       rotationMatrix = this.getMatrixAt('time', value);
       rotationMatrix.m03 = 0;
       rotationMatrix.m13 = 0;

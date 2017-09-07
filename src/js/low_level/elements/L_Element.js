@@ -82,6 +82,7 @@ export default class L_Element extends GLBoostObject {
   multiplyMatrix(mat) {
     this._matrix = mat.clone();
     this._currentCalcMode = 'matrix';
+//    this._translate = new Vector3(mat.m03, mat.m03, mat.m03);
     this._needUpdate();
   }
 

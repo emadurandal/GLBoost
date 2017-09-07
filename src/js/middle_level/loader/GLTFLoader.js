@@ -852,7 +852,7 @@ export default class GLTFLoader {
           if (hitElement) {
             hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             hitElement.setActiveAnimationLine('time');
-            hitElement.currentCalcMode = 'quaternion';
+            //hitElement.currentCalcMode = 'quaternion';
           }
         }
       }
