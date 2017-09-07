@@ -20,7 +20,15 @@ export default class M_SPVScreenMesh extends M_Mesh {
     material.states = {
       "enable": [
         gl.BLEND
-      ]
+      ],
+      "functions": {
+        "blendFuncSeparate": [
+          770, // SRC_ALPHA
+          771, // ONE MINUS SRC_ALPHA
+          1,   // ONE
+          1    // ONE
+        ]
+      }
     };
     this.geometry.materials = [material];
     this._material = material;
