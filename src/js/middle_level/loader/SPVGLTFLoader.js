@@ -871,7 +871,7 @@ export default class SPVGLTFLoader {
           if (hitElement) {
             hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             hitElement.setActiveAnimationLine('time');
-            hitElement.currentCalcMode = 'quaternion';
+            //hitElement.currentCalcMode = 'quaternion';
           }
         }
       }
