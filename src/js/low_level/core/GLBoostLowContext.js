@@ -223,7 +223,7 @@ export default class GLBoostLowContext {
     depthTexture.depthAttachment = attachimentId;
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
 
-    console.log('FBO', gl.checkFramebufferStatus(gl.FRAMEBUFFER));
+//    console.log('FBO', gl.checkFramebufferStatus(gl.FRAMEBUFFER));
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
