@@ -1,3 +1,6 @@
+import GLBoost from '../../globals';
+
+
 export default class DataUtil {
 
   constructor() {
@@ -55,6 +58,37 @@ export default class DataUtil {
       }
       return result;
     }
+  }
+
+  static stringToBase64(str) {
+    let b64 = null;
+    b64 = DataUtil.btoa(str);
+    return b64;
+  }
+
+  static UInt8ArrayToDataURL(uint8array, width, height) {
+    let canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    let ctx = canvas.getContext("2d");
+    let imageData = ctx.createImageData(width, height);
+
+    for(let i = 0; i < imageData.data.length; i+=4) {
+      /*
+      imageData.data[i + 0] = uint8array[imageData.data.length - i + 0];
+      imageData.data[i + 1] = uint8array[imageData.data.length - i + 1];
+      imageData.data[i + 2] = uint8array[imageData.data.length - i + 2];
+      imageData.data[i + 3] = uint8array[imageData.data.length - i + 3];
+      */
+      imageData.data[i + 0] = uint8array[(height - Math.floor(i/(4*width)))*(4*width) + i%(4*width) + 0];
+      imageData.data[i + 1] = uint8array[(height - Math.floor(i/(4*width)))*(4*width) + i%(4*width) + 1];
+      imageData.data[i + 2] = uint8array[(height - Math.floor(i/(4*width)))*(4*width) + i%(4*width) + 2];
+      imageData.data[i + 3] = uint8array[(height - Math.floor(i/(4*width)))*(4*width) + i%(4*width) + 3];
+    }
+
+    ctx.putImageData(imageData,0,0);
+    canvas.remove();
+    return canvas.toDataURL("image/png");
   }
 
   static loadResourceAsync(resourceUri, isBinary, resolveCallback, rejectCallback) {
@@ -124,3 +158,4 @@ export default class DataUtil {
   }
 }
 
+GLBoost['DataUtil'] = DataUtil;

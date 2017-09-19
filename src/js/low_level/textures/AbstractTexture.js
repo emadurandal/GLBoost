@@ -79,16 +79,19 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   getTexturePixelData() {
+    let gl = this._glContext.gl;
+
     // Create a framebuffer backed by the texture
-    var framebuffer = this._glContext.createFramebuffer(this);
+    let framebuffer = this._glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
 
     // Read the contents of the framebuffer (data stores the pixel data)
-    var data = new Uint8Array(this.width * this.height * 4);
+    let data = new Uint8Array(this.width * this.height * 4);
     gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
-    this._glContext.deleteFramebuffer(this, framebuffer);
+    //this._glContext.deleteFramebuffer(this, framebuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     return data;
   }

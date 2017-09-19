@@ -11,6 +11,7 @@ export default class VertexWorldShaderSource {
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 aVertex_normal;\n`;
       shaderText += `${out_} vec3 v_normal;\n`;
+      shaderText += `${out_} vec3 v_normal_world;\n`;
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += `${in_} vec3 aVertex_tangent;\n`;
       }
@@ -74,6 +75,7 @@ export default class VertexWorldShaderSource {
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  v_normal = normal_world;\n';
+      shaderText += '  v_normal_world = normal_world;\n';
       shaderText += '  v_viewDirection = viewDirection_world;\n';
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
         // world space to tangent space
@@ -160,6 +162,7 @@ export default class VertexWorldShaderSource {
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 v_normal;\n`;
+      shaderText += `${in_} vec3 v_normal_world;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
     shaderText += `${in_} vec3 v_position_world;\n`;

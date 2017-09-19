@@ -30,7 +30,7 @@ export default class M_SkeletalMesh extends M_Mesh {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
           this._joints.push(joints[j]);
           joints[j].skeletalMesh = this;
-          joints[j].isVisible = true;
+//          joints[j].isVisible = true;
           joints[j].inverseBindMatrix = this._inverseBindMatrices[jointCount++];
           break;
         }
