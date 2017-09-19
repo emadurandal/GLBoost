@@ -622,6 +622,7 @@ export default class Shader extends GLBoostObject {
     let shaderText = '';
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
     shaderText += '  vec3 normal = normalize(v_normal);\n';
+    shaderText += '  vec3 normal_world = normal;\n';
 
     if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += '  vec3 dx = dFdx(v_position_world);\n';
@@ -630,6 +631,7 @@ export default class Shader extends GLBoostObject {
       shaderText += '  vec3 viewDirection_world = normalize(v_viewDirection_world);\n';
 //      shaderText += '  normal = dot(viewDirection_world, cross(dx, dy)) >= 0.0 ? normalize(cross(dx, dy)) : normalize(cross(dy, dx));\n';
       shaderText += '  normal = normalize(cross(dx, dy));\n';
+      shaderText += '  normal_world = normal;\n';
 
       shaderText += '  if (dot(vec3(0.0, 0.0, 1.0), cross(dx, dy)) < 0.0) {\n';
       shaderText += '   visibilityLevel = 0.0;\n';
@@ -642,6 +644,8 @@ export default class Shader extends GLBoostObject {
       let textureFunc = Shader._texture_func(gl);
       shaderText += `  normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
       //shaderText += `  normal.y = 1.0 - normal.x - normal.z;\n`;
+      shaderText += `  normal_world = normalize(v_normal_world);\n`;
+
     }
 
     return shaderText;
