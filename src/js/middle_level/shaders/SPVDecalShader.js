@@ -133,6 +133,23 @@ export class SPVDecalShaderSource {
     shaderText += 'float borderMode = splitParameter.z;\n';
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
 
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.01)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  if (borderMode < 0.5) {\n';
+    shaderText += '    rt0 = vec4(normal_world*0.5+0.5, 1.0);\n';
+    shaderText += '  }\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (borderMode > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.0)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  rt0 = borderColor;\n';
+    shaderText += '} else\n';
+
+    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
+    shaderText += '  if (borderMode < 0.5) {\n';
+    shaderText += '    rt0 = rt0;\n';
+    shaderText += '  }\n';
+    shaderText += '}\n';
+
+    /*
     shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.25)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  if (borderMode > 0.5) {\n';
     shaderText += '    rt0 = rt0;\n';
@@ -172,7 +189,7 @@ export class SPVDecalShaderSource {
     shaderText += 'if (splitParameter.z > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.26)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
     shaderText += '  rt0 = borderColor;\n';
     shaderText += '}\n';
-
+*/
 
 
 
