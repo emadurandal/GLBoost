@@ -56,6 +56,7 @@ export class SPVDecalShaderSource {
     shaderText += 'uniform vec4 textureContributionRate;\n';
     shaderText += 'uniform vec4 gamma;\n';
     shaderText += 'uniform vec4 splitParameter;\n';
+    shaderText += 'uniform vec4 splitControlParameter;\n';
     shaderText += 'uniform bool isColorAberration;\n';
     shaderText += 'uniform bool isVignette;\n';
 
@@ -132,22 +133,30 @@ export class SPVDecalShaderSource {
     shaderText += 'float aspect = splitParameter.x/splitParameter.y;\n';
     shaderText += 'float borderMode = splitParameter.z;\n';
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
+    shaderText += 'float tanTheta = splitControlParameter.x;\n';
 
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.01)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  if (borderMode < 0.5) {\n';
+//    shaderText += 'float angle = mix(1.0, splitParameter.y/splitParameter.x*tanTheta, animationRatio);\n';
+//    shaderText += 'float slope = tanTheta;\n';
+
+    shaderText += 'float offsetValue = splitParameter.x*1.5*(inverseAnimationRatio)*tanTheta;\n';
+    shaderText += 'float angle1 = tanTheta * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + offsetValue);\n';
+    shaderText += 'float angle3 = tanTheta * (gl_FragCoord.x - (splitParameter.x*-0.02)*animationRatio + offsetValue);\n';
+    shaderText += 'float angle4 = tanTheta * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + offsetValue);\n';
+
+    shaderText += 'if (borderMode < 0.5) {\n';
+    shaderText += '  if (gl_FragCoord.y > angle1) {\n';
     shaderText += '    rt0 = vec4(normal_world*0.5+0.5, 1.0);\n';
-    shaderText += '  }\n';
-    shaderText += '} else\n';
+    shaderText += '  }';
+    shaderText += '}\n';
 
-    shaderText += 'if (borderMode > 0.5 && gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.0)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  rt0 = borderColor;\n';
-    shaderText += '} else\n';
-
-    shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
-    shaderText += '  if (borderMode < 0.5) {\n';
-    shaderText += '    rt0 = rt0;\n';
+    shaderText += 'if (borderMode > 0.5) {\n';
+    shaderText += '  if (gl_FragCoord.y > angle3) {\n';
+    shaderText += '  } else\n';
+    shaderText += '  if (gl_FragCoord.y > angle4) {\n';
+    shaderText += '    rt0 = borderColor;\n';
     shaderText += '  }\n';
     shaderText += '}\n';
+
 
     /*
     shaderText += 'if (gl_FragCoord.y > slope * (gl_FragCoord.x - (splitParameter.x*-0.25)*animationRatio + splitParameter.x*1.5*(inverseAnimationRatio))) {\n';
@@ -212,6 +221,7 @@ export class SPVDecalShaderSource {
     material.setUniform(shaderProgram, 'uniform_textureContributionRate', this._glContext.getUniformLocation(shaderProgram, 'textureContributionRate'));
     material.setUniform(shaderProgram, 'uniform_gamma', this._glContext.getUniformLocation(shaderProgram, 'gamma'));
     material.setUniform(shaderProgram, 'uniform_splitParameter', this._glContext.getUniformLocation(shaderProgram, 'splitParameter'));
+    material.setUniform(shaderProgram, 'uniform_splitControlParameter', this._glContext.getUniformLocation(shaderProgram, 'splitControlParameter'));
     material.setUniform(shaderProgram, 'uniform_isColorAberration', this._glContext.getUniformLocation(shaderProgram, 'isColorAberration'));
     material.setUniform(shaderProgram, 'uniform_isVignette', this._glContext.getUniformLocation(shaderProgram, 'isVignette'));
 
@@ -325,8 +335,11 @@ export default class SPVDecalShader extends WireframeShader {
     let gamma = Vector3.divideVector(this.handleArgument(targetGamma), this.handleArgument(sourceGamma));
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_gamma'), gamma.x, gamma.y, gamma.z, isGammaEnable ? 1 : 0, true);
 
-    let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector3(1, 1, 1, 1));
+    let splitParameter = this.getShaderParameter(material, 'splitParameter', new Vector4(1, 1, 1, 0));
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
+
+    let splitControlParameter = this.getShaderParameter(material, 'splitControlParameter', new Vector4(Math.PI/4, 0, 0, 0));
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitControlParameter'), Math.tan(splitControlParameter.x), splitControlParameter.y, splitControlParameter.z, splitControlParameter.w, true);
 
     let isColorAberration = this.getShaderParameter(material, 'isColorAberration', false);
     this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isColorAberration'), isColorAberration, true);
