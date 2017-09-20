@@ -54,6 +54,7 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     // Enable Flags
     this._enableRotation = true;
+    this._enableTranslate = true;
 
     this._userMouseEventHandler = null;
 
@@ -95,22 +96,25 @@ export default class L_SPVCameraController extends GLBoostObject {
       this._movedMouseXOnCanvas = evt.clientX - rect.left;
       this._movedMouseYOnCanvas = evt.clientY - rect.top;
 
+
       let button_l = (InputUtil.whichButton(evt) === 'left');
       let button_c = (InputUtil.whichButton(evt) === 'middle') || (InputUtil.whichButton(evt) === 'right') || (evt.altKey && !evt.ctrlKey);
-      if (button_c) {
-        this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
-        this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
+      if (this._enableTranslate) {
+        if (button_c) {
+          this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
+          this._mouse_translate_x = (this._movedMouseXOnCanvas - this._clickedMouseXOnCanvas) / 1000 * this._efficiency;
 
-        let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
-        if (evt.shiftKey) {
-          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
-        } else {
-          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
+          let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
+          if (evt.shiftKey) {
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
+          } else {
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
+          }
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
+
+          this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
+          this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
         }
-        this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
-
-        this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
-        this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
       }
 
       this._camaras.forEach(function (camera) {
@@ -432,6 +436,14 @@ export default class L_SPVCameraController extends GLBoostObject {
 
   get enableRotation() {
     return this._enableRotation;
+  }
+
+  set enableTranslate(flg) {
+    this._enableTranslate = flg;
+  }
+
+  get enableTranslate() {
+    return this._enableTranslate;
   }
 
   updateTargeting(doIgnoireFovy = false) {
