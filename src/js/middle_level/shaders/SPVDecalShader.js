@@ -134,28 +134,49 @@ export class SPVDecalShaderSource {
     shaderText += 'float borderMode = splitParameter.z;\n';
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
     shaderText += 'float tanTheta = splitControlParameter.x;\n';
+    shaderText += 'float theta = splitControlParameter.y;\n';
 
 //    shaderText += 'float angle = mix(1.0, splitParameter.y/splitParameter.x*tanTheta, animationRatio);\n';
 //    shaderText += 'float slope = tanTheta;\n';
 
     shaderText += 'float offsetValue = splitParameter.x*1.5*(inverseAnimationRatio)*tanTheta;\n';
-    shaderText += 'float angle1 = tanTheta * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + offsetValue);\n';
-    shaderText += 'float angle3 = tanTheta * (gl_FragCoord.x - (splitParameter.x*-0.02)*animationRatio + offsetValue);\n';
-    shaderText += 'float angle4 = tanTheta * (gl_FragCoord.x - (splitParameter.x*0.0)*animationRatio + offsetValue);\n';
+
+    shaderText += 'float borderWidth = -0.01;\n';
+    shaderText += 'if (theta < 0.0) {\n';
+    shaderText += '  borderWidth *= -1.0;\n';
+    shaderText += '}\n';
+
+
+    shaderText += 'float angle1 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
+    shaderText += 'float angle2 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*borderWidth)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
+    shaderText += 'float angle3 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
 
     shaderText += 'if (borderMode < 0.5) {\n';
+    shaderText += '  if (theta > 3.141592/2.|| theta < -3.141592/2.0) {\n';
+    shaderText += '    if (gl_FragCoord.y < angle1) {\n';
+    shaderText += '      rt0 = vec4(normal_world*0.5+0.5, 1.0);\n';
+    shaderText += '    }\n';
+    shaderText += '  } else \n';
     shaderText += '  if (gl_FragCoord.y > angle1) {\n';
     shaderText += '    rt0 = vec4(normal_world*0.5+0.5, 1.0);\n';
-    shaderText += '  }';
+    shaderText += '  }\n';
     shaderText += '}\n';
 
     shaderText += 'if (borderMode > 0.5) {\n';
-    shaderText += '  if (gl_FragCoord.y > angle3) {\n';
+    shaderText += '  if (theta > 3.141592/2.0 || theta < -3.141592/2.0) {\n';
+    shaderText += '    if (gl_FragCoord.y < angle2) {\n';
+    shaderText += '    } else\n';
+    shaderText += '    if (gl_FragCoord.y < angle3) {\n';
+    shaderText += '      rt0 = borderColor;\n';
+    shaderText += '    }\n';
     shaderText += '  } else\n';
-    shaderText += '  if (gl_FragCoord.y > angle4) {\n';
+
+    shaderText += '  if (gl_FragCoord.y > angle2) {\n';
+    shaderText += '  } else\n';
+    shaderText += '  if (gl_FragCoord.y > angle3) {\n';
     shaderText += '    rt0 = borderColor;\n';
     shaderText += '  }\n';
-    shaderText += '}\n';
+    shaderText += '}';
 
 
     /*
@@ -339,7 +360,7 @@ export default class SPVDecalShader extends WireframeShader {
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitParameter'), this._glContext.canvasWidth, this._glContext.canvasHeight, splitParameter.z, splitParameter.w, true);
 
     let splitControlParameter = this.getShaderParameter(material, 'splitControlParameter', new Vector4(Math.PI/4, 0, 0, 0));
-    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitControlParameter'), Math.tan(splitControlParameter.x), splitControlParameter.y, splitControlParameter.z, splitControlParameter.w, true);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_splitControlParameter'), Math.tan(splitControlParameter.x), splitControlParameter.x, splitControlParameter.z, splitControlParameter.w, true);
 
     let isColorAberration = this.getShaderParameter(material, 'isColorAberration', false);
     this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isColorAberration'), isColorAberration, true);
