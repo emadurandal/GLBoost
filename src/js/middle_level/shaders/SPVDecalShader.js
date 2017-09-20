@@ -141,7 +141,8 @@ export class SPVDecalShaderSource {
 
     shaderText += 'float offsetValue = splitParameter.x*1.5*(inverseAnimationRatio)*tanTheta;\n';
 
-    shaderText += 'float borderWidth = -0.01;\n';
+    shaderText += 'float borderWidth = -0.0025;\n';
+    shaderText += 'float borderWidth2 = -borderWidth;\n';
     shaderText += 'if (theta < 0.0) {\n';
     shaderText += '  borderWidth *= -1.0;\n';
     shaderText += '}\n';
@@ -166,14 +167,14 @@ export class SPVDecalShaderSource {
     shaderText += '  if (theta > 3.141592/2.0 || theta < -3.141592/2.0) {\n';
     shaderText += '    if (gl_FragCoord.y < angle2) {\n';
     shaderText += '    } else\n';
-    shaderText += '    if (gl_FragCoord.y < angle3) {\n';
+    shaderText += '    if (gl_FragCoord.y < angle3 + splitParameter.y*borderWidth2 * aspect) {\n';
     shaderText += '      rt0 = borderColor;\n';
     shaderText += '    }\n';
     shaderText += '  } else\n';
 
     shaderText += '  if (gl_FragCoord.y > angle2) {\n';
     shaderText += '  } else\n';
-    shaderText += '  if (gl_FragCoord.y > angle3) {\n';
+    shaderText += '  if (gl_FragCoord.y > angle3 - splitParameter.y*borderWidth2 * aspect) {\n';
     shaderText += '    rt0 = borderColor;\n';
     shaderText += '  }\n';
     shaderText += '}';
