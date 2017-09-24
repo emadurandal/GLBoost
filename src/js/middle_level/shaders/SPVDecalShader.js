@@ -135,22 +135,24 @@ export class SPVDecalShaderSource {
     shaderText += 'float inverseAnimationRatio = 1.0 - splitParameter.w;\n';
     shaderText += 'float tanTheta = splitControlParameter.x;\n';
     shaderText += 'float theta = splitControlParameter.y;\n';
+    shaderText += 'float offsetX = splitControlParameter.z;\n';
+    shaderText += 'float offsetY = splitControlParameter.w;\n';
 
 //    shaderText += 'float angle = mix(1.0, splitParameter.y/splitParameter.x*tanTheta, animationRatio);\n';
 //    shaderText += 'float slope = tanTheta;\n';
 
     shaderText += 'float offsetValue = splitParameter.x*1.5*(inverseAnimationRatio)*tanTheta;\n';
 
-    shaderText += 'float borderWidth = -0.0025;\n';
+    shaderText += 'float borderWidth = -0.001;\n';
     shaderText += 'float borderWidth2 = -borderWidth;\n';
     shaderText += 'if (theta < 0.0) {\n';
     shaderText += '  borderWidth *= -1.0;\n';
     shaderText += '}\n';
 
 
-    shaderText += 'float angle1 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
-    shaderText += 'float angle2 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*borderWidth)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
-    shaderText += 'float angle3 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0;\n';
+    shaderText += 'float angle1 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 + offsetX - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0 + offsetY;\n';
+    shaderText += 'float angle2 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 + offsetX - (splitParameter.x*borderWidth)*animationRatio + offsetValue) + splitParameter.y/2.0 + offsetY;\n';
+    shaderText += 'float angle3 = tanTheta * (gl_FragCoord.x - splitParameter.x/2.0 + offsetX - (splitParameter.x*0.0)*animationRatio + offsetValue) + splitParameter.y/2.0 + offsetY;\n';
 
     shaderText += 'if (borderMode < 0.5) {\n';
     shaderText += '  if (theta > 3.141592/2.|| theta < -3.141592/2.0) {\n';
@@ -169,6 +171,9 @@ export class SPVDecalShaderSource {
     shaderText += '    } else\n';
     shaderText += '    if (gl_FragCoord.y < angle3 + splitParameter.y*borderWidth2 * aspect) {\n';
     shaderText += '      rt0 = borderColor;\n';
+    shaderText += '      if (gl_FragCoord.x > splitParameter.x/2.0 - offsetX && gl_FragCoord.x < splitParameter.x/2.0 + splitParameter.x*borderWidth2*3.0 - offsetX) {\n';
+    shaderText += '        rt0.xyz = (vec3(1.0) - borderColor.xyz);\n';
+    shaderText += '      }\n';
     shaderText += '    }\n';
     shaderText += '  } else\n';
 
@@ -176,6 +181,9 @@ export class SPVDecalShaderSource {
     shaderText += '  } else\n';
     shaderText += '  if (gl_FragCoord.y > angle3 - splitParameter.y*borderWidth2 * aspect) {\n';
     shaderText += '    rt0 = borderColor;\n';
+    shaderText += '    if (gl_FragCoord.x > splitParameter.x/2.0 - offsetX && gl_FragCoord.x < splitParameter.x/2.0 + splitParameter.x*borderWidth2*3.0 - offsetX) {\n';
+    shaderText += '      rt0.xyz = (vec3(1.0) - borderColor.xyz);\n';
+    shaderText += '    }\n';
     shaderText += '  }\n';
     shaderText += '}';
 
