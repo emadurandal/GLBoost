@@ -126,7 +126,7 @@ export default class WireframeShader extends FragmentSimpleShader {
     }
     WireframeShader.mixin(WireframeShaderSource);
 
-    this._unfoldUVRatio = 0.0;
+    this._unfoldUVRatio = void 0;
 
     this._AABB = null;
 
@@ -173,7 +173,8 @@ export default class WireframeShader extends FragmentSimpleShader {
     }
     let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram, 'uniform_unfoldUVRatio');
     if (uniformLocationUnfoldUVRatio) {
-      this._glContext.uniform1f(uniformLocationUnfoldUVRatio, this._unfoldUVRatio, true);
+      let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
+      this._glContext.uniform1f(uniformLocationUnfoldUVRatio, unfoldUVRatioParameter, true);
     }
 
     super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
