@@ -1,7 +1,7 @@
 var global = ('global',eval)('this');
 
 (function (global) {
-  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r2-dev' };
+  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r3-dev' };
 
   if (typeof define === 'function' && define.amd) {
     define(function() { return GLBoost; });
