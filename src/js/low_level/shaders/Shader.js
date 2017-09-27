@@ -417,6 +417,7 @@ export default class Shader extends GLBoostObject {
     // See if it compiled successfully
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
       alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+      console.error(gl.getShaderInfoLog(shader));
       return null;
     }
 
@@ -444,7 +445,8 @@ export default class Shader extends GLBoostObject {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      alert('Unable to initialize the shader program.');
+      alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+      console.error(gl.getProgramInfoLog(shaderProgram));
     }
 
     this._glContext.useProgram(shaderProgram);
