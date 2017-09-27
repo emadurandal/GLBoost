@@ -78,7 +78,6 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._onMouseDown = (evt) => {
       [this._clickedMouseXOnCanvas, this._clickedMouseYOnCanvas] = this._updateXYOnCanvas(evt);
-      console.log(this._clickedMouseXOnCanvas, this._clickedMouseYOnCanvas);
       this._movedMouseYOnCanvas = -1;
       this._movedMouseXOnCanvas = -1;
       this._rot_bgn_x = this._rot_x;
@@ -109,7 +108,6 @@ export default class L_SPVCameraController extends GLBoostObject {
       }
 
       [this._movedMouseXOnCanvas, this._movedMouseYOnCanvas] = this._updateXYOnCanvas(evt);
-      console.log(this._movedMouseXOnCanvas, this._movedMouseXOnCanvas);
 
       let button_l = false;
       let button_c = false;
