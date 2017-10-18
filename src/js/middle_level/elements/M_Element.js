@@ -818,36 +818,44 @@ export default class M_Element extends L_Element {
     let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
     //if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(this, true, input);
+      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
       this._accumulatedAncestryNameWithUpdateInfoString = tempString;
     //}
 
     return this._matrixAccumulatedAncestry.clone();
   }
 
-
-  _multiplyMyAndParentTransformMatricesForJoints(currentElem, withMySelf, inputValue) {
+  _multiplyMyAndParentTransformMatricesForJoints(withMySelf, inputValue) {
     let input = inputValue;
     if (typeof input === 'undefined') {
-      if (currentElem._activeAnimationLineName !== null) {
-        input = currentElem._getCurrentAnimationInputValue(currentElem._activeAnimationLineName);
+      if (this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
     }
 
-    if (currentElem._parent === null) {
+    if (this._parent === null) {
       if (withMySelf) {
-        return currentElem.getRotateTranslateAt(input);
+        return this.getRotateTranslateAt(input);
       } else {
         return Matrix44.identity();
       }
     } else {
+
+
       let currentMatrix = Matrix44.identity();
       if (withMySelf) {
-        currentMatrix = currentElem.getRotateTranslateAt(input);
+        currentMatrix = this.getRotateTranslateAt(input);
       }
-      return Matrix44.multiply(this._multiplyMyAndParentTransformMatricesForJoints(currentElem._parent, true, inputValue), currentMatrix);
+
+      let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      if (this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempString || this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0) {
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, inputValue), currentMatrix);
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempString;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
     }
   }
+
 
   get rotateTranslate() {
 
