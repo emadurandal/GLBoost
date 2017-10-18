@@ -352,7 +352,7 @@ export default class Geometry extends GLBoostObject {
     this._performanceHint = gl[performanceHintStr];
   }
 
-  updateVerticesData(vertices) {
+  updateVerticesData(vertices, skipUpdateAABB = false) {
     let gl = this._glContext.gl;
 
     for (let attribName in vertices) {
@@ -361,7 +361,7 @@ export default class Geometry extends GLBoostObject {
         let element = vertices[attribName][index];
         Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
 
-        if (attribName === 'position') {
+        if (attribName === 'position' && !(skipUpdateAABB === true)) {
           let componentN = this._vertices.components[attribName];
           this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
         }
@@ -369,7 +369,9 @@ export default class Geometry extends GLBoostObject {
       });
     }
 
-    this._AABB.updateAllInfo();
+    if(!(skipUpdateAABB === true)) {
+      this._AABB.updateAllInfo();
+    }
 
     for (let attribName in vertices) {
       if (this._vboObj[attribName]) {
