@@ -24,8 +24,10 @@ export default class VertexWorldShaderSource {
     /// These are assumed as in World coordinate
     shaderText += `uniform vec4 viewPosition_world;\n`;
     shaderText += `${out_} vec3 v_viewDirection;\n`;
-    shaderText += `${out_} vec3 v_viewDirection_world;\n`;
-    shaderText += `${out_} vec3 v_position_world;\n`;
+
+    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      shaderText += `${out_} vec3 v_position_world;\n`;
+    }
 
     // for Lighting
     if(lights.length > 0) {
@@ -64,10 +66,11 @@ export default class VertexWorldShaderSource {
 
     shaderText += '  vec3 viewDirection_world = viewPosition_world.xyz - position_world.xyz;\n';
 
-    shaderText += '  v_viewDirection_world = viewDirection_world;\n';
-
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-    shaderText += '  v_position_world = position_world.xyz;\n';
+
+    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      shaderText += '  v_position_world = position_world.xyz;\n';
+    }
 
     //    shaderText += '  v_position_view.z *= -1.0;\n';
 
@@ -153,7 +156,6 @@ export default class VertexWorldShaderSource {
     let shaderText = '';
 
     shaderText += `${in_} vec3 v_viewDirection;\n`;
-    shaderText += `${in_} vec3 v_viewDirection_world;\n`;
 
     if(lights.length > 0) {
       shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
@@ -165,7 +167,10 @@ export default class VertexWorldShaderSource {
       shaderText += `${in_} vec3 v_normal_world;\n`;
     }
     shaderText += `${in_} vec4 position;\n`;
-    shaderText += `${in_} vec3 v_position_world;\n`;
+
+    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      shaderText += `${in_} vec3 v_position_world;\n`;
+    }
 
     return shaderText;
   }

@@ -62,10 +62,22 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._isTargetingToRootJointIfSkeletalTarget = false;
 
-    this._onMouseDown = (evt) => {
+    this._updateXYOnCanvas = (evt)=> {
       let rect = evt.target.getBoundingClientRect();
-      this._clickedMouseXOnCanvas = evt.clientX - rect.left;
-      this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+      let clientX = 0;
+      let clientY = 0;
+      if (evt.changedTouches) {
+        clientX = evt.changedTouches[0].clientX;
+        clientY = evt.changedTouches[0].clientY;
+      } else {
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      }
+      return [clientX - rect.left, clientY - rect.top];
+    };
+
+    this._onMouseDown = (evt) => {
+      [this._clickedMouseXOnCanvas, this._clickedMouseYOnCanvas] = this._updateXYOnCanvas(evt);
       this._movedMouseYOnCanvas = -1;
       this._movedMouseXOnCanvas = -1;
       this._rot_bgn_x = this._rot_x;
@@ -83,8 +95,11 @@ export default class L_SPVCameraController extends GLBoostObject {
 
     this._onMouseUp = (evt) => {
       this._isKeyUp = true;
-      this._movedMouseYOnCanvas = -1;
-      this._movedMouseXOnCanvas = -1;
+//      this._movedMouseYOnCanvas = -1;
+//      this._movedMouseXOnCanvas = -1;
+      this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
+      this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
+//      this._button_c_once = false;
     };
 
     this._onMouseMove = (evt) => {
@@ -92,13 +107,20 @@ export default class L_SPVCameraController extends GLBoostObject {
         return;
       }
 
-      let rect = evt.target.getBoundingClientRect();
-      this._movedMouseXOnCanvas = evt.clientX - rect.left;
-      this._movedMouseYOnCanvas = evt.clientY - rect.top;
+      [this._movedMouseXOnCanvas, this._movedMouseYOnCanvas] = this._updateXYOnCanvas(evt);
 
-
-      let button_l = (InputUtil.whichButton(evt) === 'left');
-      let button_c = (InputUtil.whichButton(evt) === 'middle') || (InputUtil.whichButton(evt) === 'right') || (evt.altKey && !evt.ctrlKey);
+      let button_l = false;
+      let button_c = false;
+      if (evt.changedTouches) {
+        button_l = (evt.changedTouches.length > 1) ? false:true;
+        button_c = (evt.changedTouches.length > 1) ? true:false;
+        if (button_c) {
+//          this._button_c_once = true;
+        }
+      } else {
+        button_l = (InputUtil.whichButton(evt) === 'left');
+        button_c = (InputUtil.whichButton(evt) === 'middle') || (InputUtil.whichButton(evt) === 'right') || (evt.altKey && !evt.ctrlKey);
+      }
       if (this._enableTranslate) {
         if (button_c) {
           this._mouse_translate_y = (this._movedMouseYOnCanvas - this._clickedMouseYOnCanvas) / 1000 * this._efficiency;
@@ -193,9 +215,14 @@ export default class L_SPVCameraController extends GLBoostObject {
     };
 
     if (this._glContext.canvas) {
-      this._glContext.canvas.addEventListener('mousedown', this._onMouseDown);
-      this._glContext.canvas.addEventListener('mouseup', this._onMouseUp);
-      this._glContext.canvas.addEventListener('mousemove', this._onMouseMove);
+      const supportTouch = 'ontouchend' in document;
+      const event_pointstart = supportTouch ? 'touchstart' : 'mousedown';
+      const event_pointmove = supportTouch ? 'touchmove' : 'mousemove';
+      const event_pointend = supportTouch ? 'touchend' : 'mouseup';
+
+      this._glContext.canvas.addEventListener(event_pointstart, this._onMouseDown);
+      this._glContext.canvas.addEventListener(event_pointend, this._onMouseUp);
+      this._glContext.canvas.addEventListener(event_pointmove, this._onMouseMove);
       if (window.WheelEvent) {
         this._glContext.canvas.addEventListener("wheel", this._onMouseWheel);
       }
