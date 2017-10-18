@@ -125,7 +125,7 @@ export default class JointPrimitive extends Geometry {
 
   update() {
     this._vertexData = this._setupVertexData();
-    this.updateVerticesData(this._vertexData, null, GLBoost.LINES);
+    this.updateVerticesData(this._vertexData, true);
   }
 
   set meshContainingSelf(jointGizmoMesh) {
