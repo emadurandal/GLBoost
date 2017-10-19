@@ -60,7 +60,7 @@ export default class Matrix33 {
   }
 
   /**
-   * 単位行列にする（static版）
+   * Make this identity matrix（static method version）
    */
   static identity() {
     return new Matrix33(
@@ -193,6 +193,22 @@ export default class Matrix33 {
       cos, -sin, 0,
       sin, cos, 0,
       0, 0, 1
+    );
+  }
+
+  scale(vec) {
+    return this.setComponents(
+      vec.x, 0, 0,
+      0, vec.y, 0,
+      0, 0, vec.z
+    );
+  }
+
+  static scale(vec) {
+    return new Matrix33(
+      vec.x, 0, 0,
+      0, vec.y, 0,
+      0, 0, vec.z
     );
   }
 
