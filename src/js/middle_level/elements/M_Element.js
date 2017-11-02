@@ -847,12 +847,13 @@ export default class M_Element extends L_Element {
       }
 
       let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input) {
-        if (this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempString || this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0) {
+      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempString ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
+      {
           this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, inputValue), currentMatrix);
           this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempString;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
-        }
       }
       return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
     }
