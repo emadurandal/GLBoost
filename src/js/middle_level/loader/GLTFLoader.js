@@ -497,7 +497,9 @@ export default class GLTFLoader {
       for (let i = 0; i < meshJson.primitives.length; i++) {
         //lengthDic.index += _indicesArray[i].length;
         lengthDic.position += _positions[i].length;
-        lengthDic.normal += _normals[i].length;
+        if (_normals[i]) {
+          lengthDic.normal += _normals[i].length;
+        }
         if (typeof additional['joint'][i] !== 'undefined') {
           lengthDic.joint += additional['joint'][i].length;
         }
@@ -549,8 +551,10 @@ export default class GLTFLoader {
             array = additional['texcoord'][i];
           }
 
-          newTypedArray.set(array, offset);
-          offset += array.length;
+          if (array) {
+            newTypedArray.set(array, offset);
+            offset += array.length;
+          }
         }
 
         if (attribName === 'position') {
