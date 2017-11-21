@@ -14,6 +14,8 @@ import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import DataUtil from '../../low_level/misc/DataUtil';
 import M_Group from '../elements/M_Group';
+import MathUtil from "../../low_level/math/MathUtil";
+
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
