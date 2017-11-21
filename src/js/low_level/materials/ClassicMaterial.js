@@ -5,6 +5,12 @@ export default class ClassicMaterial extends L_AbstractMaterial {
   constructor(glBoostContext) {
     super(glBoostContext);
 
+    this._wireframeWidthRelativeScale = 1.0;
+
+  }
+
+  get wireframeWidthRelativeScale() {
+    return this._wireframeWidthRelativeScale;
   }
 }
 
