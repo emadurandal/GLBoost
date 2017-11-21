@@ -138,11 +138,13 @@ export default class WireframeShader extends FragmentSimpleShader {
     let isWifeframe = false;
     let isWireframeOnShade = false;
     let wireframeWidth = 0.0;
+    let wireframeWidthRelativeScale = 0.0;
 
     if (typeof material.isWireframe !== 'undefined') {
       isWifeframe = material.isWireframe;
       isWireframeOnShade = material.isWireframeOnShade;
       wireframeWidth = material.wireframeWidth;
+      wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
     }
 
     let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
