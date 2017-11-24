@@ -378,6 +378,27 @@ export default class SPVGLTFLoader {
       }
       camera.userFlavorName = cameraStr;
       group.addChild(camera);
+    } else if (nodeJson.extensions) {
+      if (nodeJson.extensions.KHR_materials_common) {
+        if (nodeJson.extensions.KHR_materials_common.light) {
+          const lightStr = nodeJson.extensions.KHR_materials_common.light
+          const lightJson = json.extensions.KHR_materials_common.lights[lightStr];
+          let light = null;
+          if (lightJson.type === 'point') {
+            let color = lightJson.point.color;
+            light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
+          } else if (lightJson.type === 'directional') {
+            const color = lightJson.directional.color;
+            let lightDir = new Vector4(0, 0, -1, 1);
+            const matrix = new Matrix44(nodeJson.matrix, true);
+            lightDir = matrix.multiplyVector(lightDir);
+            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
+            light.multiplyMatrixGizmo = group.matrix;
+            group.multiplyMatrix(Matrix44.identity());
+          }
+          group.addChild(light);
+        }
+      }
     }
 
     if (nodeJson.children) {
