@@ -372,6 +372,7 @@ export default class GLTFLoader {
           if (lightJson.type === 'point') {
             let color = lightJson.point.color;
             light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
+            group.addChild(light);
           } else if (lightJson.type === 'directional') {
             const color = lightJson.directional.color;
             let lightDir = new Vector4(0, 0, -1, 1);
@@ -380,8 +381,8 @@ export default class GLTFLoader {
             light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
             light.multiplyMatrixGizmo = group.matrix;
             group.multiplyMatrix(Matrix44.identity());
+            group.addChild(light);
           }
-          group.addChild(light);
         }
       }
     }

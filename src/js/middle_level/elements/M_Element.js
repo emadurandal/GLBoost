@@ -16,8 +16,10 @@ export default class M_Element extends L_Element {
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
     this._accumulatedAncestryNameWithUpdateInfoString = '';
+    this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf = '';    
     this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
     this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
+    this._accumulatedAncestryNameWithUpdateInfoStringJoint = '';
     this._animationLine = {};
     this._transparentByUser = false;
     this._opacity = 1.0;
@@ -460,9 +462,9 @@ export default class M_Element extends L_Element {
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+    if (this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+      this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf = tempString;
     }
 
     return this._matrixAccumulatedAncestry.clone();
@@ -817,9 +819,9 @@ export default class M_Element extends L_Element {
 
     let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
-    //if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+    //if (this._accumulatedAncestryNameWithUpdateInfoStringJoint !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+      this._accumulatedAncestryNameWithUpdateInfoStringJoint = tempString;
     //}
 
     return this._matrixAccumulatedAncestry.clone();

@@ -9,10 +9,9 @@ import Vector3 from '../../../low_level/math/Vector3';
 export default class M_DirectionalLight extends M_AbstractLight {
 
   /**
-   * [en] The constructor of DirectionalLight class. <br>
-   * [ja] DirectionalLightクラスのコンストラクタ
-   * @param {Vector4} intensity [en] intensity as Vector4 Color [ja] Vector4による色情報で指定する光の強度
-   * @param {Vector4} direction [en] the light (traveling) direction [ja] 光が向かう方向
+   * The constructor of DirectionalLight class. 
+   * @param {Vector4} intensity intensity as Vector4 Color
+   * @param {Vector4} direction the light (traveling) direction
    */
   constructor(glBoostContext, intensity, direction, length = 1.0) {
     super(glBoostContext);
