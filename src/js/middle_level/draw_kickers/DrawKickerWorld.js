@@ -99,12 +99,10 @@ export default class DrawKickerWorld {
       if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-          let cameraPos = new Vector4(0, 0, 0, 1);
+          let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
             cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
           //  console.log(cameraPos);
-          } else {
-            let cameraPos = new Vector4(0, 0, 1, 1);
           }
           material._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
         }
@@ -132,17 +130,12 @@ export default class DrawKickerWorld {
 
       let isMaterialSetupDone = true;
 
-      //if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerWorld._lastMaterialUpdateStateString || DrawKickerWorld._lastRenderPassIndex !== renderPassIndex) {
       {
         let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-      //} else {
-//        debugger;
-      //}
 
         material.setUpStates();
 
-//        this._setUpOrTearDownTextures(false, material);
         this._setUpOrTearDownTextures(true, material);
       }
 
