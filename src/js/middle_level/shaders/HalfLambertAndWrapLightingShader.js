@@ -1,13 +1,18 @@
+import Shader from '../../low_level/shaders/Shader';
 import DecalShader from './DecalShader';
 import Vector3 from '../../low_level/math/Vector3';
 
 export class HalfLambertAndWrapLightingShaderSource {
 
   FSDefine_HalfLambertAndWrapLightingShaderSource(in_, f, lights) {
+    var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec3 wrap;\n`;
-
+    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
+    shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
+    shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
+    shaderText += `${in_} vec4 temp[1];\n`;
     return shaderText;
   }
 
@@ -17,16 +22,19 @@ export class HalfLambertAndWrapLightingShaderSource {
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     shaderText += '  vec3 normal = normalize(v_normal);\n';
-
-    shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-    shaderText += '    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n';
-    shaderText += '    float halfLambert = max(dot(light, normal), 0.0)*0.5+0.5;\n';
-    shaderText += '    float diffuse = halfLambert*halfLambert;\n';
-    shaderText += '    vec3 diffuseVec = vec3(diffuse, diffuse, diffuse);\n';
-    shaderText += '    diffuseVec = (diffuseVec+wrap) / (1.0 + wrap);\n';
-    shaderText += '    rt0 += Kd * lightDiffuse[i] * vec4(diffuseVec, 1.0) * surfaceColor;\n';
-    shaderText += '  }\n';
+    for (let i=0; i<lights.length; i++) {
+      let isShadowEnabledAsTexture = (lights[i].camera && lights[i].camera.texture) ? true:false;
+      shaderText += '  {\n';
+      // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+      shaderText += `    vec3 lightDirection = normalize(v_lightDirection[${i}]);\n`;
+      shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
+      shaderText += '    float diffuse = max(dot(lightDirection, normal), 0.0)*0.5+0.5;\n';
+      shaderText += '    diffuse *= diffuse;\n';
+      shaderText += '    vec3 diffuseVec = vec3(diffuse, diffuse, diffuse);\n';
+      shaderText += '    diffuseVec = (diffuseVec+wrap) / (1.0 + wrap);\n';  
+      shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuseVec, 1.0) * surfaceColor;\n`;
+      shaderText += '  }\n';
+    }
 
     return shaderText;
   }
