@@ -56,7 +56,8 @@ export class WireframeShaderSource {
     let shaderText = '';
 
     shaderText += 'bool isWireframeInner = false;\n';
-
+    shaderText += 'float wireframeWidthRelativeScale = 1.0;\n';
+    
     return shaderText;
   }
 
