@@ -1,8 +1,7 @@
 import M_Element from '../M_Element';
 
 /**
- * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
- * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+ * This is the abstract class for all lights classes. Don't use this class directly.<br>
  */
 export default class M_AbstractLight extends M_Element {
   constructor(glBoostContext) {
