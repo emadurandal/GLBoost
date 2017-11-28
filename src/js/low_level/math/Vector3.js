@@ -134,7 +134,7 @@ export default class Vector3 {
   }
 
   /**
-   * 加算
+   * add value
    */
   add(v) {
     this.x += v.x;
@@ -145,7 +145,7 @@ export default class Vector3 {
   }
 
   /**
-   * 加算（static版）
+   * add value（static version）
    */
   static add(lv, rv) {
     return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
