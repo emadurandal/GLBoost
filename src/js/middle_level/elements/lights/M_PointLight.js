@@ -14,7 +14,9 @@ export default class M_PointLight extends M_AbstractLight {
     super(glBoostContext);
 
     this._intensity = intensity;
-
+    
+    this._isLightType = 'point';
+    
   }
 
   set intensity(vec) {
