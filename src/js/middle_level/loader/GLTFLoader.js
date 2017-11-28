@@ -369,7 +369,11 @@ export default class GLTFLoader {
           const lightStr = nodeJson.extensions.KHR_materials_common.light
           const lightJson = json.extensions.KHR_materials_common.lights[lightStr];
           let light = null;
-          if (lightJson.type === 'point') {
+          if (lightJson.type === 'ambient') {
+            let color = lightJson.ambient.color;
+            light = glBoostContext.createAmbientLight(new Vector3(color[0], color[1], color[2]));
+            group.addChild(light);
+          } else if (lightJson.type === 'point') {
             let color = lightJson.point.color;
             light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
             group.addChild(light);
