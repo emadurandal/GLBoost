@@ -8,10 +8,12 @@ export default class VertexWorldShadowShaderSource {
     var shaderText =   '';
     let textureUnitIndex = 0;
     //for (let i=0; i<lights.length; i++) {
-      //if (lights[i].camera && lights[i].camera.texture) {
+    //if (lights[i].camera && lights[i].camera.texture) {
 
-    shaderText +=      `uniform mat4 depthPVMatrix[${lights.length}];\n`;
-    shaderText +=       `${out_} vec4 v_shadowCoord[${lights.length}];\n`;
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
+        
+    shaderText +=      `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    shaderText +=       `${out_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
 
     return shaderText;
   }
@@ -27,8 +29,8 @@ export default class VertexWorldShadowShaderSource {
       0.5, 0.5, 0.5, 1.0
     );\n`;
 
-
-    for (let i=0; i<lights.length; i++) {
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});            
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
       shaderText += `  { // ${i}\n`;
       if (GLBoost.isThisGLVersion_2(gl)) {
         shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
@@ -46,7 +48,8 @@ export default class VertexWorldShadowShaderSource {
     let shaderText = '';
 
     shaderText += 'uniform float depthBias;\n';
-    shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
+    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
 
     return shaderText;
   }
@@ -89,11 +92,14 @@ export default class VertexWorldShadowShaderSource {
       material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
       material._semanticsDic['PROJECTION'] = 'projectionMatrix';
     }
-    
-    for (let i=0; i<lights.length; i++) {
+
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
+      let light = lightsExceptAmbient[i];
+      
       material.setUniform(shaderProgram, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
-      if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
+      if (light.camera && light.camera.texture) {// && light.isCastingShadow) {
 
         // depthTexture
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
