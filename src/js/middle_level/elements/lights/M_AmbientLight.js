@@ -1,9 +1,9 @@
 import M_AbstractLight from './M_AbstractLight';
 
 /**
- * This is a Point Light class.
+ * This is a Ambient Light class.
  */
-export default class M_PointLight extends M_AbstractLight {
+export default class M_AmbientLight extends M_AbstractLight {
 
   /**
    * The constructor of PointLight class.
@@ -14,9 +14,7 @@ export default class M_PointLight extends M_AbstractLight {
     super(glBoostContext);
 
     this._intensity = intensity;
-    
-    this._isLightType = 'point';
-    
+    this._isLightType = 'ambient';
   }
 
   set intensity(vec) {

@@ -33,6 +33,70 @@ export default class Vector4 {
     return new Vector3(this.x, this.y, this.z);
   }
 
+  /**
+   * add value
+   */
+  add(v) {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+    this.w += v.w;
+    
+    return this;
+  }
+
+  /**
+   * add value（static version）
+   */
+  static add(lv, rv) {
+    return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
+  }
+
+  /**
+   * add value except w component
+   */
+  addWithOutW(v) {
+    this.x += v.x;
+    this.y += v.y;
+    this.z += v.z;
+    
+    return this;
+  }
+
+  /**
+   * add value except w component（static version）
+   */
+  static addWithOutW(lv, rv) {
+    return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
+  }
+
+  multiply(val) {
+    this.x *= val;
+    this.y *= val;
+    this.z *= val;
+    this.w *= val;
+    
+    return this;
+  }
+
+  multiplyVector(vec) {
+    this.x *= vec.x;
+    this.y *= vec.y;
+    this.z *= vec.z;
+    this.w *= vec.w;
+    
+    return this;
+  }
+
+  static multiply(vec4, val) {
+    return new Vector4(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
+  }
+
+  static multiplyVector(vec4, vec) {
+    return new Vector4(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
+  }
+
+
   divide(val) {
     console.assert(val != 0, "0 division!");
     this.x /= val;

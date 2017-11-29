@@ -13,6 +13,7 @@ import M_FrustumCamera from '../elements/cameras/M_FrustumCamera';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import M_PointLight from '../elements/lights/M_PointLight';
+import M_AmbientLight from '../elements/lights/M_AmbientLight';
 import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
@@ -88,6 +89,10 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
 
   createPointLight(intensity) {
     return new M_PointLight(this, intensity);
+  }
+
+  createAmbientLight(intensity) {
+    return new M_AmbientLight(this, intensity);
   }
 
   createJoint() {

@@ -23,7 +23,8 @@ export default class M_DirectionalLight extends M_AbstractLight {
     this._gizmos.push(this._gizmo);
 
     //this._gizmo._mesh.masterElement = this._gizmo;
-
+    this._isLightType = 'directional';
+    
   }
 
   set multiplyMatrixGizmo(mat4) {

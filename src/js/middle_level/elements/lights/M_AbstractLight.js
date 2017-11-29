@@ -14,6 +14,7 @@ export default class M_AbstractLight extends M_Element {
     this._gl = this._glContext.gl;
 
     this._isCastingShadow = true;
+    this._isLightType = '';
   }
 
   prepareToRender() {
@@ -30,6 +31,22 @@ export default class M_AbstractLight extends M_Element {
 
   get isCastingShadow() {
     return this._isCastingShadow;
+  }
+
+  get lightType() {
+    return this._isLightType;
+  }
+
+  isTypeAmbient() {
+    return this._isLightType === 'ambient';
+  }
+
+  isTypeDirectional() {
+    return this._isLightType === 'directional';
+  }
+
+  isTypePoint() {
+    return this._isLightType === 'point';
   }
 
 }

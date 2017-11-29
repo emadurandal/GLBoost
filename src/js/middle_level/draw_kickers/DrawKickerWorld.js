@@ -98,6 +98,8 @@ export default class DrawKickerWorld {
 
       if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
+        let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
+        
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
@@ -107,23 +109,24 @@ export default class DrawKickerWorld {
           material._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
         }
 
-        for (let j = 0; j < lights.length; j++) {
+        for (let j = 0; j < lightsExceptAmbient.length; j++) {
+          let light = lightsExceptAmbient[j];
           if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
             let lightVec = null;
             let isPointLight = -9999;
-            if (lights[j] instanceof M_PointLight) {
+            if (light instanceof M_PointLight) {
               lightVec = new Vector4(0, 0, 0, 1);
-              lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+              lightVec = light.transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
               isPointLight = 1.0;
-            } else if (lights[j].className === 'M_DirectionalLight') {
-              lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
-              lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
+            } else if (light.className === 'M_DirectionalLight') {
+              lightVec = new Vector4(-light.direction.x, -light.direction.y, -light.direction.z, 1);
+              lightVec = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
               isPointLight = 0.0;
             }
 
             material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight, true);
-            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), light.intensity.x, light.intensity.y, light.intensity.z, 1.0, true);
           }
         }
       }
@@ -140,8 +143,9 @@ export default class DrawKickerWorld {
       }
 
 
-
-      this._setupOtherTextures(lights);
+      let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
+      
+      this._setupOtherTextures(lightsExceptAmbient);
 
       if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
@@ -155,7 +159,7 @@ export default class DrawKickerWorld {
 
       material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
 
-      this._tearDownOtherTextures(lights);
+      this._tearDownOtherTextures(lightsExceptAmbient);
 
       material.tearDownStates();
 

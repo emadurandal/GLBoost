@@ -30,9 +30,10 @@ export default class VertexWorldShaderSource {
     }
 
     // for Lighting
-    if(lights.length > 0) {
-      shaderText += `uniform vec4 lightPosition_world[${lights.length}];\n`;
-      shaderText += `${out_} vec3 v_lightDirection[${lights.length}];\n`;
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
+    if(lightNumExceptAmbient > 0) {
+      shaderText += `uniform vec4 lightPosition_world[${lightNumExceptAmbient}];\n`;
+      shaderText += `${out_} vec3 v_lightDirection[${lightNumExceptAmbient}];\n`;
     }
 
     // for Unfold UV
@@ -117,7 +118,8 @@ export default class VertexWorldShaderSource {
     shaderText += `  vec3 lightDirection_tangent;\n`;
     shaderText += `  vec3 lightDirection_world;\n`;
 
-    for (let i=0; i<lights.length; i++) {
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
       // if PointLight: lightPosition_world[i].w === 1.0      if DirectionalLight: lightPosition_world[i].w === 0.0
       shaderText += `  lightDirection_world = normalize(lightPosition_world[${i}].xyz - position_world.xyz * lightPosition_world[${i}].w);\n`;
       shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
@@ -157,9 +159,10 @@ export default class VertexWorldShaderSource {
 
     shaderText += `${in_} vec3 v_viewDirection;\n`;
 
-    if(lights.length > 0) {
-      shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
-      shaderText += `${in_} vec3 v_lightDirection[${lights.length}];\n`;
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
+    if(lightNumExceptAmbient > 0) {
+      shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec3 v_lightDirection[${lightNumExceptAmbient}];\n`;
     }
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
@@ -206,7 +209,8 @@ export default class VertexWorldShaderSource {
 
     material.setUniform(shaderProgram, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition_world'));
 
-    for(let i=0; i<lights.length; i++) {
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
+    for(let i=0; i<lightsExceptAmbient.length; i++) {
       material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
       material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
     }
