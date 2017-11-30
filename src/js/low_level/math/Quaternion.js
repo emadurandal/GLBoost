@@ -134,14 +134,29 @@ export default class Quaternion {
     return this;
   }
 
-  multiply(val) {
-    this.x *= val;
-    this.y *= val;
-    this.z *= val;
-    this.w *= val;
-
+  multiply(q) {
+    let result = new Quaternion(0, 0, 0, 1);
+    result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
+    result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
+    result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
+    result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+    this.x = result.x;
+    this.y = result.y;
+    this.z = result.z;
+    this.w = result.w;
+    
     return this;
   }
+
+  static multiply(q1, q2) {
+    let result = new Quaternion(0, 0, 0, 1);
+    result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
+    result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
+    result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
+    result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+    return result;
+  }
+
 }
 
 GLBoost["Quaternion"] = Quaternion;
