@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_Element from '../M_Element';
 import M_JointGizmo from '../gizmos/M_JointGizmo';
 import Vector3 from '../../../low_level/math/Vector3';
@@ -124,3 +125,5 @@ export default class M_Joint extends M_Element {
   }
 
 }
+
+GLBoost['M_Joint'] = M_Joint;
