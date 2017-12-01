@@ -16,6 +16,11 @@ export default class GLBoostObject {
     this._userFlavorName = '';
     this._readyForDiscard = false;
 
+    // generate the simple class-specific number.
+    this._classUniqueNumber = 0;
+    for(let i=0; i<this.className.length; i++) {
+      this._classUniqueNumber += this.className.charCodeAt(i);
+    }
   }
 
   _setName() {
@@ -33,6 +38,13 @@ export default class GLBoostObject {
    */
   toString() {
     return this._instanceName;
+  }
+
+  /**
+   * Return the simple class-specific number.
+   */
+  get classUniqueNumber() {
+    return this._classUniqueNumber;
   }
 
   get className() {
