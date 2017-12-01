@@ -1,6 +1,6 @@
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
-import Geometry from '../low_level/geometries/Geometry';
 import GLBoostObject from '../low_level/core/GLBoostObject';
+import M_SkeletalMesh from './elements/meshes/M_SkeletalMesh';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -19,9 +19,36 @@ export default class Renderer extends GLBoostObject {
   }
 
   /**
-   * en: draw elements of the scene.<br>
+   * en: update things of elements of the expression.<br>
+   * @param {Expression} expression a instance of Expression class
+   */
+  update(expression) {
+    
+    let skeletalMeshes = [];
+    // gather scenes as unique
+    for (let renderPass of expression.renderPasses) {
+      skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
+    }
+
+    let unique = function(array) {
+      return array.reduce(function(a, b) {
+        if (a.instanceName !== b.instanceName) {
+          a.push(b);
+        }
+        return a;
+      }, []);
+    };
+    skeletalMeshes = unique(skeletalMeshes);
+    
+    for (let mesh of skeletalMeshes) {
+      mesh.geometry.update(mesh);
+    }
+  }
+
+  /**
+   * en: draw elements of the expression.<br>
    * ja: sceneが持つオブジェクトを描画します
-   * @param {Scene} scene a instance of Scene class
+   * @param {Expression} expression a instance of Expression class
    */
   draw(expression) {
     let renderPassTag = '';

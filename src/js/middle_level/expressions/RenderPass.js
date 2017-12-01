@@ -408,6 +408,14 @@ export default class RenderPass extends GLBoostObject {
       }
     });
 
+    this._skeletalMeshes = [];    
+    this._meshes.forEach((mesh)=>{
+      if (mesh.instanceName.indexOf('SkeletalMesh') !== -1) {
+        this._skeletalMeshes.push(mesh);
+      }
+    });
+      
+
     if (this._scene) {
       this._scene.prepareToRender(expression);
     }
