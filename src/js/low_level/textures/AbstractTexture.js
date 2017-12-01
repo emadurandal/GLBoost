@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import GLContext from '../core/GLContext';
 import GLBoostObject from '../core/GLBoostObject';
+import Vector4 from '../math/Vector4';
 
 /**
  * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -22,6 +23,9 @@ export default class AbstractTexture extends GLBoostObject {
     }
 
     this._textureUnitIndex = 0;
+
+    // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
+    this._uvTransform = new Vector4(1, 1, 0, 0);
   }
 
   /**
@@ -149,4 +153,13 @@ export default class AbstractTexture extends GLBoostObject {
 
     super.readyForDiscard();
   }
+
+  get uvTransform() {
+    return this._uvTransform;
+  }
+
+  set uvTransform(vec4) {
+    this._uvTransform = vec4;
+  }
+
 }
