@@ -13,9 +13,101 @@ export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
     super(glBoostContext);
 
+    this._jointMatrices = null;
+  }
+
+  update(skeletalMesh) {
+    /*
+    if (skeletalMesh.isNeedlessUpdate()) {
+      return;
+    }
+*/
+    var joints = skeletalMesh._joints;
+    var matrices = [];
+
+    let areThereAnyJointsWhichHaveAnimation = false;
+
+    for (let i=0; i<joints.length; i++) {
+      if (typeof joints[i].parent._getCurrentAnimationInputValue(joints[i].parent._activeAnimationLineName) !== 'undefined') {
+        areThereAnyJointsWhichHaveAnimation = true;
+      }
+    }
+
+    for (let i=0; i<joints.length; i++) {
+      let globalJointTransform = null;
+      let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
+      if (areThereAnyJointsWhichHaveAnimation) {
+        globalJointTransform = joints[i].transformMatrixAccumulatedAncestryForJoints;
+      } else {
+        globalJointTransform = skeletalMesh.transformMatrixAccumulatedAncestry;
+        let inverseMat = Matrix44.multiply(Matrix44.invert(skeletalMesh.bindShapeMatrix), Matrix44.invert(inverseBindMatrix));
+        globalJointTransform = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, inverseMat);
+      }
+      if (this._materialForSkeletal.shaderInstance.constructor === FreeShader) {
+        matrices[i] = Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry);
+      } else {
+        matrices[i] = Matrix44.identity();
+      }
+      matrices[i] = Matrix44.multiply(matrices[i], globalJointTransform);
+      joints[i].jointPoseMatrix = Matrix44.multiply(Matrix44.identity(), globalJointTransform);
+      matrices[i] = Matrix44.multiply(matrices[i], inverseBindMatrix);
+      matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+    }
+
+    for (let i=0; i<joints.length; i++) {
+
+      let backOfJointMatrix = Matrix44.identity();
+      let tipOfJointMatrix = null;
+
+
+      tipOfJointMatrix = joints[i].jointPoseMatrix;
+      if (i > 0) {
+        let backOfJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 1];
+        if (backOfJoint) {
+          backOfJointMatrix = backOfJoint.jointPoseMatrix;
+        } else {
+          joints[i].isVisible = false;
+        }
+      } else {
+        backOfJointMatrix = joints[0].transformMatrixAccumulatedAncestryForJoints;
+      }
+
+
+      let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+
+      joints[i].worldPositionOfThisJoint = tipOfJointPos.clone();
+      joints[i].worldPositionOfParentJoint = backOfJointPos.clone();
+
+
+      joints[i].updateGizmoDisplay();
+    }
+
+    let flatMatrices = [];
+    for (let i=0; i<matrices.length; i++) {
+      Array.prototype.push.apply(flatMatrices, matrices[i].flattenAsArray());
+    }
+
+    if (matrices.length < 4) {
+      let identityMatrices = [];
+      for (let i=0; i<(4 - matrices.length); i++) {
+        Array.prototype.push.apply(identityMatrices,
+          [1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1]
+        );
+      }
+      Array.prototype.push.apply(flatMatrices, identityMatrices);
+    }
+
+    this._jointMatrices = flatMatrices;
   }
 
   draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
+    if (this._jointMatrices === null) {
+      return;
+    }
     var gl = this._glContext.gl;
     if (this._materials.length > 0) {
       var materials = this._materials;
@@ -24,6 +116,9 @@ export default class M_SkeletalGeometry extends Geometry {
     } else {
       var materials = [];
     }
+
+
+    /*
 
     var joints = skeletalMesh._joints;
     var matrices = [];
@@ -103,11 +198,14 @@ export default class M_SkeletalGeometry extends Geometry {
       }
       Array.prototype.push.apply(flatMatrices, identityMatrices);
     }
+*/
 
     for (let i=0; i<materials.length;i++) {
       var glslProgram = materials[i].shaderInstance.glslProgram;
       this._glContext.useProgram(glslProgram);
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
+//      Shader.trySettingMatrix44ToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(flatMatrices));
+      
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(this._jointMatrices));
     }
 
     super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
