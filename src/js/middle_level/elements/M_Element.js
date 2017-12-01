@@ -15,11 +15,11 @@ export default class M_Element extends L_Element {
     this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
     this._calculatedInverseMatrix = false;
     this._updateCountAsElement = 0;
-    this._accumulatedAncestryNameWithUpdateInfoString = '';
-    this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf = '';    
-    this._accumulatedAncestryNameWithUpdateInfoStringNormal = '';
-    this._accumulatedAncestryNameWithUpdateInfoStringInv = '';
-    this._accumulatedAncestryNameWithUpdateInfoStringJoint = '';
+    this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
+    this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
+    this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
+    this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
+    this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
     this._animationLine = {};
     this._transparentByUser = false;
     this._opacity = 1.0;
@@ -410,9 +410,9 @@ export default class M_Element extends L_Element {
 
   _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
     if (currentElem._parent === null) {
-      return currentElem.toStringWithUpdateInfo();
+      return currentElem.elementUpdateNumber;
     } else {
-      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.toStringWithUpdateInfo();
+      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
     }
   }
 
@@ -449,34 +449,34 @@ export default class M_Element extends L_Element {
   }
 
   get _transformMatrixAccumulatedAncestry() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempNumber);
+    if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || typeof this._matrixAccumulatedAncestry === 'undefined') {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
-      this._accumulatedAncestryNameWithUpdateInfoString = tempString;
+      this._accumulatedAncestryObjectUpdateNumber = tempNumber;
     }
 
     return this._matrixAccumulatedAncestry.clone();
   }
 
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
+    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempNumber);
+    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._matrixAccumulatedAncestry === 'undefined') {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, false);
-      this._accumulatedAncestryNameWithUpdateInfoStringWithoutMySelf = tempString;
+      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
     return this._matrixAccumulatedAncestry.clone();
   }
 
   get normalMatrixAccumulatedAncestry() {
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoStringNormal !== tempString || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempNumber);
+    if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
       let world_m = this._multiplyMyAndParentTransformMatrices(this, true);
       this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
-      this._accumulatedAncestryNameWithUpdateInfoStringNormal = tempString;
+      this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
     }
 
     return this._normalMatrixAccumulatedAncestry.clone();
@@ -488,11 +488,11 @@ export default class M_Element extends L_Element {
       return Matrix44.identity();
     }
 
-    var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    if (this._accumulatedAncestryNameWithUpdateInfoStringInv !== tempString || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
+    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    //console.log(tempNumber);
+    if (this._accumulatedAncestryObjectUpdateNumberInv !== tempNumber || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
       this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-      this._accumulatedAncestryNameWithUpdateInfoStringInv = tempString;
+      this._accumulatedAncestryObjectUpdateNumberInv = tempNumber;
     }
 
     return this._invMatrixAccumulatedAncestry.clone();
@@ -573,6 +573,10 @@ export default class M_Element extends L_Element {
     return this._parent;
   }
 
+  get elementUpdateNumber() {
+    return this.classUniqueNumber + this._updateCountAsElement;
+  }
+
   // used by library (not Application)
   toStringWithUpdateInfo() {
     //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
@@ -643,9 +647,9 @@ export default class M_Element extends L_Element {
     instance._matrixGetMode = this._matrixGetMode;
     instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
     instance._updateCountAsElement = this._updateCountAsElement;
-    instance._accumulatedAncestryNameWithUpdateInfoString = this._accumulatedAncestryNameWithUpdateInfoString;
-    instance._accumulatedAncestryNameWithUpdateInfoStringNormal = this._accumulatedAncestryNameWithUpdateInfoStringNormal;
-    instance._accumulatedAncestryNameWithUpdateInfoStringInv = this._accumulatedAncestryNameWithUpdateInfoStringInv;
+    instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
+    instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
+    instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
     instance._animationLine = {};
 
     for (let lineName in this._animationLine) {
@@ -817,14 +821,14 @@ export default class M_Element extends L_Element {
   getTransformMatrixAccumulatedAncestryForJointsAt(inputValue) {
     let input = inputValue;
 
-    let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempString);
-    //if (this._accumulatedAncestryNameWithUpdateInfoStringJoint !== tempString || typeof this._matrixAccumulatedAncestry === 'undefined') {
-      this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-      this._accumulatedAncestryNameWithUpdateInfoStringJoint = tempString;
-    //}
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
-    return this._matrixAccumulatedAncestry.clone();
+    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
+      this._matrixAccumulatedAncestryJoint = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
+      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
+    }
+
+    return this._matrixAccumulatedAncestryJoint.clone();
   }
 
   _multiplyMyAndParentTransformMatricesForJoints(withMySelf, inputValue) {
@@ -848,13 +852,13 @@ export default class M_Element extends L_Element {
         currentMatrix = this.getRotateTranslateAt(input);
       }
 
-      let tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
       if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempString ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempNumber ||
         this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
       {
           this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, inputValue), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempString;
+          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
       }
       return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
