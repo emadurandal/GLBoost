@@ -223,6 +223,19 @@ export default class SPVGLTFLoader {
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT
       });
+      let uvTransform = new Vector4(1, 1, 0, 0);
+      if (samplerJson.extras && samplerJson.extras.scale) {
+        let scale = samplerJson.extras.scale;
+        uvTransform.x = scale[0];
+        uvTransform.y = scale[1];
+      }
+      if (samplerJson.extras && samplerJson.extras.translation) {
+        let translation = samplerJson.extras.translation;
+        uvTransform.z = translation[0];
+        uvTransform.w = translation[1];
+      }
+      texture.uvTransform = uvTransform;
+
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
       promisesToLoadResources.push(promise);

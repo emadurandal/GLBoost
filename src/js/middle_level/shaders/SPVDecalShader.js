@@ -59,7 +59,8 @@ export class SPVDecalShaderSource {
     shaderText += 'uniform vec4 splitControlParameter;\n';
     shaderText += 'uniform bool isColorAberration;\n';
     shaderText += 'uniform bool isVignette;\n';
-
+    shaderText += 'uniform vec4 uvTransform;\n';
+    
     return shaderText;
   }
 
@@ -90,18 +91,19 @@ export class SPVDecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+      shaderText += `vec2 texcoordTransformed = texcoord * uvTransform.xy + uvTransform.zw;\n`;      
       shaderText += 'if (isColorAberration) {\n';
       shaderText += `  float offsetTexel = 3.0;\n`;
-      shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoord.x - offsetTexel/splitParameter.x, texcoord.y));\n`;
+      shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
       shaderText += `  leftDecal = leftDecal * vec4(1.0, 0.0, 0.0, 1.0);\n`;
-      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, vec2(texcoord.x, texcoord.y));\n`;
+      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, texcoordTransformed * uvTransform.xy + uvTransform.zw);\n`;
       shaderText += `  centerDecal = centerDecal * vec4(0.0, 1.0, 0.0, 1.0);\n`;
-      shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoord.x + offsetTexel/splitParameter.x, texcoord.y));\n`;
+      shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x + offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
       shaderText += `  rightDecal = rightDecal * vec4(0.0, 0.0, 1.0, 1.0);\n`;
       shaderText += `  vec4 decalAberration = leftDecal + centerDecal - (leftDecal * centerDecal);\n`;
       shaderText += `  rt0 *= decalAberration + rightDecal - (decalAberration * rightDecal);\n`;
       shaderText += '} else {\n';
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
+      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoordTransformed) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
       shaderText += '}\n';
 
       shaderText += 'rt0 = rt0 * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
@@ -220,6 +222,9 @@ export class SPVDecalShaderSource {
     // set texture unit 0 to the decal texture sampler
     this._glContext.uniform1i( uTexture, 0, true);
 
+    let uvTransform = this._glContext.getUniformLocation(shaderProgram, 'uvTransform');
+    material.setUniform(shaderProgram, 'uniform_uvTransform', uvTransform);
+
     material._semanticsDic['TEXTURE'] = [];
 
     material.uniformTextureSamplerDic['uTexture'] = {};
@@ -266,10 +271,13 @@ export default class SPVDecalShader extends WireframeShader {
     var texture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
 
     var rateVec4 = new Vector4(1, 1, 1, 1);
+    let uvTransform = this._glBoostContext.defaultDummyTexture.uvTransform;
     if (texture) {
       rateVec4 = material.getTextureContributionRate(texture.userFlavorName);
+      uvTransform = texture.uvTransform;
     }
-
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_uvTransform'), uvTransform.x, uvTransform.y, uvTransform.z, uvTransform.w, true);
+    
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_textureContributionRate'), rateVec4.x, rateVec4.y, rateVec4.z, rateVec4.w, true);
 
     /*
