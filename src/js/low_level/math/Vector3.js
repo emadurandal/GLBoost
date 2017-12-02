@@ -245,6 +245,14 @@ export default class Vector3 {
   toString() {
     return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
   }
+
+  at(i) {
+    switch (i%3) {
+    case 0: return this.x;
+    case 1: return this.y;
+    case 2: return this.z;
+    }
+  }
 }
 
 GLBoost['Vector3'] = Vector3;
