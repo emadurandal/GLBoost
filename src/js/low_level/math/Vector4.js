@@ -124,6 +124,15 @@ export default class Vector4 {
   static divideVector(lvec4, rvec4) {
     return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
   }
+
+  at(i) {
+    switch (i%4) {
+    case 0: return this.x;
+    case 1: return this.y;
+    case 2: return this.z;
+    case 3: return this.w;
+    }
+  }
 }
 
 GLBoost["Vector4"] = Vector4;

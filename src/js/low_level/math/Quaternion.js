@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import Matrix44 from './Matrix44';
 import Vector3 from './Vector3';
+import Vector4 from './Vector4';
 import MathUtil from './MathUtil';
 
 export default class Quaternion {
@@ -157,6 +158,70 @@ export default class Quaternion {
     return result;
   }
 
+  static quaternionFromRotationMatrix(m) {
+    // find biggest element
+    let elem = new Vector4();
+    elem.x = m.m11 - m.m22 - m.m33 + 1.0;
+    elem.y = -m.m11 + m.m22 - m.m33 + 1.0;
+    elem.z = -m.m11 - m.m22 + m.m33 + 1.0;
+    elem.w = m.m11 + m.m22 + m.m33 + 1.0;
+
+    let biggestIndex = 0;
+    for ( let i = 1; i < 4; i++ ) {
+      if ( elem.at(i) > elem.at(biggestIndex) ) {
+        biggestIndex = i;
+      }
+    }
+
+    // calc biggest element
+    let q = new Quaternion();
+    let v = Math.sqrt( elem.at(biggestIndex) ) * 0.5;
+    q.setAt(biggestIndex, v);
+    let mult = 0.25 / v;
+
+    switch ( biggestIndex ) {
+    case 0:
+      q.setAt(1, (m.m12 + m.m21) * mult);
+      q.setAt(2, (m.m31 + m.m13) * mult);
+      q.setAt(3, (m.m23 - m.m32) * mult);
+      break;
+    case 1:
+      q.setAt(0, (m.m12 + m.m21) * mult);
+      q.setAt(2, (m.m23 + m.m32) * mult);
+      q.setAt(3, (m.m31 - m.m13) * mult);
+      break;
+    case 2:
+      q.setAt(0, (m.m31 + m.m13) * mult);
+      q.setAt(1, (m.m23 + m.m32) * mult);
+      q.setAt(3, (m.m12 - m.m21) * mult);
+      break;
+    case 3:
+      q.setAt(0, (m.m23 - m.m32) * mult);
+      q.setAt(1, (m.m31 - m.m13) * mult);
+      q.setAt(2, (m.m12 - m.m21) * mult);
+      break;
+    }
+
+    return true;
+  }
+
+  at(i) {
+    switch (i%4) {
+    case 0: return this.x;
+    case 1: return this.y;
+    case 2: return this.z;
+    case 3: return this.w;
+    }
+  }
+
+  setAt(i, val) {
+    switch (i%4) {
+    case 0: this.x = val; break;
+    case 1: this.y = val; break;
+    case 2: this.z = val; break;
+    case 3: this.w = val; break;
+    }
+  }
 }
 
 GLBoost["Quaternion"] = Quaternion;
