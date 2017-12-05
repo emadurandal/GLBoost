@@ -51,6 +51,68 @@ export default class SkeletalShaderSource {
         a31 * b05 - a32 * b04 + a33 * b03, a32 * b02 - a30 * b05 - a33 * b01, a30 * b04 - a31 * b02 + a33 * b00) / determinantVal;
     }
 
+    mat4 transpose(mat4 m) {
+      return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
+                  m[0][1], m[1][1], m[2][1], m[3][1],
+                  m[0][2], m[1][2], m[2][2], m[3][2],
+                  m[0][3], m[1][3], m[2][3], m[3][3]);
+    }
+
+    mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
+      vec4 q = quaternion;
+      vec3 t = translation;
+
+      float sx = q.x * q.x;
+      float sy = q.y * q.y;
+      float sz = q.z * q.z;
+      float cx = q.y * q.z;
+      float cy = q.x * q.z;
+      float cz = q.x * q.y;
+      float wx = q.w * q.x;
+      float wy = q.w * q.y;
+      float wz = q.w * q.z;
+
+      return mat4(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
+        2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
+        2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        t.x, t.y, t.z, 1.0
+      );
+    }
+
+    vec4 unpackedVec2ToNormalizedVec4(vec2 vec_xy, float criteria){
+
+      float r;
+      float g;
+      float b;
+      float a;
+      
+      float ix = floor(vec_xy.x * criteria);
+      float v1x = ix / criteria;
+      float v1y = ix - floor(v1x) * criteria;
+  
+      r = ( v1x + 1.0 ) / (criteria-1.0);
+      g = ( v1y + 1.0 ) / (criteria-1.0);
+  
+      float iy = floor( vec_xy.y * criteria);
+      float v2x = iy / criteria;
+      float v2y = iy - floor(v2x) * criteria;
+  
+      b = ( v2x + 1.0 ) / (criteria-1.0);
+      a = ( v2y + 1.0 ) / (criteria-1.0);
+  
+      r -= 1.0/criteria;
+      g -= 1.0/criteria;
+      b -= 1.0/criteria;
+      a -= 1.0/criteria;
+        
+      r = r*2.0-1.0;
+      g = g*2.0-1.0;
+      b = b*2.0-1.0;
+      a = a*2.0-1.0;
+  
+      return vec4(r, g, b, a);
+    }
     `;
 
     return shaderText;
@@ -124,7 +186,7 @@ export default class SkeletalShaderSource {
     */
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
+      shaderText += 'mat3 normalMatrix = toNormalMatrix(worldMatrix);\n';
       shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';

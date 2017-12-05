@@ -699,6 +699,50 @@ export default class Shader extends GLBoostObject {
     });
   }
 
+  static trySettingVec4ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  }  
+
+  static trySettingVec3ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  }  
+
+  static trySettingVec2ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform2fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform2fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  } 
 
   get glslProgram() {
     return this._glslProgram;

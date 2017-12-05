@@ -189,7 +189,7 @@ export default class Quaternion {
       q.z = 0.25 * S;
     }
 
-    return true;
+    return q;
   }
 
   at(i) {
@@ -209,6 +209,16 @@ export default class Quaternion {
     case 3: this.w = val; break;
     }
   }
+
+  normalize() {
+    let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+    this.x /= norm;
+    this.y /= norm;
+    this.z /= norm;
+    this.w /= norm;
+    return this;
+  }
+
 }
 
 GLBoost["Quaternion"] = Quaternion;
