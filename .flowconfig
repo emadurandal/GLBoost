@@ -1,0 +1,14 @@
+[ignore]
+.*/node_modules/stylelint/.*
+.*/node_modules/config-chain/test/.*
+.*/docs/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+
+[strict]
