@@ -232,7 +232,7 @@ export default class M_SkeletalGeometry extends Geometry {
   }
 
   draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
-    if (this._qtArray === null) {
+    if (this._jointMatrices === null && this._qtArray === null) {
       return;
     }
     var gl = this._glContext.gl;
