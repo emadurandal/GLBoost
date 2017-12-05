@@ -97,6 +97,12 @@ export default class Matrix44 {
     );
   }
 
+  putTranslate(vec) {
+    this.m03 = vec.x;
+    this.m13 = vec.y;
+    this.m23 = vec.z;
+  }
+
   getTranslate() {
     return new Vector3(this.m03, this.m13, this.m23);
   }
@@ -126,6 +132,14 @@ export default class Matrix44 {
       0, 0, vec.z, 0,
       0, 0, 0, 1
     );
+  }
+
+  addScale(vec) {
+    this.m00 *= vec.x;
+    this.m11 *= vec.y;
+    this.m22 *= vec.z;
+
+    return this;
   }
 
   /**
@@ -627,7 +641,13 @@ export default class Matrix44 {
       this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
   }
 
-
+  getScale() {
+    return new Vector3(
+      Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+      Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+      Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+    );
+  }
 }
 
 GLBoost["Matrix44"] = Matrix44;

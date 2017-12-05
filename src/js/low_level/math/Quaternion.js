@@ -159,47 +159,34 @@ export default class Quaternion {
   }
 
   static quaternionFromRotationMatrix(m) {
-    // find biggest element
-    let elem = new Vector4();
-    elem.x = m.m11 - m.m22 - m.m33 + 1.0;
-    elem.y = -m.m11 + m.m22 - m.m33 + 1.0;
-    elem.z = -m.m11 - m.m22 + m.m33 + 1.0;
-    elem.w = m.m11 + m.m22 + m.m33 + 1.0;
-
-    let biggestIndex = 0;
-    for ( let i = 1; i < 4; i++ ) {
-      if ( elem.at(i) > elem.at(biggestIndex) ) {
-        biggestIndex = i;
-      }
-    }
-
-    // calc biggest element
+    
     let q = new Quaternion();
-    let v = Math.sqrt( elem.at(biggestIndex) ) * 0.5;
-    q.setAt(biggestIndex, v);
-    let mult = 0.25 / v;
+    let tr = m.m00 + m.m11 + m.m22;
 
-    switch ( biggestIndex ) {
-    case 0:
-      q.setAt(1, (m.m12 + m.m21) * mult);
-      q.setAt(2, (m.m31 + m.m13) * mult);
-      q.setAt(3, (m.m23 - m.m32) * mult);
-      break;
-    case 1:
-      q.setAt(0, (m.m12 + m.m21) * mult);
-      q.setAt(2, (m.m23 + m.m32) * mult);
-      q.setAt(3, (m.m31 - m.m13) * mult);
-      break;
-    case 2:
-      q.setAt(0, (m.m31 + m.m13) * mult);
-      q.setAt(1, (m.m23 + m.m32) * mult);
-      q.setAt(3, (m.m12 - m.m21) * mult);
-      break;
-    case 3:
-      q.setAt(0, (m.m23 - m.m32) * mult);
-      q.setAt(1, (m.m31 - m.m13) * mult);
-      q.setAt(2, (m.m12 - m.m21) * mult);
-      break;
+    if (tr > 0) { 
+      let S = 0.5 / Math.sqrt(tr+1.0);
+      q.w = 0.25 / S;
+      q.x = (m.m21 - m.m12) * S;
+      q.y = (m.m02 - m.m20) * S; 
+      q.z = (m.m10 - m.m01) * S; 
+    } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
+      let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
+      q.w = (m.m21 - m.m12) / S;
+      q.x = 0.25 * S;
+      q.y = (m.m01 + m.m10) / S; 
+      q.z = (m.m02 + m.m20) / S; 
+    } else if (m.m11 > m.m22) { 
+      let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+      q.w = (m.m02 - m.m20) / S;
+      q.x = (m.m01 + m.m10) / S; 
+      q.y = 0.25 * S;
+      q.z = (m.m12 + m.m21) / S; 
+    } else { 
+      let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+      q.w = (m.m10 - m.m01) / S;
+      q.x = (m.m02 + m.m20) / S;
+      q.y = (m.m12 + m.m21) / S;
+      q.z = 0.25 * S;
     }
 
     return true;

@@ -480,6 +480,22 @@ export default class Matrix33 {
       0, 0, 0, 1
     );
   }
+
+  getScale() {
+    return new Vector3(
+      Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+      Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+      Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+    );
+  }
+
+  addScale(vec) {
+    this.m00 *= vec.x;
+    this.m11 *= vec.y;
+    this.m22 *= vec.z;
+
+    return this;
+  }
 }
 
 GLBoost['Matrix33'] = Matrix33;
