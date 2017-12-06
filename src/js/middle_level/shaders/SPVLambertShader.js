@@ -29,9 +29,10 @@ export class SPVLambertShaderSource {
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-      shaderText += `    vec3 lightDirection = normalize(v_lightDirection[${i}]);\n`;
+      shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
+      shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
       shaderText += `    vec4 enlighten = Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `    enlighten *= vec4(visibility, visibility, visibility, 1.0);\n`;
       shaderText += `    rt0 += enlighten;\n`;
