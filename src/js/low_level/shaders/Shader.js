@@ -623,24 +623,34 @@ export default class Shader extends GLBoostObject {
   _getNormalStr(gl, material, f) {
     let shaderText = '';
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
-    shaderText += '  vec3 normal_world = normal;\n';
-
-    if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
+    if (!normalTexture && Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += '  vec3 normal = normalize(v_normal_world);\n';
+      shaderText += '  vec3 normal_world = normal;\n';
+    } else if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
       if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
         shaderText += '  vec3 dx = dFdx(v_position_world);\n';
         shaderText += '  vec3 dy = dFdy(v_position_world);\n';
 
   //      shaderText += '  normal = dot(viewDirection_world, cross(dx, dy)) >= 0.0 ? normalize(cross(dx, dy)) : normalize(cross(dy, dx));\n';
-        shaderText += '  normal = normalize(cross(dx, dy));\n';
-        shaderText += '  normal_world = normal;\n';
+        shaderText += '  vec3 normal = normalize(cross(dx, dy));\n';
+        shaderText += '  vec3 normal_world = normal;\n';
       }
       //      shaderText += '  normal *= -1.0;\n';
     } else if (normalTexture && Shader._exist(f, GLBoost.TANGENT)) {
       let textureFunc = Shader._texture_func(gl);
-      shaderText += `  normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
-      //shaderText += `  normal.y = 1.0 - normal.x - normal.z;\n`;
-      shaderText += `  normal_world = normalize(v_normal_world);\n`;
+      shaderText += `  vec3 normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
+      shaderText += `  vec3 tangent_world = normalize(v_tangent_world);\n`;
+      shaderText += `  vec3 binormal_world = normalize(v_binormal_world);\n`;
+      shaderText += `  vec3 normal_world = normalize(v_normal_world);\n`;      
+
+      shaderText += `  mat3 tbnMat_tangent_to_world = mat3(
+        tangent_world.x, tangent_world.y, tangent_world.z,
+        binormal_world.x, binormal_world.y, binormal_world.z,
+        normal_world.x, normal_world.y, normal_world.z
+      );\n`;
+      
+      shaderText += `  normal = normalize(tbnMat_tangent_to_world * normal);\n`;
+      shaderText += `  normal_world = normal;\n`;
 
     }
 

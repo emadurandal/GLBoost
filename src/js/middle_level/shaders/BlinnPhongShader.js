@@ -16,16 +16,15 @@ export class BlinnPhongShaderSource {
     var shaderText = '';
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
     // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-
-    shaderText += `    vec3 light = normalize(lightPosition[i].xyz - position.xyz * lightPosition[i].w);\n`;
-    shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
+    shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
+    shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
+    shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
     shaderText += `    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
-    shaderText += `    vec3 view = normalize(viewPosition - position.xyz);\n`;
-    shaderText += `    vec3 halfVec = normalize(light + view);\n`;
+    shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
+    shaderText += `    vec3 halfVec = normalize(lightDirection_world + viewDirection);\n`;
     shaderText += `    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n`;
     shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
 

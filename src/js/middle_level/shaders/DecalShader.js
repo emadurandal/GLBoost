@@ -50,6 +50,9 @@ export class DecalShaderSource {
 
   FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
+
+    shaderText += this._getNormalStr(gl, material, f);
+    
     var textureFunc = Shader._texture_func(gl);
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt0 *= color;\n';
