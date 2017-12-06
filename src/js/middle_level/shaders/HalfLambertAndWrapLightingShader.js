@@ -25,16 +25,16 @@ export class HalfLambertAndWrapLightingShaderSource {
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
     let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
     for (let i=0; i<lightsExceptAmbient.length; i++) {
       let light = lightsExceptAmbient[i];      
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += '  {\n';
       // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-      shaderText += `    vec3 lightDirection = normalize(v_lightDirection[${i}]);\n`;
+      shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
+      shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += '    float diffuse = max(dot(lightDirection, normal), 0.0)*0.5+0.5;\n';
+      shaderText += '    float diffuse = max(dot(lightDirection_world, normal), 0.0)*0.5+0.5;\n';
       shaderText += '    diffuse *= diffuse;\n';
       shaderText += '    vec3 diffuseVec = vec3(diffuse, diffuse, diffuse);\n';
       shaderText += '    diffuseVec = (diffuseVec+wrap) / (1.0 + wrap);\n';  

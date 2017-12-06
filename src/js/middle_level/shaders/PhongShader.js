@@ -26,19 +26,19 @@ export class PhongShaderSource {
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
 
     let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
     for (let i=0; i<lightsExceptAmbient.length; i++) {
       let light = lightsExceptAmbient[i];      
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
-      shaderText += `    vec3 lightDirection = normalize(v_lightDirection[${i}]);\n`;
+      shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
+      shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
       shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
-      shaderText += `    vec3 viewDirection = normalize(v_viewDirection);\n`;
-      shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
+      shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
+      shaderText += `    vec3 reflect = reflect(-lightDirection_world, normal);\n`;
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
       shaderText += `    rt0 += vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
       shaderText += `  }\n`;

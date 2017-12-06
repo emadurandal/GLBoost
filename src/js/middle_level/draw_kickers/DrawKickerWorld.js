@@ -106,7 +106,7 @@ export default class DrawKickerWorld {
             cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
           //  console.log(cameraPos);
           }
-          material._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, 1, true);
+          material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
         }
 
         for (let j = 0; j < lightsExceptAmbient.length; j++) {

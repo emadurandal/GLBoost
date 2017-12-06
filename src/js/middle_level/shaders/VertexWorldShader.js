@@ -10,10 +10,12 @@ export default class VertexWorldShaderSource {
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 aVertex_normal;\n`;
-      shaderText += `${out_} vec3 v_normal;\n`;
       shaderText += `${out_} vec3 v_normal_world;\n`;
+      
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += `${in_} vec3 aVertex_tangent;\n`;
+        shaderText += `${out_} vec3 v_tangent_world;\n`;
+        shaderText += `${out_} vec3 v_binormal_world;\n`;
       }
     }
     shaderText +=      'uniform mat4 worldMatrix;\n';
@@ -21,18 +23,17 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
 
+<<<<<<< Updated upstream
     /// These are assumed as in World coordinate
     shaderText += `uniform vec4 viewPosition_world;\n`;
     shaderText += `${out_} vec3 v_viewDirection;\n`;
     shaderText += `${out_} vec3 v_viewDirection_world;\n`;
     shaderText += `${out_} vec3 v_position_world;\n`;
-
-    // for Lighting
-    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-    if(lightNumExceptAmbient > 0) {
-      shaderText += `uniform vec4 lightPosition_world[${lightNumExceptAmbient}];\n`;
-      shaderText += `${out_} vec3 v_lightDirection[${lightNumExceptAmbient}];\n`;
+=======
+    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      shaderText += `${out_} vec3 v_position_world;\n`;
     }
+>>>>>>> Stashed changes
 
     // for Unfold UV
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -55,7 +56,6 @@ export default class VertexWorldShaderSource {
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
-//    shaderText += '  vec4 position_world = position_local;\n';
     shaderText += '  if (!isSkinning) {\n';
     shaderText += '    position_world = worldMatrix * position_local;\n';
     if (Shader._exist(f, GLBoost.NORMAL)) {
@@ -63,77 +63,34 @@ export default class VertexWorldShaderSource {
     }
     shaderText += '  }\n';
 
+<<<<<<< Updated upstream
     shaderText += '  vec3 viewDirection_world = viewPosition_world.xyz - position_world.xyz;\n';
 
     shaderText += '  v_viewDirection_world = viewDirection_world;\n';
+=======
+    shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+>>>>>>> Stashed changes
 
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
     shaderText += '  v_position_world = position_world.xyz;\n';
 
-    //    shaderText += '  v_position_view.z *= -1.0;\n';
-
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += '  v_normal = normal_world;\n';
       shaderText += '  v_normal_world = normal_world;\n';
-      shaderText += '  v_viewDirection = viewDirection_world;\n';
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
         // world space to tangent space
         shaderText += '  if (!isSkinning) {\n';
         shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
         shaderText += '  }\n';
 
-        shaderText += '  vec3 binormal_world = cross(normal_world, tangent_world);\n';
-        shaderText += '  tangent_world = cross(binormal_world, normal_world);\n';
-
-        shaderText += `  mat3 tbnMat_world_to_tangent = mat3(
-          tangent_world.x, binormal_world.x, normal_world.x,
-          tangent_world.y, binormal_world.y, normal_world.y,
-          tangent_world.z, binormal_world.z, normal_world.z
-        );
-        `;
-
-        shaderText += '  // move viewDirection_world from World space to Tangent space. \n';
-
-        shaderText += '  vec3 viewDirection_tangent = tbnMat_world_to_tangent * viewDirection_world;\n';
-
-//        shaderText += '  v_viewDirection = viewDirection_world;\n';
-        shaderText += '  v_viewDirection = viewDirection_tangent;\n';
-
-        shaderText += '  vec3 normal_tangent = tbnMat_world_to_tangent * normal_world;\n';
-
-//        shaderText += '  v_normal = normal_world;\n';
-        shaderText += '  v_normal = normal_tangent;\n';
+        shaderText += '  v_binormal_world = cross(normal_world, tangent_world);\n';
+        shaderText += '  v_tangent_world = cross(v_binormal_world, normal_world);\n';
 
       }
-      shaderText += '  v_normal = normalize(v_normal);\n';
-    }
-    shaderText += '  v_viewDirection = normalize(v_viewDirection);\n';
-
-
-    shaderText += `  vec3 lightDirection_tangent;\n`;
-    shaderText += `  vec3 lightDirection_world;\n`;
-
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
-    for (let i=0; i<lightsExceptAmbient.length; i++) {
-      // if PointLight: lightPosition_world[i].w === 1.0      if DirectionalLight: lightPosition_world[i].w === 0.0
-      shaderText += `  lightDirection_world = normalize(lightPosition_world[${i}].xyz - position_world.xyz * lightPosition_world[${i}].w);\n`;
-      shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `  // move lightDirection_world from World space to Tangent space. \n`;
-
-        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
-          // world space to tangent space
-          shaderText += `  lightDirection_tangent = tbnMat_world_to_tangent * lightDirection_world;\n`;
-//          shaderText += `  v_lightDirection[${i}] = lightDirection_world;\n`;
-          shaderText += `  v_lightDirection[${i}] = lightDirection_tangent;\n`;
-        } else {
-        }
-      }
-      shaderText += `  v_lightDirection[${i}] = normalize(v_lightDirection[${i}]);\n`;
     }
 
+    // UV Unfold
     shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
     shaderText +=   '  gl_Position = position_world;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -154,21 +111,36 @@ export default class VertexWorldShaderSource {
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
+<<<<<<< Updated upstream
     shaderText += `${in_} vec3 v_viewDirection;\n`;
     shaderText += `${in_} vec3 v_viewDirection_world;\n`;
+=======
+      shaderText += `uniform vec3 viewPosition_world;\n`;
+>>>>>>> Stashed changes
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
     if(lightNumExceptAmbient > 0) {
       shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
-      shaderText += `${in_} vec3 v_lightDirection[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform vec3 lightSpotInfo[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform vec4 lightPosition_world[${lightNumExceptAmbient}];\n`;
     }
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 v_normal;\n`;
       shaderText += `${in_} vec3 v_normal_world;\n`;
+      if (Shader._exist(f, GLBoost.TANGENT)) {
+        shaderText += `${in_} vec3 v_tangent_world;\n`;
+        shaderText += `${in_} vec3 v_binormal_world;\n`;
+      }
     }
+<<<<<<< Updated upstream
     shaderText += `${in_} vec4 position;\n`;
     shaderText += `${in_} vec3 v_position_world;\n`;
+=======
+
+    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      shaderText += `${in_} vec3 v_position_world;\n`;
+    }
+>>>>>>> Stashed changes
 
     return shaderText;
   }
