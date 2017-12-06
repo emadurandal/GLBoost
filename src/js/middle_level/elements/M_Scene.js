@@ -1,3 +1,5 @@
+/* @flow */
+
 import M_Element from './M_Element';
 import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
 import M_AbstractLight from './lights/M_AbstractLight';
@@ -19,7 +21,7 @@ export default class M_Scene extends M_Group {
    * [ja] コンストラクタ
    * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
    */
-  constructor(glBoostContext) {
+  constructor(glBoostContext:any) {
     super(glBoostContext);
     this._gl = this._glContext.gl;
     this._reset();
@@ -31,7 +33,7 @@ export default class M_Scene extends M_Group {
     this._cameras = [];
   }
 
-  _getCurrentAnimationInputValue(inputName) {
+  _getCurrentAnimationInputValue(inputName:string) {
     let value = this._currentAnimationInputValues[inputName];
     if (typeof value === 'undefined') {
       return (void 0);
@@ -44,7 +46,7 @@ export default class M_Scene extends M_Group {
    * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
    * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
    */
-  prepareToRender(expression) {
+  prepareToRender(expression:any) {
     this._reset();
 
     var aabb = (function setParentAndMergeAABBRecursively(elem) {
@@ -194,7 +196,7 @@ export default class M_Scene extends M_Group {
    * [ja] このシーンに属していた子供の要素の配列を返します。
    * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
    */
-  get elements() {
+  get elements():Array<any> {
     return this._elements;
   }
 

@@ -1,3 +1,5 @@
+/* @flow */
+
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
@@ -53,11 +55,11 @@ export default class M_Group extends M_Element {
     this._elements.length = 0;
   }
 
-  getChildren() {
+  getChildren():Array<M_Element> {
     return this._elements;
   }
 
-  getAnyJointAsChild() {
+  getAnyJointAsChild():M_Element {
     for (let element of this._elements) {
       if (element.className === 'M_Joint') {
         return element;
@@ -66,7 +68,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  _setDirtyToAnimatedElement(inputName) {
+  _setDirtyToAnimatedElement(inputName:string):void {
     if (this.hasAnimation(inputName)) {
       this._needUpdate();
     }
