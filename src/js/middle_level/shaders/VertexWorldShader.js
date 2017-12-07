@@ -102,7 +102,8 @@ export default class VertexWorldShaderSource {
     if(lightNumExceptAmbient > 0) {
       shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
       shaderText += `uniform vec3 lightSpotInfo[${lightNumExceptAmbient}];\n`;
-      shaderText += `uniform vec4 lightPosition_world[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform vec3 lightPosition_world[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform vec3 lightDirection_world[${lightNumExceptAmbient}];\n`;
     }
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
@@ -152,7 +153,9 @@ export default class VertexWorldShaderSource {
     let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
     for(let i=0; i<lightsExceptAmbient.length; i++) {
       material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
+      material.setUniform(shaderProgram, 'uniform_lightDirection_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDirection_world[${i}]`));
       material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+      material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
     }
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {

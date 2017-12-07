@@ -29,6 +29,26 @@ export default class Vector4 {
     return new Vector4(0, 0, 0, 1);
   }
 
+  length() {
+    return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+  }
+
+  normalize() {
+    var length = this.length();
+    this.divide(length);
+
+    return this;
+  }
+
+  static normalize(vec4) {
+    var length = vec4.length();
+    var newVec = new Vector4(vec4.x, vec4.y, vec4.z, vec4.w);
+    newVec.divide(length);
+
+    return newVec;
+  }
+  
+
   toVector3() {
     return new Vector3(this.x, this.y, this.z);
   }

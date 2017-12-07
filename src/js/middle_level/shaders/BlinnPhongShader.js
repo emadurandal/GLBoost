@@ -1,4 +1,6 @@
+import Shader from '../../low_level/shaders/Shader';
 import DecalShader from './DecalShader';
+import Vector4 from '../../low_level/math/Vector4';
 
 export class BlinnPhongShaderSource {
 
@@ -8,30 +10,43 @@ export class BlinnPhongShaderSource {
     shaderText += `uniform vec4 Kd;\n`;
     shaderText += `uniform vec4 Ks;\n`;
     shaderText += `uniform float power;\n`;
-
+    shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights    
+    
+    var sampler2D = this._sampler2DShadow_func();
+    
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
+    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    
     return shaderText;
   }
 
   FSShade_BlinnPhongShaderSource(f, gl, lights) {
     var shaderText = '';
+    shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
-    shaderText += `  for (int i=0; i<${lights.length}; i++) {\n`;
-    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-    shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
-    shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
-    shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
-    shaderText += `    rt0 += Kd * lightDiffuse[i] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
-    shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
-    shaderText += `    vec3 halfVec = normalize(lightDirection_world + viewDirection);\n`;
-    shaderText += `    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n`;
-    shaderText += `    rt0 += Ks * lightDiffuse[i] * vec4(specular, specular, specular, 0.0);\n`;
-
-    shaderText += `  }\n`;
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
+      let light = lightsExceptAmbient[i];      
+      let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;      
+      shaderText += `  {\n`;
+      shaderText +=      Shader._generateLightStr(i);
+      shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
+      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
+      shaderText += `    vec3 halfVec = normalize(lightDirection + viewDirection);\n`;
+      shaderText += `    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `  }\n`;
+    }
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
-
+    shaderText += '  rt0 += ambient;\n';
+    
 
 
     return shaderText;
@@ -44,7 +59,8 @@ export class BlinnPhongShaderSource {
     material.setUniform(shaderProgram, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
     material.setUniform(shaderProgram, 'uniform_Ks', this._glContext.getUniformLocation(shaderProgram, 'Ks'));
     material.setUniform(shaderProgram, 'uniform_power', this._glContext.getUniformLocation(shaderProgram, 'power'));
-
+    material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));    
+    
     return vertexAttribsAsResult;
   }
 }
@@ -66,9 +82,20 @@ export default class BlinnPhongShader extends DecalShader {
 
     var Kd = material.diffuseColor;
     var Ks = material.specularColor;
+    let Ka = material.ambientColor;    
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
     this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
+
+    const accumulatedAmbientIntensity = Vector4.zero();
+    for (let light of lights) {
+      if (light.isTypeAmbient()) {
+        accumulatedAmbientIntensity.add(light.intensity.toVector4());
+      }
+    }
+    let ambient = Vector4.multiplyVector(Ka, accumulatedAmbientIntensity);
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
+
   }
 
   set Kd(value) {

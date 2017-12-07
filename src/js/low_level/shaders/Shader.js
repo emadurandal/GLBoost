@@ -589,6 +589,27 @@ export default class Shader extends GLBoostObject {
     return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
   }
 
+  static _generateLightStr(i) {
+    let shaderText = '';
+    
+    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+    shaderText += `    vec3 lightDirection = lightDirection_world[${i}];\n`;    
+    shaderText += `    if (0.4 < lightSpotInfo[${i}].x) {\n`; // is pointlight or spotlight
+    shaderText += `      lightDirection = normalize(lightPosition_world[${i}] - v_position_world.xyz);\n`;
+    shaderText += `    }\n`;
+    shaderText += `    float spotEffect = 1.0;\n`;
+    shaderText += `    if (lightSpotInfo[${i}].x > 0.8) {\n`; // is spotlight
+    shaderText += `      spotEffect = dot(lightDirection_world[${i}], lightDirection);\n`;
+    shaderText += `      if (spotEffect > lightSpotInfo[${i}].y) {\n`; // lightSpotInfo[${i}].y == spotCosCutoff
+    shaderText += `        spotEffect = pow(spotEffect, lightSpotInfo[${i}].z);\n`; // lightSpotInfo[${i}].z == spotExponent
+    shaderText += `      } else {\n`;
+    shaderText += `        spotEffect = 0.0;\n`;
+    shaderText += `      }\n`;
+    shaderText += `    }\n`;
+
+    return shaderText;
+  }
+
   static _generateShadowingStr(gl, i, isShadowEnabledAsTexture) {
     let shadowingText = '';
     shadowingText += `float visibilityForShadow = 0.75;\n`;
