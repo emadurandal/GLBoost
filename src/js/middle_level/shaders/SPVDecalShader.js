@@ -24,12 +24,12 @@ export class SPVDecalShaderSource {
     return shaderText;
   }
 
-  VSTransform_SPVDecalShaderSource(existCamera_f, f) {
+  VSTransform_SPVDecalShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  color = aVertex_color;\n';
     }
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += '  texcoord = aVertex_texcoord;\n';
     }
     return shaderText;
@@ -40,7 +40,7 @@ export class SPVDecalShaderSource {
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += `${in_} vec4 color;\n`;
     }
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
     if (material.hasAnyTextures()) {
