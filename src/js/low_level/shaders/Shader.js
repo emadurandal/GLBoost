@@ -289,7 +289,7 @@ export default class Shader extends GLBoostObject {
       shaderText += Shader._glsl1DrawBufferExt(gl);
     }
     shaderText += Shader._glsl1StdDerivativeExt(gl);
-    shaderText +=   'precision mediump float;\n';
+    shaderText +=   'precision highp float;\n';
 
     for (let i=0; i<maxDrawBuffers; i++) {
       shaderText +=   Shader._set_outColor_onFrag(gl, i);
