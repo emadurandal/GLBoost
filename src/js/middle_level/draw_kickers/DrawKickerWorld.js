@@ -1,5 +1,6 @@
 import M_PointLight from '../elements/lights/M_PointLight';
 //import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
+import Vector3 from '../../low_level/math/Vector3';
 import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Matrix33 from '../../low_level/math/Matrix33';
@@ -112,21 +113,31 @@ export default class DrawKickerWorld {
         for (let j = 0; j < lightsExceptAmbient.length; j++) {
           let light = lightsExceptAmbient[j];
           if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-            let lightVec = null;
-            let isPointLight = -9999;
-            if (light instanceof M_PointLight) {
-              lightVec = new Vector4(0, 0, 0, 1);
-              lightVec = light.transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-              isPointLight = 1.0;
-            } else if (light.className === 'M_DirectionalLight') {
-              lightVec = new Vector4(-light.direction.x, -light.direction.y, -light.direction.z, 1);
-              lightVec = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-              lightVec.w = 0.0;
-              isPointLight = 0.0;
+            let lightPosition = new Vector4(0, 0, 0, 1);            
+            let lightDirection = new Vector4(0, 0, 0, 1);
+            // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
+            let lightType = 0.0; // M_DirectionalLight
+            if (light.className === 'M_PointLight') {
+              lightType = 0.5;
+            } else if (light.className === 'M_SpotLight') {
+              lightType = 1.0;
             }
-
-            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVec.x, lightVec.y, lightVec.z, isPointLight, true);
+            if (light.className === 'M_PointLight' || light.className === 'M_SpotLight') {
+              lightPosition = light.transformMatrixAccumulatedAncestry.multiplyVector(lightPosition);
+            }
+            if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
+              lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
+              //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
+              lightDirection.normalize();
+            }
+            material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
+            material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightDirection_${j}`), lightDirection.x, lightDirection.y, lightDirection.z, true);
             material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), light.intensity.x, light.intensity.y, light.intensity.z, 1.0, true);
+            if (light.className === 'M_SpotLight') {
+              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, light.spotCosCutoff, light.spotExponent, true);              
+            } else {
+              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, 0, 0, true);              
+            }
           }
         }
       }
