@@ -172,7 +172,7 @@ export default class SkeletalShaderSource {
     }
     
 
-    shaderText += 'position_world = worldMatrix * skinMat * position_local;\n';
+    shaderText += 'position_world = skinMat * position_local;\n';
 //shaderText += 'position_world = skinMat * position_local;\n';
 
     /*
@@ -185,8 +185,9 @@ export default class SkeletalShaderSource {
     }
     */
 
+    
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += 'mat3 normalMatrix = toNormalMatrix(worldMatrix);\n';
+      shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
       shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
@@ -194,6 +195,7 @@ export default class SkeletalShaderSource {
     }
 
     shaderText += 'isSkinning = true;\n';
+
 
     return shaderText;
   }

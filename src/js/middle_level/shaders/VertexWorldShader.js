@@ -14,8 +14,10 @@ export default class VertexWorldShaderSource {
       
       if (Shader._exist(f, GLBoost.TANGENT)) {
         shaderText += `${in_} vec3 aVertex_tangent;\n`;
-        shaderText += `${out_} vec3 v_tangent_world;\n`;
-        shaderText += `${out_} vec3 v_binormal_world;\n`;
+        if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
+          shaderText += `${out_} vec3 v_tangent_world;\n`;
+          shaderText += `${out_} vec3 v_binormal_world;\n`;  
+        }
       }
     }
     shaderText +=      'uniform mat4 worldMatrix;\n';
@@ -23,9 +25,7 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
 
-    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
-      shaderText += `${out_} vec3 v_position_world;\n`;
-    }
+    shaderText += `${out_} vec3 v_position_world;\n`;
 
     // for Unfold UV
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -57,9 +57,7 @@ export default class VertexWorldShaderSource {
 
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
-    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
-      shaderText += '  v_position_world = position_world.xyz;\n';
-    }
+    shaderText += '  v_position_world = position_world.xyz;\n';
 
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
 
@@ -97,7 +95,7 @@ export default class VertexWorldShaderSource {
 
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
-
+    
     shaderText += `uniform vec3 viewPosition_world;\n`;
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -109,16 +107,13 @@ export default class VertexWorldShaderSource {
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
       shaderText += `${in_} vec3 v_normal_world;\n`;
-      if (Shader._exist(f, GLBoost.TANGENT)) {
+      if (Shader._exist(f, GLBoost.TANGENT) && material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
         shaderText += `${in_} vec3 v_tangent_world;\n`;
         shaderText += `${in_} vec3 v_binormal_world;\n`;
       }
     }
-    shaderText += `${in_} vec3 v_position_world;\n`;
 
-    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
-      shaderText += `${in_} vec3 v_position_world;\n`;
-    }
+    shaderText += `${in_} vec3 v_position_world;\n`;
 
     return shaderText;
   }
