@@ -46,8 +46,8 @@ export default class M_SkeletalGeometry extends Geometry {
         let inverseMat = Matrix44.multiply(Matrix44.invert(skeletalMesh.bindShapeMatrix), Matrix44.invert(inverseBindMatrix));
         globalJointTransform = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, inverseMat);
       }
-      if (true) {
-//      if (this._materialForSkeletal.shaderInstance.constructor === FreeShader) {
+//      if (true) {
+      if (this._materialForSkeletal.shaderInstance.constructor === FreeShader) {
         matrices[i] = Matrix44.invert(skeletalMesh.transformMatrixAccumulatedAncestry);
       } else {
         matrices[i] = Matrix44.identity();
