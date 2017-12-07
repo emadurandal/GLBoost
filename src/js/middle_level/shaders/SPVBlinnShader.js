@@ -119,16 +119,15 @@ export class SPVBlinnShaderSource {
       let light = lightsExceptAmbient[i];            
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
-      shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
-      shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
+      shaderText +=      Shader._generateLightStr(i);
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
-      shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
-      shaderText += '    vec3 halfVector = normalize(lightDirection_world + viewDirection);\n';
+      shaderText += '    vec3 halfVector = normalize(lightDirection + viewDirection);\n';
       shaderText += '    float NH = dot(normal, halfVector);\n';
       shaderText += '    float NV = dot(normal, viewDirection);\n';
-      shaderText += '    float NL = dot(normal, lightDirection_world);\n';
+      shaderText += '    float NL = dot(normal, lightDirection);\n';
       shaderText += '    float VH = dot(viewDirection, halfVector);\n';
 
       shaderText += `    float specular = blinn_specular(refractiveIndex, NH, NV, NL, VH, power);\n`;
@@ -137,7 +136,7 @@ export class SPVBlinnShaderSource {
       shaderText += `    };\n`;
 
       shaderText += `    vec4 enlighten = Ks * lightDiffuse[${i}];\n`;
-      shaderText += `    enlighten *= vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    enlighten *= spotEffect * vec4(specular, specular, specular, 0.0);\n`;
       shaderText += `    enlighten *= vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0);\n`;
       shaderText += `    rt0 += enlighten;\n`;
       shaderText += `  }\n`;

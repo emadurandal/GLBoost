@@ -33,22 +33,20 @@ export class SPVPhongShaderSource {
       let light = lightsExceptAmbient[i];      
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
-      shaderText += `    vec3 lightObjectDirection_world = lightPosition_world[${i}].xyz;\n`;
-      shaderText += `    vec3 lightDirection_world = normalize(lightPosition_world[${i}].xyz) - normalize(v_position_world.xyz) * lightPosition_world[${i}].w;\n`;
+      shaderText +=      Shader._generateLightStr(i);
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(lightDirection_world, normal), 0.0);\n`;
-      shaderText += `    rt0 += vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
-      shaderText += `    vec3 reflect = reflect(-lightDirection_world, normal);\n`;
+      shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
 
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
       shaderText += `    if (toUseSurfaceColorAsSpecularMap) {\n`;
       shaderText += `      specular *= grayscale(surfaceColor) + 0.5;\n`;
       shaderText += `    };\n`;
 
-
       shaderText += `    vec4 enlighten = Ks * lightDiffuse[${i}];\n`;
-      shaderText += `    enlighten *= vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    enlighten *= spotEffect * vec4(specular, specular, specular, 0.0);\n`;
       shaderText += `    enlighten *= vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0);\n`;
       shaderText += `    rt0 += enlighten;\n`;
       shaderText += `  }\n`;
