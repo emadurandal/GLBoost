@@ -11,7 +11,10 @@ export default class CubeAbsolute extends Geometry {
 
     //this._
 
-    this._vertexData = this._setupVertexData(new Vector3(-Number.MAX_VALUE), new Vector3(-Number.MAX_VALUE+0.001));
+    const BIG_NUMBER = 999;
+    this._vertexData = this._setupVertexData(
+      new Vector3(-BIG_NUMBER, -BIG_NUMBER, -BIG_NUMBER),
+      new Vector3(-BIG_NUMBER+1, -BIG_NUMBER+1, -BIG_NUMBER+1));
     this.setVerticesData(this._vertexData, [this._indices]);
   }
 
