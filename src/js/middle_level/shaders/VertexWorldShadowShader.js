@@ -12,8 +12,8 @@ export default class VertexWorldShadowShaderSource {
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
         
-    shaderText +=      `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
-    shaderText +=       `${out_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+    //shaderText +=      `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    //shaderText +=       `${out_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
 
     return shaderText;
   }
@@ -21,7 +21,7 @@ export default class VertexWorldShadowShaderSource {
   VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     let gl = this._glContext.gl;
-
+/*
     shaderText += `mat4 biasMatrix = mat4(
       0.5, 0.0, 0.0, 0.0,
       0.0, 0.5, 0.0, 0.0,
@@ -40,7 +40,7 @@ export default class VertexWorldShadowShaderSource {
       shaderText += `    v_shadowCoord[${i}] = depthBiasPV * position_world; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
-
+*/
     return shaderText;
   }
 
@@ -49,16 +49,37 @@ export default class VertexWorldShadowShaderSource {
 
     shaderText += 'uniform float depthBias;\n';
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-
+//    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    
     return shaderText;
   }
 
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
     let shaderText = '';
+<<<<<<< Updated upstream
 
     shaderText += 'float visibilityLevel = 1.0;\n';
 
+=======
+/*
+    shaderText += `mat4 biasMatrix = mat4(
+      0.5, 0.0, 0.0, 0.0,
+      0.0, 0.5, 0.0, 0.0,
+      0.0, 0.0, 0.5, 0.0,
+      0.5, 0.5, 0.5, 1.0
+    );\n`;
+*/
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});            
+    shaderText += `    vec4 shadowCoord[${lightsExceptAmbient.length}];\n`;
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
+      shaderText += `  { // ${i}\n`;
+      shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
+      shaderText += `    shadowCoord[${i}].xyz *= 0.5; // ${i}\n`;
+      shaderText += `    shadowCoord[${i}].xyz += 0.5; // ${i}\n`;
+      shaderText += `  } // ${i}\n`;
+    }
+>>>>>>> Stashed changes
     return shaderText;
   }
 
