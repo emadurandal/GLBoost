@@ -8,6 +8,8 @@ export default class JointPrimitive extends Geometry {
   constructor(glBoostContext, length, lineCount = 1) {
     super(glBoostContext);
 
+    this._colors = [];
+    this.color = new Vector4(1, 1, 1, 1);
     this._worldPositionOfThisJoint = new Vector3(0, 0, 1);
     this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
     this._vertexData = this._setupVertexData();
@@ -93,7 +95,8 @@ export default class JointPrimitive extends Geometry {
     positions.push(crossPosition4);
 
     this._vertexData = {
-      position: positions
+      position: positions,
+      color: this._colors
     };
 
     return this._vertexData;
@@ -121,6 +124,19 @@ export default class JointPrimitive extends Geometry {
 
   get width() {
     return this._width;
+  }
+
+  set color(vec) {
+    this._color = vec;
+
+    this._colors = [];
+    for(let i=0; i<24; i++) {
+      this._colors.push(this._color);
+    }
+  }
+
+  get color() {
+    return this._color;
   }
 
   update() {

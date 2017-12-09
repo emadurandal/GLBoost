@@ -14,8 +14,8 @@ export default class M_Group extends M_Element {
     this._isRootJointGroup = false;
 
 //    this._aabbGizmo = null;
-    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
-    this._gizmos.push(this._aabbGizmo);
+//    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+//    this._gizmos.push(this._aabbGizmo);
 
   }
 

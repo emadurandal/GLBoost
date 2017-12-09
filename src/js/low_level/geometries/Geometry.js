@@ -20,7 +20,7 @@ export default class Geometry extends GLBoostObject {
     this._vertices = null;
     this._indicesArray = null;
     this._performanceHint = null;
-    this._defaultMaterial = glBoostContext.createClassicMaterial();
+    this._defaultMaterial = null;
     this._vertexData = [];
     this._extraDataForShader = {};
     this._vboObj = {};
@@ -464,6 +464,9 @@ export default class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
+      if (this._defaultMaterial === null) {
+        this._defaultMaterial = this._glBoostContext.createClassicMaterial();
+      }
       materials = [this._defaultMaterial];
     }
     return materials;
@@ -530,7 +533,7 @@ export default class Geometry extends GLBoostObject {
           gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
           Geometry._iboArrayDic[this.toString()][i] = ibo;
-          this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+          //this._defaultMaterial.setVertexN(this._indicesArray[i].length);
         }
       }
       glem.bindVertexArray(gl, null);
