@@ -91,7 +91,7 @@ export class SPVDecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `vec2 texcoordTransformed = texcoord * uvTransform.xy + uvTransform.zw;\n`;      
+      shaderText += `vec2 texcoordTransformed = vec2(texcoord.x * uvTransform.x + uvTransform.z, 1.0 - ((1.0-texcoord.y) * uvTransform.y + uvTransform.w));\n`;      
       shaderText += 'if (isColorAberration) {\n';
       shaderText += `  float offsetTexel = 3.0;\n`;
       shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
