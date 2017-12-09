@@ -20,36 +20,24 @@ export default class M_JointGizmo extends M_Gizmo {
 
   _init(glBoostContext, joint, length) {
     this._joint = joint;
-    this._material = new ClassicMaterial(this._glBoostContext);
     this._primitive = new JointPrimitive(this._glBoostContext, length, 1);
     this._mesh = new M_Mesh(glBoostContext,
       this._primitive,
-      this._material);
+      null
+    );
+
     this._mesh.masterElement = this;
 //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
 
-    this._material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
-    this._material.states = [
-      3042, // gl.BLEND
-    ];
-
     this.addChild(this._mesh);
   }
-/*
-  set rotate(rotateVec3) {
-    this._mesh.rotate = rotateVec3;
-  }
 
-  get rotate() {
-    return this._mesh.rotate;
-  }
-*/
   set baseColor(colorVec) {
-    this._material.baseColor = colorVec;
+    this._primitive.color = colorVec;
   }
 
   get baseColor() {
-    return this._material.baseColor;
+    return this._primitive.color;
   }
 
   // Use master element's transformMatrixAccumulatedAncestry.
