@@ -155,18 +155,20 @@ export default class M_SkeletalMesh extends M_Mesh {
     return this._joints[0].isGizmoVisible;
   }
 
+  
   get rootJointsWorldPosition() {
     if (this._joints.length > 0) {
-      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryForJoints;
+      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestry;
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
     return Vector3.zero();
   }
+  
 
   getRootJointsWorldPositionAt(inputValue) {
     if (this._joints.length > 0) {
-      const rootJointMatrix = this._joints[0].getTransformMatrixAccumulatedAncestryForJointsAt(inputValue);
+      const rootJointMatrix = this._joints[0].getTransformMatrixAccumulatedAncestryAt(inputValue);
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
@@ -174,6 +176,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     return Vector3.zero();
   }
 
+  
   get rootJointsWorldPositionAsBindPose() {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryAsForJointsBindPose;
@@ -183,6 +186,7 @@ export default class M_SkeletalMesh extends M_Mesh {
 
     return Vector3.zero();
   }
+  
 }
 
 GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;
