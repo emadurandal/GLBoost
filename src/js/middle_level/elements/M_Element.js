@@ -418,9 +418,9 @@ export default class M_Element extends L_Element {
     }
   }
 
-  _multiplyMyAndParentTransformMatrices(withMySelf) {
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
+  _multiplyMyAndParentTransformMatrices(withMySelf, input) {
+
+    if (input === null && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
@@ -441,7 +441,7 @@ export default class M_Element extends L_Element {
           this._transformMatrixAccumulatedAncestry.copyComponents(this.getTransformMatrixAt(input));
         }
 
-        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true));
+        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
         this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
       }
@@ -465,22 +465,11 @@ export default class M_Element extends L_Element {
     }
   }
 
-  get transformMatrixAccumulatedAncestryInner() {
-    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || typeof this._transformMatrixAccumulatedAncestry === 'undefined') {
-      this._transformMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(this, true);
-      this._accumulatedAncestryObjectUpdateNumber = tempNumber;
-    }
-
-    return this._transformMatrixAccumulatedAncestry.clone();
-  }
-
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
     if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._transformMatrixAccumulatedAncestryWithoutMySelf === 'undefined') {
-      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(this, false);
+      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, void 0);
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
@@ -776,11 +765,14 @@ export default class M_Element extends L_Element {
 
   // Use master element's transformMatrixAccumulatedAncestry.
   get transformMatrixAccumulatedAncestry() {
+    return this.getTransformMatrixAccumulatedAncestryAt(null);
+  }
+
+  getTransformMatrixAccumulatedAncestryAt(input) {
     if (this._masterElement) {
-      return Matrix44.multiply(this._masterElement.transformMatrixAccumulatedAncestryInner, this.transformMatrixAccumulatedAncestryInner);
+      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
     }
-    return this.transformMatrixAccumulatedAncestryInner;
-    //return this.transformMatrix;
+    return this._multiplyMyAndParentTransformMatrices(true, input);
   }
 
   getStartInputValueOfAnimation(lineName) {
