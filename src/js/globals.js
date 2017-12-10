@@ -79,6 +79,14 @@ var global = ('global',eval)('this');
     c.define('QUERY_FORMAT_STRING');
     c.define('QUERY_FORMAT_REGEXP');
 
+    c.define('WORLD_MATRIX');
+
+    c.define('SHADER_PARAMETER_TYPE_OBJECT');
+    c.define('SHADER_PARAMETER_TYPE_MATERIAL');
+    c.define('SHADER_PARAMETER_TYPE_LIGHT');
+    c.define('SHADER_PARAMETER_TYPE_JOINTSET');
+    c.define('SHADER_PARAMETER_TYPE_MORPH');
+    
     c.define('GLOBAL_STATES_USAGE_DO_NOTHING');
     c.define('GLOBAL_STATES_USAGE_IGNORE');
     c.define('GLOBAL_STATES_USAGE_INCLUSIVE');

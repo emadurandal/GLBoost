@@ -5,7 +5,9 @@ import Matrix44 from './Matrix44';
 
 export default class Matrix33 {
 
-  constructor(m, isColumnMajor = false) {
+  constructor(m, isColumnMajor = false,
+    shaderParameterType = void 0, shaderParameterEntityIndex = void 0, shaderParameterName = void 0
+  ) {
     this.m = new Float32Array(9);
     if (arguments.length >= 9) {
       if (isColumnMajor === true) {

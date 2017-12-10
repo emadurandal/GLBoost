@@ -41,7 +41,7 @@ export default class M_JointGizmo extends M_Gizmo {
   }
 
   // Use master element's transformMatrixAccumulatedAncestry.
-  get _transformMatrixAccumulatedAncestry() {
+  get transformMatrixAccumulatedAncestryInner() {
     return Matrix44.identity();
   }
 
