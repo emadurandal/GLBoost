@@ -444,8 +444,11 @@ export default class M_Element extends L_Element {
         this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
         this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
+
+        return this._transformMatrixAccumulatedAncestry;
+      } else {
+        return this._transformMatrixAccumulatedAncestry;        
       }
-      return this._transformMatrixAccumulatedAncestry;
     }
   }
 
@@ -769,10 +772,14 @@ export default class M_Element extends L_Element {
   }
 
   getTransformMatrixAccumulatedAncestryAt(input) {
+    
+    this._multiplyMyAndParentTransformMatrices(true, input);
     if (this._masterElement) {
-      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
+//      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
+//return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
+      this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
     }
-    return this._multiplyMyAndParentTransformMatrices(true, input);
+    return this._transformMatrixAccumulatedAncestry;
   }
 
   getStartInputValueOfAnimation(lineName) {
