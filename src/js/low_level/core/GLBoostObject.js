@@ -23,6 +23,7 @@ export default class GLBoostObject {
       this._classUniqueNumber += this.className.charCodeAt(i);
     }
 
+    this.setupExistIndexAndArray();
   }
 
   setupExistIndexAndArray() {
@@ -47,7 +48,7 @@ export default class GLBoostObject {
 
     if (this.className.indexOf('Mesh') !== -1) {
       seekSpaceOfArrayAndSetIndexThere('object');
-      if (this.className.indexOf('SkeltalMesh') !== -1) {
+      if (this.className.indexOf('SkeletalMesh') !== -1) {
         seekSpaceOfArrayAndSetIndexThere('jointSet');
       }
     } else if (this.className.indexOf('Light') !== -1) {

@@ -49,12 +49,16 @@ export default class InternalDataTexture extends AbstractTexture {
     return 4*this._width*this._height;
   }
 
+  /*
   set objectDataAt(i, worldMatrix, normalMatrix, AABBCenterPosition, AABBLengthCenterToCorner, opacity) {
     this._dataTextureBuffer[this._objectsStartIndex + this._objectDataLength*i + 0] = 
   }
+  */
 
-  get objectDataIndexAt(i, worldMatrix, normalMatrix, AABBCenterPosition, AABBLengthCenterToCorner, opacity) {
-    return this._objectsStartIndex + this._objectDataLength*i;
+  getObjectDataIndexAt(i, macroConstant) {
+    if (macroConstant === GLBoost.WORLD_MATRIX) {
+      return this._objectsStartIndex + this._objectDataLength*i;
+    }
   }
 
   generateTextureFromFloat32Array(float32ArrayData, isKeepBound = false) {
