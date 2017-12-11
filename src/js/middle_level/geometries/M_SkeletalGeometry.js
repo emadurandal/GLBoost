@@ -239,7 +239,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
   }
 
-  draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
+  draw(expression, lights, lightsExceptAmbient, camera, skeletalMesh, scene, renderPass_index) {
     if (this._jointMatrices === null && this._qtArray === null) {
       return;
     }
@@ -268,7 +268,7 @@ export default class M_SkeletalGeometry extends Geometry {
       }
     }
 
-    super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
+    super.draw(expression, lights, lightsExceptAmbient, camera, skeletalMesh, scene, renderPass_index);
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh) {

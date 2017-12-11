@@ -70,6 +70,7 @@ export default class Renderer extends GLBoostObject {
       });
 
       let lights = renderPass.scene.lights;
+      let lightsExceptAmbient = renderPass.scene.lightsExceptAmbient;
 
       renderPass.preRender(camera ? true:false, lights);
 
@@ -111,7 +112,7 @@ export default class Renderer extends GLBoostObject {
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw(expression, lights, lightsExceptAmbient, camera, renderPass.scene, index);
         }
       });
 
@@ -122,7 +123,7 @@ export default class Renderer extends GLBoostObject {
       var transparentMeshes = renderPass.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw(expression, lights, lightsExceptAmbient, camera, renderPass.scene, index);
         }
       });
 
@@ -134,7 +135,7 @@ export default class Renderer extends GLBoostObject {
       let gizmos = renderPass.gizmos;
       for (let gizmo of gizmos) {
         if (gizmo.isVisible) {
-          gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
+          gizmo.mesh.draw(expression, lights, lightsExceptAmbient, camera, renderPass.scene, index);
         }
       }
       this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;

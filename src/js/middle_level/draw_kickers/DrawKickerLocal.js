@@ -21,7 +21,7 @@ export default class DrawKickerLocal {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+  draw(gl, glem, expression, mesh, materials, camera, lights, lightsExceptAmbient, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
     var isVAOBound = false;
     if (DrawKickerLocal._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
