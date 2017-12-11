@@ -417,7 +417,7 @@ export default class M_Element extends L_Element {
       return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
     }
   }
-
+/*
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
 
     if (input === null && this._activeAnimationLineName !== null) {
@@ -438,10 +438,13 @@ export default class M_Element extends L_Element {
       {
         let currentMatrix = Matrix44.identity();
         if (withMySelf) {
-          this._transformMatrixAccumulatedAncestry.copyComponents(this.getTransformMatrixAt(input));
+//          this._transformMatrixAccumulatedAncestry.copyComponents(this.getTransformMatrixAt(input));
+          let currentMatrix = this.getTransformMatrixAt(input);
         }
 
-        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
+//        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
+        this._transformMatrixAccumulatedAncestry = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+
         this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
 
@@ -451,6 +454,7 @@ export default class M_Element extends L_Element {
       }
     }
   }
+  */
 
   _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
     if (currentElem._parent === null) {
@@ -765,7 +769,7 @@ export default class M_Element extends L_Element {
   get masterElement() {
     return this._masterElement;
   }
-
+/*
   // Use master element's transformMatrixAccumulatedAncestry.
   get transformMatrixAccumulatedAncestry() {
     return this.getTransformMatrixAccumulatedAncestryAt(null);
@@ -773,14 +777,21 @@ export default class M_Element extends L_Element {
 
   getTransformMatrixAccumulatedAncestryAt(input) {
     
-    this._multiplyMyAndParentTransformMatrices(true, input);
-    if (this._masterElement) {
-//      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-//return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-      this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+
+    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
+      this._multiplyMyAndParentTransformMatrices(true, input);
+      if (this._masterElement) {
+  //      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
+  //return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
+        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
+      }
+      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
     }
+    
     return this._transformMatrixAccumulatedAncestry;
   }
+  */
 
   getStartInputValueOfAnimation(lineName) {
     let inputLine = this._animationLine[lineName];
@@ -814,4 +825,180 @@ export default class M_Element extends L_Element {
     return latestInputValue;
   }
 
+    get transformMatrixAccumulatedAncestryForJoints() {
+
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+
+    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(input);
+
+    return matrix;
+
+  }
+
+  get transformMatrixAccumulatedAncestryAsForJointsBindPose() {
+    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
+
+    return matrix;
+  }
+
+
+  getTransformMatrixAccumulatedAncestryForJointsAt(inputValue) {
+    let input = inputValue;
+
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+
+    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
+      this._matrixAccumulatedAncestryJoint = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
+      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
+    }
+
+    return this._matrixAccumulatedAncestryJoint;
+  }
+
+  _multiplyMyAndParentTransformMatricesForJoints(withMySelf, inputValue) {
+    let input = inputValue;
+    if (typeof input === 'undefined') {
+      if (this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+    }
+
+    if (this._parent === null) {
+      if (withMySelf) {
+        return this.getRotateTranslateAt(input);
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = this.getRotateTranslateAt(input);
+      }
+
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempNumber ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
+      {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, inputValue), currentMatrix);
+          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
+          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
+    }
+  }
+
+
+  get rotateTranslate() {
+
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+
+    const matrix = this.getRotateTranslateAt(input);
+
+    return matrix;
+
+  }
+
+  getRotateTranslateAt(inputValue, lineName) {
+    const input = inputValue;
+//    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
+///     this._finalMatrix_RotateTranslate = void 0;
+    if (true) {
+
+      const matrix = Matrix44.identity();
+
+      if (this._currentCalcMode === 'matrix') {
+        this._finalMatrix_RotateTranslate = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
+        this._dirtyAsElement = false;
+        return this._finalMatrix_RotateTranslate.clone();
+      }
+
+      let rotationMatrix = Matrix44.identity();
+      if (this._currentCalcMode === 'quaternion') {
+        rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
+      } else {
+        const rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
+        rotationMatrix.rotateZ(rotateVec.z).
+        multiply(Matrix44.rotateY(rotateVec.y)).
+        multiply(Matrix44.rotateX(rotateVec.x));
+      }
+
+      this._finalMatrix_RotateTranslate = rotationMatrix;
+
+      const translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
+
+      this._finalMatrix_RotateTranslate.m03 = translateVec.x;
+      this._finalMatrix_RotateTranslate.m13 = translateVec.y;
+      this._finalMatrix_RotateTranslate.m23 = translateVec.z;
+
+
+   //   this._dirtyAsElement = false;
+   //   this._matrixGetMode = 'animated_' + input;
+    }
+
+
+    return this._finalMatrix_RotateTranslate.clone();
+  }
+
+
+  get transformMatrixAccumulatedAncestry() {
+
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+
+    const matrix = this.getTransformMatrixAccumulatedAncestryAt(input);
+
+    return matrix;
+
+  }
+
+
+  getTransformMatrixAccumulatedAncestryAt(input) {
+
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+
+    if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
+      this._matrixAccumulatedAncestry = (this._multiplyMyAndParentTransformMatrices(true, input));
+      this._accumulatedAncestryObjectUpdateNumber= tempNumber;
+    }
+
+    return this._matrixAccumulatedAncestry;
+  }
+
+  _multiplyMyAndParentTransformMatrices(withMySelf, input) {
+
+    if (this._parent === null) {
+      if (withMySelf) {
+        return this.getTransformMatrixAt(input);
+      } else {
+        return Matrix44.identity();
+      }
+    } else {
+
+      let currentMatrix = Matrix44.identity();
+      if (withMySelf) {
+        currentMatrix = this.getTransformMatrixAt(input);
+      }
+
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatrices !== tempNumber ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
+      {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+          this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
+          this.__cache_input_multiplyMyAndParentTransformMatrices = input;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
+    }
+  }
 }

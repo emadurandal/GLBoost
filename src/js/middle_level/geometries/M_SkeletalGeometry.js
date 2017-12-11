@@ -44,7 +44,7 @@ export default class M_SkeletalGeometry extends Geometry {
       let globalJointTransform = null;
       let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
       if (areThereAnyJointsWhichHaveAnimation) {
-        globalJointTransform = joints[i].getTransformMatrixAccumulatedAncestryAt(input);
+        globalJointTransform = joints[i].getTransformMatrixAccumulatedAncestryForJointsAt(input);
         if (i === 0) {
           jointZeroTransformMatrixAccumulatedAncestry = globalJointTransform;
         }
