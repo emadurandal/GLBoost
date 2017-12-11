@@ -35,7 +35,7 @@ export class LambertShaderSource {
       shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `  }\n`;
     }
-    shaderText += '  rt0 += ambient;\n';
+    shaderText += '  rt0.xyz += ambient.xyz;\n';
     
     //shaderText += '  rt0.a = 1.0;\n';
     // shaderText += '  rt0 = surfaceColor;\n';
