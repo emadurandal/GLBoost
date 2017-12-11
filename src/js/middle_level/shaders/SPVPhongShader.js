@@ -53,7 +53,7 @@ export class SPVPhongShaderSource {
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
     //shaderText += '  rt0.a = 1.0;\n';
     }
-    shaderText += '  rt0 += ambient;\n';
+    shaderText += '  rt0.xyz += ambient.xyz;\n';
     
 
     return shaderText;

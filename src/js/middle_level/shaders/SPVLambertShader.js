@@ -36,11 +36,11 @@ export class SPVLambertShaderSource {
       shaderText += `    rt0 += enlighten;\n`;
       shaderText += `  }\n`;
     }
-    shaderText += '  rt0 += ambient;\n';
+    shaderText += '  rt0.xyz += ambient.xyz;\n';
     
     //shaderText +=   `rt0 += vec4(Ka.x, Ka.y, Ka.z, 1.0);\n`;
 
-    shaderText += '  rt0.a = 1.0;\n';
+    //shaderText += '  rt0.a = 1.0;\n';
     //shaderText += '  rt0 = vec4(v_shadowCoord[0].x, v_shadowCoord[0].y, 0.0, 1.0);\n';
 
 
