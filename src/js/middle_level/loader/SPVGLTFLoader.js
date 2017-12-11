@@ -307,6 +307,10 @@ export default class SPVGLTFLoader {
         rootGroup.LastSaved_ApplicationVersion = json.asset.LastSaved_ApplicationVersion;
       }
 
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
+        rootGroup.animationTracks = json.asset.extras.animation_tracks;
+      }
 
       rootGroup.addChild(group)
     }
