@@ -64,7 +64,8 @@ export default class Matrix44 {
   }
 
   copyComponents(mat4) {
-    this.m.set(mat4.m);
+    //this.m.set(mat4.m);
+    this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
   }
 
   clone() {
