@@ -36,18 +36,20 @@ export default class M_SkeletalGeometry extends Geometry {
       }
     }
 
+    let input = joints[0]._getCurrentAnimationInputValue('time');
+
     let jointZeroTransformMatrixAccumulatedAncestry = null;
     let skeletalMeshTransformMatrixAccumulatedAncestry = null;
     for (let i=0; i<joints.length; i++) {
       let globalJointTransform = null;
       let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
       if (areThereAnyJointsWhichHaveAnimation) {
-        globalJointTransform = joints[i].transformMatrixAccumulatedAncestry;
+        globalJointTransform = joints[i].getTransformMatrixAccumulatedAncestryAt(input);
         if (i === 0) {
           jointZeroTransformMatrixAccumulatedAncestry = globalJointTransform;
         }
       } else {
-        globalJointTransform = skeletalMesh.transformMatrixAccumulatedAncestry;
+        globalJointTransform = skeletalMesh.getTransformMatrixAccumulatedAncestryAt(input);
         skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
         let inverseMat = Matrix44.multiply(Matrix44.invert(skeletalMesh.bindShapeMatrix), Matrix44.invert(inverseBindMatrix));
         //globalJointTransform = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, inverseMat);
