@@ -483,7 +483,7 @@ export default class M_Element extends L_Element {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
     if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
-      let world_m = this._multiplyMyAndParentTransformMatrices(this, true);
+      let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
       this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
       this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
     }
@@ -540,7 +540,7 @@ export default class M_Element extends L_Element {
   }
 
   get inverseTransformMatrixAccumulatedAncestry() {
-    return this._multiplyMyAndParentTransformMatrices(this, true).invert();
+    return this._multiplyMyAndParentTransformMatrices(true, null).invert();
   }
 
   _accumulateMyAndParentOpacity(currentElem) {
