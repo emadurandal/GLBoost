@@ -44,7 +44,7 @@ export class PhongShaderSource {
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
       //shaderText += '  rt0.a = 1.0;\n';
     }
-    shaderText += '  rt0 += ambient;\n';
+    shaderText += '  rt0.xyz += ambient.xyz;\n';
     /*
     shaderText += 'if ( isWireframe ) {\n';
     shaderText += '  if ( barycentricCoord[0] > wireframeThicknessThreshold && barycentricCoord[1] > wireframeThicknessThreshold && barycentricCoord[2] > wireframeThicknessThreshold ) {\n';

@@ -7,11 +7,10 @@ import MathUtil from './MathUtil';
 
 export default class Matrix44 {
 
-  constructor(m, isColumnMajor = false,
-    shaderParameterType = void 0, shaderParameterEntityIndex = void 0, shaderParameterName = void 0
+  constructor(m, isColumnMajor = false, notCopyFloat32Array = false
   ) {
-    this.m = new Float32Array(16);
     if (arguments.length >= 16) {
+      this.m = new Float32Array(16);
       if (isColumnMajor === true) {
         let m = arguments;
         this.setComponents(
@@ -23,6 +22,7 @@ export default class Matrix44 {
         this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
       }
     } else if (Array.isArray(m)) {
+      this.m = new Float32Array(16);
       if (isColumnMajor === true) {
         this.setComponents(
           m[0], m[4], m[8], m[12],
@@ -33,16 +33,23 @@ export default class Matrix44 {
         this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
       }
     } else if (m instanceof Float32Array) {
-      if (isColumnMajor === true) {
-        this.setComponents(
-          m[0], m[4], m[8], m[12],
-          m[1], m[5], m[9], m[13],
-          m[2], m[6], m[10], m[14],
-          m[3], m[7], m[11], m[15]);
+      this.m = new Float32Array(16);
+      if (notCopyFloat32Array) {
+        this.m = m;
       } else {
-        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        this.m = new Float32Array(16);
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }  
       }
     } else {
+      this.m = new Float32Array(16);
       this.identity();
     }
   }

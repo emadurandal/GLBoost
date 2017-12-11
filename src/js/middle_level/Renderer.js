@@ -126,12 +126,12 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
-      let gizmos = renderPass.gizmos;
       const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
       this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
       this._glBoostContext.currentGlobalStates = [
         3042, // gl.BLEND
       ];
+      let gizmos = renderPass.gizmos;
       for (let gizmo of gizmos) {
         if (gizmo.isVisible) {
           gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
