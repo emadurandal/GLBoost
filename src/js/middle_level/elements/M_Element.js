@@ -844,10 +844,6 @@ export default class M_Element extends L_Element {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
-      if (this._activeAnimationLineName !== null && input === null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
       this._matrixAccumulatedAncestryJoint = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
       this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
     }
@@ -855,12 +851,9 @@ export default class M_Element extends L_Element {
     return this._matrixAccumulatedAncestryJoint;
   }
 
-  _multiplyMyAndParentTransformMatricesForJoints(withMySelf, inputValue) {
-    let input = inputValue;
-    if (typeof input === 'undefined') {
-      if (this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
+  _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
+    if (input === null && this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
     if (this._parent === null) {
@@ -881,7 +874,7 @@ export default class M_Element extends L_Element {
         this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempNumber ||
         this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
       {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, inputValue), currentMatrix);
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
           this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
       }
@@ -959,10 +952,6 @@ export default class M_Element extends L_Element {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
-      if (this._activeAnimationLineName !== null && input === null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
       this._matrixAccumulatedAncestry = (this._multiplyMyAndParentTransformMatrices(true, input));
       this._accumulatedAncestryObjectUpdateNumber= tempNumber;
     }
@@ -971,7 +960,9 @@ export default class M_Element extends L_Element {
   }
 
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-
+    if (input === null && this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
     if (this._parent === null) {
       if (withMySelf) {
         return this.getTransformMatrixAt(input);
