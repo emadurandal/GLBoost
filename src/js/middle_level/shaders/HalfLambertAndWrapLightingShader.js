@@ -67,21 +67,15 @@ export default class HalfLambertAndWrapLightingShader extends DecalShader {
     this._wrap = new Vector3(0.6, 0.3, 0.0);
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     var Kd = material.diffuseColor;
     let Ka = material.ambientColor;
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_wrap'), this._wrap.x, this._wrap.y, this._wrap.z, true);
 
-    const accumulatedAmbientIntensity = Vector4.zero();
-    for (let light of lights) {
-      if (light.isTypeAmbient()) {
-        accumulatedAmbientIntensity.add(light.intensity.toVector4());
-      }
-    }
-    let ambient = Vector4.multiplyVector(Ka, accumulatedAmbientIntensity);
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
   }
 

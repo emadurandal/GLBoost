@@ -6,6 +6,7 @@ import M_AbstractLight from './lights/M_AbstractLight';
 import M_Mesh from './meshes/M_Mesh';
 import M_Group from './M_Group';
 import AABB from '../../low_level/math/AABB';
+import Vector4 from '../../low_level/math/Vector4';
 
 
 /**
@@ -30,7 +31,11 @@ export default class M_Scene extends M_Group {
   _reset() {
     this._meshes = [];
     this._lights = [];
+    this._lightsExceptAmbient = [];
+    this._ambientLights = [];    
     this._cameras = [];
+    this._accumulatedAmbientIntensity = Vector4.zero();
+    ;
   }
 
   _getCurrentAnimationInputValue(inputName:string) {
@@ -88,8 +93,12 @@ export default class M_Scene extends M_Group {
     };
 
     this._lights = [];
+    this._lightsExceptAmbient = [];
+    this._ambientLights = [];
     this._elements.forEach((elm)=> {
       this._lights = this._lights.concat(collectLights(elm));
+      this._lightsExceptAmbient = this._lights.filter((light)=>{return !light.isTypeAmbient();});
+      this._ambientLights = this._lights.filter((light)=>{return light.isTypeAmbient();});
     });
 
     let existCamera_f = false;
@@ -181,6 +190,21 @@ export default class M_Scene extends M_Group {
     };
     callPrepareToRenderMethodOfAllElements(this);
   }
+
+  get lightsExceptAmbient() {
+    return this._lightsExceptAmbient;
+  }
+
+  updateAmountOfAmbientLightsIntensity() {
+    this._accumulatedAmbientIntensity = Vector4.zero();
+    for (let light of this._ambientLights) {
+      this._accumulatedAmbientIntensity.add(light.intensity);
+    }
+  }
+
+  getAmountOfAmbientLightsIntensity() {
+    return this._accumulatedAmbientIntensity.clone();
+  }    
 
   /**
    * [en] Get child elements which belong to this scene.<br>

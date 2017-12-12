@@ -119,7 +119,7 @@ export default class DrawKickerLocal {
       let isMaterialSetupDone = true;
 
       {
-        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh);
+        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
         isMaterialSetupDone = material.setUpTexture();
