@@ -948,7 +948,7 @@ export default class M_Element extends L_Element {
       }
   
       if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
         return currentMatrix;
       }
 
