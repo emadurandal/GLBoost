@@ -476,7 +476,7 @@ export default class M_Element extends L_Element {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
     if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._transformMatrixAccumulatedAncestryWithoutMySelf === 'undefined') {
-      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, void 0);
+      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null);
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
@@ -827,12 +827,7 @@ export default class M_Element extends L_Element {
 
     get transformMatrixAccumulatedAncestryForJoints() {
 
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(input);
+    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(null);
 
     return matrix;
 
@@ -845,12 +840,14 @@ export default class M_Element extends L_Element {
   }
 
 
-  getTransformMatrixAccumulatedAncestryForJointsAt(inputValue) {
-    let input = inputValue;
-
+  getTransformMatrixAccumulatedAncestryForJointsAt(input) {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
+      if (this._activeAnimationLineName !== null || input === null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+
       this._matrixAccumulatedAncestryJoint = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
       this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
     }
@@ -950,12 +947,7 @@ export default class M_Element extends L_Element {
 
   get transformMatrixAccumulatedAncestry() {
 
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    const matrix = this.getTransformMatrixAccumulatedAncestryAt(input);
+    const matrix = this.getTransformMatrixAccumulatedAncestryAt(null);
 
     return matrix;
 
@@ -967,6 +959,10 @@ export default class M_Element extends L_Element {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
+      if (this._activeAnimationLineName !== null || input === null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+
       this._matrixAccumulatedAncestry = (this._multiplyMyAndParentTransformMatrices(true, input));
       this._accumulatedAncestryObjectUpdateNumber= tempNumber;
     }

@@ -32,6 +32,8 @@ export default class DrawKickerWorld {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
     }
 
+    let input = mesh._getCurrentAnimationInputValue('time');
+
     for (let i=0; i<materials.length;i++) {
       let material = materials[i];
       if (!material.isVisible) {
@@ -60,10 +62,10 @@ export default class DrawKickerWorld {
       let normal_m;
       if (mesh.isAffectedByWorldMatrix) {
         if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
-          world_m = mesh.transformMatrixAccumulatedAncestry;
+          world_m = mesh.getTransformMatrixAccumulatedAncestryAt(input);
           normal_m = mesh.normalMatrixAccumulatedAncestry;
         } else {
-          world_m = mesh.transformMatrix;
+          world_m = mesh.getTransformMatrixAt(input);
           normal_m = mesh.normalMatrix;
         }
       } else {
