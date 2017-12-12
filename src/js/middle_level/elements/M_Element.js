@@ -844,7 +844,7 @@ export default class M_Element extends L_Element {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
-      if (this._activeAnimationLineName !== null || input === null) {
+      if (this._activeAnimationLineName !== null && input === null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
@@ -959,7 +959,7 @@ export default class M_Element extends L_Element {
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
     if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
-      if (this._activeAnimationLineName !== null || input === null) {
+      if (this._activeAnimationLineName !== null && input === null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
