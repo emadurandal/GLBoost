@@ -71,11 +71,7 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
-<<<<<<< HEAD
-      let lights = renderPass.scene.lights;
-=======
       let lights = renderPass.scene.lightsExceptAmbient;
->>>>>>> secret/master
 
       renderPass.preRender(camera ? true:false, lights);
 
