@@ -825,30 +825,12 @@ export default class M_Element extends L_Element {
     return latestInputValue;
   }
 
-    get transformMatrixAccumulatedAncestryForJoints() {
-
-    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(null);
-
-    return matrix;
-
+  get transformMatrixAccumulatedAncestryForJoints() {
+    return this._multiplyMyAndParentTransformMatricesForJoints(true, null);;
   }
-
-  get transformMatrixAccumulatedAncestryAsForJointsBindPose() {
-    const matrix = this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
-
-    return matrix;
-  }
-
 
   getTransformMatrixAccumulatedAncestryForJointsAt(input) {
-    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-
-    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
-      this._matrixAccumulatedAncestryJoint = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
-    }
-
-    return this._matrixAccumulatedAncestryJoint;
+    return this._multiplyMyAndParentTransformMatricesForJoints(true, input);
   }
 
   _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
@@ -856,30 +838,30 @@ export default class M_Element extends L_Element {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
-    if (this._parent === null) {
-      if (withMySelf) {
-        return this.getRotateTranslateAt(input);
-      } else {
-        return Matrix44.identity();
-      }
-    } else {
+    let tempNumber = 0;
+    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+      this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+      this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
+    {
 
-      let currentMatrix = Matrix44.identity();
-      if (withMySelf) {
-        currentMatrix = this.getRotateTranslateAt(input);
-      }
+        let currentMatrix = null;
+        if (withMySelf) {
+          currentMatrix = this.getRotateTranslateAt(input);
+        } else {
+          currentMatrix = Matrix44.identity();
+        }
+    
+        if (this._parent === null) {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
+          return currentMatrix;
+        }
 
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== tempNumber ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
-      {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
-          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
+        this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
     }
+    return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
+  
   }
 
 
@@ -939,53 +921,42 @@ export default class M_Element extends L_Element {
 
 
   get transformMatrixAccumulatedAncestry() {
-
-    const matrix = this.getTransformMatrixAccumulatedAncestryAt(null);
-
-    return matrix;
-
+    return this._multiplyMyAndParentTransformMatrices(true, null);
   }
 
 
   getTransformMatrixAccumulatedAncestryAt(input) {
-
-    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-
-    if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
-      this._matrixAccumulatedAncestry = (this._multiplyMyAndParentTransformMatrices(true, input));
-      this._accumulatedAncestryObjectUpdateNumber= tempNumber;
-    }
-
-    return this._matrixAccumulatedAncestry;
+    return this._multiplyMyAndParentTransformMatrices(true, input);
   }
 
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
     if (input === null && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
-    if (this._parent === null) {
-      if (withMySelf) {
-        return this.getTransformMatrixAt(input);
-      } else {
-        return Matrix44.identity();
-      }
-    } else {
 
-      let currentMatrix = Matrix44.identity();
+    let tempNumber = 0;
+    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
+      this.__updateInfoString_multiplyMyAndParentTransformMatrices !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+      this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
+    {
+
+      let currentMatrix = null;
       if (withMySelf) {
         currentMatrix = this.getTransformMatrixAt(input);
+      } else {
+        currentMatrix = Matrix44.identity();
+      }
+  
+      if (this._parent === null) {
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
+        return currentMatrix;
       }
 
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatrices !== tempNumber ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
-      {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
-          this.__cache_input_multiplyMyAndParentTransformMatrices = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
+      this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+      this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
+      this.__cache_input_multiplyMyAndParentTransformMatrices = input;
     }
+    return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
+  
   }
 }
