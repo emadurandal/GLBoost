@@ -87,8 +87,8 @@ export default class PhongShader extends DecalShader {
 
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     var Kd = material.diffuseColor;
     var Ks = material.specularColor;
@@ -97,13 +97,7 @@ export default class PhongShader extends DecalShader {
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
     this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
 
-    const accumulatedAmbientIntensity = Vector4.zero();
-    for (let light of lights) {
-      if (light.isTypeAmbient()) {
-        accumulatedAmbientIntensity.add(light.intensity.toVector4());
-      }
-    }
-    let ambient = Vector4.multiplyVector(Ka, accumulatedAmbientIntensity);
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
   }

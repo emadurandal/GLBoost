@@ -35,8 +35,8 @@ export default class FragmentSimpleShader extends Shader {
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
   }
 }

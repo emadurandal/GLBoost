@@ -49,4 +49,7 @@ export default class M_AbstractLight extends M_Element {
     return this._isLightType === 'point';
   }
 
+  isTypeSpot() {
+    return this._isLightType === 'spot';
+  }
 }

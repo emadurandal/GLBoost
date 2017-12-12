@@ -133,8 +133,8 @@ export default class WireframeShader extends FragmentSimpleShader {
 
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let isWifeframe = false;
     let isWireframeOnShade = false;
@@ -180,7 +180,7 @@ export default class WireframeShader extends FragmentSimpleShader {
       this._glContext.uniform1f(uniformLocationUnfoldUVRatio, unfoldUVRatioParameter, true);
     }
 
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {

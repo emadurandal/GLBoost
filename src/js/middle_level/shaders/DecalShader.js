@@ -131,8 +131,8 @@ export default class DecalShader extends WireframeShader {
     this._lut = null;
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let baseColor = material.baseColor;
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
@@ -169,8 +169,8 @@ export default class DecalShader extends WireframeShader {
     }
   }
 
-  setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         // set depthTexture unit i+1 to the sampler

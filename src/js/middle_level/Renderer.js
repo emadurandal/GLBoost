@@ -28,6 +28,7 @@ export default class Renderer extends GLBoostObject {
     // gather scenes as unique
     for (let renderPass of expression.renderPasses) {
       skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
+      renderPass.scene.updateAmountOfAmbientLightsIntensity();
     }
 
     let unique = function(array) {
@@ -43,6 +44,7 @@ export default class Renderer extends GLBoostObject {
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
     }
+
   }
 
   /**
@@ -69,8 +71,7 @@ export default class Renderer extends GLBoostObject {
         }
       });
 
-      let lights = renderPass.scene.lights;
-      let lightsExceptAmbient = renderPass.scene.lightsExceptAmbient;
+      let lights = renderPass.scene.lightsExceptAmbient;
 
       renderPass.preRender(camera ? true:false, lights);
 

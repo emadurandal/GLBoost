@@ -111,8 +111,8 @@ export default class DrawKickerWorld {
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
         }
 
-        for (let j = 0; j < lightsExceptAmbient.length; j++) {
-          let light = lightsExceptAmbient[j];
+        for (let j = 0; j < lights.length; j++) {
+          let light = lights[j];
           if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
             let lightPosition = new Vector4(0, 0, 0, 1);            
             let lightDirection = new Vector4(0, 0, 0, 1);
@@ -146,7 +146,7 @@ export default class DrawKickerWorld {
       let isMaterialSetupDone = true;
 
       {
-        let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+        let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
         material.setUpStates();
@@ -154,7 +154,7 @@ export default class DrawKickerWorld {
         this._setUpOrTearDownTextures(true, material);
       }
       
-      this._setupOtherTextures(lightsExceptAmbient);
+      this._setupOtherTextures(lights);
 
       if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
@@ -166,9 +166,9 @@ export default class DrawKickerWorld {
         gl.drawArrays(primitiveType, 0, vertexN);
       }
 
-      material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights);
+      material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
 
-      this._tearDownOtherTextures(lightsExceptAmbient);
+      this._tearDownOtherTextures(lights);
 
       material.tearDownStates();
 
