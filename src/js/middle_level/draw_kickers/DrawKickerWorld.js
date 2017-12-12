@@ -25,7 +25,7 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, materials, camera, lights, lightsExceptAmbient, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
 
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
@@ -101,6 +101,7 @@ export default class DrawKickerWorld {
 
       if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
+        let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
         
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 1, 1);
@@ -153,6 +154,9 @@ export default class DrawKickerWorld {
 
         this._setUpOrTearDownTextures(true, material);
       }
+
+
+      let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
       
       this._setupOtherTextures(lightsExceptAmbient);
 

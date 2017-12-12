@@ -25,8 +25,8 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  draw(expression, lights, lightsExceptAmbient, camera, scene, renderPassIndex) {
-    this._geometry.draw(expression, lights, lightsExceptAmbient, camera, this, scene, renderPassIndex);
+  draw(expression, lights, camera, scene, renderPassIndex) {
+    this._geometry.draw(expression, lights, camera, this, scene, renderPassIndex);
   }
 
   set geometry(geometry) {

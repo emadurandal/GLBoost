@@ -30,7 +30,6 @@ export default class M_Scene extends M_Group {
   _reset() {
     this._meshes = [];
     this._lights = [];
-    this._lightsExceptAmbient = [];
     this._cameras = [];
   }
 
@@ -89,10 +88,8 @@ export default class M_Scene extends M_Group {
     };
 
     this._lights = [];
-    this._lightsExceptAmbient = [];
     this._elements.forEach((elm)=> {
       this._lights = this._lights.concat(collectLights(elm));
-      this._lightsExceptAmbient = this._lights.filter((light)=>{return !light.isTypeAmbient();});
     });
 
     let existCamera_f = false;
@@ -219,10 +216,6 @@ export default class M_Scene extends M_Group {
    */
   get lights() {
     return this._lights;
-  }
-
-  get lightsExceptAmbient() {
-    return this._lightsExceptAmbient;
   }
 
   /**
