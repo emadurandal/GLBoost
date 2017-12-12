@@ -85,8 +85,8 @@ export default class SPVPhongShader extends SPVDecalShader {
     this._toUseSurfaceColorAsSpecularMap = true;
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     let Ks = material.specularColor;
@@ -96,13 +96,7 @@ export default class SPVPhongShader extends SPVDecalShader {
     this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
     this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_toUseSurfaceColorAsSpecularMap'), this._toUseSurfaceColorAsSpecularMap, true);
 
-    const accumulatedAmbientIntensity = Vector4.zero();
-    for (let light of lights) {
-      if (light.isTypeAmbient()) {
-        accumulatedAmbientIntensity.add(light.intensity.toVector4());
-      }
-    }
-    let ambient = Vector4.multiplyVector(Ka, accumulatedAmbientIntensity);
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
 
   }

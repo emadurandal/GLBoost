@@ -67,20 +67,14 @@ export default class SPVLambertShader extends SPVDecalShader {
     SPVLambertShader.mixin(SPVLambertShaderSource);
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
     let Ka = material.ambientColor;    
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
 
-    const accumulatedAmbientIntensity = Vector4.zero();
-    for (let light of lights) {
-      if (light.isTypeAmbient()) {
-        accumulatedAmbientIntensity.add(light.intensity.toVector4());
-      }
-    }
-    let ambient = Vector4.multiplyVector(Ka, accumulatedAmbientIntensity);
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
 
   }
