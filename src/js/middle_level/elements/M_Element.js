@@ -456,20 +456,34 @@ export default class M_Element extends L_Element {
   }
   */
 
-  _multiplyMyAndParentTransformMatricesInInverseOrder(currentElem, withMySelf) {
-    if (currentElem._parent === null) {
-      if (withMySelf) {
-        return currentElem.transformMatrix;
-      } else {
-        return Matrix44.identity();
-      }
-    } else {
-      let currentMatrix = Matrix44.identity();
-      if (withMySelf) {
-        currentMatrix = currentElem.transformMatrix;
-      }
-      return currentMatrix.multiply(this._multiplyMyAndParentTransformMatricesInInverseOrder(currentElem._parent, true));
+  _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
+    if (input === null && this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
+
+    let tempNumber = 0;
+    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
+      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
+    {
+
+      let currentMatrix = null;
+      if (withMySelf) {
+        currentMatrix = this.getTransformMatrixAt(input);
+      } else {
+        currentMatrix = Matrix44.identity();
+      }
+  
+      if (this._parent === null) {
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
+        return currentMatrix;
+      }
+
+      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
+      this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
+    }
+    return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
   }
 
   get transformMatrixAccumulatedAncestryWithoutMySelf() {
@@ -501,14 +515,7 @@ export default class M_Element extends L_Element {
       return Matrix44.identity();
     }
 
-    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberInv !== tempNumber || typeof this._invMatrixAccumulatedAncestry === 'undefined') {
-      this._invMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(this, false).invert();
-      this._accumulatedAncestryObjectUpdateNumberInv = tempNumber;
-    }
-
-    return this._invMatrixAccumulatedAncestry.clone();
+    return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).invert();
   }
 
   _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
@@ -527,7 +534,7 @@ export default class M_Element extends L_Element {
     }
   }
 
-  get rotateMatrixAccumulatedAncestry() {
+//  get rotateMatrixAccumulatedAncestry() {
     /*
      var mat = this._multiplyMyAndParentTransformMatrices(this);
      var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
@@ -540,8 +547,8 @@ export default class M_Element extends L_Element {
      mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
      0, 0, 0, 1
      );*/
-    return this._multiplyMyAndParentRotateMatrices(this, true);
-  }
+//    return this._multiplyMyAndParentRotateMatrices(true, null);
+//  }
 
   get inverseTransformMatrixAccumulatedAncestry() {
     return this._multiplyMyAndParentTransformMatrices(true, null).invert();
@@ -948,7 +955,7 @@ export default class M_Element extends L_Element {
       }
   
       if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
         return currentMatrix;
       }
 
