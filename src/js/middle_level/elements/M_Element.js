@@ -490,11 +490,11 @@ export default class M_Element extends L_Element {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
     if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._transformMatrixAccumulatedAncestryWithoutMySelf === 'undefined') {
-      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null);
+      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
-    return this._transformMatrixAccumulatedAncestryWithoutMySelf.clone();
+    return this._transformMatrixAccumulatedAncestryWithoutMySelf;
   }
 
   get normalMatrixAccumulatedAncestry() {
@@ -515,7 +515,7 @@ export default class M_Element extends L_Element {
       return Matrix44.identity();
     }
 
-    return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).invert();
+    return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
   }
 
   _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
@@ -551,7 +551,7 @@ export default class M_Element extends L_Element {
 //  }
 
   get inverseTransformMatrixAccumulatedAncestry() {
-    return this._multiplyMyAndParentTransformMatrices(true, null).invert();
+    return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
   }
 
   _accumulateMyAndParentOpacity(currentElem) {
@@ -833,11 +833,11 @@ export default class M_Element extends L_Element {
   }
 
   get transformMatrixAccumulatedAncestryForJoints() {
-    return this._multiplyMyAndParentTransformMatricesForJoints(true, null);;
+    return this._multiplyMyAndParentTransformMatricesForJoints(true, null).clone();
   }
 
   getTransformMatrixAccumulatedAncestryForJointsAt(input) {
-    return this._multiplyMyAndParentTransformMatricesForJoints(true, input);
+    return this._multiplyMyAndParentTransformMatricesForJoints(true, input).clone();
   }
 
   _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
@@ -928,12 +928,12 @@ export default class M_Element extends L_Element {
 
 
   get transformMatrixAccumulatedAncestry() {
-    return this._multiplyMyAndParentTransformMatrices(true, null);
+    return this._multiplyMyAndParentTransformMatrices(true, null).clone();
   }
 
 
   getTransformMatrixAccumulatedAncestryAt(input) {
-    return this._multiplyMyAndParentTransformMatrices(true, input);
+    return this._multiplyMyAndParentTransformMatrices(true, input).clone();
   }
 
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
