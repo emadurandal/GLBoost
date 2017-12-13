@@ -241,11 +241,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
   }
 
-<<<<<<< HEAD
-  draw(expression, lights, camera, skeletalMesh, scene, renderPass_index) {
-=======
   drawIntermediate(gl, glslProgram, materials) {
->>>>>>> secret/master
     if (this._jointMatrices === null && this._qtArray === null) {
       return;
     }
@@ -276,11 +272,7 @@ export default class M_SkeletalGeometry extends Geometry {
       }
     }
 
-<<<<<<< HEAD
-    super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
-=======
     //super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
->>>>>>> secret/master
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, shaderClassSpecified) {
