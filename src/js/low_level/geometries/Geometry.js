@@ -553,6 +553,8 @@ export default class Geometry extends GLBoostObject {
 
   }
 
+  drawIntermediate() {}
+
   merge(geometrys) {
     if (Array.isArray(geometrys)) {
       let typedArrayDic = {};

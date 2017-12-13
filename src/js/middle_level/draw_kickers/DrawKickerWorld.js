@@ -160,6 +160,9 @@ export default class DrawKickerWorld {
       
       this._setupOtherTextures(lights);
 
+      geometry.drawIntermediate(gl, glslProgram, materials);
+
+
       if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
         let vertexN = material.getVertexN(geometry);
