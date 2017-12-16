@@ -113,11 +113,19 @@ export default class GLExtensionsManager {
       gl[`COLOR_ATTACHMENT${index}`];
   }
 
-  elementIndexBitSize(gl) {
+  elementIndexBitSizeGLConstant(gl) {
     if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
       return gl.UNSIGNED_INT;
     } else {
       return gl.UNSIGNED_SHORT;
+    }
+  }
+
+  elementIndexByteSizeNumber(gl) {
+    if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
+      return 4;
+    } else {
+      return 2;
     }
   }
 

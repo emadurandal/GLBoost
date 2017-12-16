@@ -64,12 +64,7 @@ export default class Renderer extends GLBoostObject {
       }
       renderPassTag = renderPass.tag;
 
-      var camera = false;
-      renderPass.scene.cameras.forEach((elm)=> {
-        if (elm.isMainCamera(renderPass.scene)) {
-          camera = elm;
-        }
-      });
+      var camera = renderPass.scene.getMainCamera();
 
       let lights = renderPass.scene.lightsExceptAmbient;
 

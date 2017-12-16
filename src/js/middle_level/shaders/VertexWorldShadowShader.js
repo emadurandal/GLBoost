@@ -103,17 +103,6 @@ export default class VertexWorldShadowShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
-    material._semanticsDic['WORLD'] = 'worldMatrix';
-    material.setUniform(shaderProgram, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
-    material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
-    if (existCamera_f) {
-      material.setUniform(shaderProgram, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
-      material._semanticsDic['VIEW'] = 'viewMatrix';
-      material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
-      material._semanticsDic['PROJECTION'] = 'projectionMatrix';
-    }
-
     let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
     for (let i=0; i<lightsExceptAmbient.length; i++) {
       let light = lightsExceptAmbient[i];

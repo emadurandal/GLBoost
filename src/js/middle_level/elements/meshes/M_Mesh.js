@@ -20,9 +20,15 @@ export default class M_Mesh extends M_Element {
 
   prepareToRender(expression, existCamera_f, lights) {
     this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
+    /*
     if (this._geometry._materials.length === 0 && this._material) {
-      this._material = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
+      let shaderInstance = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
+      this._geometry._setVertexNtoSingleMaterial(this._material, 0);
+      this._material.shaderInstance = shaderInstance;      
+      this._material.shaderInstance.vao = this._geometry._getVAO();
+      this._geometry.setUpVertexAttribs(this._glContext.gl, shaderInstance._glslProgram, this._geometry._getAllVertexAttribs());
     }
+    */
   }
 
   draw(expression, lights, lightsExceptAmbient, camera, scene, renderPassIndex) {
