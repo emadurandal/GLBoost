@@ -9,6 +9,7 @@ import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShade
 import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
+import Shader from '../../low_level/shaders/Shader';
 
 
 export default class Geometry extends GLBoostObject {
@@ -19,6 +20,7 @@ export default class Geometry extends GLBoostObject {
     this._vertexN = 0;
     this._vertices = null;
     this._indicesArray = null;
+    this._indexStartOffsetArray = [];
     this._performanceHint = null;
     this._defaultMaterial = null;
     this._vertexData = [];
@@ -38,17 +40,6 @@ export default class Geometry extends GLBoostObject {
    * 全ての頂点属性のリストを返す
    */
   static _allVertexAttribs(vertices) {
-    var attribNameArray = [];
-    for (var attribName in vertices) {
-      if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
-        attribNameArray.push(attribName);
-      }
-    }
-
-    return attribNameArray;
-  }
-
-  _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
       if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
@@ -401,60 +392,57 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
-  _createShaderInstance(shaderClass) {
-    let basicShaderSource = null;
-    if (this._drawKicker instanceof DrawKickerWorld) {
-      basicShaderSource = VertexWorldShaderSource;
-    } else if (this._drawKicker instanceof DrawKickerLocal) {
-      basicShaderSource = VertexLocalShaderSource;
-    }
-    let shaderInstance = new shaderClass(this._glBoostContext, basicShaderSource);
-    return shaderInstance;
+
+
+  _getVAO() {
+    return Geometry._vaoDic[this.toString()];
   }
+
+  _getAllVertexAttribs() {
+    return Geometry._allVertexAttribs(this._vertices);
+  } 
 
   prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0) {
     let gl = this._glContext.gl;
     let vertices = this._vertices;
 
-    let glem = GLExtensionsManager.getInstance(this._glContext);
+   //let glem = GLExtensionsManager.getInstance(this._glContext);
     let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
 
-    if (doSetupVertexAttribs) {
-      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-    }
+//    if (doSetupVertexAttribs) {
+//      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
+//    }
 
-    let allVertexAttribs = Geometry._allVertexAttribs(vertices);
+    
 
-
+    let shaderInstance = null;
     if (shaderClass) {
-      material.shaderInstance = this._createShaderInstance(shaderClass);
-    } else if (material.shaderInstance === null) {
-      material.shaderInstance = this._createShaderInstance(material.shaderClass);
+      shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+    } else {
+      shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
     }
 
-    let glslProgram = material.shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
-    if (doSetupVertexAttribs) {
-      this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-    }
-    material.shaderInstance.vao = Geometry._vaoDic[this.toString()];
+    let glslProgram = shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+//    if (doSetupVertexAttribs) {
+    //  this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
+//    }
 
-    if (doSetupVertexAttribs) {
-      glem.bindVertexArray(gl, null);
-    }
-    this._setVertexNtoSingleMaterial(material, index);
+//    if (doSetupVertexAttribs) {
+    //  glem.bindVertexArray(gl, null);
+//    }
 
-    return material;
+    return shaderInstance;
   }
 
   _setVertexNtoSingleMaterial(material, index) {
     // if this mesh has only one material...
-    if (material.getVertexN(this) === 0) {
-      if (this._indicesArray && this._indicesArray.length > 0) {
-        material.setVertexN(this, this._indicesArray[index].length);
-      } else {
-        material.setVertexN(this, this._vertexN);
-      }
+    //if (material.getVertexN(this) === 0) {
+    if (this._indicesArray && this._indicesArray.length > 0) {
+      material.setVertexN(this, this._indicesArray[index].length);
+    } else {
+      material.setVertexN(this, this._vertexN);
     }
+    //}
   }
 
   _getAppropriateMaterials(mesh) {
@@ -464,15 +452,17 @@ export default class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      if (this._defaultMaterial === null) {
-        this._defaultMaterial = this._glBoostContext.createClassicMaterial();
-      }
-      materials = [this._defaultMaterial];
+      mesh.material = this._glBoostContext.createClassicMaterial();
+      materials = [mesh.material];
     }
     return materials;
   }
 
-  prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh, shaderClass = void 0) {
+  getIndexStartOffsetArrayAtMaterial(i) {
+    return this._indexStartOffsetArray[i];
+  }
+
+  prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh, shaderClass = void 0, argMaterials = void 0) {
 
     var vertices = this._vertices;
     var gl = this._glContext.gl;
@@ -492,53 +482,78 @@ export default class Geometry extends GLBoostObject {
     }
     glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
 
-    let doAfter = true;
+    let doAfter = false;
 
     allVertexAttribs.forEach((attribName)=> {
       // create VBO
       if (this._vboObj[attribName]) {
-        doAfter = false;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
       } else {
         let vbo = this._glContext.createBuffer(this);
         this._vboObj[attribName] = vbo;
-      }
-    });
 
-
-    let materials = this._getAppropriateMaterials(mesh);
-
-
-    for (let i=0; i<materials.length;i++) {
-      this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
-    }
-
-    if (doAfter) {
-
-      allVertexAttribs.forEach((attribName)=> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
 //        if (typeof this._vertices[attribName].buffer !== 'undefined') {
-          gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+        gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
 //        } else {
 //          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
 //        }
-        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
-      });
+      //gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-      Geometry._iboArrayDic[this.toString()] = [];
-      if (this._indicesArray) {
-        // create Index Buffer
-        for (let i=0; i<this._indicesArray.length; i++) {
+        doAfter = true;
+      }
+    });
+
+    if (doAfter) {
+        
+      if (Geometry._iboArrayDic[this.toString()]) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()] );
+      } else {
+        if (this._indicesArray) {
+          let indices = [];
+          for (let i=0; i<this._indicesArray.length; i++) {
+            if (i==0) {
+              this._indexStartOffsetArray[i] = 0;
+            }
+            this._indexStartOffsetArray[i+1] = this._indexStartOffsetArray[i] + this._indicesArray[i].length;
+            Array.prototype.push.apply(indices, this._indicesArray[i]);  
+          }
+          // create Index Buffer
           var ibo = this._glContext.createBuffer(this);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, this._indicesArray[i]), gl.STATIC_DRAW);
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-          Geometry._iboArrayDic[this.toString()][i] = ibo;
-          //this._defaultMaterial.setVertexN(this._indicesArray[i].length);
+          gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, indices), gl.STATIC_DRAW);
+          Geometry._iboArrayDic[this.toString()] = ibo;
         }
       }
-      glem.bindVertexArray(gl, null);
     }
+
+    let materials = argMaterials;
+
+    if (argMaterials === void 0) {
+      materials = this._getAppropriateMaterials(mesh);
+    }
+    //let materials = this._getAppropriateMaterials(mesh);
+
+    for (let i=0; i<materials.length;i++) {
+      let shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+      this._setVertexNtoSingleMaterial(materials[i], i);
+      shaderInstance.vao = Geometry._vaoDic[this.toString()];
+      this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
+      if (argMaterials === void 0) {
+        materials[i].shaderInstance = shaderInstance;
+      } else {
+        argMaterials[i].shaderInstance = shaderInstance;
+      }
+    }
+
+    glem.bindVertexArray(gl, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
     return materials;
+  }
+
+  _setUpVertexAttibsWrapper(glslProgram) {
+    this.setUpVertexAttribs(this._glContext.gl, glslProgram, this._getAllVertexAttribs());    
   }
 
   draw(expression, lights, camera, mesh, scene, renderPassIndex) {
@@ -787,7 +802,7 @@ export default class Geometry extends GLBoostObject {
   }
 
   isIndexed() {
-    return Geometry._iboArrayDic[this.toString()].length > 0;
+    return !!Geometry._iboArrayDic[this.toString()];
   }
 
   getTriangleCount(mesh) {

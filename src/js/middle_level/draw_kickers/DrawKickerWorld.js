@@ -6,6 +6,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Matrix33 from '../../low_level/math/Matrix33';
 import Shader from '../../low_level/shaders/Shader';
 import MiscUtil from '../../low_level/misc/MiscUtil';
+import Geometry from '../../low_level/geometries/Geometry';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -25,7 +26,7 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+  draw(gl, glem, expression, mesh, originalMaterials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
 
     var isVAOBound = false;
     if (DrawKickerWorld._lastGeometry !== geometryName) {
@@ -34,14 +35,18 @@ export default class DrawKickerWorld {
 
     let input = mesh._getCurrentAnimationInputValue('time');
 
-    for (let i=0; i<materials.length;i++) {
-      let material = materials[i];
+    for (let i=0; i<originalMaterials.length;i++) {
+      let material = originalMaterials[i];
       if (!material.isVisible) {
         continue;
       }
 
-      let materialUpdateStateString = material.getUpdateStateString();
+      let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
+      if (renderpassSpecificMaterial) {
+        material = renderpassSpecificMaterial;
+      }
       this._glslProgram = material.shaderInstance.glslProgram;
+
       material._glContext.useProgram(this._glslProgram);
       let glslProgram = this._glslProgram;
 
@@ -49,7 +54,7 @@ export default class DrawKickerWorld {
         if (DrawKickerWorld._lastGeometry !== geometryName) {
           for (let attribName in vboDic) {
             gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-            geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+            geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
           }
         }
       }
@@ -160,15 +165,17 @@ export default class DrawKickerWorld {
       
       this._setupOtherTextures(lights);
 
-      geometry.drawIntermediate(gl, glslProgram, materials);
+      geometry.drawIntermediate(gl, glslProgram, material);
 
 
       if (geometry.isIndexed()) {
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
         let vertexN = material.getVertexN(geometry);
-        let indexBitSize = glem.elementIndexBitSize(gl);
-        gl.drawElements(primitiveType, vertexN, indexBitSize, 0);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+        let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
+        let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
+        let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);
+        gl.drawElements(primitiveType, vertexN, indexBitSizeGLConstant, offset*indexByteSizeNumber);
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(primitiveType, 0, vertexN);
       }
@@ -179,12 +186,13 @@ export default class DrawKickerWorld {
 
       material.tearDownStates();
 
-      DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
+      //DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
+    //glem.bindVertexArray(gl, null);
 
   //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
+    //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     DrawKickerWorld._lastGeometry = geometryName;
   }
 
@@ -231,6 +239,6 @@ export default class DrawKickerWorld {
   }
 }
 
-DrawKickerWorld._lastMaterialUpdateStateString = null;
-DrawKickerWorld._lastGeometry = null;
-DrawKickerWorld._lastRenderPassIndex = -1;
+//DrawKickerWorld._lastMaterialUpdateStateString = null;
+//DrawKickerWorld._lastGeometry = null;
+//DrawKickerWorld._lastRenderPassIndex = -1;

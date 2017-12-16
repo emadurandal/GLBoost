@@ -191,6 +191,17 @@ export default class M_Scene extends M_Group {
     callPrepareToRenderMethodOfAllElements(this);
   }
 
+  getMainCamera(renderPass:any) {
+    var camera = null;
+    this.cameras.forEach((elm)=> {
+      if (elm.isMainCamera(this)) {
+        camera = elm;
+      }
+    });
+
+    return camera;
+  }
+
   get lightsExceptAmbient() {
     return this._lightsExceptAmbient;
   }

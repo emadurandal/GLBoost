@@ -57,7 +57,7 @@ export default class M_SkeletalGeometry extends Geometry {
         jointZeroTransformMatrixAccumulatedAncestry = globalJointTransform;
       }
 //      if (true) {
-      if (this._materialForSkeletal.shaderInstance.constructor === FreeShader) {
+      if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
         matrices[i] = Matrix44.invert(skeletalMeshTransformMatrixAccumulatedAncestry);
       } else {
         matrices[i] = Matrix44.identity();
@@ -241,7 +241,7 @@ export default class M_SkeletalGeometry extends Geometry {
 
   }
 
-  drawIntermediate(gl, glslProgram, materials) {
+  drawIntermediate(gl, glslProgram, material) {
     if (this._jointMatrices === null && this._qtArray === null) {
       return;
     }
@@ -256,97 +256,80 @@ export default class M_SkeletalGeometry extends Geometry {
     }
     */
 
-    for (let i=0; i<materials.length;i++) {
+//    for (let i=0; i<materials.length;i++) {
       //var glslProgram = materials[i].shaderInstance.glslProgram;
 //      this._glContext.useProgram(glslProgram);
       
       if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINTMATRIX', new Float32Array(this._jointMatrices));
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(this._jointMatrices));
       } else {
  //     Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', this._qArray);
 //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', this._qArray);
  //     Shader.trySettingVec3ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_TRANSLATION', this._tArray);      
-        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATTRANSLATION', this._qtArray);//
-        this._glContext.uniform3f(materials[i].getUniform(glslProgram, 'uniform_translationScale'),
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', this._qtArray);//
+        this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
           this._translationScale.x, this._translationScale.y, this._translationScale.z, true);
       }
-    }
+  //  }
 
     //super.draw(expression, lights, camera, skeletalMesh, scene, renderPass_index);
   }
 
-  prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, shaderClassSpecified) {
-    // before prepareForRender of 'Geometry' class, a new 'BlendShapeShader'(which extends default shader) is assigned.
-/*
-    if (this._skeletalShaderSpecified) {
-      return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, this._skeletalShaderSpecified); 
-    } else if (this._skeletalShaderNormal) {
-      return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, this._skeletalShaderNormal);       
-    }
-  */  
-    if (this._materials.length > 0) {
-      this._materialForSkeletal = this._materials[0];
-    } else if (meshMaterial) {
-      this._materialForSkeletal = meshMaterial;
+  prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, shaderClassSpecified = void 0, argMaterials = void 0) {
+
+    if (argMaterials !== void 0) {
+      this._materialForSkeletals = argMaterials;
     } else {
-      this._materialForSkeletal = this._defaultMaterial;
+      if (this._materials.length > 0) {
+        this._materialForSkeletals = this._materials;
+      } else if (meshMaterial) {
+        this._materialForSkeletals = [meshMaterial];
+      } else {
+        this._materialForSkeletals = [this._defaultMaterial];
+      }  
     }
 
-    let derrivedClass = null;    
-    if (!(this._materialForSkeletal.shaderInstance !== null && this._materialForSkeletal.shaderInstance.constructor === FreeShader)) {
-
-      let baseClass = null;
-      if (shaderClassSpecified) {
-        baseClass = shaderClassSpecified;
-        class SkeletalShader extends baseClass {
-          constructor(glBoostContext, basicShader) {
-            super(glBoostContext, basicShader);
-            SkeletalShader.mixin(SkeletalShaderSource);
+      let derrivedClass = null;    
+      if (!(this._materialForSkeletals[0].shaderInstance && this._materialForSkeletals[0].shaderInstance.constructor === FreeShader)) {
+    
+        let baseClass = null;
+        if (shaderClassSpecified) {
+          baseClass = shaderClassSpecified;
+          class SkeletalShader extends baseClass {
+            constructor(glBoostContext, basicShader) {
+              super(glBoostContext, basicShader);
+              SkeletalShader.mixin(SkeletalShaderSource);
+            }
           }
-        }
-        derrivedClass = SkeletalShader;
-        this._skeletalShaderSpecified = derrivedClass;
-      } else {
-        baseClass = this._materialForSkeletal.shaderClass;
-        class SkeletalShader extends baseClass {
-          constructor(glBoostContext, basicShader) {
-            super(glBoostContext, basicShader);
-            SkeletalShader.mixin(SkeletalShaderSource);
+          derrivedClass = SkeletalShader;
+          this._skeletalShaderSpecified = derrivedClass;
+        } else {
+          for (let materialForSkeletal of this._materialForSkeletals) {
+            
+            baseClass = materialForSkeletal.shaderClass;
+            class SkeletalShader extends baseClass {
+              constructor(glBoostContext, basicShader) {
+                super(glBoostContext, basicShader);
+                SkeletalShader.mixin(SkeletalShaderSource);
+              }
+            }
+            derrivedClass = SkeletalShader;
           }
+          
+          this._skeletalShaderNormal = derrivedClass;
         }
-        derrivedClass = SkeletalShader;
-        this._skeletalShaderNormal = derrivedClass;
-      }
 
-      if (this._materials.length > 0) {
-        for (let i = 0; i < this._materials.length; i++) {
+        for (let i = 0; i < this._materialForSkeletals.length; i++) {
           if (shaderClassSpecified) {
 //            derrivedClass = SkeletalShader;
           } else {
-            if (this._materials[i].shaderClass.name !== derrivedClass.name) {
-              this._materials[i].shaderClass = derrivedClass;
+            if (this._materialForSkeletals[i].shaderClass.name !== derrivedClass.name) {
+              this._materialForSkeletals[i].shaderClass = derrivedClass;
             }
           }
         }
-      } else if (meshMaterial) {
-        if (shaderClassSpecified) {
-//          derrivedClass = SkeletalShader;
-        } else {
-          if (meshMaterial.shaderClass.name !== derrivedClass.name) {
-            meshMaterial.shaderClass = derrivedClass;
-          }
-        }
-      } else {
-        if (shaderClassSpecified) {
-//          derrivedClass = SkeletalShader;
-        } else {
-          if (this._defaultMaterial.shaderClass.name !== derrivedClass.name) {
-            this._defaultMaterial.shaderClass = derrivedClass;
-          }
-        }
       }
-    }
 
-    return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, derrivedClass);
-  }
+      return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, derrivedClass, argMaterials);
+    }
 }

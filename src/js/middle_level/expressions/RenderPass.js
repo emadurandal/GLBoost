@@ -24,7 +24,9 @@ export default class RenderPass extends GLBoostObject {
     this._isRenderTargetTexturesIfSet = false;
     this._isEnableToDraw = true;
 
-    this._customFunction = null;
+    this._customFunctionWhenPrepareToRender = null;
+    this._customFunctionWhenPreRender = null;
+    this._customFunctionWhenPostRender = null;
 
     this._webglStatesAssignDictionaries = [];
     this._backupWebGLStatesOfMaterials = [];
@@ -218,6 +220,7 @@ export default class RenderPass extends GLBoostObject {
     this._newShaderInstance = null;
     this._backupShaderClassDic = {};
     this._shaderAssignDictionaries = dictionaries;
+    
   }
 
   _assignWebGLStates() {
@@ -269,12 +272,23 @@ export default class RenderPass extends GLBoostObject {
     if (this._backupShaderParametersOfMaterials.length === 0) {
       return;
     }
+    /*
     for (let dic of this._backupShaderParametersOfMaterials) {
       let materials = dic.mesh.getAppropriateMaterials();
       for (let i=0; i<materials.length; i++) {
-        materials[0].shaderParameters = dic.shaderParameters;
+        materials[i].shaderParameters = dic.shaderParameters;
       }
     }
+    */
+    for (let i=0; i<this._backupShaderParametersOfMaterials.length; i++) {
+      for (let mesh of this._meshes) {
+        let materials = mesh.getAppropriateMaterials();
+        for (let j=0; j<materials.length; j++) {
+          materials[j].shaderParameters = this._backupShaderParametersOfMaterials[i].shaderParameters;
+        }
+      }
+    }
+
   }
 
   _assignShaders(existCamera_f, lights, assumeThatAllMaterialsAreSame = true) {
@@ -301,12 +315,14 @@ export default class RenderPass extends GLBoostObject {
             }
 
             if (!this._newShaderInstance) {
-              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
-              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+//              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+//              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+              let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
               this._oldShaderClass = material.shaderClass;
+              this._newShaderInstance = material.shaderInstance;
             }
 
-            material.shaderInstance = this._newShaderInstance;
+//            material.shaderInstance = this._newShaderInstance;
           });
         }
       }
@@ -329,12 +345,13 @@ export default class RenderPass extends GLBoostObject {
 
 
         if(!shaderInstance) {
-          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
-          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-
+//          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+//          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+          material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+          
         }
 
-        material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
+//        material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
 
 
       });
@@ -355,12 +372,28 @@ export default class RenderPass extends GLBoostObject {
   /**
    * this function is called final part of prepareToRender
    */
-  set customFunction(func) {
-    this._customFunction = func;
+  set customFunctionWhenPrepareToRender(func) {
+    this._customFunctionWhenPrepareToRender = func;
   }
 
-  get customFunction() {
-    return this._customFunction;
+  get customFunctionWhenPrepareToRender() {
+    return this._customFunctionWhenPrepareToRender;
+  }
+
+  set customFunctionWhenPreRender(func) {
+    this._customFunctionWhenPreRender = func;
+  }
+
+  get customFunctionWhenPreRender() {
+    return this._customFunctionWhenPreRender;
+  }
+
+  set customFunctionWhenPostRender(func) {
+    this._customFunctionWhenPostRender = func;
+  }
+
+  get customFunctionWhenPostRender() {
+    return this._customFunctionWhenPostRender;
   }
 
   prepareToRender(expression) {
@@ -420,8 +453,26 @@ export default class RenderPass extends GLBoostObject {
       this._scene.prepareToRender(expression);
     }
 
-    if (this._customFunction) {
-      this._customFunction();
+
+    // Setting RenderPass Specific Shader
+    var camera = this.scene.getMainCamera(this);    
+    let lights = this.scene.lightsExceptAmbient;
+    for (let dic of this._shaderAssignDictionaries) {
+      for (let obj of dic.instances) {
+        let renderSpecificMaterials = [];
+        obj.getAppropriateMaterials().forEach((material, index) => {
+          renderSpecificMaterials.push(this._glBoostContext.createClassicMaterial());
+        });
+        let materials = obj.geometry.prepareToRender(this.expression, camera ? true : false, lights, null, obj, dic.shaderClass, renderSpecificMaterials);
+        obj.getAppropriateMaterials().forEach((material, index) => {
+          material['renderpassSpecificShaderInstance_' + this.instanceName + '_material_' + index] = materials[index].shaderInstance;
+          material['renderpassSpecificMaterial_' + this.instanceName+ '_material_' + index] = materials[index];
+        });
+      }
+    }
+
+    if (this._customFunctionWhenPrepareToRender) {
+      this._customFunctionWhenPrepareToRender();
     }
   }
 
@@ -451,9 +502,14 @@ export default class RenderPass extends GLBoostObject {
     if (!this.doPreRender) {
       return;
     }
+
+    if (this._customFunctionWhenPreRender) {
+      this._customFunctionWhenPreRender();
+    }
+
     //this._assignWebGLStates();
    // this._assignShaderParameters();
-    this._assignShaders(existCamera_f, lights);
+//    this._assignShaders(existCamera_f, lights);
     // And call functions registered by user.
   }
 
@@ -461,7 +517,11 @@ export default class RenderPass extends GLBoostObject {
     if (!this.doPostRender) {
       return;
     }
-    this._restoreShaders(existCamera_f, lights);
+
+    if (this._customFunctionWhenPostRender) {
+      this._customFunctionWhenPostRender();
+    }
+//    this._restoreShaders(existCamera_f, lights);
     //this._restoreWebGLStates();
     //this._restoreShaderParameters();
     // And call functions registered by user.
