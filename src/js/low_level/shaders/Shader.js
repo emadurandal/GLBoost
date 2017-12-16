@@ -390,12 +390,12 @@ export default class Shader extends GLBoostObject {
     this._dirty = flg;
   }
 
-  setUniforms() {
-
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    //super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
   }
 
-  setUniformsAsTearDown() {
-
+  setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
+    //super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
   }
 
   _getShader(gl, theSource, type) {
