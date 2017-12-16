@@ -124,7 +124,7 @@ export default class Renderer extends GLBoostObject {
       });
 
       const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
       this._glBoostContext.currentGlobalStates = [
         3042, // gl.BLEND
       ];

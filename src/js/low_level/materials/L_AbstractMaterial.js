@@ -25,7 +25,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._shaderClass = DecalShader;
     this._shaderInstance = null;
     this._vertexNofGeometries = {};
-    this._states = null;
+    this._states = {
+      enable:[],
+      functions:{}
+    };
     this._shaderUniformLocationsOfExpressions = {};
     this._isVisibleForGeometiesAssginedByThisMaterial = true;
     this._globalStatesUsage = null;
