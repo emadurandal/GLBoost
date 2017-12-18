@@ -48,7 +48,7 @@ export default class AbstractTexture extends GLBoostObject {
       return false;
     }
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-    gl.activeTexture(gl['TEXTURE'+index]);
+    gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
     return true;
@@ -62,7 +62,7 @@ export default class AbstractTexture extends GLBoostObject {
     var gl = this._glContext.gl;
 
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-    gl.activeTexture(gl['TEXTURE'+index]);
+    gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
