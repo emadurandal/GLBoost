@@ -13,7 +13,7 @@ export class HalfLambertAndWrapLightingShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights    
     
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
-    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
     shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
     shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
     shaderText += `${in_} vec4 temp[1];\n`;

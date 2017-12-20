@@ -15,7 +15,7 @@ export class BlinnPhongShaderSource {
     var sampler2D = this._sampler2DShadow_func();
     
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
     shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
     shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
     

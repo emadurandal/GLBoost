@@ -592,7 +592,7 @@ export default class Shader extends GLBoostObject {
   }
 
   static _textureProj_func(gl) {
-    return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+    return GLBoost.isThisGLVersion_2(gl) ? 'shadowProj' : 'texture2DProj';
   }
 
   static _generateLightStr(i) {

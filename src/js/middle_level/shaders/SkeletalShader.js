@@ -51,7 +51,7 @@ export default class SkeletalShaderSource {
         a31 * b05 - a32 * b04 + a33 * b03, a32 * b02 - a30 * b05 - a33 * b01, a30 * b04 - a31 * b02 + a33 * b00) / determinantVal;
     }
 
-    mat4 transpose(mat4 m) {
+    mat4 transposeMatrix(mat4 m) {
       return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
                   m[0][1], m[1][1], m[2][1], m[3][1],
                   m[0][2], m[1][2], m[2][2], m[3][2],

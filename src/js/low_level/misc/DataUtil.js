@@ -6,9 +6,13 @@ export default class DataUtil {
   constructor() {
 
   }
+  static isNode() {
+    let isNode = (window === void 0 && typeof process !== "undefined" && typeof require !== "undefined");
+    return isNode;
+  }
 
   static btoa(str) {
-    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+    let isNode = DataUtil.isNode();
     if (isNode) {
       let buffer;
       if (Buffer.isBuffer(str)) {
@@ -24,7 +28,7 @@ export default class DataUtil {
   }
 
   static atob(str) {
-    let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+    let isNode = DataUtil.isNode();
     if (isNode) {
       return new Buffer(str, 'base64').toString('binary');
     } else {
@@ -93,7 +97,7 @@ export default class DataUtil {
 
   static loadResourceAsync(resourceUri, isBinary, resolveCallback, rejectCallback) {
     return new Promise((resolve, reject)=> {
-      let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+      let isNode = DataUtil.isNode();
 
       if (isNode) {
         let fs = require('fs');

@@ -280,6 +280,11 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
+        rootGroup.animationTracks = json.asset.extras.animation_tracks;
+      }
+
       rootGroup.addChild(group)
     }
 

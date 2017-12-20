@@ -26,7 +26,7 @@ export default class GLContextImpl {
       this._gl = gl;
     } else {
 
-      let gl = this._canvas.getContext(glVersionString);
+      let gl = this._canvas.getContext(glVersionString, { antialias: true });
 
       if (!gl) {
         gl = this._canvas.getContext('experimental-' + glVersionString);
