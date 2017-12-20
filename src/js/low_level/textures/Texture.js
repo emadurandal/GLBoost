@@ -2,6 +2,8 @@ import GLBoost from '../../globals';
 import AbstractTexture from './AbstractTexture';
 import GLExtensionsManager from '../core/GLExtensionsManager';
 import MiscUtil from '../misc/MiscUtil';
+import DataUtil from '../misc/DataUtil';
+
 
 export default class Texture extends AbstractTexture {
   constructor(glBoostContext, src, userFlavorName, parameters = null) {
@@ -56,7 +58,7 @@ export default class Texture extends AbstractTexture {
 
   generateTextureFromUri(imageUri, isKeepBound = false) {
     return new Promise((resolve, reject)=> {
-      let isNode = (typeof process !== "undefined" && typeof require !== "undefined");
+      let isNode = DataUtil.isNode();
       if (isNode) {
         let getPixels = require("get-pixels");
 
