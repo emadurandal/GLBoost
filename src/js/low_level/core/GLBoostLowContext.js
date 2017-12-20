@@ -193,9 +193,9 @@ export default class GLBoostLowContext {
     let internalFormat = gl.DEPTH_COMPONENT;
     let type = gl.UNSIGNED_INT;
     if (GLBoost.isThisGLVersion_2(gl)) {
-      type = gl.FLOAT;
+      type = gl.UNSIGNED_INT;
       format = gl.DEPTH_COMPONENT;
-      internalFormat = gl.DEPTH_COMPONENT32F;
+      internalFormat = gl.DEPTH_COMPONENT24;
     } else if (glem.extDepthTex) {
       type = glem.extDepthTex.UNSIGNED_INT_24_8_WEBGL;
       format = gl.DEPTH_STENCIL;
@@ -204,7 +204,7 @@ export default class GLBoostLowContext {
 
     let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
       internalFormat, format, type,
-      gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+      gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
 
     /// Attach Buffers
