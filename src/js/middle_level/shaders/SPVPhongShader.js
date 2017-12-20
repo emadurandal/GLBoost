@@ -13,7 +13,7 @@ export class SPVPhongShaderSource {
     
     var sampler2D = this._sampler2DShadow_func();
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
     shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
     shaderText += `uniform bool toUseSurfaceColorAsSpecularMap;\n`;
 

@@ -49,7 +49,7 @@ export class SPVDecalShaderSource {
 
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
     if (normalTexture) {
-      shaderText += `uniform mediump sampler2D uNormalTexture;\n`;
+      shaderText += `uniform highp sampler2D uNormalTexture;\n`;
     }
 
     shaderText += 'uniform vec4 materialBaseColor;\n';
