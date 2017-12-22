@@ -16,11 +16,6 @@ export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
     super(glBoostContext);
 
-    this._jointMatrices = null;
-    this._qArray = null;
-    this._tArray = null;    
-    this._qtArray = null;
-    this._translationScale = 0;
     this._skeletalShaderSpecified = null;
     this._skeletalShaderNormal = null;
   }
@@ -150,7 +145,7 @@ export default class M_SkeletalGeometry extends Geometry {
         }
         Array.prototype.push.apply(flatMatrices, identityMatrices);
       }
-      this._jointMatrices = flatMatrices;
+      skeletalMesh._jointMatrices = flatMatrices;
 
     } else {
       /*
@@ -158,20 +153,20 @@ export default class M_SkeletalGeometry extends Geometry {
       {
         // no comporess
 
-        this._qArray = new Float32Array(matrices.length * 4);
-        this._tArray = new Float32Array(matrices.length * 3);
+        skeletalMesh._qArray = new Float32Array(matrices.length * 4);
+        skeletalMesh._tArray = new Float32Array(matrices.length * 3);
 
         for (let i=0; i<matrices.length; i++) {
           let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
           q.normalize();
-          this._qArray[i*4+0] = q.x;
-          this._qArray[i*4+1] = q.y;
-          this._qArray[i*4+2] = q.z;
-          this._qArray[i*4+3] = q.w;
+          skeletalMesh._qArray[i*4+0] = q.x;
+          skeletalMesh._qArray[i*4+1] = q.y;
+          skeletalMesh._qArray[i*4+2] = q.z;
+          skeletalMesh._qArray[i*4+3] = q.w;
           let t = matrices[i].getTranslate();
-          this._tArray[i*3+0] = t.x;
-          this._tArray[i*3+1] = t.y;
-          this._tArray[i*3+2] = t.z;
+          tskeletalMeshis._tArray[i*3+0] = t.x;
+          skeletalMesh._tArray[i*3+1] = t.y;
+          skeletalMesh._tArray[i*3+2] = t.z;
         }
       }
       */
@@ -179,19 +174,19 @@ export default class M_SkeletalGeometry extends Geometry {
       {
         // comporess quaternion only
 
-        this._qArray = new Float32Array(matrices.length * 2);
-        this._tArray = new Float32Array(matrices.length * 3);
+        skeletalMesh._qArray = new Float32Array(matrices.length * 2);
+        skeletalMesh._tArray = new Float32Array(matrices.length * 3);
 
         for (let i=0; i<matrices.length; i++) {
           let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
-          this._qArray[i*2+0] = vec2QPacked[0];
-          this._qArray[i*2+1] = vec2QPacked[1];
+          skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
+          skeletalMesh._qArray[i*2+1] = vec2QPacked[1];
           let t = matrices[i].getTranslate();
-          this._tArray[i*3+0] = t.x;
-          this._tArray[i*3+1] = t.y;
-          this._tArray[i*3+2] = t.z;
+          skeletalMesh._tArray[i*3+0] = t.x;
+          skeletalMesh._tArray[i*3+1] = t.y;
+          skeletalMesh._tArray[i*3+2] = t.z;
         }
       }
       */
@@ -200,7 +195,7 @@ export default class M_SkeletalGeometry extends Geometry {
       {
         // comporess both of quaternion and traslation
 
-        this._qtArray = new Float32Array(matrices.length * 4);
+        skeletalMesh._qtArray = new Float32Array(matrices.length * 4);
         let tXArray = [];
         let tYArray = [];
         let tZArray = [];
@@ -211,13 +206,13 @@ export default class M_SkeletalGeometry extends Geometry {
           tZArray.push(Math.abs(t.z));
         }
 
-        this._translationScale = new Vector3();
+        skeletalMesh._translationScale = new Vector3();
         let maxX = Math.max.apply(null, tXArray);
         let maxY = Math.max.apply(null, tYArray);
         let maxZ = Math.max.apply(null, tZArray);
-        this._translationScale.x = maxX*1.1;
-        this._translationScale.y = maxY*1.1;
-        this._translationScale.z = maxZ*1.1;
+        skeletalMesh._translationScale.x = maxX*1.1;
+        skeletalMesh._translationScale.y = maxY*1.1;
+        skeletalMesh._translationScale.z = maxZ*1.1;
 
         // console.log('getScale are ...');
         for (let i=0; i<matrices.length; i++) {
@@ -229,21 +224,21 @@ export default class M_SkeletalGeometry extends Geometry {
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
-          this._qtArray[i*4+0] = vec2QPacked[0];
-          this._qtArray[i*4+1] = vec2QPacked[1];
+          skeletalMesh._qtArray[i*4+0] = vec2QPacked[0];
+          skeletalMesh._qtArray[i*4+1] = vec2QPacked[1];
           let vec2TPacked = MathUtil.packNormalizedVec4ToVec2(
-            t.x/this._translationScale.x, t.y/this._translationScale.y,
-            t.z/this._translationScale.z, 0.0, 4096);
-          this._qtArray[i*4+2] = vec2TPacked[0];
-          this._qtArray[i*4+3] = vec2TPacked[1];
+            t.x/skeletalMesh._translationScale.x, t.y/skeletalMesh._translationScale.y,
+            t.z/skeletalMesh._translationScale.z, 0.0, 4096);
+            skeletalMesh._qtArray[i*4+2] = vec2TPacked[0];
+            skeletalMesh._qtArray[i*4+3] = vec2TPacked[1];
         }
       }
     }    
 
   }
 
-  drawIntermediate(gl, glslProgram, material) {
-    if (this._jointMatrices === null && this._qtArray === null) {
+  drawIntermediate(gl, glslProgram, skeletalMesh, material) {
+    if (skeletalMesh._jointMatrices === null && skeletalMesh._qtArray === null) {
       return;
     }
 /*
@@ -262,14 +257,14 @@ export default class M_SkeletalGeometry extends Geometry {
 //      this._glContext.useProgram(glslProgram);
       
       if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(this._jointMatrices));
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
       } else {
- //     Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', this._qArray);
-//      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', this._qArray);
- //     Shader.trySettingVec3ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_TRANSLATION', this._tArray);      
-        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', this._qtArray);//
+ //     Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+//      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+ //     Shader.trySettingVec3ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray);//
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
-          this._translationScale.x, this._translationScale.y, this._translationScale.z, true);
+        skeletalMesh._translationScale.x, skeletalMesh._translationScale.y, skeletalMesh._translationScale.z, true);
       }
   //  }
 

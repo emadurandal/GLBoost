@@ -167,7 +167,7 @@ export default class DrawKickerWorld {
       
       this._setupOtherTextures(lights);
 
-      geometry.drawIntermediate(gl, glslProgram, material);
+      geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
 
       if (geometry.isIndexed()) {
