@@ -43,6 +43,16 @@ export default class L_GLBoostMonitor {
     return glBoostObjects;
   }
 
+  getGLBoostObjectWhichHasThisObjectId(objectId) {
+    for (let instanceName in this._glBoostObjects) {
+      if (this._glBoostObjects[instanceName].objectIndex === objectId) {
+        return this._glBoostObjects[instanceName];
+      }
+    }
+
+    return null;
+  }
+
   printGLBoostObjects() {
     var objects = this._glBoostObjects;
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [begin] ==========');

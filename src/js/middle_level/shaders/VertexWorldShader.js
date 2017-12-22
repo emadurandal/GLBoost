@@ -95,7 +95,8 @@ export default class VertexWorldShaderSource {
 
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
-    
+
+    shaderText += `uniform highp ivec2 objectIds;\n`;
     shaderText += `uniform vec3 viewPosition_world;\n`;
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -136,6 +137,8 @@ export default class VertexWorldShaderSource {
         vertexAttribsAsResult.push(attribName);
       }
     });
+
+    material.setUniform(shaderProgram, 'uniform_objectIds', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
 
     material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';

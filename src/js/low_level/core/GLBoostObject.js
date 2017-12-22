@@ -143,6 +143,10 @@ export default class GLBoostObject {
   _copy(instance) {
     instance._userFlavorName = this._userFlavorName;
   }
+
+  get objectIndex() {
+    return this._objectIndex;
+  }
 }
 
 GLBoostObject.classInfoDic = {};
