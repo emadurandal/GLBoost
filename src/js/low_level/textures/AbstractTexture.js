@@ -100,6 +100,28 @@ export default class AbstractTexture extends GLBoostObject {
     return data;
   }
 
+  /**
+   * Origin is left bottom
+   *
+   * @param {number} x horizontal pixel position (0 is left)
+   * @param {number} y virtical pixel position (0 is bottom)
+   * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+   */
+  getPixelValueAt(x, y, argByteArray) {
+    let byteArray = argByteArray;
+    if (!byteArray) {
+      byteArray = this.getTexturePixelData();
+    }
+
+    let color = new Vector4(
+      byteArray[(y*this.width + x) * 4+0],
+      byteArray[(y*this.width + x) * 4+1],
+      byteArray[(y*this.width + x) * 4+2],
+      byteArray[(y*this.width + x) * 4+3]
+      );
+    return color;
+  }
+
   _getResizedCanvas(image) {
     var canvas = document.createElement("canvas");
     canvas.width = this._getNearestPowerOfTwo(image.width);
