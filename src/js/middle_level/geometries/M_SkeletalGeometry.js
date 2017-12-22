@@ -50,7 +50,7 @@ export default class M_SkeletalGeometry extends Geometry {
       } else {
         globalJointTransform = skeletalMesh.getTransformMatrixAccumulatedAncestryAt(input);
         skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
-        let inverseMat = Matrix44.multiply(Matrix44.invert(skeletalMesh.bindShapeMatrix), Matrix44.invert(inverseBindMatrix));
+        let inverseMat = Matrix44.invert(inverseBindMatrix);
         globalJointTransform = Matrix44.multiply(skeletalMeshTransformMatrixAccumulatedAncestry, inverseMat);
       }
       if (i === 0) {
