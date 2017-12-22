@@ -516,7 +516,8 @@ export default class Geometry extends GLBoostObject {
               this._indexStartOffsetArray[i] = 0;
             }
             this._indexStartOffsetArray[i+1] = this._indexStartOffsetArray[i] + this._indicesArray[i].length;
-            Array.prototype.push.apply(indices, this._indicesArray[i]);  
+            //Array.prototype.push.apply(indices, this._indicesArray[i]);  
+            indices = indices.concat(this._indicesArray[i]);
           }
           // create Index Buffer
           var ibo = this._glContext.createBuffer(this);
