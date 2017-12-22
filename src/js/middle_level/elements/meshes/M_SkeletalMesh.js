@@ -16,6 +16,14 @@ export default class M_SkeletalMesh extends M_Mesh {
     this._bindShapeMatrix = Matrix44.identity();
     this._jointNames = [];
     this._joints = [];
+
+    // these are calculated by M_SkeletalGeometry
+    this._jointMatrices = null;
+    this._qArray = null;
+    this._tArray = null;    
+    this._qtArray = null;
+    this._translationScale = 0;
+
   }
 
   prepareToRender(expression, existCamera_f, lights, renderPasses) {
