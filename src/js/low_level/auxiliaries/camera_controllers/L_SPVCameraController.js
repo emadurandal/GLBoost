@@ -220,14 +220,14 @@ export default class L_SPVCameraController extends GLBoostObject {
       const event_pointmove = supportTouch ? 'touchmove' : 'mousemove';
       const event_pointend = supportTouch ? 'touchend' : 'mouseup';
 
-      this._glContext.canvas.addEventListener(event_pointstart, this._onMouseDown);
-      this._glContext.canvas.addEventListener(event_pointend, this._onMouseUp);
-      this._glContext.canvas.addEventListener(event_pointmove, this._onMouseMove);
+      document.addEventListener(event_pointstart, this._onMouseDown);
+      document.addEventListener(event_pointend, this._onMouseUp);
+      document.addEventListener(event_pointmove, this._onMouseMove);
       if (window.WheelEvent) {
-        this._glContext.canvas.addEventListener("wheel", this._onMouseWheel);
+        document.addEventListener("wheel", this._onMouseWheel);
       }
-      this._glContext.canvas.addEventListener('contextmenu', this._onContexMenu, false);
-      this._glContext.canvas.addEventListener("dblclick", this._onMouseDblClick);
+      document.addEventListener('contextmenu', this._onContexMenu, false);
+      document.addEventListener("dblclick", this._onMouseDblClick);
     }
   }
 
