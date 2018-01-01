@@ -89,10 +89,14 @@ export default class M_Group extends M_Element {
       propertyName = 'instanceNameWithUserFlavor';
     }
 
-    if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING) {
+    if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
       if (object[propertyName] === query) {
         return object;
       }
+    } else if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
+        if (object[propertyName].indexOf(query) !== -1) {
+          return object;
+        }
     } else if (queryMeta.format === GLBoost.QUERY_FORMAT_REGEXP) {
       if (object[propertyName].match(query)) {
         return object;
@@ -101,7 +105,7 @@ export default class M_Group extends M_Element {
 
   }
 
-  searchElement(query, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+  searchElement(query, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     /*
     if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
       return element;
@@ -124,7 +128,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+  searchElementByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
@@ -142,7 +146,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+  searchElementsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     let resultElements = [];
 
     if (element instanceof M_Group) {
@@ -196,7 +200,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchGLBoostObjectByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+  searchGLBoostObjectByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     if (element instanceof M_Group) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
@@ -229,7 +233,7 @@ export default class M_Group extends M_Element {
     }
   }
 
-  searchGLBoostObjectsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING}, element = this) {
+  searchGLBoostObjectsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     let objects = [];
     if (element instanceof M_Group) {
       let children = element.getChildren();
