@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 import FragmentSimpleShader from './FragmentSimpleShader';
+import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import Matrix44 from '../../low_level/math/Matrix44';
 
 
@@ -126,6 +127,7 @@ export default class DecalShader extends FragmentSimpleShader {
 
     super(glBoostContext);
 
+    DecalShader.mixin(VertexWorldShadowShaderSource);
     DecalShader.mixin(DecalShaderSource);
 
     this._lut = null;
