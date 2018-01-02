@@ -35,24 +35,27 @@ export default class M_SkeletalGeometry extends Geometry {
 
     let jointZeroTransformMatrixAccumulatedAncestry = null;
     let skeletalMeshTransformMatrixAccumulatedAncestry = null;
+    let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getTransformMatrixAccumulatedAncestryAt(input);
+    let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
+
     for (let i=joints.length-1; i>=0; i--) {
       let globalJointTransform = null;
-      let inverseBindMatrix = (typeof skeletalMesh.inverseBindMatrices[i] !== 'undefined') ? skeletalMesh.inverseBindMatrices[i] : Matrix44.identity();
+      let inverseBindMatrix = joints[i].inverseBindMatrix;
       if (areThereAnyJointsWhichHaveAnimation) {
         globalJointTransform = joints[i].getTransformMatrixAccumulatedAncestryAt(input);
         skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
       } else {
-        globalJointTransform = skeletalMesh.getTransformMatrixAccumulatedAncestryAt(input);
+        globalJointTransform = skeletalMeshTransformMatrixAccmulatedAncestry;
         skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
-        let inverseMat = Matrix44.invert(inverseBindMatrix);
-        globalJointTransform = Matrix44.multiply(skeletalMeshTransformMatrixAccumulatedAncestry, inverseMat);
+        let bindMat = joints[i].bindMatrix;
+        globalJointTransform = Matrix44.multiply(skeletalMeshTransformMatrixAccumulatedAncestry, bindMat);
       }
       if (i === 0) {
         jointZeroTransformMatrixAccumulatedAncestry = globalJointTransform;
       }
 //      if (true) {
       if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
-        matrices[i] = Matrix44.invert(skeletalMeshTransformMatrixAccumulatedAncestry);
+        matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
       } else {
         matrices[i] = Matrix44.identity();
       }

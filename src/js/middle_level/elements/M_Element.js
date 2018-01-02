@@ -287,7 +287,7 @@ export default class M_Element extends L_Element {
     if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
       var matrix = Matrix44.identity();
 
-      if (!input && this._currentCalcMode === 'matrix') {
+      if (this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.matrix);
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
@@ -295,7 +295,7 @@ export default class M_Element extends L_Element {
 
       var rotationMatrix = Matrix44.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (input || this._currentCalcMode === 'quaternion') {
+      if (this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.quaternion.rotationMatrix;
       } else {
         /*
@@ -464,7 +464,7 @@ export default class M_Element extends L_Element {
     }
 
     let tempNumber = 0;
-    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
+    if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
     {
@@ -857,7 +857,7 @@ export default class M_Element extends L_Element {
     }
 
     let tempNumber = 0;
-    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+    if (this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
     {
@@ -961,7 +961,7 @@ export default class M_Element extends L_Element {
     }
 
     let tempNumber = 0;
-    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
+    if (this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatrices !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
     {
