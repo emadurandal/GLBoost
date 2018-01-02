@@ -208,16 +208,6 @@ export default class SPVExtensionShader extends FragmentSimpleShader {
       let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
       this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
     }
-
-    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-    let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
-    if (uniformLocationDepthBias) {
-      let depthBias = this.getShaderParameter(material, 'depthBias', false);
-      if (depthBias) {
-        this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
-      }
-    }
   }
 
   set unfoldUVRatio(value) {
