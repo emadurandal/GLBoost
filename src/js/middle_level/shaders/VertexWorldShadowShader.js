@@ -57,8 +57,9 @@ export default class VertexWorldShadowShaderSource {
 
   FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
     let shaderText = '';
+    shaderText += 'float visibilityLevel = 1.0;\n';
+
 /*
-    shaderText += `mat4 biasMatrix = mat4(
       0.5, 0.0, 0.0, 0.0,
       0.0, 0.5, 0.0, 0.0,
       0.0, 0.0, 0.5, 0.0,
@@ -74,10 +75,9 @@ export default class VertexWorldShadowShaderSource {
       shaderText += `    shadowCoord[${i}].xyz += 0.5; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
-     
+    
     return shaderText;
   }
-
   FSPostEffect_VertexWorldShadowShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
