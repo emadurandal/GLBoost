@@ -30,8 +30,7 @@ export default class VertexWorldShaderSource {
     // for Unfold UV
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
-      shaderText +=      'uniform vec4 AABBCenterPosition;\n';
-      shaderText +=      'uniform float unfoldUVRatio;\n';
+      shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
     }
 
     return shaderText;
@@ -55,16 +54,19 @@ export default class VertexWorldShaderSource {
     }
     shaderText += '  }\n';
 
+    // calc Projection * View * World matrix
     shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
+    // calc vertex position in world space
     shaderText += '  v_position_world = position_world.xyz;\n';
 
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
+      // calc Normal vector in world space
       shaderText += '  v_normal_world = normal_world;\n';
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
-        // world space to tangent space
+        // calc BiNormal vector and Tangent vector in world space
         shaderText += '  if (!isSkinning) {\n';
         shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
         shaderText += '  }\n';
@@ -79,6 +81,8 @@ export default class VertexWorldShaderSource {
     shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
     shaderText +=   '  gl_Position = position_world;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
+      shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
       shaderText += '  uvScaled.y = - uvScaled.y;\n';
       shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
@@ -163,8 +167,7 @@ export default class VertexWorldShaderSource {
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
       material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
-      material.setUniform(shaderProgram, 'uniform_AABBCenterPosition', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPosition'));
-      material.setUniform(shaderProgram, 'uniform_unfoldUVRatio', this._glContext.getUniformLocation(shaderProgram, 'unfoldUVRatio'));
+      material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
     }
 
     return vertexAttribsAsResult;
