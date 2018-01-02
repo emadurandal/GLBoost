@@ -1,10 +1,13 @@
 import GLBoost from '../../globals';
 import Vector3 from './Vector3';
 import MathUtil from './MathUtil';
+import Matrix44 from './Matrix44';
 
 export default class Matrix33 {
 
-  constructor(m, isColumnMajor = false) {
+  constructor(m, isColumnMajor = false,
+    shaderParameterType = void 0, shaderParameterEntityIndex = void 0, shaderParameterName = void 0
+  ) {
     this.m = new Float32Array(9);
     if (arguments.length >= 9) {
       if (isColumnMajor === true) {
@@ -460,6 +463,40 @@ export default class Matrix33 {
     return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + '\n' +
       this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' \n' +
       this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
+  }
+
+  toMatrix44() {
+    return new Matrix44(
+      this.m00, this.m01, this.m02, 0,
+      this.m10, this.m11, this.m12, 0,
+      this.m20, this.m21, this.m22, 0,
+      0, 0, 0, 1
+    );
+  }
+
+  static toMatrix44(mat) {
+    return new Matrix44(
+      mat.m00, mat.m01, mat.m02, 0,
+      mat.m10, mat.m11, mat.m12, 0,
+      mat.m20, mat.m21, mat.m22, 0,
+      0, 0, 0, 1
+    );
+  }
+
+  getScale() {
+    return new Vector3(
+      Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+      Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+      Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+    );
+  }
+
+  addScale(vec) {
+    this.m00 *= vec.x;
+    this.m11 *= vec.y;
+    this.m22 *= vec.z;
+
+    return this;
   }
 }
 

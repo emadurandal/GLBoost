@@ -12,11 +12,18 @@ GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
 var canvas = document.getElementById("world");
 
 var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING;
 
-var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+var renderer = glBoostContext.createRenderer({ clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
 var gl = renderer.glContext;
+gl.enable(gl.BLEND);
 gl.disable(gl.DEPTH_TEST);
+gl.depthFunc(gl.LEQUAL);
+gl.blendEquation(gl.FUNC_ADD);
+gl.clearDepth(1);
+gl.clearStencil(0);
 gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+
 
 var scene = glBoostContext.createScene();
 
@@ -100,8 +107,8 @@ class MyCustomShader extends GLBoost.HalfLambertShader {
     this._time = 0;
   }
 
-  setUniforms(gl, glslProgram, expression, material) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, expression, material, camera, mesh, lights);
 
     gl.uniform1f(glslProgram.time, this._time);
     gl.uniform1f(glslProgram.endHeight, -3.5);

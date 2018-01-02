@@ -1,14 +1,16 @@
 import GLBoost from '../../globals';
 import Vector4 from './Vector4';
+import Vector3 from './Vector3';
 import Matrix33 from './Matrix33';
 import MathUtil from './MathUtil';
 
 
 export default class Matrix44 {
 
-  constructor(m, isColumnMajor = false) {
-    this.m = new Float32Array(16);
+  constructor(m, isColumnMajor = false, notCopyFloat32Array = false
+  ) {
     if (arguments.length >= 16) {
+      this.m = new Float32Array(16);
       if (isColumnMajor === true) {
         let m = arguments;
         this.setComponents(
@@ -20,6 +22,7 @@ export default class Matrix44 {
         this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
       }
     } else if (Array.isArray(m)) {
+      this.m = new Float32Array(16);
       if (isColumnMajor === true) {
         this.setComponents(
           m[0], m[4], m[8], m[12],
@@ -30,16 +33,23 @@ export default class Matrix44 {
         this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
       }
     } else if (m instanceof Float32Array) {
-      if (isColumnMajor === true) {
-        this.setComponents(
-          m[0], m[4], m[8], m[12],
-          m[1], m[5], m[9], m[13],
-          m[2], m[6], m[10], m[14],
-          m[3], m[7], m[11], m[15]);
+      this.m = new Float32Array(16);
+      if (notCopyFloat32Array) {
+        this.m = m;
       } else {
-        this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        this.m = new Float32Array(16);
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }  
       }
     } else {
+      this.m = new Float32Array(16);
       this.identity();
     }
   }
@@ -51,6 +61,11 @@ export default class Matrix44 {
     this.m30 = m30; this.m31 = m31; this.m32 = m32; this.m33 = m33;
 
     return this;
+  }
+
+  copyComponents(mat4) {
+    //this.m.set(mat4.m);
+    this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
   }
 
   clone() {
@@ -96,6 +111,16 @@ export default class Matrix44 {
     );
   }
 
+  putTranslate(vec) {
+    this.m03 = vec.x;
+    this.m13 = vec.y;
+    this.m23 = vec.z;
+  }
+
+  getTranslate() {
+    return new Vector3(this.m03, this.m13, this.m23);
+  }
+
   static translate(vec) {
     return new Matrix44(
       1, 0, 0, vec.x,
@@ -121,6 +146,14 @@ export default class Matrix44 {
       0, 0, vec.z, 0,
       0, 0, 0, 1
     );
+  }
+
+  addScale(vec) {
+    this.m00 *= vec.x;
+    this.m11 *= vec.y;
+    this.m22 *= vec.z;
+
+    return this;
   }
 
   /**
@@ -334,6 +367,35 @@ export default class Matrix44 {
     var m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
     var m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
     var m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
+
+    return this.setComponents(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+    );
+  }
+
+  multiplyByLeft(mat) {
+    var m00 = mat.m00*this.m00 + mat.m01*this.m10 + mat.m02*this.m20 + mat.m03*this.m30;
+    var m01 = mat.m00*this.m01 + mat.m01*this.m11 + mat.m02*this.m21 + mat.m03*this.m31;
+    var m02 = mat.m00*this.m02 + mat.m01*this.m12 + mat.m02*this.m22 + mat.m03*this.m32;
+    var m03 = mat.m00*this.m03 + mat.m01*this.m13 + mat.m02*this.m23 + mat.m03*this.m33;
+
+    var m10 = mat.m10*this.m00 + mat.m11*this.m10 + mat.m12*this.m20 + mat.m13*this.m30;
+    var m11 = mat.m10*this.m01 + mat.m11*this.m11 + mat.m12*this.m21 + mat.m13*this.m31;
+    var m12 = mat.m10*this.m02 + mat.m11*this.m12 + mat.m12*this.m22 + mat.m13*this.m32;
+    var m13 = mat.m10*this.m03 + mat.m11*this.m13 + mat.m12*this.m23 + mat.m13*this.m33;
+
+    var m20 = mat.m20*this.m00 + mat.m21*this.m10 + mat.m22*this.m20 + mat.m23*this.m30;
+    var m21 = mat.m20*this.m01 + mat.m21*this.m11 + mat.m22*this.m21 + mat.m23*this.m31;
+    var m22 = mat.m20*this.m02 + mat.m21*this.m12 + mat.m22*this.m22 + mat.m23*this.m32;
+    var m23 = mat.m20*this.m03 + mat.m21*this.m13 + mat.m22*this.m23 + mat.m23*this.m33;
+
+    var m30 = mat.m30*this.m00 + mat.m31*this.m10 + mat.m32*this.m20 + mat.m33*this.m30;
+    var m31 = mat.m30*this.m01 + mat.m31*this.m11 + mat.m32*this.m21 + mat.m33*this.m31;
+    var m32 = mat.m30*this.m02 + mat.m31*this.m12 + mat.m32*this.m22 + mat.m33*this.m32;
+    var m33 = mat.m30*this.m03 + mat.m31*this.m13 + mat.m32*this.m23 + mat.m33*this.m33;
 
     return this.setComponents(
         m00, m01, m02, m03,
@@ -622,7 +684,13 @@ export default class Matrix44 {
       this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
   }
 
-
+  getScale() {
+    return new Vector3(
+      Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+      Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+      Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+    );
+  }
 }
 
 GLBoost["Matrix44"] = Matrix44;

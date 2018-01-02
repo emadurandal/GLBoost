@@ -92,10 +92,16 @@
   var canvas = document.getElementById("world");
 
   var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+  glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING;
 
   var renderer = glBoostContext.createRenderer({ clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
   var gl = renderer.glContext;
+  gl.enable(gl.BLEND);
   gl.disable(gl.DEPTH_TEST);
+  gl.depthFunc(gl.LEQUAL);
+  gl.blendEquation(gl.FUNC_ADD);
+  gl.clearDepth(1);
+  gl.clearStencil(0);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
   var scene = glBoostContext.createScene();
@@ -194,8 +200,8 @@
 
     babelHelpers.createClass(MyCustomShader, [{
       key: 'setUniforms',
-      value: function setUniforms(gl, glslProgram, expression, material) {
-        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material);
+      value: function setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
+        babelHelpers.get(MyCustomShader.prototype.__proto__ || Object.getPrototypeOf(MyCustomShader.prototype), 'setUniforms', this).call(this, gl, glslProgram, expression, material, camera, mesh, lights);
 
         gl.uniform1f(glslProgram.time, this._time);
         gl.uniform1f(glslProgram.endHeight, -3.5);

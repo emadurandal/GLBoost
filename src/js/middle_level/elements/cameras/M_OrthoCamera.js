@@ -70,4 +70,8 @@ export default class M_OrthoCamera extends M_AbstractCamera {
   get zFar() {
     return this._lowLevelCamera.zFar;
   }
+
+  get aspect() {
+    return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
+  }
 }

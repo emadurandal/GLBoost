@@ -1,7 +1,6 @@
 import M_PointLight from '../elements/lights/M_PointLight';
-import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
+//import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
 import Vector4 from '../../low_level/math/Vector4';
-import Geometry from '../../low_level/geometries/Geometry';
 import Shader from '../../low_level/shaders/Shader';
 
 let singleton = Symbol();
@@ -22,7 +21,7 @@ export default class DrawKickerLocal {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, materials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+  draw(gl, glem, expression, mesh, materials, camera, lights, lightsExceptAmbient, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
     var isVAOBound = false;
     if (DrawKickerLocal._lastGeometry !== geometryName) {
       isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
@@ -30,10 +29,14 @@ export default class DrawKickerLocal {
 
     for (let i=0; i<materials.length;i++) {
       let material = materials[i];
+      if (!material.isVisible) {
+        continue;
+      }
+
       let materialUpdateStateString = material.getUpdateStateString();
       if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
         this._glslProgram = material.shaderInstance.glslProgram;
-        gl.useProgram(this._glslProgram);
+        material._glContext.useProgram(this._glslProgram);
       }
       let glslProgram = this._glslProgram;
 
@@ -41,26 +44,45 @@ export default class DrawKickerLocal {
         if (DrawKickerLocal._lastGeometry !== geometryName) {
           for (let attribName in vboDic) {
             gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-            geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+            geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
           }
         }
       }
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      gl.uniform1f(material.getUniform(glslProgram.hashId, 'opacity'), opacity);
+      material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), opacity, true);
 
       if (camera) {
-        var viewMatrix = camera.lookAtRHMatrix();
-        var projectionMatrix = camera.projectionRHMatrix();
-        var world_m = mesh.transformMatrixAccumulatedAncestry;
-        var pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram.hashId, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
+        let world_m;
+        if (mesh.isAffectedByWorldMatrix) {
+          if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
+            world_m = mesh.transformMatrixAccumulatedAncestry;
+          } else {
+            world_m = mesh.transformMatrix;
+          }
+        } else {
+          world_m = Matrix44.identity();
+        }
+        let viewMatrix;
+        if (mesh.isAffectedByViewMatrix) {
+          viewMatrix = camera.lookAtRHMatrix();
+        } else {
+          viewMatrix = Matrix44.identity();
+        }
+        let projectionMatrix;
+        if (mesh.isAffectedByProjectionMatrix) {
+          projectionMatrix = camera.projectionRHMatrix();
+        } else {
+          projectionMatrix = Matrix44.identity();
+        }
+        let pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
       }
 
-      if (material.getUniform(glslProgram.hashId, 'uniform_lightPosition_0')) {
+      if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-        if (material.getUniform(glslProgram.hashId, 'uniform_viewPosition')) {
+        if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPosInLocalCoord = null;
           if (camera) {
             let cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
@@ -68,18 +90,18 @@ export default class DrawKickerLocal {
           } else {
             cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
           }
-          gl.uniform3f(material.getUniform(glslProgram.hashId, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
+          material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
         }
 
         for (let j = 0; j < lights.length; j++) {
-          if (material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`)) {
+          if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
             let lightVec = null;
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
               lightVec = new Vector4(0, 0, 0, 1);
               lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
               isPointLight = 1.0;
-            } else if (lights[j] instanceof M_DirectionalLight) {
+            } else if (lights[j].className === 'M_DirectionalLight') {
               lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
@@ -87,35 +109,29 @@ export default class DrawKickerLocal {
             }
 
             let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight, true);
 
-            gl.uniform4f(material.getUniform(glslProgram.hashId, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
           }
         }
       }
 
       let isMaterialSetupDone = true;
 
-      if (material.shaderInstance.dirty || materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, expression, material, camera, mesh);
+      {
+        var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-      }
 
-      if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString || DrawKickerLocal._lastRenderPassIndex !== renderPassIndex) {
-        if (material) {
-          isMaterialSetupDone = material.setUpTexture();
-        }
-      }
-      if (!isMaterialSetupDone) {
+        isMaterialSetupDone = material.setUpTexture();
         return;
       }
 
-      if (iboArrayDic[geometryName].length > 0) {
+      if (geometry.isIndexed()) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-        gl.drawElements(gl[primitiveType], material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
+        gl.drawElements(primitiveType, material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
-        gl.drawArrays(gl[primitiveType], 0, vertexN);
+        gl.drawArrays(primitiveType, 0, vertexN);
       }
 
 

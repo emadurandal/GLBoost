@@ -33,8 +33,16 @@ export default class Expression extends GLBoostObject {
     return this._renderPasses;
   }
 
+  setCurrentAnimationValue(inputName, inputValue) {
+    for (let renderPass of this.renderPasses) {
+      if (renderPass.scene) {
+        renderPass.scene.setCurrentAnimationValue(inputName, inputValue);
+      }
+    }
+  }
+
   prepareToRender() {
-    this._renderPasses.forEach((renderPass)=>{
+    this._renderPasses.forEach((renderPass, index)=>{
       renderPass.prepareToRender(this);
     });
   }

@@ -1,7 +1,9 @@
+import GLBoost from '../../globals';
 import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';
 import MiscUtil from '../misc/MiscUtil';
 import GLExtensionsManager from '../core/GLExtensionsManager';
+import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 
 export default class Shader extends GLBoostObject {
   constructor(glBoostContext) {
@@ -14,12 +16,13 @@ export default class Shader extends GLBoostObject {
   static initMixinMethodArray() {
     this.prototype._classNamesOfVSDefine = this.prototype._classNamesOfVSDefine ? this.prototype._classNamesOfVSDefine : [];
     this.prototype._classNamesOfVSMethodDefine = this.prototype._classNamesOfVSMethodDefine ? this.prototype._classNamesOfVSMethodDefine : [];
+    this.prototype._classNamesOfVSPreProcess = this.prototype._classNamesOfVSPreProcess ? this.prototype._classNamesOfVSPreProcess : [];
     this.prototype._classNamesOfVSTransform = this.prototype._classNamesOfVSTransform ? this.prototype._classNamesOfVSTransform : [];
-    this.prototype._classNamesOfVSShade = this.prototype._classNamesOfVSShade ? this.prototype._classNamesOfVSShade : [];
 
     this.prototype._classNamesOfFSDefine = this.prototype._classNamesOfFSDefine ? this.prototype._classNamesOfFSDefine : [];
     this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
     this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
+    this.prototype._classNamesOfFSPostEffect = this.prototype._classNamesOfFSPostEffect ? this.prototype._classNamesOfFSPostEffect : [];
 
     this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
   }
@@ -36,11 +39,11 @@ export default class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfVSMethodDefine.indexOf(source.name) === -1){
       this.prototype._classNamesOfVSMethodDefine.push(source.name);
     }
+    if(this.prototype._classNamesOfVSPreProcess.indexOf(source.name) === -1){
+      this.prototype._classNamesOfVSPreProcess.push(source.name);
+    }
     if(this.prototype._classNamesOfVSTransform.indexOf(source.name) === -1){
       this.prototype._classNamesOfVSTransform.push(source.name);
-    }
-    if(this.prototype._classNamesOfVSShade.indexOf(source.name) === -1){
-      this.prototype._classNamesOfVSShade.push(source.name);
     }
     if(this.prototype._classNamesOfFSDefine.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSDefine.push(source.name);
@@ -51,6 +54,10 @@ export default class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfFSShade.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSShade.push(source.name);
     }
+    if(this.prototype._classNamesOfFSPostEffect.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSPostEffect.push(source.name);
+    }
+
     if(this.prototype._classNamesOfPrepare.indexOf(source.name) === -1){
       this.prototype._classNamesOfPrepare.push(source.name);
     }
@@ -72,13 +79,13 @@ export default class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSMethodDefine[matchIdx] = newone.name;
     }
+    matchIdx = this.prototype._classNamesOfVSPreProcess.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSPreProcess[matchIdx] = newone.name;
+    }
     matchIdx = this.prototype._classNamesOfVSTransform.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSTransform[matchIdx] = newone.name;
-    }
-    matchIdx = this.prototype._classNamesOfVSShade.indexOf(current.name);
-    if(matchIdx !== -1){
-      this.prototype._classNamesOfVSShade[matchIdx] = newone.name;
     }
     matchIdx = this.prototype._classNamesOfFSDefine.indexOf(current.name);
     if(matchIdx !== -1){
@@ -91,6 +98,10 @@ export default class Shader extends GLBoostObject {
     matchIdx = this.prototype._classNamesOfFSShade.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSShade[matchIdx] = newone.name;
+    }
+    matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSPostEffect[matchIdx] = newone.name;
     }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
     if(matchIdx !== -1){
@@ -111,15 +122,15 @@ export default class Shader extends GLBoostObject {
     }
     matchIdx = this.prototype._classNamesOfVSMethodDefine.indexOf(source.name);
     if(matchIdx !== -1){
-      this.prototype._classNamesOfVSMethodDefine.splice(matchIdx, 1);
+      this.prototype._classNamesOfVSMethodDefineVSPreProcess.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfVSPreProcess.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfVSPreProcess.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfVSTransform.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfVSTransform.splice(matchIdx, 1);
-    }
-    matchIdx = this.prototype._classNamesOfVSShade.indexOf(source.name);
-    if(matchIdx !== -1){
-      this.prototype._classNamesOfVSShade.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfFSDefine.indexOf(source.name);
     if(matchIdx !== -1){
@@ -133,9 +144,26 @@ export default class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSShade.splice(matchIdx, 1);
     }
+    matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSPostEffect.splice(matchIdx, 1);
+    }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfPrepare.splice(matchIdx, 1);
+    }
+  }
+
+  static isMixin(source) {
+
+    // create mixin method Array
+    this.initMixinMethodArray();
+
+    // register mixin methods to Array
+    if (this.prototype._classNamesOfVSDefine.indexOf(source.name) === -1) {
+      return false;
+    } else {
+      return true;
     }
   }
 
@@ -158,6 +186,23 @@ export default class Shader extends GLBoostObject {
     return processedShaderString;
   }
 
+  _addLineNumber(shaderString) {
+    let shaderTextLines = shaderString.split(/\r\n|\r|\n/);
+    let shaderTextWithLineNumber = '';
+    for (let i=0; i<shaderTextLines.length; i++) {
+      let lineIndex = i+1;
+      let splitter = ' : ';
+      if (lineIndex<10) {
+        splitter = '  : ';
+      } else if (lineIndex>=100) {
+        splitter = ': ';
+      }
+      shaderTextWithLineNumber += lineIndex + splitter + shaderTextLines[i] + '\n';
+    }
+
+    return shaderTextWithLineNumber;
+  }
+
   _getVertexShaderString(gl, functions, existCamera_f, lights, material, extraData) {
     var f = functions;
     var shaderText = '';
@@ -165,8 +210,9 @@ export default class Shader extends GLBoostObject {
     var in_ = Shader._in_onVert(gl);
     var out_ = Shader._out_onVert(gl);
 
-    shaderText +=   Shader._glslVer(gl);
+    shaderText =   Shader._glslVer(gl);
     shaderText +=   'precision highp float;\n';
+    shaderText +=   `${in_} vec3 aVertex_position;\n`;
 
     /// define variables
     // start defining variables. first, sub class Shader, ...
@@ -181,9 +227,6 @@ export default class Shader extends GLBoostObject {
     });
     shaderText += this._removeDuplicatedLine(vsDefineShaderText);
 
-    // begin of main function
-    shaderText +=   'void main(void) {\n';
-
     /// define methods
     // start defining methods. first, sub class Shader, ...
     // seconds, define methods as mixin Shaders
@@ -191,6 +234,28 @@ export default class Shader extends GLBoostObject {
       var method = this['VSMethodDefine_' + className];
       if (method) {
         shaderText += '//                                                            VSMethodDefine_' + className + ' //\n';
+        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
+      }
+    });
+
+    // begin of main function
+    shaderText +=   'void main(void) {\n';
+    shaderText +=   'vec4 position_local = vec4(aVertex_position, 1.0);\n';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += 'vec3 normal_local = aVertex_normal;\n';
+      if (Shader._exist(f, GLBoost.TANGENT)) {
+        shaderText += 'vec3 tangent_local = aVertex_tangent;\n';
+      }
+    }
+    shaderText +=   'bool isSkinning = false;\n';
+
+    /// PreProcess
+    // start pre-processing. first, sub class Shader, ...
+    // seconds, pre-process as mixin Shaders
+    this._classNamesOfVSPreProcess.forEach((className)=> {
+      var method = this['VSPreProcess_' + className];
+      if (method) {
+        shaderText += '//                                                            VSPreProcess_' + className + ' //\n';
         shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
       }
     });
@@ -206,20 +271,8 @@ export default class Shader extends GLBoostObject {
       }
     });
 
-    /// Shading
-    // start shading. first, sub class Shader, ...
-    // seconds, shade as mixin Shaders
-    this._classNamesOfVSShade.forEach((className)=> {
-      var method = this['VSShade_' + className];
-      if (method) {
-        shaderText += '//                                                            VSShade_' + className + ' //\n';
-        shaderText += method.bind(this, existCamera_f, f, lights, material, extraData)();
-      }
-    });
-
-
     // end of main function
-    shaderText +=   '}\n';
+    shaderText +=   '}';
 
     return shaderText;
   }
@@ -236,7 +289,8 @@ export default class Shader extends GLBoostObject {
     if (maxDrawBuffers > 1) {
       shaderText += Shader._glsl1DrawBufferExt(gl);
     }
-    shaderText +=   'precision mediump float;\n';
+    shaderText += Shader._glsl1StdDerivativeExt(gl);
+    shaderText +=   'precision highp float;\n';
 
     for (let i=0; i<maxDrawBuffers; i++) {
       shaderText +=   Shader._set_outColor_onFrag(gl, i);
@@ -283,6 +337,17 @@ export default class Shader extends GLBoostObject {
       }
     });
 
+    /// PostEffect
+    // start posteffect. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
+    this._classNamesOfFSPostEffect.forEach((className)=> {
+      let method = this['FSPostEffect_' + className];
+      if (method) {
+        shaderText += '//                                                            FSPostEffect_' + className + ' //\n';
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
+      }
+    });
+
     // end of main function
     if (maxDrawBuffers > 1) {
       for (let i=0; i<maxDrawBuffers; i++) {
@@ -291,7 +356,7 @@ export default class Shader extends GLBoostObject {
     } else {
       shaderText += Shader._set_glFragColor_inGLVer1(gl);
     }
-    shaderText +=   '}\n';
+    shaderText +=   '}';
 
     return shaderText;
   }
@@ -299,7 +364,7 @@ export default class Shader extends GLBoostObject {
   _prepareAssetsForShaders(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData, canvas) {
     var temp = [];
 
-    gl.useProgram(shaderProgram);
+    this._glContext.useProgram(shaderProgram);
     this._classNamesOfPrepare.forEach((className)=> {
       var method = this['prepare_' + className];
       if (method) {
@@ -325,12 +390,12 @@ export default class Shader extends GLBoostObject {
     this._dirty = flg;
   }
 
-  setUniforms() {
-
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    //super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
   }
 
-  setUniformsAsTearDown() {
-
+  setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
+    //super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
   }
 
   _getShader(gl, theSource, type) {
@@ -353,6 +418,7 @@ export default class Shader extends GLBoostObject {
     // See if it compiled successfully
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
       alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+      console.error(gl.getShaderInfoLog(shader));
       return null;
     }
 
@@ -360,10 +426,12 @@ export default class Shader extends GLBoostObject {
   }
 
   _initShaders(gl, vertexShaderStr, fragmentShaderStr) {
+    let vertexShaderStrWithLineNumber = this._addLineNumber(vertexShaderStr);
+    let fragmentShaderStrWithLineNumber = this._addLineNumber(fragmentShaderStr);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Vertex Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, vertexShaderStrWithLineNumber);
     MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'Fragment Shader:');
-    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStr);
+    MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, fragmentShaderStrWithLineNumber);
 
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
@@ -378,10 +446,15 @@ export default class Shader extends GLBoostObject {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      alert('Unable to initialize the shader program.');
+      alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+      console.error(gl.getProgramInfoLog(shaderProgram));
     }
 
-    gl.useProgram(shaderProgram);
+    this._glContext.useProgram(shaderProgram);
+
+
+    shaderProgram.vertexShaderSource = vertexShaderStrWithLineNumber;
+    shaderProgram.fragmentShaderSource = fragmentShaderStrWithLineNumber;
 
     return shaderProgram;
   }
@@ -419,7 +492,6 @@ export default class Shader extends GLBoostObject {
 
     if (programToReturn === null || !gl.isProgram(programToReturn)) {
     // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
 
       // register it to shaderHashTable.
       let indexStr = null;
@@ -428,21 +500,31 @@ export default class Shader extends GLBoostObject {
       } else {
         indexStr = hash;
       }
+
+      MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
+      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+      programToReturn.createdAt = performance.now();
       programToReturn.hashId = indexStr;
+      programToReturn.glslProgramsSelfUsageCount = -1;
+
       hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
       Shader._shaderHashTable[canvasId] = hashTable;
 
-    } else {
-      //gl.useProgram(programToReturn);
     }
+
     this._glslProgram = programToReturn;
 
-    material._semanticsDic = {};
+    material._semanticsDic = {_glslProgram:programToReturn};
     material.uniformTextureSamplerDic = {};
     programToReturn._material = material;
     programToReturn.optimizedVertexAttribs = this._prepareAssetsForShaders(gl, programToReturn, expression, vertexAttribs, existCamera_f, lights, material, extraData);
 
     return programToReturn;
+  }
+
+  static _createShaderInstance(glBoostContext, shaderClass) {
+    let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
+    return shaderInstance;
   }
 
   getDefaultPointLightIfNotExist(lights) {
@@ -457,7 +539,8 @@ export default class Shader extends GLBoostObject {
     }
   }
 
-  static _exist(functions, attribute) {
+  static _exist(functions, glboostConstantForAttributeType) {
+    let attribute = GLBoost.getValueOfGLBoostConstant(glboostConstantForAttributeType);
     return functions.indexOf(attribute) >= 0;
   }
 
@@ -490,6 +573,9 @@ export default class Shader extends GLBoostObject {
   static _glsl1DrawBufferExt(gl) {
     return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_draw_buffers : require\n' : '';
   }
+  static _glsl1StdDerivativeExt(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_OES_standard_derivatives : require\n' : '';
+  }
 
   static _in_onVert(gl) {
     return GLBoost.isThisGLVersion_2(gl) ? 'in' : 'attribute';
@@ -506,7 +592,96 @@ export default class Shader extends GLBoostObject {
   }
 
   static _textureProj_func(gl) {
-    return GLBoost.isThisGLVersion_2(gl) ? 'textureProj' : 'texture2DProj';
+    return GLBoost.isThisGLVersion_2(gl) ? 'shadowProj' : 'texture2DProj';
+  }
+
+  static _generateLightStr(i) {
+    let shaderText = '';
+    
+    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
+    shaderText += `    vec3 lightDirection = lightDirection_world[${i}];\n`;    
+    shaderText += `    if (0.4 < lightSpotInfo[${i}].x) {\n`; // is pointlight or spotlight
+    shaderText += `      lightDirection = normalize(lightPosition_world[${i}] - v_position_world.xyz);\n`;
+    shaderText += `    }\n`;
+    shaderText += `    float spotEffect = 1.0;\n`;
+    shaderText += `    if (lightSpotInfo[${i}].x > 0.8) {\n`; // is spotlight
+    shaderText += `      spotEffect = dot(lightDirection_world[${i}], lightDirection);\n`;
+    shaderText += `      if (spotEffect > lightSpotInfo[${i}].y) {\n`; // lightSpotInfo[${i}].y == spotCosCutoff
+    shaderText += `        spotEffect = pow(spotEffect, lightSpotInfo[${i}].z);\n`; // lightSpotInfo[${i}].z == spotExponent
+    shaderText += `      } else {\n`;
+    shaderText += `        spotEffect = 0.0;\n`;
+    shaderText += `      }\n`;
+    shaderText += `    }\n`;
+
+    return shaderText;
+  }
+
+  static _generateShadowingStr(gl, i, isShadowEnabledAsTexture) {
+    let shadowingText = '';
+    shadowingText += `float visibilityForShadow = 0.75;\n`;
+    shadowingText += `float visibility = 1.0;\n`;
+    shadowingText += `float visibilitySpecular = 1.0;\n`;
+    shadowingText += `if (isShadowCasting[${i}] == 1) {// ${i}\n`;
+    shadowingText += `vec4 shadowCoord_i = shadowCoord[${i}];\n`;
+    shadowingText += `shadowCoord_i.z -= depthBias;\n`;
+
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      if (isShadowEnabledAsTexture) {
+        shadowingText += `visibilitySpecular = textureProj(uDepthTexture[${i}], shadowCoord_i);\n`;
+        shadowingText += `visibility = visibilitySpecular + visibilityForShadow;\n`;
+      }
+    } else {
+      if (isShadowEnabledAsTexture) {
+//        shadowingText += `  shadowCoord_i.y = 1.0 - shadowCoord_i.y;\n`;
+        shadowingText += `float depth = texture2DProj(uDepthTexture[${i}], shadowCoord_i).r;\n`;
+        shadowingText += `if (depth < shadowCoord_i.z) {\n`;
+//        shadowingText += `if (depth < 0.9) {\n`;
+        shadowingText += `  visibility = visibilityForShadow;\n`;
+        shadowingText += `  visibilitySpecular = 0.0;\n`;
+//        shadowingText += `  visibilityLevel = 0.0;\n`;
+        shadowingText += `}\n`;
+      }
+    }
+    shadowingText += `}\n`;
+
+    return shadowingText;
+  };
+
+  static _getNormalStr(gl, material, f) {
+    let shaderText = '';
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    if (!normalTexture && Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += '  vec3 normal = normalize(v_normal_world);\n';
+      shaderText += '  vec3 normal_world = normal;\n';
+    } else if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
+      if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+        shaderText += '  vec3 dx = dFdx(v_position_world);\n';
+        shaderText += '  vec3 dy = dFdy(v_position_world);\n';
+
+  //      shaderText += '  normal = dot(viewDirection_world, cross(dx, dy)) >= 0.0 ? normalize(cross(dx, dy)) : normalize(cross(dy, dx));\n';
+        shaderText += '  vec3 normal = normalize(cross(dx, dy));\n';
+        shaderText += '  vec3 normal_world = normal;\n';
+      }
+      //      shaderText += '  normal *= -1.0;\n';
+    } else if (normalTexture && Shader._exist(f, GLBoost.TANGENT)) {
+      let textureFunc = Shader._texture_func(gl);
+      shaderText += `  vec3 normal = ${textureFunc}(uNormalTexture, texcoord).xyz*2.0 - 1.0;\n`;
+      shaderText += `  vec3 tangent_world = normalize(v_tangent_world);\n`;
+      shaderText += `  vec3 binormal_world = normalize(v_binormal_world);\n`;
+      shaderText += `  vec3 normal_world = normalize(v_normal_world);\n`;      
+
+      shaderText += `  mat3 tbnMat_tangent_to_world = mat3(
+        tangent_world.x, tangent_world.y, tangent_world.z,
+        binormal_world.x, binormal_world.y, binormal_world.z,
+        normal_world.x, normal_world.y, normal_world.z
+      );\n`;
+      
+      shaderText += `  normal = normalize(tbnMat_tangent_to_world * normal);\n`;
+      shaderText += `  normal_world = normal;\n`;
+
+    }
+
+    return shaderText;
   }
 
   _sampler2DShadow_func() {
@@ -555,6 +730,50 @@ export default class Shader extends GLBoostObject {
     });
   }
 
+  static trySettingVec4ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform4fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  }  
+
+  static trySettingVec3ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform3fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  }  
+
+  static trySettingVec2ArrayToUniform(gl, hashIdOfGLSLProgram, material, semanticsDir, semantics, vecArray) {
+    if (typeof semanticsDir[semantics] === 'undefined') {
+      return;
+    }
+    if (typeof semanticsDir[semantics] === 'string') {
+      gl.uniform2fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+semanticsDir[semantics]), vecArray);
+      return;
+    }
+
+    // it must be an Array...
+    semanticsDir[semantics].forEach((uniformName)=>{
+      gl.uniform2fv(material.getUniform(hashIdOfGLSLProgram, 'uniform_'+uniformName), vecArray);
+    });
+  } 
 
   get glslProgram() {
     return this._glslProgram;
@@ -567,6 +786,14 @@ export default class Shader extends GLBoostObject {
     super.readyForDiscard();
   }
 
+  getShaderParameter(material, parameterName, defaultValue) {
+    if (typeof this[parameterName] !== 'undefined') {
+      return this[parameterName];
+    } else if (typeof material.shaderParameters[parameterName] !== 'undefined') {
+      return material.shaderParameters[parameterName];
+    }
+    return defaultValue;
+  }
 }
 
 Shader._instances = new Object();

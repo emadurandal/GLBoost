@@ -22,9 +22,9 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
 
-  draw(lights, camera, mesh, scene, renderPass_index) {
+  draw(expression, lights, camera, mesh, scene, renderPass_index) {
     this._currentRenderPassIndex = renderPass_index;
-    super.draw(lights, camera, mesh, scene, renderPass_index);
+    super.draw(expression, lights, camera, mesh, scene, renderPass_index);
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
@@ -49,12 +49,12 @@ export default class BlendShapeGeometry extends Geometry {
     super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
-  _setBlendWeightToGlslProgram(blendTarget, weight) {
-    let gl = this._glContext.gl;
+  _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+    let blendTarget = GLBoost.getValueOfGLBoostConstant(blendTargetNumber);
     let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
-      gl.useProgram(materials[i].shaderInstance.glslProgram);
-      gl.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight);
+      this._glContext.useProgram(materials[i].shaderInstance.glslProgram);
+      this._glContext.uniform1f(materials[i]['uniform_FloatSampler_blendWeight_' + blendTarget], weight, true);
     }
   }
 
@@ -63,7 +63,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET1, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_1 = weight;
   }
   get blendWeight_1() {
@@ -75,7 +75,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET2, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_2 = weight;
   }
   get blendWeight_2() {
@@ -87,7 +87,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET3, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_3 = weight;
   }
   get blendWeight_3() {
@@ -99,7 +99,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET4, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_4 = weight;
   }
   get blendWeight_4() {
@@ -111,7 +111,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET5, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_5 = weight;
   }
   get blendWeight_5() {
@@ -123,7 +123,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET6, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_6 = weight;
   }
   get blendWeight_6() {
@@ -135,7 +135,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET7, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_7 = weight;
   }
   get blendWeight_7() {
@@ -147,7 +147,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET8, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_8 = weight;
   }
   get blendWeight_8() {
@@ -159,7 +159,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET9, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_9 = weight;
   }
   get blendWeight_9() {
@@ -171,7 +171,7 @@ export default class BlendShapeGeometry extends Geometry {
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
     this._setBlendWeightToGlslProgram(GLBoost.BLENDTARGET10, weight);
-    gl.useProgram(currentProgram);
+    this._glContext.useProgram(currentProgram);
     this._blendWeight_10 = weight;
   }
   get blendWeight_10() {

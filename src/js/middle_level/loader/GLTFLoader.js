@@ -120,7 +120,7 @@ export default class GLTFLoader {
 
   _checkGLTFVersion(json) {
     let glTFVer = 1.0;
-    if (json.asset) {
+    if (json.asset && json.asset.version) {
       glTFVer = parseFloat(json.asset.version);
     }
     return glTFVer;
@@ -280,6 +280,11 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
+        rootGroup.animationTracks = json.asset.extras.animation_tracks;
+      }
+
       rootGroup.addChild(group)
     }
 
@@ -339,8 +344,8 @@ export default class GLTFLoader {
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
-            fovy: perspective.yfov,
-            aspect: perspective.aspectRatio,
+            fovy: MathUtil.radianToDegree(perspective.yfov),
+            aspect: perspective.aspectRatio ? perspective.aspectRatio : 1.5,
             zNear: perspective.znear,
             zFar: perspective.zfar
           }
@@ -363,6 +368,32 @@ export default class GLTFLoader {
       }
       camera.userFlavorName = cameraStr;
       group.addChild(camera);
+    } else if (nodeJson.extensions) {
+      if (nodeJson.extensions.KHR_materials_common) {
+        if (nodeJson.extensions.KHR_materials_common.light) {
+          const lightStr = nodeJson.extensions.KHR_materials_common.light
+          const lightJson = json.extensions.KHR_materials_common.lights[lightStr];
+          let light = null;
+          if (lightJson.type === 'ambient') {
+            let color = lightJson.ambient.color;
+            light = glBoostContext.createAmbientLight(new Vector3(color[0], color[1], color[2]));
+            group.addChild(light);
+          } else if (lightJson.type === 'point') {
+            let color = lightJson.point.color;
+            light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
+            group.addChild(light);
+          } else if (lightJson.type === 'directional') {
+            const color = lightJson.directional.color;
+            let lightDir = new Vector4(0, 0, -1, 1);
+            const matrix = new Matrix44(nodeJson.matrix, true);
+            lightDir = matrix.multiplyVector(lightDir);
+            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
+            light.multiplyMatrixGizmo = group.matrix;
+            group.multiplyMatrix(Matrix44.identity());
+            group.addChild(light);
+          }
+        }
+      }
     }
 
     if (nodeJson.children) {
@@ -499,7 +530,9 @@ export default class GLTFLoader {
       for (let i = 0; i < meshJson.primitives.length; i++) {
         //lengthDic.index += _indicesArray[i].length;
         lengthDic.position += _positions[i].length;
-        lengthDic.normal += _normals[i].length;
+        if (_normals[i]) {
+          lengthDic.normal += _normals[i].length;
+        }
         if (typeof additional['joint'][i] !== 'undefined') {
           lengthDic.joint += additional['joint'][i].length;
         }
@@ -551,8 +584,10 @@ export default class GLTFLoader {
             array = additional['texcoord'][i];
           }
 
-          newTypedArray.set(array, offset);
-          offset += array.length;
+          if (array) {
+            newTypedArray.set(array, offset);
+            offset += array.length;
+          }
         }
 
         if (attribName === 'position') {
@@ -611,7 +646,9 @@ export default class GLTFLoader {
 
   _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
     let materialJson = json.materials[materialStr];
+    material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
+    
     if (this._isKHRMaterialsCommon(materialJson)) {
       materialJson = materialJson.extensions.KHR_materials_common;
     }
@@ -641,7 +678,11 @@ export default class GLTFLoader {
           }
           if (typeof value === 'string') {
             let textureStr = value;
-            material.setTexture(textures[textureStr]);
+            let texturePurpose;
+            if (valueName === 'diffuse') {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
+            }
+            material.setTexture(textures[textureStr], texturePurpose);
           }
         }
       };
@@ -848,7 +889,7 @@ export default class GLTFLoader {
           if (hitElement) {
             hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             hitElement.setActiveAnimationLine('time');
-            hitElement.currentCalcMode = 'quaternion';
+            //hitElement.currentCalcMode = 'quaternion';
           }
         }
       }

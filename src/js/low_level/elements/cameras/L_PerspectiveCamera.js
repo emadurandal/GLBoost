@@ -10,6 +10,9 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     this._zNear = perspective.zNear;
     this._zFar = perspective.zFar;
 
+    this._zNearInner = perspective.zNear;
+    this._zFarInner = perspective.zFar;
+
     this._dirtyProjection = true;
     this._updateCountAsCameraProjection = 0;
   }
@@ -25,7 +28,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNear, this._zFar);
+      this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {

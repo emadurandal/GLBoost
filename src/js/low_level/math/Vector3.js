@@ -25,6 +25,8 @@ export default class Vector3 {
     return new Vector3(0, 0, 0);
   }
 
+
+
   clone() {
     return new Vector3(this.x, this.y, this.z);
   }
@@ -132,7 +134,7 @@ export default class Vector3 {
   }
 
   /**
-   * 加算
+   * add value
    */
   add(v) {
     this.x += v.x;
@@ -143,7 +145,7 @@ export default class Vector3 {
   }
 
   /**
-   * 加算（static版）
+   * add value（static version）
    */
   static add(lv, rv) {
     return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
@@ -195,11 +197,20 @@ export default class Vector3 {
     return this;
   }
 
-  /**
-   * 除算（static版）
-   */
+  multiplyVector(vec) {
+    this.x *= vec.x;
+    this.y *= vec.y;
+    this.z *= vec.z;
+
+    return this;
+  }
+
   static multiply(vec3, val) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
+  }
+
+  static multiplyVector(vec3, vec) {
+    return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
   }
 
   static angleOfVectors(lhv, rhv) {
@@ -214,12 +225,33 @@ export default class Vector3 {
     return sita;
   }
 
+  divideVector(vec3) {
+    this.x /= vec3.x;
+    this.y /= vec3.y;
+    this.z /= vec3.z;
+
+    return this;
+  }
+
+  static divideVector(lvec3, rvec3) {
+    return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
+  }
+
+
   toVector4() {
     return new Vector4(this.x, this.y, this.z, 1.0);
   }
 
   toString() {
     return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
+  }
+
+  at(i) {
+    switch (i%3) {
+    case 0: return this.x;
+    case 1: return this.y;
+    case 2: return this.z;
+    }
   }
 }
 

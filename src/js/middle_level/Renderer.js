@@ -1,6 +1,6 @@
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
-import Geometry from '../low_level/geometries/Geometry';
 import GLBoostObject from '../low_level/core/GLBoostObject';
+import M_SkeletalMesh from './elements/meshes/M_SkeletalMesh';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -13,82 +13,103 @@ export default class Renderer extends GLBoostObject {
 
     var gl = this._glContext.gl;
 
-    Renderer.reflectGlobalGLState(gl);
+    this._glBoostContext.reflectGlobalGLState();
 
     gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
-
-  }
-
-  static reflectGlobalGLState(gl) {
-
-    gl.enable( gl.DEPTH_TEST );
-    gl.depthFunc( gl.LEQUAL );
-
-    gl.enable( gl.BLEND );
-    gl.blendEquation( gl.FUNC_ADD );
-    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-
-    gl.clearDepth( 1 );
-    gl.clearStencil( 0 );
-  }
-
-  static disableAllGLState(gl) {
-    let states = [
-      3042,
-      2884,
-      2929,
-      32823,
-      32926
-    ];
-
-    states.forEach((state)=>{
-      gl.disable(state);
-    });
   }
 
   /**
-   * en: draw elements of the scene.<br>
+   * en: update things of elements of the expression.<br>
+   * @param {Expression} expression a instance of Expression class
+   */
+  update(expression) {
+    
+    let skeletalMeshes = [];
+    // gather scenes as unique
+    for (let renderPass of expression.renderPasses) {
+      skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
+      renderPass.scene.updateAmountOfAmbientLightsIntensity();
+    }
+
+    let unique = function(array) {
+      return array.reduce(function(a, b) {
+        if (a.instanceName !== b.instanceName) {
+          a.push(b);
+        }
+        return a;
+      }, []);
+    };
+    skeletalMeshes = unique(skeletalMeshes);
+    
+    for (let mesh of skeletalMeshes) {
+      mesh.geometry.update(mesh);
+    }
+
+  }
+
+  /**
+   * en: draw elements of the expression.<br>
    * ja: sceneが持つオブジェクトを描画します
-   * @param {Scene} scene a instance of Scene class
+   * @param {Expression} expression a instance of Expression class
    */
   draw(expression) {
+    let renderPassTag = '';
     expression.renderPasses.forEach((renderPass, index)=>{
-      if (!renderPass.scene) {
+      if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
 
-      var camera = false;
-      renderPass.scene.cameras.forEach((elm)=> {
-        if (elm.isMainCamera(renderPass.scene)) {
-          camera = elm;
-        }
-      });
+      if (renderPassTag !== renderPass.tag) {
+        renderPass.clearAssignShaders();
+      }
+      renderPassTag = renderPass.tag;
+
+      var camera = renderPass.scene.getMainCamera();
+
+      let lights = renderPass.scene.lightsExceptAmbient;
+
+      renderPass.preRender(camera ? true:false, lights);
 
       var glContext = this._glContext;
       var gl = glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
-      let lights = renderPass.scene.lights;
 
-      if (renderPass.fbo) {
+      // set render target buffers for each RenderPass.
+      /*
+      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
         gl.bindTexture(gl.TEXTURE_2D, null);
-        Geometry.clearMaterialCache();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+      } else {
+        glem.drawBuffers(gl, [gl.BACK]);
+      }
+      */
+      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
       }
-      glem.drawBuffers(gl, renderPass.buffersToDraw); // set render target buffers for each RenderPass.
 
-      if (renderPass.renderTargetColorTextures || renderPass.renderTargetDepthTexture) {
+      glem.drawBuffers(gl, renderPass.buffersToDraw);
+      //glem.readBuffer(gl, renderPass.buffersToDraw);
+
+      if (renderPass.viewport) {
         gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
       } else {
-        gl.viewport(0, 0, glContext.width, glContext.height);
+        if (camera) {
+          let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
+          gl.viewport(-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight);
+        } else {
+          gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
+        }
       }
-      
+
       this._clearBuffer(gl, renderPass);
 
       // draw opacity meshes.
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
-        mesh.draw(expression, lights, camera, renderPass.scene, index);
+        if (mesh.isVisible) {
+          mesh.draw(expression, lights, camera, renderPass.scene, index);
+        }
       });
 
       if (camera) {
@@ -97,11 +118,29 @@ export default class Renderer extends GLBoostObject {
       // draw transparent meshes.
       var transparentMeshes = renderPass.transparentMeshes;
       transparentMeshes.forEach((mesh)=> {
-        mesh.draw(expression, lights, camera, renderPass.scene, index);
+        if (mesh.isVisible) {
+          mesh.draw(expression, lights, camera, renderPass.scene, index);
+        }
       });
+
+      const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
+      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
+      this._glBoostContext.currentGlobalStates = [
+        3042, // gl.BLEND
+      ];
+      let gizmos = renderPass.gizmos;
+      for (let gizmo of gizmos) {
+        if (gizmo.isVisible) {
+          gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
+        }
+      }
+      this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+      this._glBoostContext.restoreGlobalStatesToDefault();
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
+
+      renderPass.postRender(camera ? true:false, lights);
 
     });
   }
@@ -115,12 +154,15 @@ export default class Renderer extends GLBoostObject {
     if (clearDepth) {
       gl.clearDepth(clearDepth);
     }
-    if (clearColor || clearDepth) {
+
+    if (renderPass.buffersToDraw[0] === gl.NONE) {
+      {
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+      }
+    } else if (clearColor || clearDepth) {
       gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     } else if (clearColor) {
       gl.clear( gl.COLOR_BUFFER_BIT );
-    } else {
-      gl.clear( gl.DEPTH_BUFFER_BIT );
     }
   }
 
@@ -162,10 +204,8 @@ export default class Renderer extends GLBoostObject {
    * @param {number} height en: height to resize, ja:リサイズする高さ
    */
   resize(width, height) {
-    this._glContext.width = width;
-    this._glContext.height = height;
-
-    this._glContext.gl.viewport(0, 0, width, height);
+    this._glContext.canvasWidth = width;
+    this._glContext.canvasHeight = height;
   }
 
 }

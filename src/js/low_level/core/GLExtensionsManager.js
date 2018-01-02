@@ -17,9 +17,15 @@ export default class GLExtensionsManager {
       this._extEIUI = gl.getExtension('OES_element_index_uint');
 
       this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
+
+      this._extStdDerivatives = gl.getExtension("OES_standard_derivatives");
+
+      this._extTFL = gl.getExtension("OES_texture_float_linear");
     }
 
     GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+
+    this._glContext = glContext;
   }
   static getInstance(glContext) {
     if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
@@ -40,6 +46,10 @@ export default class GLExtensionsManager {
     return this._extTFA;
   }
 
+  get extDepthTex() {
+    return this._extDepthTex;
+  }
+
   createVertexArray(gl) {
     if (GLBoost.isThisGLVersion_2(gl)) {
       return gl.createVertexArray();
@@ -48,6 +58,8 @@ export default class GLExtensionsManager {
     } else {
       return null;
     }
+
+    this._glContext.checkGLError();
   }
 
   bindVertexArray(gl, vao) {
@@ -60,24 +72,42 @@ export default class GLExtensionsManager {
     } else {
       return false;
     }
+
+    this._glContext.checkGLError();
   }
 
   drawBuffers(gl, buffers) {
+    let buffer = buffers;
     if (GLBoost.isThisGLVersion_2(gl)) {
       gl.drawBuffers(buffers);
-      return true;
+      buffer = buffer[0];
     } else if (this._extDBs) {
       this.extDBs.drawBuffersWEBGL(buffers);
-      return true;
-    } else {
-      if (buffers[0] === gl.NONE) {
-        gl.colorMask(false, false, false, false);
-      } else {
-        gl.colorMask(true, true, true, true);
-      }
-      return false;
+      buffer = buffer[0];
     }
+
+    if (buffer === gl.NONE) {
+      gl.colorMask(false, false, false, false);
+    } else {
+      gl.colorMask(true, true, true, true);
+    }
+
+    this._glContext.checkGLError();
   }
+
+  readBuffer(gl, buffers) {
+    let buffer = buffers;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      buffer = buffer[0];
+    } else if (this._extDBs) {
+      buffer = buffer[0];
+    }
+
+    gl.readBuffer(buffer);
+
+    this._glContext.checkGLError();
+  }
+
 
   colorAttachiment(gl, index) {
     return this._extDBs ?
@@ -85,11 +115,19 @@ export default class GLExtensionsManager {
       gl[`COLOR_ATTACHMENT${index}`];
   }
 
-  elementIndexBitSize(gl) {
+  elementIndexBitSizeGLConstant(gl) {
     if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
       return gl.UNSIGNED_INT;
     } else {
       return gl.UNSIGNED_SHORT;
+    }
+  }
+
+  elementIndexByteSizeNumber(gl) {
+    if (GLBoost.isThisGLVersion_2(gl) || this._extEIUI) {
+      return 4;
+    } else {
+      return 2;
     }
   }
 

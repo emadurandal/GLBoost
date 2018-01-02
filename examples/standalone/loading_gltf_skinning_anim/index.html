@@ -70,11 +70,10 @@
   );
   scene.addChild( camera );
 
-  var gtime = 0/30;
-  var gtimeDelta = 1/60;
-
   var glTFLoader = GLBoost.GLTFLoader.getInstance();
   var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', null);
+//  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/BrainStem/BrainStem.gltf', null);
+//  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/RiggedFigure/RiggedFigure.gltf', null);
 
   promise.then(function(group) {
     console.log(group);
@@ -89,26 +88,30 @@
 
 
 
+    const animationLength = group.getEndAnimationInputValue('time');
+    var lastAnimatedTime = Date.now();
     var render = function(){
-      scene.setCurrentAnimationValue('time', gtime);
+      var currentMillisecondDeltaFromStart = Date.now() - lastAnimatedTime;
+      scene.setCurrentAnimationValue('time', currentMillisecondDeltaFromStart/1000);
       renderer.clearCanvas();
+      renderer.update(expression);
       renderer.draw(expression);
 
-      gtime += gtimeDelta;
-
-      if (gtime > 1.0) {
-          gtime = 0;
+      if (currentMillisecondDeltaFromStart/1000 > animationLength) {
+        lastAnimatedTime = Date.now();
       }
+
       var rotateMatrix = GLBoost.Matrix33.rotateY(0.75);
       var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
       camera.eye = rotatedVector;
-
-
       requestAnimationFrame(render);
     };
     render();
   });
-
 </script>
 </body>
 </html>
+
+
+
+

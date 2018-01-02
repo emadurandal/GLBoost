@@ -1,52 +1,19 @@
 import Shader from '../../low_level/shaders/Shader';
 import DecalShader from './DecalShader';
-import Matrix44 from '../../low_level/math/Matrix44';
+import Vector4 from '../../low_level/math/Vector4';
 
 export class LambertShaderSource {
-  /*
-  VSDefine_LambertShaderSource(in_, out_, f, lights, material, extraData) {
-    var shaderText = '';
-
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += `${out_} vec4 projectedPosByLight[${textureUnitIndex+1}];\n`;
-        shaderText +=      `uniform mat4 viewMatrixFromLight[${textureUnitIndex+1}];\n`;
-        shaderText +=      `uniform mat4 projectionMatrixFromLight[${textureUnitIndex+1}];\n`;
-        textureUnitIndex++;
-      }
-    }
-    return shaderText;
-  }
-
-  VSTransform_LambertShaderSource(existCamera_f, f, lights, material, extraData) {
-    var shaderText = '';
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        shaderText += `mat4 pvwLightMatrix = projectionMatrixFromLight[${textureUnitIndex}] * viewMatrixFromLight[${textureUnitIndex}] * worldMatrix;\n`;
-        shaderText += `projectedPosByLight[${textureUnitIndex}] = pvwLightMatrix * vec4(aVertex_position, 1.0);\n`;
-        textureUnitIndex++;
-      }
-    }
-    return shaderText;
-  }*/
 
   FSDefine_LambertShaderSource(in_, f, lights) {
     
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
-    shaderText += `uniform vec4 Kd;\n`;
+    shaderText += 'uniform vec4 Kd;\n';
+    shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
-    //for (let i=0; i<lights.length; i++) {
-    //  if (lights[i].camera && lights[i].camera.texture) {
-    shaderText += `uniform mediump ${sampler2D} uDepthTexture[${lights.length}];\n`;
-
-    shaderText += `${in_} vec4 v_shadowCoord[${lights.length}];\n`;
-
-      //}
-    //}
-    shaderText += `uniform int isShadowCasting[${lights.length}];\n`;
+    let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
+    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
     shaderText += `${in_} vec4 temp[1];\n`;
 
     return shaderText;
@@ -55,44 +22,25 @@ export class LambertShaderSource {
   FSShade_LambertShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    var textureProjFunc = Shader._textureProj_func(gl);
-
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        textureUnitIndex++;
-      }
-    }
-
-    shaderText += '  float depthBias = 0.005;\n';
-
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    shaderText += '  vec3 normal = normalize(v_normal);\n';
-    for (let i=0; i<lights.length; i++) {
+    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
+    for (let i=0; i<lightsExceptAmbient.length; i++) {
+      let light = lightsExceptAmbient[i];
+      let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
-      // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
-      shaderText += `    vec3 light = normalize(lightPosition[${i}].xyz - position.xyz * lightPosition[${i}].w);\n`;
-
-      shaderText += `    if (isShadowCasting[${i}] == 1) {// ${i}\n`;
-
-      shaderText += `      float depth = ${textureProjFunc}(uDepthTexture[${i}], v_shadowCoord[${i}]).r;\n`;
-      shaderText += `      if (depth < (v_shadowCoord[${i}].z - depthBias) / v_shadowCoord[${i}].w) {\n`;
-      shaderText += `        light *= 0.5;\n`;
-      shaderText += `      }\n`;
-
-      //shaderText += `        float visibility = texture2DProj(uDepthTexture[${i}], v_shadowCoord[${i}], depthBias).x;\n`;
-      //shaderText += `        light *= visibility > 0.5 ? 1.0 : 0.0;\n`;
-
-      shaderText += `    }\n`;
-
-      shaderText += `    float diffuse = max(dot(light, normal), 0.0);\n`;
-      shaderText += `    rt0 += Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      shaderText +=      Shader._generateLightStr(i);
+      shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
+      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `  }\n`;
     }
+    shaderText += '  rt0.xyz += ambient.xyz;\n';
+    
     //shaderText += '  rt0.a = 1.0;\n';
     // shaderText += '  rt0 = surfaceColor;\n';
-    //shaderText += '  rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+//    shaderText += '  rt0 = vec4(v_shadowCoord[0].xy, 0.0, 1.0);\n';
+
 
 
     return shaderText;
@@ -102,20 +50,9 @@ export class LambertShaderSource {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram.hashId, 'uniform_Kd', gl.getUniformLocation(shaderProgram, 'Kd'));
-
-    let textureUnitIndex = 0;
-    for (let i=0; i<lights.length; i++) {
-      material.setUniform(shaderProgram.hashId, 'uniform_isShadowCasting' + i, gl.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
-
-      if (lights[i].camera && lights[i].camera.texture) {
-        // depthTexture
-        let depthTextureUniformLocation = gl.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
-        material.setUniform(shaderProgram.hashId, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
-        lights[i].camera.texture.textureUnitIndex = i + 1;  // +1 because 0 is used for diffuse texture
-      }
-    }
-
+    material.setUniform(shaderProgram, 'uniform_Kd', this._glContext.getUniformLocation(shaderProgram, 'Kd'));
+    material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
+    
     return vertexAttribsAsResult;
   }
 }
@@ -129,46 +66,18 @@ export default class LambertShader extends DecalShader {
     LambertShader.mixin(LambertShaderSource);
   }
 
-  setUniforms(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniforms(gl, glslProgram, expression, material);
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     let Kd = material.diffuseColor;
-    gl.uniform4f(material.getUniform(glslProgram.hashId, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w);
+    let Ka = material.ambientColor;    
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
+    
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
 
-
-    for (let j = 0; j < lights.length; j++) {
-      if (lights[j].camera && lights[j].camera.texture) {
-        let cameraMatrix = lights[j].camera.lookAtRHMatrix();
-        let projectionMatrix = lights[j].camera.projectionRHMatrix();
-        gl.uniformMatrix4fv(material.getUniform(glslProgram.hashId, 'uniform_depthPVMatrix_'+j), false, Matrix44.multiply(projectionMatrix, cameraMatrix).flatten());
-      }
-    }
-
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 1);
-      } else {
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_isShadowCasting' + i), 0);
-      }
-    }
-
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        // set depthTexture unit i+1 to the sampler
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), i+1);  // +1 because 0 is used for diffuse texture
-      }
-    }
   }
 
-  setUniformsAsTearDown(gl, glslProgram, expression, material, camera, mesh, lights) {
-    super.setUniformsAsTearDown(gl, glslProgram, expression, material);
-    for (let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {
-        // set depthTexture unit i+1 to the sampler
-        gl.uniform1i(material.getUniform(glslProgram.hashId, 'uniform_DepthTextureSampler_' + i), 0);  // +1 because 0 is used for diffuse texture
-      }
-    }
-  }
 }
 
 GLBoost['LambertShader'] = LambertShader;

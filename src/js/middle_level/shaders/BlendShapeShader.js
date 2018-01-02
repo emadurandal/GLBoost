@@ -49,9 +49,9 @@ export default class BlendShapeShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
         // Specifically, this uniform location is saved directly to the material.
-        material['uniform_FloatSampler_blendWeight_' + attribName] = gl.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
+        material['uniform_FloatSampler_blendWeight_' + attribName] = this._glContext.getUniformLocation(shaderProgram, 'blendWeight_' + attribName);
         // Initially zero initialization
-        gl.uniform1f(material['uniform_FloatSampler_blendWeight_' + attribName], 0.0);
+        this._glContext.uniform1f(material['uniform_FloatSampler_blendWeight_' + attribName], 0.0, true);
       }
     });
 

@@ -14,6 +14,14 @@ export default class L_Element extends GLBoostObject {
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._matrix = Matrix44.identity();
 
+    this._translateOnInit = this._translate.clone();
+    this._scaleOnInit = this._scale.clone();
+
+    this._rotateOnInit = this._rotate.clone();
+    this._quaternionOnInit = this._quaternion.clone();
+    this._matrixOnInit = this._matrix.clone();
+
+
     this._finalMatrix = Matrix44.identity();
 
     this._dirtyAsElement = true;
@@ -74,6 +82,7 @@ export default class L_Element extends GLBoostObject {
   multiplyMatrix(mat) {
     this._matrix = mat.clone();
     this._currentCalcMode = 'matrix';
+//    this._translate = new Vector3(mat.m03, mat.m03, mat.m03);
     this._needUpdate();
   }
 
@@ -124,6 +133,10 @@ export default class L_Element extends GLBoostObject {
     }
 
     return this._finalMatrix.clone();
+  }
+
+  get normalMatrix() {
+    return Matrix44.invert(this.transformMatrix).transpose().toMatrix33();
   }
 
   set currentCalcMode(mode) {

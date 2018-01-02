@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import Matrix44 from './Matrix44';
 import Vector3 from './Vector3';
+import Vector4 from './Vector4';
 import MathUtil from './MathUtil';
 
 export default class Quaternion {
@@ -134,14 +135,90 @@ export default class Quaternion {
     return this;
   }
 
-  multiply(val) {
-    this.x *= val;
-    this.y *= val;
-    this.z *= val;
-    this.w *= val;
-
+  multiply(q) {
+    let result = new Quaternion(0, 0, 0, 1);
+    result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
+    result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
+    result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
+    result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+    this.x = result.x;
+    this.y = result.y;
+    this.z = result.z;
+    this.w = result.w;
+    
     return this;
   }
+
+  static multiply(q1, q2) {
+    let result = new Quaternion(0, 0, 0, 1);
+    result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
+    result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
+    result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
+    result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+    return result;
+  }
+
+  static quaternionFromRotationMatrix(m) {
+    
+    let q = new Quaternion();
+    let tr = m.m00 + m.m11 + m.m22;
+
+    if (tr > 0) { 
+      let S = 0.5 / Math.sqrt(tr+1.0);
+      q.w = 0.25 / S;
+      q.x = (m.m21 - m.m12) * S;
+      q.y = (m.m02 - m.m20) * S; 
+      q.z = (m.m10 - m.m01) * S; 
+    } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
+      let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
+      q.w = (m.m21 - m.m12) / S;
+      q.x = 0.25 * S;
+      q.y = (m.m01 + m.m10) / S; 
+      q.z = (m.m02 + m.m20) / S; 
+    } else if (m.m11 > m.m22) { 
+      let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+      q.w = (m.m02 - m.m20) / S;
+      q.x = (m.m01 + m.m10) / S; 
+      q.y = 0.25 * S;
+      q.z = (m.m12 + m.m21) / S; 
+    } else { 
+      let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+      q.w = (m.m10 - m.m01) / S;
+      q.x = (m.m02 + m.m20) / S;
+      q.y = (m.m12 + m.m21) / S;
+      q.z = 0.25 * S;
+    }
+
+    return q;
+  }
+
+  at(i) {
+    switch (i%4) {
+    case 0: return this.x;
+    case 1: return this.y;
+    case 2: return this.z;
+    case 3: return this.w;
+    }
+  }
+
+  setAt(i, val) {
+    switch (i%4) {
+    case 0: this.x = val; break;
+    case 1: this.y = val; break;
+    case 2: this.z = val; break;
+    case 3: this.w = val; break;
+    }
+  }
+
+  normalize() {
+    let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+    this.x /= norm;
+    this.y /= norm;
+    this.z /= norm;
+    this.w /= norm;
+    return this;
+  }
+
 }
 
 GLBoost["Quaternion"] = Quaternion;

@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, user-scalable=no" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <link rel="stylesheet" href="app.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
 <script src="../../../build/glboost.js"></script>
 </head>
 <body>
@@ -14,7 +13,7 @@
   <p class="header-title">GLBoost Shadow Mapping example (two lights)</p>
 </header>
 <main>
-  <canvas id="world" width="600" height="600"></canvas>
+  <canvas id="world" width="1200" height="1200"></canvas>
 </main>
 <script>
   var DEPTH_TEXTURE_SIZE = 1024;
@@ -68,6 +67,7 @@
       var planeGeometry = glBoostContext.createPlane(20, 20, 10, 10, null);
 
       plane = glBoostContext.createMesh(planeGeometry, material);
+      window._material = material;
 
       var materialForDepth = glBoostContext.createClassicMaterial();
       materialForDepth.shaderClass = GLBoost.PassThroughShader;
@@ -107,6 +107,8 @@
           expression.renderPasses[i].scene = scene;
           expression.renderPasses[i].setClearDepth(1.0);
           expression.renderPasses[i].specifyRenderTargetTextures([depthTexture]);
+          expression.renderPasses[i].setViewportAsFittingToRenderTarget();
+
           depthCameras.push(depthCamera);
 
           function updateDepthCamera(light) {

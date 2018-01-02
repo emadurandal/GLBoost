@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import GLContext from '../core/GLContext';
 import GLBoostObject from '../core/GLBoostObject';
+import Vector4 from '../math/Vector4';
 
 /**
  * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
@@ -22,6 +23,9 @@ export default class AbstractTexture extends GLBoostObject {
     }
 
     this._textureUnitIndex = 0;
+
+    // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
+    this._uvTransform = new Vector4(1, 1, 0, 0);
   }
 
   /**
@@ -35,8 +39,8 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] bind the texture. <br />
-   * [ja] テクスチャをバインドします。
+   * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
+   * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
    */
   setUp(textureUnitIndex) {
     var gl = this._glContext.gl;
@@ -44,7 +48,7 @@ export default class AbstractTexture extends GLBoostObject {
       return false;
     }
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-    gl.activeTexture(gl['TEXTURE'+index]);
+    gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, this._texture);
 
     return true;
@@ -58,7 +62,7 @@ export default class AbstractTexture extends GLBoostObject {
     var gl = this._glContext.gl;
 
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-    gl.activeTexture(gl['TEXTURE'+index]);
+    gl.activeTexture(gl.TEXTURE0 + index);
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
@@ -79,18 +83,43 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   getTexturePixelData() {
+    let gl = this._glContext.gl;
+
     // Create a framebuffer backed by the texture
-    var framebuffer = this._glContext.createFramebuffer(this);
+    let framebuffer = this._glContext.createFramebuffer(this);
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
 
     // Read the contents of the framebuffer (data stores the pixel data)
-    var data = new Uint8Array(this.width * this.height * 4);
+    let data = new Uint8Array(this.width * this.height * 4);
     gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
 
-    this._glContext.deleteFramebuffer(this, framebuffer);
+    //this._glContext.deleteFramebuffer(this, framebuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     return data;
+  }
+
+  /**
+   * Origin is left bottom
+   *
+   * @param {number} x horizontal pixel position (0 is left)
+   * @param {number} y virtical pixel position (0 is bottom)
+   * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+   */
+  getPixelValueAt(x, y, argByteArray) {
+    let byteArray = argByteArray;
+    if (!byteArray) {
+      byteArray = this.getTexturePixelData();
+    }
+
+    let color = new Vector4(
+      byteArray[(y*this.width + x) * 4+0],
+      byteArray[(y*this.width + x) * 4+1],
+      byteArray[(y*this.width + x) * 4+2],
+      byteArray[(y*this.width + x) * 4+3]
+      );
+    return color;
   }
 
   _getResizedCanvas(image) {
@@ -124,4 +153,35 @@ export default class AbstractTexture extends GLBoostObject {
   _getNearestPowerOfTwo(x) {
     return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
   }
+
+  readyForDiscard() {
+    if (this._texture) {
+      this._glContext.deleteTexture(this, this._texture);
+    }
+    if (this.fbo) {
+      for (let texture of this.fbo._glboostTextures) {
+        this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function(v, i) {
+          return (v !== this);
+        });
+      }
+      if (this.fbo._glboostTextures.length === 0) {
+        this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+        this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+        if (this.fbo.renderBuffer) {
+          this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+        }
+      }
+    }
+
+    super.readyForDiscard();
+  }
+
+  get uvTransform() {
+    return this._uvTransform;
+  }
+
+  set uvTransform(vec4) {
+    this._uvTransform = vec4;
+  }
+
 }

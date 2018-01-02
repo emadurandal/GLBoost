@@ -1,9 +1,11 @@
 import GLContext from './GLContext';
+import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLExtensionsManager from './GLExtensionsManager';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
-import ClassicMaterial from '../ClassicMaterial';
+import ClassicMaterial from '../materials/ClassicMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
+import L_FrustumCamera from '../elements/cameras/L_FrustumCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
 import L_CameraController from '../auxiliaries/camera_controllers/L_CameraController'
 import MutableTexture from '../textures/MutableTexture';
@@ -14,7 +16,6 @@ import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
 import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
-import MiscUtil from '../misc/MiscUtil';
 import GLBoost from '../../globals';
 
 export default class GLBoostLowContext {
@@ -28,6 +29,25 @@ export default class GLBoostLowContext {
     } else {
       this._glContext = GLContext.getInstance(canvas);
     }
+
+    this._globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+    this._defaultGlobalStates = [
+      3042, // gl.BLEND
+      2929  // gl.DEPTH_TEST
+    ];
+
+    this.restoreGlobalStatesToDefault();
+
+    this._glBoostMonitor = L_GLBoostMonitor.getInstance();
+
+    let dummyWhite1x1ImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6REY4MUVGRjk0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MUVGRkE0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpERjgxRUZGNzRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpERjgxRUZGODRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvTp+QkAAAAPSURBVHjaYvj//z9AgAEABf4C/i3Oie4AAAAASUVORK5CYII=';
+    this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
+
+  }
+
+  get defaultDummyTexture() {
+    return this._defaultDummyTexture;
   }
 
   _setName() {
@@ -79,6 +99,10 @@ export default class GLBoostLowContext {
     return new L_PerspectiveCamera(this, true, lookat, perspective);
   }
 
+  createFrustumCamera(lookat, perspective) {
+    return new L_FrustumCamera(this, true, lookat, perspective);
+  }
+
   createOrthoCamera(lookat, ortho) {
     return new L_OrthoCamera(this, true, lookat, ortho);
   }
@@ -115,32 +139,33 @@ export default class GLBoostLowContext {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = width;
     fbo.height = height;
+    fbo._glboostTextures = [];
 
-    var renderTargetTextures = [];
     for(let i=0; i<textureNum; i++) {
       let texture = new MutableTexture(this, fbo.width, fbo.height);
       texture.fbo = fbo;
-      renderTargetTextures.push(texture);
+      fbo._glboostTextures.push(texture);
     }
 
     // Create RenderBuffer
-    var renderbuffer = glContext.createRenderbuffer(this);
-    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    var renderBuffer = glContext.createRenderbuffer(this);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
+    fbo.renderBuffer = renderBuffer;
 
     // Attach Buffers
-    renderTargetTextures.forEach((texture, i)=>{
+    fbo._glboostTextures.forEach((texture, i)=>{
       var glTexture = texture.glTextureResource;
       var attachimentId = glem.colorAttachiment(gl, i);
       texture.colorAttachment = attachimentId;
       gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
     });
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuffer);
 
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    return renderTargetTextures;
+    return fbo._glboostTextures.concat();
   }
 
   createDepthTexturesForRenderTarget(width, height) {
@@ -156,26 +181,49 @@ export default class GLBoostLowContext {
     fbo.width = width;
     fbo.height = height;
 
+    /*
     // Create color RenderBuffer
     var colorBuffer = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, colorBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, fbo.width, fbo.width);
+*/
 
     // Create MutableTexture for Depth Texture
+    let format = gl.DEPTH_COMPONENT;
+    let internalFormat = gl.DEPTH_COMPONENT;
+    let type = gl.UNSIGNED_INT;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      type = gl.UNSIGNED_INT;
+      format = gl.DEPTH_COMPONENT;
+      internalFormat = gl.DEPTH_COMPONENT24;
+    } else if (glem.extDepthTex) {
+      type = glem.extDepthTex.UNSIGNED_INT_24_8_WEBGL;
+      format = gl.DEPTH_STENCIL;
+      internalFormat = gl.DEPTH_STENCIL;
+    }
+
     let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
-      gl.DEPTH_COMPONENT, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT,
-      gl.NEAREST, gl.NEAREST, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
+      internalFormat, format, type,
+      gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
 
     /// Attach Buffers
     // color
-    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+//    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorBuffer);
+    //gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, null);
 
     // depth
     var glTexture = depthTexture.glTextureResource;
     var attachimentId = gl.DEPTH_ATTACHMENT;
+    if (GLBoost.isThisGLVersion_2(gl)) {
+      attachimentId = gl.DEPTH_ATTACHMENT;
+    } else if (glem.extDepthTex) {
+      attachimentId = gl.DEPTH_STENCIL_ATTACHMENT;
+    }
     depthTexture.depthAttachment = attachimentId;
     gl.framebufferTexture2D(gl.FRAMEBUFFER, attachimentId, gl.TEXTURE_2D, glTexture, 0);
+
+//    console.log('FBO', gl.checkFramebufferStatus(gl.FRAMEBUFFER));
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -184,6 +232,59 @@ export default class GLBoostLowContext {
 
   get belongingCanvasId() {
     return this._glContext.belongingCanvasId;
+  }
+
+  set globalStatesUsage(usageMode) {
+    this._globalStatesUsage = usageMode;
+  }
+
+  get globalStatesUsage() {
+    return this._globalStatesUsage;
+  }
+
+  reflectGlobalGLState() {
+    let gl = this._glContext.gl;
+
+    this.currentGlobalStates.forEach((state)=>{
+      gl.enable(state);
+    });
+
+    gl.depthFunc( gl.LEQUAL );
+
+    gl.blendEquation( gl.FUNC_ADD );
+    gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
+
+    gl.clearDepth( 1 );
+    gl.clearStencil( 0 );
+  }
+
+  disableAllGLState() {
+    let states = [
+      3042, // gl.BLEND
+      2884, // gl.CULL_FACE
+      2929, // gl.DEPTH_TEST
+      32823, // gl.POLYGON_OFFSET_FILL
+      32926, // gl.SAMPLE_ALPHA_TO_COVERAGE
+    ];
+
+    let glContext = this._glContext;
+    let gl = glContext.gl;
+
+    states.forEach((state)=>{
+      gl.disable(state);
+    });
+  }
+
+  set currentGlobalStates(states) {
+    this._currentGlobalStates = states.concat();
+  }
+
+  get currentGlobalStates() {
+    return this._currentGlobalStates.concat();
+  }
+
+  restoreGlobalStatesToDefault() {
+    this._currentGlobalStates = this._defaultGlobalStates.concat();
   }
 
 }

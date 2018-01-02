@@ -6,8 +6,6 @@
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
-<!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>-->
-  <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script>
   <script src="../../../build/glboost.js"></script>
 </head>
 <body>
@@ -99,7 +97,7 @@ var expression = glBoostContext.createExpressionAndRenderPasses(1);
 expression.renderPasses[0].scene = scene;
 expression.prepareToRender();
 
-var glBoostMonitor = GLBoost.GLBoostMonitor.getInstance();
+var glBoostMonitor = GLBoost.M_GLBoostMonitor.getInstance();
 glBoostMonitor.printGLBoostObjectsOrderByName();
 glBoostMonitor.printWebGLResources();
 glBoostMonitor.printHierarchy();

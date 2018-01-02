@@ -1,8 +1,7 @@
 import M_Element from '../M_Element';
 
 /**
- * [en] This is the abstract class for all lights classes. Don't use this class directly.<br>
- * [ja] 全ての光源クラスのための抽象クラスです。直接このクラスは使わないでください。
+ * This is the abstract class for all lights classes. Don't use this class directly.<br>
  */
 export default class M_AbstractLight extends M_Element {
   constructor(glBoostContext) {
@@ -13,6 +12,9 @@ export default class M_AbstractLight extends M_Element {
     }
 
     this._gl = this._glContext.gl;
+
+    this._isCastingShadow = true;
+    this._isLightType = '';
   }
 
   prepareToRender() {
@@ -21,5 +23,33 @@ export default class M_AbstractLight extends M_Element {
         this._camera.customFunction(this);
       }
     }
+  }
+
+  set isCastingShadow(flg) {
+    this._isCastingShadow = flg;
+  }
+
+  get isCastingShadow() {
+    return this._isCastingShadow;
+  }
+
+  get lightType() {
+    return this._isLightType;
+  }
+
+  isTypeAmbient() {
+    return this._isLightType === 'ambient';
+  }
+
+  isTypeDirectional() {
+    return this._isLightType === 'directional';
+  }
+
+  isTypePoint() {
+    return this._isLightType === 'point';
+  }
+
+  isTypeSpot() {
+    return this._isLightType === 'spot';
   }
 }

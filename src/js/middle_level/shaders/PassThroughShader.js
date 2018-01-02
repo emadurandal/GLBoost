@@ -24,6 +24,18 @@ export class PassThroughShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  texcoord = aVertex_texcoord;\n';
     }
+    if (existCamera_f) {
+      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+      shaderText +=   '  gl_Position = pvMatrix * position_world;\n';
+    }
+    
+    return shaderText;
+  }
+
+  VSTransform_FragmentSimpleShaderSource(existCamera_f, f) {
+    var shaderText = '';
+
+
     return shaderText;
   }
 
