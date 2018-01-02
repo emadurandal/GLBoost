@@ -144,8 +144,7 @@ export default class VertexWorldShaderSource {
 
     material.setUniform(shaderProgram, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition_world'));
 
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});    
-    for(let i=0; i<lightsExceptAmbient.length; i++) {
+    for(let i=0; i<lights.length; i++) {
       material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
       material.setUniform(shaderProgram, 'uniform_lightDirection_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDirection_world[${i}]`));
       material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
