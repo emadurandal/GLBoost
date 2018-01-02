@@ -68,12 +68,13 @@ promise.then(function(group) {
   var expression = glBoostContext.createExpressionAndRenderPasses(1);
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
-  const animationLength = group.getLengthOfAnimationInputValue('time');
+  const animationLength = group.getEndAnimationInputValue('time');
   var lastAnimatedTime = Date.now();
   var render = function(){
     var currentMillisecondDeltaFromStart = Date.now() - lastAnimatedTime;
     scene.setCurrentAnimationValue('time', currentMillisecondDeltaFromStart/1000);
     renderer.clearCanvas();
+    renderer.update(expression);
     renderer.draw(expression);
 
     if (currentMillisecondDeltaFromStart/1000 > animationLength) {

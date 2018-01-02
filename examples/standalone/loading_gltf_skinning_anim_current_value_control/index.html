@@ -71,7 +71,7 @@
   var centerLadyOverride = null;
   var rightLadyDontInherit = null;
 
-  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', GLBoost.BlinnShader);
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', GLBoost.HalfLambertShader);
   promise.then(function(group) {
     console.log(group);
 
@@ -108,6 +108,7 @@
     var render = function(){
       scene.setCurrentAnimationValue('time', sceneTime);
       centerLadyOverride.setCurrentAnimationValue('time', overrideTime);
+      rightLadyDontInherit.setCurrentAnimationValue('time', null);
       renderer.clearCanvas();
       renderer.update(expression);
       renderer.draw(expression);
@@ -117,7 +118,7 @@
 
       var resetTime = function(time) {
         if (time > 1.0) {
-          return 0;
+          return 1/60;
         } else {
           return time;
         }
