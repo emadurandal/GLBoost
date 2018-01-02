@@ -109,6 +109,7 @@
       scene.setCurrentAnimationValue('time', sceneTime);
       centerLadyOverride.setCurrentAnimationValue('time', overrideTime);
       renderer.clearCanvas();
+      renderer.update(expression);
       renderer.draw(expression);
 
       sceneTime += timeDelta;
