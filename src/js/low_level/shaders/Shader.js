@@ -214,6 +214,8 @@ export default class Shader extends GLBoostObject {
     shaderText +=   'precision highp float;\n';
     shaderText +=   `${in_} vec3 aVertex_position;\n`;
 
+
+
     /// define variables
     // start defining variables. first, sub class Shader, ...
     // seconds, define variables as mixin shaders
@@ -459,11 +461,13 @@ export default class Shader extends GLBoostObject {
     return shaderProgram;
   }
 
-  getShaderProgram(expression, vertexAttribs, existCamera_f, lights, material, extraData = {}) {
+  getShaderProgram(expression, vertexAttribs, existCamera_f, lights_, material, extraData = {}) {
     var gl = this._glContext.gl;
     var canvasId = this._glContext.belongingCanvasId;
 
-    lights = this.getDefaultPointLightIfNotExist(lights);
+    let lights = this.getDefaultPointLightIfNotExist(lights_);
+
+    lights = lights.filter((light)=>{return !light.isTypeAmbient();});
 
     var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
     var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);

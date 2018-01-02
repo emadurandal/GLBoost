@@ -1,6 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
 
+
 export class FragmentSimpleShaderSource {
   // In the context within these member methods,
   // this is the instance of the corresponding shader class.
@@ -9,8 +10,9 @@ export class FragmentSimpleShaderSource {
     var shaderText = '';
 
     if (existCamera_f) {
-      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
-      shaderText +=   '  gl_Position = pvMatrix * position_world;\n';
+      shaderText +=   '  gl_Position = projectionMatrix * viewMatrix * position_world;\n';
+    } else {
+      shaderText +=   '  gl_Position = position_world;\n';
     }
 
     return shaderText;
@@ -27,11 +29,19 @@ export class FragmentSimpleShaderSource {
     return shaderText;
   }
 
-  prepare_FragmentSimpleShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_FragmentSimpleShaderSource(gl, glslProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram, 'uniform_opacity', this._glContext.getUniformLocation(shaderProgram, 'opacity'));
+    material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
+
+    let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
+    if (uniformLocationDepthBias) {
+      let depthBias = this.getShaderParameter(material, 'depthBias', false);
+      if (depthBias) {
+        this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
+      }
+    }
 
     return vertexAttribsAsResult;
   }
@@ -40,7 +50,7 @@ export class FragmentSimpleShaderSource {
 export default class FragmentSimpleShader extends Shader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
-    super(glBoostContext);
+    super(glBoostContext, basicShader);
 
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);

@@ -20,26 +20,7 @@ export default class VertexWorldShadowShaderSource {
   VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
     let gl = this._glContext.gl;
-/*
-    shaderText += `mat4 biasMatrix = mat4(
-      0.5, 0.0, 0.0, 0.0,
-      0.0, 0.5, 0.0, 0.0,
-      0.0, 0.0, 0.5, 0.0,
-      0.5, 0.5, 0.5, 1.0
-    );\n`;
 
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});            
-    for (let i=0; i<lightsExceptAmbient.length; i++) {
-      shaderText += `  { // ${i}\n`;
-      if (GLBoost.isThisGLVersion_2(gl)) {
-        shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
-      } else {
-        shaderText += `    mat4 depthBiasPV = biasMatrix * depthPVMatrix[${i}]; // ${i}\n`;
-      }
-      shaderText += `    v_shadowCoord[${i}] = depthBiasPV * position_world; // ${i}\n`;
-      shaderText += `  } // ${i}\n`;
-    }
-*/
     return shaderText;
   }
 
@@ -58,16 +39,9 @@ export default class VertexWorldShadowShaderSource {
     let shaderText = '';
     shaderText += 'float visibilityLevel = 1.0;\n';
 
-/*
-      0.5, 0.0, 0.0, 0.0,
-      0.0, 0.5, 0.0, 0.0,
-      0.0, 0.0, 0.5, 0.0,
-      0.5, 0.5, 0.5, 1.0
-    );\n`;
-*/
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});            
-    shaderText += `    vec4 shadowCoord[${lightsExceptAmbient.length}];\n`;
-    for (let i=0; i<lightsExceptAmbient.length; i++) {
+    
+    shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
       shaderText += `    shadowCoord[${i}].xyz *= 0.5; // ${i}\n`;
@@ -96,9 +70,9 @@ export default class VertexWorldShadowShaderSource {
       }
     });
 
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});        
-    for (let i=0; i<lightsExceptAmbient.length; i++) {
-      let light = lightsExceptAmbient[i];
+    
+    for (let i=0; i<lights.length; i++) {
+      let light = lights[i];
       
       material.setUniform(shaderProgram, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
 
