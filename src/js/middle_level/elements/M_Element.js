@@ -242,10 +242,10 @@ export default class M_Element extends L_Element {
     return matrix;
   }
 
-  getTransformMatrixAt(inputValue, lineName) {
+  getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
     let input = inputValue;
-//    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
-    if (true) {
+    if (this._dirtyAsElement) {
+//    if (true) {
 
       var matrix = Matrix44.identity();
 
@@ -273,7 +273,8 @@ export default class M_Element extends L_Element {
       this._finalMatrix.m23 = translateVec.z;
 
       this._dirtyAsElement = false;
-//      this._matrixGetMode = 'animated_' + input;
+    } else {
+     // console.count('Cache')
     }
 
     return this._finalMatrix.clone();

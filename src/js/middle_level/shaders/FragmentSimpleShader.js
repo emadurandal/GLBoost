@@ -9,8 +9,7 @@ export class FragmentSimpleShaderSource {
     var shaderText = '';
 
     if (existCamera_f) {
-      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
-      shaderText +=   '  gl_Position = pvMatrix * position_world;\n';
+      shaderText +=   '  gl_Position = projectionMatrix * viewMatrix * position_world;\n';
     } else {
       shaderText +=   '  gl_Position = position_world;\n';
     }
