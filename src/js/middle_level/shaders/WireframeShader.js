@@ -1,3 +1,5 @@
+
+import Shader from '../../low_level/shaders/Shader';
 import FragmentSimpleShader from './FragmentSimpleShader';
 import VertexWorldShaderSource from './VertexWorldShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
@@ -12,11 +14,34 @@ export class WireframeShaderSource {
     shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
     shaderText += `${out_} vec3 barycentricCoord;\n`;
 
+    // for Unfold UV
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+      shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
+    }
     return shaderText;
   }
 
   VSTransform_WireframeShaderSource(existCamera_f, f) {
     var shaderText = '';
+
+
+    // UV Unfold
+    shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
+    shaderText +=   '  gl_Position = position_world;\n';
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+      shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
+      shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
+      shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
+      shaderText += '  uvScaled.y = - uvScaled.y;\n';
+      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+      shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
+    }
+
+    if (existCamera_f) {
+      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+      shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
+    }
 
     shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
 
@@ -112,6 +137,11 @@ export class WireframeShaderSource {
     let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
     material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
     this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
+
+    if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+      material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
+    }
 
     return vertexAttribsAsResult;
   }
