@@ -647,7 +647,7 @@ export default class Shader extends GLBoostObject {
     return shadowingText;
   };
 
-  _getNormalStr(gl, material, f) {
+  static _getNormalStr(gl, material, f) {
     let shaderText = '';
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
     if (!normalTexture && Shader._exist(f, GLBoost.NORMAL)) {
