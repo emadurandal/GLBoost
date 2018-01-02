@@ -1,4 +1,3 @@
-import WireframeShader from './WireframeShader';
 
 export default class VertexWorldShadowShaderSource {
   // In the context within these member methods,
