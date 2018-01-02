@@ -27,12 +27,6 @@ export default class VertexWorldShaderSource {
 
     shaderText += `${out_} vec3 v_position_world;\n`;
 
-    // for Unfold UV
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
-      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
-      shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
-    }
-
     return shaderText;
   }
 
@@ -77,22 +71,7 @@ export default class VertexWorldShaderSource {
       }
     }
 
-    // UV Unfold
-    shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
-    shaderText +=   '  gl_Position = position_world;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
-      shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
-      shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
-      shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
-      shaderText += '  uvScaled.y = - uvScaled.y;\n';
-      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
-      shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
-    }
-
-    if (existCamera_f) {
-      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
-      shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
-    }
+    shaderText += '  gl_Position =  pvwMatrix * position_local;\n';
 
     return shaderText;
   }
@@ -165,10 +144,6 @@ export default class VertexWorldShaderSource {
       material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
     }
 
-    if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
-      material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
-    }
 
     return vertexAttribsAsResult;
   }
