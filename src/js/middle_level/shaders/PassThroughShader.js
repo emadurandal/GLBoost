@@ -1,5 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
+import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
+import SPVExtensionShader from './SPVExtensionShader';
 
 export class PassThroughShaderSource {
 
@@ -13,6 +15,10 @@ export class PassThroughShaderSource {
       shaderText += `${in_} vec2 aVertex_texcoord;\n`;
       shaderText += `${out_} vec2 texcoord;\n`;
     }
+
+    shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
+    shaderText += `${out_} vec3 barycentricCoord;\n`;
+
     return shaderText;
   }
 
@@ -24,11 +30,15 @@ export class PassThroughShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += '  texcoord = aVertex_texcoord;\n';
     }
+    
     if (existCamera_f) {
       shaderText +=   '  gl_Position = projectionMatrix * viewMatrix * position_world;\n';
     } else {
       shaderText +=   '  gl_Position = position_world;\n';
     }
+    
+    shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
     
     return shaderText;
   }
@@ -58,18 +68,10 @@ export class PassThroughShaderSource {
     return shaderText;
   }
 
-  prepare_PassThroughShaderSource(gl, shaderProgram, vertexAttribs, existCamera_f) {
+  prepare_PassThroughShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
-    /*
-    vertexAttribs.forEach((attribName)=>{
-      if (attribName === GLBoost.COLOR || attribName === GLBoost.TEXCOORD) {
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
-      }
-    });
-    */
+
     return vertexAttribsAsResult;
   }
 }
@@ -82,7 +84,9 @@ export default class PassThroughShader extends Shader {
     PassThroughShader.mixin(basicShader);
     PassThroughShader.mixin(PassThroughShaderSource);
   }
-
+  setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+  }
 }
 
 
