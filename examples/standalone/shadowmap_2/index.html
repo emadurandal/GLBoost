@@ -13,7 +13,7 @@
   <p class="header-title">GLBoost Shadow Mapping example (two lights)</p>
 </header>
 <main>
-  <canvas id="world" width="1200" height="1200"></canvas>
+  <canvas id="world" width="800" height="800"></canvas>
 </main>
 <script>
   var DEPTH_TEXTURE_SIZE = 1024;
@@ -44,7 +44,9 @@
   });
 
   var directionOfDirectionalLights = [new GLBoost.Vector3(5, -10, 5), new GLBoost.Vector3(3, -10, 1)];
-  var expression = glBoostContext.createExpressionAndRenderPasses(directionOfDirectionalLights.length+1);
+  var expression = glBoostContext.createExpressionAndRenderPasses(directionOfDirectionalLights.length+1
+  +1 // Debug
+  );
   var plane = null;
   var planeForDepth = null;
   var camera = null;
@@ -52,7 +54,7 @@
   var directionalLights = [];
 
   var glTFLoader = GLBoost.GLTFLoader.getInstance();
-  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/WalkingLady/WalkingLady.gltf', null);
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/WalkingLady/WalkingLady.gltf', GLBoost.HalfLambertShader);
 
   promise.then(function(character) {
 
@@ -60,7 +62,6 @@
 
     (function commonProcess(){
       var material = glBoostContext.createClassicMaterial();
-      material.shaderClass = GLBoost.LambertShader;
       var texture = glBoostContext.createTexture('resources/texture.png');
       material.setTexture(texture);
 
@@ -68,12 +69,6 @@
 
       plane = glBoostContext.createMesh(planeGeometry, material);
       window._material = material;
-
-      var materialForDepth = glBoostContext.createClassicMaterial();
-      materialForDepth.shaderClass = GLBoost.PassThroughShader;
-
-      planeForDepth = glBoostContext.createMesh(planeGeometry, materialForDepth);
-
 
     })();
 
@@ -83,7 +78,7 @@
           var depthTexture = glBoostContext.createDepthTexturesForRenderTarget(DEPTH_TEXTURE_SIZE, DEPTH_TEXTURE_SIZE);
 
           var scene = glBoostContext.createScene();
-          scene.addChild(planeForDepth);
+          scene.addChild(plane);
           scene.addChild(character);
 
           depthCamera = glBoostContext.createOrthoCamera(
@@ -108,7 +103,14 @@
           expression.renderPasses[i].setClearDepth(1.0);
           expression.renderPasses[i].specifyRenderTargetTextures([depthTexture]);
           expression.renderPasses[i].setViewportAsFittingToRenderTarget();
-
+       
+          expression.renderPasses[i].setShaderAssignDictionaries([
+            {
+              instances: character.searchElementsByType(GLBoost.M_Mesh),
+              shaderClass: GLBoost.PassThroughShader
+            }
+          ]);
+          
           depthCameras.push(depthCamera);
 
           function updateDepthCamera(light) {
@@ -178,7 +180,7 @@
 
       var planeGeometry = glBoostContext.createPlane(1, 1, 1, 1, null);
       var material = glBoostContext.createClassicMaterial();
-      material.setTexture(depthTexture);
+      material.setTexture(depthCameras[0].texture);
       material.shaderClass = GLBoost.DepthDisplayShader;
       var plane = glBoostContext.createMesh(planeGeometry, material);
       plane.rotate = new GLBoost.Vector3(90, 0, 0);
@@ -188,7 +190,7 @@
 
       expression.renderPasses[3].scene = scene;
 
-    });
+    })();
 
     expression.prepareToRender();
 
@@ -204,6 +206,7 @@
       //console.log(gtime);
 
       renderer.clearCanvas();
+      renderer.update(expression);
       renderer.draw(expression);
 
       gtime += gtimeDelta;

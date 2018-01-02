@@ -71,7 +71,7 @@
   scene.addChild( camera );
 
   var glTFLoader = GLBoost.GLTFLoader.getInstance();
-  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', null);
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', GLBoost.HalfLambertShader);
 //  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/BrainStem/BrainStem.gltf', null);
 //  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/RiggedFigure/RiggedFigure.gltf', null);
 
