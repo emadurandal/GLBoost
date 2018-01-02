@@ -5,6 +5,17 @@ export class FragmentSimpleShaderSource {
   // In the context within these member methods,
   // this is the instance of the corresponding shader class.
 
+  VSTransform_FragmentSimpleShaderSource(existCamera_f, f) {
+    var shaderText = '';
+
+    if (existCamera_f) {
+      shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+      shaderText +=   '  gl_Position = pvMatrix * position_world;\n';
+    }
+
+    return shaderText;
+  }
+
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
     return shaderText;
