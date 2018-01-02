@@ -23,9 +23,9 @@ export class SPVLambertShaderSource {
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
     shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    let lightsExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();});
-    for (let i=0; i<lightsExceptAmbient.length; i++) {
-      let light = lightsExceptAmbient[i];      
+    
+    for (let i=0; i<lights.length; i++) {
+      let light = lights[i];      
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;      
       shaderText +=      Shader._generateLightStr(i);
