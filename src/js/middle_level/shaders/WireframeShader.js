@@ -171,14 +171,10 @@ export default class WireframeShader extends FragmentSimpleShader {
     if (uniformLocationAABBLengthCenterToCorner) {
       this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
     }
-        let uniformLocationAABBCenterPosition = material.getUniform(glslProgram, 'uniform_AABBCenterPosition');
-    if (uniformLocationAABBCenterPosition) {
-      this._glContext.uniform4f(uniformLocationAABBCenterPosition, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, 0.0, true);
-    }
-    let uniformLocationUnfoldUVRatio = material.getUniform(glslProgram, 'uniform_unfoldUVRatio');
-    if (uniformLocationUnfoldUVRatio) {
+    let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
+    if (uniformLocationAABBCenterPositionAndRatio) {
       let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
-      this._glContext.uniform1f(uniformLocationUnfoldUVRatio, unfoldUVRatioParameter, true);
+      this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
     }
 
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
