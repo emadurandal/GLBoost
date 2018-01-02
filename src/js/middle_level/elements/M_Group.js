@@ -74,8 +74,10 @@ export default class M_Group extends M_Element {
     }
 
     let children = this.getChildren();
-    for (let i = 0; i < children.length; i++) {
-      children[i]._setDirtyToAnimatedElement(inputName);
+    if (children) {
+      for (let i = 0; i < children.length; i++) {
+        children[i]._setDirtyToAnimatedElement(inputName);
+      }  
     }
   }
 
@@ -290,6 +292,7 @@ export default class M_Group extends M_Element {
           }
         }
       }
+      
       return latestInputValue;
     }
 

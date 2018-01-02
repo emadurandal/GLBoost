@@ -74,12 +74,16 @@ export default class M_Element extends L_Element {
 
   _getCurrentAnimationInputValue(inputName) {
     let value = this._currentAnimationInputValues[inputName];
-    if (typeof value !== 'undefined') {
+    if (typeof(value) === 'number') {
       return value;
     } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
-      return this._parent._getCurrentAnimationInputValue(inputName);
+      let val = this._parent._getCurrentAnimationInputValue(inputName);
+      if (val === void 0) {
+        val = null;
+      }
+      return val;
     } else {
-      return (void 0);
+      return null;
     }
   }
 
@@ -94,13 +98,10 @@ export default class M_Element extends L_Element {
   }
 
   _getAnimatedTransformValue(value, animation, type) {
-    if (typeof animation !== 'undefined' && animation[type]) { //} && typeof value !== 'undefined') {
+    if (typeof animation !== 'undefined' && animation[type]) {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
       //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
-      if (type == 'quaternion') {
-//        return new Quaternion(0, 0, 0, 1);
-      }
       return this['_' + type];
     }
   }
@@ -245,9 +246,10 @@ export default class M_Element extends L_Element {
     let input = inputValue;
 //    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
     if (true) {
+
       var matrix = Matrix44.identity();
 
-      if (!input && this._currentCalcMode === 'matrix') {
+      if (this._currentCalcMode === 'matrix') {
         this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
@@ -255,7 +257,7 @@ export default class M_Element extends L_Element {
 
       var rotationMatrix = Matrix44.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (input || this._currentCalcMode === 'quaternion') {
+      if (this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
       } else {
         let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
@@ -270,7 +272,7 @@ export default class M_Element extends L_Element {
       this._finalMatrix.m13 = translateVec.y;
       this._finalMatrix.m23 = translateVec.z;
 
-//      this._dirtyAsElement = false;
+      this._dirtyAsElement = false;
 //      this._matrixGetMode = 'animated_' + input;
     }
 
@@ -457,12 +459,12 @@ export default class M_Element extends L_Element {
   */
 
   _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-    if (input === null && this._activeAnimationLineName !== null) {
+    if (input === void 0 && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
     let tempNumber = 0;
-    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
+    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
     {
@@ -779,7 +781,7 @@ export default class M_Element extends L_Element {
 /*
   // Use master element's transformMatrixAccumulatedAncestry.
   get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(null);
+    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
   }
 
   getTransformMatrixAccumulatedAncestryAt(input) {
@@ -833,7 +835,7 @@ export default class M_Element extends L_Element {
   }
 
   get transformMatrixAccumulatedAncestryForJoints() {
-    return this.getTransformMatrixAccumulatedAncestryForJointsAt(null);
+    return this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
   }
 
   getTransformMatrixAccumulatedAncestryForJointsAt(input) {
@@ -850,12 +852,12 @@ export default class M_Element extends L_Element {
   }
 
   _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
-    if (input === null && this._activeAnimationLineName !== null) {
+    if (input === void 0 && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
     let tempNumber = 0;
-    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
     {
@@ -937,7 +939,7 @@ export default class M_Element extends L_Element {
 
 
   get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(null);
+    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
   }
 
 
@@ -947,19 +949,19 @@ export default class M_Element extends L_Element {
   
     if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
       this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(true, input);
-      this._accumulatedAncestryObjectUpdateNumber= tempNumber;
+      this._accumulatedAncestryObjectUpdateNumber = tempNumber;
     }
 
     return this._matrixAccumulatedAncestry.clone();
   }
 
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-    if (input === null && this._activeAnimationLineName !== null) {
+    if (input === void 0 && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
     let tempNumber = 0;
-    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
+    if (input === null || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
       this.__updateInfoString_multiplyMyAndParentTransformMatrices !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
     {
