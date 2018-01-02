@@ -39,7 +39,10 @@ export default class M_SkeletalMesh extends M_Mesh {
           this._joints.push(joints[j]);
           joints[j].skeletalMesh = this;
 //          joints[j].isVisible = true;
-          joints[j].inverseBindMatrix = this._inverseBindMatrices[jointCount++];
+          let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44.identity(); 
+          joints[j].inverseBindMatrix = inverseBindMatrix;
+          joints[j].bindMatrix = Matrix44.invert(inverseBindMatrix);
+          jointCount++;
           break;
         }
       }
