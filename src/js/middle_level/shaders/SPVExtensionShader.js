@@ -5,11 +5,11 @@ import VertexWorldShaderSource from './VertexWorldShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
 
-export class WireframeShaderSource {
+export class SPVExtensionShaderSource {
   // In the context within these member methods,
   // this is the instance of the corresponding shader class.
 
-  VSDefine_WireframeShaderSource(in_, out_, f) {
+  VSDefine_SPVExtensionShaderSource(in_, out_, f) {
     var shaderText = '';
     shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
     shaderText += `${out_} vec3 barycentricCoord;\n`;
@@ -22,11 +22,11 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  VSTransform_WireframeShaderSource(existCamera_f, f) {
+  VSTransform_SPVExtensionShaderSource(existCamera_f, f) {
     var shaderText = '';
 
 
-    // UV Unfold
+    // UV Unfold function
     shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
     shaderText +=   '  gl_Position = position_world;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -48,7 +48,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+  FSDefine_SPVExtensionShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += `${in_} vec3 barycentricCoord;\n`;
@@ -61,9 +61,10 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+  FSMethodDefine_SPVExtensionShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
+    // function for wireframe
     shaderText += `
     float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
         vec3 d = fwidth(bary3);
@@ -78,7 +79,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSShade_SPVExtensionShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += 'bool isWireframeInner = false;\n';
@@ -87,9 +88,10 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSPostEffect_SPVExtensionShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
+    // Wireframe function
     shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
     shaderText += 'float threshold = 0.001;\n';
     shaderText += 'vec4 wireframeResult = rt0;\n';
@@ -120,7 +122,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_SPVExtensionShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
     shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
@@ -148,15 +150,15 @@ export class WireframeShaderSource {
   }
 }
 
-export default class WireframeShader extends FragmentSimpleShader {
+export default class SPVExtensionShader extends FragmentSimpleShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
     if (basicShader === VertexWorldShaderSource) {
-      WireframeShader.mixin(VertexWorldShadowShaderSource);
+      SPVExtensionShader.mixin(VertexWorldShadowShaderSource);
     }
-    WireframeShader.mixin(WireframeShaderSource);
+    SPVExtensionShader.mixin(SPVExtensionShaderSource);
 
     this._unfoldUVRatio = void 0;
 
@@ -236,4 +238,4 @@ export default class WireframeShader extends FragmentSimpleShader {
 
 }
 
-GLBoost['WireframeShader'] = WireframeShader;
+GLBoost['SPVExtensionShaderSource'] = SPVExtensionShaderSource;

@@ -1,7 +1,7 @@
 import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
-import WireframeShader from './WireframeShader';
+import SPVExtensionShader from './SPVExtensionShader';
 import Vector4 from '../../low_level/math/Vector4';
 import Vector3 from '../../low_level/math/Vector3';
 import Matrix44 from '../../low_level/math/Matrix44';
@@ -253,7 +253,7 @@ export class SPVDecalShaderSource {
   }
 }
 
-export default class SPVDecalShader extends WireframeShader {
+export default class SPVDecalShader extends SPVExtensionShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
