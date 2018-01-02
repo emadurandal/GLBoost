@@ -41,6 +41,7 @@ export default class VertexWorldShaderSource {
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
+    // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
     shaderText += '  if (!isSkinning) {\n';
     shaderText += '    position_world = worldMatrix * position_local;\n';
     if (Shader._exist(f, GLBoost.NORMAL)) {
@@ -56,14 +57,19 @@ export default class VertexWorldShaderSource {
 
     let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
 
+    // Send normal, tangent, binormal vectors in world space to the rasterizer
     if (Shader._exist(f, GLBoost.NORMAL)) {
       // calc Normal vector in world space
       shaderText += '  v_normal_world = normal_world;\n';
       if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
         // calc BiNormal vector and Tangent vector in world space
-        shaderText += '  if (!isSkinning) {\n';
-        shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
-        shaderText += '  }\n';
+        
+        {
+          // Calculate only when No skinning. If skinning, it has already been calculated by SkeletalShader.
+          shaderText += '  if (!isSkinning) {\n';
+          shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
+          shaderText += '  }\n';
+        }
 
         shaderText += '  v_binormal_world = cross(normal_world, tangent_world);\n';
         shaderText += '  v_tangent_world = cross(v_binormal_world, normal_world);\n';
@@ -71,6 +77,8 @@ export default class VertexWorldShaderSource {
       }
     }
 
+    // Calc vertex positions in clip coordinate space.
+    // (These will be converted in Normalized Device Coordinates by divided gl_Posiiton.w in after stage.)
     shaderText += '  gl_Position =  pvwMatrix * position_local;\n';
 
     return shaderText;
