@@ -11,7 +11,6 @@ import Vector4 from '../../low_level/math/Vector4';
 import Quaternion from '../../low_level/math/Quaternion';
 import MathUtil from '../../low_level/math/MathUtil';
 
-
 export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
     super(glBoostContext);
@@ -65,35 +64,7 @@ export default class M_SkeletalGeometry extends Geometry {
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
     }
 
-    if (joints[0].isVisible) {
-      for (let i=0; i<joints.length; i++) {
-
-        let backOfJointMatrix = Matrix44.identity();
-        let tipOfJointMatrix = null;
-
-
-        tipOfJointMatrix = joints[i].jointPoseMatrix;
-        if (i > 0) {
-          let backOfJoint = joints[i].jointsOfParentHierarchies[joints[i].jointsOfParentHierarchies.length - 1];
-          if (backOfJoint) {
-            backOfJointMatrix = backOfJoint.jointPoseMatrix;
-          } else {
-            joints[i].isVisible = false;
-          }
-        } else {
-          backOfJointMatrix = jointZeroTransformMatrixAccumulatedAncestry;
-        }
-
-        let backOfJointPos = backOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-        let tipOfJointPos = tipOfJointMatrix.multiplyVector(Vector4.zero()).toVector3();
-
-        joints[i].worldPositionOfThisJoint = tipOfJointPos.clone();
-        joints[i].worldPositionOfParentJoint = backOfJointPos.clone();
-
-
-        joints[i].updateGizmoDisplay();
-      }
-    }
+    GLBoost.JointGizmoUpdater.update(joints, jointZeroTransformMatrixAccumulatedAncestry);
 
 /*
       let s = matrices[i].getScale();
