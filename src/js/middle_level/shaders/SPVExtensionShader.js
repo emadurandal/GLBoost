@@ -34,7 +34,7 @@ export class SPVExtensionShaderSource {
       shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
       shaderText += '  uvScaled.y = - uvScaled.y;\n';
-      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, (AABBCenterPosition.z + (float(objectIds.x)/10.0*AABBLengthCenterToCorner*2.0)), 1.0);\n';
       shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
     }
 
