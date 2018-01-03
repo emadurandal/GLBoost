@@ -24,6 +24,7 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 viewMatrix;\n';
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
+    shaderText += `     uniform highp ivec2 objectIds;\n`;
 
     shaderText += `${out_} vec3 v_position_world;\n`;
 
