@@ -1,7 +1,6 @@
 import Shader from '../../low_level/shaders/Shader';
 import VertexWorldShaderSource from './VertexWorldShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
-import SPVExtensionShader from './SPVExtensionShader';
 
 export class PassThroughShaderSource {
 
