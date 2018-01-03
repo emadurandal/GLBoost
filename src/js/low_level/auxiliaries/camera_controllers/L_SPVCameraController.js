@@ -9,7 +9,7 @@ import AABB from '../../math/AABB';
 
 
 export default class L_SPVCameraController extends GLBoostObject {
-  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
+  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0, eventTargetDom = document) {
     super(glBoostContext);
 
     this._camaras = new Set();
@@ -220,14 +220,14 @@ export default class L_SPVCameraController extends GLBoostObject {
       const event_pointmove = supportTouch ? 'touchmove' : 'mousemove';
       const event_pointend = supportTouch ? 'touchend' : 'mouseup';
 
-      document.addEventListener(event_pointstart, this._onMouseDown);
-      document.addEventListener(event_pointend, this._onMouseUp);
-      document.addEventListener(event_pointmove, this._onMouseMove);
+      eventTargetDom.addEventListener(event_pointstart, this._onMouseDown);
+      eventTargetDom.addEventListener(event_pointend, this._onMouseUp);
+      eventTargetDom.addEventListener(event_pointmove, this._onMouseMove);
       if (window.WheelEvent) {
-        document.addEventListener("wheel", this._onMouseWheel);
+        eventTargetDom.addEventListener("wheel", this._onMouseWheel);
       }
-      document.addEventListener('contextmenu', this._onContexMenu, false);
-      document.addEventListener("dblclick", this._onMouseDblClick);
+      eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
+      eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
     }
   }
 

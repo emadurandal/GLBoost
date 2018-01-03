@@ -290,8 +290,8 @@ export default class GLBoostLowContext {
     this._currentGlobalStates = this._defaultGlobalStates.concat();
   }
 
-  createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
-    return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+  createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency, eventTargetDom) {
+    return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency, eventTargetDom);
   }
 
   createSPVClassicMaterial() {
