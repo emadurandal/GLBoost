@@ -77,14 +77,14 @@ export default class Renderer extends GLBoostObject {
 
       // set render target buffers for each RenderPass.
       /*
-      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
+      if (renderPass.fbo && renderPass.isRenderTargetAttachedTextures) {
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
       } else {
         glem.drawBuffers(gl, [gl.BACK]);
       }
       */
-      if (renderPass.fbo && renderPass.isRenderTargetTexturesIfSet) {
+      if (renderPass.fbo && renderPass.isRenderTargetAttachedTextures) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
       }
 
