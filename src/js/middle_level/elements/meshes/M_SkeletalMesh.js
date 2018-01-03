@@ -187,7 +187,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     return Vector3.zero();
   }
 
-  
+  /*
   get rootJointsWorldPositionAsBindPose() {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryAsForJointsBindPose;
@@ -197,7 +197,7 @@ export default class M_SkeletalMesh extends M_Mesh {
 
     return Vector3.zero();
   }
-  
+  */
 }
 
 GLBoost['M_SkeletalMesh'] = M_SkeletalMesh;
