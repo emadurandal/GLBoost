@@ -961,9 +961,9 @@ export default class M_Element extends L_Element {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
-    let tempNumber = 0;
-    if (this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
-      this.__updateInfoString_multiplyMyAndParentTransformMatrices !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    if (this.__updateInfoString_multiplyMyAndParentTransformMatrices !== tempNumber ||
+      this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
     {
 
@@ -973,15 +973,18 @@ export default class M_Element extends L_Element {
       } else {
         currentMatrix = Matrix44.identity();
       }
-  
+
+      this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
+      this.__cache_input_multiplyMyAndParentTransformMatrices = input;
+
       if (this._parent === null) {
         this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
         return currentMatrix;
       }
 
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
-      this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
-      this.__cache_input_multiplyMyAndParentTransformMatrices = input;
+    } else {
+      let hoge = 10;
     }
     return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
   

@@ -366,11 +366,11 @@ export default class L_SPVCameraController extends GLBoostObject {
     }
     this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((_fogy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
-    //let newCenterVec = Vector3.zero(); //\\\targetAABB.centerPoint;
     let newCenterVec = targetAABB.centerPoint;
+    let posAtZero = targetAABB.centerPoint;
 
     if (this._targetSkeletalMesh && this._isTargetingToRootJointIfSkeletalTarget ) {
-      let posAtZero = this._targetSkeletalMesh.getRootJointsWorldPositionAt(0);
+      //let posAtZero = this._targetSkeletalMesh.getRootJointsWorldPositionAt(0);
       let posAtNow =  this._targetSkeletalMesh.rootJointsWorldPosition;
       let deltaPosFromZero = Vector3.subtract(posAtNow, posAtZero);
       newCenterVec = posAtZero;
