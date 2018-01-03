@@ -974,8 +974,6 @@ export default class M_Element extends L_Element {
         currentMatrix = Matrix44.identity();
       }
 
-      this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
-      this.__cache_input_multiplyMyAndParentTransformMatrices = input;
 
       if (this._parent === null) {
         this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
@@ -983,6 +981,8 @@ export default class M_Element extends L_Element {
       }
 
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+      this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
+      this.__cache_input_multiplyMyAndParentTransformMatrices = input;
     } else {
       let hoge = 10;
     }
