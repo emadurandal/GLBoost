@@ -13113,12 +13113,13 @@ class M_Scene extends M_Group {
   prepareToRender(expression    ) {
     this._reset();
 
-    var aabb = (function setParentAndMergeAABBRecursively(elem) {
+    var aabb = (function setParentAndClearAccumulatedTransformMatriAndMergeAABBRecursively(elem) {
       if (elem instanceof M_Group) {
+        elem._needUpdate();
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
-          var aabb = setParentAndMergeAABBRecursively(children[i]);
+          var aabb = setParentAndClearAccumulatedTransformMatriAndMergeAABBRecursively(children[i]);
           if (aabb instanceof AABB) {
             elem.AABB.mergeAABB(aabb);
           } else {
