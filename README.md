@@ -7,20 +7,10 @@
 
 A New WebGL Rendering Library for 3D Graphics Geeks
 
-Our concept is ...
-
-### "__Convenience like Three.js, Infinite Flexibility like raw WebGL, We get both.__"
-
 ## Concept
 
-[en]
 GLBoost is a new WebGL library for realtime 3D graphics geeks. It’s a low-level library that takes away the pain of having to deal with routine WebGL API tasks without limiting your expressive power.
 Use this library to spend your time doing cool stuff instead of fighting WebGL.
-
-[ja]
-GLBoostはWebGLライブラリです。
-WebGLの面倒くさい部分を肩代わりしつつ、それでいて表現の幅を制約することのない、
-3Dグラフィックス開発の玄人向けのライブラリを目指しています。
 
 ## Latest released revision
 
@@ -39,11 +29,11 @@ $ npm start
 
 ## Key features
 
-* ECMAScript 2015 based library (using Babel)
+* ECMAScript 2015 based library
 * Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
-* WebGL2.0 Ready (Currently, Firefox nightly and Chrome Canary)
+* WebGL2.0 Ready (Currently, Firefox and Chrome)
 * User's Custom Shader Support
-* Obj and glTF loader
+* Obj and glTF1.0 loader
 
 ## Supported Browsers
 
@@ -137,6 +127,9 @@ var render = function() {
   // clear canvas
   renderer.clearCanvas();
 
+  // update the expression (for example, calculation of skeletal animaiton)
+  renderer.update(expression);
+
   // render the expression
   renderer.draw(expression);
 
@@ -168,13 +161,8 @@ $ npm run build
 
 ### Build of examples
 
-[en]
 Some examples needs to be built by Babel because they are written ECMAScript 2015.
 The following command builds them all.
-
-[ja]
-いくつかのサンプルはECMAScript 2015で書かれているため、Babelでのビルドを必要とします。
-次のコマンドでそれら全てをビルドできます。
 
 ```
 $ npm run build-examples
