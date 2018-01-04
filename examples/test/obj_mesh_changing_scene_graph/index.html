@@ -79,6 +79,9 @@
 
   var g_mesh;
   var currentGroup = 'group_1';
+
+  var expression = glBoostContext.createExpressionAndRenderPasses(1);
+
   function switchSceneGraph() {
     if (currentGroup === 'group_1') {
       scene.removeChild(group_1);
@@ -98,12 +101,12 @@
     var that = this;
     var tick = 0;
 
-    var expression = glBoostContext.createExpressionAndRenderPasses(1);
     expression.renderPasses[0].scene = scene;
     expression.prepareToRender();
 
     var render = function() {
       renderer.clearCanvas();
+      renderer.update(expression);
       renderer.draw(expression);
 
       if (tick > 60) {
