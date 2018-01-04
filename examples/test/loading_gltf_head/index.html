@@ -57,7 +57,7 @@ var camera = glBoostContext.createPerspectiveCamera(
       zFar: 300.0
     }
 );
-//camera.cameraController = glBoostContext.createCameraController(true, false, false, 1);
+camera.cameraController = glBoostContext.createCameraController(true, false, false, 1);
 scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
@@ -66,14 +66,17 @@ promise.then(function(mesh) {
   console.log(mesh);
 
   scene.addChild( mesh );
-  mesh.scale = new GLBoost.Vector3(5, 5, 5);
+  //mesh.scale = new GLBoost.Vector3(5, 5, 5);
   window.mesh = mesh;
 
-  //camera.cameraController.target = mesh;
+  camera.cameraController.target = mesh;
+
 
   var expression = glBoostContext.createExpressionAndRenderPasses(1);
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
+
+  camera.cameraController.dolly = 0.6;
 
   mesh.searchElementsByType(GLBoost.M_Mesh).forEach(function(mesh){
     mesh.geometry.materials[0].shaderInstance.wrap = new GLBoost.Vector3(0.6, 0.3, 0.0);
