@@ -9102,14 +9102,8 @@ class L_CameraController extends GLBoostObject {
 
     this._onMouseWheel = (evt) => {
       evt.preventDefault();
-      this._wheel_y += evt.deltaY / 600;
-      this._wheel_y = Math.min(this._wheel_y, 3);
-      this._wheel_y = Math.max(this._wheel_y, 0.4);
 
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-        camera._needUpdateProjection();
-      });
+      this.dolly += evt.deltaY / 600;
     };
 
     this._onContexMenu = (evt) => {
@@ -9329,6 +9323,27 @@ class L_CameraController extends GLBoostObject {
 
   get shiftCameraTo() {
     return this._shiftCameraTo;
+  }
+
+  resetDolly() {
+    this.dolly = 1;
+
+    this._updateCameras();
+  }
+
+  set dolly(value) {
+    this._wheel_y = value;
+    this._wheel_y = Math.min(this._wheel_y, 3);
+    this._wheel_y = Math.max(this._wheel_y, 0.01);
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+      camera._needUpdateProjection();
+    });
+  }
+
+  get dolly() {
+    return this._wheel_y;
   }
 }
 
@@ -13115,7 +13130,7 @@ class M_Scene extends M_Group {
 
     var aabb = (function setParentAndClearAccumulatedTransformMatriAndMergeAABBRecursively(elem) {
       if (elem instanceof M_Group) {
-        elem._needUpdate();
+        elem._needUpdate(); // This line enforces to clear AccumulatedTransformMatrix for all below elements.
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
