@@ -1,5 +1,5 @@
 {
-  "for_phina": [
+  "test_with_phinajs": [
     "basic",
     "blendshape",
     "camera",
@@ -19,7 +19,7 @@
     "triangle_strip"
   ],
 
-  "standalone": [
+  "test": [
     "custom_shader",
     "custom_shader_2",
     "loading_gltf",

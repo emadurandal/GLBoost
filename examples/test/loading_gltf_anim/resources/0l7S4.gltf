@@ -1,0 +1,602 @@
+{
+    "accessors": {
+        "IBM_pPlaneShape1-skin": {
+            "bufferView": "bufferView_54",
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 6,
+            "type": "MAT4"
+        },
+        "accessor_29": {
+            "bufferView": "bufferView_55",
+            "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 42,
+            "type": "SCALAR"
+        },
+        "accessor_31": {
+            "bufferView": "bufferView_56",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 18,
+            "max": [
+                2.5,
+                0,
+                -0.5
+            ],
+            "min": [
+                -2.5,
+                0,
+                -2.5
+            ],
+            "type": "VEC3"
+        },
+        "accessor_33": {
+            "bufferView": "bufferView_56",
+            "byteOffset": 216,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 18,
+            "max": [
+                0,
+                1,
+                0
+            ],
+            "min": [
+                0,
+                1,
+                0
+            ],
+            "type": "VEC3"
+        },
+        "accessor_35": {
+            "bufferView": "bufferView_56",
+            "byteOffset": 432,
+            "byteStride": 8,
+            "componentType": 5126,
+            "count": 18,
+            "max": [
+                1,
+                1
+            ],
+            "min": [
+                0,
+                0
+            ],
+            "type": "VEC2"
+        },
+        "accessor_48": {
+            "bufferView": "bufferView_56",
+            "byteOffset": 576,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 18,
+            "max": [
+                0.8854399919509888,
+                0.7917119860649109,
+                0.6659560203552246,
+                0.4887869954109192
+            ],
+            "min": [
+                0.0010654899524524808,
+                0.019489901140332222,
+                0.00601535988971591,
+                0.0016933099832385778
+            ],
+            "type": "VEC4"
+        },
+        "accessor_51": {
+            "bufferView": "bufferView_56",
+            "byteOffset": 864,
+            "byteStride": 16,
+            "componentType": 5126,
+            "count": 18,
+            "max": [
+                0,
+                3,
+                4,
+                5
+            ],
+            "min": [
+                0,
+                1,
+                2,
+                3
+            ],
+            "type": "VEC4"
+        },
+        "animAccessor_0": {
+            "bufferView": "bufferView_54",
+            "byteOffset": 384,
+            "componentType": 5126,
+            "count": 2,
+            "type": "SCALAR"
+        },
+        "animAccessor_1": {
+            "bufferView": "bufferView_54",
+            "byteOffset": 392,
+            "componentType": 5126,
+            "count": 2,
+            "type": "VEC4"
+        },
+        "animAccessor_2": {
+            "bufferView": "bufferView_54",
+            "byteOffset": 424,
+            "componentType": 5126,
+            "count": 7,
+            "type": "SCALAR"
+        },
+        "animAccessor_3": {
+            "bufferView": "bufferView_54",
+            "byteOffset": 452,
+            "componentType": 5126,
+            "count": 7,
+            "type": "VEC4"
+        }
+    },
+    "animations": {
+        "animation_0": {
+            "channels": [
+                {
+                    "sampler": "animation_0_rotation_sampler",
+                    "target": {
+                        "id": "_joint1_joint2",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_1"
+            },
+            "samplers": {
+                "animation_0_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_1": {
+            "channels": [
+                {
+                    "sampler": "animation_1_rotation_sampler",
+                    "target": {
+                        "id": "_joint1_joint4_joint5",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_2",
+                "rotation": "animAccessor_3"
+            },
+            "samplers": {
+                "animation_1_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_2": {
+            "channels": [],
+            "parameters": {
+                "TIME": "animAccessor_2"
+            },
+            "samplers": {}
+        }
+    },
+    "asset": {
+        "generator": "collada2gltf@",
+        "premultipliedAlpha": true,
+        "profile": {
+            "api": "WebGL",
+            "version": "1.0.2"
+        },
+        "version": 1
+    },
+    "bufferViews": {
+        "bufferView_54": {
+            "buffer": "input",
+            "byteLength": 564,
+            "byteOffset": 0
+        },
+        "bufferView_55": {
+            "buffer": "input",
+            "byteLength": 84,
+            "byteOffset": 564,
+            "target": 34963
+        },
+        "bufferView_56": {
+            "buffer": "input",
+            "byteLength": 1152,
+            "byteOffset": 648,
+            "target": 34962
+        }
+    },
+    "buffers": {
+        "input": {
+            "byteLength": 1800,
+            "type": "arraybuffer",
+            "uri": "data:application/octet-stream;base64,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"
+        }
+    },
+    "materials": {
+        "lambert1-fx": {
+            "name": "lambert1",
+            "technique": "technique0",
+            "values": {
+                "ambient": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "diffuse": [
+                    0.4000000059604645,
+                    0.4000000059604645,
+                    0.4000000059604645,
+                    1
+                ],
+                "emission": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "transparency": 1
+            }
+        }
+    },
+    "meshes": {
+        "pPlaneShape1": {
+            "name": "pPlaneShape1",
+            "primitives": [
+                {
+                    "attributes": {
+                        "JOINT": "accessor_51",
+                        "NORMAL": "accessor_33",
+                        "POSITION": "accessor_31",
+                        "TEXCOORD_0": "accessor_35",
+                        "WEIGHT": "accessor_48"
+                    },
+                    "indices": "accessor_29",
+                    "material": "lambert1-fx",
+                    "mode": 4
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "_joint1": {
+            "children": [
+                "_joint1_joint2",
+                "_joint1_joint4"
+            ],
+            "jointName": "_joint1",
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                -2,
+                1
+            ],
+            "name": "joint1"
+        },
+        "_joint1_joint2": {
+            "children": [
+                "_joint1_joint2_joint3"
+            ],
+            "jointName": "_joint1_joint2",
+            "name": "joint2",
+            "rotation": [
+                0,
+                0.6647956371307373,
+                0,
+                0.7470252513885498
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                1,
+                0,
+                0
+            ]
+        },
+        "_joint1_joint2_joint3": {
+            "children": [],
+            "jointName": "_joint1_joint2_joint3",
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0,
+                1
+            ],
+            "name": "joint3"
+        },
+        "_joint1_joint4": {
+            "children": [
+                "_joint1_joint4_joint5"
+            ],
+            "jointName": "_joint1_joint4",
+            "matrix": [
+                -1,
+                0,
+                -0.00000000008979318677493353,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0.00000000008979318677493353,
+                0,
+                -1,
+                0,
+                0,
+                0,
+                1,
+                1
+            ],
+            "name": "joint4"
+        },
+        "_joint1_joint4_joint5": {
+            "children": [
+                "_joint1_joint4_joint5_joint6"
+            ],
+            "jointName": "_joint1_joint4_joint5",
+            "name": "joint5",
+            "rotation": [
+                -0.45710185170173645,
+                -0.5394977927207947,
+                0.45710185170173645,
+                0.5394977927207947
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                2,
+                0,
+                0
+            ]
+        },
+        "_joint1_joint4_joint5_joint6": {
+            "children": [],
+            "jointName": "_joint1_joint4_joint5_joint6",
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0,
+                1
+            ],
+            "name": "joint6"
+        },
+        "_pPlane1": {
+            "children": [],
+            "matrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "meshes": [
+                "pPlaneShape1"
+            ],
+            "name": "pPlane1",
+            "skeletons": [
+                "_joint1",
+                "_joint1_joint2",
+                "_joint1_joint2_joint3",
+                "_joint1_joint4",
+                "_joint1_joint4_joint5",
+                "_joint1_joint4_joint5_joint6"
+            ],
+            "skin": "pPlaneShape1-skin"
+        }
+    },
+    "programs": {
+        "program_0": {
+            "attributes": [
+                "a_joint",
+                "a_normal",
+                "a_position",
+                "a_weight"
+            ],
+            "fragmentShader": "input0FS",
+            "vertexShader": "input0VS"
+        }
+    },
+    "scene": "defaultScene",
+    "scenes": {
+        "defaultScene": {
+            "nodes": [
+                "_joint1",
+                "_pPlane1"
+            ]
+        }
+    },
+    "shaders": {
+        "input0FS": {
+            "type": 35632,
+            "uri": "data:text/plain;base64,cHJlY2lzaW9uIGhpZ2hwIGZsb2F0Owp2YXJ5aW5nIHZlYzMgdl9ub3JtYWw7CnVuaWZvcm0gdmVjNCB1X2FtYmllbnQ7CnVuaWZvcm0gdmVjNCB1X2RpZmZ1c2U7CnVuaWZvcm0gdmVjNCB1X2VtaXNzaW9uOwp1bmlmb3JtIGZsb2F0IHVfdHJhbnNwYXJlbmN5Owp2b2lkIG1haW4odm9pZCkgewp2ZWMzIG5vcm1hbCA9IG5vcm1hbGl6ZSh2X25vcm1hbCk7CmlmIChnbF9Gcm9udEZhY2luZyA9PSBmYWxzZSkgbm9ybWFsID0gLW5vcm1hbDsKdmVjNCBjb2xvciA9IHZlYzQoMC4sIDAuLCAwLiwgMC4pOwp2ZWM0IGRpZmZ1c2UgPSB2ZWM0KDAuLCAwLiwgMC4sIDEuKTsKdmVjNCBlbWlzc2lvbjsKdmVjNCBhbWJpZW50OwphbWJpZW50ID0gdV9hbWJpZW50OwpkaWZmdXNlID0gdV9kaWZmdXNlOwplbWlzc2lvbiA9IHVfZW1pc3Npb247CmRpZmZ1c2UueHl6ICo9IG1heChkb3Qobm9ybWFsLHZlYzMoMC4sMC4sMS4pKSwgMC4pOwpjb2xvci54eXogKz0gZGlmZnVzZS54eXo7CmNvbG9yLnh5eiArPSBlbWlzc2lvbi54eXo7CmNvbG9yID0gdmVjNChjb2xvci5yZ2IgKiBkaWZmdXNlLmEsIGRpZmZ1c2UuYSAqIHVfdHJhbnNwYXJlbmN5KTsKZ2xfRnJhZ0NvbG9yID0gY29sb3I7Cn0K"
+        },
+        "input0VS": {
+            "type": 35633,
+            "uri": "data:text/plain;base64,cHJlY2lzaW9uIGhpZ2hwIGZsb2F0OwphdHRyaWJ1dGUgdmVjMyBhX3Bvc2l0aW9uOwphdHRyaWJ1dGUgdmVjMyBhX25vcm1hbDsKdmFyeWluZyB2ZWMzIHZfbm9ybWFsOwphdHRyaWJ1dGUgdmVjNCBhX2pvaW50OwphdHRyaWJ1dGUgdmVjNCBhX3dlaWdodDsKdW5pZm9ybSBtYXQ0IHVfam9pbnRNYXRbNl07CnVuaWZvcm0gbWF0MyB1X25vcm1hbE1hdHJpeDsKdW5pZm9ybSBtYXQ0IHVfbW9kZWxWaWV3TWF0cml4Owp1bmlmb3JtIG1hdDQgdV9wcm9qZWN0aW9uTWF0cml4Owp2b2lkIG1haW4odm9pZCkgewptYXQ0IHNraW5NYXQgPSBhX3dlaWdodC54ICogdV9qb2ludE1hdFtpbnQoYV9qb2ludC54KV07CnNraW5NYXQgKz0gYV93ZWlnaHQueSAqIHVfam9pbnRNYXRbaW50KGFfam9pbnQueSldOwpza2luTWF0ICs9IGFfd2VpZ2h0LnogKiB1X2pvaW50TWF0W2ludChhX2pvaW50LnopXTsKc2tpbk1hdCArPSBhX3dlaWdodC53ICogdV9qb2ludE1hdFtpbnQoYV9qb2ludC53KV07CnZlYzQgcG9zID0gdV9tb2RlbFZpZXdNYXRyaXggKiBza2luTWF0ICogdmVjNChhX3Bvc2l0aW9uLDEuMCk7CnZfbm9ybWFsID0gdV9ub3JtYWxNYXRyaXggKiBtYXQzKHNraW5NYXQpKiBhX25vcm1hbDsKZ2xfUG9zaXRpb24gPSB1X3Byb2plY3Rpb25NYXRyaXggKiBwb3M7Cn0K"
+        }
+    },
+    "skins": {
+        "pPlaneShape1-skin": {
+            "bindShapeMatrix": [
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1
+            ],
+            "inverseBindMatrices": "IBM_pPlaneShape1-skin",
+            "jointNames": [
+                "_joint1",
+                "_joint1_joint2",
+                "_joint1_joint2_joint3",
+                "_joint1_joint4",
+                "_joint1_joint4_joint5",
+                "_joint1_joint4_joint5_joint6"
+            ],
+            "name": "pPlaneShape1-skin"
+        }
+    },
+    "techniques": {
+        "technique0": {
+            "attributes": {
+                "a_joint": "joint",
+                "a_normal": "normal",
+                "a_position": "position",
+                "a_weight": "weight"
+            },
+            "parameters": {
+                "ambient": {
+                    "type": 35666
+                },
+                "diffuse": {
+                    "type": 35666
+                },
+                "emission": {
+                    "type": 35666
+                },
+                "joint": {
+                    "semantic": "JOINT",
+                    "type": 35666
+                },
+                "jointMat": {
+                    "count": 6,
+                    "semantic": "JOINTMATRIX",
+                    "type": 35676
+                },
+                "modelViewMatrix": {
+                    "semantic": "MODELVIEW",
+                    "type": 35676
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": 35665
+                },
+                "normalMatrix": {
+                    "semantic": "MODELVIEWINVERSETRANSPOSE",
+                    "type": 35675
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": 35665
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": 35676
+                },
+                "transparency": {
+                    "type": 5126
+                },
+                "weight": {
+                    "semantic": "WEIGHT",
+                    "type": 35666
+                }
+            },
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929,
+                    3042
+                ],
+                "functions": {
+                    "blendEquationSeparate": [
+                        32774,
+                        32774
+                    ],
+                    "blendFuncSeparate": [
+                        1,
+                        771,
+                        1,
+                        771
+                    ],
+                    "depthMask": false
+                }
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_jointMat": "jointMat",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_transparency": "transparency"
+            }
+        }
+    }
+}

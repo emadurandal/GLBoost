@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Update Particle example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+<!--  <script src="../../../node_modules/babel-polyfill/dist/polyfill.min.js"></script> -->
+  <script src="../../../build/glboost.js"></script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Update Particle example</p>
+</header>
+<main>
+  <canvas id="world" width="600" height="600"></canvas>
+</main>
+<script>
+"use strict";
+
+var arg = new Object;
+var pair = location.search.substring(1).split('&');
+for(var i = 0; pair[i] ; i++) {
+  var kv = pair[i].split('=');
+  arg[kv[0]] = kv[1];
+}
+
+GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+
+var canvas = document.getElementById("world");
+
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING;
+
+var renderer = glBoostContext.createRenderer({ clearColor: { red: 0.5, green: 0.5, blue: 0.5, alpha: 1 } });
+var gl = renderer.glContext;
+gl.enable(gl.BLEND);
+gl.disable(gl.DEPTH_TEST);
+gl.depthFunc(gl.LEQUAL);
+gl.blendEquation(gl.FUNC_ADD);
+gl.clearDepth(1);
+gl.clearStencil(0);
+gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+
+var scene = glBoostContext.createScene();
+
+var camera = glBoostContext.createPerspectiveCamera(
+    {
+      eye: new GLBoost.Vector3(0.0, 1.5, 10.0),
+      center: new GLBoost.Vector3(0.0, 1.5, 0.0),
+      up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+    },
+    {
+      fovy: 45.0,
+      aspect: 1.0,
+      zNear: 0.1,
+      zFar: 500.0
+    }
+);
+scene.addChild( camera );
+
+var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1.0, 1.0, 1.0), new GLBoost.Vector3(0, 0, -10));
+scene.addChild( directionalLight );
+
+
+var wide = 10;
+var particlesPosition = [];
+for (var i=0; i<100; i++) {
+  particlesPosition.push(
+      [(Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide] // GLBoost can accept arrays as vector values other than instances of vector class.
+  //    new GLBoost.Vector3((Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide, (Math.random() - 0.5)*wide)   // of course you can use vector class.
+  );
+}
+
+var particleGeometry = glBoostContext.createParticle(
+    {
+      position: particlesPosition
+    }, 0.5, 0.5, null, GLBoost.DYNAMIC_DRAW);
+
+var material = glBoostContext.createClassicMaterial();
+var texture = glBoostContext.createTexture('resources/iceball.png');
+material.setTexture(texture);
+var particle = glBoostContext.createMesh(particleGeometry, material);
+
+scene.addChild(particle);
+
+var expression = glBoostContext.createExpressionAndRenderPasses(1);
+expression.renderPasses[0].scene = scene;
+expression.prepareToRender();
+
+var render = function(){
+  renderer.clearCanvas();
+  renderer.draw(expression);
+
+  var rotateMatrix = GLBoost.Matrix33.rotateY(-5.0);
+  var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+  camera.eye = rotatedVector;
+
+  for (var i=0; i<100; i++) {
+    // You have to access this element using .y property, because GLBoost converted the above-specified arrays to instances of vector class.
+    particlesPosition[i].y -= 0.1;
+    if (particlesPosition[i].y < -1.0) {
+      particlesPosition[i].y = 5.0;
+    }
+  }
+  particleGeometry.updateVerticesData({
+    position: particlesPosition
+  }, 0.5, 0.5, null);
+
+
+  requestAnimationFrame(render);
+};
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Leela</author>
+      <authoring_tool>OpenCOLLADA2016</authoring_tool>
+      <comments>
+			ColladaMaya export options: 
+			bakeTransforms=0;relativePaths=0;preserveSourceTree=0;copyTextures=0;exportTriangles=0;exportCgfxFileReferences=0;
+			isSampling=0;curveConstrainSampling=0;removeStaticCurves=1;exportPhysics=0;exportConvexMeshGeometries=0;exportPolygonMeshes=1;exportLights=0;
+			exportCameras=0;exportJointsAndSkin=0;exportAnimations=1;exportOptimizedBezierAnimation=0;exportInvisibleNodes=0;exportDefaultCameras=0;
+			exportTexCoords=0;exportNormals=1;exportNormalsPerVertex=1;exportVertexColors=0;exportVertexColorsPerVertex=0;
+			exportTexTangents=0;exportTangents=0;exportReferencedMaterials=0;exportMaterialsOnly=0;
+			exportXRefs=1;dereferenceXRefs=1;exportCameraAsLookat=0;cameraXFov=0;cameraYFov=1;doublePrecision=0
+		</comments>
+      <source_data>file:///C:/Users/Leela/Desktop/pyramid_anim.mb</source_data>
+    </contributor>
+    <created>2016-02-12T00:45:27</created>
+    <modified>2016-02-12T00:45:27</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Y_UP</up_axis>
+    <extra>
+      <technique profile="OpenCOLLADAMaya">
+        <pluginVersion>developer version</pluginVersion>
+      </technique>
+    </extra>
+  </asset>
+  <library_materials>
+    <material id="lambert1" name="lambert1">
+      <instance_effect url="#lambert1-fx"/>
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="lambert1-fx">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.4 0.4 0.4 1</color>
+            </diffuse>
+            <transparent opaque="RGB_ZERO">
+              <color>0 0 0 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <originalMayaNodeId sid="originalMayaNodeId" type="string">lambert1</originalMayaNodeId>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry id="pPyramidShape1" name="pPyramidShape1">
+      <mesh>
+        <source id="pPyramidShape1-positions" name="pPyramidShape1-positions">
+          <float_array id="pPyramidShape1-positions-array" count="15">0 -0.003535534 -0.007071068 -0.007071068 -0.003535534 0 0 -0.003535534 0.007071068 0.007071068 -0.003535534 0 0 0.003535534 0</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-positions-array" count="5" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="pPyramidShape1-normals" name="pPyramidShape1-normals">
+          <float_array id="pPyramidShape1-normals-array" count="48">0 -1 0 0 -1 0 0 -1 0 0 -1 0 -0.5773502 0.5773502 -0.5773503 -0.5773502 0.5773502 -0.5773503 -0.5773502 0.5773502 -0.5773503 -0.5773503 0.5773503 0.5773502 -0.5773503 0.5773503 0.5773502 -0.5773503 0.5773503 0.5773502 0.5773503 0.5773503 0.5773503 0.5773503 0.5773503 0.5773503 0.5773503 0.5773503 0.5773503 0.5773502 0.5773503 -0.5773501 0.5773502 0.5773503 -0.5773501 0.5773503 0.5773503 -0.5773502</float_array>
+          <technique_common>
+            <accessor source="#pPyramidShape1-normals-array" count="16" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="pPyramidShape1-vertices" name="pPyramidShape1-vertices">
+          <input semantic="POSITION" source="#pPyramidShape1-positions"/>
+        </vertices>
+        <polylist material="initialShadingGroup" count="5">
+          <input semantic="VERTEX" source="#pPyramidShape1-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#pPyramidShape1-normals" offset="1"/>
+          <vcount>4 3 3 3 3</vcount>
+          <p>0 0 3 1 2 2 1 3 0 4 1 5 4 6 1 7 2 8 4 9 2 10 3 11 4 12 3 13 0 14 4 15</p>
+        </polylist>
+      </mesh>
+      <extra>
+        <technique profile="OpenCOLLADAMaya">
+          <originalMayaNodeId sid="originalMayaNodeId">pPyramidShape1</originalMayaNodeId>
+          <double_sided sid="double_sided">1</double_sided>
+        </technique>
+      </extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="VisualSceneNode" name="pyramid_anim">
+      <node id="_pPyramid1" name="pPyramid1" type="NODE">
+        <translate sid="translate">0 0 0</translate>
+        <rotate sid="rotateZ">0 0 1 0</rotate>
+        <rotate sid="rotateY">0 1 0 0</rotate>
+        <rotate sid="rotateX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_geometry url="#pPyramidShape1">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="initialShadingGroup" target="#lambert1"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADAMaya">
+            <originalMayaNodeId sid="originalMayaNodeId" type="string">pPyramid1</originalMayaNodeId>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <library_animations>
+    <animation id="pPyramid1.translate__pPyramid1">
+      <source id="pPyramid1.translate__pPyramid1_translate-input" name="pPyramid1.translate__pPyramid1_translate-input">
+        <float_array id="pPyramid1.translate__pPyramid1_translate-input-array" count="4">0 0.3333333 0.6666667 1 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.translate__pPyramid1_translate-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="OpenCOLLADAMaya">
+          <pre_infinity sid="pre_infinity">CONSTANT</pre_infinity>
+          <post_infinity sid="post_infinity">CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="pPyramid1.translate__pPyramid1_translate-output" name="pPyramid1.translate__pPyramid1_translate-output">
+        <float_array id="pPyramid1.translate__pPyramid1_translate-output-array" count="12">0 0 0 0.05014699 0 0 0.05014699 0.05014699 0 -7.55985e-4 0.05014699 0 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.translate__pPyramid1_translate-output-array" count="4" stride="3">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.translate__pPyramid1_translate-interpolation" name="pPyramid1.translate__pPyramid1_translate-interpolation">
+        <Name_array id="pPyramid1.translate__pPyramid1_translate-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <technique_common>
+          <accessor source="#pPyramid1.translate__pPyramid1_translate-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.translate__pPyramid1_translate-intangent" name="pPyramid1.translate__pPyramid1_translate-intangent">
+        <float_array id="pPyramid1.translate__pPyramid1_translate-intangent-array" count="24">-0.3333333 0 -0.3333333 0 -0.3333333 0 0.2222222 0.05014699 0.2222222 0 0.2222222 0 0.5555556 0.05014699 0.5555556 0.05014699 0.5555556 0 0.8888889 -7.55985e-4 0.8888889 0.05014699 0.8888889 0 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.translate__pPyramid1_translate-intangent-array" count="4" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.translate__pPyramid1_translate-outtangent" name="pPyramid1.translate__pPyramid1_translate-outtangent">
+        <float_array id="pPyramid1.translate__pPyramid1_translate-outtangent-array" count="24">0.1111111 0 0.1111111 0 0.1111111 0 0.4444444 0.05014699 0.4444444 0 0.4444444 0 0.7777778 0.05014699 0.7777778 0.05014699 0.7777778 0 1.333333 -7.55985e-4 1.333333 0.05014699 1.333333 0 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.translate__pPyramid1_translate-outtangent-array" count="4" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="pPyramid1.translate__pPyramid1_translate-sampler">
+        <input semantic="INPUT" source="#pPyramid1.translate__pPyramid1_translate-input"/>
+        <input semantic="OUTPUT" source="#pPyramid1.translate__pPyramid1_translate-output"/>
+        <input semantic="INTERPOLATION" source="#pPyramid1.translate__pPyramid1_translate-interpolation"/>
+        <input semantic="IN_TANGENT" source="#pPyramid1.translate__pPyramid1_translate-intangent"/>
+        <input semantic="OUT_TANGENT" source="#pPyramid1.translate__pPyramid1_translate-outtangent"/>
+      </sampler>
+      <channel source="#pPyramid1.translate__pPyramid1_translate-sampler" target="_pPyramid1/translate"/>
+    </animation>
+    <animation id="pPyramid1.rotateZ__pPyramid1">
+      <source id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-input" name="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-input">
+        <float_array id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-input-array" count="4">0 0.3333333 0.6666667 1 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="OpenCOLLADAMaya">
+          <pre_infinity sid="pre_infinity">CONSTANT</pre_infinity>
+          <post_infinity sid="post_infinity">CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-output" name="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-output">
+        <float_array id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-output-array" count="4">0 90.41555 181.9546 269.8781 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-output-array" count="4" stride="1">
+            <param name="ANGLE" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-interpolation" name="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-interpolation">
+        <Name_array id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <technique_common>
+          <accessor source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-intangent" name="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-intangent">
+        <float_array id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-intangent-array" count="8">-0.3333333 0 0.2222222 60.08978 0.5555556 152.0442 0.8888889 269.8781 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-intangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-outtangent" name="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-outtangent">
+        <float_array id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-outtangent-array" count="8">0.1111111 0 0.4444444 120.7413 0.7777778 211.865 1.333333 269.8781 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-outtangent-array" count="4" stride="2">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-sampler">
+        <input semantic="INPUT" source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-input"/>
+        <input semantic="OUTPUT" source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-output"/>
+        <input semantic="INTERPOLATION" source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-interpolation"/>
+        <input semantic="IN_TANGENT" source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-intangent"/>
+        <input semantic="OUT_TANGENT" source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-outtangent"/>
+      </sampler>
+      <channel source="#pPyramid1.rotateZ__pPyramid1_pPyramid1.rotateZ__pPyramid1-sampler" target="_pPyramid1/rotateZ.ANGLE"/>
+    </animation>
+    <animation id="pPyramid1.scale__pPyramid1">
+      <source id="pPyramid1.scale__pPyramid1_scale-input" name="pPyramid1.scale__pPyramid1_scale-input">
+        <float_array id="pPyramid1.scale__pPyramid1_scale-input-array" count="4">0 0.3333333 0.6666667 1 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.scale__pPyramid1_scale-input-array" count="4" stride="1">
+            <param name="TIME" type="float"/>
+          </accessor>
+        </technique_common>
+        <technique profile="OpenCOLLADAMaya">
+          <pre_infinity sid="pre_infinity">CONSTANT</pre_infinity>
+          <post_infinity sid="post_infinity">CONSTANT</post_infinity>
+        </technique>
+      </source>
+      <source id="pPyramid1.scale__pPyramid1_scale-output" name="pPyramid1.scale__pPyramid1_scale-output">
+        <float_array id="pPyramid1.scale__pPyramid1_scale-output-array" count="12">1 1 1 1.639417 1.639417 1.639417 3.863019 3.863019 3.863019 0.4213167 0.4213167 0.4213167 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.scale__pPyramid1_scale-output-array" count="4" stride="3">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="Z" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.scale__pPyramid1_scale-interpolation" name="pPyramid1.scale__pPyramid1_scale-interpolation">
+        <Name_array id="pPyramid1.scale__pPyramid1_scale-interpolation-array" count="4">BEZIER BEZIER BEZIER BEZIER </Name_array>
+        <technique_common>
+          <accessor source="#pPyramid1.scale__pPyramid1_scale-interpolation-array" count="4" stride="1">
+            <param name="INTERPOLATION" type="name"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.scale__pPyramid1_scale-intangent" name="pPyramid1.scale__pPyramid1_scale-intangent">
+        <float_array id="pPyramid1.scale__pPyramid1_scale-intangent-array" count="24">-0.3333333 1 -0.3333333 1 -0.3333333 1 0.2222222 1.162247 0.2222222 1.162247 0.2222222 1.162247 0.5555556 3.863019 0.5555556 3.863019 0.5555556 3.863019 0.8888889 0.4213167 0.8888889 0.4213167 0.8888889 0.4213167 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.scale__pPyramid1_scale-intangent-array" count="4" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <source id="pPyramid1.scale__pPyramid1_scale-outtangent" name="pPyramid1.scale__pPyramid1_scale-outtangent">
+        <float_array id="pPyramid1.scale__pPyramid1_scale-outtangent-array" count="24">0.1111111 1 0.1111111 1 0.1111111 1 0.4444444 2.116587 0.4444444 2.116587 0.4444444 2.116587 0.7777778 3.863019 0.7777778 3.863019 0.7777778 3.863019 1.333333 0.4213167 1.333333 0.4213167 1.333333 0.4213167 </float_array>
+        <technique_common>
+          <accessor source="#pPyramid1.scale__pPyramid1_scale-outtangent-array" count="4" stride="6">
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+            <param name="X" type="float"/>
+            <param name="Y" type="float"/>
+          </accessor>
+        </technique_common>
+      </source>
+      <sampler id="pPyramid1.scale__pPyramid1_scale-sampler">
+        <input semantic="INPUT" source="#pPyramid1.scale__pPyramid1_scale-input"/>
+        <input semantic="OUTPUT" source="#pPyramid1.scale__pPyramid1_scale-output"/>
+        <input semantic="INTERPOLATION" source="#pPyramid1.scale__pPyramid1_scale-interpolation"/>
+        <input semantic="IN_TANGENT" source="#pPyramid1.scale__pPyramid1_scale-intangent"/>
+        <input semantic="OUT_TANGENT" source="#pPyramid1.scale__pPyramid1_scale-outtangent"/>
+      </sampler>
+      <channel source="#pPyramid1.scale__pPyramid1_scale-sampler" target="_pPyramid1/scale"/>
+    </animation>
+  </library_animations>
+  <scene>
+    <instance_visual_scene url="#VisualSceneNode"/>
+  </scene>
+</COLLADA>

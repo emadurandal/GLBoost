@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Multiple Contexts example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../../build/glboost.js"></script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Multiple Contexts example</p>
+</header>
+<main>
+  <canvas id="world_1" width="465" height="465"></canvas>
+  <canvas id="world_2" width="465" height="465"></canvas>
+</main>
+<script>
+var arg = new Object;
+var pair = location.search.substring(1).split('&');
+for(var i = 0; pair[i] ; i++) {
+  var kv = pair[i].split('=');
+  arg[kv[0]] = kv[1];
+}
+
+GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+
+// Canvas 1
+var canvas_1 = document.getElementById("world_1");
+var glBoostContext_1 = new GLBoost.GLBoostMiddleContext(canvas_1);
+
+var renderer_1 = glBoostContext_1.createRenderer({
+  clearColor: {red: 0.3, green: 0.3, blue: 0.3, alpha: 1}
+});
+
+var scene_1 = glBoostContext_1.createScene();
+
+var material_1 = glBoostContext_1.createClassicMaterial();
+var texture_1 = glBoostContext_1.createTexture('resources/texture.png');
+material_1.setTexture(texture_1);
+
+var shader_1 = new GLBoost.PhongShader(glBoostContext_1);
+material_1.shaderInstance = shader_1;
+
+var geometry_1 = glBoostContext_1.createCube(new GLBoost.Vector3(24,24,24), new GLBoost.Vector4(1,0,0,1));
+
+var cube = glBoostContext_1.createMesh(geometry_1, material_1);
+scene_1.addChild(cube);
+
+var directionalLight_1 = glBoostContext_1.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+scene_1.addChild( directionalLight_1 );
+
+
+// Canvas 2
+var canvas_2 = document.getElementById("world_2");
+var glBoostContext_2 = new GLBoost.GLBoostMiddleContext(canvas_2);
+
+var renderer_2 = glBoostContext_2.createRenderer({
+  clearColor: {red: 0.0, green: 0.0, blue: 0.0, alpha: 1}
+});
+
+var scene_2 = glBoostContext_2.createScene();
+
+var material_2 = glBoostContext_2.createClassicMaterial();
+var texture_2 = glBoostContext_2.createTexture('resources/texture.png');
+material_2.setTexture(texture_2);
+
+var shader_2 = new GLBoost.PhongShader(glBoostContext_2);
+material_2.shaderInstance = shader_2;
+var geometry_2 = glBoostContext_2.createSphere(20, 24, 24, null);
+
+var sphere = glBoostContext_2.createMesh(geometry_2, material_2);
+scene_2.addChild(sphere);
+
+var directionalLight_2 = glBoostContext_2.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+scene_2.addChild( directionalLight_2 );
+
+
+var camera = glBoostContext_1.createPerspectiveCamera({
+  eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
+  center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+  up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+}, {
+  fovy: 45.0,
+  aspect: 1.0,
+  zNear: 0.1,
+  zFar: 1000.0
+});
+
+scene_1.addChild(camera);
+scene_2.addChild(camera);
+
+var expression_1 = glBoostContext_1.createExpressionAndRenderPasses(1);
+expression_1.renderPasses[0].scene = scene_1;
+expression_1.prepareToRender();
+
+var expression_2 = glBoostContext_2.createExpressionAndRenderPasses(1);
+expression_2.renderPasses[0].scene = scene_2;
+expression_2.prepareToRender();
+
+
+var glBoostMonitor = GLBoost.M_GLBoostMonitor.getInstance();
+glBoostMonitor.printGLBoostObjects();
+glBoostMonitor.printWebGLResources();
+glBoostMonitor.printHierarchy();
+
+var render = function() {
+  renderer_1.clearCanvas();
+  renderer_1.draw(expression_1);
+
+  renderer_2.clearCanvas();
+  renderer_2.draw(expression_2);
+
+  var rotateMatrixY = GLBoost.Matrix33.rotateY(-1.0);
+  var rotatedVector = rotateMatrixY.multiplyVector(camera.eye);
+  camera.eye = rotatedVector;
+
+  requestAnimationFrame(render);
+};
+
+render();
+</script>
+</body>
+</html>
