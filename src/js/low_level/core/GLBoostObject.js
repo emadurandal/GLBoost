@@ -1,8 +1,22 @@
+/* @flow */
+
 import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLBoost from '../../globals';
+import GLBoostLowContext from './GLBoostLowContext';
+import GLContext from './GLContext';
 
 export default class GLBoostObject {
-  constructor(glBoostContext, toRegister = true) {
+  _glBoostContext: GLBoostLowContext;
+  _glContext: GLContext;
+  _toRegister: boolean;
+  _glBoostMonitor: L_GLBoostMonitor;
+  _instanceName:string;
+  _userFlavorName: string;
+  _readyForDiscard: boolean;
+  _classUniqueNumber: number;
+  _objectIndex:number;
+
+  constructor(glBoostContext:GLBoostLowContext, toRegister:boolean = true) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
@@ -91,22 +105,22 @@ export default class GLBoostObject {
    * [ja] インスタンス名を返します。
    * @returns {string} [en] the instance name. [ja] インスタンス名
    */
-  toString() {
+  toString():string {
     return this._instanceName;
   }
 
   /**
    * Return the simple class-specific number.
    */
-  get classUniqueNumber() {
+  get classUniqueNumber():number {
     return this._classUniqueNumber;
   }
 
-  get className() {
+  get className():string {
     return this.constructor.name;
   }
 
-  get instanceName() {
+  get instanceName():string {
     return this._instanceName;
   }
 
@@ -114,15 +128,15 @@ export default class GLBoostObject {
     return this._glBoostContext.belongingCanvasId;
   }
 
-  set userFlavorName(name) {
+  set userFlavorName(name:string) {
     this._userFlavorName = name;
   }
 
-  get userFlavorName() {
+  get userFlavorName():string {
     return this._userFlavorName;
   }
 
-  get instanceNameWithUserFlavor() {
+  get instanceNameWithUserFlavor():string {
     return this._instanceName + '__' + this._userFlavorName;
   }
 
@@ -136,7 +150,7 @@ export default class GLBoostObject {
     this._readyForDiscard = true;
   }
 
-  get isReadyForDiscard() {
+  get isReadyForDiscard():boolean {
     return this._readyForDiscard;
   }
 
@@ -144,7 +158,7 @@ export default class GLBoostObject {
     instance._userFlavorName = this._userFlavorName;
   }
 
-  get objectIndex() {
+  get objectIndex():number {
     return this._objectIndex;
   }
 }

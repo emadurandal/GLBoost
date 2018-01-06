@@ -16,7 +16,8 @@ import Vector4 from '../../low_level/math/Vector4';
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
 export default class M_Scene extends M_Group {
-
+  _gl:WebGLRenderingContext;
+  
   /**
    * [en] constructor
    * [ja] コンストラクタ
