@@ -7,6 +7,8 @@ import M_Mesh from './meshes/M_Mesh';
 import M_AABBGizmo from '../elements/gizmos/M_AABBGizmo';
 
 export default class M_Group extends M_Element {
+  _elements:Array<M_Element>;
+
   constructor(glBoostContext) {
     super(glBoostContext);
     this._elements = [];

@@ -1,0 +1,347 @@
+{
+    "accessors": {
+        "accessor_16": {
+            "bufferView": "bufferView_34",
+            "byteOffset": 0,
+            "byteStride": 0,
+            "componentType": 5123,
+            "count": 18,
+            "type": "SCALAR"
+        },
+        "accessor_18": {
+            "bufferView": "bufferView_35",
+            "byteOffset": 0,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 16,
+            "max": [
+                0.00707107,
+                0.00353553,
+                0.00707107
+            ],
+            "min": [
+                -0.00707107,
+                -0.00353553,
+                -0.00707107
+            ],
+            "type": "VEC3"
+        },
+        "accessor_20": {
+            "bufferView": "bufferView_35",
+            "byteOffset": 192,
+            "byteStride": 12,
+            "componentType": 5126,
+            "count": 16,
+            "max": [
+                0.57735,
+                0.57735,
+                0.57735
+            ],
+            "min": [
+                -0.57735,
+                -1,
+                -0.57735
+            ],
+            "type": "VEC3"
+        },
+        "animAccessor_0": {
+            "bufferView": "bufferView_33",
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 4,
+            "type": "SCALAR"
+        },
+        "animAccessor_1": {
+            "bufferView": "bufferView_33",
+            "byteOffset": 16,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC3"
+        },
+        "animAccessor_2": {
+            "bufferView": "bufferView_33",
+            "byteOffset": 64,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC4"
+        },
+        "animAccessor_3": {
+            "bufferView": "bufferView_33",
+            "byteOffset": 128,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC3"
+        }
+    },
+    "animations": {
+        "animation_0": {
+            "channels": [
+                {
+                    "sampler": "animation_0_translation_sampler",
+                    "target": {
+                        "id": "_pPyramid1",
+                        "path": "translation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "translation": "animAccessor_1"
+            },
+            "samplers": {
+                "animation_0_translation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "translation"
+                }
+            }
+        },
+        "animation_1": {
+            "channels": [
+                {
+                    "sampler": "animation_1_rotation_sampler",
+                    "target": {
+                        "id": "_pPyramid1",
+                        "path": "rotation"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "rotation": "animAccessor_2"
+            },
+            "samplers": {
+                "animation_1_rotation_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "rotation"
+                }
+            }
+        },
+        "animation_2": {
+            "channels": [
+                {
+                    "sampler": "animation_2_scale_sampler",
+                    "target": {
+                        "id": "_pPyramid1",
+                        "path": "scale"
+                    }
+                }
+            ],
+            "parameters": {
+                "TIME": "animAccessor_0",
+                "scale": "animAccessor_3"
+            },
+            "samplers": {
+                "animation_2_scale_sampler": {
+                    "input": "TIME",
+                    "interpolation": "LINEAR",
+                    "output": "scale"
+                }
+            }
+        }
+    },
+    "asset": {
+        "generator": "collada2gltf@bbe133925a39976f0172929f3838e16326b737c1",
+        "premultipliedAlpha": true,
+        "profile": {
+            "api": "WebGL",
+            "version": "1.0.2"
+        },
+        "version": "1.0"
+    },
+    "bufferViews": {
+        "bufferView_33": {
+            "buffer": "pyramid_anim2",
+            "byteLength": 176,
+            "byteOffset": 0
+        },
+        "bufferView_34": {
+            "buffer": "pyramid_anim2",
+            "byteLength": 36,
+            "byteOffset": 176,
+            "target": 34963
+        },
+        "bufferView_35": {
+            "buffer": "pyramid_anim2",
+            "byteLength": 384,
+            "byteOffset": 212,
+            "target": 34962
+        }
+    },
+    "buffers": {
+        "pyramid_anim2": {
+            "byteLength": 596,
+            "type": "arraybuffer",
+            "uri": "pyramid_anim2.bin"
+        }
+    },
+    "materials": {
+        "lambert1-fx": {
+            "name": "lambert1",
+            "technique": "technique1",
+            "values": {
+                "ambient": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "diffuse": [
+                    0.4,
+                    0.4,
+                    0.4,
+                    1
+                ],
+                "emission": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "transparency": 0
+            }
+        }
+    },
+    "meshes": {
+        "pPyramidShape1": {
+            "name": "pPyramidShape1",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": "accessor_20",
+                        "POSITION": "accessor_18"
+                    },
+                    "indices": "accessor_16",
+                    "material": "lambert1-fx",
+                    "mode": 4
+                }
+            ]
+        }
+    },
+    "nodes": {
+        "_pPyramid1": {
+            "children": [],
+            "meshes": [
+                "pPyramidShape1"
+            ],
+            "name": "pPyramid1",
+            "rotation": [
+                0,
+                0,
+                0,
+                1
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "translation": [
+                0,
+                0,
+                0
+            ]
+        }
+    },
+    "programs": {
+        "program_0": {
+            "attributes": [
+                "a_normal",
+                "a_position"
+            ],
+            "fragmentShader": "pyramid_anim20FS",
+            "vertexShader": "pyramid_anim20VS"
+        }
+    },
+    "scene": "defaultScene",
+    "scenes": {
+        "defaultScene": {
+            "nodes": [
+                "_pPyramid1"
+            ]
+        }
+    },
+    "shaders": {
+        "pyramid_anim20FS": {
+            "type": 35632,
+            "uri": "pyramid_anim20FS.glsl"
+        },
+        "pyramid_anim20VS": {
+            "type": 35633,
+            "uri": "pyramid_anim20VS.glsl"
+        }
+    },
+    "skins": {},
+    "techniques": {
+        "technique1": {
+            "attributes": {
+                "a_normal": "normal",
+                "a_position": "position"
+            },
+            "parameters": {
+                "ambient": {
+                    "type": 35666
+                },
+                "diffuse": {
+                    "type": 35666
+                },
+                "emission": {
+                    "type": 35666
+                },
+                "modelViewMatrix": {
+                    "semantic": "MODELVIEW",
+                    "type": 35676
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": 35665
+                },
+                "normalMatrix": {
+                    "semantic": "MODELVIEWINVERSETRANSPOSE",
+                    "type": 35675
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": 35665
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": 35676
+                },
+                "transparency": {
+                    "type": 5126
+                }
+            },
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929,
+                    3042
+                ],
+                "functions": {
+                    "blendEquationSeparate": [
+                        32774,
+                        32774
+                    ],
+                    "blendFuncSeparate": [
+                        1,
+                        771,
+                        1,
+                        771
+                    ],
+                    "depthMask": false
+                }
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_transparency": "transparency"
+            }
+        }
+    }
+}

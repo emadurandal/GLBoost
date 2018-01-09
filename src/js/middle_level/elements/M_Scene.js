@@ -16,7 +16,8 @@ import Vector4 from '../../low_level/math/Vector4';
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
 export default class M_Scene extends M_Group {
-
+  _gl:WebGLRenderingContext;
+  
   /**
    * [en] constructor
    * [ja] コンストラクタ
@@ -54,12 +55,13 @@ export default class M_Scene extends M_Group {
   prepareToRender(expression:any) {
     this._reset();
 
-    var aabb = (function setParentAndMergeAABBRecursively(elem) {
+    var aabb = (function setParentAndClearAccumulatedTransformMatriAndMergeAABBRecursively(elem) {
       if (elem instanceof M_Group) {
+        elem._needUpdate(); // This line enforces to clear AccumulatedTransformMatrix for all below elements.
         var children = elem.getChildren();
         for(let i=0; i<children.length; i++) {
           children[i]._parent = elem;
-          var aabb = setParentAndMergeAABBRecursively(children[i]);
+          var aabb = setParentAndClearAccumulatedTransformMatriAndMergeAABBRecursively(children[i]);
           if (aabb instanceof AABB) {
             elem.AABB.mergeAABB(aabb);
           } else {

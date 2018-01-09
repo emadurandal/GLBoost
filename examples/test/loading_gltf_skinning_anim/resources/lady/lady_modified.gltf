@@ -1,0 +1,707 @@
+{
+    "accessors": {
+        "AzumaAnimeHead1_mesh_Normals": {
+            "count": 158694, 
+            "name": "AzumaAnimeHead1_mesh_Normals", 
+            "byteStride": 12, 
+            "bufferView": "AzumaAnimeHead1_mesh_Normals_Buffer", 
+            "componentType": 5126, 
+            "byteOffset": 0, 
+            "type": "VEC3"
+        }, 
+        "AzumaAnimeHead1_skin_inverseBindMatrices": {
+            "count": 16, 
+            "name": "AzumaAnimeHead1_skin_inverseBindMatrices", 
+            "byteStride": 64, 
+            "bufferView": "AzumaAnimeHead1_skin_inverseBindMatrices_Buffer", 
+            "componentType": 5126, 
+            "byteOffset": 0, 
+            "type": "MAT4"
+        }, 
+        "AzumaAnimeHead1_mesh_Weights": {
+            "count": 158694, 
+            "name": "AzumaAnimeHead1_mesh_Weights", 
+            "byteStride": 16, 
+            "bufferView": "AzumaAnimeHead1_mesh_Weights_Buffer", 
+            "componentType": 5126, 
+            "byteOffset": 0, 
+            "type": "VEC4"
+        }, 
+        "AzumaAnimeHead1_mesh_Joints": {
+            "count": 158694, 
+            "name": "AzumaAnimeHead1_mesh_Joints", 
+            "byteStride": 16, 
+            "bufferView": "AzumaAnimeHead1_mesh_Joints_Buffer", 
+            "componentType": 5126, 
+            "byteOffset": 0, 
+            "type": "VEC4"
+        }, 
+        "AzumaAnimeHead1_mesh_Polygons_0": {
+            "count": 158694, 
+            "name": "AzumaAnimeHead1_mesh_Polygons_0", 
+            "byteStride": 4, 
+            "bufferView": "AzumaAnimeHead1_mesh_Polygons_0_Buffer", 
+            "componentType": 5125, 
+            "byteOffset": 0, 
+            "type": "SCALAR"
+        }, 
+        "AzumaAnimeHead1_mesh_Positions": {
+            "count": 158694, 
+            "name": "AzumaAnimeHead1_mesh_Positions", 
+            "byteStride": 12, 
+            "bufferView": "AzumaAnimeHead1_mesh_Positions_Buffer", 
+            "componentType": 5126, 
+            "byteOffset": 0, 
+            "type": "VEC3"
+        }
+    }, 
+    "samplers": {}, 
+    "scene": "default", 
+    "scenes": {
+        "default": {
+            "nodes": [
+                "koshi", 
+                "AzumaAnimeHead1"
+            ]
+        }
+    }, 
+    "materials": {
+        "AzumaAnimeHead1_blinn_mat": {
+            "technique": "technique1", 
+            "values": {
+                "shininess": 6.311790938168236, 
+                "specular": [
+                    0.5, 
+                    0.5, 
+                    0.5, 
+                    1.0
+                ], 
+                "diffuse": [
+                    0.4000000059604645, 
+                    0.4000000059604645, 
+                    0.4000000059604645, 
+                    1.0
+                ], 
+                "emission": [
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    1.0
+                ], 
+                "ambient": [
+                    0.0, 
+                    0.0, 
+                    0.0, 
+                    1.0
+                ]
+            }, 
+            "name": "AzumaAnimeHead1_blinn_mat"
+        }
+    }, 
+    "meshes": {
+        "AzumaAnimeHead1_mesh": {
+            "primitives": [
+                {
+                    "indices": "AzumaAnimeHead1_mesh_Polygons_0", 
+                    "attributes": {
+                        "POSITION": "AzumaAnimeHead1_mesh_Positions", 
+                        "JOINT": "AzumaAnimeHead1_mesh_Joints", 
+                        "WEIGHT": "AzumaAnimeHead1_mesh_Weights", 
+                        "NORMAL": "AzumaAnimeHead1_mesh_Normals"
+                    }, 
+                    "material": "AzumaAnimeHead1_blinn_mat", 
+                    "mode": 4
+                }
+            ], 
+            "name": "AzumaAnimeHead1_mesh"
+        }
+    }, 
+    "extensionsUsed": [
+        "KHR_materials_common"
+    ], 
+    "images": {}, 
+    "nodes": {
+        "R_kurubushi": {
+            "matrix": [
+                0.43159355865915866, 
+                -0.02335891480300625, 
+                0.9017656908660636, 
+                0.0, 
+                0.22669225814620825, 
+                0.9703925257022097, 
+                -0.083360459198947, 
+                0.0, 
+                -0.8731194764867499, 
+                0.24040113801833868, 
+                0.42411044860860414, 
+                0.0, 
+                26.63113077887217, 
+                0.0, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "R_te"
+            ], 
+            "name": "R_kurubushi"
+        }, 
+        "L_ashi_tsukene": {
+            "matrix": [
+                -0.8903513957730902, 
+                -0.059065898153279416, 
+                -0.4514261974235173, 
+                0.0, 
+                -0.2529959660350948, 
+                -0.7601662597695991, 
+                0.5984482422715165, 
+                0.0, 
+                -0.37850684698546627, 
+                0.6470382347151094, 
+                0.6618716564424527, 
+                0.0, 
+                -9.959917153883964, 
+                8.337529999999996, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "L_hiza"
+            ], 
+            "name": "L_ashi_tsukene"
+        }, 
+        "koshi": {
+            "matrix": [
+                2.83276944882399e-16, 
+                1.0, 
+                0.0, 
+                0.0, 
+                -1.0, 
+                2.83276944882399e-16, 
+                0.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                1.0, 
+                0.0, 
+                0.0, 
+                105.48681715388396, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "sakotsu", 
+                "R_ashi_tsukene", 
+                "L_ashi_tsukene"
+            ], 
+            "name": "koshi"
+        }, 
+        "atama": {
+            "matrix": [
+                0.004424735446049803, 
+                -0.9999902108102021, 
+                -2.7755575615628914e-17, 
+                0.0, 
+                0.999990210810202, 
+                0.004424735446049804, 
+                -3.469446951953614e-18, 
+                0.0, 
+                0.0, 
+                4.163336342344337e-17, 
+                1.0000000000000002, 
+                0.0, 
+                24.73584625497182, 
+                -1.3877787807814457e-17, 
+                0.0, 
+                1.0
+            ], 
+            "children": [], 
+            "name": "atama"
+        }, 
+        "R_ashi_tsukene": {
+            "matrix": [
+                -0.6107655123173743, 
+                0.05906586592205916, 
+                0.7896054156644146, 
+                0.0, 
+                0.5402128068745989, 
+                0.7601663368201095, 
+                0.3609948249686733, 
+                0.0, 
+                -0.5789089844287808, 
+                0.6470381471353703, 
+                -0.49619151937459005, 
+                0.0, 
+                -9.959911389858817, 
+                -8.33753323833197, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "R_hiza"
+            ], 
+            "name": "R_ashi_tsukene"
+        }, 
+        "L_kata": {
+            "matrix": [
+                -0.8074850948344352, 
+                0.20414066212789897, 
+                0.5534387153842844, 
+                0.0, 
+                0.21308609303159362, 
+                0.9758022476491475, 
+                -0.04903356441666823, 
+                0.0, 
+                -0.5500564867145507, 
+                0.07833622118059741, 
+                -0.8314453066043436, 
+                0.0, 
+                -0.43738732198070807, 
+                11.9494, 
+                -1.0446000000000017, 
+                1.0
+            ], 
+            "children": [
+                "L_kurubushi"
+            ], 
+            "name": "L_kata"
+        }, 
+        "R_te": {
+            "matrix": [
+                -0.6577532057579476, 
+                0.7532335098195931, 
+                -2.7755575615628914e-17, 
+                0.0, 
+                -0.7532335098195934, 
+                -0.6577532057579475, 
+                2.7755575615628914e-17, 
+                0.0, 
+                2.7755575615628914e-17, 
+                -8.326672684688674e-17, 
+                1.0000000000000002, 
+                0.0, 
+                30.950242285949415, 
+                7.105427357601002e-15, 
+                0.0, 
+                1.0
+            ], 
+            "children": [], 
+            "name": "R_te"
+        }, 
+        "R_ashi": {
+            "matrix": [
+                -0.987912247344917, 
+                0.15501416562983716, 
+                1.214306433183765e-17, 
+                0.0, 
+                0.010376897241498682, 
+                0.06613243268873906, 
+                -0.997756894914943, 
+                0.0, 
+                -0.1546664525666569, 
+                -0.9856962563593078, 
+                -0.06694160626763612, 
+                0.0, 
+                52.73713961194079, 
+                0.0, 
+                0.0, 
+                1.0
+            ], 
+            "children": [], 
+            "name": "R_ashi"
+        }, 
+        "L_te": {
+            "matrix": [
+                0.6577427747274074, 
+                -0.753242618479525, 
+                -5.551115123125783e-17, 
+                0.0, 
+                0.7532426184795248, 
+                0.6577427747274077, 
+                -1.1102230246251565e-16, 
+                0.0, 
+                0.0, 
+                -1.3877787807814457e-17, 
+                1.0, 
+                0.0, 
+                30.949788856953433, 
+                1.7763568394002505e-15, 
+                -1.4210854715202004e-14, 
+                1.0
+            ], 
+            "children": [], 
+            "name": "L_te"
+        }, 
+        "AzumaAnimeHead1": {
+            "skin": "AzumaAnimeHead1_skin", 
+            "meshes": [
+                "AzumaAnimeHead1_mesh"
+            ], 
+            "children": [], 
+            "name": "AzumaAnimeHead1"
+        }, 
+        "sakotsu": {
+            "matrix": [
+                0.9986275688205947, 
+                -4.9986681489188795e-19, 
+                0.05237345502703095, 
+                0.0, 
+                -0.0037728999047677266, 
+                0.997401859292196, 
+                0.07193953229469116, 
+                0.0, 
+                -0.052237381421516876, 
+                -0.07203840004102194, 
+                0.9960329938821066, 
+                0.0, 
+                33.49157016809674, 
+                0.0, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "neck", 
+                "R_kata", 
+                "L_kata"
+            ], 
+            "name": "sakotsu"
+        }, 
+        "R_kata": {
+            "matrix": [
+                -0.33209579049736937, 
+                -0.19951106309847894, 
+                -0.921904399401176, 
+                0.0, 
+                0.1673212877743316, 
+                -0.9743347009314471, 
+                0.1505837880330002, 
+                0.0, 
+                -0.9282865789137897, 
+                -0.10424598918971911, 
+                0.3569549007177103, 
+                0.0, 
+                -0.437798302850922, 
+                -11.949369236852222, 
+                -1.0446047022908642, 
+                1.0
+            ], 
+            "children": [
+                "R_kurubushi"
+            ], 
+            "name": "R_kata"
+        }, 
+        "L_hiza": {
+            "matrix": [
+                0.9778037441835634, 
+                -0.16841769180640745, 
+                -0.12464075957409082, 
+                0.0, 
+                -0.20004985662312752, 
+                -0.5735870575191812, 
+                -0.7943412001851307, 
+                0.0, 
+                0.06228878491085253, 
+                0.8016441657824809, 
+                -0.5945475075561583, 
+                0.0, 
+                42.619176779925006, 
+                3.552713678800501e-15, 
+                3.552713678800501e-15, 
+                1.0
+            ], 
+            "children": [
+                "L_ashi"
+            ], 
+            "name": "L_hiza"
+        }, 
+        "R_hiza": {
+            "matrix": [
+                0.3637750450666519, 
+                -0.6121933890180398, 
+                0.7020590936875354, 
+                0.0, 
+                -0.9241515232355483, 
+                -0.14279725538818622, 
+                0.3543344549363183, 
+                0.0, 
+                -0.116669099114427, 
+                -0.7777070131458306, 
+                -0.6177055309899852, 
+                0.0, 
+                42.619204884171786, 
+                -7.105427357601002e-15, 
+                0.0, 
+                1.0
+            ], 
+            "children": [
+                "R_ashi"
+            ], 
+            "name": "R_hiza"
+        }, 
+        "L_kurubushi": {
+            "matrix": [
+                0.13042370096801642, 
+                0.21635489738619235, 
+                -0.9675640633068257, 
+                0.0, 
+                0.10756494143974876, 
+                0.9670517043398006, 
+                0.23073964658582297, 
+                0.0, 
+                0.9856061290388106, 
+                -0.13416989047657932, 
+                0.10285426043987606, 
+                0.0, 
+                26.63153075134808, 
+                0.0, 
+                -1.4210854715202004e-14, 
+                1.0
+            ], 
+            "children": [
+                "L_te"
+            ], 
+            "name": "L_kurubushi"
+        }, 
+        "L_ashi": {
+            "matrix": [
+                0.987912248399568, 
+                -0.15501415890850123, 
+                3.469446951953614e-18, 
+                0.0, 
+                -0.010376742963893987, 
+                -0.06613145240865279, 
+                -0.9977569614930202, 
+                0.0, 
+                0.1546664561809426, 
+                0.9856963231848903, 
+                -0.06694061392171896, 
+                0.0, 
+                52.7371627128652, 
+                7.105427357601002e-15, 
+                0.0, 
+                1.0
+            ], 
+            "children": [], 
+            "name": "L_ashi"
+        }, 
+        "neck": {
+            "matrix": [
+                0.9971214630239312, 
+                -0.004424735446049507, 
+                -0.075691543076149, 
+                0.0, 
+                0.004412041871774007, 
+                0.9999902108102023, 
+                -0.00033491833219435885, 
+                0.0, 
+                0.0756922840422837, 
+                2.7755575615628914e-17, 
+                0.9971312241307376, 
+                0.0, 
+                7.004772845615008, 
+                0.0, 
+                8.881784197001252e-16, 
+                1.0
+            ], 
+            "children": [
+                "atama"
+            ], 
+            "name": "neck"
+        }
+    }, 
+    "bufferViews": {
+        "AzumaAnimeHead1_mesh_Positions_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 1904328, 
+            "target": 34963, 
+            "byteOffset": 634776, 
+            "name": "AzumaAnimeHead1_mesh_Positions_Buffer"
+        }, 
+        "AzumaAnimeHead1_mesh_Weights_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 2539104, 
+            "target": 34962, 
+            "byteOffset": 6982536, 
+            "name": "AzumaAnimeHead1_mesh_Weights_Buffer"
+        }, 
+        "AzumaAnimeHead1_mesh_Joints_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 2539104, 
+            "target": 34962, 
+            "byteOffset": 4443432, 
+            "name": "AzumaAnimeHead1_mesh_Joints_Buffer"
+        }, 
+        "AzumaAnimeHead1_skin_inverseBindMatrices_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 1024, 
+            "target": 34963, 
+            "byteOffset": 9521640, 
+            "name": "AzumaAnimeHead1_skin_inverseBindMatrices_Buffer"
+        }, 
+        "AzumaAnimeHead1_mesh_Normals_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 1904328, 
+            "target": 34963, 
+            "byteOffset": 2539104, 
+            "name": "AzumaAnimeHead1_mesh_Normals_Buffer"
+        }, 
+        "AzumaAnimeHead1_mesh_Polygons_0_Buffer": {
+            "buffer": "lady", 
+            "byteLength": 634776, 
+            "target": 34962, 
+            "byteOffset": 0, 
+            "name": "AzumaAnimeHead1_mesh_Polygons_0_Buffer"
+        }
+    }, 
+    "skins": {
+        "AzumaAnimeHead1_skin": {
+            "inverseBindMatrices": "AzumaAnimeHead1_skin_inverseBindMatrices", 
+            "bindShapeMatrix": [
+                1.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                1.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                1.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                0.0, 
+                1.0
+            ], 
+            "jointNames": [
+                "koshi", 
+                "sakotsu", 
+                "neck", 
+                "atama", 
+                "R_kata", 
+                "R_kurubushi", 
+                "R_te", 
+                "L_kata", 
+                "L_kurubushi", 
+                "L_te", 
+                "R_ashi_tsukene", 
+                "R_hiza", 
+                "R_ashi", 
+                "L_ashi_tsukene", 
+                "L_hiza", 
+                "L_ashi"
+            ]
+        }
+    }, 
+    "buffers": {
+        "lady": {
+            "byteLength": 9522664, 
+            "type": "arraybuffer", 
+            "name": "lady", 
+            "uri": "lady.bin"
+        }
+    },
+        "techniques": {
+        "technique1": {
+            "attributes": {
+                "a_joint": "joint",
+                "a_normal": "normal",
+                "a_position": "position",
+                "a_weight": "weight"
+            },
+            "parameters": {
+                "ambient": {
+                    "type": 35666
+                },
+                "diffuse": {
+                    "type": 35666
+                },
+                "emission": {
+                    "type": 35666
+                },
+                "joint": {
+                    "semantic": "JOINT",
+                    "type": 35666
+                },
+                "jointMat": {
+                    "count": 16,
+                    "semantic": "JOINTMATRIX",
+                    "type": 35676
+                },
+                "modelViewMatrix": {
+                    "semantic": "MODELVIEW",
+                    "type": 35676
+                },
+                "normal": {
+                    "semantic": "NORMAL",
+                    "type": 35665
+                },
+                "normalMatrix": {
+                    "semantic": "MODELVIEWINVERSETRANSPOSE",
+                    "type": 35675
+                },
+                "position": {
+                    "semantic": "POSITION",
+                    "type": 35665
+                },
+                "projectionMatrix": {
+                    "semantic": "PROJECTION",
+                    "type": 35676
+                },
+                "shininess": {
+                    "type": 5126
+                },
+                "specular": {
+                    "type": 35666
+                },
+                "transparency": {
+                    "type": 5126
+                },
+                "weight": {
+                    "semantic": "WEIGHT",
+                    "type": 35666
+                }
+            },
+            "program": "program_0",
+            "states": {
+                "enable": [
+                    2929
+                ]
+            },
+            "uniforms": {
+                "u_ambient": "ambient",
+                "u_diffuse": "diffuse",
+                "u_emission": "emission",
+                "u_jointMat": "jointMat",
+                "u_modelViewMatrix": "modelViewMatrix",
+                "u_normalMatrix": "normalMatrix",
+                "u_projectionMatrix": "projectionMatrix",
+                "u_shininess": "shininess",
+                "u_specular": "specular",
+                "u_transparency": "transparency"
+            }
+        }
+    },
+    "programs": {
+        "program_0": {
+            "attributes": [
+                "a_joint",
+                "a_normal",
+                "a_position",
+                "a_weight"
+            ],
+            "fragmentShader": "lady0FS",
+            "vertexShader": "lady0VS"
+        }
+    },
+        "shaders": {
+        "lady0FS": {
+            "type": 35632,
+            "uri": "lady0FS.glsl"
+        },
+        "lady0VS": {
+            "type": 35633,
+            "uri": "lady0VS.glsl"
+        }
+    }
+}

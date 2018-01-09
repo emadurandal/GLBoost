@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <title>GLBoost Opacity example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../../build/glboost.js"></script>
+</head>
+<body>
+<header>
+  <p class="header-title">GLBoost Opacity example</p>
+</header>
+<main>
+  <canvas id="world" width="600" height="600"></canvas>
+</main>
+<script>
+
+var arg = new Object;
+var pair = location.search.substring(1).split('&');
+for(var i = 0; pair[i] ; i++) {
+  var kv = pair[i].split('=');
+  arg[kv[0]] = kv[1];
+}
+
+GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+
+var canvas = document.getElementById("world");
+
+var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.5, blue:0.5, alpha:1}});
+
+var scene = glBoostContext.createScene();
+
+var material = glBoostContext.createClassicMaterial();
+var texture = glBoostContext.createTexture('resources/texture.png');
+material.setTexture(texture);
+
+var group1 = glBoostContext.createGroup();
+var group2 = glBoostContext.createGroup();
+
+var planeGeometry = glBoostContext.createPlane(1, 1, 1, 1, null);
+var cube0 = glBoostContext.createMesh(planeGeometry, material);
+cube0.translate = new GLBoost.Vector3(-3, 0, 0);
+cube0.opacity = 0.5;
+group2.addChild( cube0 );
+
+var cube1 = glBoostContext.createMesh(planeGeometry, material);
+cube1.translate = new GLBoost.Vector3(-1, 0, 0);
+group2.addChild( cube1 );
+group2.opacity = 0.5;
+
+var cube2 = glBoostContext.createMesh(planeGeometry, material);
+cube2.translate = new GLBoost.Vector3(1, 0, 0);
+
+group1.addChild(cube2);
+group1.addChild(group2);
+group1.opacity = 0.5;
+
+var cube3 = glBoostContext.createMesh(planeGeometry, material);
+cube3.translate = new GLBoost.Vector3(3, 0, 0);
+
+scene.addChild(cube3);
+scene.addChild(group1);
+scene.opacity = 0.5;
+
+var camera = glBoostContext.createPerspectiveCamera(
+    {
+      eye: new GLBoost.Vector3(0.0, 10, 0),
+      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+      up: new GLBoost.Vector3(0.0, 0.0, -1.0)
+    },
+    {
+      fovy: 45.0,
+      aspect: 1.0,
+      zNear: 0.1,
+      zFar: 300.0
+    }
+);
+scene.addChild( camera );
+
+var expression = glBoostContext.createExpressionAndRenderPasses(1);
+expression.renderPasses[0].scene = scene;
+expression.prepareToRender();
+
+
+var render = function(){
+  renderer.clearCanvas();
+  renderer.draw(expression);
+
+
+  requestAnimationFrame(render);
+};
+render();
+</script>
+</body>
+</html>

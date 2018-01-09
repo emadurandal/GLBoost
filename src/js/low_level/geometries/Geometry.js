@@ -10,6 +10,7 @@ import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
 import Shader from '../../low_level/shaders/Shader';
+import FreeShader from '../../middle_level/shaders/FreeShader';
 
 
 export default class Geometry extends GLBoostObject {
@@ -402,7 +403,7 @@ export default class Geometry extends GLBoostObject {
     return Geometry._allVertexAttribs(this._vertices);
   } 
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0) {
+  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
     let gl = this._glContext.gl;
     let vertices = this._vertices;
 
@@ -413,13 +414,16 @@ export default class Geometry extends GLBoostObject {
 //      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
 //    }
 
-    
 
     let shaderInstance = null;
-    if (shaderClass) {
-      shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+    if (argShaderInstance) {
+      shaderInstance = argShaderInstance;
     } else {
-      shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
+      if (shaderClass) {
+        shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+      } else {
+        shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
+      }  
     }
 
     let glslProgram = shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
@@ -536,7 +540,12 @@ export default class Geometry extends GLBoostObject {
     //let materials = this._getAppropriateMaterials(mesh);
 
     for (let i=0; i<materials.length;i++) {
-      let shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+      let shaderInstance = null;
+      if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
+        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+      } else {
+        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+      }
       this._setVertexNtoSingleMaterial(materials[i], i);
       shaderInstance.vao = Geometry._vaoDic[this.toString()];
       this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
