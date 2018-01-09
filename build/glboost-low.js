@@ -2844,8 +2844,20 @@ class GLContext {
 }
 GLContext._instances = new Object();
 
+/*       */
+
 class GLBoostObject {
-  constructor(glBoostContext, toRegister = true) {
+                                     
+                        
+                       
+                                    
+                       
+                          
+                            
+                             
+                      
+
+  constructor(glBoostContext                  , toRegister         = true) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
@@ -2934,22 +2946,22 @@ class GLBoostObject {
    * [ja] インスタンス名を返します。
    * @returns {string} [en] the instance name. [ja] インスタンス名
    */
-  toString() {
+  toString()        {
     return this._instanceName;
   }
 
   /**
    * Return the simple class-specific number.
    */
-  get classUniqueNumber() {
+  get classUniqueNumber()        {
     return this._classUniqueNumber;
   }
 
-  get className() {
+  get className()        {
     return this.constructor.name;
   }
 
-  get instanceName() {
+  get instanceName()        {
     return this._instanceName;
   }
 
@@ -2957,15 +2969,15 @@ class GLBoostObject {
     return this._glBoostContext.belongingCanvasId;
   }
 
-  set userFlavorName(name) {
+  set userFlavorName(name       ) {
     this._userFlavorName = name;
   }
 
-  get userFlavorName() {
+  get userFlavorName()        {
     return this._userFlavorName;
   }
 
-  get instanceNameWithUserFlavor() {
+  get instanceNameWithUserFlavor()        {
     return this._instanceName + '__' + this._userFlavorName;
   }
 
@@ -2979,7 +2991,7 @@ class GLBoostObject {
     this._readyForDiscard = true;
   }
 
-  get isReadyForDiscard() {
+  get isReadyForDiscard()         {
     return this._readyForDiscard;
   }
 
@@ -2987,7 +2999,7 @@ class GLBoostObject {
     instance._userFlavorName = this._userFlavorName;
   }
 
-  get objectIndex() {
+  get objectIndex()        {
     return this._objectIndex;
   }
 }
