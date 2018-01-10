@@ -184,7 +184,7 @@ class GLContextImpl {
       this._gl = gl;
     } else {
 
-      let gl = this._canvas.getContext(glVersionString, { antialias: true });
+      let gl = this._canvas.getContext(glVersionString, { antialias: true, premultipliedAlpha: false });
 
       if (!gl) {
         gl = this._canvas.getContext('experimental-' + glVersionString);
