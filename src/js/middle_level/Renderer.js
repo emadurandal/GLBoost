@@ -146,13 +146,18 @@ export default class Renderer extends GLBoostObject {
   }
 
   _clearBuffer(gl, renderPass) {
-    var clearColor = renderPass.clearColor;
-    var clearDepth = renderPass.clearDepth;
+    const clearColor = renderPass.clearColor;
+    const clearDepth = renderPass.clearDepth;
+    const colorMask = renderPass.colorMask;
+
     if (clearColor) {
       gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
     }
     if (clearDepth) {
       gl.clearDepth(clearDepth);
+    }
+    if (colorMask) {
+      gl.colorMask.apply(null, [colorMask]);
     }
 
     if (renderPass.buffersToDraw[0] === gl.NONE) {

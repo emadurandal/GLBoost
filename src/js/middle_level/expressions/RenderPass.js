@@ -16,7 +16,8 @@ export default class RenderPass extends GLBoostObject {
     this._transparentMeshes = [];
     this._drawBuffers = [this._glContext.gl.NONE];
     this._clearColor = null;
-    this._clearDepth = null;  // default is 1.0
+    this._clearDepth = null;  // webgl default is 1.0
+    this._colorMask = null; // webgl defalult is [true, true, true, true];
     this._renderTargetColorTextures = [];
     this._renderTargetDepthTexture = [];
     this._expression = null;
@@ -207,6 +208,14 @@ export default class RenderPass extends GLBoostObject {
     return this._clearDepth;
   }
 
+  setColorMask(colorMask) {
+    this._colorMask = colorMask;
+  }
+
+  get colorMask() {
+    return this._colorMask;
+  }
+
   setWebGLStatesAssignDictionaries(dictionaries) {
     this._webglStatesAssignDictionaries = dictionaries;
 
@@ -219,8 +228,22 @@ export default class RenderPass extends GLBoostObject {
   setShaderAssignDictionaries(dictionaries) {
     this._newShaderInstance = null;
     this._backupShaderClassDic = {};
-    this._shaderAssignDictionaries = dictionaries;
-    
+
+    this._shaderAssignDictionaries = [];
+    for (let directory of dictionaries) {
+      let meshes = [];
+      for (let instance of directory.instances) {
+        if (instance instanceof M_Group) {
+          meshes = meshes.concat(instance.searchElementsByType(GLBoost.M_Mesh));
+        } else {
+          meshes.push(instance);
+        }
+      }
+      this._shaderAssignDictionaries.push({
+        instances: meshes,
+        shaderClass: directory.shaderClass
+      });
+    }
   }
 
   _assignWebGLStates() {
