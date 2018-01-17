@@ -10564,7 +10564,7 @@ class GLBoostLowContext {
 
 
     // effekseer
-    if (effekseer !== void 0) {
+    if (typeof effekseer !== "undefined") {
       effekseer.init(this._glContext.gl);
     }
   }
@@ -12961,7 +12961,7 @@ class Renderer extends GLBoostObject {
       mesh.geometry.update(mesh);
     }
 
-    if (effekseer !== void 0) {
+    if (typeof effekseer !== "undefined") {
       effekseer.update();
     }
 
@@ -13060,7 +13060,7 @@ class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (effekseer !== void 0) {
+      if (typeof effekseer !== "undefined") {
         effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
         effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
         effekseer.draw();

@@ -10322,7 +10322,7 @@ class GLBoostLowContext {
 
 
     // effekseer
-    if (effekseer !== void 0) {
+    if (typeof effekseer !== "undefined") {
       effekseer.init(this._glContext.gl);
     }
   }
