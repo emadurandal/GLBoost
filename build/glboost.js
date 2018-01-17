@@ -10561,6 +10561,12 @@ class GLBoostLowContext {
     let dummyWhite1x1ImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6REY4MUVGRjk0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MUVGRkE0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpERjgxRUZGNzRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpERjgxRUZGODRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvTp+QkAAAAPSURBVHjaYvj//z9AgAEABf4C/i3Oie4AAAAASUVORK5CYII=';
     this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
+
+
+    // effekseer
+    if (effekseer) {
+      effekseer.init(this._glContext.gl);
+    }
   }
 
   get defaultDummyTexture() {
@@ -12923,7 +12929,9 @@ class Renderer extends GLBoostObject {
 
     this._glBoostContext.reflectGlobalGLState();
 
-    gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    if (_clearColor) {
+      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    }
   }
 
   /**
@@ -12951,6 +12959,10 @@ class Renderer extends GLBoostObject {
     
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
+    }
+
+    if (effekseer) {
+      effekseer.update();
     }
 
   }
@@ -13047,6 +13059,12 @@ class Renderer extends GLBoostObject {
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
+
+      if (effekseer) {
+        effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
+        effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
+        effekseer.draw();
+      }
 
       renderPass.postRender(camera ? true:false, lights);
 
@@ -14204,6 +14222,83 @@ class M_GridGizmo extends M_Gizmo {
   }
 }
 
+class EffekseerElement extends M_Element {
+  constructor(glBoostContext) {
+    super(glBoostContext);
+    this.__effect = null;
+    this.__handle = null;
+    this.__speed = 1;
+  }
+
+  load(uri, playJustAfterLoaded = false) {
+    return new Promise((resolve, reject)=>{
+      this.__effect = effekseer.loadEffect(uri, ()=>{
+        if (playJustAfterLoaded) {
+          this.play();
+        }
+        resolve(this.__effect);
+      });
+    })
+  }
+
+  play() {
+    // Play the loaded effect
+    this.__handle = effekseer.play(this.__effect);
+//            handle.setScale(1, 1, 1);
+    this.__handle.setLocation(this.translate.x, this.translate.y, this.translate.z);
+    this.__handle.setRotation(this.rotate.x, this.rotate.y, this.rotate.z);
+    this.__handle.setScale(this.scale.x, this.scale.y, this.scale.z);
+    this.__handle.setSpeed(this.__speed);
+    //handle.setMatrix((new GLBoost.Matrix44()).scale(0.01, 0.01, 0.01));
+//    this.__handle.setSpeed(0.2);
+  }
+
+  set playSpeed(val) {
+    if (this.__handle) {
+      this.__handle.setSpeed(val);
+    }
+    this.__speed = val;
+  }
+
+  get playSpeed() {
+    return this.__speed;
+  }
+
+  set translate(vec) {
+    if (this.__handle) {
+      this.__handle.setLocation(vec.x, vec.y, vec.z);      
+    }
+    super.translate = vec;
+  }
+
+  get translate() {
+    return super.translate;
+  }
+
+  set rotate(vec) {
+    if (this.__handle) {
+      this.__handle.setRotation(vec.x, vec.y, vec.z);      
+    }
+    super.rotate = vec;
+  }
+
+  get rotate() {
+    return super.rotate;
+  }
+
+  set scale(vec) {
+    if (this.__handle) {
+      this.__handle.setScale(vec.x, vec.y, vec.z);      
+    }
+    super.scale = vec;
+  }
+
+  get scale() {
+    return super.scale;
+  }
+
+}
+
 class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, gl, width, height) {
     super(canvas, gl, width, height);
@@ -14294,6 +14389,10 @@ class GLBoostMiddleContext extends GLBoostLowContext {
 
   createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
     return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
+  }
+
+  createEffekseerElement() {
+    return new EffekseerElement(this);
   }
 
 }
