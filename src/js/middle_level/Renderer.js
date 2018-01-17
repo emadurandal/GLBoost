@@ -47,7 +47,7 @@ export default class Renderer extends GLBoostObject {
       mesh.geometry.update(mesh);
     }
 
-    if (effekseer) {
+    if (effekseer !== void 0) {
       effekseer.update();
     }
 
@@ -146,7 +146,7 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (effekseer) {
+      if (effekseer !== void 0) {
         effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
         effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
         effekseer.draw();
