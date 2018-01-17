@@ -29,4 +29,5 @@ import JointGizmoUpdater from './elements/skeletons/JointGizmoUpdater';
 import M_ScreenMesh from './elements/meshes/M_ScreenMesh';
 
 
+import EffekseerElement from './plugins/EffekseerElement';
 import AnimationPlayer from '../auxiliaries/AnimationPlayer';

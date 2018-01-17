@@ -15,7 +15,9 @@ export default class Renderer extends GLBoostObject {
 
     this._glBoostContext.reflectGlobalGLState();
 
-    gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    if (_clearColor) {
+      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    }
   }
 
   /**
@@ -43,6 +45,10 @@ export default class Renderer extends GLBoostObject {
     
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
+    }
+
+    if (effekseer) {
+      effekseer.update();
     }
 
   }
@@ -139,6 +145,12 @@ export default class Renderer extends GLBoostObject {
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
+
+      if (effekseer) {
+        effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
+        effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
+        effekseer.draw();
+      }
 
       renderPass.postRender(camera ? true:false, lights);
 
