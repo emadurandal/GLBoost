@@ -9,7 +9,7 @@ export default class M_DirectionalLightGizmo extends M_Gizmo {
     super(glBoostContext, null, null);
     this._init(glBoostContext, length);
 
-//    this.isVisible = false;
+    this.isVisible = false;
 
     this.baseColor = new Vector4(0.8, 0.8, 0, 1);
   }

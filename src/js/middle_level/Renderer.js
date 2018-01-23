@@ -15,7 +15,9 @@ export default class Renderer extends GLBoostObject {
 
     this._glBoostContext.reflectGlobalGLState();
 
-    gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    if (_clearColor) {
+      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    }
   }
 
   /**
@@ -43,6 +45,10 @@ export default class Renderer extends GLBoostObject {
     
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
+    }
+
+    if (typeof effekseer !== "undefined") {
+      effekseer.update();
     }
 
   }
@@ -140,19 +146,30 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
+      if (typeof effekseer !== "undefined") {
+        effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
+        effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
+        effekseer.draw();
+      }
+
       renderPass.postRender(camera ? true:false, lights);
 
     });
   }
 
   _clearBuffer(gl, renderPass) {
-    var clearColor = renderPass.clearColor;
-    var clearDepth = renderPass.clearDepth;
+    const clearColor = renderPass.clearColor;
+    const clearDepth = renderPass.clearDepth;
+    const colorMask = renderPass.colorMask;
+
     if (clearColor) {
       gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
     }
     if (clearDepth) {
       gl.clearDepth(clearDepth);
+    }
+    if (colorMask) {
+      gl.colorMask.apply(null, [colorMask]);
     }
 
     if (renderPass.buffersToDraw[0] === gl.NONE) {

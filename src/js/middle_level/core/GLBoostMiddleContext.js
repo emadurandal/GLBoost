@@ -19,6 +19,7 @@ import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 import M_SPVScreenMesh from '../elements/meshes/M_SPVScreenMesh';
+import EffekseerElement from '../plugins/EffekseerElement';
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, gl, width, height) {
@@ -112,9 +113,14 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
   }
 
+  createEffekseerElement() {
+    return new EffekseerElement(this);
+  }
+
   createSPVScreenMesh(screens, customVertexAttributes) {
     return new M_SPVScreenMesh(this, screens, customVertexAttributes);
   }
+
 }
 
 GLBoost['GLBoostMiddleContext'] = GLBoostMiddleContext;
