@@ -93,15 +93,20 @@ export class SPVExtensionShaderSource {
 
     // Wireframe function
     shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
+    shaderText += 'float wireframeWidthInnerAlpha = wireframeWidth-1.0;\n';
     shaderText += 'float threshold = 0.001;\n';
     shaderText += 'vec4 wireframeResult = rt0;\n';
     shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
     shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
     shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
+    shaderText += '  float edgeRatioAlpha = edge_ratio(barycentricCoord, wireframeWidthInnerAlpha, wireframeWidthRelativeScale);\n';
+    shaderText += '  float edgeRatioModifiedAlpha = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInnerAlpha / wireframeWidthRelativeScale/4.0);\n';
     // if r0.a is 0.0, it is wireframe not on shaded
     shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
-    shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+    shaderText += '  wireframeResult.a = wireframeColor.a * edgeRatioModifiedAlpha + rt0.a * (1.0 - edgeRatioModified);\n';
+
+    //shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModifiedAlpha, pow(edgeRatioModifiedAlpha, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
     shaderText += '}\n';
 
     shaderText += 'if ( isWireframe ) {\n';
