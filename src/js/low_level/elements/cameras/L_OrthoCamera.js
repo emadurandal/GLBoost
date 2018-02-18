@@ -5,10 +5,10 @@ export default class L_OrthoCamera extends L_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, ortho) {
     super(glBoostContext, toRegister, lookat);
 
-    this._left = ortho.left;
-    this._right = ortho.right;
-    this._bottom = ortho.bottom;
-    this._top = ortho.top;
+    this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
+    this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
+    this._bottom = (typeof ortho.bottom === "undefined") ? -1:ortho.bottom;
+    this._top = (typeof ortho.top === "undefined") ? 1:ortho.top;
     this._zNear = ortho.zNear;
     this._zFar = ortho.zFar;
     this._xmag = ortho.xmag;
