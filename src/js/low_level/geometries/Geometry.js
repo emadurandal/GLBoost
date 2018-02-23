@@ -403,7 +403,7 @@ export default class Geometry extends GLBoostObject {
     return Geometry._allVertexAttribs(this._vertices);
   } 
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
+  prepareGLSLProgram(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
     let gl = this._glContext.gl;
     let vertices = this._vertices;
 
@@ -541,14 +541,23 @@ export default class Geometry extends GLBoostObject {
 
     for (let i=0; i<materials.length;i++) {
       let shaderInstance = null;
-      if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+
+      if (argMaterials !== void 0 && argMaterials[i].shaderInstance !== null) {
+        shaderInstance = argMaterials[i].shaderInstance;
+      } else if (materials[i].shaderInstance !== null) {
+        shaderInstance = materials[i].shaderInstance;
       } else {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+        if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+        } else {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+        }  
       }
+
       this._setVertexNtoSingleMaterial(materials[i], i);
       shaderInstance.vao = Geometry._vaoDic[this.toString()];
       this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
+
       if (argMaterials === void 0) {
         materials[i].shaderInstance = shaderInstance;
       } else {
