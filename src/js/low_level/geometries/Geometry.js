@@ -456,7 +456,7 @@ export default class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      mesh.material = this._glBoostContext.createClassicMaterial();
+      mesh.material = this._glBoostContext._defaultMaterial;
       materials = [mesh.material];
     }
     return materials;
