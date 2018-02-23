@@ -194,12 +194,12 @@ export default class M_Mesh extends M_Element {
   calcTransformedDepth(camera) {
     var viewMatrix = camera.lookAtRHMatrix();
     var m_m = this.transformMatrixAccumulatedAncestry;
-    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestry).multiply(m_m);
 
     var centerPosition = this.geometry.centerPosition.toVector4();
     var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
-    this._transformedDepth = transformedCenterPosition.z;
+    this._transformedDepth = transformedCenterPosition.z;//transformedCenterPosition.length();// //
   }
 
   get transformedDepth() {
