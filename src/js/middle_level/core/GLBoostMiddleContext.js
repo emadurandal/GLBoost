@@ -21,8 +21,8 @@ import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 import EffekseerElement from '../plugins/EffekseerElement';
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
-    super(canvas, gl, width, height);
+  constructor(canvas, initParameter, gl, width, height) {
+    super(canvas, initParameter, gl, width, height);
 
     this._glBoostMonitor = M_GLBoostMonitor.getInstance();
   }

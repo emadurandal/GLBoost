@@ -2,13 +2,13 @@ import GLContextImpl from './GLContextImpl'
 
 export default class GLContextWebGL1Impl extends GLContextImpl {
 
-  constructor(canvas, parent, gl) {
-    super(canvas, parent);
+  constructor(canvas, parent, initParameter, gl) {
+    super(canvas, parent, initParameter);
 
     if (gl) {
-      super.init('webgl', null, gl);
+      super.init('webgl', null, initParameter, gl);
     } else {
-      super.init('webgl', WebGLRenderingContext, gl);
+      super.init('webgl', WebGLRenderingContext, initParameter, gl);
     }
   }
 

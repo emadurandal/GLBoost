@@ -20,6 +20,7 @@ export class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
+    shaderText +=         'uniform bool isPreMultipliedAlpha;\n';
     return shaderText;
   }
 
@@ -29,11 +30,22 @@ export class FragmentSimpleShaderSource {
     return shaderText;
   }
 
+  FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += 'if (isPreMultipliedAlpha) {\n';
+    shaderText += '  rt0.rgb *= rt0.a;\n';
+    shaderText += '}\n';
+
+    return shaderText;
+  }
+
   prepare_FragmentSimpleShaderSource(gl, glslProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
 
     material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
+    material.setUniform(glslProgram, 'uniform_isPremultipliedAlpha', this._glContext.getUniformLocation(glslProgram, 'isPremultipliedAlpha'));
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
@@ -54,11 +66,23 @@ export default class FragmentSimpleShader extends Shader {
 
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
+
+    this._isPreMultipliedAlpha = null;
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isPreMultipliedAlpha'), this._isPreMultipliedAlpha, true);
+
+  }
+
+  set isPreMultipliedAlpha(flg) {
+    this._isPreMultipliedAlpha = flg;
+  }
+
+  get isPreMultipliedAlpha() {
+    return this._isPreMultipliedAlpha;
   }
 }
 

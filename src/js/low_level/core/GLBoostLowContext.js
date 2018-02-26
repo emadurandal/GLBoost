@@ -19,15 +19,15 @@ import Particle from '../primitives/Particle';
 import GLBoost from '../../globals';
 
 export default class GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
     this._setName();
 
     console.log('*** GLBoost revision ' + GLBoost.REVISION + ' ***');
 
     if (gl) {
-      this._glContext = GLContext.getInstance(null, gl, width, height);
+      this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {
-      this._glContext = GLContext.getInstance(canvas);
+      this._glContext = GLContext.getInstance(canvas, initParameter);
     }
 
     this._globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
