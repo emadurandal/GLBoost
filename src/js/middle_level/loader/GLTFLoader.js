@@ -699,7 +699,7 @@ export default class GLTFLoader {
           if (typeof value === 'string') {
             let textureStr = value;
             let texturePurpose;
-            if (valueName === 'diffuse') {
+            if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
             }
             material.setTexture(textures[textureStr], texturePurpose);
