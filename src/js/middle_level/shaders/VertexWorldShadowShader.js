@@ -41,8 +41,9 @@ export default class VertexWorldShadowShaderSource {
     let shaderText = '';
     shaderText += 'float visibilityLevel = 1.0;\n';
 
-    
-    shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    if (lights.length > 0) {
+      shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    }    
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
