@@ -30,7 +30,9 @@ export default class VertexWorldShadowShaderSource {
     shaderText += 'uniform float depthBias;\n';
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
 //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    }
     
     return shaderText;
   }
