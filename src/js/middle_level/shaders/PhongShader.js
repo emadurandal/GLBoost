@@ -13,10 +13,12 @@ export class PhongShaderSource {
     var sampler2D = this._sampler2DShadow_func();
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
+    
     return shaderText;
   }
 
