@@ -25,7 +25,9 @@ export class FragmentSimpleShaderSource {
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
-    let shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    let shaderText =   "";
+    shaderText +=   `bool isDataOutput = false;\n`;
+    shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
 
     return shaderText;
   }
@@ -33,7 +35,7 @@ export class FragmentSimpleShaderSource {
   FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += 'if (isPreMultipliedAlpha) {\n';
+    shaderText += 'if (isPreMultipliedAlpha && !isDataOutput) {\n';
     shaderText += '  rt0.rgb *= rt0.a;\n';
     shaderText += '}\n';
 
