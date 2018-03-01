@@ -542,17 +542,19 @@ export default class Geometry extends GLBoostObject {
     for (let i=0; i<materials.length;i++) {
       let shaderInstance = null;
 
+      /*
       if (argMaterials !== void 0 && argMaterials[i].shaderInstance !== null) {
         shaderInstance = argMaterials[i].shaderInstance;
       } else if (materials[i].shaderInstance !== null) {
         shaderInstance = materials[i].shaderInstance;
       } else {
+        */
         if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
           shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
         } else {
           shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
         }  
-      }
+//      }
 
       this._setVertexNtoSingleMaterial(materials[i], i);
       shaderInstance.vao = Geometry._vaoDic[this.toString()];
