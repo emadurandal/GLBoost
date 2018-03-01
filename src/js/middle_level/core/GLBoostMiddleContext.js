@@ -100,8 +100,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_SpotLight(this, intensity, direction);
   }
 
-  createJoint() {
-    return new M_Joint(this);
+  createJoint(isExistJointGizmo) {
+    return new M_Joint(this, isExistJointGizmo);
   }
 
   createAxisGizmo(length) {

@@ -61,7 +61,8 @@ export default class GLTFLoader {
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
       isPixelOutputPreMultipliedAlpha: true,
-      isTexturePreMultipliedAlpha: false
+      isTexturePreMultipliedAlpha: false,
+      isExistJointGizmo: false
     }
   ) {
     return DataUtil.loadResourceAsync(url, true,
@@ -336,7 +337,7 @@ export default class GLTFLoader {
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint();
+      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {

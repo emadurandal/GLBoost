@@ -6,11 +6,15 @@ import Matrix44 from '../../../low_level/math/Matrix44';
 
 
 export default class M_Joint extends M_Element {
-  constructor(glBoostContext, length = 1.0) {
+  constructor(glBoostContext, isExistJointGizmo = false) {
     super(glBoostContext);
 
-    this._gizmo = new M_JointGizmo(glBoostContext, this, length);
-    this._gizmos.push(this._gizmo);
+    if (isExistJointGizmo) {
+      this._gizmo = new M_JointGizmo(glBoostContext, this, length);
+      this._gizmos.push(this._gizmo);
+    } else {
+      this._gizmo = {};
+    }
 
     M_Joint._calculatedTransforms = {};
     M_Joint._calculatedTranslates = {};
