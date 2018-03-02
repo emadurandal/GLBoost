@@ -14,6 +14,7 @@ export default class RenderPass extends GLBoostObject {
     this._gizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
+    this._transparentMeshesAsManualOrder = null;
     this._drawBuffers = [this._glContext.gl.NONE];
     this._clearColor = null;
     this._clearDepth = null;  // webgl default is 1.0
@@ -549,6 +550,14 @@ export default class RenderPass extends GLBoostObject {
     this._restoreWebGLStates();
     //this._restoreShaderParameters();
     // And call functions registered by user.
+  }
+
+  set transparentMeshesAsManualOrder(meshes) {
+    this._transparentMeshesAsManualOrder = meshes;
+  }
+
+  get transparentMeshesAsManualOrder() {
+    return this._transparentMeshesAsManualOrder;
   }
 
 }

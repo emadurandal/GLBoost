@@ -153,6 +153,10 @@ export default class Vector4 {
     case 3: return this.w;
     }
   }
+
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+  }
 }
 
 GLBoost["Vector4"] = Vector4;

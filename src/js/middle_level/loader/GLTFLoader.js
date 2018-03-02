@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 import DecalShader from '../shaders/DecalShader';
 import LambertShader from '../shaders/LambertShader';
 import PhongShader from '../shaders/PhongShader';
@@ -294,7 +295,22 @@ export default class GLTFLoader {
         rootGroup.animationTracks = json.asset.extras.animation_tracks;
       }
 
-      rootGroup.addChild(group)
+      rootGroup.addChild(group);
+
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
+        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
+        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        rootGroup.transparentMeshes = [];
+        for (let name of rootGroup.transparentMeshesDrawOrder) {
+          for (let mesh of meshes) {
+            if (mesh.userFlavorName === name) {
+              rootGroup.transparentMeshes.push(mesh);
+              break;
+            }
+          }
+        }
+      }
     }
 
     resolve(rootGroup);
@@ -704,7 +720,9 @@ export default class GLTFLoader {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
             }
             material.setTexture(textures[textureStr], texturePurpose);
+            material.states.enable = [3042]; // It means, [gl.BLEND];
             material.states.functions.blendFuncSeparate = [1, 771, 1, 771]; // It means, [gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA]            
+            material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
           }
         }
       };
