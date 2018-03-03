@@ -50,8 +50,6 @@ export default class GLTFLoader {
     return this[singleton];
   }
 
-
-
   /**
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
@@ -63,7 +61,9 @@ export default class GLTFLoader {
     options = {
       isPixelOutputPreMultipliedAlpha: true,
       isTexturePreMultipliedAlpha: false,
-      isExistJointGizmo: false
+      isExistJointGizmo: false,
+      isBlend: false,
+      isDepthTest: true
     }
   ) {
     return DataUtil.loadResourceAsync(url, true,
@@ -543,7 +543,9 @@ export default class GLTFLoader {
 
         if (material === null) {
           material = glBoostContext.createClassicMaterial();
-          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+          if (options.isPixelOutputMultiplidAlpha) {
+            material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+          }
           this._materials.push(material);
         }
 
@@ -720,8 +722,18 @@ export default class GLTFLoader {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
             }
             material.setTexture(textures[textureStr], texturePurpose);
-            material.states.enable = [3042]; // It means, [gl.BLEND];
-            material.states.functions.blendFuncSeparate = [1, 771, 1, 771]; // It means, [gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA]            
+
+            let enables = [];
+            if (options.isBlend) {
+              enables.push(3042);
+            }
+            if (options.isDepthTest) {
+              enables.push(2929);
+            }
+            material.states.enable = enables; // It means, [gl.BLEND];
+            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+              material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+            }
             material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
           }
         }
