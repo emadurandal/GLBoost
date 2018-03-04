@@ -532,6 +532,8 @@ export default class GLTFLoader {
         let texcoords0AccessorStr = primitiveJson.attributes.TEXCOORD_0;
 
         let materialStr = primitiveJson.material;
+
+        /*
         let materialJson = json.materials[materialStr];
 
         let material = null;
@@ -540,14 +542,14 @@ export default class GLTFLoader {
             material = mat;
           }
         }
-
-        if (material === null) {
-          material = glBoostContext.createClassicMaterial();
-          if (options.isPixelOutputMultiplidAlpha) {
-            material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
-          }
-          this._materials.push(material);
+*/
+//        if (material === null) {
+        let material = glBoostContext.createClassicMaterial();
+        if (options.isPixelOutputMultiplidAlpha) {
+          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
         }
+        this._materials.push(material);
+//        }
 
         texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
 
