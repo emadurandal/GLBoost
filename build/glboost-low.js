@@ -67,6 +67,7 @@ var global = ('global',eval)('this');
     c.define('RENDER_TARGET_NONE_COLOR', 0); // gl.NONE
     c.define('COLOR_ATTACHMENT0', 0x8CE0); // gl.COLOR_ATTACHMENT0
     c.define('UNPACK_FLIP_Y_WEBGL');
+    c.define('UNPACK_PREMULTIPLY_ALPHA_WEBGL');
     c.define('TEXTURE_MAG_FILTER');
     c.define('TEXTURE_MIN_FILTER');
     c.define('LINEAR');
@@ -303,6 +304,10 @@ class Vector4 {
     case 2: return this.z;
     case 3: return this.w;
     }
+  }
+
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
   }
 }
 
@@ -2097,7 +2102,7 @@ GLBoost$1['MiscUtil'] = MiscUtil;
 
 class GLContextImpl {
 
-  constructor(canvas, parent) {
+  constructor(canvas, parent, initParameter) {
 //    if (new.target === GLContextImpl) {
     if (this.constructor === GLContextImpl) {
       throw new TypeError("Cannot construct GLContextImpl instances directly");
@@ -2115,13 +2120,13 @@ class GLContextImpl {
 
   }
 
-  init(glVersionString, ContextType, gl) {
+  init(glVersionString, ContextType, initParameter = { antialias: true, premultipliedAlpha: true }, gl) {
 
     if (gl) {
       this._gl = gl;
     } else {
 
-      let gl = this._canvas.getContext(glVersionString, { antialias: true, premultipliedAlpha: false });
+      let gl = this._canvas.getContext(glVersionString, initParameter);
 
       if (!gl) {
         gl = this._canvas.getContext('experimental-' + glVersionString);
@@ -2154,13 +2159,13 @@ class GLContextImpl {
 
 class GLContextWebGL1Impl extends GLContextImpl {
 
-  constructor(canvas, parent, gl) {
-    super(canvas, parent);
+  constructor(canvas, parent, initParameter, gl) {
+    super(canvas, parent, initParameter);
 
     if (gl) {
-      super.init('webgl', null, gl);
+      super.init('webgl', null, initParameter, gl);
     } else {
-      super.init('webgl', WebGLRenderingContext, gl);
+      super.init('webgl', WebGLRenderingContext, initParameter, gl);
     }
   }
 
@@ -2168,10 +2173,10 @@ class GLContextWebGL1Impl extends GLContextImpl {
 
 class GLContextWebGL2Impl extends GLContextImpl {
 
-  constructor(canvas, parent, gl) {
-    super(canvas, parent);
+  constructor(canvas, parent, initParameter, gl) {
+    super(canvas, parent, initParameter);
 
-    super.init('webgl2', WebGL2RenderingContext, gl);
+    super.init('webgl2', WebGL2RenderingContext, initParameter, gl);
 
   }
 
@@ -2497,10 +2502,10 @@ GLBoost$1['L_GLBoostMonitor'] = L_GLBoostMonitor;
 
 class GLContext {
 
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
 
     if (typeof gl !== 'undefined' && gl !== null) {
-      this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+      this.impl = new GLContextWebGL1Impl(canvas, initParameter, this, gl);
       this._canvasWidth = width;
       this._canvasHeight = height;
       GLContext._instances['nocanvas'] = this;
@@ -2510,9 +2515,9 @@ class GLContext {
       }
 
       if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
+        this.impl = new GLContextWebGL1Impl(canvas, this, initParameter);
       } else if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
+        this.impl = new GLContextWebGL2Impl(canvas, this, initParameter);
       }
 
       GLContext._instances[canvas.id] = this;
@@ -2524,11 +2529,11 @@ class GLContext {
     this._glslProgramsLatestUsageCount = 0;
   }
 
-  static getInstance(canvas, gl, width, height) {
+  static getInstance(canvas, initParameter, gl, width, height) {
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
-    return new GLContext(canvas, gl, width, height);
+    return new GLContext(canvas, initParameter, gl, width, height);
   }
 
   get gl() {
@@ -4427,8 +4432,10 @@ class VertexWorldShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);
+        }
       }
     });
 
@@ -4479,6 +4486,7 @@ class Shader extends GLBoostObject {
     this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
     this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
     this.prototype._classNamesOfFSPostEffect = this.prototype._classNamesOfFSPostEffect ? this.prototype._classNamesOfFSPostEffect : [];
+    this.prototype._classNamesOfFSFinalize = this.prototype._classNamesOfFSFinalize ? this.prototype._classNamesOfFSFinalize : [];
 
     this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
   }
@@ -4513,7 +4521,9 @@ class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfFSPostEffect.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSPostEffect.push(source.name);
     }
-
+    if(this.prototype._classNamesOfFSFinalize.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSFinalize.push(source.name);
+    }
     if(this.prototype._classNamesOfPrepare.indexOf(source.name) === -1){
       this.prototype._classNamesOfPrepare.push(source.name);
     }
@@ -4559,6 +4569,10 @@ class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSPostEffect[matchIdx] = newone.name;
     }
+    matchIdx = this.prototype._classNamesOfFSFinalize.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSFinalize[matchIdx] = newone.name;
+    }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
@@ -4603,6 +4617,10 @@ class Shader extends GLBoostObject {
     matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSPostEffect.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfFSFinalize.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSFinalize.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
     if(matchIdx !== -1){
@@ -4802,6 +4820,17 @@ class Shader extends GLBoostObject {
       let method = this['FSPostEffect_' + className];
       if (method) {
         shaderText += '//                                                            FSPostEffect_' + className + ' //\n';
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
+      }
+    });
+
+    /// Finalize
+    // start finalize. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
+    this._classNamesOfFSFinalize.forEach((className)=> {
+      let method = this['FSFinalize_' + className];
+      if (method) {
+        shaderText += '//                                                            FSFinalize_' + className + ' //\n';
         shaderText += method.bind(this, f, gl, lights, material, extraData)();
       }
     });
@@ -6379,7 +6408,7 @@ class Geometry extends GLBoostObject {
     return Geometry._allVertexAttribs(this._vertices);
   } 
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
+  prepareGLSLProgram(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
     let gl = this._glContext.gl;
     let vertices = this._vertices;
 
@@ -6432,7 +6461,7 @@ class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      mesh.material = this._glBoostContext.createClassicMaterial();
+      mesh.material = this._glBoostContext._defaultMaterial;
       materials = [mesh.material];
     }
     return materials;
@@ -6517,14 +6546,25 @@ class Geometry extends GLBoostObject {
 
     for (let i=0; i<materials.length;i++) {
       let shaderInstance = null;
-      if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+
+      /*
+      if (argMaterials !== void 0 && argMaterials[i].shaderInstance !== null) {
+        shaderInstance = argMaterials[i].shaderInstance;
+      } else if (materials[i].shaderInstance !== null) {
+        shaderInstance = materials[i].shaderInstance;
       } else {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
-      }
+        */
+        if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+        } else {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+        }  
+//      }
+
       this._setVertexNtoSingleMaterial(materials[i], i);
       shaderInstance.vao = Geometry._vaoDic[this.toString()];
       this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
+
       if (argMaterials === void 0) {
         materials[i].shaderInstance = shaderInstance;
       } else {
@@ -7281,11 +7321,24 @@ class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
+    shaderText +=         'uniform bool isPreMultipliedAlpha;\n';
     return shaderText;
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
-    let shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    let shaderText =   "";
+    shaderText +=   `bool isDataOutput = false;\n`;
+    shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+
+    return shaderText;
+  }
+
+  FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += 'if (isPreMultipliedAlpha && !isDataOutput) {\n';
+    shaderText += '  rt0.rgb *= rt0.a;\n';
+    shaderText += '}\n';
 
     return shaderText;
   }
@@ -7295,6 +7348,7 @@ class FragmentSimpleShaderSource {
     var vertexAttribsAsResult = [];
 
     material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
+    material.setUniform(glslProgram, 'uniform_isPremultipliedAlpha', this._glContext.getUniformLocation(glslProgram, 'isPremultipliedAlpha'));
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
@@ -7315,11 +7369,23 @@ class FragmentSimpleShader extends Shader {
 
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
+
+    this._isPreMultipliedAlpha = null;
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isPreMultipliedAlpha'), this._isPreMultipliedAlpha, true);
+
+  }
+
+  set isPreMultipliedAlpha(flg) {
+    this._isPreMultipliedAlpha = flg;
+  }
+
+  get isPreMultipliedAlpha() {
+    return this._isPreMultipliedAlpha;
   }
 }
 
@@ -7357,7 +7423,9 @@ class VertexWorldShadowShaderSource {
     shaderText += 'uniform float depthBias;\n';
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
 //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    }
     
     return shaderText;
   }
@@ -7366,8 +7434,9 @@ class VertexWorldShadowShaderSource {
     let shaderText = '';
     shaderText += 'float visibilityLevel = 1.0;\n';
 
-    
-    shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    if (lights.length > 0) {
+      shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    }    
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
@@ -7392,8 +7461,10 @@ class VertexWorldShadowShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);  
+        }
       }
     });
 
@@ -7518,8 +7589,10 @@ class DecalShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'color' || attribName === 'texcoord') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);  
+        }
       }
     });
 
@@ -8474,10 +8547,10 @@ class L_OrthoCamera extends L_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, ortho) {
     super(glBoostContext, toRegister, lookat);
 
-    this._left = ortho.left;
-    this._right = ortho.right;
-    this._bottom = ortho.bottom;
-    this._top = ortho.top;
+    this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
+    this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
+    this._bottom = (typeof ortho.bottom === "undefined") ? -1:ortho.bottom;
+    this._top = (typeof ortho.top === "undefined") ? 1:ortho.top;
     this._zNear = ortho.zNear;
     this._zFar = ortho.zFar;
     this._xmag = ortho.xmag;
@@ -9384,6 +9457,7 @@ class Texture extends AbstractTexture {
     let ret = null;
     switch (paramNumber) {
       case GLBoost$1['UNPACK_FLIP_Y_WEBGL']:
+      case GLBoost$1['UNPACK_PREMULTIPLY_ALPHA_WEBGL']:
       case GLBoost$1['TEXTURE_MAG_FILTER']:
       case GLBoost$1['TEXTURE_MIN_FILTER']:
       case GLBoost$1['TEXTURE_WRAP_S']:
@@ -9472,6 +9546,7 @@ class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {
@@ -9496,6 +9571,7 @@ class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {
@@ -10294,15 +10370,15 @@ class Particle extends Geometry {
 GLBoost$1["Particle"] = Particle;
 
 class GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
     this._setName();
 
     console.log('*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
 
     if (gl) {
-      this._glContext = GLContext.getInstance(null, gl, width, height);
+      this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {
-      this._glContext = GLContext.getInstance(canvas);
+      this._glContext = GLContext.getInstance(canvas, initParameter);
     }
 
     this._globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE;
@@ -10319,7 +10395,7 @@ class GLBoostLowContext {
     let dummyWhite1x1ImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6REY4MUVGRjk0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MUVGRkE0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpERjgxRUZGNzRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpERjgxRUZGODRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvTp+QkAAAAPSURBVHjaYvj//z9AgAEABf4C/i3Oie4AAAAASUVORK5CYII=';
     this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
-
+    this._defaultMaterial = this.createClassicMaterial();
 
     // effekseer
     if (typeof effekseer !== "undefined") {
