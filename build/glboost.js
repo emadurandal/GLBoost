@@ -67,6 +67,7 @@ var global = ('global',eval)('this');
     c.define('RENDER_TARGET_NONE_COLOR', 0); // gl.NONE
     c.define('COLOR_ATTACHMENT0', 0x8CE0); // gl.COLOR_ATTACHMENT0
     c.define('UNPACK_FLIP_Y_WEBGL');
+    c.define('UNPACK_PREMULTIPLY_ALPHA_WEBGL');
     c.define('TEXTURE_MAG_FILTER');
     c.define('TEXTURE_MIN_FILTER');
     c.define('LINEAR');
@@ -160,7 +161,7 @@ GLBoost$1['MiscUtil'] = MiscUtil;
 
 class GLContextImpl {
 
-  constructor(canvas, parent) {
+  constructor(canvas, parent, initParameter) {
 //    if (new.target === GLContextImpl) {
     if (this.constructor === GLContextImpl) {
       throw new TypeError("Cannot construct GLContextImpl instances directly");
@@ -178,13 +179,13 @@ class GLContextImpl {
 
   }
 
-  init(glVersionString, ContextType, gl) {
+  init(glVersionString, ContextType, initParameter = { antialias: true, premultipliedAlpha: true }, gl) {
 
     if (gl) {
       this._gl = gl;
     } else {
 
-      let gl = this._canvas.getContext(glVersionString, { antialias: true, premultipliedAlpha: false });
+      let gl = this._canvas.getContext(glVersionString, initParameter);
 
       if (!gl) {
         gl = this._canvas.getContext('experimental-' + glVersionString);
@@ -217,13 +218,13 @@ class GLContextImpl {
 
 class GLContextWebGL1Impl extends GLContextImpl {
 
-  constructor(canvas, parent, gl) {
-    super(canvas, parent);
+  constructor(canvas, parent, initParameter, gl) {
+    super(canvas, parent, initParameter);
 
     if (gl) {
-      super.init('webgl', null, gl);
+      super.init('webgl', null, initParameter, gl);
     } else {
-      super.init('webgl', WebGLRenderingContext, gl);
+      super.init('webgl', WebGLRenderingContext, initParameter, gl);
     }
   }
 
@@ -231,10 +232,10 @@ class GLContextWebGL1Impl extends GLContextImpl {
 
 class GLContextWebGL2Impl extends GLContextImpl {
 
-  constructor(canvas, parent, gl) {
-    super(canvas, parent);
+  constructor(canvas, parent, initParameter, gl) {
+    super(canvas, parent, initParameter);
 
-    super.init('webgl2', WebGL2RenderingContext, gl);
+    super.init('webgl2', WebGL2RenderingContext, initParameter, gl);
 
   }
 
@@ -560,10 +561,10 @@ GLBoost$1['L_GLBoostMonitor'] = L_GLBoostMonitor;
 
 class GLContext {
 
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
 
     if (typeof gl !== 'undefined' && gl !== null) {
-      this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+      this.impl = new GLContextWebGL1Impl(canvas, initParameter, this, gl);
       this._canvasWidth = width;
       this._canvasHeight = height;
       GLContext._instances['nocanvas'] = this;
@@ -573,9 +574,9 @@ class GLContext {
       }
 
       if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
+        this.impl = new GLContextWebGL1Impl(canvas, this, initParameter);
       } else if (GLBoost$1.VALUE_TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
+        this.impl = new GLContextWebGL2Impl(canvas, this, initParameter);
       }
 
       GLContext._instances[canvas.id] = this;
@@ -587,11 +588,11 @@ class GLContext {
     this._glslProgramsLatestUsageCount = 0;
   }
 
-  static getInstance(canvas, gl, width, height) {
+  static getInstance(canvas, initParameter, gl, width, height) {
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
-    return new GLContext(canvas, gl, width, height);
+    return new GLContext(canvas, initParameter, gl, width, height);
   }
 
   get gl() {
@@ -1253,6 +1254,10 @@ class Vector4 {
     case 2: return this.z;
     case 3: return this.w;
     }
+  }
+
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
   }
 }
 
@@ -4669,8 +4674,10 @@ class VertexWorldShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);
+        }
       }
     });
 
@@ -4721,6 +4728,7 @@ class Shader extends GLBoostObject {
     this.prototype._classNamesOfFSMethodDefine = this.prototype._classNamesOfFSMethodDefine ? this.prototype._classNamesOfFSMethodDefine : [];
     this.prototype._classNamesOfFSShade = this.prototype._classNamesOfFSShade ? this.prototype._classNamesOfFSShade : [];
     this.prototype._classNamesOfFSPostEffect = this.prototype._classNamesOfFSPostEffect ? this.prototype._classNamesOfFSPostEffect : [];
+    this.prototype._classNamesOfFSFinalize = this.prototype._classNamesOfFSFinalize ? this.prototype._classNamesOfFSFinalize : [];
 
     this.prototype._classNamesOfPrepare = this.prototype._classNamesOfPrepare ? this.prototype._classNamesOfPrepare : [];
   }
@@ -4755,7 +4763,9 @@ class Shader extends GLBoostObject {
     if(this.prototype._classNamesOfFSPostEffect.indexOf(source.name) === -1){
       this.prototype._classNamesOfFSPostEffect.push(source.name);
     }
-
+    if(this.prototype._classNamesOfFSFinalize.indexOf(source.name) === -1){
+      this.prototype._classNamesOfFSFinalize.push(source.name);
+    }
     if(this.prototype._classNamesOfPrepare.indexOf(source.name) === -1){
       this.prototype._classNamesOfPrepare.push(source.name);
     }
@@ -4801,6 +4811,10 @@ class Shader extends GLBoostObject {
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSPostEffect[matchIdx] = newone.name;
     }
+    matchIdx = this.prototype._classNamesOfFSFinalize.indexOf(current.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSFinalize[matchIdx] = newone.name;
+    }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(current.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfPrepare[matchIdx] = newone.name;
@@ -4845,6 +4859,10 @@ class Shader extends GLBoostObject {
     matchIdx = this.prototype._classNamesOfFSPostEffect.indexOf(source.name);
     if(matchIdx !== -1){
       this.prototype._classNamesOfFSPostEffect.splice(matchIdx, 1);
+    }
+    matchIdx = this.prototype._classNamesOfFSFinalize.indexOf(source.name);
+    if(matchIdx !== -1){
+      this.prototype._classNamesOfFSFinalize.splice(matchIdx, 1);
     }
     matchIdx = this.prototype._classNamesOfPrepare.indexOf(source.name);
     if(matchIdx !== -1){
@@ -5044,6 +5062,17 @@ class Shader extends GLBoostObject {
       let method = this['FSPostEffect_' + className];
       if (method) {
         shaderText += '//                                                            FSPostEffect_' + className + ' //\n';
+        shaderText += method.bind(this, f, gl, lights, material, extraData)();
+      }
+    });
+
+    /// Finalize
+    // start finalize. first, sub class Shaders, ...
+    // second, shade as mixin Shaders
+    this._classNamesOfFSFinalize.forEach((className)=> {
+      let method = this['FSFinalize_' + className];
+      if (method) {
+        shaderText += '//                                                            FSFinalize_' + className + ' //\n';
         shaderText += method.bind(this, f, gl, lights, material, extraData)();
       }
     });
@@ -6621,7 +6650,7 @@ class Geometry extends GLBoostObject {
     return Geometry._allVertexAttribs(this._vertices);
   } 
 
-  prepareGLSLProgramAndSetVertexNtoMaterial(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
+  prepareGLSLProgram(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
     let gl = this._glContext.gl;
     let vertices = this._vertices;
 
@@ -6674,7 +6703,7 @@ class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      mesh.material = this._glBoostContext.createClassicMaterial();
+      mesh.material = this._glBoostContext._defaultMaterial;
       materials = [mesh.material];
     }
     return materials;
@@ -6759,14 +6788,25 @@ class Geometry extends GLBoostObject {
 
     for (let i=0; i<materials.length;i++) {
       let shaderInstance = null;
-      if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+
+      /*
+      if (argMaterials !== void 0 && argMaterials[i].shaderInstance !== null) {
+        shaderInstance = argMaterials[i].shaderInstance;
+      } else if (materials[i].shaderInstance !== null) {
+        shaderInstance = materials[i].shaderInstance;
       } else {
-        shaderInstance = this.prepareGLSLProgramAndSetVertexNtoMaterial(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
-      }
+        */
+        if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+        } else {
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+        }  
+//      }
+
       this._setVertexNtoSingleMaterial(materials[i], i);
       shaderInstance.vao = Geometry._vaoDic[this.toString()];
       this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
+
       if (argMaterials === void 0) {
         materials[i].shaderInstance = shaderInstance;
       } else {
@@ -7523,11 +7563,24 @@ class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
+    shaderText +=         'uniform bool isPreMultipliedAlpha;\n';
     return shaderText;
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
-    let shaderText =   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    let shaderText =   "";
+    shaderText +=   `bool isDataOutput = false;\n`;
+    shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+
+    return shaderText;
+  }
+
+  FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += 'if (isPreMultipliedAlpha && !isDataOutput) {\n';
+    shaderText += '  rt0.rgb *= rt0.a;\n';
+    shaderText += '}\n';
 
     return shaderText;
   }
@@ -7537,6 +7590,7 @@ class FragmentSimpleShaderSource {
     var vertexAttribsAsResult = [];
 
     material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
+    material.setUniform(glslProgram, 'uniform_isPremultipliedAlpha', this._glContext.getUniformLocation(glslProgram, 'isPremultipliedAlpha'));
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
@@ -7557,11 +7611,23 @@ class FragmentSimpleShader extends Shader {
 
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
+
+    this._isPreMultipliedAlpha = null;
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isPreMultipliedAlpha'), this._isPreMultipliedAlpha, true);
+
+  }
+
+  set isPreMultipliedAlpha(flg) {
+    this._isPreMultipliedAlpha = flg;
+  }
+
+  get isPreMultipliedAlpha() {
+    return this._isPreMultipliedAlpha;
   }
 }
 
@@ -7599,7 +7665,9 @@ class VertexWorldShadowShaderSource {
     shaderText += 'uniform float depthBias;\n';
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
 //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    }
     
     return shaderText;
   }
@@ -7608,8 +7676,9 @@ class VertexWorldShadowShaderSource {
     let shaderText = '';
     shaderText += 'float visibilityLevel = 1.0;\n';
 
-    
-    shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    if (lights.length > 0) {
+      shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    }    
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
@@ -7634,8 +7703,10 @@ class VertexWorldShadowShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);  
+        }
       }
     });
 
@@ -7760,8 +7831,10 @@ class DecalShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'color' || attribName === 'texcoord') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);  
+        }
       }
     });
 
@@ -8716,10 +8789,10 @@ class L_OrthoCamera extends L_AbstractCamera {
   constructor(glBoostContext, toRegister, lookat, ortho) {
     super(glBoostContext, toRegister, lookat);
 
-    this._left = ortho.left;
-    this._right = ortho.right;
-    this._bottom = ortho.bottom;
-    this._top = ortho.top;
+    this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
+    this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
+    this._bottom = (typeof ortho.bottom === "undefined") ? -1:ortho.bottom;
+    this._top = (typeof ortho.top === "undefined") ? 1:ortho.top;
     this._zNear = ortho.zNear;
     this._zFar = ortho.zFar;
     this._xmag = ortho.xmag;
@@ -9626,6 +9699,7 @@ class Texture extends AbstractTexture {
     let ret = null;
     switch (paramNumber) {
       case GLBoost$1['UNPACK_FLIP_Y_WEBGL']:
+      case GLBoost$1['UNPACK_PREMULTIPLY_ALPHA_WEBGL']:
       case GLBoost$1['TEXTURE_MAG_FILTER']:
       case GLBoost$1['TEXTURE_MIN_FILTER']:
       case GLBoost$1['TEXTURE_WRAP_S']:
@@ -9714,6 +9788,7 @@ class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {
@@ -9738,6 +9813,7 @@ class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {
@@ -10536,15 +10612,15 @@ class Particle extends Geometry {
 GLBoost$1["Particle"] = Particle;
 
 class GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
     this._setName();
 
     console.log('*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
 
     if (gl) {
-      this._glContext = GLContext.getInstance(null, gl, width, height);
+      this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {
-      this._glContext = GLContext.getInstance(canvas);
+      this._glContext = GLContext.getInstance(canvas, initParameter);
     }
 
     this._globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE;
@@ -10561,7 +10637,7 @@ class GLBoostLowContext {
     let dummyWhite1x1ImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6REY4MUVGRjk0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MUVGRkE0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpERjgxRUZGNzRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpERjgxRUZGODRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvTp+QkAAAAPSURBVHjaYvj//z9AgAEABf4C/i3Oie4AAAAASUVORK5CYII=';
     this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
-
+    this._defaultMaterial = this.createClassicMaterial();
 
     // effekseer
     if (typeof effekseer !== "undefined") {
@@ -11002,13 +11078,19 @@ class M_Mesh extends M_Element {
 
   calcTransformedDepth(camera) {
     var viewMatrix = camera.lookAtRHMatrix();
-    var m_m = this.transformMatrixAccumulatedAncestry;
-    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+    var m_m = null;
+    if (this.bindShapeMatrix) {
+      m_m = Matrix44$1.multiply(this.transformMatrixAccumulatedAncestry, this.bindShapeMatrix);
+    } else {
+      m_m = this.transformMatrixAccumulatedAncestry;
+    }
+    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestry).multiply(m_m);
 
     var centerPosition = this.geometry.centerPosition.toVector4();
+    //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
     var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
-    this._transformedDepth = transformedCenterPosition.z;
+    this._transformedDepth = transformedCenterPosition.z;//transformedCenterPosition.length();// //
   }
 
   get transformedDepth() {
@@ -11821,6 +11903,7 @@ class RenderPass extends GLBoostObject {
     this._gizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
+    this._transparentMeshesAsManualOrder = null;
     this._drawBuffers = [this._glContext.gl.NONE];
     this._clearColor = null;
     this._clearDepth = null;  // webgl default is 1.0
@@ -12358,6 +12441,14 @@ class RenderPass extends GLBoostObject {
     // And call functions registered by user.
   }
 
+  set transparentMeshesAsManualOrder(meshes) {
+    this._transparentMeshesAsManualOrder = meshes;
+  }
+
+  get transparentMeshesAsManualOrder() {
+    return this._transparentMeshesAsManualOrder;
+  }
+
 }
 
 class M_Gizmo extends M_Group {
@@ -12599,11 +12690,15 @@ class M_JointGizmo extends M_Gizmo {
 GLBoost$1['M_JointGizmo'] = M_JointGizmo;
 
 class M_Joint extends M_Element {
-  constructor(glBoostContext, length = 1.0) {
+  constructor(glBoostContext, isExistJointGizmo = false) {
     super(glBoostContext);
 
-    this._gizmo = new M_JointGizmo(glBoostContext, this, length);
-    this._gizmos.push(this._gizmo);
+    if (isExistJointGizmo) {
+      this._gizmo = new M_JointGizmo(glBoostContext, this, length);
+      this._gizmos.push(this._gizmo);
+    } else {
+      this._gizmo = {};
+    }
 
     M_Joint._calculatedTransforms = {};
     M_Joint._calculatedTranslates = {};
@@ -13036,13 +13131,16 @@ class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = renderPass.transparentMeshes;
+      var transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+//      console.log("START!!");
       transparentMeshes.forEach((mesh)=> {
+        //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
           mesh.draw(expression, lights, camera, renderPass.scene, index);
         }
       });
-
+//      console.log("END!!");
+      
       const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
       this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
       this._glBoostContext.currentGlobalStates = [
@@ -14300,8 +14398,8 @@ class EffekseerElement extends M_Element {
 }
 
 class GLBoostMiddleContext extends GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
-    super(canvas, gl, width, height);
+  constructor(canvas, initParameter, gl, width, height) {
+    super(canvas, initParameter, gl, width, height);
 
     this._glBoostMonitor = M_GLBoostMonitor.getInstance();
   }
@@ -14379,8 +14477,8 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_SpotLight(this, intensity, direction);
   }
 
-  createJoint() {
-    return new M_Joint(this);
+  createJoint(isExistJointGizmo) {
+    return new M_Joint(this, isExistJointGizmo);
   }
 
   createAxisGizmo(length) {
@@ -14410,9 +14508,11 @@ class PhongShaderSource {
     var sampler2D = this._sampler2DShadow_func();
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
 
     return shaderText;
   }
@@ -14422,7 +14522,7 @@ class PhongShaderSource {
 
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -14435,7 +14535,7 @@ class PhongShaderSource {
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
       shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
-      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 1.0);\n`;
       shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
       //shaderText += '  rt0.a = 1.0;\n';
@@ -15206,9 +15306,10 @@ class LambertShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 temp[1];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
 
     return shaderText;
   }
@@ -15217,7 +15318,7 @@ class LambertShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
     
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
@@ -15308,8 +15409,6 @@ class GLTFLoader {
     return this[singleton$5];
   }
 
-
-
   /**
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
@@ -15317,10 +15416,20 @@ class GLTFLoader {
    * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url, defaultShader = null) {
+  loadGLTF(glBoostContext, url, defaultShader = null,
+    options = {
+      isPixelOutputPreMultipliedAlpha: true,
+      isTexturePreMultipliedAlpha: false,
+      isExistJointGizmo: false,
+      isBlend: false,
+      isDepthTest: true
+    }
+  ) {
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
+
+        this._materials = [];
 
         let dataView = new DataView(arrayBuffer, 0, 20);
         let isLittleEndian = true;
@@ -15344,7 +15453,7 @@ class GLTFLoader {
 
           let glTFVer = this._checkGLTFVersion(json);
 
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve);
+          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
 
           return;
         }
@@ -15370,7 +15479,7 @@ class GLTFLoader {
 
         let glTFVer = this._checkGLTFVersion(json);
 
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve);
+        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
       }, (reject, error)=>{
 
       });
@@ -15385,7 +15494,7 @@ class GLTFLoader {
     return glTFVer;
   }
 
-  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve) {
+  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
     let shadersJson = json.shaders;
     let shaders = {};
     let buffers = {};
@@ -15483,7 +15592,8 @@ class GLTFLoader {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT
+        'TEXTURE_WRAP_T': samplerJson.wrapT,
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': options.isTexturePreMultipliedAlpha
       });
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
@@ -15497,15 +15607,15 @@ class GLTFLoader {
           return Promise.all(promisesToLoadResources);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
+      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve) {
+  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -15518,7 +15628,7 @@ class GLTFLoader {
         nodeStr = sceneJson.nodes[i];
 
         // iterate nodes and load meshes
-        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(element);
       }
 
@@ -15528,7 +15638,7 @@ class GLTFLoader {
         let rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
         if (!rootJointGroup) {
           // This is a countermeasure when skeleton node does not exist in scene.nodes.
-          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
           group.addChild(rootJointGroup);
         }
 
@@ -15545,6 +15655,21 @@ class GLTFLoader {
       }
 
       rootGroup.addChild(group);
+
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
+        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
+        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        rootGroup.transparentMeshes = [];
+        for (let name of rootGroup.transparentMeshesDrawOrder) {
+          for (let mesh of meshes) {
+            if (mesh.userFlavorName === name) {
+              rootGroup.transparentMeshes.push(mesh);
+              break;
+            }
+          }
+        }
+      }
     }
 
     resolve(rootGroup);
@@ -15552,7 +15677,7 @@ class GLTFLoader {
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer) {
+  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -15582,12 +15707,12 @@ class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint();
+      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -15599,7 +15724,7 @@ class GLTFLoader {
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -15614,7 +15739,7 @@ class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -15658,7 +15783,7 @@ class GLTFLoader {
     if (nodeJson.children) {
       for (let i = 0; i < nodeJson.children.length; i++) {
         let nodeStr = nodeJson.children[i];
-        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(childElement);
       }
     }
@@ -15666,7 +15791,7 @@ class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer) {
+  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -15767,9 +15892,25 @@ class GLTFLoader {
 
         let materialStr = primitiveJson.material;
 
-        let material = glBoostContext.createClassicMaterial();
+        /*
+        let materialJson = json.materials[materialStr];
 
-        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
+        let material = null;
+        for (let mat of this._materials) {
+          if (mat.userFlavorName === materialJson.name) {
+            material = mat;
+          }
+        }
+*/
+//        if (material === null) {
+        let material = glBoostContext.createClassicMaterial();
+        if (options.isPixelOutputMultiplidAlpha) {
+          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        }
+        this._materials.push(material);
+//        }
+
+        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
 
         materials.push(material);
       } else {
@@ -15903,7 +16044,7 @@ class GLTFLoader {
     }
   }
 
-  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
+  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
     let materialJson = json.materials[materialStr];
     material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
@@ -15938,10 +16079,23 @@ class GLTFLoader {
           if (typeof value === 'string') {
             let textureStr = value;
             let texturePurpose;
-            if (valueName === 'diffuse') {
+            if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost$1.TEXTURE_PURPOSE_DIFFUSE;
             }
             material.setTexture(textures[textureStr], texturePurpose);
+
+            let enables = [];
+            if (options.isBlend) {
+              enables.push(3042);
+            }
+            if (options.isDepthTest) {
+              enables.push(2929);
+            }
+            material.states.enable = enables; // It means, [gl.BLEND];
+            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+              material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+            }
+            material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
           }
         }
       };
@@ -16568,10 +16722,12 @@ class BlinnPhongShaderSource {
     var sampler2D = this._sampler2DShadow_func();
     
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-    
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
+
     return shaderText;
   }
 
@@ -16579,7 +16735,7 @@ class BlinnPhongShaderSource {
     var shaderText = '';
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
   
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -16592,7 +16748,7 @@ class BlinnPhongShaderSource {
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
       shaderText += `    vec3 halfVec = normalize(lightDirection + viewDirection);\n`;
       shaderText += `    float specular = pow(max(dot(halfVec, normal), 0.0), power);\n`;
-      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 1.0);\n`;
       shaderText += `  }\n`;
     }
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
@@ -16680,11 +16836,12 @@ class HalfLambertShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights    
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 temp[1];\n`;
-
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
+    
     return shaderText;
   }
 
@@ -16756,10 +16913,11 @@ class HalfLambertAndWrapLightingShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights    
     
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 temp[1];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
     return shaderText;
   }
 
