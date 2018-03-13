@@ -290,6 +290,8 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      rootGroup.asset = json.asset;
+
       // Animation FPS
       if (json.asset && json.asset.animationFps) {
         rootGroup.animationFps = json.asset.animationFps;
