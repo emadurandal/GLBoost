@@ -16,9 +16,9 @@ Use this library to spend your time doing cool stuff instead of fighting WebGL.
 
 Currently, **r1** released!
 
-## Demo
+## Test Examples
 
-[Check our examples page!](http://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)
+[Check our test examples page](https://rawgit.com/emadurandal/GLBoost/master/examples/index.html)
 
 If you want to watch examples in local. Go to GLBoost top directory by terminal and start local web server up.
 
