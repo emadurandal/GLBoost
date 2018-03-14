@@ -249,7 +249,7 @@ export default class M_Element extends L_Element {
 
       var matrix = Matrix44.identity();
 
-      if (this._currentCalcMode === 'matrix') {
+      if (this._currentCalcMode === 'matrix' && !input) {
         this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
