@@ -32,25 +32,25 @@ export default class M_SkeletalGeometry extends Geometry {
 
     let input = joints[0]._getCurrentAnimationInputValue('time');
 
-    let jointZeroTransformMatrixAccumulatedAncestry = null;
-    let skeletalMeshTransformMatrixAccumulatedAncestry = null;
-    let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getTransformMatrixAccumulatedAncestryAt(input);
+    let jointZeroWorldMatrix = null;
+    let skeletalMeshWorldMatrix = null;
+    let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getWorldMatrixAt(input);
     let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
 
     for (let i=joints.length-1; i>=0; i--) {
       let globalJointTransform = null;
       let inverseBindMatrix = joints[i].inverseBindMatrix;
       if (areThereAnyJointsWhichHaveAnimation) {
-        globalJointTransform = joints[i].getTransformMatrixAccumulatedAncestryAt(input);
-        skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
+        globalJointTransform = joints[i].getWorldMatrixAt(input);
+        skeletalMeshWorldMatrix = globalJointTransform;
       } else {
         globalJointTransform = skeletalMeshTransformMatrixAccmulatedAncestry;
-        skeletalMeshTransformMatrixAccumulatedAncestry = globalJointTransform;
+        skeletalMeshWorldMatrix = globalJointTransform;
         let bindMat = joints[i].bindMatrix;
-        globalJointTransform = Matrix44.multiply(skeletalMeshTransformMatrixAccumulatedAncestry, bindMat);
+        globalJointTransform = Matrix44.multiply(skeletalMeshWorldMatrix, bindMat);
       }
       if (i === 0) {
-        jointZeroTransformMatrixAccumulatedAncestry = globalJointTransform;
+        jointZeroWorldMatrix = globalJointTransform;
       }
 //      if (true) {
       if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
@@ -64,7 +64,7 @@ export default class M_SkeletalGeometry extends Geometry {
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
     }
 
-    GLBoost.JointGizmoUpdater.update(joints, jointZeroTransformMatrixAccumulatedAncestry);
+    GLBoost.JointGizmoUpdater.update(joints, jointZeroWorldMatrix);
 
 /*
       let s = matrices[i].getScale();

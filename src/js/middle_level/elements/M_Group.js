@@ -420,7 +420,7 @@ export default class M_Group extends M_Element {
       this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
     }
     */
-    let world_m = this.transformMatrixAccumulatedAncestry;
+    let world_m = this.worldMatrix;
     let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
 
 //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);

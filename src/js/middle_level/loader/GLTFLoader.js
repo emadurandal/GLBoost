@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 import DecalShader from '../shaders/DecalShader';
 import LambertShader from '../shaders/LambertShader';
 import PhongShader from '../shaders/PhongShader';
@@ -49,8 +50,6 @@ export default class GLTFLoader {
     return this[singleton];
   }
 
-
-
   /**
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
@@ -58,10 +57,20 @@ export default class GLTFLoader {
    * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url, defaultShader = null) {
+  loadGLTF(glBoostContext, url, defaultShader = null,
+    options = {
+      isPixelOutputPreMultipliedAlpha: true,
+      isTexturePreMultipliedAlpha: false,
+      isExistJointGizmo: false,
+      isBlend: false,
+      isDepthTest: true
+    }
+  ) {
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
+
+        this._materials = [];
 
         let dataView = new DataView(arrayBuffer, 0, 20);
         let isLittleEndian = true;
@@ -85,7 +94,7 @@ export default class GLTFLoader {
 
           let glTFVer = this._checkGLTFVersion(json);
 
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve);
+          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
 
           return;
         }
@@ -111,7 +120,7 @@ export default class GLTFLoader {
 
         let glTFVer = this._checkGLTFVersion(json);
 
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve);
+        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
       }, (reject, error)=>{
 
       });
@@ -126,7 +135,7 @@ export default class GLTFLoader {
     return glTFVer;
   }
 
-  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve) {
+  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
     let shadersJson = json.shaders;
     let shaders = {};
     let buffers = {};
@@ -224,7 +233,8 @@ export default class GLTFLoader {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT
+        'TEXTURE_WRAP_T': samplerJson.wrapT,
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': options.isTexturePreMultipliedAlpha
       });
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
@@ -238,15 +248,15 @@ export default class GLTFLoader {
           return Promise.all(promisesToLoadResources);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
+          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve);
+      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve) {
+  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -259,7 +269,7 @@ export default class GLTFLoader {
         nodeStr = sceneJson.nodes[i];
 
         // iterate nodes and load meshes
-        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(element);
       }
 
@@ -269,7 +279,7 @@ export default class GLTFLoader {
         let rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
         if (!rootJointGroup) {
           // This is a countermeasure when skeleton node does not exist in scene.nodes.
-          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
           group.addChild(rootJointGroup);
         }
 
@@ -280,12 +290,34 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      rootGroup.asset = json.asset;
+
+      // Animation FPS
+      if (json.asset && json.asset.animationFps) {
+        rootGroup.animationFps = json.asset.animationFps;
+      }
+
       // Animation Tracks
       if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
         rootGroup.animationTracks = json.asset.extras.animation_tracks;
       }
 
-      rootGroup.addChild(group)
+      rootGroup.addChild(group);
+
+      // Animation Tracks
+      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
+        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
+        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        rootGroup.transparentMeshes = [];
+        for (let name of rootGroup.transparentMeshesDrawOrder) {
+          for (let mesh of meshes) {
+            if (mesh.userFlavorName === name) {
+              rootGroup.transparentMeshes.push(mesh);
+              break;
+            }
+          }
+        }
+      }
     }
 
     resolve(rootGroup);
@@ -293,7 +325,7 @@ export default class GLTFLoader {
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer) {
+  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -323,12 +355,12 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint();
+      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -340,7 +372,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -355,7 +387,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: new Vector3(1.0, 0.0, 0.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -399,7 +431,7 @@ export default class GLTFLoader {
     if (nodeJson.children) {
       for (let i = 0; i < nodeJson.children.length; i++) {
         let nodeStr = nodeJson.children[i];
-        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer);
+        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(childElement);
       }
     }
@@ -407,7 +439,7 @@ export default class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer) {
+  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -508,9 +540,25 @@ export default class GLTFLoader {
 
         let materialStr = primitiveJson.material;
 
-        let material = glBoostContext.createClassicMaterial();
+        /*
+        let materialJson = json.materials[materialStr];
 
-        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer);
+        let material = null;
+        for (let mat of this._materials) {
+          if (mat.userFlavorName === materialJson.name) {
+            material = mat;
+          }
+        }
+*/
+//        if (material === null) {
+        let material = glBoostContext.createClassicMaterial();
+        if (options.isPixelOutputMultiplidAlpha) {
+          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        }
+        this._materials.push(material);
+//        }
+
+        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
 
         materials.push(material);
       } else {
@@ -644,7 +692,7 @@ export default class GLTFLoader {
     }
   }
 
-  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer) {
+  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
     let materialJson = json.materials[materialStr];
     material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
@@ -679,10 +727,23 @@ export default class GLTFLoader {
           if (typeof value === 'string') {
             let textureStr = value;
             let texturePurpose;
-            if (valueName === 'diffuse') {
+            if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
             }
             material.setTexture(textures[textureStr], texturePurpose);
+
+            let enables = [];
+            if (options.isBlend) {
+              enables.push(3042);
+            }
+            if (options.isDepthTest) {
+              enables.push(2929);
+            }
+            material.states.enable = enables; // It means, [gl.BLEND];
+            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+              material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+            }
+            material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
           }
         }
       };

@@ -161,7 +161,7 @@ export default class M_Mesh extends M_Element {
 
   bakeTransformToGeometry() {
     var positions = this._geometry._vertices.position;
-    var mat = this.transformMatrixAccumulatedAncestry;
+    var mat = this.worldMatrix;
     for (let i=0; i&lt;positions.length; i++) {
       let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
       let transformedPosVec = mat.multiplyVector(posVector4);
@@ -184,7 +184,7 @@ export default class M_Mesh extends M_Element {
 
   bakeInverseTransformToGeometry() {
     var positions = this._geometry._vertices.position;
-    var invMat = this.inverseTransformMatrixAccumulatedAncestry;
+    var invMat = this.inverseWorldMatrix;
     for (let i=0; i&lt;positions.length; i++) {
       let posVector4 = new Vector4(positions[i].x, positions[i].y, positions[i].z, 1);
       let transformedPosVec = invMat.multiplyVector(posVector4);
@@ -192,7 +192,7 @@ export default class M_Mesh extends M_Element {
     }
     this._geometry._vertices.position = positions;
 
-    let mat = this.transformMatrixAccumulatedAncestry;
+    let mat = this.worldMatrix;
     if (this._geometry._vertices.normal) {
       var normals = this._geometry._vertices.normal;
       for (let i=0; i&lt;normals.length; i++) {
@@ -268,8 +268,8 @@ export default class M_Mesh extends M_Element {
 
   calcTransformedDepth(camera) {
     var viewMatrix = camera.lookAtRHMatrix();
-    var m_m = this.transformMatrixAccumulatedAncestry;
-    var mv_m = viewMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+    var m_m = this.worldMatrix;
+    var mv_m = viewMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf).multiply(m_m);
 
     var centerPosition = this.geometry.centerPosition.toVector4();
     var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
@@ -282,7 +282,7 @@ export default class M_Mesh extends M_Element {
   }
 
   get AABB() {
-    var world_m = this.transformMatrixAccumulatedAncestry;
+    var world_m = this.worldMatrix;
     return AABB.multiplyMatrix(world_m, this._geometry.AABB);
   }
 

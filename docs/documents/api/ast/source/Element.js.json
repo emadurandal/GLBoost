@@ -23352,7 +23352,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "transformMatrixAccumulatedAncestry",
+                "name": "worldMatrix",
                 "range": [
                   8820,
                   8854
@@ -24239,7 +24239,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                "name": "inverseWorldMatrixWithoutMySelf",
                 "range": [
                   9326,
                   9380
@@ -26637,7 +26637,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "inverseTransformMatrixAccumulatedAncestry",
+                "name": "inverseWorldMatrix",
                 "range": [
                   11125,
                   11166

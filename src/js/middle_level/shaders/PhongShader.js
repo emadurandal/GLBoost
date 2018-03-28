@@ -13,9 +13,11 @@ export class PhongShaderSource {
     var sampler2D = this._sampler2DShadow_func();
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
 
     return shaderText;
   }
@@ -25,7 +27,7 @@ export class PhongShaderSource {
 
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -38,7 +40,7 @@ export class PhongShaderSource {
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
       shaderText += `    vec3 reflect = reflect(-lightDirection, normal);\n`;
       shaderText += `    float specular = pow(max(dot(reflect, viewDirection), 0.0), power);\n`;
-      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 0.0);\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibilitySpecular, visibilitySpecular, visibilitySpecular, 1.0) * Ks * lightDiffuse[${i}] * vec4(specular, specular, specular, 1.0);\n`;
       shaderText += `  }\n`;
 //    shaderText += '  rt0 *= (1.0 - shadowRatio);\n';
       //shaderText += '  rt0.a = 1.0;\n';

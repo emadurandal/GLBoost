@@ -61,6 +61,7 @@ var global = ('global',eval)('this');
     c.define('RENDER_TARGET_NONE_COLOR', 0); // gl.NONE
     c.define('COLOR_ATTACHMENT0', 0x8CE0); // gl.COLOR_ATTACHMENT0
     c.define('UNPACK_FLIP_Y_WEBGL');
+    c.define('UNPACK_PREMULTIPLY_ALPHA_WEBGL');
     c.define('TEXTURE_MAG_FILTER');
     c.define('TEXTURE_MIN_FILTER');
     c.define('LINEAR');

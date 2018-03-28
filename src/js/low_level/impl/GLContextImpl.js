@@ -2,7 +2,7 @@ import GLContext from '../core/GLContext'
 
 export default class GLContextImpl {
 
-  constructor(canvas, parent) {
+  constructor(canvas, parent, initParameter) {
 //    if (new.target === GLContextImpl) {
     if (this.constructor === GLContextImpl) {
       throw new TypeError("Cannot construct GLContextImpl instances directly");
@@ -20,13 +20,13 @@ export default class GLContextImpl {
 
   }
 
-  init(glVersionString, ContextType, gl) {
+  init(glVersionString, ContextType, initParameter = { antialias: true, premultipliedAlpha: true }, gl) {
 
     if (gl) {
       this._gl = gl;
     } else {
 
-      let gl = this._canvas.getContext(glVersionString, { antialias: true, premultipliedAlpha: false });
+      let gl = this._canvas.getContext(glVersionString, initParameter);
 
       if (!gl) {
         gl = this._canvas.getContext('experimental-' + glVersionString);

@@ -7,10 +7,10 @@ import L_GLBoostMonitor from './L_GLBoostMonitor';
 
 export default class GLContext {
 
-  constructor(canvas, gl, width, height) {
+  constructor(canvas, initParameter, gl, width, height) {
 
     if (typeof gl !== 'undefined' && gl !== null) {
-      this.impl = new GLContextWebGL1Impl(canvas, this, gl);
+      this.impl = new GLContextWebGL1Impl(canvas, initParameter, this, gl);
       this._canvasWidth = width;
       this._canvasHeight = height;
       GLContext._instances['nocanvas'] = this;
@@ -20,9 +20,9 @@ export default class GLContext {
       }
 
       if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 1) {
-        this.impl = new GLContextWebGL1Impl(canvas, this);
+        this.impl = new GLContextWebGL1Impl(canvas, this, initParameter);
       } else if (GLBoost.VALUE_TARGET_WEBGL_VERSION === 2) {
-        this.impl = new GLContextWebGL2Impl(canvas, this);
+        this.impl = new GLContextWebGL2Impl(canvas, this, initParameter);
       }
 
       GLContext._instances[canvas.id] = this;
@@ -34,11 +34,11 @@ export default class GLContext {
     this._glslProgramsLatestUsageCount = 0;
   }
 
-  static getInstance(canvas, gl, width, height) {
+  static getInstance(canvas, initParameter, gl, width, height) {
     if (typeof canvas === 'string') {
       canvas = window.document.querySelector(canvas);
     }
-    return new GLContext(canvas, gl, width, height);
+    return new GLContext(canvas, initParameter, gl, width, height);
   }
 
   get gl() {

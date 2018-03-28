@@ -197,11 +197,6 @@
 
     <script>
 
-      if (window.location.protocol === 'https:') {
-        // because Runstant doesn't support https
-        window.location.href = 'http:' + window.location.href.replace( /^https:/g , '' );
-      }
-
       // Checking GET Parameters
       var arg = new Object;
       var argStr = location.href.split('?')[1];

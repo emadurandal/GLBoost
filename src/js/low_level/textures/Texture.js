@@ -40,6 +40,7 @@ export default class Texture extends AbstractTexture {
     let ret = null;
     switch (paramNumber) {
       case GLBoost['UNPACK_FLIP_Y_WEBGL']:
+      case GLBoost['UNPACK_PREMULTIPLY_ALPHA_WEBGL']:
       case GLBoost['TEXTURE_MAG_FILTER']:
       case GLBoost['TEXTURE_MIN_FILTER']:
       case GLBoost['TEXTURE_WRAP_S']:
@@ -128,6 +129,7 @@ export default class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {
@@ -152,6 +154,7 @@ export default class Texture extends AbstractTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_FLIP_Y_WEBGL, false));
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
     if (glem.extTFA) {

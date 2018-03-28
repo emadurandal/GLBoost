@@ -30,7 +30,9 @@ export default class VertexWorldShadowShaderSource {
     shaderText += 'uniform float depthBias;\n';
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
 //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+    }
     
     return shaderText;
   }
@@ -39,8 +41,9 @@ export default class VertexWorldShadowShaderSource {
     let shaderText = '';
     shaderText += 'float visibilityLevel = 1.0;\n';
 
-    
-    shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    if (lights.length > 0) {
+      shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+    }    
     for (let i=0; i<lights.length; i++) {
       shaderText += `  { // ${i}\n`;
       shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
@@ -66,8 +69,10 @@ export default class VertexWorldShadowShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);  
+        }
       }
     });
 

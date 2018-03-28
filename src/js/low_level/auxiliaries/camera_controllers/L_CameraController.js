@@ -293,7 +293,7 @@ export default class L_CameraController extends GLBoostObject {
 
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
-      let mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+      let mat = camera.inverseWorldMatrixWithoutMySelf;
       newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
       newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
       newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();

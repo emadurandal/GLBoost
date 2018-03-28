@@ -3547,7 +3547,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "transformMatrixAccumulatedAncestry",
+                              "name": "worldMatrix",
                               "range": [
                                 1387,
                                 1421
@@ -6678,7 +6678,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "inverseTransformMatrixAccumulatedAncestry",
+                              "name": "inverseWorldMatrix",
                               "range": [
                                 2367,
                                 2408
@@ -8016,7 +8016,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "transformMatrixAccumulatedAncestry",
+                              "name": "worldMatrix",
                               "range": [
                                 2781,
                                 2815
@@ -14860,7 +14860,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "transformMatrixAccumulatedAncestry",
+                              "name": "worldMatrix",
                               "range": [
                                 4989,
                                 5023
@@ -15031,7 +15031,7 @@
                                     },
                                     "property": {
                                       "type": "Identifier",
-                                      "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                                      "name": "inverseWorldMatrixWithoutMySelf",
                                       "range": [
                                         5067,
                                         5121
@@ -15935,7 +15935,7 @@
                             },
                             "property": {
                               "type": "Identifier",
-                              "name": "transformMatrixAccumulatedAncestry",
+                              "name": "worldMatrix",
                               "range": [
                                 5448,
                                 5482

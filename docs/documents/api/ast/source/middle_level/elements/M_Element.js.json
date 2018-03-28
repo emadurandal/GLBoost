@@ -2,6 +2,8 @@
   "type": "Program",
   "body": [
     {
+
+      
       "type": "ImportDeclaration",
       "specifiers": [
         {
@@ -36617,7 +36619,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "transformMatrixAccumulatedAncestry",
+                "name": "worldMatrix",
                 "range": [
                   13684,
                   13718
@@ -37504,7 +37506,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "normalMatrixAccumulatedAncestry",
+                "name": "normalMatrix",
                 "range": [
                   14190,
                   14221
@@ -37813,7 +37815,7 @@
                               },
                               "property": {
                                 "type": "Identifier",
-                                "name": "_normalMatrixAccumulatedAncestry",
+                                "name": "_normalMatrix",
                                 "range": [
                                   14425,
                                   14457
@@ -38102,7 +38104,7 @@
                                 },
                                 "property": {
                                   "type": "Identifier",
-                                  "name": "_normalMatrixAccumulatedAncestry",
+                                  "name": "_normalMatrix",
                                   "range": [
                                     14564,
                                     14596
@@ -38544,7 +38546,7 @@
                         },
                         "property": {
                           "type": "Identifier",
-                          "name": "_normalMatrixAccumulatedAncestry",
+                          "name": "_normalMatrix",
                           "range": [
                             14749,
                             14781
@@ -38645,7 +38647,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                "name": "inverseWorldMatrixWithoutMySelf",
                 "range": [
                   14795,
                   14849
@@ -41043,7 +41045,7 @@
               "type": "MethodDefinition",
               "key": {
                 "type": "Identifier",
-                "name": "inverseTransformMatrixAccumulatedAncestry",
+                "name": "inverseWorldMatrix",
                 "range": [
                   16596,
                   16637

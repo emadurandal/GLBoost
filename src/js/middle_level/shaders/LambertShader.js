@@ -12,9 +12,10 @@ export class LambertShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-    shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
-    shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
-    shaderText += `${in_} vec4 temp[1];\n`;
+    if (lightNumExceptAmbient > 0) {
+      shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
+      shaderText += `uniform int isShadowCasting[${lightNumExceptAmbient}];\n`;
+    }
 
     return shaderText;
   }
@@ -23,7 +24,7 @@ export class LambertShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
     
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];

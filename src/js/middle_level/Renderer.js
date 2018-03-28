@@ -122,13 +122,16 @@ export default class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = renderPass.transparentMeshes;
+      var transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+//      console.log("START!!");
       transparentMeshes.forEach((mesh)=> {
+        //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
           mesh.draw(expression, lights, camera, renderPass.scene, index);
         }
       });
-
+//      console.log("END!!");
+      
       const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
       this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
       this._glBoostContext.currentGlobalStates = [
@@ -148,7 +151,7 @@ export default class Renderer extends GLBoostObject {
 
       if (typeof effekseer !== "undefined") {
         effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
-        effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
+        effekseer.setCameraMatrix(camera.inverseWorldMatrix.m);
         effekseer.draw();
       }
 

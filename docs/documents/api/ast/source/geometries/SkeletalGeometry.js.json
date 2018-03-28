@@ -14869,7 +14869,7 @@
                             "leadingComments": [
                               {
                                 "type": "Line",
-                                "value": "skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);",
+                                "value": "skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].worldMatrix);",
                                 "range": [
                                   5809,
                                   5911
@@ -15725,7 +15725,7 @@
     },
     {
       "type": "Line",
-      "value": "skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);",
+      "value": "skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].worldMatrix);",
       "range": [
         5809,
         5911

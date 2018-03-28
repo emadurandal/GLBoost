@@ -69,8 +69,8 @@ export default class DrawKickerWorld {
       let normal_m;
       if (mesh.isAffectedByWorldMatrix) {
         if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
-          world_m = mesh.getTransformMatrixAccumulatedAncestryAt(input);
-          normal_m = mesh.normalMatrixAccumulatedAncestry;
+          world_m = mesh.getWorldMatrixAt(input);
+          normal_m = mesh.normalMatrix;
         } else {
           world_m = mesh.getTransformMatrixAt(input);
           normal_m = mesh.normalMatrix;
@@ -86,8 +86,8 @@ export default class DrawKickerWorld {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-//          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestry);
+//          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
           viewMatrix = Matrix44.identity();
         }
@@ -112,7 +112,7 @@ export default class DrawKickerWorld {
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
-            cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
           //  console.log(cameraPos);
           }
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
@@ -131,7 +131,7 @@ export default class DrawKickerWorld {
               lightType = 1.0;
             }
             if (light.className === 'M_PointLight' || light.className === 'M_SpotLight') {
-              lightPosition = light.transformMatrixAccumulatedAncestry.multiplyVector(lightPosition);
+              lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
               lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);

@@ -22,8 +22,8 @@ import M_SPVScreenMesh from '../elements/meshes/M_SPVScreenMesh';
 import EffekseerElement from '../plugins/EffekseerElement';
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
-  constructor(canvas, gl, width, height) {
-    super(canvas, gl, width, height);
+  constructor(canvas, initParameter, gl, width, height) {
+    super(canvas, initParameter, gl, width, height);
 
     this._glBoostMonitor = M_GLBoostMonitor.getInstance();
   }
@@ -101,8 +101,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_SpotLight(this, intensity, direction);
   }
 
-  createJoint() {
-    return new M_Joint(this);
+  createJoint(isExistJointGizmo) {
+    return new M_Joint(this, isExistJointGizmo);
   }
 
   createAxisGizmo(length) {

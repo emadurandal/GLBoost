@@ -39,6 +39,7 @@
     "shadowmap",
     "shadowmap_2",
     "update_geometry",
-    "update_particles"
+    "update_particles",
+    "effekseer"
   ]
 }

@@ -125,8 +125,10 @@ export default class VertexWorldShaderSource {
     vertexAttribs.forEach((attribName)=>{
       if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
         shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        vertexAttribsAsResult.push(attribName);
+        if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          vertexAttribsAsResult.push(attribName);
+        }
       }
     });
 
