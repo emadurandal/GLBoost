@@ -257,7 +257,7 @@ export default class M_Element extends L_Element {
 
       var rotationMatrix = Matrix44.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._currentCalcMode === 'quaternion') {
+      if (this._currentCalcMode === 'quaternion' || input) {
         rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
       } else {
         let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
