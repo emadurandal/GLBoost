@@ -206,8 +206,8 @@ export default class M_SkeletalGeometry extends Geometry {
           tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);
         } else {
           //tempMatrices[j] = thisLoopMatrix;
-          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.transformMatrixAccumulatedAncestry);
-          tempMatrices[j] = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, thisLoopMatrix);
+          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.worldMatrix);
+          tempMatrices[j] = Matrix44.multiply(skeletalMesh.worldMatrix, thisLoopMatrix);
         }
       }
        globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];
@@ -221,11 +221,11 @@ export default class M_SkeletalGeometry extends Geometry {
           tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, tempMatrices[j + 1]);
         }
       }
-      tempMatrices[0] = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, tempMatrices[0]);
+      tempMatrices[0] = Matrix44.multiply(skeletalMesh.worldMatrix, tempMatrices[0]);
       globalJointTransformMatrices[i] = tempMatrices[0];
     }
     for (let i=0; i&lt;joints.length; i++) {
-      matrices[i] = skeletalMesh.transformMatrixAccumulatedAncestry;
+      matrices[i] = skeletalMesh.worldMatrix;
       matrices[i] = Matrix44.invert(matrices[i]);
       matrices[i] = Matrix44.multiply(matrices[i], globalJointTransformMatrices[i]);
       matrices[i] = Matrix44.multiply(matrices[i], skeletalMesh.inverseBindMatrices[i]);

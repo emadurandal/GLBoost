@@ -246,7 +246,7 @@ export default class SkeletalGeometry extends Geometry {
 
     let joints = skeletalMesh.jointsHierarchy.searchElementsByType(Joint);
     for (let i=0; i&lt;joints.length; i++) {
-      //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].transformMatrixAccumulatedAncestry);
+      //skeletalMesh.inverseBindMatrices[i] = Matrix44.invert(joints[i].worldMatrix);
       let matrix = joints[i].parent.transformMatrixOnlyRotateOnInit;
       joints[i].inverceMatrix = Matrix44.invert(matrix);
       //joints[i].inverceMatrix = Matrix44.identity();

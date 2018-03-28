@@ -430,8 +430,8 @@ export default class Geometry {
         if (camera) {
           var viewMatrix = camera.lookAtRHMatrix();
           var projectionMatrix = camera.perspectiveRHMatrix();
-          var m_m = mesh.transformMatrixAccumulatedAncestry;
-          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(m_m);
+          var m_m = mesh.worldMatrix;
+          var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseWorldMatrixWithoutMySelf).multiply(m_m);
           gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
         }
 
@@ -440,10 +440,10 @@ export default class Geometry {
           if (glslProgram[&apos;viewPosition&apos;]) {
             if (camera) {
               let cameraPos = new Vector4(0, 0, 0, 1);
-              cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+              cameraPos = camera.worldMatrix.multiplyVector(cameraPos);
+              var cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
             } else {
-              var cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
+              var cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
             }
             gl.uniform3f(glslProgram[&apos;viewPosition&apos;], cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z);
           }
@@ -454,7 +454,7 @@ export default class Geometry {
               let isPointLight = -9999;
               if (lights[j] instanceof PointLight) {
                 lightVec = new Vector4(0, 0, 0, 1);
-                lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+                lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
                 isPointLight = 1.0;
               } else if (lights[j] instanceof DirectionalLight) {
                 lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
@@ -463,7 +463,7 @@ export default class Geometry {
                 isPointLight = 0.0;
               }
 
-              let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+              let lightVecInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(lightVec);
               gl.uniform4f(glslProgram[`lightPosition_${j}`], lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight);
 
               gl.uniform4f(glslProgram[`lightDiffuse_${j}`], lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0);
@@ -524,7 +524,7 @@ export default class Geometry {
       if (camera) {
         var viewMatrix = camera.lookAtRHMatrix();
         var projectionMatrix = camera.perspectiveRHMatrix();
-        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(mesh.transformMatrixAccumulatedAncestry);
+        var mvp_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseWorldMatrixWithoutMySelf).multiply(mesh.worldMatrix);
         gl.uniformMatrix4fv(glslProgram.modelViewProjectionMatrix, false, new Float32Array(mvp_m.flatten()));
 
       }

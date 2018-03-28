@@ -4172,7 +4172,7 @@
                                         },
                                         "property": {
                                           "type": "Identifier",
-                                          "name": "transformMatrixAccumulatedAncestry",
+                                          "name": "worldMatrix",
                                           "range": [
                                             1900,
                                             1934
@@ -4416,7 +4416,7 @@
                                                 },
                                                 "property": {
                                                   "type": "Identifier",
-                                                  "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                                                  "name": "inverseWorldMatrixWithoutMySelf",
                                                   "range": [
                                                     2010,
                                                     2064
@@ -5554,7 +5554,7 @@
                                                       },
                                                       "property": {
                                                         "type": "Identifier",
-                                                        "name": "transformMatrixAccumulatedAncestry",
+                                                        "name": "worldMatrix",
                                                         "range": [
                                                           2528,
                                                           2562
@@ -5734,7 +5734,7 @@
                                                       },
                                                       "property": {
                                                         "type": "Identifier",
-                                                        "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                        "name": "inverseWorldMatrix",
                                                         "range": [
                                                           2631,
                                                           2672
@@ -6133,7 +6133,7 @@
                                                       },
                                                       "property": {
                                                         "type": "Identifier",
-                                                        "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                        "name": "inverseWorldMatrix",
                                                         "range": [
                                                           2804,
                                                           2845
@@ -7709,7 +7709,7 @@
                                                             },
                                                             "property": {
                                                               "type": "Identifier",
-                                                              "name": "transformMatrixAccumulatedAncestry",
+                                                              "name": "worldMatrix",
                                                               "range": [
                                                                 3384,
                                                                 3418
@@ -9059,7 +9059,7 @@
                                                         },
                                                         "property": {
                                                           "type": "Identifier",
-                                                          "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                          "name": "inverseWorldMatrix",
                                                           "range": [
                                                             3876,
                                                             3917

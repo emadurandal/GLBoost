@@ -3865,14 +3865,14 @@ window.esdocSearchIndex = [
   ],
   [
     "js/middle_level/elements/m_element.js~m_element#inversetransformmatrixaccumulatedancestry",
-    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-inverseTransformMatrixAccumulatedAncestry",
-    "js/middle_level/elements/M_Element.js~M_Element#inverseTransformMatrixAccumulatedAncestry",
+    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-inverseWorldMatrix",
+    "js/middle_level/elements/M_Element.js~M_Element#inverseWorldMatrix",
     "member"
   ],
   [
     "js/middle_level/elements/m_element.js~m_element#inversetransformmatrixaccumulatedancestrywithoutmyself",
-    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
-    "js/middle_level/elements/M_Element.js~M_Element#inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-inverseWorldMatrixWithoutMySelf",
+    "js/middle_level/elements/M_Element.js~M_Element#inverseWorldMatrixWithoutMySelf",
     "member"
   ],
   [
@@ -3889,8 +3889,8 @@ window.esdocSearchIndex = [
   ],
   [
     "js/middle_level/elements/m_element.js~m_element#normalmatrixaccumulatedancestry",
-    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-normalMatrixAccumulatedAncestry",
-    "js/middle_level/elements/M_Element.js~M_Element#normalMatrixAccumulatedAncestry",
+    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-normalMatrix",
+    "js/middle_level/elements/M_Element.js~M_Element#normalMatrix",
     "member"
   ],
   [
@@ -3991,8 +3991,8 @@ window.esdocSearchIndex = [
   ],
   [
     "js/middle_level/elements/m_element.js~m_element#transformmatrixaccumulatedancestry",
-    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-transformMatrixAccumulatedAncestry",
-    "js/middle_level/elements/M_Element.js~M_Element#transformMatrixAccumulatedAncestry",
+    "class/js/middle_level/elements/M_Element.js~M_Element.html#instance-get-worldMatrix",
+    "js/middle_level/elements/M_Element.js~M_Element#worldMatrix",
     "member"
   ],
   [

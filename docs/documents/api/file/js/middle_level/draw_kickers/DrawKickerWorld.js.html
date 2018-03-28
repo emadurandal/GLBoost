@@ -161,13 +161,13 @@ export default class DrawKickerWorld {
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
       gl.uniform1f(glslProgram.opacity, opacity);
 
-      let world_m = mesh.transformMatrixAccumulatedAncestry;
+      let world_m = mesh.worldMatrix;
       gl.uniformMatrix4fv(glslProgram.worldMatrix, false, world_m.flatten());
-      let normal_m = mesh.normalMatrixAccumulatedAncestry;
+      let normal_m = mesh.normalMatrix;
       gl.uniformMatrix3fv(glslProgram.normalMatrix, false, normal_m.flatten());
       if (camera) {
         let cameraMatrix = camera.lookAtRHMatrix();
-        let viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
+        let viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
         let projectionMatrix = camera.projectionRHMatrix();
         gl.uniformMatrix4fv(glslProgram.viewMatrix, false, viewMatrix.flatten());
         gl.uniformMatrix4fv(glslProgram.projectionMatrix, false, projectionMatrix.flatten());
@@ -178,7 +178,7 @@ export default class DrawKickerWorld {
         if (glslProgram[&apos;viewPosition&apos;]) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
-            cameraPos = camera.transformMatrixAccumulatedAncestry.multiplyVector(cameraPos);
+            cameraPos = camera.worldMatrix.multiplyVector(cameraPos);
           }
           gl.uniform3f(glslProgram[&apos;viewPosition&apos;], cameraPos.x, cameraPos.y, cameraPos.z);
         }
@@ -189,7 +189,7 @@ export default class DrawKickerWorld {
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
               lightVec = new Vector4(0, 0, 0, 1);
-              lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+              lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j] instanceof M_DirectionalLight) {
               lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);

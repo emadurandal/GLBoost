@@ -380,7 +380,7 @@ export default class Element {
     }
   }
 
-  get transformMatrixAccumulatedAncestry() {
+  get worldMatrix() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempString);
     if (this._accumulatedAncestryNameWithUpdateInfoString !== tempString || typeof this._matrixAccumulatedAncestry === &apos;undefined&apos;) {
@@ -391,7 +391,7 @@ export default class Element {
     return this._matrixAccumulatedAncestry;
   }
 
-  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+  get inverseWorldMatrixWithoutMySelf() {
     if (this._parent === null) {
       return Matrix44.identity();
     }
@@ -438,7 +438,7 @@ export default class Element {
     return this._multiplyMyAndParentRotateMatrices(this, true);
   }
 
-  get inverseTransformMatrixAccumulatedAncestry() {
+  get inverseWorldMatrix() {
     return this._multiplyMyAndParentTransformMatrices(this, true).invert();
   }
 

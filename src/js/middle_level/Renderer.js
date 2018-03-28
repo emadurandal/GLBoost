@@ -151,7 +151,7 @@ export default class Renderer extends GLBoostObject {
 
       if (typeof effekseer !== "undefined") {
         effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
-        effekseer.setCameraMatrix(camera.inverseTransformMatrixAccumulatedAncestry.m);
+        effekseer.setCameraMatrix(camera.inverseWorldMatrix.m);
         effekseer.draw();
       }
 

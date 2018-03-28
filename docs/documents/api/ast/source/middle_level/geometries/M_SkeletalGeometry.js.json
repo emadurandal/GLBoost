@@ -6034,7 +6034,7 @@
                             "trailingComments": [
                               {
                                 "type": "Block",
-                                "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.transformMatrixAccumulatedAncestry);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
+                                "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.worldMatrix);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.worldMatrix, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
                                 "range": [
                                   2503,
                                   3298
@@ -7089,7 +7089,7 @@
                             "leadingComments": [
                               {
                                 "type": "Block",
-                                "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.transformMatrixAccumulatedAncestry);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
+                                "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.worldMatrix);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.worldMatrix, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
                                 "range": [
                                   2503,
                                   3298
@@ -7247,7 +7247,7 @@
                                     },
                                     "property": {
                                       "type": "Identifier",
-                                      "name": "transformMatrixAccumulatedAncestry",
+                                      "name": "worldMatrix",
                                       "range": [
                                         3789,
                                         3823
@@ -7842,7 +7842,7 @@
                                 },
                                 "property": {
                                   "type": "Identifier",
-                                  "name": "transformMatrixAccumulatedAncestry",
+                                  "name": "worldMatrix",
                                   "range": [
                                     3981,
                                     4015
@@ -14246,7 +14246,7 @@
     },
     {
       "type": "Block",
-      "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.transformMatrixAccumulatedAncestry);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.transformMatrixAccumulatedAncestry, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
+      "value": "\n      for (let j = 0; j < jointsHierarchy.length; j++) {\n        let thisLoopMatrix = jointsHierarchy[j].parent.transformMatrix;\n        //let thisLoopMatrix = Matrix44.multiply(jointsHierarchy[j].parent.transformMatrix, Matrix44.invert(jointsHierarchy[j].parent.transformMatrixOnInit));\n        if (j > 0) {\n          tempMatrices[j] = Matrix44.multiply(tempMatrices[j - 1], thisLoopMatrix);\n        } else {\n          //tempMatrices[j] = thisLoopMatrix;\n          //tempMatrices[j] = Matrix44.multiply(thisLoopMatrix, skeletalMesh.worldMatrix);\n          tempMatrices[j] = Matrix44.multiply(skeletalMesh.worldMatrix, thisLoopMatrix);\n        }\n      }\n       globalJointTransformMatrices[i] = tempMatrices[jointsHierarchy.length - 1];\n       ",
       "range": [
         2503,
         3298

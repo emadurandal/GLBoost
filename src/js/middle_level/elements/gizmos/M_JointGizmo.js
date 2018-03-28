@@ -40,8 +40,8 @@ export default class M_JointGizmo extends M_Gizmo {
     return this._primitive.color;
   }
 
-  // Use master element's transformMatrixAccumulatedAncestry.
-  get transformMatrixAccumulatedAncestryInner() {
+  // Use master element's worldMatrix.
+  get worldMatrixInner() {
     return Matrix44.identity();
   }
 

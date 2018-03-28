@@ -90,7 +90,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     super.prepareToRender(expression, existCamera_f, lights, renderPasses);
 
 
-    let lengthCenterToCorner = AABB.multiplyMatrix(this._joints[0].transformMatrixAccumulatedAncestry,
+    let lengthCenterToCorner = AABB.multiplyMatrix(this._joints[0].worldMatrix,
       this.rawAABBInLocal).lengthCenterToCorner;
     for (let i=0; i<this._joints.length; i++) {
       this._joints[i].width = lengthCenterToCorner / 100;
@@ -169,7 +169,7 @@ export default class M_SkeletalMesh extends M_Mesh {
   
   get rootJointsWorldPosition() {
     if (this._joints.length > 0) {
-      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestry;
+      const rootJointMatrix = this._joints[0].worldMatrix;
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
@@ -179,7 +179,7 @@ export default class M_SkeletalMesh extends M_Mesh {
 
   getRootJointsWorldPositionAt(inputValue) {
     if (this._joints.length > 0) {
-      const rootJointMatrix = this._joints[0].getTransformMatrixAccumulatedAncestryAt(inputValue);
+      const rootJointMatrix = this._joints[0].getWorldMatrixAt(inputValue);
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
@@ -190,7 +190,7 @@ export default class M_SkeletalMesh extends M_Mesh {
   /*
   get rootJointsWorldPositionAsBindPose() {
     if (this._joints.length > 0) {
-      const rootJointMatrix = this._joints[0].transformMatrixAccumulatedAncestryAsForJointsBindPose;
+      const rootJointMatrix = this._joints[0].worldMatrixAsForJointsBindPose;
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }

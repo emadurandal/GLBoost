@@ -3249,7 +3249,7 @@ class M_Element extends L_Element {
     this._gizmos = [];
     this._masterElement = null;
 
-    this._transformMatrixAccumulatedAncestry = new Matrix44$1();
+    this._worldMatrix = new Matrix44$1();
   }
 
 
@@ -3459,7 +3459,7 @@ class M_Element extends L_Element {
 
       var matrix = Matrix44$1.identity();
 
-      if (this._currentCalcMode === 'matrix') {
+      if (this._currentCalcMode === 'matrix' && !input) {
         this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
@@ -3467,7 +3467,7 @@ class M_Element extends L_Element {
 
       var rotationMatrix = Matrix44$1.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._currentCalcMode === 'quaternion') {
+      if (this._currentCalcMode === 'quaternion' || input) {
         rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
       } else {
         let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
@@ -3651,19 +3651,19 @@ class M_Element extends L_Element {
       {
         let currentMatrix = Matrix44.identity();
         if (withMySelf) {
-//          this._transformMatrixAccumulatedAncestry.copyComponents(this.getTransformMatrixAt(input));
+//          this._worldMatrix.copyComponents(this.getTransformMatrixAt(input));
           let currentMatrix = this.getTransformMatrixAt(input);
         }
 
-//        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
-        this._transformMatrixAccumulatedAncestry = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+//        this._worldMatrix.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
+        this._worldMatrix = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
 
         this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
 
-        return this._transformMatrixAccumulatedAncestry;
+        return this._worldMatrix;
       } else {
-        return this._transformMatrixAccumulatedAncestry;        
+        return this._worldMatrix;        
       }
     }
   }
@@ -3699,31 +3699,31 @@ class M_Element extends L_Element {
     return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
   }
 
-  get transformMatrixAccumulatedAncestryWithoutMySelf() {
+  get worldMatrixWithoutMySelf() {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._transformMatrixAccumulatedAncestryWithoutMySelf === 'undefined') {
-      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
+    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._worldMatrixWithoutMySelf === 'undefined') {
+      this._worldMatrixWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
-    return this._transformMatrixAccumulatedAncestryWithoutMySelf;
+    return this._worldMatrixWithoutMySelf;
   }
 
-  get normalMatrixAccumulatedAncestry() {
+  get normalMatrix() {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+    if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
       let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-      this._normalMatrixAccumulatedAncestry = Matrix44$1.invert(world_m).transpose().toMatrix33();
+      this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
       this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
     }
 
-    return this._normalMatrixAccumulatedAncestry.clone();
+    return this._normalMatrix.clone();
   }
 
 
-  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+  get inverseWorldMatrixWithoutMySelf() {
     if (this._parent === null) {
       return Matrix44$1.identity();
     }
@@ -3763,7 +3763,7 @@ class M_Element extends L_Element {
 //    return this._multiplyMyAndParentRotateMatrices(true, null);
 //  }
 
-  get inverseTransformMatrixAccumulatedAncestry() {
+  get inverseWorldMatrix() {
     return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
   }
 
@@ -3990,12 +3990,12 @@ class M_Element extends L_Element {
     return this._masterElement;
   }
 /*
-  // Use master element's transformMatrixAccumulatedAncestry.
-  get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
+  // Use master element's worldMatrix.
+  get worldMatrix() {
+    return this.getWorldMatrixAt(void 0);
   }
 
-  getTransformMatrixAccumulatedAncestryAt(input) {
+  getWorldMatrixAt(input) {
     
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
@@ -4004,12 +4004,12 @@ class M_Element extends L_Element {
       if (this._masterElement) {
   //      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
   //return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
+        this._worldMatrix.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
       }
       this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
     }
     
-    return this._transformMatrixAccumulatedAncestry;
+    return this._worldMatrix;
   }
   */
 
@@ -4045,11 +4045,11 @@ class M_Element extends L_Element {
     return latestInputValue;
   }
 
-  get transformMatrixAccumulatedAncestryForJoints() {
-    return this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
+  get worldMatrixForJoints() {
+    return this.getWorldMatrixForJointsAt(void 0);
   }
 
-  getTransformMatrixAccumulatedAncestryForJointsAt(input) {
+  getWorldMatrixForJointsAt(input) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4149,12 +4149,12 @@ class M_Element extends L_Element {
   }
 
 
-  get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
+  get worldMatrix() {
+    return this.getWorldMatrixAt(void 0);
   }
 
 
-  getTransformMatrixAccumulatedAncestryAt(input) {
+  getWorldMatrixAt(input) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
   
@@ -5343,7 +5343,7 @@ class DrawKickerLocal {
         let world_m;
         if (mesh.isAffectedByWorldMatrix) {
           if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
-            world_m = mesh.transformMatrixAccumulatedAncestry;
+            world_m = mesh.worldMatrix;
           } else {
             world_m = mesh.transformMatrix;
           }
@@ -5362,7 +5362,7 @@ class DrawKickerLocal {
         } else {
           projectionMatrix = Matrix44.identity();
         }
-        let pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf).multiply(world_m);
+        let pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseWorldMatrixWithoutMySelf).multiply(world_m);
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
       }
@@ -5372,10 +5372,10 @@ class DrawKickerLocal {
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPosInLocalCoord = null;
           if (camera) {
-            let cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
-            cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+            let cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
           } else {
-            cameraPosInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(new Vector4(0, 0, 1, 1));
+            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
           }
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
         }
@@ -5386,7 +5386,7 @@ class DrawKickerLocal {
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
               lightVec = new Vector4(0, 0, 0, 1);
-              lightVec = lights[j].transformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+              lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j].className === 'M_DirectionalLight') {
               lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
@@ -5395,7 +5395,7 @@ class DrawKickerLocal {
               isPointLight = 0.0;
             }
 
-            let lightVecInLocalCoord = mesh.inverseTransformMatrixAccumulatedAncestry.multiplyVector(lightVec);
+            let lightVecInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(lightVec);
             material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight, true);
 
             material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
@@ -5498,8 +5498,8 @@ class DrawKickerWorld {
       let normal_m;
       if (mesh.isAffectedByWorldMatrix) {
         if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
-          world_m = mesh.getTransformMatrixAccumulatedAncestryAt(input);
-          normal_m = mesh.normalMatrixAccumulatedAncestry;
+          world_m = mesh.getWorldMatrixAt(input);
+          normal_m = mesh.normalMatrix;
         } else {
           world_m = mesh.getTransformMatrixAt(input);
           normal_m = mesh.normalMatrix;
@@ -5515,8 +5515,8 @@ class DrawKickerWorld {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-//          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf);
-          viewMatrix = cameraMatrix.multiply(camera.inverseTransformMatrixAccumulatedAncestry);
+//          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
           viewMatrix = Matrix44$1.identity();
         }
@@ -5541,7 +5541,7 @@ class DrawKickerWorld {
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
-            cameraPos = camera.transformMatrixAccumulatedAncestryWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
           //  console.log(cameraPos);
           }
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
@@ -5560,7 +5560,7 @@ class DrawKickerWorld {
               lightType = 1.0;
             }
             if (light.className === 'M_PointLight' || light.className === 'M_SpotLight') {
-              lightPosition = light.transformMatrixAccumulatedAncestry.multiplyVector(lightPosition);
+              lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
               lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
@@ -9099,7 +9099,7 @@ class L_CameraController extends GLBoostObject {
 
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
-      let mat = camera.inverseTransformMatrixAccumulatedAncestryWithoutMySelf;
+      let mat = camera.inverseWorldMatrixWithoutMySelf;
       newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
       newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
       newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();

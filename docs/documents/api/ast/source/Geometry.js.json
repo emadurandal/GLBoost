@@ -29614,7 +29614,7 @@
                                               },
                                               "property": {
                                                 "type": "Identifier",
-                                                "name": "transformMatrixAccumulatedAncestry",
+                                                "name": "worldMatrix",
                                                 "range": [
                                                   11606,
                                                   11640
@@ -29858,7 +29858,7 @@
                                                       },
                                                       "property": {
                                                         "type": "Identifier",
-                                                        "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                                                        "name": "inverseWorldMatrixWithoutMySelf",
                                                         "range": [
                                                           11718,
                                                           11772
@@ -30922,7 +30922,7 @@
                                                             },
                                                             "property": {
                                                               "type": "Identifier",
-                                                              "name": "transformMatrixAccumulatedAncestry",
+                                                              "name": "worldMatrix",
                                                               "range": [
                                                                 12212,
                                                                 12246
@@ -31102,7 +31102,7 @@
                                                               },
                                                               "property": {
                                                                 "type": "Identifier",
-                                                                "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                                "name": "inverseWorldMatrix",
                                                                 "range": [
                                                                   12321,
                                                                   12362
@@ -31503,7 +31503,7 @@
                                                               },
                                                               "property": {
                                                                 "type": "Identifier",
-                                                                "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                                "name": "inverseWorldMatrix",
                                                                 "range": [
                                                                   12502,
                                                                   12543
@@ -33081,7 +33081,7 @@
                                                                   },
                                                                   "property": {
                                                                     "type": "Identifier",
-                                                                    "name": "transformMatrixAccumulatedAncestry",
+                                                                    "name": "worldMatrix",
                                                                     "range": [
                                                                       13095,
                                                                       13129
@@ -34431,7 +34431,7 @@
                                                               },
                                                               "property": {
                                                                 "type": "Identifier",
-                                                                "name": "inverseTransformMatrixAccumulatedAncestry",
+                                                                "name": "inverseWorldMatrix",
                                                                 "range": [
                                                                   13601,
                                                                   13642
@@ -40394,7 +40394,7 @@
                                                 },
                                                 "property": {
                                                   "type": "Identifier",
-                                                  "name": "inverseTransformMatrixAccumulatedAncestryWithoutMySelf",
+                                                  "name": "inverseWorldMatrixWithoutMySelf",
                                                   "range": [
                                                     16020,
                                                     16074
@@ -40498,7 +40498,7 @@
                                             },
                                             "property": {
                                               "type": "Identifier",
-                                              "name": "transformMatrixAccumulatedAncestry",
+                                              "name": "worldMatrix",
                                               "range": [
                                                 16090,
                                                 16124

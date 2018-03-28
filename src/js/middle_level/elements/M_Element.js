@@ -39,7 +39,7 @@ export default class M_Element extends L_Element {
     this._gizmos = [];
     this._masterElement = null;
 
-    this._transformMatrixAccumulatedAncestry = new Matrix44();
+    this._worldMatrix = new Matrix44();
   }
 
 
@@ -441,19 +441,19 @@ export default class M_Element extends L_Element {
       {
         let currentMatrix = Matrix44.identity();
         if (withMySelf) {
-//          this._transformMatrixAccumulatedAncestry.copyComponents(this.getTransformMatrixAt(input));
+//          this._worldMatrix.copyComponents(this.getTransformMatrixAt(input));
           let currentMatrix = this.getTransformMatrixAt(input);
         }
 
-//        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
-        this._transformMatrixAccumulatedAncestry = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+//        this._worldMatrix.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
+        this._worldMatrix = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
 
         this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
 
-        return this._transformMatrixAccumulatedAncestry;
+        return this._worldMatrix;
       } else {
-        return this._transformMatrixAccumulatedAncestry;        
+        return this._worldMatrix;        
       }
     }
   }
@@ -489,31 +489,31 @@ export default class M_Element extends L_Element {
     return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
   }
 
-  get transformMatrixAccumulatedAncestryWithoutMySelf() {
+  get worldMatrixWithoutMySelf() {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._transformMatrixAccumulatedAncestryWithoutMySelf === 'undefined') {
-      this._transformMatrixAccumulatedAncestryWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
+    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._worldMatrixWithoutMySelf === 'undefined') {
+      this._worldMatrixWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
     }
 
-    return this._transformMatrixAccumulatedAncestryWithoutMySelf;
+    return this._worldMatrixWithoutMySelf;
   }
 
-  get normalMatrixAccumulatedAncestry() {
+  get normalMatrix() {
     var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrixAccumulatedAncestry === 'undefined') {
+    if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
       let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-      this._normalMatrixAccumulatedAncestry = Matrix44.invert(world_m).transpose().toMatrix33();
+      this._normalMatrix = Matrix44.invert(world_m).transpose().toMatrix33();
       this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
     }
 
-    return this._normalMatrixAccumulatedAncestry.clone();
+    return this._normalMatrix.clone();
   }
 
 
-  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+  get inverseWorldMatrixWithoutMySelf() {
     if (this._parent === null) {
       return Matrix44.identity();
     }
@@ -553,7 +553,7 @@ export default class M_Element extends L_Element {
 //    return this._multiplyMyAndParentRotateMatrices(true, null);
 //  }
 
-  get inverseTransformMatrixAccumulatedAncestry() {
+  get inverseWorldMatrix() {
     return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
   }
 
@@ -780,12 +780,12 @@ export default class M_Element extends L_Element {
     return this._masterElement;
   }
 /*
-  // Use master element's transformMatrixAccumulatedAncestry.
-  get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
+  // Use master element's worldMatrix.
+  get worldMatrix() {
+    return this.getWorldMatrixAt(void 0);
   }
 
-  getTransformMatrixAccumulatedAncestryAt(input) {
+  getWorldMatrixAt(input) {
     
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
 
@@ -794,12 +794,12 @@ export default class M_Element extends L_Element {
       if (this._masterElement) {
   //      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
   //return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-        this._transformMatrixAccumulatedAncestry.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
+        this._worldMatrix.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
       }
       this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
     }
     
-    return this._transformMatrixAccumulatedAncestry;
+    return this._worldMatrix;
   }
   */
 
@@ -835,11 +835,11 @@ export default class M_Element extends L_Element {
     return latestInputValue;
   }
 
-  get transformMatrixAccumulatedAncestryForJoints() {
-    return this.getTransformMatrixAccumulatedAncestryForJointsAt(void 0);
+  get worldMatrixForJoints() {
+    return this.getWorldMatrixForJointsAt(void 0);
   }
 
-  getTransformMatrixAccumulatedAncestryForJointsAt(input) {
+  getWorldMatrixForJointsAt(input) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -939,12 +939,12 @@ export default class M_Element extends L_Element {
   }
 
 
-  get transformMatrixAccumulatedAncestry() {
-    return this.getTransformMatrixAccumulatedAncestryAt(void 0);
+  get worldMatrix() {
+    return this.getWorldMatrixAt(void 0);
   }
 
 
-  getTransformMatrixAccumulatedAncestryAt(input) {
+  getWorldMatrixAt(input) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
   
