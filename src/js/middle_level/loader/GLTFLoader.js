@@ -552,8 +552,8 @@ export default class GLTFLoader {
 */
 //        if (material === null) {
         let material = glBoostContext.createClassicMaterial();
-        if (options.isPixelOutputMultiplidAlpha) {
-          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        if (options.isPixelOutputPreMultipliedAlpha) {
+          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputPreMultipliedAlpha;
         }
         this._materials.push(material);
 //        }
