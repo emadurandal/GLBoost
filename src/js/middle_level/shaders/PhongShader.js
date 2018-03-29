@@ -27,7 +27,7 @@ export class PhongShaderSource {
 
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
