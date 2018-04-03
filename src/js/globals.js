@@ -1,3 +1,4 @@
+// This revision is the commit right after the SHA: ########
 var global = ('global',eval)('this');
 
 (function (global) {

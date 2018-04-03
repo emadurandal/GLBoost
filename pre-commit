@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+var child_process = require('child_process'),
+    fs = require('fs'),
+    root = __dirname + '/../../',
+    builtFile = root + 'build/glboost.js';
+
+function setCommitVersion() {
+    child_process.exec('git rev-parse HEAD', { cwd: root }, function (error, stdout, stderr) {
+        var hash = stdout,
+            version = hash.slice(0, 8),
+            data = fs.readFileSync(builtFile, 'utf-8'),
+            position = data.indexOf('// This revision is the commit right after the SHA: ') + 52, fd = fs.openSync(builtFile, 'a', 0666);
+
+        fs.writeSync(fd, version, position);
+
+        child_process.exec('git add ' + builtFile, { cwd: root }, function (error, stdout, stderr) {});
+
+        console.log('Commit version set to ' + version);
+    });
+}
+
+child_process.exec('npm run build', { cwd: root }, function (error, stdout, stderr) {
+	if (error) {
+    console.error(`exec error: ${error}`);
+    
+    process.exit(1);
+  }
+
+	setCommitVersion();
+
+});
