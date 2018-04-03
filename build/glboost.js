@@ -7563,25 +7563,27 @@ class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
-    shaderText +=         'uniform bool isPreMultipliedAlpha;\n';
+    shaderText +=         'uniform bool isNeededToMultiplyAlphaToColorOfPixelOutput;\n';
     return shaderText;
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
     let shaderText =   "";
-    shaderText +=   `bool isDataOutput = false;\n`;
     shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
+    shaderText += '    rt0.rgb *= rt0.a;\n';
+    shaderText += '  }\n';
 
     return shaderText;
   }
 
   FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
-
-    shaderText += 'if (isPreMultipliedAlpha && !isDataOutput) {\n';
+/*
+    shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
     shaderText += '  rt0.rgb *= rt0.a;\n';
     shaderText += '}\n';
-
+*/
     return shaderText;
   }
 
@@ -7590,7 +7592,7 @@ class FragmentSimpleShaderSource {
     var vertexAttribsAsResult = [];
 
     material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
-    material.setUniform(glslProgram, 'uniform_isPremultipliedAlpha', this._glContext.getUniformLocation(glslProgram, 'isPremultipliedAlpha'));
+    material.setUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput', this._glContext.getUniformLocation(glslProgram, 'isNeededToMultiplyAlphaToColorOfPixelOutput'));
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
@@ -7612,22 +7614,22 @@ class FragmentSimpleShader extends Shader {
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
 
-    this._isPreMultipliedAlpha = null;
+    this._isNeededToMultiplyAlphaToColorOfPixelOutput = null;
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isPreMultipliedAlpha'), this._isPreMultipliedAlpha, true);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
 
   }
 
-  set isPreMultipliedAlpha(flg) {
-    this._isPreMultipliedAlpha = flg;
+  set isNeededToMultiplyAlphaToColorOfPixelOutput(flg) {
+    this._isNeededToMultiplyAlphaToColorOfPixelOutput = flg;
   }
 
-  get isPreMultipliedAlpha() {
-    return this._isPreMultipliedAlpha;
+  get isNeededToMultiplyAlphaToColorOfPixelOutput() {
+    return this._isNeededToMultiplyAlphaToColorOfPixelOutput;
   }
 }
 
@@ -14522,7 +14524,7 @@ class PhongShaderSource {
 
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -15318,7 +15320,7 @@ class LambertShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
@@ -15418,8 +15420,8 @@ class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
-      isPixelOutputPreMultipliedAlpha: true,
-      isTexturePreMultipliedAlpha: false,
+      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true
@@ -15588,12 +15590,27 @@ class GLTFLoader {
         }
       }
 
+      let isNeededToMultiplyAlphaToColorOfTexture = true;
+      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // Nothing to do because premultipling alpha is already done.
+        } else {
+          isNeededToMultiplyAlphaToColorOfTexture = true;
+        }
+      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // TODO: Implement to Make Texture Straight.
+        } else {
+          // Nothing to do because the texture is straight.
+        }        
+      }
+      
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': options.isTexturePreMultipliedAlpha
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
@@ -15911,8 +15928,8 @@ class GLTFLoader {
 */
 //        if (material === null) {
         let material = glBoostContext.createClassicMaterial();
-        if (options.isPixelOutputMultiplidAlpha) {
-          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+          material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
 //        }
@@ -16099,7 +16116,7 @@ class GLTFLoader {
               enables.push(2929);
             }
             material.states.enable = enables; // It means, [gl.BLEND];
-            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+            if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
               material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
             }
             material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
@@ -16742,7 +16759,7 @@ class BlinnPhongShaderSource {
     var shaderText = '';
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
   
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
