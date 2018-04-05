@@ -865,7 +865,7 @@ export default class M_Element extends L_Element {
 
         let currentMatrix = null;
         if (withMySelf) {
-          currentMatrix = this.getTransformMatrixAt(input);
+          currentMatrix = this.getRotateTranslateAt(input);
         } else {
           currentMatrix = Matrix44.identity();
         }

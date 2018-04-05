@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: dae00043
+// This revision is the commit right after the SHA: b47400b8
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -4076,7 +4076,7 @@ class M_Element extends L_Element {
 
         let currentMatrix = null;
         if (withMySelf) {
-          currentMatrix = this.getTransformMatrixAt(input);
+          currentMatrix = this.getRotateTranslateAt(input);
         } else {
           currentMatrix = Matrix44$1.identity();
         }
