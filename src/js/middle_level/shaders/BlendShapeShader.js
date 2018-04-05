@@ -15,17 +15,11 @@ export default class BlendShapeShaderSource {
 
   VSTransform_BlendShapeShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
-    shaderText +=     'float sumOfWeights = 0.0;\n';
-    f.forEach((attribName)=>{
-      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
-        shaderText += 'sumOfWeights += blendWeight_' + attribName +';\n';
-      }
-    });
     var numOfShapeTargets = this.BlendShapeShaderSource_numberOfShapeTargets(f);
-    shaderText += '    vec3 blendedPosition = aVertex_position * max(1.0 - sumOfWeights/float(' + numOfShapeTargets + '), 0.0);\n';
+    shaderText += '    vec3 blendedPosition = aVertex_position;\n';    
     f.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
-        shaderText += 'blendedPosition += aVertex_' + attribName + ' * blendWeight_' + attribName + '/float(' + numOfShapeTargets + ');\n';
+        shaderText += 'blendedPosition += (aVertex_' + attribName + ' - aVertex_position) * blendWeight_' + attribName + ';\n';
       }
     });
     if (existCamera_f) {
