@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 188a3e89
+// This revision is the commit right after the SHA: f2bbbe17
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -14394,6 +14394,153 @@ class EffekseerElement extends M_Element {
 
 }
 
+class Screen extends Geometry {
+  constructor(glBoostContext, screen = 
+    {
+      unit: 'ratio', // or 'pixel'
+      range: 'positive-negative', // or 'positive'
+      origin: new Vector2(-1, -1),
+      size: new Vector2(2, 2),
+    }, customVertexAttributes = null) {
+    super(glBoostContext);
+
+    this._setupVertexData(screen, customVertexAttributes);
+  }
+
+  _setupVertexData(screen, customVertexAttributes) {
+    let positions = [];
+    let indices = [];
+    let colors = [];
+    let texcoords = [];
+    let normals = [];
+
+    let originX = screen.origin.x;
+    let originY = screen.origin.y;
+    let sizeX = screen.size.x;
+    let sizeY = screen.size.y;
+
+    if (screen.unit === 'pixel') {
+      originX = originX/this._glContext.canvasWidth;
+      originY = originY/this._glContext.canvasHeight;
+      sizeX = sizeX/this._glContext.canvasWidth;
+      sizeY = sizeY/this._glContext.canvasHeight;
+    }
+    if (screen.range === 'positive') {
+      originX = (originX-0.5)*2;
+      originY = (originY-0.5)*2;
+      sizeX = sizeX*2;
+      sizeY = sizeY*2;
+    }
+
+    screen.origin = new Vector2(originX, originY);
+    screen.size = new Vector2(sizeX, sizeY);
+
+    this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, 1, 1, screen.uUVRepeat, screen.vUVRepeat);
+
+
+    let object = {
+      position: positions,
+      color: colors,
+      texcoord: texcoords,
+      normal: normals
+    };
+
+    let completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+    this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
+  }
+
+  _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        positions.push(new Vector3(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
+      }
+    }
+
+    for(let i=0; i<vSpan; i++) {
+      let degenerate_left_index = 0;
+      let degenerate_right_index = 0;
+      for(let j=0; j<=uSpan; j++) {
+        indices.push(i*(uSpan+1)+j);
+        indices.push((i+1)*(uSpan+1)+j);
+        if (j === 0) {
+          degenerate_left_index = (i + 1) * (uSpan+1) + j;
+        } else if (j === uSpan) {
+          degenerate_right_index = (i + 1) * (uSpan+1) + j;
+        }
+      }
+      indices.push(degenerate_right_index);
+      indices.push(degenerate_left_index);
+    }
+
+    let vertexColor = new Vector4(1, 1, 1, 1);
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        colors.push(vertexColor);
+      }
+    }
+
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        texcoords.push(new Vector2(j, i));
+      }
+    }
+
+    let normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        normals.push(normal);
+      }
+    }
+  }
+}
+
+GLBoost$1["Screen"] = Screen;
+
+class M_ScreenMesh extends M_Mesh {
+  constructor(glBoostContext, customVertexAttributes) {
+    super(glBoostContext, null, null);
+    this._init(customVertexAttributes);
+  }
+
+  _init(customVertexAttributes) {
+    let gl = this._glContext.gl;
+    this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
+    this.isAffectedByWorldMatrix = false;
+    this.isAffectedByViewMatrix = false;
+    this.isAffectedByProjectionMatrix = false;
+
+    let material = new ClassicMaterial$1(this._glBoostContext);
+    material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+    material.states = {
+      "enable": [
+        gl.BLEND
+      ],
+      "functions": {
+        "blendFuncSeparate": [
+          770, // SRC_ALPHA
+          771, // ONE MINUS SRC_ALPHA
+          1,   // ONE
+          1    // ONE
+        ]
+      }
+    };
+    this.geometry.materials = [material];
+    this._material = material;
+  }
+
+  set material(obj) {
+    this._material = obj;
+  }
+
+  get material() {
+    return this._material;
+  }
+
+}
+
+
+GLBoost["M_ScreenMesh"] = M_ScreenMesh;
+
 class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, initParameter, gl, width, height) {
     super(canvas, initParameter, gl, width, height);
@@ -14488,6 +14635,10 @@ class GLBoostMiddleContext extends GLBoostLowContext {
 
   createEffekseerElement() {
     return new EffekseerElement(this);
+  }
+
+  createScreenMesh(customVertexAttributes) {
+    return new M_ScreenMesh(this, customVertexAttributes);
   }
 
 }
@@ -17144,153 +17295,6 @@ class JointGizmoUpdater {
 if (GLBoost['JointGizmoUpdater'] === void 0) {
   GLBoost['JointGizmoUpdater'] = JointGizmoUpdater;
 }
-
-class Screen extends Geometry {
-  constructor(glBoostContext, screen = 
-    {
-      unit: 'ratio', // or 'pixel'
-      range: 'positive-negative', // or 'positive'
-      origin: new Vector2(-1, -1),
-      size: new Vector2(2, 2),
-    }, customVertexAttributes = null) {
-    super(glBoostContext);
-
-    this._setupVertexData(screen, customVertexAttributes);
-  }
-
-  _setupVertexData(screen, customVertexAttributes) {
-    let positions = [];
-    let indices = [];
-    let colors = [];
-    let texcoords = [];
-    let normals = [];
-
-    let originX = screen.origin.x;
-    let originY = screen.origin.y;
-    let sizeX = screen.size.x;
-    let sizeY = screen.size.y;
-
-    if (screen.unit === 'pixel') {
-      originX = originX/this._glContext.canvasWidth;
-      originY = originY/this._glContext.canvasHeight;
-      sizeX = sizeX/this._glContext.canvasWidth;
-      sizeY = sizeY/this._glContext.canvasHeight;
-    }
-    if (screen.range === 'positive') {
-      originX = (originX-0.5)*2;
-      originY = (originY-0.5)*2;
-      sizeX = sizeX*2;
-      sizeY = sizeY*2;
-    }
-
-    screen.origin = new Vector2(originX, originY);
-    screen.size = new Vector2(sizeX, sizeY);
-
-    this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, 1, 1, screen.uUVRepeat, screen.vUVRepeat);
-
-
-    let object = {
-      position: positions,
-      color: colors,
-      texcoord: texcoords,
-      normal: normals
-    };
-
-    let completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-    this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
-  }
-
-  _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        positions.push(new Vector3(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
-      }
-    }
-
-    for(let i=0; i<vSpan; i++) {
-      let degenerate_left_index = 0;
-      let degenerate_right_index = 0;
-      for(let j=0; j<=uSpan; j++) {
-        indices.push(i*(uSpan+1)+j);
-        indices.push((i+1)*(uSpan+1)+j);
-        if (j === 0) {
-          degenerate_left_index = (i + 1) * (uSpan+1) + j;
-        } else if (j === uSpan) {
-          degenerate_right_index = (i + 1) * (uSpan+1) + j;
-        }
-      }
-      indices.push(degenerate_right_index);
-      indices.push(degenerate_left_index);
-    }
-
-    let vertexColor = new Vector4(1, 1, 1, 1);
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        colors.push(vertexColor);
-      }
-    }
-
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        texcoords.push(new Vector2(j, i));
-      }
-    }
-
-    let normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        normals.push(normal);
-      }
-    }
-  }
-}
-
-GLBoost$1["Screen"] = Screen;
-
-class M_ScreenMesh extends M_Mesh {
-  constructor(glBoostContext, customVertexAttributes) {
-    super(glBoostContext, null, null);
-    this._init(customVertexAttributes);
-  }
-
-  _init(customVertexAttributes) {
-    let gl = this._glContext.gl;
-    this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
-    this.isAffectedByWorldMatrix = false;
-    this.isAffectedByViewMatrix = false;
-    this.isAffectedByProjectionMatrix = false;
-
-    let material = new ClassicMaterial$1(this._glBoostContext);
-    material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
-    material.states = {
-      "enable": [
-        gl.BLEND
-      ],
-      "functions": {
-        "blendFuncSeparate": [
-          770, // SRC_ALPHA
-          771, // ONE MINUS SRC_ALPHA
-          1,   // ONE
-          1    // ONE
-        ]
-      }
-    };
-    this.geometry.materials = [material];
-    this._material = material;
-  }
-
-  set material(obj) {
-    this._material = obj;
-  }
-
-  get material() {
-    return this._material;
-  }
-
-}
-
-
-GLBoost["M_ScreenMesh"] = M_ScreenMesh;
 
 /*       */
 

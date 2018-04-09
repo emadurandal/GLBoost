@@ -19,6 +19,8 @@ import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
 import EffekseerElement from '../plugins/EffekseerElement';
+import M_ScreenMesh from '../elements/meshes/M_ScreenMesh';
+
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, initParameter, gl, width, height) {
@@ -114,6 +116,10 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
 
   createEffekseerElement() {
     return new EffekseerElement(this);
+  }
+
+  createScreenMesh(customVertexAttributes) {
+    return new M_ScreenMesh(this, customVertexAttributes);
   }
 
 }
