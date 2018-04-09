@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: f2bbbe17
+// This revision is the commit right after the SHA: 5a642716
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -14530,6 +14530,7 @@ class M_ScreenMesh extends M_Mesh {
 
   set material(obj) {
     this._material = obj;
+    this.geometry.materials = [obj];
   }
 
   get material() {
