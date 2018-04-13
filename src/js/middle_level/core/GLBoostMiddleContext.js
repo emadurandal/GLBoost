@@ -18,6 +18,7 @@ import M_SpotLight from '../elements/lights/M_SpotLight';
 import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
+import M_SPVScreenMesh from '../elements/meshes/M_SPVScreenMesh';
 import EffekseerElement from '../plugins/EffekseerElement';
 import M_ScreenMesh from '../elements/meshes/M_ScreenMesh';
 
@@ -120,6 +121,10 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
 
   createScreenMesh(customVertexAttributes) {
     return new M_ScreenMesh(this, customVertexAttributes);
+  }
+  
+  createSPVScreenMesh(screens, customVertexAttributes) {
+    return new M_SPVScreenMesh(this, screens, customVertexAttributes);
   }
 
 }

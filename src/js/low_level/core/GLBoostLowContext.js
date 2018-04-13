@@ -18,6 +18,9 @@ import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 import Screen from '../primitives/Screen';
 import GLBoost from '../../globals';
+import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
+import SPVClassicMaterial from '../materials/SPVClassicMaterial';
+import SPVScreen from '../primitives/SPVScreen';
 
 export default class GLBoostLowContext {
   constructor(canvas, initParameter, gl, width, height) {
@@ -298,6 +301,17 @@ export default class GLBoostLowContext {
     this._currentGlobalStates = this._defaultGlobalStates.concat();
   }
 
+  createSPVCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency, eventTargetDom) {
+    return new L_SPVCameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency, eventTargetDom);
+  }
+
+  createSPVClassicMaterial() {
+    return new SPVClassicMaterial(this);
+  }
+
+  createSPVScreen(layout, customVertexAttributes) {
+    return new SPVScreen(this, layout, customVertexAttributes);
+  }
 }
 
 GLBoost['GLBoostLowContext'] = GLBoostLowContext;

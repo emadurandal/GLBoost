@@ -51,6 +51,7 @@ export default class VertexWorldShadowShaderSource {
       shaderText += `    shadowCoord[${i}].xyz += 0.5; // ${i}\n`;
       shaderText += `  } // ${i}\n`;
     }
+    
     return shaderText;
   }
   FSPostEffect_VertexWorldShadowShaderSource(f, gl, lights, material, extraData) {

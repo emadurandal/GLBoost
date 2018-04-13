@@ -5,11 +5,11 @@ import VertexWorldShaderSource from './VertexWorldShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import {FragmentSimpleShaderSource} from './FragmentSimpleShader';
 
-export class WireframeShaderSource {
+export class SPVExtensionShaderSource {
   // In the context within these member methods,
   // this is the instance of the corresponding shader class.
 
-  VSDefine_WireframeShaderSource(in_, out_, f) {
+  VSDefine_SPVExtensionShaderSource(in_, out_, f) {
     var shaderText = '';
     shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
     shaderText += `${out_} vec3 barycentricCoord;\n`;
@@ -22,11 +22,11 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  VSTransform_WireframeShaderSource(existCamera_f, f) {
+  VSTransform_SPVExtensionShaderSource(existCamera_f, f) {
     var shaderText = '';
 
 
-    // UV Unfold
+    // UV Unfold function
     shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
     shaderText +=   '  gl_Position = position_world;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
@@ -34,7 +34,7 @@ export class WireframeShaderSource {
       shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
       shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
       shaderText += '  uvScaled.y = - uvScaled.y;\n';
-      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+      shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, (AABBCenterPosition.z + (float(objectIds.x)/10.0*AABBLengthCenterToCorner*2.0)), 1.0);\n';
       shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
     }
 
@@ -48,7 +48,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+  FSDefine_SPVExtensionShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += `${in_} vec3 barycentricCoord;\n`;
@@ -56,13 +56,15 @@ export class WireframeShaderSource {
     shaderText += 'uniform bool isWireframe;\n';
     //shaderText += 'uniform bool isWireframeOnShade;\n';
     shaderText += 'uniform float wireframeWidth;\n';
+    shaderText += 'uniform float wireframeWidthRelativeScale;\n';
 
     return shaderText;
   }
 
-  FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+  FSMethodDefine_SPVExtensionShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
+    // function for wireframe
     shaderText += `
     float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
         vec3 d = fwidth(bary3);
@@ -77,7 +79,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSShade_SPVExtensionShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += 'bool isWireframeInner = false;\n';
@@ -86,26 +88,32 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
+  FSPostEffect_SPVExtensionShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
 
+    // Wireframe function
     shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
+    shaderText += 'float wireframeWidthInnerAlpha = wireframeWidth-1.0;\n';
     shaderText += 'float threshold = 0.001;\n';
     shaderText += 'vec4 wireframeResult = rt0;\n';
     shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
     shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
     shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
     shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
+    shaderText += '  float edgeRatioAlpha = edge_ratio(barycentricCoord, wireframeWidthInnerAlpha, wireframeWidthRelativeScale);\n';
+    shaderText += '  float edgeRatioModifiedAlpha = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInnerAlpha / wireframeWidthRelativeScale/4.0);\n';
     // if r0.a is 0.0, it is wireframe not on shaded
     shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
-    shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+    shaderText += '  wireframeResult.a = wireframeColor.a * edgeRatioModifiedAlpha + rt0.a * (1.0 - edgeRatioModified);\n';
+
+    //shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModifiedAlpha, pow(edgeRatioModifiedAlpha, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
     shaderText += '}\n';
 
     shaderText += 'if ( isWireframe ) {\n';
     shaderText += '  rt0 = wireframeResult;\n';
     shaderText += '}\n';
 
-    shaderText += '    if (rt0.a < 0.05) {\n';
+    shaderText += '    if (rt0.a < threshold) {\n';
     shaderText += '      discard;\n';
     shaderText += '    }\n';
 
@@ -119,7 +127,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_SPVExtensionShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
     shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
@@ -147,15 +155,15 @@ export class WireframeShaderSource {
   }
 }
 
-export default class WireframeShader extends FragmentSimpleShader {
+export default class SPVExtensionShader extends FragmentSimpleShader {
   constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
 
     super(glBoostContext);
 
     if (basicShader === VertexWorldShaderSource) {
-      WireframeShader.mixin(VertexWorldShadowShaderSource);
+      SPVExtensionShader.mixin(VertexWorldShadowShaderSource);
     }
-    WireframeShader.mixin(WireframeShaderSource);
+    SPVExtensionShader.mixin(SPVExtensionShaderSource);
 
     this._unfoldUVRatio = void 0;
 
@@ -205,16 +213,6 @@ export default class WireframeShader extends FragmentSimpleShader {
       let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
       this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
     }
-
-    super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-    let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
-    if (uniformLocationDepthBias) {
-      let depthBias = this.getShaderParameter(material, 'depthBias', false);
-      if (depthBias) {
-        this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
-      }
-    }
   }
 
   set unfoldUVRatio(value) {
@@ -235,4 +233,4 @@ export default class WireframeShader extends FragmentSimpleShader {
 
 }
 
-GLBoost['WireframeShader'] = WireframeShader;
+GLBoost['SPVExtensionShaderSource'] = SPVExtensionShaderSource;
