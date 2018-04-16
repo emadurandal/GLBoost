@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 1764db13
+// This revision is the commit right after the SHA: dd9d68dd
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -11103,7 +11103,7 @@ class L_SPVCameraController extends GLBoostObject {
       targetAABB = this._target.AABB;
     }
 
-    let targetAABBInWorld = AABB.multiplyMatrix(this._target.transformMatrixAccumulatedAncestry, targetAABB);
+    let targetAABBInWorld = AABB.multiplyMatrix(this._target.worldMatrix, targetAABB);
 
     return targetAABB;
   }
