@@ -1,9 +1,10 @@
 (function (global, factory) {
-	typeof exports === 'd9ae3060&& typeof module !== 'undefined' ? factory() :
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
 	(factory());
 }(this, (function () { 'use strict';
 
+// This revision is the commit right after the SHA: 15473e56
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -7162,17 +7163,11 @@ class BlendShapeShaderSource {
 
   VSTransform_BlendShapeShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
-    shaderText +=     'float sumOfWeights = 0.0;\n';
-    f.forEach((attribName)=>{
-      if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
-        shaderText += 'sumOfWeights += blendWeight_' + attribName +';\n';
-      }
-    });
     var numOfShapeTargets = this.BlendShapeShaderSource_numberOfShapeTargets(f);
-    shaderText += '    vec3 blendedPosition = aVertex_position * max(1.0 - sumOfWeights/float(' + numOfShapeTargets + '), 0.0);\n';
+    shaderText += '    vec3 blendedPosition = aVertex_position;\n';    
     f.forEach((attribName)=>{
       if (this.BlendShapeShaderSource_isShapeTarget(attribName)) {
-        shaderText += 'blendedPosition += aVertex_' + attribName + ' * blendWeight_' + attribName + '/float(' + numOfShapeTargets + ');\n';
+        shaderText += 'blendedPosition += (aVertex_' + attribName + ' - aVertex_position) * blendWeight_' + attribName + ';\n';
       }
     });
     if (existCamera_f) {
@@ -7601,25 +7596,27 @@ class FragmentSimpleShaderSource {
 
   FSDefine_FragmentSimpleShaderSource(in_, f) {
     let shaderText =      'uniform float opacity;\n';
-    shaderText +=         'uniform bool isPreMultipliedAlpha;\n';
+    shaderText +=         'uniform bool isNeededToMultiplyAlphaToColorOfPixelOutput;\n';
     return shaderText;
   }
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
     let shaderText =   "";
-    shaderText +=   `bool isDataOutput = false;\n`;
     shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+    shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
+    shaderText += '    rt0.rgb *= rt0.a;\n';
+    shaderText += '  }\n';
 
     return shaderText;
   }
 
   FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
-
-    shaderText += 'if (isPreMultipliedAlpha && !isDataOutput) {\n';
+/*
+    shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
     shaderText += '  rt0.rgb *= rt0.a;\n';
     shaderText += '}\n';
-
+*/
     return shaderText;
   }
 
@@ -7628,7 +7625,7 @@ class FragmentSimpleShaderSource {
     var vertexAttribsAsResult = [];
 
     material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
-    material.setUniform(glslProgram, 'uniform_isPremultipliedAlpha', this._glContext.getUniformLocation(glslProgram, 'isPremultipliedAlpha'));
+    material.setUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput', this._glContext.getUniformLocation(glslProgram, 'isNeededToMultiplyAlphaToColorOfPixelOutput'));
 
     let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
     if (uniformLocationDepthBias) {
@@ -7650,22 +7647,22 @@ class FragmentSimpleShader extends Shader {
     FragmentSimpleShader.mixin(basicShader);
     FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
 
-    this._isPreMultipliedAlpha = null;
+    this._isNeededToMultiplyAlphaToColorOfPixelOutput = null;
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isPreMultipliedAlpha'), this._isPreMultipliedAlpha, true);
+    this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
 
   }
 
-  set isPreMultipliedAlpha(flg) {
-    this._isPreMultipliedAlpha = flg;
+  set isNeededToMultiplyAlphaToColorOfPixelOutput(flg) {
+    this._isNeededToMultiplyAlphaToColorOfPixelOutput = flg;
   }
 
-  get isPreMultipliedAlpha() {
-    return this._isPreMultipliedAlpha;
+  get isNeededToMultiplyAlphaToColorOfPixelOutput() {
+    return this._isNeededToMultiplyAlphaToColorOfPixelOutput;
   }
 }
 
@@ -10650,6 +10647,108 @@ class Particle extends Geometry {
 
 GLBoost$1["Particle"] = Particle;
 
+class Screen extends Geometry {
+  constructor(glBoostContext, screen = 
+    {
+      unit: 'ratio', // or 'pixel'
+      range: 'positive-negative', // or 'positive'
+      origin: new Vector2(-1, -1),
+      size: new Vector2(2, 2),
+    }, customVertexAttributes = null) {
+    super(glBoostContext);
+
+    this._setupVertexData(screen, customVertexAttributes);
+  }
+
+  _setupVertexData(screen, customVertexAttributes) {
+    let positions = [];
+    let indices = [];
+    let colors = [];
+    let texcoords = [];
+    let normals = [];
+
+    let originX = screen.origin.x;
+    let originY = screen.origin.y;
+    let sizeX = screen.size.x;
+    let sizeY = screen.size.y;
+
+    if (screen.unit === 'pixel') {
+      originX = originX/this._glContext.canvasWidth;
+      originY = originY/this._glContext.canvasHeight;
+      sizeX = sizeX/this._glContext.canvasWidth;
+      sizeY = sizeY/this._glContext.canvasHeight;
+    }
+    if (screen.range === 'positive') {
+      originX = (originX-0.5)*2;
+      originY = (originY-0.5)*2;
+      sizeX = sizeX*2;
+      sizeY = sizeY*2;
+    }
+
+    screen.origin = new Vector2(originX, originY);
+    screen.size = new Vector2(sizeX, sizeY);
+
+    this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, 1, 1, screen.uUVRepeat, screen.vUVRepeat);
+
+
+    let object = {
+      position: positions,
+      color: colors,
+      texcoord: texcoords,
+      normal: normals
+    };
+
+    let completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
+    this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
+  }
+
+  _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        positions.push(new Vector3(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
+      }
+    }
+
+    for(let i=0; i<vSpan; i++) {
+      let degenerate_left_index = 0;
+      let degenerate_right_index = 0;
+      for(let j=0; j<=uSpan; j++) {
+        indices.push(i*(uSpan+1)+j);
+        indices.push((i+1)*(uSpan+1)+j);
+        if (j === 0) {
+          degenerate_left_index = (i + 1) * (uSpan+1) + j;
+        } else if (j === uSpan) {
+          degenerate_right_index = (i + 1) * (uSpan+1) + j;
+        }
+      }
+      indices.push(degenerate_right_index);
+      indices.push(degenerate_left_index);
+    }
+
+    let vertexColor = new Vector4(1, 1, 1, 1);
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        colors.push(vertexColor);
+      }
+    }
+
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        texcoords.push(new Vector2(j, i));
+      }
+    }
+
+    let normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
+    for(let i=0; i<=vSpan; i++) {
+      for(let j=0; j<=uSpan; j++) {
+        normals.push(normal);
+      }
+    }
+  }
+}
+
+GLBoost$1["Screen"] = Screen;
+
 class InputUtil {
 
   constructor() {
@@ -12097,6 +12196,10 @@ class GLBoostLowContext {
 
   createPhinaTexture(width, height, fillStyle, parameters = null) {
     return new PhinaTexture(this, width, height, fillStyle, parameters);
+  }
+
+  createScreen(screen, customVertexAttributes) {
+    return new Screen(this, screen, customVertexAttributes);
   }
 
   /**
@@ -15817,6 +15920,52 @@ class EffekseerElement extends M_Element {
 
 }
 
+class M_ScreenMesh extends M_Mesh {
+  constructor(glBoostContext, customVertexAttributes) {
+    super(glBoostContext, null, null);
+    this._init(customVertexAttributes);
+  }
+
+  _init(customVertexAttributes) {
+    let gl = this._glContext.gl;
+    this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
+    this.isAffectedByWorldMatrix = false;
+    this.isAffectedByViewMatrix = false;
+    this.isAffectedByProjectionMatrix = false;
+
+    let material = new ClassicMaterial$1(this._glBoostContext);
+    material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+    material.states = {
+      "enable": [
+        gl.BLEND
+      ],
+      "functions": {
+        "blendFuncSeparate": [
+          770, // SRC_ALPHA
+          771, // ONE MINUS SRC_ALPHA
+          1,   // ONE
+          1    // ONE
+        ]
+      }
+    };
+    this.geometry.materials = [material];
+    this._material = material;
+  }
+
+  set material(obj) {
+    this._material = obj;
+    this.geometry.materials = [obj];
+  }
+
+  get material() {
+    return this._material;
+  }
+
+}
+
+
+GLBoost["M_ScreenMesh"] = M_ScreenMesh;
+
 class GLBoostMiddleContext extends GLBoostLowContext {
   constructor(canvas, initParameter, gl, width, height) {
     super(canvas, initParameter, gl, width, height);
@@ -15913,6 +16062,10 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new EffekseerElement(this);
   }
 
+  createScreenMesh(customVertexAttributes) {
+    return new M_ScreenMesh(this, customVertexAttributes);
+  }
+
   createSPVScreenMesh(screens, customVertexAttributes) {
     return new M_SPVScreenMesh(this, screens, customVertexAttributes);
   }
@@ -15946,7 +16099,7 @@ class PhongShaderSource {
 
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -16743,7 +16896,7 @@ class LambertShaderSource {
     var shaderText = '';
 
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
     
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
@@ -16843,8 +16996,8 @@ class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
-      isPixelOutputPreMultipliedAlpha: true,
-      isTexturePreMultipliedAlpha: false,
+      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true
@@ -17013,12 +17166,27 @@ class GLTFLoader {
         }
       }
 
+      let isNeededToMultiplyAlphaToColorOfTexture = true;
+      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // Nothing to do because premultipling alpha is already done.
+        } else {
+          isNeededToMultiplyAlphaToColorOfTexture = true;
+        }
+      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // TODO: Implement to Make Texture Straight.
+        } else {
+          // Nothing to do because the texture is straight.
+        }        
+      }
+      
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': options.isTexturePreMultipliedAlpha
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
@@ -17336,8 +17504,8 @@ class GLTFLoader {
 */
 //        if (material === null) {
         let material = glBoostContext.createClassicMaterial();
-        if (options.isPixelOutputMultiplidAlpha) {
-          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+          material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
 //        }
@@ -17524,7 +17692,7 @@ class GLTFLoader {
               enables.push(2929);
             }
             material.states.enable = enables; // It means, [gl.BLEND];
-            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+            if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
               material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
             }
             material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
@@ -18167,7 +18335,7 @@ class BlinnPhongShaderSource {
     var shaderText = '';
     shaderText += '  float depthBias = 0.005;\n';
     shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 1.0);\n';
+    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
   
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];      
@@ -18557,153 +18725,6 @@ class JointGizmoUpdater {
 if (GLBoost['JointGizmoUpdater'] === void 0) {
   GLBoost['JointGizmoUpdater'] = JointGizmoUpdater;
 }
-
-class Screen extends Geometry {
-  constructor(glBoostContext, screen = 
-    {
-      unit: 'ratio', // or 'pixel'
-      range: 'positive-negative', // or 'positive'
-      origin: new Vector2(-1, -1),
-      size: new Vector2(2, 2),
-    }, customVertexAttributes = null) {
-    super(glBoostContext);
-
-    this._setupVertexData(screen, customVertexAttributes);
-  }
-
-  _setupVertexData(screen, customVertexAttributes) {
-    let positions = [];
-    let indices = [];
-    let colors = [];
-    let texcoords = [];
-    let normals = [];
-
-    let originX = screen.origin.x;
-    let originY = screen.origin.y;
-    let sizeX = screen.size.x;
-    let sizeY = screen.size.y;
-
-    if (screen.unit === 'pixel') {
-      originX = originX/this._glContext.canvasWidth;
-      originY = originY/this._glContext.canvasHeight;
-      sizeX = sizeX/this._glContext.canvasWidth;
-      sizeY = sizeY/this._glContext.canvasHeight;
-    }
-    if (screen.range === 'positive') {
-      originX = (originX-0.5)*2;
-      originY = (originY-0.5)*2;
-      sizeX = sizeX*2;
-      sizeY = sizeY*2;
-    }
-
-    screen.origin = new Vector2(originX, originY);
-    screen.size = new Vector2(sizeX, sizeY);
-
-    this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, 1, 1, screen.uUVRepeat, screen.vUVRepeat);
-
-
-    let object = {
-      position: positions,
-      color: colors,
-      texcoord: texcoords,
-      normal: normals
-    };
-
-    let completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
-    this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
-  }
-
-  _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        positions.push(new Vector3(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
-      }
-    }
-
-    for(let i=0; i<vSpan; i++) {
-      let degenerate_left_index = 0;
-      let degenerate_right_index = 0;
-      for(let j=0; j<=uSpan; j++) {
-        indices.push(i*(uSpan+1)+j);
-        indices.push((i+1)*(uSpan+1)+j);
-        if (j === 0) {
-          degenerate_left_index = (i + 1) * (uSpan+1) + j;
-        } else if (j === uSpan) {
-          degenerate_right_index = (i + 1) * (uSpan+1) + j;
-        }
-      }
-      indices.push(degenerate_right_index);
-      indices.push(degenerate_left_index);
-    }
-
-    let vertexColor = new Vector4(1, 1, 1, 1);
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        colors.push(vertexColor);
-      }
-    }
-
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        texcoords.push(new Vector2(j, i));
-      }
-    }
-
-    let normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
-    for(let i=0; i<=vSpan; i++) {
-      for(let j=0; j<=uSpan; j++) {
-        normals.push(normal);
-      }
-    }
-  }
-}
-
-GLBoost$1["Screen"] = Screen;
-
-class M_ScreenMesh extends M_Mesh {
-  constructor(glBoostContext, customVertexAttributes) {
-    super(glBoostContext, null, null);
-    this._init(customVertexAttributes);
-  }
-
-  _init(customVertexAttributes) {
-    let gl = this._glContext.gl;
-    this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
-    this.isAffectedByWorldMatrix = false;
-    this.isAffectedByViewMatrix = false;
-    this.isAffectedByProjectionMatrix = false;
-
-    let material = new ClassicMaterial$1(this._glBoostContext);
-    material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
-    material.states = {
-      "enable": [
-        gl.BLEND
-      ],
-      "functions": {
-        "blendFuncSeparate": [
-          770, // SRC_ALPHA
-          771, // ONE MINUS SRC_ALPHA
-          1,   // ONE
-          1    // ONE
-        ]
-      }
-    };
-    this.geometry.materials = [material];
-    this._material = material;
-  }
-
-  set material(obj) {
-    this._material = obj;
-  }
-
-  get material() {
-    return this._material;
-  }
-
-}
-
-
-GLBoost["M_ScreenMesh"] = M_ScreenMesh;
 
 /*       */
 

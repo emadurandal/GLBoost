@@ -36,6 +36,7 @@ export default class M_ScreenMesh extends M_Mesh {
 
   set material(obj) {
     this._material = obj;
+    this.geometry.materials = [obj];
   }
 
   get material() {

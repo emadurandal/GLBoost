@@ -59,8 +59,8 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
-      isPixelOutputPreMultipliedAlpha: true,
-      isTexturePreMultipliedAlpha: false,
+      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true
@@ -229,12 +229,27 @@ export default class GLTFLoader {
         }
       }
 
+      let isNeededToMultiplyAlphaToColorOfTexture = true;
+      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // Nothing to do because premultipling alpha is already done.
+        } else {
+          isNeededToMultiplyAlphaToColorOfTexture = true;
+        }
+      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // TODO: Implement to Make Texture Straight.
+        } else {
+          // Nothing to do because the texture is straight.
+        }        
+      }
+      
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': options.isTexturePreMultipliedAlpha
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
@@ -552,8 +567,8 @@ export default class GLTFLoader {
 */
 //        if (material === null) {
         let material = glBoostContext.createClassicMaterial();
-        if (options.isPixelOutputMultiplidAlpha) {
-          material.shaderParameters.isPreMultipliedAlpha = options.isPixelOutputMultiplidAlpha;
+        if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+          material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
 //        }
@@ -740,7 +755,7 @@ export default class GLTFLoader {
               enables.push(2929);
             }
             material.states.enable = enables; // It means, [gl.BLEND];
-            if (options.isBlend && options.isTexturePreMultipliedAlpha) {
+            if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
               material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
             }
             material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;

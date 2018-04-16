@@ -16,6 +16,7 @@ import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
 import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
+import Screen from '../primitives/Screen';
 import GLBoost from '../../globals';
 import L_SPVCameraController from '../auxiliaries/camera_controllers/L_SPVCameraController';
 import SPVClassicMaterial from '../materials/SPVClassicMaterial';
@@ -126,6 +127,10 @@ export default class GLBoostLowContext {
 
   createPhinaTexture(width, height, fillStyle, parameters = null) {
     return new PhinaTexture(this, width, height, fillStyle, parameters);
+  }
+
+  createScreen(screen, customVertexAttributes) {
+    return new Screen(this, screen, customVertexAttributes);
   }
 
   /**
