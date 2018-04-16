@@ -96,7 +96,7 @@ export class SPVDecalShaderSource {
       shaderText += `  float offsetTexel = 2.0;\n`;
       shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
       shaderText += `  leftDecal = leftDecal * vec4(1.0, 0.0, 0.0, 1.0);\n`;
-      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, texcoordTransformed * uvTransform.xy + uvTransform.zw);\n`;
+      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, texcoordTransformed);\n`;
       shaderText += `  centerDecal = centerDecal * vec4(0.0, 1.0, 0.0, 1.0);\n`;
       shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x + offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
       shaderText += `  rightDecal = rightDecal * vec4(0.0, 0.0, 1.0, 1.0);\n`;
