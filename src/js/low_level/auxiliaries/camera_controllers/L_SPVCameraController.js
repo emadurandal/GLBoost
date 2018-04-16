@@ -346,7 +346,7 @@ export default class L_SPVCameraController extends GLBoostObject {
       targetAABB = this._target.AABB;
     }
 
-    let targetAABBInWorld = AABB.multiplyMatrix(this._target.transformMatrixAccumulatedAncestry, targetAABB);
+    let targetAABBInWorld = AABB.multiplyMatrix(this._target.worldMatrix, targetAABB);
 
     return targetAABB;
   }
