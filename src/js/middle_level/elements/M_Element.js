@@ -255,7 +255,7 @@ export default class M_Element extends L_Element {
 
   getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
     let input = inputValue;
-    if (this._dirtyAsElement) {
+//    if (this._dirtyAsElement || input) {
 //    if (true) {
 
       var matrix = Matrix44.identity();
@@ -284,9 +284,11 @@ export default class M_Element extends L_Element {
       this._finalMatrix.m23 = translateVec.z;
 
       this._dirtyAsElement = false;
+      /*
     } else {
      // console.count('Cache')
     }
+    */
 
     return this._finalMatrix.clone();
   }
