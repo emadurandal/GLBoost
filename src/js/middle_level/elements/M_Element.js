@@ -40,6 +40,13 @@ export default class M_Element extends L_Element {
     this._masterElement = null;
 
     this._worldMatrix = new Matrix44();
+
+
+    this._is_trs_matrix_updated = true;
+    this._is_translate_updated = true;
+    this._is_scale_updated = true;
+    this._is_quaternion_updated = true;
+    this._is_euler_angles_updated = true;
   }
 
 
@@ -116,6 +123,7 @@ export default class M_Element extends L_Element {
       this.matrix.m23 = vec.z;
     }
     this._translate = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -144,6 +152,7 @@ export default class M_Element extends L_Element {
       return;
     }
     this._rotate = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -172,6 +181,7 @@ export default class M_Element extends L_Element {
       return;
     }
     this._quaternion = quat;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -196,6 +206,7 @@ export default class M_Element extends L_Element {
       return;
     }
     this._scale = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -244,7 +255,7 @@ export default class M_Element extends L_Element {
 
   getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
     let input = inputValue;
-    if (this._dirtyAsElement) {
+//    if (this._dirtyAsElement || input) {
 //    if (true) {
 
       var matrix = Matrix44.identity();
@@ -273,9 +284,11 @@ export default class M_Element extends L_Element {
       this._finalMatrix.m23 = translateVec.z;
 
       this._dirtyAsElement = false;
+      /*
     } else {
      // console.count('Cache')
     }
+    */
 
     return this._finalMatrix.clone();
   }
