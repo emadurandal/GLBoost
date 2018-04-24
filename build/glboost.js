@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 63bdeeb9
+// This revision is the commit right after the SHA: 43ac0b31
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3139,6 +3139,7 @@ class L_Element extends GLBoostObject {
     this._matrix = mat.clone();
     this._currentCalcMode = 'matrix';
 //    this._translate = new Vector3(mat.m03, mat.m03, mat.m03);
+    this._is_trs_matrix_updated = true;
     this._needUpdate();
   }
 
@@ -3251,6 +3252,13 @@ class M_Element extends L_Element {
     this._masterElement = null;
 
     this._worldMatrix = new Matrix44$1$1();
+
+
+    this._is_trs_matrix_updated = true;
+    this._is_translate_updated = true;
+    this._is_scale_updated = true;
+    this._is_quaternion_updated = true;
+    this._is_euler_angles_updated = true;
   }
 
 
@@ -3327,6 +3335,7 @@ class M_Element extends L_Element {
       this.matrix.m23 = vec.z;
     }
     this._translate = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -3355,6 +3364,7 @@ class M_Element extends L_Element {
       return;
     }
     this._rotate = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -3383,6 +3393,7 @@ class M_Element extends L_Element {
       return;
     }
     this._quaternion = quat;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -3407,6 +3418,7 @@ class M_Element extends L_Element {
       return;
     }
     this._scale = vec;
+    this._is_trs_matrix_updated = false;
     this._needUpdate();
   }
 
@@ -3455,7 +3467,7 @@ class M_Element extends L_Element {
 
   getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
     let input = inputValue;
-    if (this._dirtyAsElement) {
+//    if (this._dirtyAsElement || input) {
 //    if (true) {
 
       var matrix = Matrix44$1$1.identity();
@@ -3484,9 +3496,11 @@ class M_Element extends L_Element {
       this._finalMatrix.m23 = translateVec.z;
 
       this._dirtyAsElement = false;
+      /*
     } else {
      // console.count('Cache')
     }
+    */
 
     return this._finalMatrix.clone();
   }
