@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 1f2221d0
+// This revision is the commit right after the SHA: 5fa3a295
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -4484,7 +4484,7 @@ class SkeletalShaderSource {
   VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += 'vec4 weightVec = normalize(aVertex_weight);\n';
+    shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
 
     if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
