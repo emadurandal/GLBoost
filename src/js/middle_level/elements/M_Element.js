@@ -13,8 +13,6 @@ export default class M_Element extends L_Element {
     this._parent = null;
     this._invMatrix = Matrix44.identity();
     this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-    this._calculatedInverseMatrix = false;
-    this._updateCountAsElement = 0;
     this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
     this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
@@ -47,18 +45,16 @@ export default class M_Element extends L_Element {
     this._is_scale_updated = true;
     this._is_quaternion_updated = true;
     this._is_euler_angles_updated = true;
+    this._is_inverse_trs_matrix_updated = false;
   }
 
 
   _needUpdate() {
     this._dirtyAsElement = true;
-    this._calculatedInverseMatrix = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }
 
-  get updateCountAsElement() {
-    return this._updateCountAsElement;
-  }
 
   set toInheritCurrentAnimationInputValue(flg) {
     this._toInheritCurrentAnimationInputValue = flg;
@@ -419,9 +415,9 @@ export default class M_Element extends L_Element {
   }
 
   get inverseTransformMatrix() {
-    if (!this._calculatedInverseMatrix) {
+    if (!this._is_inverse_trs_matrix_updated) {
       this._invMatrix = this.transformMatrix.invert();
-      this._calculatedInverseMatrix = true;
+      this._is_inverse_trs_matrix_updated = true;
     }
     return this._invMatrix.clone();
   }
@@ -681,8 +677,7 @@ export default class M_Element extends L_Element {
     instance._parent = this._parent;
     instance._invMatrix = this._invMatrix.clone();
     instance._matrixGetMode = this._matrixGetMode;
-    instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
-    instance._updateCountAsElement = this._updateCountAsElement;
+    instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
     instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
     instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;

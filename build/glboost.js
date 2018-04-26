@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 3ee7455b
+// This revision is the commit right after the SHA: 7d1baef1
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3083,6 +3083,12 @@ class L_Element extends GLBoostObject {
     this._dirtyAsElement = true;
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
 
+    this._updateCountAsElement = 0;
+  }
+
+
+  get updateCountAsElement() {
+    return this._updateCountAsElement;
   }
 
   _needUpdate() {
@@ -3215,6 +3221,8 @@ class L_Element extends GLBoostObject {
     instance._finalMatrix = this._finalMatrix.clone();
     instance._dirtyAsElement = this._dirtyAsElement;
     instance._currentCalcMode = this._currentCalcMode;
+
+    instance._updateCountAsElement = this._updateCountAsElement;
   }
 }
 
@@ -3225,8 +3233,6 @@ class M_Element extends L_Element {
     this._parent = null;
     this._invMatrix = Matrix44$1$1.identity();
     this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-    this._calculatedInverseMatrix = false;
-    this._updateCountAsElement = 0;
     this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
     this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
@@ -3259,18 +3265,16 @@ class M_Element extends L_Element {
     this._is_scale_updated = true;
     this._is_quaternion_updated = true;
     this._is_euler_angles_updated = true;
+    this._is_inverse_trs_matrix_updated = false;
   }
 
 
   _needUpdate() {
     this._dirtyAsElement = true;
-    this._calculatedInverseMatrix = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }
 
-  get updateCountAsElement() {
-    return this._updateCountAsElement;
-  }
 
   set toInheritCurrentAnimationInputValue(flg) {
     this._toInheritCurrentAnimationInputValue = flg;
@@ -3631,9 +3635,9 @@ class M_Element extends L_Element {
   }
 
   get inverseTransformMatrix() {
-    if (!this._calculatedInverseMatrix) {
+    if (!this._is_inverse_trs_matrix_updated) {
       this._invMatrix = this.transformMatrix.invert();
-      this._calculatedInverseMatrix = true;
+      this._is_inverse_trs_matrix_updated = true;
     }
     return this._invMatrix.clone();
   }
@@ -3893,8 +3897,7 @@ class M_Element extends L_Element {
     instance._parent = this._parent;
     instance._invMatrix = this._invMatrix.clone();
     instance._matrixGetMode = this._matrixGetMode;
-    instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
-    instance._updateCountAsElement = this._updateCountAsElement;
+    instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
     instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
     instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;

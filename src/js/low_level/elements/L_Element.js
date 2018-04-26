@@ -27,6 +27,12 @@ export default class L_Element extends GLBoostObject {
     this._dirtyAsElement = true;
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
 
+    this._updateCountAsElement = 0;
+  }
+
+
+  get updateCountAsElement() {
+    return this._updateCountAsElement;
   }
 
   _needUpdate() {
@@ -159,5 +165,7 @@ export default class L_Element extends GLBoostObject {
     instance._finalMatrix = this._finalMatrix.clone();
     instance._dirtyAsElement = this._dirtyAsElement;
     instance._currentCalcMode = this._currentCalcMode;
+
+    instance._updateCountAsElement = this._updateCountAsElement;
   }
 }
