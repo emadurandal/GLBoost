@@ -34,6 +34,14 @@ export default class L_Element extends GLBoostObject {
     this._animationLine = {};
     this._currentAnimationInputValues = {};
     this._activeAnimationLineName = null;
+
+    this._is_trs_matrix_updated = true;
+    this._is_translate_updated = true;
+    this._is_scale_updated = true;
+    this._is_quaternion_updated = true;
+    this._is_euler_angles_updated = true;
+    this._is_inverse_trs_matrix_updated = false;
+
   }
 
 
@@ -43,6 +51,8 @@ export default class L_Element extends GLBoostObject {
 
   _needUpdate() {
     this._dirtyAsElement = true;
+    this._is_inverse_trs_matrix_updated = false;
+    this._updateCountAsElement++;
   }
 
   _getAnimatedTransformValue(value, animation, type) {
@@ -270,15 +280,14 @@ export default class L_Element extends GLBoostObject {
     if (this._dirtyAsElement) {
 //    if (true) {
 
-      var matrix = Matrix44.identity();
-
       if (this._currentCalcMode === 'matrix' && !input) {
+        let matrix = Matrix44.identity();
         this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
 
-      var rotationMatrix = Matrix44.identity();
+      let rotationMatrix = Matrix44.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
       if (this._currentCalcMode === 'quaternion' || input) {
         rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
@@ -289,7 +298,7 @@ export default class L_Element extends GLBoostObject {
         multiply(Matrix44.rotateX(rotateVec.x));
       }
 
-      this._finalMatrix = matrix.multiply(Matrix44.scale(this.getScaleAt(this._activeAnimationLineName, input))).multiply(rotationMatrix);
+      this._finalMatrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAt(this._activeAnimationLineName, input)));
       let translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
       this._finalMatrix.m03 = translateVec.x;
       this._finalMatrix.m13 = translateVec.y;
@@ -332,35 +341,6 @@ export default class L_Element extends GLBoostObject {
 
   getQuaternionAt(lineName, value) {
     return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
-  }
-
-  get transformMatrix() {
-    if (this._dirtyAsElement) {
-      var matrix = Matrix44.identity();
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = null;
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.quaternion.rotationMatrix;
-      } else {
-        rotationMatrix = Matrix44.rotateX(this.rotate.x).
-        multiply(Matrix44.rotateY(this.rotate.y)).
-        multiply(Matrix44.rotateZ(this.rotate.z));
-      }
-
-      this._finalMatrix = matrix.multiply(Matrix44.scale(this.scale)).multiply(rotationMatrix);
-      this._finalMatrix.m03 = this.translate.x;
-      this._finalMatrix.m13 = this.translate.y;
-      this._finalMatrix.m23 = this.translate.z;
-
-      this._dirtyAsElement = false;
-    }
-
-    return this._finalMatrix.clone();
   }
 
   get inverseTransformMatrix() {
