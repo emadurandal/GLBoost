@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 0b852fea
+// This revision is the commit right after the SHA: 3ee7455b
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3467,7 +3467,7 @@ class M_Element extends L_Element {
 
   getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
     let input = inputValue;
-//    if (this._dirtyAsElement || input) {
+    if (this._dirtyAsElement) {
 //    if (true) {
 
       var matrix = Matrix44$1$1.identity();
@@ -3496,11 +3496,11 @@ class M_Element extends L_Element {
       this._finalMatrix.m23 = translateVec.z;
 
       this._dirtyAsElement = false;
-      /*
+
     } else {
      // console.count('Cache')
     }
-    */
+    
 
     return this._finalMatrix.clone();
   }
