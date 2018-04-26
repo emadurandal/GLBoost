@@ -1,4 +1,6 @@
+import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
+import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
 import Matrix44 from '../math/Matrix44';
 import GLBoostObject from '../core/GLBoostObject';
@@ -29,6 +31,8 @@ export default class L_Element extends GLBoostObject {
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
 
     this._updateCountAsElement = 0;
+    this._animationLine = {};
+    this._currentAnimationInputValues = {};
     this._activeAnimationLineName = null;
   }
 
@@ -57,6 +61,70 @@ export default class L_Element extends GLBoostObject {
     } else {
       return null;
     }
+  }
+
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    var outputComponentN = 0;
+    if (outputArray[0] instanceof Vector2) {
+      outputComponentN = 2;
+    } else if (outputArray[0] instanceof Vector3) {
+      outputComponentN = 3;
+    } else if (outputArray[0] instanceof Vector4) {
+      outputComponentN = 4;
+    } else if (outputArray[0] instanceof Quaternion) {
+      outputComponentN = 4;
+    } else {
+      outputComponentN = 1;
+    }
+    if (!this._animationLine[lineName]) {
+      this._animationLine[lineName] = {};
+    }
+    this._animationLine[lineName][attributeName] = {
+      input: inputArray,
+      output: outputArray,
+      outputAttribute: attributeName,
+      outputComponentN: outputComponentN
+    };
+  }
+
+  hasAnimation(lineName) {
+    if (this._animationLine[lineName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getStartInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[0];
+      if (inputLatestValueAtThisAttribute < latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
+  }
+
+  getEndInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = - Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
+      if (inputLatestValueAtThisAttribute > latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
   }
 
   /**
@@ -293,6 +361,14 @@ export default class L_Element extends GLBoostObject {
     }
 
     return this._finalMatrix.clone();
+  }
+
+  get inverseTransformMatrix() {
+    if (!this._is_inverse_trs_matrix_updated) {
+      this._invMatrix = this.transformMatrix.invert();
+      this._is_inverse_trs_matrix_updated = true;
+    }
+    return this._invMatrix.clone();
   }
 
   get normalMatrix() {

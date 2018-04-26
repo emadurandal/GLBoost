@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 11c6eefa
+// This revision is the commit right after the SHA: 8fcdc6e3
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3084,6 +3084,8 @@ class L_Element extends GLBoostObject {
     this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
 
     this._updateCountAsElement = 0;
+    this._animationLine = {};
+    this._currentAnimationInputValues = {};
     this._activeAnimationLineName = null;
   }
 
@@ -3112,6 +3114,70 @@ class L_Element extends GLBoostObject {
     } else {
       return null;
     }
+  }
+
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    var outputComponentN = 0;
+    if (outputArray[0] instanceof Vector2) {
+      outputComponentN = 2;
+    } else if (outputArray[0] instanceof Vector3) {
+      outputComponentN = 3;
+    } else if (outputArray[0] instanceof Vector4) {
+      outputComponentN = 4;
+    } else if (outputArray[0] instanceof Quaternion) {
+      outputComponentN = 4;
+    } else {
+      outputComponentN = 1;
+    }
+    if (!this._animationLine[lineName]) {
+      this._animationLine[lineName] = {};
+    }
+    this._animationLine[lineName][attributeName] = {
+      input: inputArray,
+      output: outputArray,
+      outputAttribute: attributeName,
+      outputComponentN: outputComponentN
+    };
+  }
+
+  hasAnimation(lineName) {
+    if (this._animationLine[lineName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getStartInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[0];
+      if (inputLatestValueAtThisAttribute < latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
+  }
+
+  getEndInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = - Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
+      if (inputLatestValueAtThisAttribute > latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
   }
 
   /**
@@ -3350,6 +3416,14 @@ class L_Element extends GLBoostObject {
     return this._finalMatrix.clone();
   }
 
+  get inverseTransformMatrix() {
+    if (!this._is_inverse_trs_matrix_updated) {
+      this._invMatrix = this.transformMatrix.invert();
+      this._is_inverse_trs_matrix_updated = true;
+    }
+    return this._invMatrix.clone();
+  }
+
   get normalMatrix() {
     return Matrix44$1$1.invert(this.transformMatrix).transpose().toMatrix33();
   }
@@ -3390,7 +3464,6 @@ class M_Element extends L_Element {
     this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
-    this._animationLine = {};
     this._transparentByUser = false;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
@@ -3398,7 +3471,6 @@ class M_Element extends L_Element {
     this._isAffectedByViewMatrix = true;
     this._isAffectedByProjectionMatrix = true;
 
-    this._currentAnimationInputValues = {};
     this._toInheritCurrentAnimationInputValue = true;
 
     this._camera = null;
@@ -3579,14 +3651,6 @@ class M_Element extends L_Element {
     }
 
     return rotationMatrix.clone();
-  }
-
-  get inverseTransformMatrix() {
-    if (!this._is_inverse_trs_matrix_updated) {
-      this._invMatrix = this.transformMatrix.invert();
-      this._is_inverse_trs_matrix_updated = true;
-    }
-    return this._invMatrix.clone();
   }
 
   _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
@@ -3782,38 +3846,6 @@ class M_Element extends L_Element {
     return this._instanceName + this._updateCountAsElement;                // faster
   }
 
-  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
-    var outputComponentN = 0;
-    if (outputArray[0] instanceof Vector2) {
-      outputComponentN = 2;
-    } else if (outputArray[0] instanceof Vector3) {
-      outputComponentN = 3;
-    } else if (outputArray[0] instanceof Vector4) {
-      outputComponentN = 4;
-    } else if (outputArray[0] instanceof Quaternion) {
-      outputComponentN = 4;
-    } else {
-      outputComponentN = 1;
-    }
-    if (!this._animationLine[lineName]) {
-      this._animationLine[lineName] = {};
-    }
-    this._animationLine[lineName][attributeName] = {
-      input: inputArray,
-      output: outputArray,
-      outputAttribute: attributeName,
-      outputComponentN: outputComponentN
-    };
-  }
-
-  hasAnimation(lineName) {
-    if (this._animationLine[lineName]) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   set camera(camera) {
     this._camera = camera;
   }
@@ -3974,37 +4006,6 @@ class M_Element extends L_Element {
   }
   */
 
-  getStartInputValueOfAnimation(lineName) {
-    let inputLine = this._animationLine[lineName];
-    let latestInputValue = Number.MAX_VALUE;
-    if (typeof inputLine === 'undefined') {
-      return latestInputValue;
-    }
-    for (let attributeName in inputLine) {
-      let inputValueArray = inputLine[attributeName].input;
-      let inputLatestValueAtThisAttribute = inputValueArray[0];
-      if (inputLatestValueAtThisAttribute < latestInputValue) {
-        latestInputValue = inputLatestValueAtThisAttribute;
-      }
-    }
-    return latestInputValue;
-  }
-
-  getEndInputValueOfAnimation(lineName) {
-    let inputLine = this._animationLine[lineName];
-    let latestInputValue = - Number.MAX_VALUE;
-    if (typeof inputLine === 'undefined') {
-      return latestInputValue;
-    }
-    for (let attributeName in inputLine) {
-      let inputValueArray = inputLine[attributeName].input;
-      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
-      if (inputLatestValueAtThisAttribute > latestInputValue) {
-        latestInputValue = inputLatestValueAtThisAttribute;
-      }
-    }
-    return latestInputValue;
-  }
 
   get worldMatrixForJoints() {
     return this.getWorldMatrixForJointsAt(void 0);
