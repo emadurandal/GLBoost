@@ -50,7 +50,7 @@ export default class M_Element extends L_Element {
 
 
   _needUpdate() {
-    this._dirtyAsElement = true;
+    super._needUpdate();
     this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }

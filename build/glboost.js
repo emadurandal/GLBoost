@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 7d1baef1
+// This revision is the commit right after the SHA: e39a4698
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3270,7 +3270,7 @@ class M_Element extends L_Element {
 
 
   _needUpdate() {
-    this._dirtyAsElement = true;
+    super._needUpdate();
     this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }
