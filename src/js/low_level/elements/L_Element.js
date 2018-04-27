@@ -337,7 +337,7 @@ export default class L_Element extends GLBoostObject {
     return matrix;
   }
 
-  
+  /*
   getTransformMatrixAt(inputValue) {
     let input = inputValue;
     if (this._dirtyAsElement) {
@@ -376,38 +376,43 @@ export default class L_Element extends GLBoostObject {
 
     return this._finalMatrix.clone();
   }
+*/
 
-
-/*
 
  getTransformMatrixAt(inputValue) {
   let input = inputValue;
 
-  
-  if (this._is_trs_matrix_updated) {
-    let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
-    if (matrix !== null) {
+//  if (this._is_trs_matrix_updated && input === null) {
+  if (false) {
+
+  } else {
+//    console.log('hoge');
+    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
+      let matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+/*
+      let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
+      if (matrix !== null) {
+        this.multiplyMatrix(matrix);
+  //      this._is_trs_matrix_updated = true;
+        return this._matrix.clone();  
+      } else {
+//        let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
+      let matrix = this.getMatrixNotAnimated(this._activeAnimationLineName, input);
       this.multiplyMatrix(matrix);
-//      this._is_trs_matrix_updated = true;
-      return this._matrix.clone();  
+        return this._matrix.clone();  
+      }
+      */
     }
-  }
+
 
   //if (input !== null) {
 
-    
-  //  let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
-  //  if (matrix !== null) {
-  //    this.multiplyMatrix(matrix);
-  //    return this._matrix.clone();  
-  //  }
-    
-
     let rotationMatrix;
     // if input is truly, glTF animation's can be regarded as quaternion
-    if (this._is_quaternion_updated) {
+    if (this._is_quaternion_updated || input) {
       rotationMatrix = this.getQuaternionAtOrStatic(this._activeAnimationLineName, input).rotationMatrix;
-    } else if (this._is_euler_angles_updated) {
+//    } else if (this._is_euler_angles_updated) {
+    } else {
       let rotateVec = this.getRotateAtOrStatic(this._activeAnimationLineName, input);
       rotationMatrix = Matrix44.rotateZ(rotateVec.z).
       multiply(Matrix44.rotateY(rotateVec.y)).
@@ -421,12 +426,11 @@ export default class L_Element extends GLBoostObject {
     this._matrix.m23 = translateVec.z;
 
     this._is_trs_matrix_updated = true;
-  //}
-  
+  }
 
   return this._matrix.clone();
 }
-*/
+
 
   set quaternion(quat) {
     if (this._quaternion.isEqual(quat)) {
