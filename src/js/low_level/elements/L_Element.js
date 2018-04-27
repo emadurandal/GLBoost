@@ -9,7 +9,7 @@ import AnimationUtil from '../../low_level/misc/AnimationUtil';
 const LatestRotationDriverType = {
   TrsMatrix: Symbol(),
   Quaternion: Symbol(),
-  EulerAngles: Symbol(),
+  EulerAngles: Symbol()
 };
 
 export default class L_Element extends GLBoostObject {
@@ -47,7 +47,7 @@ export default class L_Element extends GLBoostObject {
     this._is_quaternion_updated = true;
     this._is_euler_angles_updated = true;
     this._is_inverse_trs_matrix_updated = false;
-    this._latest_rotation_driver_type = LatestRotationDriverType.TrsMatrix;
+    this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles;
   }
 
 
@@ -387,8 +387,8 @@ export default class L_Element extends GLBoostObject {
 
     } else {
   //    console.log('hoge');
-//      if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
-      if (this._currentCalcMode === 'matrix') {
+      if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
+//      if (this._currentCalcMode === 'matrix') {
         this._matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
 /*
         let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
@@ -438,9 +438,10 @@ export default class L_Element extends GLBoostObject {
     if (this._quaternion.isEqual(quat)) {
       return;
     }
+    this._currentCalcMode = 'quaternion';
     this._quaternion = quat;
     this._is_trs_matrix_updated = false;
-    this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles;
+    this._latest_rotation_driver_type = LatestRotationDriverType.Quaternion;
     this._needUpdate();
   }
 
@@ -489,6 +490,11 @@ export default class L_Element extends GLBoostObject {
   }
 
   set currentCalcMode(mode) {
+    switch (mode) {
+      case "matrix": this._latest_rotation_driver_type = LatestRotationDriverType.TrsMatrix; break; 
+      case "euler": this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles; break; 
+      case "quaternion": this._latest_rotation_driver_type = LatestRotationDriverType.Quaternion; break; 
+    }
     this._currentCalcMode = mode;
   }
 
@@ -507,6 +513,7 @@ export default class L_Element extends GLBoostObject {
     instance._finalMatrix = this._finalMatrix.clone();
     instance._dirtyAsElement = this._dirtyAsElement;
     instance._currentCalcMode = this._currentCalcMode;
+    instance._latest_rotation_driver_type = this._latest_rotation_driver_type;
 
     instance._updateCountAsElement = this._updateCountAsElement;
   }
