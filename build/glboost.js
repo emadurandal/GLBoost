@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 8930705c
+// This revision is the commit right after the SHA: d631d59c
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16822,7 +16822,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   /// define value of GLBoost global settings.
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
-  define('VALUE_TARGET_IS_MOBILE', false);
+  define('VALUE_TARGET_IS_MOBILE', true);
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);

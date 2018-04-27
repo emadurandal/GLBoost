@@ -29,7 +29,7 @@ import Vector3 from './low_level/math/Vector3';
   /// define value of GLBoost global settings.
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
-  define('VALUE_TARGET_IS_MOBILE', false);
+  define('VALUE_TARGET_IS_MOBILE', true);
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
