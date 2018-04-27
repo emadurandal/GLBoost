@@ -388,7 +388,8 @@ export default class L_Element extends GLBoostObject {
     } else {
   //    console.log('hoge');
       if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
-//      if (this._currentCalcMode === 'matrix') {
+ //     if (this._currentCalcMode === 'matrix') {
+//      if (this._is_trs_matrix_updated) {
         this._matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
 /*
         let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
@@ -513,7 +514,14 @@ export default class L_Element extends GLBoostObject {
     instance._finalMatrix = this._finalMatrix.clone();
     instance._dirtyAsElement = this._dirtyAsElement;
     instance._currentCalcMode = this._currentCalcMode;
+
     instance._latest_rotation_driver_type = this._latest_rotation_driver_type;
+    instance._is_trs_matrix_updated = this._is_trs_matrix_updated;
+    instance._is_translate_updated = this._is_translate_updated;
+    instance._is_scale_updated = this._is_scale_updated;
+    instance._is_quaternion_updated = this._is_quaternion_updated;
+    instance._is_euler_angles_updated = this._is_euler_angles_updated;
+    instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
 
     instance._updateCountAsElement = this._updateCountAsElement;
   }
