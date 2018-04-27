@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 2a8efc7e
+// This revision is the commit right after the SHA: aa0bb8da
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3390,32 +3390,32 @@ class L_Element extends GLBoostObject {
     return matrix;
   }
 
-  /*
+  
   getTransformMatrixAt(inputValue) {
     let input = inputValue;
     if (this._dirtyAsElement) {
 //    if (true) {
 
       if (this._currentCalcMode === 'matrix') {//} && !input) { <- この　} && !input)  があると、上のif (true)が有効の時にWalkingLadyがひしゃげる
-        let matrix = Matrix44.identity();
-        this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
+        //let matrix = Matrix44.identity();
+        this._finalMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
 
-      let rotationMatrix = Matrix44.identity();
+      let rotationMatrix = Matrix44$1$1.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
       if (this._currentCalcMode === 'quaternion' || input) {
-        rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
+        rotationMatrix = this.getQuaternionAtOrStatic(this._activeAnimationLineName, input).rotationMatrix;
       } else {
-        let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
+        let rotateVec = this.getRotateAtOrStatic(this._activeAnimationLineName, input);
         rotationMatrix.rotateZ(rotateVec.z).
-        multiply(Matrix44.rotateY(rotateVec.y)).
-        multiply(Matrix44.rotateX(rotateVec.x));
+        multiply(Matrix44$1$1.rotateY(rotateVec.y)).
+        multiply(Matrix44$1$1.rotateX(rotateVec.x));
       }
 
-      this._finalMatrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAt(this._activeAnimationLineName, input)));
-      let translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
+      this._finalMatrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(this.getScaleAtOrStatic(this._activeAnimationLineName, input)));
+      let translateVec = this.getTranslateAtOrStatic(this._activeAnimationLineName, input);
       this._finalMatrix.m03 = translateVec.x;
       this._finalMatrix.m13 = translateVec.y;
       this._finalMatrix.m23 = translateVec.z;
@@ -3430,44 +3430,56 @@ class L_Element extends GLBoostObject {
     return this._finalMatrix.clone();
   }
 
-  */
+
+/*
 
  getTransformMatrixAt(inputValue) {
   let input = inputValue;
-  if (!this._is_trs_matrix_updated) {
 
-    if (input) {
-      let matrix = this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-      if (matrix !== null) {
-        this._matrix = matrix;
-        this._is_trs_matrix_updated = true;
-        return this._matrix.clone();  
-      }
+  
+  if (this._is_trs_matrix_updated) {
+    let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
+    if (matrix !== null) {
+      this.multiplyMatrix(matrix);
+//      this._is_trs_matrix_updated = true;
+      return this._matrix.clone();  
     }
+  }
+
+  //if (input !== null) {
+
+    
+  //  let matrix = this.getMatrixAt(this._activeAnimationLineName, input);
+  //  if (matrix !== null) {
+  //    this.multiplyMatrix(matrix);
+  //    return this._matrix.clone();  
+  //  }
+    
 
     let rotationMatrix;
     // if input is truly, glTF animation's can be regarded as quaternion
     if (this._is_quaternion_updated) {
       rotationMatrix = this.getQuaternionAtOrStatic(this._activeAnimationLineName, input).rotationMatrix;
     } else if (this._is_euler_angles_updated) {
-      let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
-      rotationMatrix = Matrix44$1$1.rotateZ(rotateVec.z).
-      multiply(Matrix44$1$1.rotateY(rotateVec.y)).
-      multiply(Matrix44$1$1.rotateX(rotateVec.x));
+      let rotateVec = this.getRotateAtOrStatic(this._activeAnimationLineName, input);
+      rotationMatrix = Matrix44.rotateZ(rotateVec.z).
+      multiply(Matrix44.rotateY(rotateVec.y)).
+      multiply(Matrix44.rotateX(rotateVec.x));
     }
 
-    this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(this.getScaleAt(this._activeAnimationLineName, input)));
-    let translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
+    this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAtOrStatic(this._activeAnimationLineName, input)));
+    let translateVec = this.getTranslateAtOrStatic(this._activeAnimationLineName, input);
     this._matrix.m03 = translateVec.x;
     this._matrix.m13 = translateVec.y;
     this._matrix.m23 = translateVec.z;
 
     this._is_trs_matrix_updated = true;
-  }
+  //}
   
 
   return this._matrix.clone();
 }
+*/
 
   set quaternion(quat) {
     if (this._quaternion.isEqual(quat)) {
