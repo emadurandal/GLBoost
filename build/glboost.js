@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 5632998f
+// This revision is the commit right after the SHA: 65f8098a
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3437,7 +3437,7 @@ class L_Element extends GLBoostObject {
 
   //  if (this._is_trs_matrix_updated && input === null) {
     {
-  //    console.log('hoge');
+     // console.log('mode:' + this._currentCalcMode);
       if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
  //     if (this._currentCalcMode === 'matrix') {
 //      if (this._is_trs_matrix_updated) {
@@ -3463,7 +3463,7 @@ class L_Element extends GLBoostObject {
 
       let rotationMatrix;
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._is_quaternion_updated || input) {
+      if (this._is_quaternion_updated) {
         rotationMatrix = this.getQuaternionAtOrStatic(this._activeAnimationLineName, input).rotationMatrix;
   //    } else if (this._is_euler_angles_updated) {
       } else {

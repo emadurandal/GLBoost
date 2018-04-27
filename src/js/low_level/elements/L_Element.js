@@ -386,7 +386,7 @@ export default class L_Element extends GLBoostObject {
     if (false) {
 
     } else {
-  //    console.log('hoge');
+     // console.log('mode:' + this._currentCalcMode);
       if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
  //     if (this._currentCalcMode === 'matrix') {
 //      if (this._is_trs_matrix_updated) {
@@ -412,7 +412,7 @@ export default class L_Element extends GLBoostObject {
 
       let rotationMatrix;
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._is_quaternion_updated || input) {
+      if (this._is_quaternion_updated) {
         rotationMatrix = this.getQuaternionAtOrStatic(this._activeAnimationLineName, input).rotationMatrix;
   //    } else if (this._is_euler_angles_updated) {
       } else {
