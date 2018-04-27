@@ -185,7 +185,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44.identity();
       }
@@ -552,7 +552,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44.identity();
       }
@@ -591,7 +591,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44.identity();
       }

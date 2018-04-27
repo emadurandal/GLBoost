@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 1f6dd377
+// This revision is the commit right after the SHA: 4515f6eb
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -2292,6 +2292,24 @@ class Matrix44$1$1 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    /*
+    let sinX = Math.sin(x);
+    let cosX = Math.cos(x);
+    let sinY = Math.sin(y);
+    let cosY = Math.cos(y);
+    let sinZ = Math.sin(z);
+    let cosZ = Math.cos(z);
+    
+    return new Matrix44(
+      cosZ * cosY,
+      cosZ * sinY 
+    );
+    */
+
+    return (Matrix33.rotateZ() * Matrix33.rotateY() * Matrix33.rotateX()).toMatrix44();
+  }
+
   /**
    * ゼロ行列
    */
@@ -3115,7 +3133,7 @@ class L_Element extends GLBoostObject {
   }
 
   _getAnimatedTransformValue(value, animation, type) {
-    if (typeof animation !== 'undefined' && animation[type]) {
+    if (typeof animation !== 'undefined' && animation[type] && value !== null && value !== void 0) {
       return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
     } else {
       //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
@@ -3250,10 +3268,7 @@ class L_Element extends GLBoostObject {
   }
 
   getTranslateAtOrStatic(lineName, inputValue) {
-    let value = null;
-    if (lineName) {
-      value = this.getTranslateAt(lineName, inputValue);
-    }
+    let value = this.getTranslateAt(lineName, inputValue);
     if (value === null) {
       return this.getTranslateNotAnimated();
     }
@@ -3316,28 +3331,20 @@ class L_Element extends GLBoostObject {
   }
 
   get scale() {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    }
-    if (value === null) {
-      return this.getScaleNotAnimated();
+    return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+  }
+
+  getScaleAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
+    if (value !== null) {
+      this._scale = value;
+      this._is_scale_updated = true;  
     }
     return value;
   }
 
-  getScaleAt(lineName, inputValue) {
-    return this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
-  }
-
   getScaleAtOrStatic(lineName, inputValue) {
-    if (inputValue === null || inputValue === void 0) {
-      return this.getScaleNotAnimated();
-    }
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getScaleAt(this._activeAnimationLineName, inputValue);
-    }
+    let value = this.getScaleAt(lineName, inputValue);
     if (value === null) {
       return this.getScaleNotAnimated();
     }
@@ -3383,7 +3390,12 @@ class L_Element extends GLBoostObject {
   }
 
   getMatrixAt(lineName, inputValue) {
-    return this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'matrix');
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'matrix');
+    if (value !== null) {
+      this._translate = value;
+      this._is_translate_updated = true;  
+    }
+    return value;
   }
 
   getMatrixAtOrStatic(lineName, inputValue) {
@@ -3407,13 +3419,13 @@ class L_Element extends GLBoostObject {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
-    const matrix = this.getTransformMatrixAt(input);
+    const matrix = this.getMatrixAtOrStatic(input);
 
     return matrix;
   }
 
   /*
-  getTransformMatrixAt(inputValue) {
+  getMatrixAtOrStatic(inputValue) {
     let input = inputValue;
     if (this._dirtyAsElement) {
 //    if (true) {
@@ -3454,14 +3466,11 @@ class L_Element extends GLBoostObject {
 */
 
 
-  getTransformMatrixAt(inputValue) {
+  getMatrixAtOrStatic(inputValue) {
     let input = inputValue;
 
 //    if (false) {
-    if ((input === null || input === void 0) && this._is_trs_matrix_updated) {
-//        let matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-      return this._matrix.clone();
-    } else {
+
      // console.log('mode:' + this._currentCalcMode);
 
      // In current version, matrix does not animate
@@ -3491,8 +3500,8 @@ class L_Element extends GLBoostObject {
       this.multiplyMatrix(matrix);
 
       this._is_trs_matrix_updated = true;
-    }
 
+      
     return this._matrix.clone();
   }
 
@@ -3509,34 +3518,38 @@ class L_Element extends GLBoostObject {
   }
 
   get quaternion() {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    }
-    if (value === null) {
-      return this.getQuaternionNotAnimated();
-    }
-    this.quaternion = value;
-    return value;
+    return this.getQuaternionAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
   getQuaternionAt(lineName, inputValue) {
-    return this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion');
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion');
+    if (value !== null) {
+      this._quaternion = value;
+      this._is_quaternion_updated = true;  
+    }
+    return value;
   }
 
   getQuaternionAtOrStatic(lineName, inputValue) {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getQuaternionAt(this._activeAnimationLineName, inputValue);
-    }
+    let value = this.getQuaternionAt(lineName, inputValue);
     if (value === null) {
       return this.getQuaternionNotAnimated();
     }
-    this.quaternion = value;
     return value;
   }
   
   getQuaternionNotAnimated() {
+    let value = null;
+    if (!this._is_quaternion_updated) {
+      if (this._is_trs_matrix_updated) {
+        value = Quaternion.quaternionFromRotationMatrix(this._matrix);
+      } else if (this._is_euler_angles_updated) {
+        value = Quaternion.quaternionFromRotationMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+      }
+      this._quaternion = value;
+      this._is_quaternion_updated = true;  
+    }
+
     return this._quaternion;
   }
 
@@ -3796,7 +3809,7 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
@@ -4163,7 +4176,7 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
@@ -4202,7 +4215,7 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
@@ -5762,7 +5775,7 @@ class DrawKickerWorld {
           world_m = mesh.getWorldMatrixAt(input);
           normal_m = mesh.normalMatrix;
         } else {
-          world_m = mesh.getTransformMatrixAt(input);
+          world_m = mesh.getMatrixAtOrStatic(input);
           normal_m = mesh.normalMatrix;
         }
       } else {
