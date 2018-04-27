@@ -174,9 +174,9 @@ export default class L_Element extends GLBoostObject {
 
   getTranslateNotAnimated() {
     if (!this._is_translate_updated && this._is_trs_matrix_updated) {
-      this._translate.x = this.matrix.m03;
-      this._translate.y = this.matrix.m13;
-      this._translate.z = this.matrix.m23;
+      this._translate.x = this._matrix.m03;
+      this._translate.y = this._matrix.m13;
+      this._translate.z = this._matrix.m23;
       this._is_translate_updated = true;
     }
     
@@ -220,18 +220,16 @@ export default class L_Element extends GLBoostObject {
   }
 
   get rotate() {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    }
-    if (value === null) {
-      return this._rotate;
-    }
-    return value;
+    return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
   getRotateAt(lineName, inputValue) {
-    return this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
+    if (value !== null) {
+      this._rotate = value;
+      this._is_euler_angles_updated = true;  
+    }
+    return value;
   }
 
   getRotateAtOrStatic(lineName, inputValue) {
@@ -281,15 +279,14 @@ export default class L_Element extends GLBoostObject {
   }
 
   getScaleNotAnimated() {
-    let m = this.matrix;
+    let m = this.getMatrixNotAnimated();
     
     if (!this._is_scale_updated && this._is_trs_matrix_updated) {
       this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
       this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
       this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._is_scale_updated = true;
     }
-
-    this._is_scale_updated = true;
     
     return this._scale;
   }

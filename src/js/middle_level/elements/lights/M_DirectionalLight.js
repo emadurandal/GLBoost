@@ -32,7 +32,7 @@ export default class M_DirectionalLight extends M_AbstractLight {
   }
 
   get multiplyMatrixGizmo() {
-    return this._gizmo.matrix;
+    return this._gizmo.getMatrixNotAnimated();
   }
 
   set translate(vec3) {

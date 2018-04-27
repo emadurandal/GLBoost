@@ -81,7 +81,7 @@ export default class M_Element extends L_Element {
       var matrix = Matrix44.identity();
 
       if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
+        this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
@@ -122,7 +122,7 @@ export default class M_Element extends L_Element {
     if (input || this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.quaternion.rotationMatrix;
     } else if (!input && this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.matrix;
+      rotationMatrix = this.getMatrixNotAnimated();
       rotationMatrix.m03 = 0;
       rotationMatrix.m13 = 0;
       rotationMatrix.m23 = 0;
