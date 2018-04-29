@@ -72,7 +72,7 @@ export default class DrawKickerWorld {
           world_m = mesh.getWorldMatrixAt(input);
           normal_m = mesh.normalMatrix;
         } else {
-          world_m = mesh.getMatrixAtOrStatic(input);
+          world_m = mesh.matrix;
           normal_m = mesh.normalMatrix;
         }
       } else {

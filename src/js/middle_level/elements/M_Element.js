@@ -185,7 +185,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getMatrixAtOrStatic(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
@@ -552,7 +552,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getMatrixAtOrStatic(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
@@ -591,7 +591,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getMatrixAtOrStatic(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
