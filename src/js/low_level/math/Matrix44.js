@@ -279,6 +279,24 @@ export default class Matrix44 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    /*
+    let sinX = Math.sin(x);
+    let cosX = Math.cos(x);
+    let sinY = Math.sin(y);
+    let cosY = Math.cos(y);
+    let sinZ = Math.sin(z);
+    let cosZ = Math.cos(z);
+    
+    return new Matrix44(
+      cosZ * cosY,
+      cosZ * sinY 
+    );
+    */
+
+    return (Matrix33.rotateZ() * Matrix33.rotateY() * Matrix33.rotateX()).toMatrix44();
+  }
+
   /**
    * ゼロ行列
    */
