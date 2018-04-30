@@ -10,7 +10,7 @@ export default class Matrix44 {
   constructor(m, isColumnMajor = false, notCopyFloat32Array = false
   ) {
     if (arguments.length >= 16) {
-      this.m = new Float32Array(16);
+      this.m = new Float32Array(16); // Data order is column major
       if (isColumnMajor === true) {
         let m = arguments;
         this.setComponents(
