@@ -28,11 +28,11 @@ export default class M_DirectionalLight extends M_AbstractLight {
   }
 
   set multiplyMatrixGizmo(mat4) {
-    this._gizmo.multiplyMatrix(mat4);
+    this._gizmo.matrix = mat4;
   }
 
   get multiplyMatrixGizmo() {
-    return this._gizmo.matrix;
+    return this._gizmo.getMatrixNotAnimated();
   }
 
   set translate(vec3) {

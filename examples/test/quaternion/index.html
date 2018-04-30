@@ -80,7 +80,7 @@ var render = function() {
   renderer.draw(expression);
 
   //var rotateMatrixY = GLBoost.Matrix44.rotateY(gAngle);
-  //cube.multiplyMatrix(rotateMatrixY);
+  //cube.matrix = rotateMatrixY;
 
   cube.quaternion = GLBoost.Quaternion.axisAngle(new GLBoost.Vector3(0,1,0), GLBoost.MathUtil.radianToDegree(gAngle));
   gAngle += 0.02;

@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: cc6a6b8f
+// This revision is the commit right after the SHA: 7ee3ab7b
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -2292,6 +2292,24 @@ class Matrix44$1$1 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    /*
+    let sinX = Math.sin(x);
+    let cosX = Math.cos(x);
+    let sinY = Math.sin(y);
+    let cosY = Math.cos(y);
+    let sinZ = Math.sin(z);
+    let cosZ = Math.cos(z);
+    
+    return new Matrix44(
+      cosZ * cosY,
+      cosZ * sinY 
+    );
+    */
+
+    return (Matrix33.rotateZ() * Matrix33.rotateY() * Matrix33.rotateX()).toMatrix44();
+  }
+
   /**
    * ゼロ行列
    */
@@ -3063,144 +3081,431 @@ class L_Element extends GLBoostObject {
   constructor(glBoostContext, toRegister = true) {
     super(glBoostContext, toRegister);
 
+    // Live (Static or Animation)
     this._translate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
-
     this._rotate = Vector3.zero();
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._matrix = Matrix44$1$1.identity();
 
-    this._translateOnInit = this._translate.clone();
-    this._scaleOnInit = this._scale.clone();
+//    this._finalMatrix = Matrix44.identity();
 
-    this._rotateOnInit = this._rotate.clone();
-    this._quaternionOnInit = this._quaternion.clone();
-    this._matrixOnInit = this._matrix.clone();
+    this._updateCountAsElement = 0;
+    this._animationLine = {};
+    this._currentAnimationInputValues = {};
+    this._activeAnimationLineName = null;
+
+    this._is_trs_matrix_updated = true;
+    this._is_translate_updated = true;
+    this._is_scale_updated = true;
+    this._is_quaternion_updated = true;
+    this._is_euler_angles_updated = true;
+    this._is_inverse_trs_matrix_updated = false;
+  }
 
 
-    this._finalMatrix = Matrix44$1$1.identity();
-
-    this._dirtyAsElement = true;
-    this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
-
+  get updateCountAsElement() {
+    return this._updateCountAsElement;
   }
 
   _needUpdate() {
-    this._dirtyAsElement = true;
+    this._is_inverse_trs_matrix_updated = false;
+    this._updateCountAsElement++;
+  }
+
+  _getAnimatedTransformValue(value, animation, type) {
+    if (typeof animation !== 'undefined' && animation[type] && value !== null && value !== void 0) {
+      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+    } else {
+      //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
+      return null;
+    }
+  }
+
+  _getCurrentAnimationInputValue(inputName) {
+    let value = this._currentAnimationInputValues[inputName];
+    if (typeof(value) === 'number') {
+      return value;
+    } else {
+      return null;
+    }
+  }
+
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    var outputComponentN = 0;
+    if (outputArray[0] instanceof Vector2) {
+      outputComponentN = 2;
+    } else if (outputArray[0] instanceof Vector3) {
+      outputComponentN = 3;
+    } else if (outputArray[0] instanceof Vector4) {
+      outputComponentN = 4;
+    } else if (outputArray[0] instanceof Quaternion) {
+      outputComponentN = 4;
+    } else {
+      outputComponentN = 1;
+    }
+    if (!this._animationLine[lineName]) {
+      this._animationLine[lineName] = {};
+    }
+    this._animationLine[lineName][attributeName] = {
+      input: inputArray,
+      output: outputArray,
+      outputAttribute: attributeName,
+      outputComponentN: outputComponentN
+    };
+  }
+
+  hasAnimation(lineName) {
+    if (this._animationLine[lineName]) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  getStartInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[0];
+      if (inputLatestValueAtThisAttribute < latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
+  }
+
+  getEndInputValueOfAnimation(lineName) {
+    let inputLine = this._animationLine[lineName];
+    let latestInputValue = - Number.MAX_VALUE;
+    if (typeof inputLine === 'undefined') {
+      return latestInputValue;
+    }
+    for (let attributeName in inputLine) {
+      let inputValueArray = inputLine[attributeName].input;
+      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
+      if (inputLatestValueAtThisAttribute > latestInputValue) {
+        latestInputValue = inputLatestValueAtThisAttribute;
+      }
+    }
+    return latestInputValue;
+  }
+
+  /**
+   * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
+   * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
+   * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
+   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
+   */
+  setCurrentAnimationValue(inputName, inputValue) {
+    this._setDirtyToAnimatedElement(inputName);
+    this._currentAnimationInputValues[inputName] = inputValue;
+  }
+
+  removeCurrentAnimationValue(inputName) {
+    delete this._currentAnimationInputValues[inputName];
+  }
+
+  setActiveAnimationLine(lineName) {
+    this._activeAnimationLineName = lineName;
   }
 
   set translate(vec) {
     if (this._translate.isEqual(vec)) {
       return;
     }
-    if (this._currentCalcMode === 'matrix') {
-      this.matrix.m03 = vec.x;
-      this.matrix.m13 = vec.y;
-      this.matrix.m23 = vec.z;
-    }
-    this._translate = vec;
+    this._translate = vec.clone();
+    this._is_trs_matrix_updated = false;
+    this._is_translate_updated = true;
     this._needUpdate();
   }
 
+  getTranslateNotAnimated() {
+    if (this._is_translate_updated) {
+      return this._translate.clone();
+    } else if (this._is_trs_matrix_updated) {
+      this._translate.x = this._matrix.m03;
+      this._translate.y = this._matrix.m13;
+      this._translate.z = this._matrix.m23;
+      this._is_translate_updated = true;
+    }
+    return this._translate.clone();
+  }
+
   get translate() {
-    return this._translate;
+    return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+  }
+
+  getTranslateAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
+    if (value !== null) {
+      this._translate = value;
+      this._is_translate_updated = true;  
+      this._is_trs_matrix_updated = false;
+    }
+    return value;
+  }
+
+  getTranslateAtOrStatic(lineName, inputValue) {
+    let value = this.getTranslateAt(lineName, inputValue);
+    if (value === null) {
+      return this.getTranslateNotAnimated();
+    }
+    return value;
   }
 
   set rotate(vec) {
-    if (this._currentCalcMode !== 'euler') {
-      this._currentCalcMode = 'euler';
-      this._needUpdate();
-    }
     if (this._rotate.isEqual(vec)) {
       return;
     }
-    this._rotate = vec;
+    this._rotate = vec.clone();
+    this._is_trs_matrix_updated = false;
+    this._is_euler_angles_updated = true;
     this._needUpdate();
   }
 
   get rotate() {
-    return this._rotate;
+    return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
+  getRotateAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
+    if (value !== null) {
+      this._rotate = value;
+      this._is_euler_angles_updated = true;  
+    }
+    return value;
+  }
+
+  getRotateAtOrStatic(lineName, inputValue) {
+    let value = null;
+    if (this._activeAnimationLineName) {
+      value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+    }
+    if (value === null) {
+      return this.getRotateNotAnimated();
+    }
+    return value;
+  }
+
+  getRotateNotAnimated() {
+    if (this._is_euler_angles_updated) {
+      return this._rotate.clone();
+    }
+    return this._rotate.clone();
+  }
 
   set scale(vec) {
     if (this._scale.isEqual(vec)) {
       return;
     }
-    this._scale = vec;
+    this._scale = vec.clone();
+    this._is_trs_matrix_updated = false;
+    this._is_scale_updated = true;
     this._needUpdate();
   }
 
   get scale() {
-    return this._scale;
+    return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  multiplyMatrix(mat) {
+  getScaleAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
+    if (value !== null) {
+      this._scale = value.clone();
+      this._is_scale_updated = true;  
+      this._is_trs_matrix_updated = false;
+    }
+    return value;
+  }
+
+  getScaleAtOrStatic(lineName, inputValue) {
+    let value = this.getScaleAt(lineName, inputValue);
+    if (value === null) {
+      return this.getScaleNotAnimated();
+    }
+    return value;
+  }
+
+  getScaleNotAnimated() {    
+    if (this._is_scale_updated) {
+      return this._scale.clone();
+    } else if (this._is_trs_matrix_updated) {
+      let m = this._matrix();
+      this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+      this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+      this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._is_scale_updated = true;
+    }
+    
+      return this._scale.clone();
+  }
+
+  set matrix(mat) {
     this._matrix = mat.clone();
-    this._currentCalcMode = 'matrix';
-//    this._translate = new Vector3(mat.m03, mat.m03, mat.m03);
+    this._is_trs_matrix_updated = true;
+    this._is_scale_updated = false;
+    this._is_translate_updated = false;
+    this._is_quaternion_updated = false;
+    this._is_euler_angles_updated = false;
     this._needUpdate();
   }
 
   get matrix() {
-    return this._matrix;
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+
+    let value = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+    return value;
   }
 
-  set quaternion(quat) {
-    if (this._currentCalcMode !== 'quaternion') {
-      this._currentCalcMode = 'quaternion';
-      this._needUpdate();
+  getMatrixAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'matrix');
+    if (value !== null) {
+      this._translate = value;
+      this._is_translate_updated = true;  
     }
+    return value;
+  }
+
+  getMatrixNotAnimated() {
+
+    if (this._is_trs_matrix_updated) {
+      return this._matrix.clone();
+    }
+
+    let rotationMatrix = Matrix44$1$1.identity();
+    rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+
+    let scale = this.getScaleNotAnimated();
+
+    this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(scale));
+    let translateVec = this.getTranslateNotAnimated();
+    this._matrix.m03 = translateVec.x;
+    this._matrix.m13 = translateVec.y;
+    this._matrix.m23 = translateVec.z;
+
+    this._is_trs_matrix_updated = true;
+
+    return this._matrix.clone();
+  }
+
+  get transformMatrix() {
+    let input = void 0;
+    if (this._activeAnimationLineName !== null) {
+      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+    }
+
+    const matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+
+    return matrix;
+  }
+
+  isTrsMatrixNeeded(lineName, inputValue) {
+    let result = (
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate') === null &&
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion') === null &&
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale') === null
+    );
+    return result;
+  }
+
+
+  getMatrixAtOrStatic(lineName, inputValue) {
+    let input = inputValue;
+
+   // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
+    if (this.isTrsMatrixNeeded(lineName, inputValue)) {
+      return this.getMatrixNotAnimated();
+    } else {
+
+      let rotationMatrix = Matrix44$1$1.identity();
+      let quaternion = this.getQuaternionAtOrStatic(lineName, input);
+      rotationMatrix = quaternion.rotationMatrix;
+
+      let scale = this.getScaleAtOrStatic(lineName, input);
+      
+      this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(scale));
+      let translateVec = this.getTranslateAtOrStatic(lineName, input);
+      this._matrix.m03 = translateVec.x;
+      this._matrix.m13 = translateVec.y;
+      this._matrix.m23 = translateVec.z;
+
+      return this._matrix.clone();
+
+    }
+
+    this._is_trs_matrix_updated = true;    
+  }
+
+
+  set quaternion(quat) {
     if (this._quaternion.isEqual(quat)) {
       return;
     }
-    this._quaternion = quat;
+    this._quaternion = quat.clone();
+    this._is_trs_matrix_updated = false;
+    this._is_quaternion_updated = true;
     this._needUpdate();
   }
 
   get quaternion() {
+    return this.getQuaternionAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
+  }
+
+  getQuaternionAt(lineName, inputValue) {
+    let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion');
+    if (value !== null) {
+      this._quaternion = value;
+      this._is_quaternion_updated = true;  
+      this._is_trs_matrix_updated = false;
+    }
+    return value;
+  }
+
+  getQuaternionAtOrStatic(lineName, inputValue) {
+    let value = this.getQuaternionAt(lineName, inputValue);
+    if (value === null) {
+      return this.getQuaternionNotAnimated();
+    }
+    return value;
+  }
+  
+  getQuaternionNotAnimated() {
+    let value = null;
+    if (this._is_quaternion_updated) {
+      return this._quaternion;
+    } else if (!this._is_quaternion_updated) {
+      if (this._is_trs_matrix_updated) {
+        value = Quaternion.quaternionFromRotationMatrix(this._matrix);
+      } else if (this._is_euler_angles_updated) {
+        value = Quaternion.quaternionFromRotationMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+      }
+      this._quaternion = value;
+      this._is_quaternion_updated = true;
+      this._is_trs_matrix_updated = false;
+    }
+
     return this._quaternion;
   }
 
-  get transformMatrix() {
-    if (this._dirtyAsElement) {
-      var matrix = Matrix44$1$1.identity();
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = null;
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.quaternion.rotationMatrix;
-      } else {
-        rotationMatrix = Matrix44$1$1.rotateX(this.rotate.x).
-        multiply(Matrix44$1$1.rotateY(this.rotate.y)).
-        multiply(Matrix44$1$1.rotateZ(this.rotate.z));
-      }
-
-      this._finalMatrix = matrix.multiply(Matrix44$1$1.scale(this.scale)).multiply(rotationMatrix);
-      this._finalMatrix.m03 = this.translate.x;
-      this._finalMatrix.m13 = this.translate.y;
-      this._finalMatrix.m23 = this.translate.z;
-
-      this._dirtyAsElement = false;
+  get inverseTransformMatrix() {
+    if (!this._is_inverse_trs_matrix_updated) {
+      this._invMatrix = this.transformMatrix.invert();
+      this._is_inverse_trs_matrix_updated = true;
     }
-
-    return this._finalMatrix.clone();
+    return this._invMatrix.clone();
   }
 
   get normalMatrix() {
     return Matrix44$1$1.invert(this.transformMatrix).transpose().toMatrix33();
-  }
-
-  set currentCalcMode(mode) {
-    this._currentCalcMode = mode;
-  }
-
-  get currentCalcMode() {
-    return this._currentCalcMode;
   }
 
   _copy(instance) {
@@ -3211,9 +3516,37 @@ class L_Element extends GLBoostObject {
     instance._rotate = this._rotate.clone();
     instance._quaternion = this._quaternion.clone();
     instance._matrix = this._matrix.clone();
-    instance._finalMatrix = this._finalMatrix.clone();
-    instance._dirtyAsElement = this._dirtyAsElement;
-    instance._currentCalcMode = this._currentCalcMode;
+
+
+    instance._animationLine = {};
+
+    for (let lineName in this._animationLine) {
+      instance._animationLine[lineName] = {};
+      for (let attributeName in this._animationLine[lineName]) {
+        instance._animationLine[lineName][attributeName] = {};
+        instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
+
+        let instanceOutput = [];
+        let thisOutput = this._animationLine[lineName][attributeName].output;
+        for (let i=0; i<thisOutput.length; i++) {
+          instanceOutput.push((typeof thisOutput[i] === 'number') ? thisOutput[i] : thisOutput[i].clone());
+        }
+        instance._animationLine[lineName][attributeName].output = instanceOutput;
+
+        instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
+
+        instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
+      }
+    }
+
+    instance._is_trs_matrix_updated = this._is_trs_matrix_updated;
+    instance._is_translate_updated = this._is_translate_updated;
+    instance._is_scale_updated = this._is_scale_updated;
+    instance._is_quaternion_updated = this._is_quaternion_updated;
+    instance._is_euler_angles_updated = this._is_euler_angles_updated;
+    instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
+
+    instance._updateCountAsElement = this._updateCountAsElement;
   }
 }
 
@@ -3224,14 +3557,11 @@ class M_Element extends L_Element {
     this._parent = null;
     this._invMatrix = Matrix44$1$1.identity();
     this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-    this._calculatedInverseMatrix = false;
-    this._updateCountAsElement = 0;
     this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
     this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
-    this._animationLine = {};
     this._transparentByUser = false;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
@@ -3239,8 +3569,6 @@ class M_Element extends L_Element {
     this._isAffectedByViewMatrix = true;
     this._isAffectedByProjectionMatrix = true;
 
-    this._activeAnimationLineName = null;
-    this._currentAnimationInputValues = {};
     this._toInheritCurrentAnimationInputValue = true;
 
     this._camera = null;
@@ -3253,15 +3581,12 @@ class M_Element extends L_Element {
     this._worldMatrix = new Matrix44$1$1();
   }
 
-
-  _needUpdate() {
-    this._dirtyAsElement = true;
-    this._calculatedInverseMatrix = false;
-    this._updateCountAsElement++;
-  }
-
-  get updateCountAsElement() {
-    return this._updateCountAsElement;
+  _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.elementUpdateNumber;
+    } else {
+      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
+    }
   }
 
   set toInheritCurrentAnimationInputValue(flg) {
@@ -3270,17 +3595,6 @@ class M_Element extends L_Element {
 
   get toInheritCurrentAnimationInputValue() {
     return this._toInheritCurrentAnimationInputValue;
-  }
-
-  /**
-   * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-   * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-   * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
-   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
-   */
-  setCurrentAnimationValue(inputName, inputValue) {
-    this._setDirtyToAnimatedElement(inputName);
-    this._currentAnimationInputValues[inputName] = inputValue;
   }
 
   _getCurrentAnimationInputValue(inputName) {
@@ -3298,377 +3612,12 @@ class M_Element extends L_Element {
     }
   }
 
-  removeCurrentAnimationValue(inputName) {
-    delete this._currentAnimationInputValues[inputName];
-  }
-
   _setDirtyToAnimatedElement(inputName) {
     if (this.hasAnimation(inputName)) {
       this._needUpdate();
     }
   }
 
-  _getAnimatedTransformValue(value, animation, type) {
-    if (typeof animation !== 'undefined' && animation[type]) {
-      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
-    } else {
-      //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
-      return this['_' + type];
-    }
-  }
-
-  set translate(vec) {
-    if (this._translate.isEqual(vec)) {
-      return;
-    }
-    if (this._currentCalcMode === 'matrix') {
-      this.matrix.m03 = vec.x;
-      this.matrix.m13 = vec.y;
-      this.matrix.m23 = vec.z;
-    }
-    this._translate = vec;
-    this._needUpdate();
-  }
-
-  get translate() {
-    if (this._activeAnimationLineName) {
-      return this.getTranslateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    } else {
-      return this._translate;
-    }
-  }
-
-  getTranslateAt(lineName, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'translate');
-  }
-
-  getTranslateNotAnimated() {
-    return this._translate;
-  }
-
-  set rotate(vec) {
-    if (this._currentCalcMode !== 'euler') {
-      this._currentCalcMode = 'euler';
-      this._needUpdate();
-    }
-    if (this._rotate.isEqual(vec)) {
-      return;
-    }
-    this._rotate = vec;
-    this._needUpdate();
-  }
-
-  get rotate() {
-    if (this._activeAnimationLineName) {
-      return this.getRotateAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    } else {
-      return this._rotate;
-    }
-  }
-
-  getRotateAt(lineName, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'rotate');
-  }
-
-  getRotateNotAnimated() {
-    return this._rotate;
-  }
-
-  set quaternion(quat) {
-    if (this._currentCalcMode !== 'quaternion') {
-      this._currentCalcMode = 'quaternion';
-      this._needUpdate();
-    }
-    if (this._quaternion.isEqual(quat)) {
-      return;
-    }
-    this._quaternion = quat;
-    this._needUpdate();
-  }
-
-  get quaternion() {
-    if (this._activeAnimationLineName) {
-      return this.getQuaternionAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    } else {
-      return this._quaternion;
-    }
-  }
-
-  getQuaternionNotAnimated() {
-    return this._quaternion;
-  }
-
-  getQuaternionAt(lineName, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'quaternion');
-  }
-
-  set scale(vec) {
-    if (this._scale.isEqual(vec)) {
-      return;
-    }
-    this._scale = vec;
-    this._needUpdate();
-  }
-
-  get scale() {
-    if (this._activeAnimationLineName) {
-      return this.getScaleAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    } else {
-      return this._scale;
-    }
-  }
-
-  getScaleAt(lineName, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'scale');
-  }
-
-  getScaleNotAnimated() {
-    return this._scale;
-  }
-
-  getMatrixAt(lineName, value) {
-    return this._getAnimatedTransformValue(value, this._animationLine[lineName], 'matrix');
-  }
-
-  get matrix() {
-    if (this._activeAnimationLineName) {
-      return this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    } else {
-      return this._matrix;
-    }
-  }
-
-  getMatrixNotAnimated() {
-    return this._matrix;
-  }
-
-  get transformMatrix() {
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    const matrix = this.getTransformMatrixAt(input);
-
-    return matrix;
-  }
-
-  getTransformMatrixAt(inputValue, lineName, accumulateMyAndParentNameIsNoUpdate = false) {
-    let input = inputValue;
-    if (this._dirtyAsElement) {
-//    if (true) {
-
-      var matrix = Matrix44$1$1.identity();
-
-      if (this._currentCalcMode === 'matrix' && !input) {
-        this._finalMatrix = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = Matrix44$1$1.identity();
-      // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._currentCalcMode === 'quaternion' || input) {
-        rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
-      } else {
-        let rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
-        rotationMatrix.rotateZ(rotateVec.z).
-        multiply(Matrix44$1$1.rotateY(rotateVec.y)).
-        multiply(Matrix44$1$1.rotateX(rotateVec.x));
-      }
-
-      this._finalMatrix = matrix.multiply(Matrix44$1$1.scale(this.getScaleAt(this._activeAnimationLineName, input))).multiply(rotationMatrix);
-      let translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
-      this._finalMatrix.m03 = translateVec.x;
-      this._finalMatrix.m13 = translateVec.y;
-      this._finalMatrix.m23 = translateVec.z;
-
-      this._dirtyAsElement = false;
-    } else {
-     // console.count('Cache')
-    }
-
-    return this._finalMatrix.clone();
-  }
-
-  get rotateScaleTranslate() {
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
-      var matrix = Matrix44$1$1.identity();
-
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
-        this._dirtyAsElement = false;
-        return this._finalMatrix.clone();
-      }
-
-      var rotationMatrix = Matrix44$1$1.identity();
-      // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.quaternion.rotationMatrix;
-      } else {
-        /*
-         rotationMatrix = Matrix44.rotateX(this.rotate.x).
-         multiply(Matrix44.rotateY(this.rotate.y)).
-         multiply(Matrix44.rotateZ(this.rotate.z));
-         */
-        rotationMatrix.rotateZ(this.rotate.z).
-        multiply(Matrix44$1$1.rotateY(this.rotate.y)).
-        multiply(Matrix44$1$1.rotateX(this.rotate.x));
-      }
-
-      Matrix44$1$1.translate(this.translate);
-
-      this._finalMatrix = Matrix44$1$1.translate(this.translate).multiply(Matrix44$1$1.scale(this.scale)).multiply(rotationMatrix);
-
-      this._dirtyAsElement = false;
-      this._matrixGetMode = 'animated_' + input;
-    }
-
-    return this._finalMatrix.clone();
-  }
-/*
-  get transformMatrixForJoints() {
-
-    var rotationMatrix = null;
-    if (this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.quaternion.rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.matrix;
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      rotationMatrix = Matrix44.rotateX(this.rotate.x).
-      multiply(Matrix44.rotateY(this.rotate.y)).
-      multiply(Matrix44.rotateZ(this.rotate.z));
-    }
-
-    return rotationMatrix.clone();
-  }
-
-*/
-
-  get transformMatrixOnlyRotate() {
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    var rotationMatrix = null;
-    if (input || this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.quaternion.rotationMatrix;
-    } else if (!input && this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.matrix;
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      rotationMatrix = Matrix44$1$1.rotateX(this.rotate.x).
-      multiply(Matrix44$1$1.rotateY(this.rotate.y)).
-      multiply(Matrix44$1$1.rotateZ(this.rotate.z));
-    }
-
-    return rotationMatrix.clone();
-  }
-
-  get transformMatrixOnlyRotateOnInit() {
-    return this.getTransformMatrixOnlyRotateOn(0);
-  }
-
-  getTransformMatrixOnlyRotateOn(value) {
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    var rotationMatrix = Matrix44$1$1.identity();
-    if (input || this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.getQuaternionAt('time', value).rotationMatrix;
-    } else if (!input && this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.getMatrixAt('time', value);
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      /*
-      rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
-      multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
-      multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
-       */
-      rotationMatrix.rotateZ(this.getRotate('time', value).z).
-      multiply(Matrix44$1$1.rotateY(this.getRotateAt('time', value).y)).
-      multiply(Matrix44$1$1.rotateX(this.getRotateAt('time', value).x));
-    }
-
-    return rotationMatrix.clone();
-  }
-
-  get inverseTransformMatrix() {
-    if (!this._calculatedInverseMatrix) {
-      this._invMatrix = this.transformMatrix.invert();
-      this._calculatedInverseMatrix = true;
-    }
-    return this._invMatrix.clone();
-  }
-
-  _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
-    if (currentElem._parent === null) {
-      return currentElem.elementUpdateNumber;
-    } else {
-      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
-    }
-  }
-/*
-  _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-
-    if (input === null && this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    if (this._parent === null) {
-      if (withMySelf) {
-        return this.getTransformMatrixAt(input);
-      } else {
-        return Matrix44.identity();
-      }
-    } else {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
-        this.__updateInfoNumber_multiplyMyAndParentTransformMatrices !== tempNumber)
-      {
-        let currentMatrix = Matrix44.identity();
-        if (withMySelf) {
-//          this._worldMatrix.copyComponents(this.getTransformMatrixAt(input));
-          let currentMatrix = this.getTransformMatrixAt(input);
-        }
-
-//        this._worldMatrix.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
-        this._worldMatrix = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
-
-        this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatrices = input;
-
-        return this._worldMatrix;
-      } else {
-        return this._worldMatrix;        
-      }
-    }
-  }
-  */
 
   _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
     if (input === void 0 && this._activeAnimationLineName !== null) {
@@ -3683,7 +3632,7 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
@@ -3748,22 +3697,6 @@ class M_Element extends L_Element {
     }
   }
 
-//  get rotateMatrixAccumulatedAncestry() {
-    /*
-     var mat = this._multiplyMyAndParentTransformMatrices(this);
-     var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
-     var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
-     var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
-
-     return new Matrix44(
-     mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
-     mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
-     mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
-     0, 0, 0, 1
-     );*/
-//    return this._multiplyMyAndParentRotateMatrices(true, null);
-//  }
-
   get inverseWorldMatrix() {
     return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
   }
@@ -3797,7 +3730,6 @@ class M_Element extends L_Element {
   }
 
   set dirty(flg) {
-    this._dirtyAsElement = flg;
     if (flg) {
       this._needUpdate();
     }
@@ -3815,42 +3747,6 @@ class M_Element extends L_Element {
   toStringWithUpdateInfo() {
     //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
     return this._instanceName + this._updateCountAsElement;                // faster
-  }
-
-  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
-    var outputComponentN = 0;
-    if (outputArray[0] instanceof Vector2) {
-      outputComponentN = 2;
-    } else if (outputArray[0] instanceof Vector3) {
-      outputComponentN = 3;
-    } else if (outputArray[0] instanceof Vector4) {
-      outputComponentN = 4;
-    } else if (outputArray[0] instanceof Quaternion) {
-      outputComponentN = 4;
-    } else {
-      outputComponentN = 1;
-    }
-    if (!this._animationLine[lineName]) {
-      this._animationLine[lineName] = {};
-    }
-    this._animationLine[lineName][attributeName] = {
-      input: inputArray,
-      output: outputArray,
-      outputAttribute: attributeName,
-      outputComponentN: outputComponentN
-    };
-  }
-
-  setActiveAnimationLine(lineName) {
-    this._activeAnimationLineName = lineName;
-  }
-
-  hasAnimation(lineName) {
-    if (this._animationLine[lineName]) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   set camera(camera) {
@@ -3879,31 +3775,11 @@ class M_Element extends L_Element {
     instance._parent = this._parent;
     instance._invMatrix = this._invMatrix.clone();
     instance._matrixGetMode = this._matrixGetMode;
-    instance._calculatedInverseMatrix = this._calculatedInverseMatrix;
-    instance._updateCountAsElement = this._updateCountAsElement;
+    instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
     instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
     instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
-    instance._animationLine = {};
 
-    for (let lineName in this._animationLine) {
-      instance._animationLine[lineName] = {};
-      for (let attributeName in this._animationLine[lineName]) {
-        instance._animationLine[lineName][attributeName] = {};
-        instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
-
-        let instanceOutput = [];
-        let thisOutput = this._animationLine[lineName][attributeName].output;
-        for (let i=0; i<thisOutput.length; i++) {
-          instanceOutput.push((typeof thisOutput[i] === 'number') ? thisOutput[i] : thisOutput[i].clone());
-        }
-        instance._animationLine[lineName][attributeName].output = instanceOutput;
-
-        instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
-
-        instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
-      }
-    }
 
     instance._transparentByUser = this._transparentByUser;
     instance.opacity = this.opacity;
@@ -3990,61 +3866,6 @@ class M_Element extends L_Element {
   get masterElement() {
     return this._masterElement;
   }
-/*
-  // Use master element's worldMatrix.
-  get worldMatrix() {
-    return this.getWorldMatrixAt(void 0);
-  }
-
-  getWorldMatrixAt(input) {
-    
-    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-
-    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
-      this._multiplyMyAndParentTransformMatrices(true, input);
-      if (this._masterElement) {
-  //      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-  //return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-        this._worldMatrix.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
-      }
-      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
-    }
-    
-    return this._worldMatrix;
-  }
-  */
-
-  getStartInputValueOfAnimation(lineName) {
-    let inputLine = this._animationLine[lineName];
-    let latestInputValue = Number.MAX_VALUE;
-    if (typeof inputLine === 'undefined') {
-      return latestInputValue;
-    }
-    for (let attributeName in inputLine) {
-      let inputValueArray = inputLine[attributeName].input;
-      let inputLatestValueAtThisAttribute = inputValueArray[0];
-      if (inputLatestValueAtThisAttribute < latestInputValue) {
-        latestInputValue = inputLatestValueAtThisAttribute;
-      }
-    }
-    return latestInputValue;
-  }
-
-  getEndInputValueOfAnimation(lineName) {
-    let inputLine = this._animationLine[lineName];
-    let latestInputValue = - Number.MAX_VALUE;
-    if (typeof inputLine === 'undefined') {
-      return latestInputValue;
-    }
-    for (let attributeName in inputLine) {
-      let inputValueArray = inputLine[attributeName].input;
-      let inputLatestValueAtThisAttribute = inputValueArray[inputValueArray.length - 1];
-      if (inputLatestValueAtThisAttribute > latestInputValue) {
-        latestInputValue = inputLatestValueAtThisAttribute;
-      }
-    }
-    return latestInputValue;
-  }
 
   get worldMatrixForJoints() {
     return this.getWorldMatrixForJointsAt(void 0);
@@ -4095,61 +3916,6 @@ class M_Element extends L_Element {
   }
 
 
-  get rotateTranslate() {
-
-    let input = void 0;
-    if (this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    const matrix = this.getRotateTranslateAt(input);
-
-    return matrix;
-
-  }
-
-  getRotateTranslateAt(inputValue, lineName) {
-    const input = inputValue;
-//    if (this._dirtyAsElement || this._matrixGetMode !== 'animated_' + input) {
-///     this._finalMatrix_RotateTranslate = void 0;
-    {
-
-      const matrix = Matrix44$1$1.identity();
-
-      if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix_RotateTranslate = matrix.multiply(this.getMatrixAt(this._activeAnimationLineName, input));
-        this._dirtyAsElement = false;
-        return this._finalMatrix_RotateTranslate.clone();
-      }
-
-      let rotationMatrix = Matrix44$1$1.identity();
-      if (this._currentCalcMode === 'quaternion') {
-        rotationMatrix = this.getQuaternionAt(this._activeAnimationLineName, input).rotationMatrix;
-      } else {
-        const rotateVec = this.getRotateAt(this._activeAnimationLineName, input);
-        rotationMatrix.rotateZ(rotateVec.z).
-        multiply(Matrix44$1$1.rotateY(rotateVec.y)).
-        multiply(Matrix44$1$1.rotateX(rotateVec.x));
-      }
-
-      this._finalMatrix_RotateTranslate = rotationMatrix;
-
-      const translateVec = this.getTranslateAt(this._activeAnimationLineName, input);
-
-      this._finalMatrix_RotateTranslate.m03 = translateVec.x;
-      this._finalMatrix_RotateTranslate.m13 = translateVec.y;
-      this._finalMatrix_RotateTranslate.m23 = translateVec.z;
-
-
-   //   this._dirtyAsElement = false;
-   //   this._matrixGetMode = 'animated_' + input;
-    }
-
-
-    return this._finalMatrix_RotateTranslate.clone();
-  }
-
-
   get worldMatrix() {
     return this.getWorldMatrixAt(void 0);
   }
@@ -4180,17 +3946,14 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
-
-
       if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
         return currentMatrix;
       }
-
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
       this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
       this.__cache_input_multiplyMyAndParentTransformMatrices = input;
@@ -4222,7 +3985,7 @@ class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44$1$1.identity();
       }
@@ -4470,7 +4233,7 @@ class SkeletalShaderSource {
   VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += 'vec4 weightVec = normalize(aVertex_weight);\n';
+    shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
 
     if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
@@ -5782,7 +5545,7 @@ class DrawKickerWorld {
           world_m = mesh.getWorldMatrixAt(input);
           normal_m = mesh.normalMatrix;
         } else {
-          world_m = mesh.getTransformMatrixAt(input);
+          world_m = mesh.matrix;
           normal_m = mesh.normalMatrix;
         }
       } else {
@@ -15592,11 +15355,11 @@ class M_DirectionalLight extends M_AbstractLight {
   }
 
   set multiplyMatrixGizmo(mat4) {
-    this._gizmo.multiplyMatrix(mat4);
+    this._gizmo.matrix = mat4;
   }
 
   get multiplyMatrixGizmo() {
-    return this._gizmo.matrix;
+    return this._gizmo.getMatrixNotAnimated();
   }
 
   set translate(vec3) {
@@ -17292,7 +17055,7 @@ class GLTFLoader {
       group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
-      group.multiplyMatrix(new Matrix44$1$1(nodeJson.matrix, true));
+      group.matrix = new Matrix44$1$1(nodeJson.matrix, true);
     }
 
     if (nodeJson.meshes) {
@@ -17372,8 +17135,8 @@ class GLTFLoader {
             const matrix = new Matrix44$1$1(nodeJson.matrix, true);
             lightDir = matrix.multiplyVector(lightDir);
             light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
-            light.multiplyMatrixGizmo = group.matrix;
-            group.multiplyMatrix(Matrix44$1$1.identity());
+            light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
+            group.matrix = Matrix44$1$1.identity();
             group.addChild(light);
           }
         }
@@ -17902,7 +17665,6 @@ class GLTFLoader {
           if (hitElement) {
             hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             hitElement.setActiveAnimationLine('time');
-            //hitElement.currentCalcMode = 'quaternion';
           }
         }
       }

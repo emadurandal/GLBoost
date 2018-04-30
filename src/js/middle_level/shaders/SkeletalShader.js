@@ -124,7 +124,7 @@ export default class SkeletalShaderSource {
   VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += 'vec4 weightVec = normalize(aVertex_weight);\n';
+    shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
 
     if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
