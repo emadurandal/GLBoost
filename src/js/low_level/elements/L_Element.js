@@ -274,7 +274,7 @@ export default class L_Element extends GLBoostObject {
       return this._scale.clone();
   }
 
-  multiplyMatrix(mat) {
+  set matrix(mat) {
     this._matrix = mat.clone();
     this._is_trs_matrix_updated = true;
     this._is_scale_updated = false;

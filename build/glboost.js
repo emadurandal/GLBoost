@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 175777fc
+// This revision is the commit right after the SHA: e748930e
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3339,7 +3339,7 @@ class L_Element extends GLBoostObject {
       return this._scale.clone();
   }
 
-  multiplyMatrix(mat) {
+  set matrix(mat) {
     this._matrix = mat.clone();
     this._is_trs_matrix_updated = true;
     this._is_scale_updated = false;
@@ -13999,7 +13999,7 @@ class M_DirectionalLight extends M_AbstractLight {
   }
 
   set multiplyMatrixGizmo(mat4) {
-    this._gizmo.multiplyMatrix(mat4);
+    this._gizmo.matrix = mat4;
   }
 
   get multiplyMatrixGizmo() {
@@ -15653,7 +15653,7 @@ class GLTFLoader {
       group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
-      group.multiplyMatrix(new Matrix44$1$1(nodeJson.matrix, true));
+      group.matrix = new Matrix44$1$1(nodeJson.matrix, true);
     }
 
     if (nodeJson.meshes) {
@@ -15734,7 +15734,7 @@ class GLTFLoader {
             lightDir = matrix.multiplyVector(lightDir);
             light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
             light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
-            group.multiplyMatrix(Matrix44$1$1.identity());
+            group.matrix = Matrix44$1$1.identity();
             group.addChild(light);
           }
         }
