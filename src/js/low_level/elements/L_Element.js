@@ -163,10 +163,10 @@ export default class L_Element extends GLBoostObject {
   }
 
   set translate(vec) {
-    if (this._translate.isEqual(vec)) {
+    if (this._translate_static.isEqual(vec)) {
       return;
     }
-    this._translate = vec;
+    this._translate_static = vec;
     this._is_trs_matrix_updated = false;
     this._is_translate_updated = true;
     this._needUpdate();
@@ -174,13 +174,13 @@ export default class L_Element extends GLBoostObject {
 
   getTranslateNotAnimated() {
     if (!this._is_translate_updated && this._is_trs_matrix_updated) {
-      this._translate.x = this._matrix.m03;
-      this._translate.y = this._matrix.m13;
-      this._translate.z = this._matrix.m23;
+      this._translate_static.x = this._matrix_static.m03;
+      this._translate_static.y = this._matrix_static.m13;
+      this._translate_static.z = this._matrix_static.m23;
       this._is_translate_updated = true;
     }
-    
-    return this._translate;
+    this._translate = this._translate_static;
+    return this._translate_static;
   }
 
   get translate() {
@@ -209,10 +209,10 @@ export default class L_Element extends GLBoostObject {
       this._currentCalcMode = 'euler';
       this._needUpdate();
     }
-    if (this._rotate.isEqual(vec)) {
+    if (this._rotate_static.isEqual(vec)) {
       return;
     }
-    this._rotate = vec;
+    this._rotate_static = vec;
     this._is_trs_matrix_updated = false;
     this._is_euler_angles_updated = true;
     this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles;
@@ -238,20 +238,21 @@ export default class L_Element extends GLBoostObject {
       value = this.getRotateAt(this._activeAnimationLineName, inputValue);
     }
     if (value === null) {
-      return this._rotate;
+      return this.getRotateNotAnimated();
     }
     return value;
   }
 
   getRotateNotAnimated() {
-    return this._rotate;
+    this._rotate = this._rotate_static;
+    return this._rotate_static;
   }
 
   set scale(vec) {
-    if (this._scale.isEqual(vec)) {
+    if (this._scale_static.isEqual(vec)) {
       return;
     }
-    this._scale = vec;
+    this._scale_static = vec;
     this._is_trs_matrix_updated = false;
     this._is_scale_updated = true;
     this._needUpdate();
@@ -282,13 +283,14 @@ export default class L_Element extends GLBoostObject {
     let m = this.getMatrixNotAnimated();
     
     if (!this._is_scale_updated && this._is_trs_matrix_updated) {
-      this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
-      this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
-      this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._scale_static.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+      this._scale_static.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+      this._scale_static.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
       this._is_scale_updated = true;
     }
     
-    return this._scale;
+    this._scale = this._scale_static;
+    return this._scale_static;
   }
 
   multiplyMatrix(mat) {
@@ -350,7 +352,8 @@ export default class L_Element extends GLBoostObject {
 */
 
   getMatrixNotAnimated() {
-    return this._matrix;
+    this._matrix = this._matrix_static;
+    return this._matrix_static;
   }
 
   get transformMatrix() {
@@ -404,11 +407,12 @@ export default class L_Element extends GLBoostObject {
     return this._matrix.clone();
   }
 
+
 /*
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-//    if (false) {
+    if (input !== null && input !== void 0) {
 
      // console.log('mode:' + this._currentCalcMode);
 
@@ -419,38 +423,72 @@ export default class L_Element extends GLBoostObject {
 //      let matrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
 
       let rotationMatrix;
+      let quaternion = this.getQuaternionAt(lineName, input);
       // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._is_quaternion_updated || input) {
-        rotationMatrix = this.getQuaternionAtOrStatic(lineName, input).rotationMatrix;
-  //    } else if (this._is_euler_angles_updated) {
+      if (quaternion === null) {
+        let rotateVec = this.getRotateAt(lineName, input);
+        if (rotateVec !== null) {
+          rotationMatrix = Matrix44.rotateZ(rotateVec.z).
+          multiply(Matrix44.rotateY(rotateVec.y)).
+          multiply(Matrix44.rotateX(rotateVec.x));
+        } else {
+          rotationMatrix = Matrix44.identity();
+        }
       } else {
-        let rotateVec = this.getRotateAtOrStatic(lineName, input);
-        rotationMatrix = Matrix44.rotateZ(rotateVec.z).
+        rotationMatrix = quaternion.rotationMatrix;
+      }
+
+      let scale = this.getScaleAt(lineName, input);
+      if (scale === null) {
+        scale = new Vector3(1.0, 1.0, 1.0);
+      }
+      this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(scale));
+      let translateVec = this.getTranslateAt(lineName, input);
+      if (translateVec !== null) {
+        this._matrix.m03 = translateVec.x;
+        this._matrix.m13 = translateVec.y;
+        this._matrix.m23 = translateVec.z;
+      }
+      this._is_trs_matrix_updated = true;
+
+      return this._matrix.clone();
+
+    } else {
+      if (this._is_trs_matrix_updated) {
+        return this.getMatrixNotAnimated().clone();
+      }
+
+      let rotationMatrix = Matrix44.identity();
+      // if input is truly, glTF animation's can be regarded as quaternion
+      if (this._is_quaternion_updated) {
+        rotationMatrix = this._quaternion_static.rotationMatrix;
+      } else {
+        let rotateVec = this._rotate_static;
+        rotationMatrix.rotateZ(rotateVec.z).
         multiply(Matrix44.rotateY(rotateVec.y)).
         multiply(Matrix44.rotateX(rotateVec.x));
       }
 
-      let matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAtOrStatic(lineName, input)));
+      this._matrix_static = Matrix44.multiply(rotationMatrix, Matrix44.scale(this._scale_static));
       let translateVec = this.getTranslateAtOrStatic(lineName, input);
-      matrix.m03 = translateVec.x;
-      matrix.m13 = translateVec.y;
-      matrix.m23 = translateVec.z;
-
-      this.multiplyMatrix(matrix);
+      this._matrix_static.m03 = translateVec.x;
+      this._matrix_static.m13 = translateVec.y;
+      this._matrix_static.m23 = translateVec.z;
 
       this._is_trs_matrix_updated = true;
 
-      
-    return this._matrix.clone();
+      return this._matrix_static.clone();
+
+    }
   }
 */
 
   set quaternion(quat) {
-    if (this._quaternion.isEqual(quat)) {
+    if (this._quaternion_static.isEqual(quat)) {
       return;
     }
     this._currentCalcMode = 'quaternion';
-    this._quaternion = quat;
+    this._quaternion_static = quat;
     this._is_trs_matrix_updated = false;
     this._latest_rotation_driver_type = LatestRotationDriverType.Quaternion;
     this._needUpdate();
@@ -485,11 +523,11 @@ export default class L_Element extends GLBoostObject {
       } else if (this._is_euler_angles_updated) {
         value = Quaternion.quaternionFromRotationMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       }
-      this._quaternion = value;
+      this._quaternion_static = value;
       this._is_quaternion_updated = true;  
     }
 
-    return this._quaternion;
+    return this._quaternion_static;
   }
 
   get inverseTransformMatrix() {
