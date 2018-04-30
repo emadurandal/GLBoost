@@ -335,7 +335,7 @@ export default class SPVGLTFLoader {
       group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
-      group.multiplyMatrix(new Matrix44(nodeJson.matrix, true));
+      group.matrix = new Matrix44(nodeJson.matrix, true);
     }
 
     if (nodeJson.meshes) {
@@ -412,7 +412,7 @@ export default class SPVGLTFLoader {
             lightDir = matrix.multiplyVector(lightDir);
             light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
             light.multiplyMatrixGizmo = group.matrix;
-            group.multiplyMatrix(Matrix44.identity());
+            group.matrix = Matrix44.identity();
             group.addChild(light);
           }
         }
