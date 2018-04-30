@@ -25,9 +25,6 @@ export default class L_Element extends GLBoostObject {
 
 //    this._finalMatrix = Matrix44.identity();
 
-    this._dirtyAsElement = true;
-    this._currentCalcMode = 'euler'; // true: calc rotation matrix using quaternion. false: calc rotation matrix using Euler
-
     this._updateCountAsElement = 0;
     this._animationLine = {};
     this._currentAnimationInputValues = {};
@@ -39,7 +36,6 @@ export default class L_Element extends GLBoostObject {
     this._is_quaternion_updated = true;
     this._is_euler_angles_updated = true;
     this._is_inverse_trs_matrix_updated = false;
-    this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles;
   }
 
 
@@ -48,7 +44,6 @@ export default class L_Element extends GLBoostObject {
   }
 
   _needUpdate() {
-    this._dirtyAsElement = true;
     this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }
@@ -197,17 +192,12 @@ export default class L_Element extends GLBoostObject {
   }
 
   set rotate(vec) {
-    if (this._currentCalcMode !== 'euler') {
-      this._currentCalcMode = 'euler';
-      this._needUpdate();
-    }
     if (this._rotate.isEqual(vec)) {
       return;
     }
     this._rotate = vec.clone();
     this._is_trs_matrix_updated = false;
     this._is_euler_angles_updated = true;
-    this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles;
     this._needUpdate();
   }
 
@@ -286,29 +276,13 @@ export default class L_Element extends GLBoostObject {
 
   multiplyMatrix(mat) {
     this._matrix = mat.clone();
-    this._currentCalcMode = 'matrix';
-//    this._translate = new Vector3(mat.m03, mat.m03, mat.m03);
     this._is_trs_matrix_updated = true;
     this._is_scale_updated = false;
     this._is_translate_updated = false;
     this._is_quaternion_updated = false;
     this._is_euler_angles_updated = false;
-    this._latest_rotation_driver_type = LatestRotationDriverType.TrsMatrix;
     this._needUpdate();
   }
-
-  /*
-  get matrix() {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getMatrixAt(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
-    }
-    if (value === null) {
-      return this._matrix;
-    }
-    return value;
-  }
-*/
 
   get matrix() {
     let input = void 0;
@@ -328,19 +302,6 @@ export default class L_Element extends GLBoostObject {
     }
     return value;
   }
-
-  /*
-  getMatrixAtOrStatic(lineName, inputValue) {
-    let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getMatrixAt(this._activeAnimationLineName, inputValue);
-    }
-    if (value === null) {
-      return this._matrix;
-    }
-    return value;
-  }
-*/
 
   getMatrixNotAnimated() {
     return this._matrix.clone();
@@ -411,11 +372,9 @@ export default class L_Element extends GLBoostObject {
     if (this._quaternion.isEqual(quat)) {
       return;
     }
-    this._currentCalcMode = 'quaternion';
     this._quaternion = quat.clone();
     this._is_trs_matrix_updated = false;
     this._is_quaternion_updated = true;
-    this._latest_rotation_driver_type = LatestRotationDriverType.Quaternion;
     this._needUpdate();
   }
 
@@ -469,19 +428,6 @@ export default class L_Element extends GLBoostObject {
     return Matrix44.invert(this.transformMatrix).transpose().toMatrix33();
   }
 
-  set currentCalcMode(mode) {
-    switch (mode) {
-      case "matrix": this._latest_rotation_driver_type = LatestRotationDriverType.TrsMatrix; break; 
-      case "euler": this._latest_rotation_driver_type = LatestRotationDriverType.EulerAngles; break; 
-      case "quaternion": this._latest_rotation_driver_type = LatestRotationDriverType.Quaternion; break; 
-    }
-    this._currentCalcMode = mode;
-  }
-
-  get currentCalcMode() {
-    return this._currentCalcMode;
-  }
-
   _copy(instance) {
     super._copy(instance);
 
@@ -512,9 +458,6 @@ export default class L_Element extends GLBoostObject {
         instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
       }
     }
-
-    instance._dirtyAsElement = this._dirtyAsElement;
-    instance._currentCalcMode = this._currentCalcMode;
 
     instance._is_trs_matrix_updated = this._is_trs_matrix_updated;
     instance._is_translate_updated = this._is_translate_updated;
