@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 789fcb97
+// This revision is the commit right after the SHA: daa3db4a
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3414,7 +3414,7 @@ class L_Element extends GLBoostObject {
 */
 
   getMatrixNotAnimated() {
-    return this._matrix;
+    return this._matrix.clone();
   }
 
   get transformMatrix() {
@@ -3428,11 +3428,11 @@ class L_Element extends GLBoostObject {
     return matrix;
   }
 
-  
+  /*
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
-    if (this._dirtyAsElement) {
-//    if (true) {
+//    if (this._dirtyAsElement) {
+    if (true) {
 
       if (this._currentCalcMode === 'matrix') {//} && !input) { <- この　} && !input)  があると、上のif (true)が有効の時にWalkingLadyがひしゃげる
         //let matrix = Matrix44.identity();
@@ -3441,18 +3441,18 @@ class L_Element extends GLBoostObject {
         return this._matrix.clone();
       }
 
-      let rotationMatrix = Matrix44$1$1.identity();
+      let rotationMatrix = Matrix44.identity();
       // if input is truly, glTF animation's can be regarded as quaternion
       if (this._currentCalcMode === 'quaternion' || input) {
         rotationMatrix = this.getQuaternionAtOrStatic(lineName, input).rotationMatrix;
       } else {
         let rotateVec = this.getRotateAtOrStatic(lineName, input);
         rotationMatrix.rotateZ(rotateVec.z).
-        multiply(Matrix44$1$1.rotateY(rotateVec.y)).
-        multiply(Matrix44$1$1.rotateX(rotateVec.x));
+        multiply(Matrix44.rotateY(rotateVec.y)).
+        multiply(Matrix44.rotateX(rotateVec.x));
       }
 
-      this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(this.getScaleAtOrStatic(lineName, input)));
+      this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAtOrStatic(lineName, input)));
       let translateVec = this.getTranslateAtOrStatic(lineName, input);
       this._matrix.m03 = translateVec.x;
       this._matrix.m13 = translateVec.y;
@@ -3467,6 +3467,8 @@ class L_Element extends GLBoostObject {
 
     return this._matrix.clone();
   }
+  */
+  
    
 
   isTrsMatrixNeeded(lineName, inputValue) {
@@ -3478,33 +3480,36 @@ class L_Element extends GLBoostObject {
     );
     return result;
   }
-/*
+
+
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-//    if (this._is_trs_matrix_updated && this.isTrsMatrixNeeded(lineName, inputValue)) {
-    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
+    if (this._is_trs_matrix_updated && this.isTrsMatrixNeeded(lineName, inputValue)) {
+//    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
       return this._matrix.clone();
     }
 
-    if (input !== null && input !== void 0) {
+//    if (input !== null && input !== void 0) {
+    {
 
-      let rotationMatrix = Matrix44.identity();
+      let rotationMatrix = Matrix44$1$1.identity();
       if (this._is_quaternion_updated) {
         let quaternion = this.getQuaternionAtOrStatic(lineName, input);
         rotationMatrix = quaternion.rotationMatrix;
       } else if (this._is_euler_angles_updated) {
         let rotateVec = this.getRotateAtOrStatic(lineName, input);
-        rotationMatrix = Matrix44.rotateZ(rotateVec.z).
-        multiply(Matrix44.rotateY(rotateVec.y)).
-        multiply(Matrix44.rotateX(rotateVec.x));
+        rotationMatrix = Matrix44$1$1.rotateZ(rotateVec.z).
+        multiply(Matrix44$1$1.rotateY(rotateVec.y)).
+        multiply(Matrix44$1$1.rotateX(rotateVec.x));
       }
 
       let scale = new Vector3(1.0, 1.0, 1.0);
       if (this._is_scale_updated) {
         scale = this.getScaleAtOrStatic(lineName, input);
       }
-      this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(scale));
+
+      this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(scale));
       if (this._is_translate_updated) {
         let translateVec = this.getTranslateAtOrStatic(lineName, input);
         this._matrix.m03 = translateVec.x;
@@ -3517,7 +3522,7 @@ class L_Element extends GLBoostObject {
     }
     return this._matrix.clone();
   }
-*/
+
 
   set quaternion(quat) {
     if (this._quaternion.isEqual(quat)) {

@@ -343,7 +343,7 @@ export default class L_Element extends GLBoostObject {
 */
 
   getMatrixNotAnimated() {
-    return this._matrix;
+    return this._matrix.clone();
   }
 
   get transformMatrix() {
@@ -357,11 +357,11 @@ export default class L_Element extends GLBoostObject {
     return matrix;
   }
 
-  
+  /*
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
-    if (this._dirtyAsElement) {
-//    if (true) {
+//    if (this._dirtyAsElement) {
+    if (true) {
 
       if (this._currentCalcMode === 'matrix') {//} && !input) { <- この　} && !input)  があると、上のif (true)が有効の時にWalkingLadyがひしゃげる
         //let matrix = Matrix44.identity();
@@ -396,6 +396,8 @@ export default class L_Element extends GLBoostObject {
 
     return this._matrix.clone();
   }
+  */
+  
    
 
   isTrsMatrixNeeded(lineName, inputValue) {
@@ -407,16 +409,18 @@ export default class L_Element extends GLBoostObject {
     );
     return result;
   }
-/*
+
+
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-//    if (this._is_trs_matrix_updated && this.isTrsMatrixNeeded(lineName, inputValue)) {
-    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
+    if (this._is_trs_matrix_updated && this.isTrsMatrixNeeded(lineName, inputValue)) {
+//    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
       return this._matrix.clone();
     }
 
-    if (input !== null && input !== void 0) {
+//    if (input !== null && input !== void 0) {
+    if (true) {
 
       let rotationMatrix = Matrix44.identity();
       if (this._is_quaternion_updated) {
@@ -433,6 +437,7 @@ export default class L_Element extends GLBoostObject {
       if (this._is_scale_updated) {
         scale = this.getScaleAtOrStatic(lineName, input);
       }
+
       this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(scale));
       if (this._is_translate_updated) {
         let translateVec = this.getTranslateAtOrStatic(lineName, input);
@@ -446,7 +451,7 @@ export default class L_Element extends GLBoostObject {
     }
     return this._matrix.clone();
   }
-*/
+
 
   set quaternion(quat) {
     if (this._quaternion.isEqual(quat)) {
