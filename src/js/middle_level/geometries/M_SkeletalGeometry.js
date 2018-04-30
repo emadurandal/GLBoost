@@ -79,7 +79,7 @@ export default class M_SkeletalGeometry extends Geometry {
       matrices[i].m21 /= s.z;
       matrices[i].m22 /= s.z;
       
-      let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+      let q = (Quaternion.fromMatrix(matrices[i]));
       q.normalize();
       let t = matrices[i].getTranslate();
       let matrix = q.rotationMatrix;
@@ -145,7 +145,7 @@ export default class M_SkeletalGeometry extends Geometry {
 //          matrices[i].m21 /= scale.z;
           matrices[i].m22 /= scale.z;
 */
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;
           skeletalMesh._qArray[i*4+1] = q.y;
@@ -168,7 +168,7 @@ export default class M_SkeletalGeometry extends Geometry {
         skeletalMesh._tArray = new Float32Array(matrices.length * 3);
 
         for (let i=0; i<matrices.length; i++) {
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
@@ -209,7 +209,7 @@ export default class M_SkeletalGeometry extends Geometry {
           // console.log(s.toString());
 
 
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
