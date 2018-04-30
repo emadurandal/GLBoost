@@ -435,7 +435,7 @@ export default class GLTFLoader {
             const matrix = new Matrix44(nodeJson.matrix, true);
             lightDir = matrix.multiplyVector(lightDir);
             light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
-            light.multiplyMatrixGizmo = group.matrix;
+            light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
             group.multiplyMatrix(Matrix44.identity());
             group.addChild(light);
           }

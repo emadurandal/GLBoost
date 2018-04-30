@@ -33,23 +33,15 @@ export default class M_Element extends L_Element {
     this._masterElement = null;
 
     this._worldMatrix = new Matrix44();
-
-
-    this._is_trs_matrix_updated = true;
-    this._is_translate_updated = true;
-    this._is_scale_updated = true;
-    this._is_quaternion_updated = true;
-    this._is_euler_angles_updated = true;
-    this._is_inverse_trs_matrix_updated = false;
   }
 
-
-  _needUpdate() {
-    super._needUpdate();
-    this._is_inverse_trs_matrix_updated = false;
-    this._updateCountAsElement++;
+  _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+    if (currentElem._parent === null) {
+      return currentElem.elementUpdateNumber;
+    } else {
+      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
+    }
   }
-
 
   set toInheritCurrentAnimationInputValue(flg) {
     this._toInheritCurrentAnimationInputValue = flg;
@@ -89,7 +81,7 @@ export default class M_Element extends L_Element {
       var matrix = Matrix44.identity();
 
       if (this._currentCalcMode === 'matrix') {
-        this._finalMatrix = matrix.multiply(this.matrix);
+        this._finalMatrix = matrix.multiply(this.getMatrixNotAnimated());
         this._dirtyAsElement = false;
         return this._finalMatrix.clone();
       }
@@ -99,11 +91,11 @@ export default class M_Element extends L_Element {
       if (this._currentCalcMode === 'quaternion') {
         rotationMatrix = this.quaternion.rotationMatrix;
       } else {
-        /*
-         rotationMatrix = Matrix44.rotateX(this.rotate.x).
-         multiply(Matrix44.rotateY(this.rotate.y)).
-         multiply(Matrix44.rotateZ(this.rotate.z));
-         */
+        
+        //rotationMatrix = Matrix44.rotateX(this.rotate.x).
+        //multiply(Matrix44.rotateY(this.rotate.y)).
+        //multiply(Matrix44.rotateZ(this.rotate.z));
+
         rotationMatrix.rotateZ(this.rotate.z).
         multiply(Matrix44.rotateY(this.rotate.y)).
         multiply(Matrix44.rotateX(this.rotate.x));
@@ -119,30 +111,6 @@ export default class M_Element extends L_Element {
 
     return this._finalMatrix.clone();
   }
-/*
-  get transformMatrixForJoints() {
-
-    var rotationMatrix = null;
-    if (this._currentCalcMode === 'quaternion') {
-      rotationMatrix = this.quaternion.rotationMatrix;
-    } else if (this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.matrix;
-      rotationMatrix.m03 = 0;
-      rotationMatrix.m13 = 0;
-      rotationMatrix.m23 = 0;
-      rotationMatrix.m30 = 0;
-      rotationMatrix.m31 = 0;
-      rotationMatrix.m32 = 0;
-    } else {
-      rotationMatrix = Matrix44.rotateX(this.rotate.x).
-      multiply(Matrix44.rotateY(this.rotate.y)).
-      multiply(Matrix44.rotateZ(this.rotate.z));
-    }
-
-    return rotationMatrix.clone();
-  }
-
-*/
 
   get transformMatrixOnlyRotate() {
     let input = void 0;
@@ -154,7 +122,7 @@ export default class M_Element extends L_Element {
     if (input || this._currentCalcMode === 'quaternion') {
       rotationMatrix = this.quaternion.rotationMatrix;
     } else if (!input && this._currentCalcMode === 'matrix') {
-      rotationMatrix = this.matrix;
+      rotationMatrix = this.getMatrixNotAnimated();
       rotationMatrix.m03 = 0;
       rotationMatrix.m13 = 0;
       rotationMatrix.m23 = 0;
@@ -192,11 +160,10 @@ export default class M_Element extends L_Element {
       rotationMatrix.m31 = 0;
       rotationMatrix.m32 = 0;
     } else {
-      /*
-      rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
-      multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
-      multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
-       */
+      //rotationMatrix = Matrix44.rotateX(this.getRotate('time', value).x).
+      //multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
+      //multiply(Matrix44.rotateZ(this.getRotateAt('time', value).z));
+      
       rotationMatrix.rotateZ(this.getRotate('time', value).z).
       multiply(Matrix44.rotateY(this.getRotateAt('time', value).y)).
       multiply(Matrix44.rotateX(this.getRotateAt('time', value).x));
@@ -204,52 +171,6 @@ export default class M_Element extends L_Element {
 
     return rotationMatrix.clone();
   }
-
-  _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
-    if (currentElem._parent === null) {
-      return currentElem.elementUpdateNumber;
-    } else {
-      return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
-    }
-  }
-/*
-  _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-
-    if (input === null && this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    if (this._parent === null) {
-      if (withMySelf) {
-        return this.getTransformMatrixAt(input);
-      } else {
-        return Matrix44.identity();
-      }
-    } else {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
-        this.__updateInfoNumber_multiplyMyAndParentTransformMatrices !== tempNumber)
-      {
-        let currentMatrix = Matrix44.identity();
-        if (withMySelf) {
-//          this._worldMatrix.copyComponents(this.getTransformMatrixAt(input));
-          let currentMatrix = this.getTransformMatrixAt(input);
-        }
-
-//        this._worldMatrix.multiplyByLeft(this._parent._multiplyMyAndParentTransformMatrices(true, input));
-        this._worldMatrix = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
-
-        this.__updateInfoNumber_multiplyMyAndParentTransformMatrices = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatrices = input;
-
-        return this._worldMatrix;
-      } else {
-        return this._worldMatrix;        
-      }
-    }
-  }
-  */
 
   _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
     if (input === void 0 && this._activeAnimationLineName !== null) {
@@ -264,7 +185,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
@@ -329,22 +250,6 @@ export default class M_Element extends L_Element {
     }
   }
 
-//  get rotateMatrixAccumulatedAncestry() {
-    /*
-     var mat = this._multiplyMyAndParentTransformMatrices(this);
-     var scaleX = Math.sqrt(mat.m00*mat.m00 + mat.m10*mat.m10 + mat.m20*mat.m20);
-     var scaleY = Math.sqrt(mat.m01*mat.m01 + mat.m11*mat.m11 + mat.m21*mat.m21);
-     var scaleZ = Math.sqrt(mat.m02*mat.m02 + mat.m12*mat.m12 + mat.m22*mat.m22);
-
-     return new Matrix44(
-     mat.m00/scaleX, mat.m01/scaleY, mat.m02/scaleZ, 0,
-     mat.m10/scaleX, mat.m11/scaleY, mat.m12/scaleZ, 0,
-     mat.m20/scaleX, mat.m21/scaleY, mat.m22/scaleZ, 0,
-     0, 0, 0, 1
-     );*/
-//    return this._multiplyMyAndParentRotateMatrices(true, null);
-//  }
-
   get inverseWorldMatrix() {
     return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
   }
@@ -378,7 +283,6 @@ export default class M_Element extends L_Element {
   }
 
   set dirty(flg) {
-    this._dirtyAsElement = flg;
     if (flg) {
       this._needUpdate();
     }
@@ -428,26 +332,7 @@ export default class M_Element extends L_Element {
     instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
     instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
-    instance._animationLine = {};
 
-    for (let lineName in this._animationLine) {
-      instance._animationLine[lineName] = {};
-      for (let attributeName in this._animationLine[lineName]) {
-        instance._animationLine[lineName][attributeName] = {};
-        instance._animationLine[lineName][attributeName].input = this._animationLine[lineName][attributeName].input.concat();
-
-        let instanceOutput = [];
-        let thisOutput = this._animationLine[lineName][attributeName].output;
-        for (let i=0; i<thisOutput.length; i++) {
-          instanceOutput.push((typeof thisOutput[i] === 'number') ? thisOutput[i] : thisOutput[i].clone());
-        }
-        instance._animationLine[lineName][attributeName].output = instanceOutput;
-
-        instance._animationLine[lineName][attributeName].outputAttribute = this._animationLine[lineName][attributeName].outputAttribute;
-
-        instance._animationLine[lineName][attributeName].outputComponentN = this._animationLine[lineName][attributeName].outputComponentN;
-      }
-    }
 
     instance._transparentByUser = this._transparentByUser;
     instance.opacity = this.opacity;
@@ -534,30 +419,6 @@ export default class M_Element extends L_Element {
   get masterElement() {
     return this._masterElement;
   }
-/*
-  // Use master element's worldMatrix.
-  get worldMatrix() {
-    return this.getWorldMatrixAt(void 0);
-  }
-
-  getWorldMatrixAt(input) {
-    
-    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-
-    if (this._accumulatedAncestryObjectUpdateNumberJoint !== tempNumber || typeof this._matrixAccumulatedAncestryJoint === 'undefined') {
-      this._multiplyMyAndParentTransformMatrices(true, input);
-      if (this._masterElement) {
-  //      return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-  //return Matrix44.multiply(this._masterElement._multiplyMyAndParentTransformMatrices(true, input), this._multiplyMyAndParentTransformMatrices(true, input));
-        this._worldMatrix.multiplyByLeft(this._masterElement._multiplyMyAndParentTransformMatrices(true, input));
-      }
-      this._accumulatedAncestryObjectUpdateNumberJoint = tempNumber;
-    }
-    
-    return this._worldMatrix;
-  }
-  */
-
 
   get worldMatrixForJoints() {
     return this.getWorldMatrixForJointsAt(void 0);
@@ -653,8 +514,6 @@ export default class M_Element extends L_Element {
       this._finalMatrix_RotateTranslate.m13 = translateVec.y;
       this._finalMatrix_RotateTranslate.m23 = translateVec.z;
 
-
-   //   this._dirtyAsElement = false;
    //   this._matrixGetMode = 'animated_' + input;
     }
 
@@ -693,17 +552,14 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
-
-
       if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesFor = currentMatrix;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
         return currentMatrix;
       }
-
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
       this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
       this.__cache_input_multiplyMyAndParentTransformMatrices = input;
@@ -735,7 +591,7 @@ export default class M_Element extends L_Element {
 
       let currentMatrix = null;
       if (withMySelf) {
-        currentMatrix = this.getTransformMatrixAt(input);
+        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
       } else {
         currentMatrix = Matrix44.identity();
       }
