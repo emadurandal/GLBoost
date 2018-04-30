@@ -357,49 +357,6 @@ export default class L_Element extends GLBoostObject {
     return matrix;
   }
 
-  /*
-  getMatrixAtOrStatic(lineName, inputValue) {
-    let input = inputValue;
-//    if (this._dirtyAsElement) {
-    if (true) {
-
-      if (this._currentCalcMode === 'matrix') {//} && !input) { <- この　} && !input)  があると、上のif (true)が有効の時にWalkingLadyがひしゃげる
-        //let matrix = Matrix44.identity();
-        //this._matrix = this._matrix;
-        this._dirtyAsElement = false;
-        return this._matrix.clone();
-      }
-
-      let rotationMatrix = Matrix44.identity();
-      // if input is truly, glTF animation's can be regarded as quaternion
-      if (this._currentCalcMode === 'quaternion' || input) {
-        rotationMatrix = this.getQuaternionAtOrStatic(lineName, input).rotationMatrix;
-      } else {
-        let rotateVec = this.getRotateAtOrStatic(lineName, input);
-        rotationMatrix.rotateZ(rotateVec.z).
-        multiply(Matrix44.rotateY(rotateVec.y)).
-        multiply(Matrix44.rotateX(rotateVec.x));
-      }
-
-      this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(this.getScaleAtOrStatic(lineName, input)));
-      let translateVec = this.getTranslateAtOrStatic(lineName, input);
-      this._matrix.m03 = translateVec.x;
-      this._matrix.m13 = translateVec.y;
-      this._matrix.m23 = translateVec.z;
-
-      this._dirtyAsElement = false;
-
-    } else {
-     // console.count('Cache')
-    }
-    
-
-    return this._matrix.clone();
-  }
-  */
-  
-   
-
   isTrsMatrixNeeded(lineName, inputValue) {
     let result = (
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
@@ -415,40 +372,37 @@ export default class L_Element extends GLBoostObject {
     let input = inputValue;
 
     if (this._is_trs_matrix_updated && this.isTrsMatrixNeeded(lineName, inputValue)) {
-//    if (this._latest_rotation_driver_type === LatestRotationDriverType.TrsMatrix) {
       return this._matrix.clone();
     }
 
-//    if (input !== null && input !== void 0) {
-    if (true) {
 
-      let rotationMatrix = Matrix44.identity();
-      if (this._is_quaternion_updated) {
-        let quaternion = this.getQuaternionAtOrStatic(lineName, input);
-        rotationMatrix = quaternion.rotationMatrix;
-      } else if (this._is_euler_angles_updated) {
-        let rotateVec = this.getRotateAtOrStatic(lineName, input);
-        rotationMatrix = Matrix44.rotateZ(rotateVec.z).
-        multiply(Matrix44.rotateY(rotateVec.y)).
-        multiply(Matrix44.rotateX(rotateVec.x));
-      }
-
-      let scale = new Vector3(1.0, 1.0, 1.0);
-      if (this._is_scale_updated) {
-        scale = this.getScaleAtOrStatic(lineName, input);
-      }
-
-      this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(scale));
-      if (this._is_translate_updated) {
-        let translateVec = this.getTranslateAtOrStatic(lineName, input);
-        this._matrix.m03 = translateVec.x;
-        this._matrix.m13 = translateVec.y;
-        this._matrix.m23 = translateVec.z;
-      }
-
-      this._is_trs_matrix_updated = true;
- 
+    let rotationMatrix = Matrix44.identity();
+    if (this._is_quaternion_updated) {
+      let quaternion = this.getQuaternionAtOrStatic(lineName, input);
+      rotationMatrix = quaternion.rotationMatrix;
+    } else if (this._is_euler_angles_updated) {
+      let rotateVec = this.getRotateAtOrStatic(lineName, input);
+      rotationMatrix = Matrix44.rotateZ(rotateVec.z).
+      multiply(Matrix44.rotateY(rotateVec.y)).
+      multiply(Matrix44.rotateX(rotateVec.x));
     }
+
+    let scale = new Vector3(1.0, 1.0, 1.0);
+    if (this._is_scale_updated) {
+      scale = this.getScaleAtOrStatic(lineName, input);
+    }
+
+    this._matrix = Matrix44.multiply(rotationMatrix, Matrix44.scale(scale));
+    if (this._is_translate_updated) {
+      let translateVec = this.getTranslateAtOrStatic(lineName, input);
+      this._matrix.m03 = translateVec.x;
+      this._matrix.m13 = translateVec.y;
+      this._matrix.m23 = translateVec.z;
+    }
+
+    this._is_trs_matrix_updated = true;
+
+    
     return this._matrix.clone();
   }
 
@@ -562,7 +516,6 @@ export default class L_Element extends GLBoostObject {
     instance._dirtyAsElement = this._dirtyAsElement;
     instance._currentCalcMode = this._currentCalcMode;
 
-    instance._latest_rotation_driver_type = this._latest_rotation_driver_type;
     instance._is_trs_matrix_updated = this._is_trs_matrix_updated;
     instance._is_translate_updated = this._is_translate_updated;
     instance._is_scale_updated = this._is_scale_updated;
