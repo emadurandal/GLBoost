@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 1a9087da
+// This revision is the commit right after the SHA: 44e00be4
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3383,8 +3383,7 @@ class L_Element extends GLBoostObject {
     let rotationMatrix = Matrix44$1$1.identity();
     rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
 
-    let scale = new Vector3(1.0, 1.0, 1.0);
-    scale = this.getScaleNotAnimated();
+    let scale = this.getScaleNotAnimated();
 
     this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(scale));
     let translateVec = this.getTranslateNotAnimated();
@@ -3411,8 +3410,8 @@ class L_Element extends GLBoostObject {
   isTrsMatrixNeeded(lineName, inputValue) {
     let result = (
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
-      (this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate') === null &&
-      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion') === null) &&
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate') === null &&
+      this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion') === null &&
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale') === null
     );
     return result;
@@ -3423,33 +3422,27 @@ class L_Element extends GLBoostObject {
     let input = inputValue;
 
    // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    
-    if (input !== null && input !== void 0) {
+    if (this.isTrsMatrixNeeded(lineName, inputValue)) {
+      return this.getMatrixNotAnimated();
+    } else {
 
       let rotationMatrix = Matrix44$1$1.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
       rotationMatrix = quaternion.rotationMatrix;
-      /*
-      } else if (this._is_euler_angles_updated) {
-        let rotateVec = this.getRotateAtOrStatic(lineName, input);
-        rotationMatrix = Matrix44.rotateZ(rotateVec.z).
-        multiply(Matrix44.rotateY(rotateVec.y)).
-        multiply(Matrix44.rotateX(rotateVec.x));
-      }
-      */
 
       let scale = this.getScaleAtOrStatic(lineName, input);
+      
       this._matrix = Matrix44$1$1.multiply(rotationMatrix, Matrix44$1$1.scale(scale));
       let translateVec = this.getTranslateAtOrStatic(lineName, input);
       this._matrix.m03 = translateVec.x;
       this._matrix.m13 = translateVec.y;
       this._matrix.m23 = translateVec.z;
 
-    } else {
-      return this.getMatrixNotAnimated();
+      return this._matrix.clone();
+
     }
-    
-    return this._matrix.clone();
+
+    this._is_trs_matrix_updated = true;    
   }
 
 
