@@ -230,7 +230,13 @@ export default class L_Element extends GLBoostObject {
   getRotateNotAnimated() {
     if (this._is_euler_angles_updated) {
       return this._rotate.clone();
+    } else if (this._is_trs_matrix_updated) {
+      this._rotate = this._matrix.toEulerAngles();
+    } else if (this._is_quaternion_updated) {
+      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
     }
+
+    this._is_euler_angles_updated = true;
     return this._rotate.clone();
   }
 
@@ -277,7 +283,7 @@ export default class L_Element extends GLBoostObject {
       this._is_scale_updated = true;
     }
     
-      return this._scale.clone();
+    return this._scale.clone();
   }
 
   set matrix(mat) {
@@ -419,9 +425,9 @@ export default class L_Element extends GLBoostObject {
       return this._quaternion;
     } else if (!this._is_quaternion_updated) {
       if (this._is_trs_matrix_updated) {
-        value = Quaternion.quaternionFromRotationMatrix(this._matrix);
+        value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
-        value = Quaternion.quaternionFromRotationMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        value = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;

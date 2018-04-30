@@ -158,7 +158,7 @@ export default class Quaternion {
     return result;
   }
 
-  static quaternionFromRotationMatrix(m) {
+  static fromMatrix(m) {
     
     let q = new Quaternion();
     let tr = m.m00 + m.m11 + m.m22;
@@ -192,7 +192,7 @@ export default class Quaternion {
     return q;
   }
 /*
-  static quaternionFromRotationMatrix(m) {
+  static fromMatrix(m) {
     let fTrace = m.m[0] + m.m[4] + m.m[8];
     let fRoot;
     let q = new Quaternion();

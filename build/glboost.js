@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 7f8ebafa
+// This revision is the commit right after the SHA: 7d01dbf8
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -2293,21 +2293,26 @@ class Matrix44$1$1 {
   }
 
   static rotateXYZ(x, y, z) {
-    /*
-    let sinX = Math.sin(x);
-    let cosX = Math.cos(x);
-    let sinY = Math.sin(y);
-    let cosY = Math.cos(y);
-    let sinZ = Math.sin(z);
-    let cosZ = Math.cos(z);
-    
-    return new Matrix44(
-      cosZ * cosY,
-      cosZ * sinY 
-    );
-    */
+    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
+  }
 
-    return (Matrix33.rotateZ() * Matrix33.rotateY() * Matrix33.rotateX()).toMatrix44();
+  /**
+   * @return Euler Angles Rotation (x, y, z)
+   */
+  toEulerAngles() {
+    let rotate = null;
+    if (Math.abs(this.m20) != 1.0) {
+      let y   = -Math.asin(this.m20);
+      let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
+      let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
+      rotate = new Vector3(x, y, z);
+    } else if (this.m20 === -1.0) {
+      rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
+    } else {
+      rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+    }
+
+    return rotate;
   }
 
   /**
@@ -2880,7 +2885,7 @@ class Quaternion {
     return result;
   }
 
-  static quaternionFromRotationMatrix(m) {
+  static fromMatrix(m) {
     
     let q = new Quaternion();
     let tr = m.m00 + m.m11 + m.m22;
@@ -2914,7 +2919,7 @@ class Quaternion {
     return q;
   }
 /*
-  static quaternionFromRotationMatrix(m) {
+  static fromMatrix(m) {
     let fTrace = m.m[0] + m.m[4] + m.m[8];
     let fRoot;
     let q = new Quaternion();
@@ -3338,7 +3343,13 @@ class L_Element extends GLBoostObject {
   getRotateNotAnimated() {
     if (this._is_euler_angles_updated) {
       return this._rotate.clone();
+    } else if (this._is_trs_matrix_updated) {
+      this._rotate = this._matrix.toEulerAngles();
+    } else if (this._is_quaternion_updated) {
+      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
     }
+
+    this._is_euler_angles_updated = true;
     return this._rotate.clone();
   }
 
@@ -3385,7 +3396,7 @@ class L_Element extends GLBoostObject {
       this._is_scale_updated = true;
     }
     
-      return this._scale.clone();
+    return this._scale.clone();
   }
 
   set matrix(mat) {
@@ -3527,9 +3538,9 @@ class L_Element extends GLBoostObject {
       return this._quaternion;
     } else if (!this._is_quaternion_updated) {
       if (this._is_trs_matrix_updated) {
-        value = Quaternion.quaternionFromRotationMatrix(this._matrix);
+        value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
-        value = Quaternion.quaternionFromRotationMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        value = Quaternion.fromMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
@@ -13653,7 +13664,7 @@ class M_SkeletalGeometry extends Geometry {
       matrices[i].m21 /= s.z;
       matrices[i].m22 /= s.z;
       
-      let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+      let q = (Quaternion.fromMatrix(matrices[i]));
       q.normalize();
       let t = matrices[i].getTranslate();
       let matrix = q.rotationMatrix;
@@ -13719,7 +13730,7 @@ class M_SkeletalGeometry extends Geometry {
 //          matrices[i].m21 /= scale.z;
           matrices[i].m22 /= scale.z;
 */
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;
           skeletalMesh._qArray[i*4+1] = q.y;
@@ -13742,7 +13753,7 @@ class M_SkeletalGeometry extends Geometry {
         skeletalMesh._tArray = new Float32Array(matrices.length * 3);
 
         for (let i=0; i<matrices.length; i++) {
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
@@ -13783,7 +13794,7 @@ class M_SkeletalGeometry extends Geometry {
           // console.log(s.toString());
 
 
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
