@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 44e00be4
+// This revision is the commit right after the SHA: 7f8ebafa
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1524,7 +1524,7 @@ class Matrix33 {
   constructor(m, isColumnMajor = false,
     shaderParameterType = void 0, shaderParameterEntityIndex = void 0, shaderParameterName = void 0
   ) {
-    this.m = new Float32Array(9);
+    this.m = new Float32Array(9); // Data order is column major
     if (arguments.length >= 9) {
       if (isColumnMajor === true) {
         let m = arguments;
@@ -2023,7 +2023,7 @@ class Matrix44$1$1 {
   constructor(m, isColumnMajor = false, notCopyFloat32Array = false
   ) {
     if (arguments.length >= 16) {
-      this.m = new Float32Array(16);
+      this.m = new Float32Array(16); // Data order is column major
       if (isColumnMajor === true) {
         let m = arguments;
         this.setComponents(
@@ -2913,6 +2913,49 @@ class Quaternion {
 
     return q;
   }
+/*
+  static quaternionFromRotationMatrix(m) {
+    let fTrace = m.m[0] + m.m[4] + m.m[8];
+    let fRoot;
+    let q = new Quaternion();
+    if ( fTrace > 0.0 ) {
+      // |w| > 1/2, may as well choose w > 1/2
+      fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+      q.w = 0.5 * fRoot;
+      fRoot = 0.5/fRoot;  // 1/(4w)
+      q.x = (m.m[5]-m.m[7])*fRoot;
+      q.y = (m.m[6]-m.m[2])*fRoot;
+      q.z = (m.m[1]-m.m[3])*fRoot;
+    } else {
+      // |w| <= 1/2
+      let i = 0;
+      if ( m.m[4] > m.m[0] )
+        i = 1;
+      if ( m.m[8] > m.m[i*3+i] )
+        i = 2;
+      let j = (i+1)%3;
+      let k = (i+2)%3;
+      fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
+      
+      let setValue = function(q, i, value) {
+        switch (i) {
+          case 0: q.x = value; break;
+          case 1: q.y = value; break;
+          case 2: q.z = value; break;
+        }
+      }
+
+      setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
+      fRoot = 0.5 / fRoot;
+      q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
+
+      setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
+      setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
+    }
+
+    return q;
+  }
+*/
 
   at(i) {
     switch (i%4) {
@@ -4120,11 +4163,16 @@ class SkeletalShaderSource {
     if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
     } else {
-      //    shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
+      shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
+      shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
       //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
-      //    shaderText += 'uniform vec3 transArray[' + extraData.jointN  + '];\n';
+
+      /*
+      // `OneVec4` Version [Begin]
       shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec3 translationScale;\n';
+      // `OneVec4` Version [End]
+      */
     }  
     
     return shaderText;
@@ -4181,13 +4229,156 @@ class SkeletalShaderSource {
       float wy = q.w * q.y;
       float wz = q.w * q.z;
 
+      
       return mat4(
         1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
         2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
         2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
         t.x, t.y, t.z, 1.0
       );
-    }
+      /*
+     return mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
+      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
+      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
+      0.0, 0.0, 0.0, 1.0
+    );
+
+   return mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+    t.x, t.y, t.z, 1.0
+  );
+
+    return mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
+      0.0, 0.0, 0.0, 1.0
+    );
+    */
+  }
+
+  mat4 createMatrixFromQuaternionTransformUniformScale( vec4 quaternion, vec4 translationUniformScale ) {
+    vec4 q = quaternion;
+    vec3 t = translationUniformScale.xyz;
+    float scale = translationUniformScale.w;
+
+    float sx = q.x * q.x;
+    float sy = q.y * q.y;
+    float sz = q.z * q.z;
+    float cx = q.y * q.z;
+    float cy = q.x * q.z;
+    float cz = q.x * q.y;
+    float wx = q.w * q.x;
+    float wy = q.w * q.y;
+    float wz = q.w * q.z;
+
+    
+    mat4 mat = mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
+      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
+      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
+      t.x, t.y, t.z, 1.0
+    );
+    /*
+    mat4 mat = mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
+    2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
+    2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
+    0.0, 0.0, 0.0, 1.0
+  );
+
+  mat4 mat = mat4(
+  1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+  2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+  2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+  t.x, t.y, t.z, 1.0
+);
+
+  mat4 mat = mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
+    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
+    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
+    0.0, 0.0, 0.0, 1.0
+  );
+  */
+ 
+  mat[0][0] *= scale;
+//  mat[0][1] *= scale;
+//  mat[0][2] *= scale;
+//  mat[1][0] *= scale;
+  mat[1][1] *= scale;
+//  mat[1][2] *= scale;
+//  mat[2][0] *= scale;
+//  mat[2][1] *= scale;
+  mat[2][2] *= scale;
+  
+  return mat;
+}
+
+/*
+  mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
+    vec4 q = quaternion;
+    vec3 t = translation;
+    float x = q.x;
+    float y = q.y;
+    float z = q.z;
+    float w = q.w;
+    float x2 = x + x;
+    float y2 = y + y;
+    float z2 = z + z;
+    float xx = x * x2;
+    float yx = y * x2;
+    float yy = y * y2;
+    float zx = z * x2;
+    float zy = z * y2;
+    float zz = z * z2;
+    float wx = w * x2;
+    float wy = w * y2;
+    float wz = w * z2;
+    float m_0 = 1.0 - yy - zz;
+    float m_3 = yx - wz;
+    float m_6 = zx + wy;
+    float m_1 = yx + wz;
+    float m_4 = 1.0 - xx - zz;
+    float m_7 = zy - wx;
+    float m_2 = zx - wy;
+    float m_5 = zy + wx;
+    float m_8 = 1.0 - xx - yy;
+
+    return mat4(
+      m_0, m_3, m_6, 0.0,
+      m_1, m_4, m_7, 0.0,
+      m_2, m_5, m_8, 0.0,
+      t.x, t.y, t.z, 0.0
+    );
+
+    return mat4(
+    m_0, m_3, m_6, t.x,
+    m_1, m_4, m_7, t.y,
+    m_2, m_5, m_8, t.z,
+    0.0, 0.0, 0.0, 0.0
+  );
+
+ 
+   return mat4(
+    m_0, m_1, m_2, 0.0,
+    m_3, m_4, m_5, 0.0,
+    m_6, m_7, m_8, 0.0,
+    t.x, t.y, t.z, 0.0
+  );
+
+return mat4(
+  m_0, m_1, m_2, t.x,
+  m_3, m_4, m_5, t.y,
+  m_6, m_7, m_8, t.z,
+  0.0, 0.0, 0.0, 0.0
+);
+
+  }
+  */
 
     vec4 unpackedVec2ToNormalizedVec4(vec2 vec_xy, float criteria){
 
@@ -4242,29 +4433,14 @@ class SkeletalShaderSource {
       shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
     } else {
 
-      /*
-      shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
-      shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransform(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
-      shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransform(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
-      shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransform(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
-  */
-  /*
-      shaderText += `float criteria = 4096.0;\n`;
-      shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatArray[int(aVertex_joint.x)], criteria),
-        transArray[int(aVertex_joint.x)]);\n`;
-      shaderText += `skinMat += weightVec.y * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatArray[int(aVertex_joint.y)], criteria),
-        transArray[int(aVertex_joint.y)]);\n`;
-      shaderText += `skinMat += weightVec.z * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatArray[int(aVertex_joint.z)], criteria),
-        transArray[int(aVertex_joint.z)]);\n`;
-      shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatArray[int(aVertex_joint.w)], criteria),
-        transArray[int(aVertex_joint.w)]);\n`;
-        */
-
-
+      // `Quaterion (Vec4) Transform(Vec3)` Version
+      shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
+      shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
+      shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
+      shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
+  
+/*
+      // `OneVec4` Version
       shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
       shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.x)].xy, criteria.x),
@@ -4278,8 +4454,8 @@ class SkeletalShaderSource {
       shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
+    */
     }
-    
 
     // Calc the following...
     // * position_world
@@ -4317,21 +4493,24 @@ class SkeletalShaderSource {
       material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
       material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
     } else {
-      /*
+      
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
       material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
       material._semanticsDic['JOINT_QUATERNION'] = 'quatArray';
       let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'transArray');
       material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
       material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
-      */
+      
 
+      /*
+      // `OneVec4` Version [Begin]
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
       material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
       material._semanticsDic['JOINT_QUATTRANSLATION'] = 'quatTranslationArray';
       let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
       material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
-
+      // `OneVec4` Version [End]
+      */
     }
     
     /*
@@ -13491,9 +13670,8 @@ class M_SkeletalGeometry extends Geometry {
       
       matrix.putTranslate(t);
       matrices[i] = matrix;
-    }
-    */
-
+  }
+*/
     if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
 
       let flatMatrices = [];
@@ -13516,28 +13694,46 @@ class M_SkeletalGeometry extends Geometry {
       skeletalMesh._jointMatrices = flatMatrices;
 
     } else {
-      /*
-
+      
       {
         // no comporess
 
         skeletalMesh._qArray = new Float32Array(matrices.length * 4);
-        skeletalMesh._tArray = new Float32Array(matrices.length * 3);
+        skeletalMesh._tArray = new Float32Array(matrices.length * 4);
 
         for (let i=0; i<matrices.length; i++) {
+          let m = matrices[i];
+          let scale = new Vector3(
+            Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02),
+            Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12),
+            Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22)
+          );
+/*
+          matrices[i].m00 /= scale.x;
+//          matrices[i].m01 /= scale.x;
+//          matrices[i].m02 /= scale.x;
+//          matrices[i].m10 /= scale.y;
+          matrices[i].m11 /= scale.y;
+//          matrices[i].m12 /= scale.y;
+//          matrices[i].m20 /= scale.z;
+//          matrices[i].m21 /= scale.z;
+          matrices[i].m22 /= scale.z;
+*/
           let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
-          q.normalize();
+          //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;
           skeletalMesh._qArray[i*4+1] = q.y;
           skeletalMesh._qArray[i*4+2] = q.z;
           skeletalMesh._qArray[i*4+3] = q.w;
           let t = matrices[i].getTranslate();
-          tskeletalMeshis._tArray[i*3+0] = t.x;
-          skeletalMesh._tArray[i*3+1] = t.y;
-          skeletalMesh._tArray[i*3+2] = t.z;
+          skeletalMesh._tArray[i*4+0] = t.x;
+          skeletalMesh._tArray[i*4+1] = t.y;
+          skeletalMesh._tArray[i*4+2] = t.z;
+          skeletalMesh._tArray[i*4+3] = Math.max(scale.x, scale.y, scale.z);
+         // console.log(scale);
         }
       }
-      */
+      
       /*
       {
         // comporess quaternion only
@@ -13558,11 +13754,10 @@ class M_SkeletalGeometry extends Geometry {
         }
       }
       */
-
+/*
       
       {
-        // comporess both of quaternion and traslation
-
+        // `OneVec4` Vertion comporess both of quaternion and traslation to Vec4
         skeletalMesh._qtArray = new Float32Array(matrices.length * 4);
         let tXArray = [];
         let tYArray = [];
@@ -13601,12 +13796,13 @@ class M_SkeletalGeometry extends Geometry {
             skeletalMesh._qtArray[i*4+3] = vec2TPacked[1];
         }
       }
+      */
     }    
 
   }
 
   drawIntermediate(gl, glslProgram, skeletalMesh, material) {
-    if (skeletalMesh._jointMatrices === null && skeletalMesh._qtArray === null) {
+    if (skeletalMesh._jointMatrices === null && skeletalMesh._qtArray === null && skeletalMesh._qArray === null) {
       return;
     }
 /*
@@ -13627,12 +13823,17 @@ class M_SkeletalGeometry extends Geometry {
       if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
       } else {
- //     Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
-//      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
- //     Shader.trySettingVec3ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray);//
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+  //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
+
+        /*
+        // `OneVec4` Vertion [Begin]
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
         skeletalMesh._translationScale.x, skeletalMesh._translationScale.y, skeletalMesh._translationScale.z, true);
+        // `OneVec4` Vertion [End]
+        */
       }
   //  }
 
