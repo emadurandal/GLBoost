@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 7d01dbf8
+// This revision is the commit right after the SHA: 58d1d021
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -4315,18 +4315,25 @@ class SkeletalShaderSource {
     0.0, 0.0, 0.0, 1.0
   );
   */
+
+  mat4 uniformScaleMat = mat4(
+    scale, 0.0, 0.0, 0.0,
+    0.0, scale, 0.0, 0.0,
+    0.0, 0.0, scale, 0.0,
+    0.0, 0.0, 0.0, 1.0
+  );
  
-  mat[0][0] *= scale;
+//  mat[0][0] *= scale;
 //  mat[0][1] *= scale;
 //  mat[0][2] *= scale;
 //  mat[1][0] *= scale;
-  mat[1][1] *= scale;
+//  mat[1][1] *= scale;
 //  mat[1][2] *= scale;
 //  mat[2][0] *= scale;
 //  mat[2][1] *= scale;
-  mat[2][2] *= scale;
+//  mat[2][2] *= scale;
   
-  return mat;
+  return mat*uniformScaleMat;
 }
 
 /*
@@ -13719,17 +13726,17 @@ class M_SkeletalGeometry extends Geometry {
             Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12),
             Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22)
           );
-/*
+
           matrices[i].m00 /= scale.x;
-//          matrices[i].m01 /= scale.x;
-//          matrices[i].m02 /= scale.x;
-//          matrices[i].m10 /= scale.y;
+          matrices[i].m01 /= scale.x;
+          matrices[i].m02 /= scale.x;
+          matrices[i].m10 /= scale.y;
           matrices[i].m11 /= scale.y;
-//          matrices[i].m12 /= scale.y;
-//          matrices[i].m20 /= scale.z;
-//          matrices[i].m21 /= scale.z;
+          matrices[i].m12 /= scale.y;
+          matrices[i].m20 /= scale.z;
+          matrices[i].m21 /= scale.z;
           matrices[i].m22 /= scale.z;
-*/
+
           let q = (Quaternion.fromMatrix(matrices[i]));
           //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;

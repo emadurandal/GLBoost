@@ -152,18 +152,25 @@ export default class SkeletalShaderSource {
     0.0, 0.0, 0.0, 1.0
   );
   */
+
+  mat4 uniformScaleMat = mat4(
+    scale, 0.0, 0.0, 0.0,
+    0.0, scale, 0.0, 0.0,
+    0.0, 0.0, scale, 0.0,
+    0.0, 0.0, 0.0, 1.0
+  );
  
-  mat[0][0] *= scale;
+//  mat[0][0] *= scale;
 //  mat[0][1] *= scale;
 //  mat[0][2] *= scale;
 //  mat[1][0] *= scale;
-  mat[1][1] *= scale;
+//  mat[1][1] *= scale;
 //  mat[1][2] *= scale;
 //  mat[2][0] *= scale;
 //  mat[2][1] *= scale;
-  mat[2][2] *= scale;
+//  mat[2][2] *= scale;
   
-  return mat;
+  return mat*uniformScaleMat;
 }
 
 /*
