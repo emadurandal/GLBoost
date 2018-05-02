@@ -10,18 +10,17 @@ export default class SkeletalShaderSource {
 
     if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-    } else {
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1){
       shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
       //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
 
-      /*
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
       // `OneVec4` Version [Begin]
       shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec3 translationScale;\n';
       // `OneVec4` Version [End]
-      */
-    }  
+    }
     
     return shaderText;
   }
@@ -286,15 +285,15 @@ return mat4(
       shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
       shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
       shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-    } else {
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
 
       // `Quaterion (Vec4) Transform(Vec3)` Version
       shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
       shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
       shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
       shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
-  
-/*
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+
       // `OneVec4` Version
       shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
       shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
@@ -309,7 +308,7 @@ return mat4(
       shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
-    */
+    
     }
 
     // Calc the following...
@@ -347,7 +346,7 @@ return mat4(
       let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
       material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
       material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
-    } else {
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
       
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
       material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
@@ -356,8 +355,8 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
       material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
       
-
-      /*
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+      
       // `OneVec4` Version [Begin]
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
       material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
@@ -365,7 +364,7 @@ return mat4(
       let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
       material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
       // `OneVec4` Version [End]
-      */
+      
     }
     
     /*
