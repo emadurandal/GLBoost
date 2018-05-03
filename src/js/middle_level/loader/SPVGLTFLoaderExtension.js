@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import SPVDecalShader from '../shaders/SPVDecalShader';
 import SPVLambertShader from '../shaders/SPVLambertShader';
 import SPVPhongShader from '../shaders/SPVPhongShader';
+import Vector4 from '../../low_level/math/Vector4';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -32,29 +33,29 @@ export default class SPVGLTFLoaderExtension {
     return this[singleton];
   }
 
-  setAssetPropertiesToRootGroup(routeGroup, asset) {
+  setAssetPropertiesToRootGroup(rootGroup, asset) {
     // Animation FPS
     if (asset && asset.animationFps) {
       rootGroup.animationFps = asset.animationFps;
     }
 
     // other information
-    if (json.asset && json.asset.spv_version) {
-      rootGroup.spv_version = json.asset.spv_version;
+    if (asset && asset.spv_version) {
+      rootGroup.spv_version = asset.spv_version;
     }
-    if (json.asset && json.asset.LastSaved_ApplicationVendor) {
-      rootGroup.LastSaved_ApplicationVendor = json.asset.LastSaved_ApplicationVendor;
+    if (asset && asset.LastSaved_ApplicationVendor) {
+      rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
     }
-    if (json.asset && json.asset.LastSaved_ApplicationName) {
-      rootGroup.LastSaved_ApplicationName = json.asset.LastSaved_ApplicationName;
+    if (asset && asset.LastSaved_ApplicationName) {
+      rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
     }
-    if (json.asset && json.asset.LastSaved_ApplicationVersion) {
-      rootGroup.LastSaved_ApplicationVersion = json.asset.LastSaved_ApplicationVersion;
+    if (asset && asset.LastSaved_ApplicationVersion) {
+      rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
     }
 
     // Animation Tracks
-    if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
-      rootGroup.animationTracks = json.asset.extras.animation_tracks;
+    if (asset && asset.extras && asset.extras.animation_tracks) {
+      rootGroup.animationTracks = asset.extras.animation_tracks;
     }
   }
 
@@ -89,3 +90,6 @@ export default class SPVGLTFLoaderExtension {
     return SPVPhongShader;
   }
 }
+
+
+GLBoost["SPVGLTFLoaderExtension"] = SPVGLTFLoaderExtension;
