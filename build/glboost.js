@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: eabbcca1
+// This revision is the commit right after the SHA: 288128fa
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17168,6 +17168,11 @@ class GLTFLoader {
         'TEXTURE_WRAP_T': samplerJson.wrapT,
         'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
+      
+      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      }
+
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
       promisesToLoadResources.push(promise);
@@ -17222,42 +17227,12 @@ class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
-      if (options.extensionLoader) {
+      if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
       rootGroup.addChild(group);
-      
-/*
-      rootGroup.asset = json.asset;
 
-      // Animation FPS
-      if (json.asset && json.asset.animationFps) {
-        rootGroup.animationFps = json.asset.animationFps;
-      }
-
-      // Animation Tracks
-      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
-        rootGroup.animationTracks = json.asset.extras.animation_tracks;
-      }
-
-      rootGroup.addChild(group);
-
-      // Transparent Meshes Draw Order
-      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
-        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
-        let meshes = rootGroup.searchElementsByType(M_Mesh);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
-          for (let mesh of meshes) {
-            if (mesh.userFlavorName === name) {
-              rootGroup.transparentMeshes.push(mesh);
-              break;
-            }
-          }
-        }
-      }
-      */
     }
 
     resolve(rootGroup);
