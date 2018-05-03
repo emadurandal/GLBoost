@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: c58d8ef8
+// This revision is the commit right after the SHA: ed322360
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -18710,9 +18710,9 @@ if (GLBoost['JointGizmoUpdater'] === void 0) {
 /*       */
 
 class AnimationPlayer {
+                              
 
   constructor() {
-
   }
 
   init(group    ) {
