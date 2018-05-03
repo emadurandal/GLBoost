@@ -26,4 +26,33 @@ export default class VRizeGLTFLoaderExtension {
     }
     return this[singleton];
   }
+
+  setAssetPropertiesToRootGroup(rootGroup, asset) {
+    // Animation FPS
+    if (asset && asset.animationFps) {
+      rootGroup.animationFps = asset.animationFps;
+    }
+
+    // Animation Tracks
+    if (asset && asset.extras && asset.extras.animation_tracks) {
+      rootGroup.animationTracks = asset.extras.animation_tracks;
+    }
+
+    rootGroup.addChild(group);
+
+    // Transparent Meshes Draw Order
+    if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+      rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
+      let meshes = rootGroup.searchElementsByType(M_Mesh);
+      rootGroup.transparentMeshes = [];
+      for (let name of rootGroup.transparentMeshesDrawOrder) {
+        for (let mesh of meshes) {
+          if (mesh.userFlavorName === name) {
+            rootGroup.transparentMeshes.push(mesh);
+            break;
+          }
+        }
+      }
+    }
+  }
 }
