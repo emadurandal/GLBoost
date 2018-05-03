@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 4f94e9b9
+// This revision is the commit right after the SHA: 67ee6902
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -12344,7 +12344,7 @@ class GLBoostLowContext {
 
 GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
-class M_Mesh extends M_Element {
+class M_Mesh$1 extends M_Element {
   constructor(glBoostContext, geometry, material) {
     super(glBoostContext);
 
@@ -12377,7 +12377,7 @@ class M_Mesh extends M_Element {
   set geometry(geometry) {
     this._geometry = geometry;
     geometry._parent = this;
-    M_Mesh._geometries[geometry.toString()] = geometry;
+    M_Mesh$1._geometries[geometry.toString()] = geometry;
   }
 
   get geometry() {
@@ -12579,7 +12579,7 @@ class M_Mesh extends M_Element {
   }
 
   clone() {
-    let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
+    let instance = new M_Mesh$1(this._glBoostContext, this.geometry, this.material);
     this._copy(instance);
 
     return instance;
@@ -12590,9 +12590,9 @@ class M_Mesh extends M_Element {
     instance._transformedDepth = this._transformedDepth;
   }
 }
-M_Mesh._geometries = {};
+M_Mesh$1._geometries = {};
 
-GLBoost$1['M_Mesh'] = M_Mesh;
+GLBoost$1['M_Mesh'] = M_Mesh$1;
 
 class CubeAbsolute extends Geometry {
   constructor(glBoostContext) {
@@ -12987,7 +12987,7 @@ class M_Group extends M_Element {
       }
     }
 
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    if (type === L_AbstractMaterial && element instanceof M_Mesh$1) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
         if (this._validateByQuery(material, query, queryMeta)) {
@@ -13023,7 +13023,7 @@ class M_Group extends M_Element {
       return objects;
     }
 
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    if (type === L_AbstractMaterial && element instanceof M_Mesh$1) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
         if (this._validateByQuery(material, query, queryMeta)) {
@@ -13109,7 +13109,7 @@ class M_Group extends M_Element {
         return elem.AABB;
         //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
       }
-      if (elem instanceof M_Mesh) {
+      if (elem instanceof M_Mesh$1) {
         let aabb = elem.AABBInWorld;
         //console.log(aabb.toString());
         return aabb;
@@ -13227,7 +13227,7 @@ class M_GLBoostMonitor extends L_GLBoostMonitor {
   getMMeshes(glBoostObjects) {
     let meshes = [];
     for (let object of glBoostObjects) {
-      if (object instanceof M_Mesh) {
+      if (object instanceof M_Mesh$1) {
         meshes.push(object);
       } else if (object instanceof M_Group) {
         meshes = meshes.concat(object.searchElementsByType(GLBoost$1.M_Mesh));
@@ -13777,7 +13777,7 @@ class RenderPass extends GLBoostObject {
       let elements = [];
       this._scene.getChildren().forEach((elm)=> {
         // collect meshes
-        this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
+        this._meshes = this._meshes.concat(collectElements(elm, M_Mesh$1));
 
         // collect meshes
         elements = elements.concat(collectElements(elm, M_Element));
@@ -14070,7 +14070,7 @@ class M_JointGizmo extends M_Gizmo {
   _init(glBoostContext, joint, length) {
     this._joint = joint;
     this._primitive = new JointPrimitive(this._glBoostContext, length, 1);
-    this._mesh = new M_Mesh(glBoostContext,
+    this._mesh = new M_Mesh$1(glBoostContext,
       this._primitive,
       null
     );
@@ -14261,7 +14261,7 @@ class M_Joint extends M_Element {
 
 GLBoost$1['M_Joint'] = M_Joint;
 
-class M_SkeletalMesh extends M_Mesh {
+class M_SkeletalMesh extends M_Mesh$1 {
   constructor(glBoostContext, geometry, material, rootJointName) {
     super(glBoostContext, geometry, material, rootJointName);
     this._rootJointName = rootJointName;
@@ -14747,7 +14747,7 @@ class M_Scene extends M_Group {
         }
         return elem.AABB;
       }
-      if (elem instanceof M_Mesh) {
+      if (elem instanceof M_Mesh$1) {
         return elem.AABB;
       }
 
@@ -14830,7 +14830,7 @@ class M_Scene extends M_Group {
           meshes = meshes.concat(childMeshes);
         });
         return meshes;
-      } else if (elem instanceof M_Mesh) {
+      } else if (elem instanceof M_Mesh$1) {
         return [elem];
       } else {
         return [];
@@ -14853,7 +14853,7 @@ class M_Scene extends M_Group {
         for (let meshGizmo of elem._gizmos) {
           meshGizmo.prepareToRender(expression, existCamera_f, []);
         }
-      } else if (elem instanceof M_Mesh) {
+      } else if (elem instanceof M_Mesh$1) {
         elem.prepareToRender(expression, existCamera_f, this._lights);
         for (let gizmo of elem._gizmos) {
           gizmo.mesh.prepareToRender(expression, existCamera_f, this._lights);
@@ -15521,7 +15521,7 @@ class M_DirectionalLightGizmo extends M_Gizmo {
 
   _init(glBoostContext, length) {
     this._material = new ClassicMaterial$1(this._glBoostContext);
-    this._mesh = new M_Mesh(glBoostContext,
+    this._mesh = new M_Mesh$1(glBoostContext,
       new Arrow(this._glBoostContext, length, 3),
       this._material);
 
@@ -15711,7 +15711,7 @@ class M_AxisGizmo extends M_Gizmo {
   }
 
   _init(glBoostContext, length) {
-    let mesh = new M_Mesh(glBoostContext, new Axis(this._glBoostContext, length));
+    let mesh = new M_Mesh$1(glBoostContext, new Axis(this._glBoostContext, length));
     this.addChild(mesh);
   }
 }
@@ -15777,11 +15777,11 @@ class M_GridGizmo extends M_Gizmo {
   _init(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec) {
     this._material = new ClassicMaterial$1(glBoostContext);
     this._material.baseColor = colorVec;
-    this.addChild(new M_Mesh(glBoostContext, new Grid(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec), this._material));
+    this.addChild(new M_Mesh$1(glBoostContext, new Grid(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec), this._material));
   }
 }
 
-class M_SPVScreenMesh extends M_Mesh {
+class M_SPVScreenMesh extends M_Mesh$1 {
   constructor(glBoostContext, layout = {preset: 'one'}, customVertexAttributes) {
     super(glBoostContext, null, null);
     this._init(layout, customVertexAttributes);
@@ -15899,7 +15899,7 @@ class EffekseerElement extends M_Element {
 
 }
 
-class M_ScreenMesh extends M_Mesh {
+class M_ScreenMesh extends M_Mesh$1 {
   constructor(glBoostContext, customVertexAttributes) {
     super(glBoostContext, null, null);
     this._init(customVertexAttributes);
@@ -15961,7 +15961,7 @@ class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createMesh(geometry, material) {
-    return new M_Mesh(this, geometry, material);
+    return new M_Mesh$1(this, geometry, material);
   }
 
   createSkeletalMesh(geometry, material, rootJointName) {
@@ -17150,6 +17150,7 @@ class GLTFLoader {
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
           // Nothing to do because premultipling alpha is already done.
+          isNeededToMultiplyAlphaToColorOfTexture = false;
         } else {
           isNeededToMultiplyAlphaToColorOfTexture = true;
         }
@@ -17466,12 +17467,7 @@ class GLTFLoader {
         }
 */
 //        if (material === null) {
-        let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
-        } else {
-          material = glBoostContext.createClassicMaterial();
-        }
+        let material = glBoostContext.createClassicMaterial();
         if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
           material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
@@ -17482,12 +17478,7 @@ class GLTFLoader {
 
         materials.push(material);
       } else {
-        let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
-        } else {
-          material = glBoostContext.createClassicMaterial();
-        }
+        let material = glBoostContext.createClassicMaterial();
         if (defaultShader) {
           material.shaderClass = defaultShader;
         } else {
@@ -17713,36 +17704,20 @@ class GLTFLoader {
     } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
       switch (techniqueStr) {
         case 'CONSTANT':
-          if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-            material.shaderClass = options.extensionLoader.getDecalShader();
-          } else {
-            material.shaderClass = DecalShader;
-          }
+          material.shaderClass = DecalShader;
           break;
         case 'LAMBERT':
-          if (options.extensionLoader && options.extensionLoader.getLambertShader) {
-            material.shaderClass = options.extensionLoader.getLambertShader();
-          } else {
-            material.shaderClass = LambertShader;
-          }
+          material.shaderClass = LambertShader;
           break;
         case 'PHONG':
-          if (options.extensionLoader && options.extensionLoader.getPhongShader) {
-            material.shaderClass = options.extensionLoader.getPhongShader();
-          } else {
-            material.shaderClass = PhongShader;
-          }
+          material.shaderClass = PhongShader;
           break;
       }
     } else {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
-        if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-          material.shaderClass = options.extensionLoader.getDecalShader();
-        } else {
-          material.shaderClass = DecalShader;
-        }
+        material.shaderClass = DecalShader;
       }
     }
 
@@ -20645,5 +20620,111 @@ class H_SPVUIRectangle extends M_SPVScreenMesh {
 }
 
 GLBoost$1["H_SPVUIRectangle"] = H_SPVUIRectangle;
+
+let singleton$7 = Symbol();
+let singletonEnforcer$5 = Symbol();
+
+/**
+ * This is a loader class of glTF VRize extension Data.
+ */
+class VRizeGLTFLoaderExtension {
+
+  /**
+   * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   */
+  constructor(enforcer) {
+    if (enforcer !== singletonEnforcer$5) {
+      throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+    }
+  }
+
+  /**
+   * The static method to get singleton instance of this class.
+   * @return {ObjLoader} the singleton instance of ObjLoader class
+   */
+  static getInstance() {
+    if (!this[singleton$7]) {
+      this[singleton$7] = new VRizeGLTFLoaderExtension(singletonEnforcer$5);
+    }
+    return this[singleton$7];
+  }
+
+  setAssetPropertiesToRootGroup(rootGroup, asset) {
+    // Animation FPS
+    if (asset && asset.animationFps) {
+      rootGroup.animationFps = asset.animationFps;
+    }
+
+    // other information
+    if (asset && asset.spv_version) {
+      rootGroup.spv_version = asset.spv_version;
+    }
+    if (asset && asset.LastSaved_ApplicationVendor) {
+      rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
+    }
+    if (asset && asset.LastSaved_ApplicationName) {
+      rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
+    }
+    if (asset && asset.LastSaved_ApplicationVersion) {
+      rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+    }
+
+    // Animation Tracks
+    if (asset && asset.extras && asset.extras.animation_tracks) {
+      rootGroup.animationTracks = asset.extras.animation_tracks;
+    }
+
+    // Transparent Meshes Draw Order
+    if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+      rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
+      let meshes = rootGroup.searchElementsByType(M_Mesh);
+      rootGroup.transparentMeshes = [];
+      for (let name of rootGroup.transparentMeshesDrawOrder) {
+        for (let mesh of meshes) {
+          if (mesh.userFlavorName === name) {
+            rootGroup.transparentMeshes.push(mesh);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  setUVTransformToTexture(texture, samplerJson) {
+    let uvTransform = new Vector4(1, 1, 0, 0);
+    if (samplerJson.extras && samplerJson.extras.scale) {
+      let scale = samplerJson.extras.scale;
+      uvTransform.x = scale[0];
+      uvTransform.y = scale[1];
+    }
+    if (samplerJson.extras && samplerJson.extras.translation) {
+      let translation = samplerJson.extras.translation;
+      uvTransform.z = translation[0];
+      uvTransform.w = translation[1];
+    }
+    texture.uvTransform = uvTransform;
+  }
+
+  createClassicMaterial(glBoostContext) {
+    return glBoostContext.createSPVClassicMaterial();
+  }
+
+  getDecalShader() {
+    return SPVDecalShader;
+  }
+
+  getLambertShader() {
+    return SPVLambertShader;
+  }
+
+  getPhongShader() {
+    return SPVPhongShader;
+  }
+
+}
+
+
+GLBoost$1["VRizeGLTFLoaderExtension"] = VRizeGLTFLoaderExtension;
 
 })));

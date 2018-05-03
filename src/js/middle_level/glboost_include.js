@@ -42,4 +42,4 @@ import SPVJointGizmoUpdater from './elements/skeletons/SPVJointGizmoUpdater';
 import H_SPVScreenLUT from '../high_level/post_effects/H_SPVScreenLUT';
 import H_SPVUIRectangle from '../high_level/user_interfaces/H_SPVUIRectangle';
 
-
+import VRizeGLTFLoaderExtension from './loader/VRizeGLTFLoaderExtension';
