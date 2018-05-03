@@ -3,9 +3,9 @@
 import GLBoost from '../globals';
 
 export default class AnimationPlayer {
+  __animationLastTime: number;
 
   constructor() {
-
   }
 
   init(group:any) {

@@ -10,7 +10,7 @@ export default class Matrix44 {
   constructor(m, isColumnMajor = false, notCopyFloat32Array = false
   ) {
     if (arguments.length >= 16) {
-      this.m = new Float32Array(16);
+      this.m = new Float32Array(16); // Data order is column major
       if (isColumnMajor === true) {
         let m = arguments;
         this.setComponents(
@@ -280,21 +280,26 @@ export default class Matrix44 {
   }
 
   static rotateXYZ(x, y, z) {
-    /*
-    let sinX = Math.sin(x);
-    let cosX = Math.cos(x);
-    let sinY = Math.sin(y);
-    let cosY = Math.cos(y);
-    let sinZ = Math.sin(z);
-    let cosZ = Math.cos(z);
-    
-    return new Matrix44(
-      cosZ * cosY,
-      cosZ * sinY 
-    );
-    */
+    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
+  }
 
-    return (Matrix33.rotateZ() * Matrix33.rotateY() * Matrix33.rotateX()).toMatrix44();
+  /**
+   * @return Euler Angles Rotation (x, y, z)
+   */
+  toEulerAngles() {
+    let rotate = null;
+    if (Math.abs(this.m20) != 1.0) {
+      let y   = -Math.asin(this.m20);
+      let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
+      let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
+      rotate = new Vector3(x, y, z);
+    } else if (this.m20 === -1.0) {
+      rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
+    } else {
+      rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+    }
+
+    return rotate;
   }
 
   /**

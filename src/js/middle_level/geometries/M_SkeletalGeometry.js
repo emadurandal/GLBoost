@@ -79,7 +79,7 @@ export default class M_SkeletalGeometry extends Geometry {
       matrices[i].m21 /= s.z;
       matrices[i].m22 /= s.z;
       
-      let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+      let q = (Quaternion.fromMatrix(matrices[i]));
       q.normalize();
       let t = matrices[i].getTranslate();
       let matrix = q.rotationMatrix;
@@ -96,9 +96,8 @@ export default class M_SkeletalGeometry extends Geometry {
       
       matrix.putTranslate(t);
       matrices[i] = matrix;
-    }
-    */
-
+  }
+*/
     if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
 
       let flatMatrices = [];
@@ -120,29 +119,46 @@ export default class M_SkeletalGeometry extends Geometry {
       }
       skeletalMesh._jointMatrices = flatMatrices;
 
-    } else {
-      /*
-
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
       {
         // no comporess
 
         skeletalMesh._qArray = new Float32Array(matrices.length * 4);
-        skeletalMesh._tArray = new Float32Array(matrices.length * 3);
+        skeletalMesh._tArray = new Float32Array(matrices.length * 4);
 
         for (let i=0; i<matrices.length; i++) {
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
-          q.normalize();
+          let m = matrices[i];
+          let scale = new Vector3(
+            Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02),
+            Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12),
+            Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22)
+          );
+
+          matrices[i].m00 /= scale.x;
+          matrices[i].m01 /= scale.x;
+          matrices[i].m02 /= scale.x;
+          matrices[i].m10 /= scale.y;
+          matrices[i].m11 /= scale.y;
+          matrices[i].m12 /= scale.y;
+          matrices[i].m20 /= scale.z;
+          matrices[i].m21 /= scale.z;
+          matrices[i].m22 /= scale.z;
+
+          let q = (Quaternion.fromMatrix(matrices[i]));
+          //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;
           skeletalMesh._qArray[i*4+1] = q.y;
           skeletalMesh._qArray[i*4+2] = q.z;
           skeletalMesh._qArray[i*4+3] = q.w;
           let t = matrices[i].getTranslate();
-          tskeletalMeshis._tArray[i*3+0] = t.x;
-          skeletalMesh._tArray[i*3+1] = t.y;
-          skeletalMesh._tArray[i*3+2] = t.z;
+          skeletalMesh._tArray[i*4+0] = t.x;
+          skeletalMesh._tArray[i*4+1] = t.y;
+          skeletalMesh._tArray[i*4+2] = t.z;
+          skeletalMesh._tArray[i*4+3] = Math.max(scale.x, scale.y, scale.z);
+         // console.log(scale);
         }
       }
-      */
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
       /*
       {
         // comporess quaternion only
@@ -151,7 +167,7 @@ export default class M_SkeletalGeometry extends Geometry {
         skeletalMesh._tArray = new Float32Array(matrices.length * 3);
 
         for (let i=0; i<matrices.length; i++) {
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
@@ -163,11 +179,9 @@ export default class M_SkeletalGeometry extends Geometry {
         }
       }
       */
-
       
       {
-        // comporess both of quaternion and traslation
-
+        // `OneVec4` Vertion comporess both of quaternion and traslation to Vec4
         skeletalMesh._qtArray = new Float32Array(matrices.length * 4);
         let tXArray = [];
         let tYArray = [];
@@ -193,7 +207,7 @@ export default class M_SkeletalGeometry extends Geometry {
           // console.log(s.toString());
 
 
-          let q = (Quaternion.quaternionFromRotationMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
@@ -206,12 +220,13 @@ export default class M_SkeletalGeometry extends Geometry {
             skeletalMesh._qtArray[i*4+3] = vec2TPacked[1];
         }
       }
+      
     }    
 
   }
 
   drawIntermediate(gl, glslProgram, skeletalMesh, material) {
-    if (skeletalMesh._jointMatrices === null && skeletalMesh._qtArray === null) {
+    if (skeletalMesh._jointMatrices === null && skeletalMesh._qtArray === null && skeletalMesh._qArray === null) {
       return;
     }
 /*
@@ -231,13 +246,18 @@ export default class M_SkeletalGeometry extends Geometry {
       
       if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
-      } else {
- //     Shader.trySettingVec4ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
-//      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
- //     Shader.trySettingVec3ArrayToUniform(gl, glslProgram, materials[i], materials[i]._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray);//
+      } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+  //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
+      } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+        
+        // `OneVec4` Vertion [Begin]
+        Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
         skeletalMesh._translationScale.x, skeletalMesh._translationScale.y, skeletalMesh._translationScale.z, true);
+        // `OneVec4` Vertion [End]
+        
       }
   //  }
 

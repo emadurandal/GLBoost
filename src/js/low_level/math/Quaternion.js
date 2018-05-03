@@ -158,7 +158,7 @@ export default class Quaternion {
     return result;
   }
 
-  static quaternionFromRotationMatrix(m) {
+  static fromMatrix(m) {
     
     let q = new Quaternion();
     let tr = m.m00 + m.m11 + m.m22;
@@ -191,6 +191,49 @@ export default class Quaternion {
 
     return q;
   }
+/*
+  static fromMatrix(m) {
+    let fTrace = m.m[0] + m.m[4] + m.m[8];
+    let fRoot;
+    let q = new Quaternion();
+    if ( fTrace > 0.0 ) {
+      // |w| > 1/2, may as well choose w > 1/2
+      fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+      q.w = 0.5 * fRoot;
+      fRoot = 0.5/fRoot;  // 1/(4w)
+      q.x = (m.m[5]-m.m[7])*fRoot;
+      q.y = (m.m[6]-m.m[2])*fRoot;
+      q.z = (m.m[1]-m.m[3])*fRoot;
+    } else {
+      // |w| <= 1/2
+      let i = 0;
+      if ( m.m[4] > m.m[0] )
+        i = 1;
+      if ( m.m[8] > m.m[i*3+i] )
+        i = 2;
+      let j = (i+1)%3;
+      let k = (i+2)%3;
+      fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
+      
+      let setValue = function(q, i, value) {
+        switch (i) {
+          case 0: q.x = value; break;
+          case 1: q.y = value; break;
+          case 2: q.z = value; break;
+        }
+      }
+
+      setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
+      fRoot = 0.5 / fRoot;
+      q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
+
+      setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
+      setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
+    }
+
+    return q;
+  }
+*/
 
   at(i) {
     switch (i%4) {
