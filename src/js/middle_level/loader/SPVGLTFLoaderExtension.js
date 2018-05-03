@@ -1,3 +1,8 @@
+import GLBoost from '../../globals';
+import SPVDecalShader from '../shaders/SPVDecalShader';
+import SPVLambertShader from '../shaders/SPVLambertShader';
+import SPVPhongShader from '../shaders/SPVPhongShader';
+
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
@@ -66,5 +71,21 @@ export default class SPVGLTFLoaderExtension {
       uvTransform.w = translation[1];
     }
     texture.uvTransform = uvTransform;
+  }
+
+  createClassicMaterial(glBoostContext) {
+    return glBoostContext.createSPVClassicMaterial();
+  }
+
+  getDecalShader() {
+    return SPVDecalShader;
+  }
+
+  getLambertShader() {
+    return SPVLambertShader;
+  }
+
+  getPhongShader() {
+    return SPVPhongShader;
   }
 }
