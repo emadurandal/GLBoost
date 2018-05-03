@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 88808287
+// This revision is the commit right after the SHA: 4c02cff5
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -15589,6 +15589,7 @@ class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
+      extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
@@ -15835,6 +15836,10 @@ class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      if (options.extensionLoader) {
+        options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      }
+/*
       rootGroup.asset = json.asset;
 
       // Animation FPS
@@ -15849,7 +15854,7 @@ class GLTFLoader {
 
       rootGroup.addChild(group);
 
-      // Animation Tracks
+      // Transparent Meshes Draw Order
       if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
         rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
         let meshes = rootGroup.searchElementsByType(M_Mesh);
@@ -15863,6 +15868,7 @@ class GLTFLoader {
           }
         }
       }
+      */
     }
 
     resolve(rootGroup);
@@ -17321,9 +17327,9 @@ if (GLBoost['JointGizmoUpdater'] === void 0) {
 /*       */
 
 class AnimationPlayer {
+                              
 
   constructor() {
-
   }
 
   init(group    ) {

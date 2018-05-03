@@ -59,6 +59,7 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
+      extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
@@ -305,6 +306,10 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
+      if (options.extensionLoader) {
+        options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      }
+/*
       rootGroup.asset = json.asset;
 
       // Animation FPS
@@ -319,7 +324,7 @@ export default class GLTFLoader {
 
       rootGroup.addChild(group);
 
-      // Animation Tracks
+      // Transparent Meshes Draw Order
       if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
         rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
         let meshes = rootGroup.searchElementsByType(M_Mesh);
@@ -333,6 +338,7 @@ export default class GLTFLoader {
           }
         }
       }
+      */
     }
 
     resolve(rootGroup);
