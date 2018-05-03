@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 2ca55c8b
+// This revision is the commit right after the SHA: e886d8db
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16080,7 +16080,12 @@ class GLTFLoader {
         }
 */
 //        if (material === null) {
-        let material = glBoostContext.createClassicMaterial();
+        let material = null;
+        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        } else {
+          material = glBoostContext.createClassicMaterial();
+        }
         if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
           material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
@@ -16091,7 +16096,12 @@ class GLTFLoader {
 
         materials.push(material);
       } else {
-        let material = glBoostContext.createClassicMaterial();
+        let material = null;
+        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        } else {
+          material = glBoostContext.createClassicMaterial();
+        }
         if (defaultShader) {
           material.shaderClass = defaultShader;
         } else {
@@ -16317,20 +16327,36 @@ class GLTFLoader {
     } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
       switch (techniqueStr) {
         case 'CONSTANT':
-          material.shaderClass = DecalShader;
+          if (options.extensionLoader && options.extensionLoader.getDecalShader) {
+            material.shaderClass = options.extensionLoader.getDecalShader();
+          } else {
+            material.shaderClass = DecalShader;
+          }
           break;
         case 'LAMBERT':
-          material.shaderClass = LambertShader;
+          if (options.extensionLoader && options.extensionLoader.getLambertShader) {
+            material.shaderClass = options.extensionLoader.getLambertShader();
+          } else {
+            material.shaderClass = LambertShader;
+          }
           break;
         case 'PHONG':
-          material.shaderClass = PhongShader;
+          if (options.extensionLoader && options.extensionLoader.getPhongShader) {
+            material.shaderClass = options.extensionLoader.getPhongShader();
+          } else {
+            material.shaderClass = PhongShader;
+          }
           break;
       }
     } else {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
-        material.shaderClass = DecalShader;
+        if (options.extensionLoader && options.extensionLoader.getDecalShader) {
+          material.shaderClass = options.extensionLoader.getDecalShader();
+        } else {
+          material.shaderClass = DecalShader;
+        }
       }
     }
 
