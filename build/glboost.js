@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 19a51e56
+// This revision is the commit right after the SHA: eabbcca1
 var global = ('global',eval)('this');
 
 (function (global) {
