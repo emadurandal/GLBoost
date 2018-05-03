@@ -3,6 +3,7 @@ import SPVDecalShader from '../shaders/SPVDecalShader';
 import SPVLambertShader from '../shaders/SPVLambertShader';
 import SPVPhongShader from '../shaders/SPVPhongShader';
 import Vector4 from '../../low_level/math/Vector4';
+import M_Mesh from '../elements/meshes/M_Mesh';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
