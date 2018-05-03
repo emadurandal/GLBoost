@@ -309,6 +309,9 @@ export default class GLTFLoader {
       if (options.extensionLoader) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
+
+      rootGroup.addChild(group);
+      
 /*
       rootGroup.asset = json.asset;
 

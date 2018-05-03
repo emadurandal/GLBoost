@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: c431c5fb
+// This revision is the commit right after the SHA: 19a51e56
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17225,6 +17225,9 @@ class GLTFLoader {
       if (options.extensionLoader) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
+
+      rootGroup.addChild(group);
+      
 /*
       rootGroup.asset = json.asset;
 
