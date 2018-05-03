@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: ecdb49c1
+// This revision is the commit right after the SHA: dfa7b447
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -4173,18 +4173,17 @@ class SkeletalShaderSource {
 
     if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
       shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-    } else {
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1){
       shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
       //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
 
-      /*
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
       // `OneVec4` Version [Begin]
       shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec3 translationScale;\n';
       // `OneVec4` Version [End]
-      */
-    }  
+    }
     
     return shaderText;
   }
@@ -4449,15 +4448,15 @@ return mat4(
       shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
       shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
       shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-    } else {
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
 
       // `Quaterion (Vec4) Transform(Vec3)` Version
       shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
       shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
       shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
       shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
-  
-/*
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+
       // `OneVec4` Version
       shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
       shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
@@ -4472,7 +4471,7 @@ return mat4(
       shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
-    */
+    
     }
 
     // Calc the following...
@@ -4510,7 +4509,7 @@ return mat4(
       let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
       material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
       material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
-    } else {
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
       
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
       material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
@@ -4519,8 +4518,8 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
       material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
       
-
-      /*
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+      
       // `OneVec4` Version [Begin]
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
       material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
@@ -4528,7 +4527,7 @@ return mat4(
       let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
       material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
       // `OneVec4` Version [End]
-      */
+      
     }
     
     /*
@@ -15052,8 +15051,7 @@ class M_SkeletalGeometry extends Geometry {
       }
       skeletalMesh._jointMatrices = flatMatrices;
 
-    } else {
-      
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
       {
         // no comporess
 
@@ -15092,7 +15090,7 @@ class M_SkeletalGeometry extends Geometry {
          // console.log(scale);
         }
       }
-      
+    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
       /*
       {
         // comporess quaternion only
@@ -15113,7 +15111,6 @@ class M_SkeletalGeometry extends Geometry {
         }
       }
       */
-/*
       
       {
         // `OneVec4` Vertion comporess both of quaternion and traslation to Vec4
@@ -15155,7 +15152,7 @@ class M_SkeletalGeometry extends Geometry {
             skeletalMesh._qtArray[i*4+3] = vec2TPacked[1];
         }
       }
-      */
+      
     }    
 
   }
@@ -15181,18 +15178,18 @@ class M_SkeletalGeometry extends Geometry {
       
       if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
-      } else {
+      } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
   //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-
-        /*
+      } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+        
         // `OneVec4` Vertion [Begin]
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
         skeletalMesh._translationScale.x, skeletalMesh._translationScale.y, skeletalMesh._translationScale.z, true);
         // `OneVec4` Vertion [End]
-        */
+        
       }
   //  }
 
@@ -16843,7 +16840,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   /// define value of GLBoost global settings.
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
-  define('VALUE_TARGET_IS_MOBILE', true);
+  define('VALUE_TARGET_IS_MOBILE', 1);
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
@@ -17171,6 +17168,11 @@ class GLTFLoader {
         'TEXTURE_WRAP_T': samplerJson.wrapT,
         'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
+      
+      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      }
+
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
       promisesToLoadResources.push(promise);
@@ -17225,39 +17227,12 @@ class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
-      if (options.extensionLoader) {
+      if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-      }
-/*
-      rootGroup.asset = json.asset;
-
-      // Animation FPS
-      if (json.asset && json.asset.animationFps) {
-        rootGroup.animationFps = json.asset.animationFps;
-      }
-
-      // Animation Tracks
-      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
-        rootGroup.animationTracks = json.asset.extras.animation_tracks;
       }
 
       rootGroup.addChild(group);
 
-      // Transparent Meshes Draw Order
-      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
-        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
-        let meshes = rootGroup.searchElementsByType(M_Mesh);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
-          for (let mesh of meshes) {
-            if (mesh.userFlavorName === name) {
-              rootGroup.transparentMeshes.push(mesh);
-              break;
-            }
-          }
-        }
-      }
-      */
     }
 
     resolve(rootGroup);

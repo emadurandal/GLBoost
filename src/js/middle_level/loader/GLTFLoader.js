@@ -59,6 +59,7 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, defaultShader = null,
     options = {
+      extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
@@ -251,6 +252,11 @@ export default class GLTFLoader {
         'TEXTURE_WRAP_T': samplerJson.wrapT,
         'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
+      
+      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      }
+
       let promise = texture.generateTextureFromUri(textureUri, false);
       textures[textureName] = texture;
       promisesToLoadResources.push(promise);
@@ -305,34 +311,12 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
-      rootGroup.asset = json.asset;
-
-      // Animation FPS
-      if (json.asset && json.asset.animationFps) {
-        rootGroup.animationFps = json.asset.animationFps;
-      }
-
-      // Animation Tracks
-      if (json.asset && json.asset.extras && json.asset.extras.animation_tracks) {
-        rootGroup.animationTracks = json.asset.extras.animation_tracks;
+      if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
+        options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
       rootGroup.addChild(group);
 
-      // Animation Tracks
-      if (json.asset && json.asset.extras && json.asset.extras.transparent_meshes_draw_order) {
-        rootGroup.transparentMeshesDrawOrder = json.asset.extras.transparent_meshes_draw_order;
-        let meshes = rootGroup.searchElementsByType(M_Mesh);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
-          for (let mesh of meshes) {
-            if (mesh.userFlavorName === name) {
-              rootGroup.transparentMeshes.push(mesh);
-              break;
-            }
-          }
-        }
-      }
     }
 
     resolve(rootGroup);

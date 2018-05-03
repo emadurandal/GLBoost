@@ -119,8 +119,7 @@ export default class M_SkeletalGeometry extends Geometry {
       }
       skeletalMesh._jointMatrices = flatMatrices;
 
-    } else {
-      
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
       {
         // no comporess
 
@@ -159,7 +158,7 @@ export default class M_SkeletalGeometry extends Geometry {
          // console.log(scale);
         }
       }
-      
+    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
       /*
       {
         // comporess quaternion only
@@ -180,7 +179,6 @@ export default class M_SkeletalGeometry extends Geometry {
         }
       }
       */
-/*
       
       {
         // `OneVec4` Vertion comporess both of quaternion and traslation to Vec4
@@ -222,7 +220,7 @@ export default class M_SkeletalGeometry extends Geometry {
             skeletalMesh._qtArray[i*4+3] = vec2TPacked[1];
         }
       }
-      */
+      
     }    
 
   }
@@ -248,18 +246,18 @@ export default class M_SkeletalGeometry extends Geometry {
       
       if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
-      } else {
+      } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
   //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-
-        /*
+      } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+        
         // `OneVec4` Vertion [Begin]
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_translationScale'),
         skeletalMesh._translationScale.x, skeletalMesh._translationScale.y, skeletalMesh._translationScale.z, true);
         // `OneVec4` Vertion [End]
-        */
+        
       }
   //  }
 
