@@ -116,7 +116,7 @@ export class SPVDecalShaderSource {
 
     }
 
-    shaderText += '  rt0.xyz = gamma.w > 0.5 ? pow(rt0.xyz, gamma.xyz) : rt0.xyz;\n';
+    shaderText += '  rt0 = gamma.w > 0.5 ? pow(rt0, vec4(gamma.xyz, gamma.x)) : rt0;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
