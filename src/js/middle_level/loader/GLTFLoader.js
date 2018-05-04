@@ -64,7 +64,8 @@ export default class GLTFLoader {
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
-      isDepthTest: true
+      isDepthTest: true,
+      isAllMeshesTransparent: true
     }
   ) {
     return DataUtil.loadResourceAsync(url, true,
@@ -454,6 +455,10 @@ export default class GLTFLoader {
     } else {
       geometry = glBoostContext.createGeometry();
       mesh = glBoostContext.createMesh(geometry);
+    }
+
+    if (options.isAllMeshesTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
