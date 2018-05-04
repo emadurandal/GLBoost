@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 4eb69a76
+// This revision is the commit right after the SHA: 9d296440
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -15594,7 +15594,8 @@ class GLTFLoader {
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
-      isDepthTest: true
+      isDepthTest: true,
+      isAllMeshesTransparent: true
     }
   ) {
     return DataUtil.loadResourceAsync(url, true,
@@ -15984,6 +15985,10 @@ class GLTFLoader {
     } else {
       geometry = glBoostContext.createGeometry();
       mesh = glBoostContext.createMesh(geometry);
+    }
+
+    if (options.isAllMeshesTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
