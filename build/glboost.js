@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: c8112c4e
+// This revision is the commit right after the SHA: 7707fbcb
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17146,11 +17146,10 @@ class GLTFLoader {
         }
       }
 
-      let isNeededToMultiplyAlphaToColorOfTexture = true;
+      let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
           // Nothing to do because premultipling alpha is already done.
-          isNeededToMultiplyAlphaToColorOfTexture = false;
         } else {
           isNeededToMultiplyAlphaToColorOfTexture = true;
         }
