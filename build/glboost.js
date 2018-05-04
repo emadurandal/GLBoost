@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 859a9820
+// This revision is the commit right after the SHA: d015e62f
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -11596,7 +11596,7 @@ class SPVDecalShaderSource {
 
     }
 
-    shaderText += '  rt0.xyz = gamma.w > 0.5 ? pow(rt0.xyz, gamma.xyz) : rt0.xyz;\n';
+    shaderText += '  rt0 = gamma.w > 0.5 ? pow(rt0, vec4(gamma.xyz, gamma.x)) : rt0;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
@@ -16840,7 +16840,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   /// define value of GLBoost global settings.
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
-  define('VALUE_TARGET_IS_MOBILE', 1);
+  define('VALUE_TARGET_IS_MOBILE', 0);
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
@@ -17146,11 +17146,10 @@ class GLTFLoader {
         }
       }
 
-      let isNeededToMultiplyAlphaToColorOfTexture = true;
+      let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
           // Nothing to do because premultipling alpha is already done.
-          isNeededToMultiplyAlphaToColorOfTexture = false;
         } else {
           isNeededToMultiplyAlphaToColorOfTexture = true;
         }
