@@ -16,6 +16,7 @@ import Sphere from '../low_level/primitives/Sphere';
 import Particle from '../low_level/primitives/Particle';
 import M_Group from './elements/M_Group';
 import GLTFLoader from './loader/GLTFLoader';
+import GLTF2Loader from './loader/GLTF2Loader';
 import GLBoost from './plugins/phina.glboost';
 import SimpleShader from './shaders/FragmentSimpleShader';
 import PhongShader from './shaders/PhongShader';

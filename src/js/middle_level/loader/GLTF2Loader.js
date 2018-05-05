@@ -36,7 +36,7 @@ export default class GLTF2Loader {
    * @param {string} uri uri of glTF file
    * @return {Promise} a promise object
    */
-  loadGLTF(glBoostContext, uri,
+  loadGLTF(uri,
     options = {
       extensionLoader: null,
       defaultShader: null,
@@ -72,10 +72,14 @@ export default class GLTF2Loader {
           }
           let json = JSON.parse(gotText);
 
-          let glTFVer = this._checkGLTFVersion(json);
+          //let glTFVer = this._checkGLTFVersion(json);
 
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, resolve, options);
+          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options);
 
+          resourcesPromise.then(() => {
+            console.log('Resoureces loading done!');
+          });
+  
           return;
         }
 
@@ -101,12 +105,16 @@ export default class GLTF2Loader {
 
 //        let glTFVer = this._checkGLTFVersion(json);
 
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, resolve, options);
+        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options);
+
+        resourcesPromise.then(() => {
+          console.log('Resoureces loading done!');
+        });
       }, (reject, error)=>{}
     );
   }
 
-  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
+  _loadResources(arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
     let shaders = {};
     let buffers = {};
     let textures = {};
@@ -152,24 +160,23 @@ export default class GLTF2Loader {
     }
 
     // Buffers Async load
-    for (let bufferName in json.buffers) {
-      let bufferInfo = json.buffers[bufferName];
-
-      if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+    for (let i in json.buffers) {
+      let bufferInfo = json.buffers[i];
+      if (typeof bufferInfo.uri === 'undefined') {
+        buffers[i] = arrayBufferBinary;
+      } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
-          new Promise((fulfilled, rejected) => {
+          new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
-            buffers[bufferName] = arrayBuffer;
-            fulfilled();
+            buffers[i] = arrayBuffer;
+            resolve();
           })
         );
-      } else if (bufferInfo.uri === 'data:,') {
-        buffers[bufferName] = arrayBufferBinary;
       } else {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
             (resolve, response)=>{
-              buffers[bufferName] = response;
+              buffers[i] = response;
               resolve();
             },
             (reject, error)=>{
@@ -213,34 +220,35 @@ export default class GLTF2Loader {
           // Nothing to do because the texture is straight.
         }        
       }
-      
-      let texture = glBoostContext.createTexture(null, textureName, {
-        'TEXTURE_MAG_FILTER': samplerJson.magFilter,
-        'TEXTURE_MIN_FILTER': samplerJson.minFilter,
-        'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
-      });
+
+      // let texture = glBoostContext.createTexture(null, textureName, {
+      //   'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+      //   'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+      //   'TEXTURE_WRAP_S': samplerJson.wrapS,
+      //   'TEXTURE_WRAP_T': samplerJson.wrapT,
+      //   'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+      // });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
         options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
       }
+      
+      promisesToLoadResources.push(new Promise((resolve, reject)=> {
+        let img = new Image();
+        if (!textureUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
+        }
+        this.img.onload = () => {
+          resolve(img);
+        };
 
-      let promise = texture.generateTextureFromUri(textureUri, false);
-      textures[textureName] = texture;
-      promisesToLoadResources.push(promise);
+        img.src = textureUri;
 
+        textures[textureName] = texture;
+      }));
     }
 
-    if (promisesToLoadResources.length > 0) {
-      Promise.resolve()
-        .then(() => {
-          return Promise.all(promisesToLoadResources);
-        })
-    } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, shaders, textures, resolve, options);
-    }
-
+    return Promise.all(promisesToLoadResources);
   }
 }
 
