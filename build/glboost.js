@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: de57974b
+// This revision is the commit right after the SHA: 135e2f54
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16858,12 +16858,6 @@ class GLTF2Loader {
         // Magic field
         let magic = dataView.getUint32(0, isLittleEndian);
 
-        let resources = {
-          shaders: [],
-          buffers: [],
-          images: []
-        };
-
         // 0x46546C67 is 'glTF' in ASCII codes.
         if (magic !== 0x46546C67) {
           // It must be normal glTF (NOT binary) file...
@@ -16877,9 +16871,9 @@ class GLTF2Loader {
 
           //let glTFVer = this._checkGLTFVersion(json);
 
-          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options, resources);
+          let promise = this._loadInner(null, basePath, json, resolve, options);
 
-          resourcesPromise.then(() => {
+          promise.then(() => {
             console.log('Resoureces loading done!');
           });
   
@@ -16908,13 +16902,22 @@ class GLTF2Loader {
 
 //        let glTFVer = this._checkGLTFVersion(json);
 
-        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options, resources);
+        let promise = this._loadInner(arrayBufferBinary, null, json, resolve, options);
 
-        resourcesPromise.then(() => {
+        promise.then(() => {
           console.log('Resoureces loading done!');
         });
       }, (reject, error)=>{}
     );
+  }
+
+  _loadInner(arrayBufferBinary, basePath, json, resolve, options) {
+    let resources = {
+      shaders: [],
+      buffers: [],
+      images: []
+    };
+    return this._loadResources(arrayBufferBinary, null, json, resolve, options, resources);
   }
 
   _loadResources(arrayBufferBinary, basePath, json, resolve, options, resources) {
