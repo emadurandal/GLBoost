@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: d015e62f
+// This revision is the commit right after the SHA: e61789a7
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -11596,7 +11596,7 @@ class SPVDecalShaderSource {
 
     }
 
-    shaderText += '  rt0 = gamma.w > 0.5 ? pow(rt0, vec4(gamma.xyz, gamma.x)) : rt0;\n';
+    shaderText += '  rt0.xyz = gamma.w > 0.5 ? pow(rt0.xyz, gamma.xyz) : rt0.xyz;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
@@ -16980,7 +16980,8 @@ class GLTFLoader {
       isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
-      isDepthTest: true
+      isDepthTest: true,
+      isAllMeshesTransparent: true
     }
   ) {
     return DataUtil.loadResourceAsync(url, true,
@@ -17185,15 +17186,15 @@ class GLTFLoader {
           return Promise.all(promisesToLoadResources);
         })
         .then(() => {
-          this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
+          this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
         });
     } else {
-      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options);
+      this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
   }
 
-  _IterateNodeOfScene(glBoostContext, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
+  _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -17206,7 +17207,7 @@ class GLTFLoader {
         nodeStr = sceneJson.nodes[i];
 
         // iterate nodes and load meshes
-        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
+        let element = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(element);
       }
 
@@ -17216,7 +17217,7 @@ class GLTFLoader {
         let rootJointGroup = group.searchElementByNameAndType(skeletalMesh.rootJointName, M_Group);
         if (!rootJointGroup) {
           // This is a countermeasure when skeleton node does not exist in scene.nodes.
-          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
+          rootJointGroup = this._recursiveIterateNode(glBoostContext, skeletalMesh.rootJointName, buffers, json, defaultShader, shaders, textures, glTFVer, options);
           group.addChild(rootJointGroup);
         }
 
@@ -17240,7 +17241,7 @@ class GLTFLoader {
 
 
 
-  _recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options) {
+  _recursiveIterateNode(glBoostContext, nodeStr, buffers, json, defaultShader, shaders, textures, glTFVer, options) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
@@ -17270,7 +17271,7 @@ class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -17346,7 +17347,7 @@ class GLTFLoader {
     if (nodeJson.children) {
       for (let i = 0; i < nodeJson.children.length; i++) {
         let nodeStr = nodeJson.children[i];
-        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, basePath, json, defaultShader, shaders, textures, glTFVer, options);
+        let childElement = this._recursiveIterateNode(glBoostContext, nodeStr, buffers, json, defaultShader, shaders, textures, glTFVer, options);
         group.addChild(childElement);
       }
     }
@@ -17354,7 +17355,7 @@ class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, basePath, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
+  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -17370,6 +17371,10 @@ class GLTFLoader {
     } else {
       geometry = glBoostContext.createGeometry();
       mesh = glBoostContext.createMesh(geometry);
+    }
+
+    if (options.isAllMeshesTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
@@ -17478,7 +17483,7 @@ class GLTFLoader {
         this._materials.push(material);
 //        }
 
-        texcoords = this._loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
+        texcoords = this._loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
 
         materials.push(material);
       } else {
@@ -17617,7 +17622,7 @@ class GLTFLoader {
     }
   }
 
-  _loadMaterial(glBoostContext, basePath, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
+  _loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
     let materialJson = json.materials[materialStr];
     material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
@@ -18179,6 +18184,258 @@ class GLTFLoader {
 
 
 GLBoost$1["GLTFLoader"] = GLTFLoader;
+
+let singleton$6 = Symbol();
+let singletonEnforcer$4 = Symbol();
+
+/**
+ * This is a loader class of glTF2 file format. You can see more detail of glTF2 format at https://github.com/KhronosGroup/glTF .
+ */
+class GLTF2Loader {
+
+  /**
+   * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   */
+  constructor(enforcer) {
+    if (enforcer !== singletonEnforcer$4) {
+      throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+    }
+  }
+
+  /**
+   * The static method to get singleton instance of this class.
+   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   */
+  static getInstance() {
+    if (!this[singleton$6]) {
+      this[singleton$6] = new GLTF2Loader(singletonEnforcer$4);
+    }
+    return this[singleton$6];
+  }
+
+  /**
+   * the method to load glTF2 file.
+   * @param {string} uri uri of glTF file
+   * @return {Promise} a promise object
+   */
+  loadGLTF(uri,
+    options = {
+      extensionLoader: null,
+      defaultShader: null,
+      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlpha: false,
+      isExistJointGizmo: false,
+      isBlend: false,
+      isDepthTest: true,
+      isAllMeshesTransparent: true
+    }) 
+    {
+
+    return DataUtil.loadResourceAsync(uri, true,
+      (resolve, response)=>{
+        var arrayBuffer = response;
+
+        this._materials = [];
+
+        let dataView = new DataView(arrayBuffer, 0, 20);
+        let isLittleEndian = true;
+
+        // Magic field
+        let magic = dataView.getUint32(0, isLittleEndian);
+
+        // 0x46546C67 is 'glTF' in ASCII codes.
+        if (magic !== 0x46546C67) {
+          // It must be normal glTF (NOT binary) file...
+          let gotText = DataUtil.arrayBufferToString(arrayBuffer);
+          let partsOfPath = uri.split('/');
+          let basePath = '';
+          for (let i = 0; i < partsOfPath.length - 1; i++) {
+            basePath += partsOfPath[i] + '/';
+          }
+          let json = JSON.parse(gotText);
+
+          //let glTFVer = this._checkGLTFVersion(json);
+
+          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options);
+
+          resourcesPromise.then(() => {
+            console.log('Resoureces loading done!');
+          });
+  
+          return;
+        }
+
+        let gltfVer = dataView.getUint32(4, isLittleEndian);
+        if (gltfVer !== 2) {
+          reject('invalid version field in this binary glTF file.');
+        }
+
+        let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+        let lengthOfJSonChunkData = dataView.getUint32(12, isLittleEndian);
+        let chunkType = dataView.getUint32(16, isLittleEndian);
+
+        // 0x4E4F534A means JSON format (0x4E4F534A is 'JSON' in ASCII codes)
+        if (chunkType !== 0x4E4F534A) {
+          reject('invalid chunkType of chunk0 in this binary glTF file.');
+        }
+
+
+        let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
+        let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
+        let json = JSON.parse(gotText);
+        let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
+
+//        let glTFVer = this._checkGLTFVersion(json);
+
+        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options);
+
+        resourcesPromise.then(() => {
+          console.log('Resoureces loading done!');
+        });
+      }, (reject, error)=>{}
+    );
+  }
+
+  _loadResources(arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
+    let shaders = {};
+    let buffers = {};
+    let textures = {};
+    let promisesToLoadResources = [];
+
+    // Shaders Async load
+    for (let shaderName in json.shaders) {
+      shaders[shaderName] = {};
+
+      let shaderJson = shadersJson[shaderName];
+      let shaderType = shaderJson.type;
+      if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
+        shaders[shaderName].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
+        shaders[shaderName].shaderType = shaderType;
+        continue;
+      }
+
+      let shaderUri = shaderJson.uri;
+      if (shaderUri.match(/^data:/)) {
+        promisesToLoadResources.push(
+          new Promise((fulfilled, rejected) => {
+            let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
+            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            shaders[shaderName].shaderType = shaderType;
+            fulfilled();
+          })
+        );
+      } else {
+        shaderUri = basePath + shaderUri;
+        promisesToLoadResources.push(
+          DataUtil.loadResourceAsync(shaderUri, false,
+            (resolve, response)=>{
+              shaders[shaderName].shaderText = response;
+              shaders[shaderName].shaderType = shaderType;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
+        );
+      }
+    }
+
+    // Buffers Async load
+    for (let i in json.buffers) {
+      let bufferInfo = json.buffers[i];
+      if (typeof bufferInfo.uri === 'undefined') {
+        buffers[i] = arrayBufferBinary;
+      } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+        promisesToLoadResources.push(
+          new Promise((resolve, rejected) => {
+            let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
+            buffers[i] = arrayBuffer;
+            resolve();
+          })
+        );
+      } else {
+        promisesToLoadResources.push(
+          DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
+            (resolve, response)=>{
+              buffers[i] = response;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
+        );
+      }
+    }
+
+    // Textures Async load
+    for (let textureName in json.textures) {
+      let textureJson = json.textures[textureName];
+      let imageJson = json.images[textureJson.source];
+      let samplerJson = json.samplers[textureJson.sampler];
+
+      let textureUri = null;
+
+      if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+        textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
+      } else {
+        let imageFileStr = imageJson.uri;
+        if (imageFileStr.match(/^data:/)) {
+          textureUri = imageFileStr;
+        } else {
+          textureUri = basePath + imageFileStr;
+        }
+      }
+
+      let isNeededToMultiplyAlphaToColorOfTexture = false;
+      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // Nothing to do because premultipling alpha is already done.
+        } else {
+          isNeededToMultiplyAlphaToColorOfTexture = true;
+        }
+      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // TODO: Implement to Make Texture Straight.
+        } else {
+          // Nothing to do because the texture is straight.
+        }        
+      }
+
+      // let texture = glBoostContext.createTexture(null, textureName, {
+      //   'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+      //   'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+      //   'TEXTURE_WRAP_S': samplerJson.wrapS,
+      //   'TEXTURE_WRAP_T': samplerJson.wrapT,
+      //   'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+      // });
+      
+      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      }
+      
+      promisesToLoadResources.push(new Promise((resolve, reject)=> {
+        let img = new Image();
+        if (!textureUri.match(/^data:/)) {
+          this._img.crossOrigin = 'Anonymous';
+        }
+        this.img.onload = () => {
+          resolve(img);
+        };
+
+        img.src = textureUri;
+
+        textures[textureName] = texture;
+      }));
+    }
+
+    return Promise.all(promisesToLoadResources);
+  }
+}
+
+GLBoost$1["GLTF2Loader"] = GLTF2Loader;
 
 if (typeof phina !== 'undefined') {
 
@@ -19252,8 +19509,8 @@ class SPVBlinnShader extends SPVDecalShader {
 
 GLBoost['SPVBlinnShader'] = SPVBlinnShader;
 
-let singleton$6 = Symbol();
-let singletonEnforcer$4 = Symbol();
+let singleton$7 = Symbol();
+let singletonEnforcer$5 = Symbol();
 
 /**
  * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
@@ -19267,7 +19524,7 @@ class SPVGLTFLoader {
    * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
    */
   constructor(enforcer) {
-    if (enforcer !== singletonEnforcer$4) {
+    if (enforcer !== singletonEnforcer$5) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
   }
@@ -19278,10 +19535,10 @@ class SPVGLTFLoader {
    * @return {SPVGLTFLoader} [en] the singleton instance of SPVGLTFLoader class [ja] SPVGLTFLoaderクラスのシングルトンインスタンス
    */
   static getInstance() {
-    if (!this[singleton$6]) {
-      this[singleton$6] = new SPVGLTFLoader(singletonEnforcer$4);
+    if (!this[singleton$7]) {
+      this[singleton$7] = new SPVGLTFLoader(singletonEnforcer$5);
     }
-    return this[singleton$6];
+    return this[singleton$7];
   }
 
 
@@ -20646,8 +20903,8 @@ class H_SPVUIRectangle extends M_SPVScreenMesh {
 
 GLBoost$1["H_SPVUIRectangle"] = H_SPVUIRectangle;
 
-let singleton$7 = Symbol();
-let singletonEnforcer$5 = Symbol();
+let singleton$8 = Symbol();
+let singletonEnforcer$6 = Symbol();
 
 /**
  * This is a loader class of glTF VRize extension Data.
@@ -20659,7 +20916,7 @@ class VRizeGLTFLoaderExtension {
    * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
    */
   constructor(enforcer) {
-    if (enforcer !== singletonEnforcer$5) {
+    if (enforcer !== singletonEnforcer$6) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
   }
@@ -20669,10 +20926,10 @@ class VRizeGLTFLoaderExtension {
    * @return {ObjLoader} the singleton instance of ObjLoader class
    */
   static getInstance() {
-    if (!this[singleton$7]) {
-      this[singleton$7] = new VRizeGLTFLoaderExtension(singletonEnforcer$5);
+    if (!this[singleton$8]) {
+      this[singleton$8] = new VRizeGLTFLoaderExtension(singletonEnforcer$6);
     }
-    return this[singleton$7];
+    return this[singleton$8];
   }
 
   setAssetPropertiesToRootGroup(rootGroup, asset) {
