@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 135e2f54
+// This revision is the commit right after the SHA: 4f55e415
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16871,10 +16871,11 @@ class GLTF2Loader {
 
           //let glTFVer = this._checkGLTFVersion(json);
 
-          let promise = this._loadInner(null, basePath, json, resolve, options);
+          let promise = this._loadInner(null, basePath, json, options);
 
           promise.then(() => {
             console.log('Resoureces loading done!');
+            resolve();
           });
   
           return;
@@ -16902,25 +16903,35 @@ class GLTF2Loader {
 
 //        let glTFVer = this._checkGLTFVersion(json);
 
-        let promise = this._loadInner(arrayBufferBinary, null, json, resolve, options);
+        let promise = this._loadInner(arrayBufferBinary, null, json, options);
 
         promise.then(() => {
           console.log('Resoureces loading done!');
+          resolve();
         });
       }, (reject, error)=>{}
     );
   }
 
-  _loadInner(arrayBufferBinary, basePath, json, resolve, options) {
+  _loadInner(arrayBufferBinary, basePath, json, options) {
+    let promises = [];
+
     let resources = {
       shaders: [],
       buffers: [],
       images: []
     };
-    return this._loadResources(arrayBufferBinary, null, json, resolve, options, resources);
+    promises.push(this._loadResources(arrayBufferBinary, null, json, options, resources));
+    this._loadJsonContent(json, options);
+
+    return Promise.all(promises);
   }
 
-  _loadResources(arrayBufferBinary, basePath, json, resolve, options, resources) {
+  _loadJsonContent(json, options) {
+
+  }
+
+  _loadResources(arrayBufferBinary, basePath, json, options, resources) {
     let promisesToLoadResources = [];
 
     // Shaders Async load
