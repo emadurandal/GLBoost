@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 655ade1b
+// This revision is the commit right after the SHA: de57974b
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16858,6 +16858,12 @@ class GLTF2Loader {
         // Magic field
         let magic = dataView.getUint32(0, isLittleEndian);
 
+        let resources = {
+          shaders: [],
+          buffers: [],
+          images: []
+        };
+
         // 0x46546C67 is 'glTF' in ASCII codes.
         if (magic !== 0x46546C67) {
           // It must be normal glTF (NOT binary) file...
@@ -16871,7 +16877,7 @@ class GLTF2Loader {
 
           //let glTFVer = this._checkGLTFVersion(json);
 
-          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options);
+          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options, resources);
 
           resourcesPromise.then(() => {
             console.log('Resoureces loading done!');
@@ -16902,7 +16908,7 @@ class GLTF2Loader {
 
 //        let glTFVer = this._checkGLTFVersion(json);
 
-        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options);
+        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options, resources);
 
         resourcesPromise.then(() => {
           console.log('Resoureces loading done!');
@@ -16911,21 +16917,18 @@ class GLTF2Loader {
     );
   }
 
-  _loadResources(arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
-    let shaders = {};
-    let buffers = {};
-    let textures = {};
+  _loadResources(arrayBufferBinary, basePath, json, resolve, options, resources) {
     let promisesToLoadResources = [];
 
     // Shaders Async load
-    for (let shaderName in json.shaders) {
-      shaders[shaderName] = {};
+    for (let i in json.shaders) {
+      resources.shaders[i] = {};
 
-      let shaderJson = shadersJson[shaderName];
+      let shaderJson = json.shaders[i];
       let shaderType = shaderJson.type;
       if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
-        shaders[shaderName].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
-        shaders[shaderName].shaderType = shaderType;
+        resources.shaders[i].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
+        resources.shaders[i].shaderType = shaderType;
         continue;
       }
 
@@ -16934,8 +16937,8 @@ class GLTF2Loader {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
-            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
-            shaders[shaderName].shaderType = shaderType;
+            resources.shaders[i].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            resources.shaders[i].shaderType = shaderType;
             fulfilled();
           })
         );
@@ -16944,8 +16947,8 @@ class GLTF2Loader {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(shaderUri, false,
             (resolve, response)=>{
-              shaders[shaderName].shaderText = response;
-              shaders[shaderName].shaderType = shaderType;
+              resources.shaders[i].shaderText = response;
+              resources.shaders[i].shaderType = shaderType;
               resolve();
             },
             (reject, error)=>{
@@ -16960,12 +16963,12 @@ class GLTF2Loader {
     for (let i in json.buffers) {
       let bufferInfo = json.buffers[i];
       if (typeof bufferInfo.uri === 'undefined') {
-        buffers[i] = arrayBufferBinary;
+        resources.buffers[i] = arrayBufferBinary;
       } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
-            buffers[i] = arrayBuffer;
+            resources.buffers[i] = arrayBuffer;
             resolve();
           })
         );
@@ -16973,7 +16976,7 @@ class GLTF2Loader {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
             (resolve, response)=>{
-              buffers[i] = response;
+              resources.buffers[i] = response;
               resolve();
             },
             (reject, error)=>{
@@ -16985,21 +16988,21 @@ class GLTF2Loader {
     }
 
     // Textures Async load
-    for (let textureName in json.textures) {
-      let textureJson = json.textures[textureName];
-      let imageJson = json.images[textureJson.source];
-      let samplerJson = json.samplers[textureJson.sampler];
+    for (let i in json.images) {
+      let imageJson = json.images[i];
+      //let imageJson = json.images[textureJson.source];
+      //let samplerJson = json.samplers[textureJson.sampler];
 
-      let textureUri = null;
+      let imageUri = null;
 
-      if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-        textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
+      if (typeof imageJson.uri === 'undefined') {
+        imageUri = this._accessBinaryAsImage(imageJson.bufferView, json, arrayBufferBinary, imageJson.mimeType);
       } else {
         let imageFileStr = imageJson.uri;
         if (imageFileStr.match(/^data:/)) {
-          textureUri = imageFileStr;
+          imageUri = imageFileStr;
         } else {
-          textureUri = basePath + imageFileStr;
+          imageUri = basePath + imageFileStr;
         }
       }
 
@@ -17032,20 +17035,48 @@ class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
-        if (!textureUri.match(/^data:/)) {
-          this._img.crossOrigin = 'Anonymous';
+        if (!imageUri.match(/^data:/)) {
+          img.crossOrigin = 'Anonymous';
         }
-        this.img.onload = () => {
+        img.onload = () => {
           resolve(img);
         };
 
-        img.src = textureUri;
+        img.src = imageUri;
 
-        textures[textureName] = texture;
+        resources.images[i] = img;
       }));
     }
 
     return Promise.all(promisesToLoadResources);
+  }
+
+  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+    let bufferViewJson = json.bufferViews[bufferViewStr];
+    let byteOffset = bufferViewJson.byteOffset;
+    let byteLength = bufferViewJson.byteLength;
+
+    let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+    let bytes = new Uint8Array(arrayBufferSliced);
+    let binaryData = '';
+    for (let i = 0, len = bytes.byteLength; i < len; i++) {
+      binaryData += String.fromCharCode(bytes[i]);
+    }
+    let imgSrc = '';
+    if (mimeType == 'image/jpeg') {
+      imgSrc = "data:image/jpeg;base64,";
+    } else if (mimeType == 'image/png') {
+      imgSrc = "data:image/png;base64,";
+    } else if (mimeType == 'image/gif') {
+      imgSrc = "data:image/gif;base64,";
+    } else if (mimeType == 'image/bmp') {
+      imgSrc = "data:image/bmp;base64,";
+    } else {
+      imgSrc = "data:image/unknown;base64,";
+    }
+    let dataUrl = imgSrc + DataUtil.btoa(binaryData);
+
+    return dataUrl;
   }
 }
 
