@@ -125,13 +125,21 @@ export default class GLTF2Loader {
       images: []
     };
     promises.push(this._loadResources(arrayBufferBinary, null, gltfJson, options, resources));
-    this._loadJsonContent(gltfJson, resources, options);
+    this._loadJsonContent(gltfJson, resources, options, resultJson);
 
     return Promise.all(promises);
   }
 
-  _loadJsonContent(gltfJson, resources, options) {
-    
+  _loadJsonContent(gltfJson, resources, options, resultJson) {
+
+    // Scene
+    for (let scene of gltfJson.scenes) {
+      scene.nodesIndices = scene.nodes;
+      for (let i in scene.nodesIndices) {
+        scene.nodes[i] = gltfJson.nodes[scene.nodesIndices[i]];
+      }
+    }
+
   }
 
   _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {

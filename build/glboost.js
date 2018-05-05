@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 036daac9
+// This revision is the commit right after the SHA: cf4feab7
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16922,13 +16922,21 @@ class GLTF2Loader {
       images: []
     };
     promises.push(this._loadResources(arrayBufferBinary, null, gltfJson, options, resources));
-    this._loadJsonContent(gltfJson, resources, options);
+    this._loadJsonContent(gltfJson, resources, options, resultJson);
 
     return Promise.all(promises);
   }
 
-  _loadJsonContent(gltfJson, resources, options) {
-    
+  _loadJsonContent(gltfJson, resources, options, resultJson) {
+
+    // Scene
+    for (let scene of gltfJson.scenes) {
+      scene.nodesIndices = scene.nodes;
+      for (let i in scene.nodesIndices) {
+        scene.nodes[i] = gltfJson.nodes[scene.nodesIndices[i]];
+      }
+    }
+
   }
 
   _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {
