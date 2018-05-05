@@ -74,7 +74,7 @@ export default class GLTF2Loader {
 
           let glTFVer = this._checkGLTFVersion(json);
 
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
+          this._loadResourcesAndScene(glBoostContext, null, basePath, json, resolve, options);
 
           return;
         }
@@ -99,11 +99,148 @@ export default class GLTF2Loader {
         let json = JSON.parse(gotText);
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
 
-        let glTFVer = this._checkGLTFVersion(json);
+//        let glTFVer = this._checkGLTFVersion(json);
 
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
+        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, resolve, options);
       }, (reject, error)=>{}
     );
+  }
+
+  _loadResourcesAndScene(glBoostContext, arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
+    let shaders = {};
+    let buffers = {};
+    let textures = {};
+    let promisesToLoadResources = [];
+
+    // Shaders Async load
+    for (let shaderName in json.shaders) {
+      shaders[shaderName] = {};
+
+      let shaderJson = shadersJson[shaderName];
+      let shaderType = shaderJson.type;
+      if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
+        shaders[shaderName].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
+        shaders[shaderName].shaderType = shaderType;
+        continue;
+      }
+
+      let shaderUri = shaderJson.uri;
+      if (shaderUri.match(/^data:/)) {
+        promisesToLoadResources.push(
+          new Promise((fulfilled, rejected) => {
+            let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
+            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            shaders[shaderName].shaderType = shaderType;
+            fulfilled();
+          })
+        );
+      } else {
+        shaderUri = basePath + shaderUri;
+        promisesToLoadResources.push(
+          DataUtil.loadResourceAsync(shaderUri, false,
+            (resolve, response)=>{
+              shaders[shaderName].shaderText = response;
+              shaders[shaderName].shaderType = shaderType;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
+        );
+      }
+    }
+
+    // Buffers Async load
+    for (let bufferName in json.buffers) {
+      let bufferInfo = json.buffers[bufferName];
+
+      if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+        promisesToLoadResources.push(
+          new Promise((fulfilled, rejected) => {
+            let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
+            buffers[bufferName] = arrayBuffer;
+            fulfilled();
+          })
+        );
+      } else if (bufferInfo.uri === 'data:,') {
+        buffers[bufferName] = arrayBufferBinary;
+      } else {
+        promisesToLoadResources.push(
+          DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
+            (resolve, response)=>{
+              buffers[bufferName] = response;
+              resolve();
+            },
+            (reject, error)=>{
+
+            }
+          )
+        );
+      }
+    }
+
+    // Textures Async load
+    for (let textureName in json.textures) {
+      let textureJson = json.textures[textureName];
+      let imageJson = json.images[textureJson.source];
+      let samplerJson = json.samplers[textureJson.sampler];
+
+      let textureUri = null;
+
+      if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
+        textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
+      } else {
+        let imageFileStr = imageJson.uri;
+        if (imageFileStr.match(/^data:/)) {
+          textureUri = imageFileStr;
+        } else {
+          textureUri = basePath + imageFileStr;
+        }
+      }
+
+      let isNeededToMultiplyAlphaToColorOfTexture = false;
+      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // Nothing to do because premultipling alpha is already done.
+        } else {
+          isNeededToMultiplyAlphaToColorOfTexture = true;
+        }
+      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+        if (options.isTextureImageToLoadPreMultipliedAlpha) {
+          // TODO: Implement to Make Texture Straight.
+        } else {
+          // Nothing to do because the texture is straight.
+        }        
+      }
+      
+      let texture = glBoostContext.createTexture(null, textureName, {
+        'TEXTURE_MAG_FILTER': samplerJson.magFilter,
+        'TEXTURE_MIN_FILTER': samplerJson.minFilter,
+        'TEXTURE_WRAP_S': samplerJson.wrapS,
+        'TEXTURE_WRAP_T': samplerJson.wrapT,
+        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+      });
+      
+      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      }
+
+      let promise = texture.generateTextureFromUri(textureUri, false);
+      textures[textureName] = texture;
+      promisesToLoadResources.push(promise);
+
+    }
+
+    if (promisesToLoadResources.length > 0) {
+      Promise.resolve()
+        .then(() => {
+          return Promise.all(promisesToLoadResources);
+        })
+    } else {
+      this._IterateNodeOfScene(glBoostContext, buffers, basePath, json, shaders, textures, resolve, options);
+    }
+
   }
 }
 
