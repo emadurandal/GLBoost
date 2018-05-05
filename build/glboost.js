@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 4f55e415
+// This revision is the commit right after the SHA: 036daac9
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16867,15 +16867,15 @@ class GLTF2Loader {
           for (let i = 0; i < partsOfPath.length - 1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          let json = JSON.parse(gotText);
+          let gltfJson = JSON.parse(gotText);
 
-          //let glTFVer = this._checkGLTFVersion(json);
-
-          let promise = this._loadInner(null, basePath, json, options);
+          //let glTFVer = this._checkGLTFVersion(gltfJson);
+          let resultJson = {};
+          let promise = this._loadInner(null, basePath, gltfJson, options, resultJson);
 
           promise.then(() => {
             console.log('Resoureces loading done!');
-            resolve();
+            resolve(resultJson);
           });
   
           return;
@@ -16898,22 +16898,22 @@ class GLTF2Loader {
 
         let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
         let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
-        let json = JSON.parse(gotText);
+        let gltfJson = JSON.parse(gotText);
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
 
-//        let glTFVer = this._checkGLTFVersion(json);
+//        let glTFVer = this._checkGLTFVersion(gltfJson);
 
-        let promise = this._loadInner(arrayBufferBinary, null, json, options);
+        let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options, resultJson);
 
         promise.then(() => {
           console.log('Resoureces loading done!');
-          resolve();
+          resolve(resultJson);
         });
       }, (reject, error)=>{}
     );
   }
 
-  _loadInner(arrayBufferBinary, basePath, json, options) {
+  _loadInner(arrayBufferBinary, basePath, gltfJson, options, resultJson) {
     let promises = [];
 
     let resources = {
@@ -16921,27 +16921,27 @@ class GLTF2Loader {
       buffers: [],
       images: []
     };
-    promises.push(this._loadResources(arrayBufferBinary, null, json, options, resources));
-    this._loadJsonContent(json, options);
+    promises.push(this._loadResources(arrayBufferBinary, null, gltfJson, options, resources));
+    this._loadJsonContent(gltfJson, resources, options);
 
     return Promise.all(promises);
   }
 
-  _loadJsonContent(json, options) {
-
+  _loadJsonContent(gltfJson, resources, options) {
+    
   }
 
-  _loadResources(arrayBufferBinary, basePath, json, options, resources) {
+  _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {
     let promisesToLoadResources = [];
 
     // Shaders Async load
-    for (let i in json.shaders) {
+    for (let i in gltfJson.shaders) {
       resources.shaders[i] = {};
 
-      let shaderJson = json.shaders[i];
+      let shaderJson = gltfJson.shaders[i];
       let shaderType = shaderJson.type;
       if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
-        resources.shaders[i].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
+        resources.shaders[i].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, gltfJson, arrayBufferBinary);
         resources.shaders[i].shaderType = shaderType;
         continue;
       }
@@ -16974,8 +16974,8 @@ class GLTF2Loader {
     }
 
     // Buffers Async load
-    for (let i in json.buffers) {
-      let bufferInfo = json.buffers[i];
+    for (let i in gltfJson.buffers) {
+      let bufferInfo = gltfJson.buffers[i];
       if (typeof bufferInfo.uri === 'undefined') {
         resources.buffers[i] = arrayBufferBinary;
       } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
@@ -17002,15 +17002,15 @@ class GLTF2Loader {
     }
 
     // Textures Async load
-    for (let i in json.images) {
-      let imageJson = json.images[i];
-      //let imageJson = json.images[textureJson.source];
-      //let samplerJson = json.samplers[textureJson.sampler];
+    for (let i in gltfJson.images) {
+      let imageJson = gltfJson.images[i];
+      //let imageJson = gltfJson.images[textureJson.source];
+      //let samplerJson = gltfJson.samplers[textureJson.sampler];
 
       let imageUri = null;
 
       if (typeof imageJson.uri === 'undefined') {
-        imageUri = this._accessBinaryAsImage(imageJson.bufferView, json, arrayBufferBinary, imageJson.mimeType);
+        imageUri = this._accessBinaryAsImage(imageJson.bufferView, gltfJson, arrayBufferBinary, imageJson.mimeType);
       } else {
         let imageFileStr = imageJson.uri;
         if (imageFileStr.match(/^data:/)) {
@@ -17065,8 +17065,8 @@ class GLTF2Loader {
     return Promise.all(promisesToLoadResources);
   }
 
-  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
-    let bufferViewJson = json.bufferViews[bufferViewStr];
+  _accessBinaryAsImage(bufferViewStr, gltfJson, arrayBuffer, mimeType) {
+    let bufferViewJson = gltfJson.bufferViews[bufferViewStr];
     let byteOffset = bufferViewJson.byteOffset;
     let byteLength = bufferViewJson.byteLength;
 
