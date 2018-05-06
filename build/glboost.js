@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 5bb5b3d8
+// This revision is the commit right after the SHA: d117db45
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16990,20 +16990,19 @@ class GLTF2Loader {
       }
  
       // Mesh
-      if (node.mesh && gltfJson.meshes !== void 0) {
+      if (node.mesh !== void 0 && gltfJson.meshes !== void 0) {
         node.meshIndex = node.mesh;
         node.mesh = gltfJson.meshes[node.meshIndex];
-
       }
 
       // Skin
-      if (node.skin && gltfJson.skins !== void 0) {
+      if (node.skin !== void 0 && gltfJson.skins !== void 0) {
         node.skinIndex = node.skin;
         node.skin = gltfJson.skins[node.skinIndex];
       }
 
       // Camera
-      if (node.camera && gltfJson.cameras !== void 0) {
+      if (node.camera !== void 0 && gltfJson.cameras !== void 0) {
         node.cameraIndex = node.camera;
         node.camera = gltfJson.cameras[node.cameraIndex];
       }
@@ -17328,16 +17327,15 @@ class ModelConverter {
     for (let node_i in gltfModel.nodes) {
       let node = gltfModel.nodes[parseInt(node_i)];
       if (node.childrenIndices) {
-        for (let childNode_i of node.childrenIndices) {
-          let childGroup = groups[childNode_i];
-          let parentGroup = groups[node_i];
-          parentGroup.addChild(childGroup);
-          if (node.mesh) {
-            parentGroup.addChild(node.mesh);
-            parentGroup.addChild(glboostMeshes[meshIndex]);
-          }
-        }  
+      for (let childNode_i of node.childrenIndices) {
+        let childGroup = groups[childNode_i];
+        let parentGroup = groups[node_i];
+        parentGroup.addChild(childGroup);
+      }  
+      if (node.mesh) {
+        parentGroup.addChild(glboostMeshes[mesh.meshIndex]);
       }
+    }
     }
     return groups;
   }

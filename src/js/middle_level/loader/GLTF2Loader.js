@@ -180,20 +180,19 @@ export default class GLTF2Loader {
       }
  
       // Mesh
-      if (node.mesh && gltfJson.meshes !== void 0) {
+      if (node.mesh !== void 0 && gltfJson.meshes !== void 0) {
         node.meshIndex = node.mesh;
         node.mesh = gltfJson.meshes[node.meshIndex];
-
       }
 
       // Skin
-      if (node.skin && gltfJson.skins !== void 0) {
+      if (node.skin !== void 0 && gltfJson.skins !== void 0) {
         node.skinIndex = node.skin;
         node.skin = gltfJson.skins[node.skinIndex];
       }
 
       // Camera
-      if (node.camera && gltfJson.cameras !== void 0) {
+      if (node.camera !== void 0 && gltfJson.cameras !== void 0) {
         node.cameraIndex = node.camera;
         node.camera = gltfJson.cameras[node.cameraIndex];
       }
