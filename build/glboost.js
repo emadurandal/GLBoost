@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 32f003d7
+// This revision is the commit right after the SHA: 90428711
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17029,7 +17029,7 @@ class GLTF2Loader {
 
         }
 
-        if (primitive.indices) {
+        if (primitive.indices !== void 0) {
           primitive.indicesIndex = primitive.indices;
           primitive.indices = gltfJson.accessors[primitive.indicesIndex];
         }
@@ -17381,8 +17381,8 @@ class ModelConverter {
           
         let indices = null;
         if (typeof primitive.indices !== 'undefined') {
-          let indicesAccessorStr = primitive.indices;
-          indices = primitive.indices;
+          primitive.indices.indices = gltfModel.accessors[primitive.indicesIndex];
+          indices = primitive.indices.indices.extras.vertexAttributeArray;
           for (let j=0; j<indices.length; j++) {
             indices[j] = indicesAccumulatedLength + indices[j];
           }

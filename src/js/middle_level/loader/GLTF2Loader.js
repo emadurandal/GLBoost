@@ -219,7 +219,7 @@ export default class GLTF2Loader {
 
         }
 
-        if (primitive.indices) {
+        if (primitive.indices !== void 0) {
           primitive.indicesIndex = primitive.indices;
           primitive.indices = gltfJson.accessors[primitive.indicesIndex];
         }

@@ -119,8 +119,8 @@ export default class ModelConverter {
           
         let indices = null;
         if (typeof primitive.indices !== 'undefined') {
-          let indicesAccessorStr = primitive.indices;
-          indices = primitive.indices
+          primitive.indices.indices = gltfModel.accessors[primitive.indicesIndex];
+          indices = primitive.indices.indices.extras.vertexAttributeArray;
           for (let j=0; j<indices.length; j++) {
             indices[j] = indicesAccumulatedLength + indices[j];
           }
