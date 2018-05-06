@@ -203,13 +203,21 @@ export default class GLTF2Loader {
   }
   
   _loadDependenciesOfMeshes(gltfJson) {
-    // Material
+    // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
         primitive.materialIndex = primitive.material;
         primitive.material = gltfJson.materials[primitive.materialIndex];
 
+        primitive.attributesindex = Object.assign({}, primitive.attributes);
+        for (let attributeName in primitive.attributesindex) {
+          primitive.attributes[attributeName] = gltfJson.accessors[primitive.attributesindex[attributeName]];
+        }
 
+        if (primitive.indices) {
+          primitive.indicesIndex = primitive.indices;
+          primitive.indices = gltfJson.accessors[primitive.indicesIndex];
+        }
       }
     }
   }
@@ -434,6 +442,8 @@ export default class GLTF2Loader {
 
     return dataUrl;
   }
+
+
 }
 
 GLBoost["GLTF2Loader"] = GLTF2Loader;
