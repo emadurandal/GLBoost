@@ -119,7 +119,7 @@ export default class ModelConverter {
   
           let accessor = primitive.attributes.TEXCOORD_0;
 
-          this._setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
+          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
   
           materials.push(glboostMaterial);
         } else {
@@ -248,13 +248,35 @@ export default class ModelConverter {
     }
   }
 
-  _setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
+  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
     if (accessor) {
       additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
       vertexData.components.texcoord = accessor.extras.componentN;
       vertexData.componentBytes.texcoord = accessor.extras.componentBytes;
       vertexData.componentType.texcoord = accessor.componentType;
-      dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;  
+      dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;
+
+      let setTextures = (materialJson)=> {
+        let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
+        if (baseColorTexture) {
+          let sampler = baseColorTexture.sampler;
+          let texture = glBoostContext.createTexture(baseColorTexture.image, '', {
+            'TEXTURE_MAG_FILTER': sampler.magFilter,
+            'TEXTURE_MIN_FILTER': sampler.minFilter,
+            'TEXTURE_WRAP_S': sampler.wrapS,
+            'TEXTURE_WRAP_T': sampler.wrapT
+//            'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+          });
+          gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+
+          // if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+          //   gltfMaterial.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+          // }
+          gltfMaterial.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+        }
+      };
+      setTextures(materialJson);
+
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
         // If texture coordinates existed even once in the previous loop
@@ -270,6 +292,15 @@ export default class ModelConverter {
         vertexData.componentBytes.texcoord = 4;
         dataViewMethodDic.texcoord = 'getFloat32';
       }
+    }
+
+    if (materialJson.pbrMetallicRoughness.baseColorFactor) {
+      let value = materialJson.pbrMetallicRoughness.baseColorFactor;
+      gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
+    }
+
+    if (indices !== null) {
+      gltfMaterial.setVertexN(geometry, indices.length);
     }
   }
 

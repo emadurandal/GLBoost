@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 8a4f0113
+// This revision is the commit right after the SHA: a0ea8b99
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -9676,6 +9676,8 @@ class Texture extends AbstractTexture {
       // do nothing
     } else if (typeof src === 'string') {
         this.generateTextureFromUri(src);
+    } else if (src instanceof Image) {
+        this.generateTextureFromImage(src);
     } else {
         this._generateTextureFromImageData(src);
     }
@@ -9755,6 +9757,17 @@ class Texture extends AbstractTexture {
         this._img.src = imageUri;
       }
     });
+  }
+
+  generateTextureFromImage(img) {
+    let imgCanvas = this._getResizedCanvas(img);
+    this._width = imgCanvas.width;
+    this._height = imgCanvas.height;
+
+    let texture = this._generateTextureInner(imgCanvas, isKeepBound);
+
+    this._texture = texture;
+    this._isTextureReady = true;
   }
 
   _generateTextureFromImageData(imageData) {
@@ -17029,15 +17042,15 @@ class GLTF2Loader {
     for (let material of gltfJson.materials) {
       let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
       if (baseColorTexture) {
-        baseColorTexture.texture = baseColorTexture.index;
+        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
       }
       let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
       if (metallicRoughnessTexture) {
-        metallicRoughnessTexture.texture = metallicRoughnessTexture.index;
+        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
       }
       let normalTexture = material.normalTexture;
       if (normalTexture) {
-        normalTexture.texture = normalTexture.index;
+        normalTexture.texture = gltfJson.textures[normalTexture.index];
       }
     }
   }
@@ -17367,7 +17380,7 @@ class ModelConverter {
   
           let accessor = primitive.attributes.TEXCOORD_0;
 
-          this._setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
+          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
   
           materials.push(glboostMaterial);
         } else {
@@ -17496,13 +17509,35 @@ class ModelConverter {
     }
   }
 
-  _setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
+  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
     if (accessor) {
       additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
       vertexData.components.texcoord = accessor.extras.componentN;
       vertexData.componentBytes.texcoord = accessor.extras.componentBytes;
       vertexData.componentType.texcoord = accessor.componentType;
-      dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;  
+      dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;
+
+      let setTextures = (materialJson)=> {
+        let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
+        if (baseColorTexture) {
+          let sampler = baseColorTexture.sampler;
+          let texture = glBoostContext.createTexture(baseColorTexture.image, '', {
+            'TEXTURE_MAG_FILTER': sampler.magFilter,
+            'TEXTURE_MIN_FILTER': sampler.minFilter,
+            'TEXTURE_WRAP_S': sampler.wrapS,
+            'TEXTURE_WRAP_T': sampler.wrapT
+//            'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+          });
+          gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+
+          // if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+          //   gltfMaterial.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+          // }
+          gltfMaterial.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+        }
+      };
+      setTextures(materialJson);
+
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
         // If texture coordinates existed even once in the previous loop
@@ -17518,6 +17553,15 @@ class ModelConverter {
         vertexData.componentBytes.texcoord = 4;
         dataViewMethodDic.texcoord = 'getFloat32';
       }
+    }
+
+    if (materialJson.pbrMetallicRoughness.baseColorFactor) {
+      let value = materialJson.pbrMetallicRoughness.baseColorFactor;
+      gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
+    }
+
+    if (indices !== null) {
+      gltfMaterial.setVertexN(geometry, indices.length);
     }
   }
 

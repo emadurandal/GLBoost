@@ -23,6 +23,8 @@ export default class Texture extends AbstractTexture {
       // do nothing
     } else if (typeof src === 'string') {
         this.generateTextureFromUri(src);
+    } else if (src instanceof Image) {
+        this.generateTextureFromImage(src);
     } else {
         this._generateTextureFromImageData(src);
     }
@@ -102,6 +104,17 @@ export default class Texture extends AbstractTexture {
         this._img.src = imageUri;
       }
     });
+  }
+
+  generateTextureFromImage(img) {
+    let imgCanvas = this._getResizedCanvas(img);
+    this._width = imgCanvas.width;
+    this._height = imgCanvas.height;
+
+    let texture = this._generateTextureInner(imgCanvas, isKeepBound);
+
+    this._texture = texture;
+    this._isTextureReady = true;
   }
 
   _generateTextureFromImageData(imageData) {
