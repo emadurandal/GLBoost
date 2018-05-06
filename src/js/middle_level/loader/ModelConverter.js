@@ -32,17 +32,19 @@ export default class ModelConverter {
   }
 
   convertToGLBoostModel(glBoostContext, gltfModel) {
-    
+
+    // load binary data
     for (accessor of gltfModel.accessors) {
       this._accessBinaryWithAccessor(accessor)
     }
 
-    this._setupMeshGeometries(glBoostContext, gltfModel);
+    // Mesh data
+    this._setupMesh(glBoostContext, gltfModel);
 
     return gltfModel;
   }
 
-  _setupMeshGeometries(glBoostContext, gltfModel) {
+  _setupMesh(glBoostContext, gltfModel) {
     for (let mesh of gltfModel.meshes) {
       
       geometry = glBoostContext.createGeometry();
@@ -116,28 +118,8 @@ export default class ModelConverter {
           this._materials.push(glboostMaterial);
   
           let accessor = primitive.attributes.TEXCOORD_0;
-          if (accessor) {
-            additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
-            vertexData.components.texcoord = accessor.extras.componentN;
-            vertexData.componentBytes.texcoord = accessor.extras.componentBytes;
-            vertexData.componentType.texcoord = accessor.componentType;
-            dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;  
-          } else {
-            if (typeof vertexData.components.texcoord !== 'undefined') {
-              // If texture coordinates existed even once in the previous loop
-              let emptyTexcoords = [];
-              let componentN = vertexData.components.position;
-              let length = _positions[i].length / componentN;
-              for (let k = 0; k < length; k++) {
-                emptyTexcoords.push(0);
-                emptyTexcoords.push(0);
-              }
-              additional['texcoord'][i] = new Float32Array(emptyTexcoords);
-              vertexData.components.texcoord = 2;
-              vertexData.componentBytes.texcoord = 4;
-              dataViewMethodDic.texcoord = 'getFloat32';
-            }
-          }
+
+          this._setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
   
           materials.push(glboostMaterial);
         } else {
@@ -263,6 +245,31 @@ export default class ModelConverter {
   
       geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
       geometry.materials = materials;
+    }
+  }
+
+  _setupMaterial(glBoostContext, gltfModel, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
+    if (accessor) {
+      additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
+      vertexData.components.texcoord = accessor.extras.componentN;
+      vertexData.componentBytes.texcoord = accessor.extras.componentBytes;
+      vertexData.componentType.texcoord = accessor.componentType;
+      dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;  
+    } else {
+      if (typeof vertexData.components.texcoord !== 'undefined') {
+        // If texture coordinates existed even once in the previous loop
+        let emptyTexcoords = [];
+        let componentN = vertexData.components.position;
+        let length = _positions[i].length / componentN;
+        for (let k = 0; k < length; k++) {
+          emptyTexcoords.push(0);
+          emptyTexcoords.push(0);
+        }
+        additional['texcoord'][i] = new Float32Array(emptyTexcoords);
+        vertexData.components.texcoord = 2;
+        vertexData.componentBytes.texcoord = 4;
+        dataViewMethodDic.texcoord = 'getFloat32';
+      }
     }
   }
 
