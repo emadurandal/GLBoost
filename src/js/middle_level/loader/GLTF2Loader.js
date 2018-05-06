@@ -133,14 +133,59 @@ export default class GLTF2Loader {
   _loadJsonContent(gltfJson, resources, options, resultJson) {
 
     // Scene
+    this._loadDependenciesOfScenes(gltfJson);
+
+    // Node hierarchy
+    this._loadDependenciesOfNodes(gltfJson);
+
+    // Node Transformation
+//    this._loadTransformationsOfNodes(gltfJson);
+    
+  }
+
+  _loadDependenciesOfScenes(gltfJson) {
     for (let scene of gltfJson.scenes) {
-      scene.nodesIndices = scene.nodes;
+      scene.nodesIndices = Object.assign({}, scene.nodes);
       for (let i in scene.nodesIndices) {
         scene.nodes[i] = gltfJson.nodes[scene.nodesIndices[i]];
       }
     }
-
   }
+
+  _loadDependenciesOfNodes(gltfJson) {
+
+    for (let node of gltfJson.nodes) {
+
+      // Hierarchy
+      node.childrenIndices = Object.assign({}, node.children);
+      for (let i in node.childrenIndices) {
+        node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
+      }
+ 
+      // Mesh
+      node.meshIndex = node.mesh;
+      if (node.meshIndex && gltfJson.meshes !== void 0) {
+        node.mesh = gltfJson.meshes[node.meshIndex];
+      }
+
+      // Skin
+      node.skinIndex = node.skin;
+      if (node.skinIndex && gltfJson.skins !== void 0) {
+        node.skin = gltfJson.skins[node.skinIndex];
+      }
+
+      // Camera
+      if (node.cameraIndex && gltfJson.cameras !== void 0) {
+        node.cameraIndex = node.camera;
+        node.camera = gltfJson.cameras[node.cameraIndex];
+      }
+    }
+
+ 
+  }
+  
+  
+//  _loadTransformationsOfNodes(gltfJson) {  }
 
   _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {
     let promisesToLoadResources = [];
