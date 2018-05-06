@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: c78043b4
+// This revision is the commit right after the SHA: 627d6cf2
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17234,6 +17234,42 @@ class GLTF2Loader {
 }
 
 GLBoost$1["GLTF2Loader"] = GLTF2Loader;
+
+let singleton$7 = Symbol();
+let singletonEnforcer$5 = Symbol();
+
+/**
+ * 
+ */
+class ModelConverter {
+
+  /**
+   * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   */
+  constructor(enforcer) {
+    if (enforcer !== singletonEnforcer$5) {
+      throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+    }
+  }
+
+  /**
+   * The static method to get singleton instance of this class.
+   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   */
+  static getInstance() {
+    if (!this[singleton$7]) {
+      this[singleton$7] = new ModelConverter(singletonEnforcer$5);
+    }
+    return this[singleton$7];
+  }
+
+  convertToGLBoostModel(gltfModel) {
+    //gltfModel.
+  }
+}
+
+GLBoost$1["ModelConverter"] = ModelConverter;
 
 if (typeof phina !== 'undefined') {
 
