@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 04559a39
+// This revision is the commit right after the SHA: 7d7c4044
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16890,7 +16890,7 @@ class GLTF2Loader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
-      isAllMeshesTransparent: true
+      isAllMeshesTransparent: false
     }) 
     {
 

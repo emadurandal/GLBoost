@@ -45,7 +45,7 @@ export default class GLTF2Loader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
-      isAllMeshesTransparent: true
+      isAllMeshesTransparent: false
     }) 
     {
 
