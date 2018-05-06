@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: b06b11e9
+// This revision is the commit right after the SHA: 68e23dca
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16941,7 +16941,8 @@ class GLTF2Loader {
     // Mesh
     this._loadDependenciesOfMeshes(gltfJson);
 
-
+    // Material
+    this._loadDependenciesOfMaterials(gltfJson);
   }
 
   _loadDependenciesOfScenes(gltfJson) {
@@ -16993,6 +16994,24 @@ class GLTF2Loader {
       for (let primitive of mesh.primitives) {
         primitive.materialIndex = primitive.material;
         primitive.material = gltfJson.materials[primitive.materialIndex];
+      }
+    }
+  }
+
+  _loadDependenciesOfMaterials(gltfJson) {
+    // Material
+    for (let material of gltfJson.materials) {
+      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+      if (baseColorTexture) {
+        baseColorTexture.texture = baseColorTexture.index;
+      }
+      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+      if (metallicRoughnessTexture) {
+        metallicRoughnessTexture.texture = metallicRoughnessTexture.index;
+      }
+      let normalTexture = material.normalTexture;
+      if (normalTexture) {
+        normalTexture.texture = normalTexture.index;
       }
     }
   }
