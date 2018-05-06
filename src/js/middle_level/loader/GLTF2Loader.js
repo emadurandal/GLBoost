@@ -166,6 +166,13 @@ export default class GLTF2Loader {
       node.meshIndex = node.mesh;
       if (node.meshIndex && gltfJson.meshes !== void 0) {
         node.mesh = gltfJson.meshes[node.meshIndex];
+
+        // Material
+        for (primitive of node.mesh.primitives) {
+          primitive.materialIndex = primitive.material;
+          primitive.material = gltfJson.materials[primitive.materialIndex];
+        }
+
       }
 
       // Skin
@@ -179,6 +186,7 @@ export default class GLTF2Loader {
         node.cameraIndex = node.camera;
         node.camera = gltfJson.cameras[node.cameraIndex];
       }
+
     }
 
  
