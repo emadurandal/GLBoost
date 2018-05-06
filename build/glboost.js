@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: d387e4d6
+// This revision is the commit right after the SHA: 2c976661
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -15568,7 +15568,7 @@ let singletonEnforcer$3 = Symbol();
  * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
  * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
  */
-class GLTFLoader$1 {
+class GLTFLoader {
 
   /**
    * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
@@ -15588,7 +15588,7 @@ class GLTFLoader$1 {
    */
   static getInstance() {
     if (!this[singleton$5]) {
-      this[singleton$5] = new GLTFLoader$1(singletonEnforcer$3);
+      this[singleton$5] = new GLTFLoader(singletonEnforcer$3);
     }
     return this[singleton$5];
   }
@@ -16691,7 +16691,7 @@ class GLTFLoader$1 {
     var vertexAttributeArray = [];
 
     if (toGetAsTypedArray) {
-      if (GLTFLoader$1._isSystemLittleEndian()) {
+      if (GLTFLoader._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
         } else if (dataViewMethod === 'getInt8') {
@@ -16810,7 +16810,7 @@ class GLTFLoader$1 {
 
 
 
-GLBoost$1["GLTFLoader"] = GLTFLoader$1;
+GLBoost$1["GLTFLoader"] = GLTFLoader;
 
 let singleton$6 = Symbol();
 let singletonEnforcer$4 = Symbol();
@@ -16883,12 +16883,11 @@ class GLTF2Loader {
           let gltfJson = JSON.parse(gotText);
 
           //let glTFVer = this._checkGLTFVersion(gltfJson);
-          let resultJson = {};
-          let promise = this._loadInner(null, basePath, gltfJson, options, resultJson);
+          let promise = this._loadInner(null, basePath, gltfJson, options);
 
-          promise.then(() => {
+          promise.then((gltfJson) => {
             console.log('Resoureces loading done!');
-            resolve(resultJson);
+            resolve(gltfJson[0][0]);
           });
   
           return;
@@ -16916,17 +16915,17 @@ class GLTF2Loader {
 
 //        let glTFVer = this._checkGLTFVersion(gltfJson);
 
-        let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options, resultJson);
+        let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options);
 
-        promise.then(() => {
+        promise.then((gltfJson) => {
           console.log('Resoureces loading done!');
-          resolve(resultJson);
+          resolve(gltfJson[0][0]);
         });
       }, (reject, error)=>{}
     );
   }
 
-  _loadInner(arrayBufferBinary, basePath, gltfJson, options, resultJson) {
+  _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
     let promises = [];
 
     let resources = {
@@ -16934,13 +16933,13 @@ class GLTF2Loader {
       buffers: [],
       images: []
     };
-    promises.push(this._loadResources(arrayBufferBinary, null, gltfJson, options, resources));
-    this._loadJsonContent(gltfJson, resources, options, resultJson);
+    promises.push(this._loadResources(arrayBufferBinary, basePath, gltfJson, options, resources));
+    this._loadJsonContent(gltfJson, resources, options);
 
     return Promise.all(promises);
   }
 
-  _loadJsonContent(gltfJson, resources, options, resultJson) {
+  _loadJsonContent(gltfJson, resources, options) {
 
     // Scene
     this._loadDependenciesOfScenes(gltfJson);
@@ -16970,7 +16969,7 @@ class GLTF2Loader {
 
   _loadDependenciesOfScenes(gltfJson) {
     for (let scene of gltfJson.scenes) {
-      scene.nodesIndices = Object.assign({}, scene.nodes);
+      scene.nodesIndices = scene.nodes.concat();
       for (let i in scene.nodesIndices) {
         scene.nodes[i] = gltfJson.nodes[scene.nodesIndices[i]];
       }
@@ -16982,10 +16981,12 @@ class GLTF2Loader {
     for (let node of gltfJson.nodes) {
 
       // Hierarchy
-      node.childrenIndices = Object.assign({}, node.children);
-      node.children = [];
-      for (let i in node.childrenIndices) {
-        node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
+      if (node.children) {
+        node.childrenIndices = node.children.concat();
+        node.children = [];
+        for (let i in node.childrenIndices) {
+          node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
+        }
       }
  
       // Mesh
@@ -17041,15 +17042,15 @@ class GLTF2Loader {
     // Material
     for (let material of gltfJson.materials) {
       let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
-      if (baseColorTexture) {
+      if (baseColorTexture !== void 0) {
         baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
       }
       let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
-      if (metallicRoughnessTexture) {
+      if (metallicRoughnessTexture !== void 0) {
         metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
       }
       let normalTexture = material.normalTexture;
-      if (normalTexture) {
+      if (normalTexture !== void 0) {
         normalTexture.texture = gltfJson.textures[normalTexture.index];
       }
     }
@@ -17057,14 +17058,16 @@ class GLTF2Loader {
 
   _loadDependenciesOfTextures(gltfJson) {
     // Texture
-    for (let texture of gltfJson.textures) {
-      if (texture.sampler) {
-        texture.samplerIndex = texture.sampler;
-        texture.sampler = gltfJson.samplers[texture.samplerIndex];
-      }
-      if (texture.source) {
-        texture.sourceIndex = texture.source;
-        texture.image = gltfJson.images[texture.sourceIndex];
+    if (gltfJson.textures) {
+      for (let texture of gltfJson.textures) {
+        if (texture.sampler !== void 0) {
+          texture.samplerIndex = texture.sampler;
+          texture.sampler = gltfJson.samplers[texture.samplerIndex];
+        }
+        if (texture.source !== void 0) {
+          texture.sourceIndex = texture.source;
+          texture.image = gltfJson.images[texture.sourceIndex];
+        }
       }
     }
   }
@@ -17072,7 +17075,7 @@ class GLTF2Loader {
   _loadDependenciesOfAccessors(gltfJson) {
     // Accessor
     for (let accessor of gltfJson.accessors) {
-      if (accessor.bufferView) {
+      if (accessor.bufferView !== void 0) {
         accessor.bufferViewIndex = accessor.bufferView;
         accessor.bufferView = gltfJson.bufferViews[accessor.bufferViewIndex];
       }
@@ -17082,7 +17085,7 @@ class GLTF2Loader {
   _loadDependenciesOfBufferViews(gltfJson) {
     // BufferView
     for (let bufferView of gltfJson.bufferViews) {
-      if (bufferView.buffer) {
+      if (bufferView.buffer !== void 0) {
         bufferView.bufferIndex = bufferView.buffer;
         bufferView.buffer = gltfJson.buffers[bufferView.bufferIndex];
       }
@@ -17110,11 +17113,11 @@ class GLTF2Loader {
       let shaderUri = shaderJson.uri;
       if (shaderUri.match(/^data:/)) {
         promisesToLoadResources.push(
-          new Promise((fulfilled, rejected) => {
+          new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
             resources.shaders[i].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
             resources.shaders[i].shaderType = shaderType;
-            fulfilled();
+            resolve();
           })
         );
       } else {
@@ -17124,7 +17127,7 @@ class GLTF2Loader {
             (resolve, response)=>{
               resources.shaders[i].shaderText = response;
               resources.shaders[i].shaderType = shaderType;
-              resolve();
+              resolve(gltfJson);
             },
             (reject, error)=>{
 
@@ -17146,7 +17149,7 @@ class GLTF2Loader {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
             resources.buffers[i] = arrayBuffer;
             bufferInfo.buffer = arrayBuffer;
-            resolve();
+            resolve(gltfJson);
           })
         );
       } else {
@@ -17155,7 +17158,7 @@ class GLTF2Loader {
             (resolve, response)=>{
               resources.buffers[i] = response;
               bufferInfo.buffer = response;
-              resolve();
+              resolve(gltfJson);
             },
             (reject, error)=>{
 
@@ -17218,7 +17221,7 @@ class GLTF2Loader {
         }
         img.onload = () => {
           imageJson.image = img;
-          resolve(img);
+          resolve(gltfJson);
         };
 
         img.src = imageUri;
@@ -17295,32 +17298,59 @@ class ModelConverter {
   convertToGLBoostModel(glBoostContext, gltfModel) {
 
     // load binary data
-    for (accessor of gltfModel.accessors) {
+    for (let accessor of gltfModel.accessors) {
       this._accessBinaryWithAccessor(accessor);
     }
 
     // Hierarchy
-    this._setupHierarchy(glBoostContext, gltfModel);
+    let groups = this._setupHierarchy(glBoostContext, gltfModel);
 
     // Mesh data
-    this._setupMesh(glBoostContext, gltfModel);
+    this._setupMesh(glBoostContext, gltfModel, groups);
 
-    return gltfModel;
+    let rootGroup = glBoostContext.createGroup();
+
+    if (gltfModel.scenes[0].nodesIndices) {
+      for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
+        rootGroup.addChild(groups[nodesIndex]);
+      }  
+    }
+
+    return rootGroup;
   }
 
   _setupHierarchy(glBoostContext, gltfModel) {
-    for (let node of gltfModel.nodes) {
-      for (let childNode of node.children) {
-        node.addChild(childNode);
+    let groups = [];
+    for (let node_i in gltfModel.nodes) {
+      let group = glBoostContext.createGroup();
+      groups.push(group);
+    }
+    for (let node_i in gltfModel.nodes) {
+      let node = gltfModel.nodes[parseInt(node_i)];
+      if (node.childrenIndices) {
+        for (let childNode_i of node.childrenIndices) {
+          let childGroup = groups[childNode_i];
+          let parentGroup = groups[node_i];
+          parentGroup.addChild(childGroup);
+          if (node.mesh) {
+            parentGroup.addChild(node.mesh);
+            parentGroup._mesh = mesh;  
+          }
+        }  
       }
     }
+    return groups;
   }
 
-  _setupMesh(glBoostContext, gltfModel) {
-    for (let mesh of gltfModel.meshes) {
-      
-      geometry = glBoostContext.createGeometry();
-      glboostMesh = glBoostContext.createMesh(geometry);
+  _setupMesh(glBoostContext, gltfModel, groups) {
+    for (let group of groups) {
+      let mesh = group._mesh;
+      if (mesh === void 0) {
+        continue;
+      }
+
+      let geometry = glBoostContext.createGeometry();
+      let glboostMesh = glBoostContext.createMesh(geometry);
 
       let _indicesArray = [];
       let _positions = [];
@@ -17669,16 +17699,20 @@ class ModelConverter {
     return dataViewMethod;
   }
   
+  static _isSystemLittleEndian() {
+    return !!(new Uint8Array((new Uint16Array([0x00ff])).buffer))[0];
+  }
+
   _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
     var byteOffset = bufferView.byteOffset + accessor.byteOffset;
-    var bufferStr = bufferView.buffer;
-    var arrayBuffer = accessor.buffer.buffer;
+    var buffer = bufferView.buffer;
+    var arrayBuffer = buffer.buffer;
 
     let componentN = this._checkComponentNumber(accessor);
     let componentBytes = this._checkBytesPerComponent(accessor);
     let dataViewMethod = this._checkDataViewMethod(accessor);
-    if (accessor.extras) {
+    if (accessor.extras === void 0) {
       accessor.extras = {};
     }
 
@@ -17691,7 +17725,7 @@ class ModelConverter {
     var vertexAttributeArray = [];
 
     if (accessor.extras && accessor.extras.toGetAsTypedArray) {
-      if (GLTFLoader._isSystemLittleEndian()) {
+      if (ModelConverter._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / componentBytes);
         } else if (dataViewMethod === 'getInt8') {

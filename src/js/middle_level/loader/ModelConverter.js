@@ -34,32 +34,59 @@ export default class ModelConverter {
   convertToGLBoostModel(glBoostContext, gltfModel) {
 
     // load binary data
-    for (accessor of gltfModel.accessors) {
+    for (let accessor of gltfModel.accessors) {
       this._accessBinaryWithAccessor(accessor)
     }
 
     // Hierarchy
-    this._setupHierarchy(glBoostContext, gltfModel);
+    let groups = this._setupHierarchy(glBoostContext, gltfModel);
 
     // Mesh data
-    this._setupMesh(glBoostContext, gltfModel);
+    this._setupMesh(glBoostContext, gltfModel, groups);
 
-    return gltfModel;
+    let rootGroup = glBoostContext.createGroup();
+
+    if (gltfModel.scenes[0].nodesIndices) {
+      for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
+        rootGroup.addChild(groups[nodesIndex]);
+      }  
+    }
+
+    return rootGroup;
   }
 
   _setupHierarchy(glBoostContext, gltfModel) {
-    for (let node of gltfModel.nodes) {
-      for (let childNode of node.children) {
-        node.addChild(childNode);
+    let groups = [];
+    for (let node_i in gltfModel.nodes) {
+      let group = glBoostContext.createGroup();
+      groups.push(group);
+    }
+    for (let node_i in gltfModel.nodes) {
+      let node = gltfModel.nodes[parseInt(node_i)];
+      if (node.childrenIndices) {
+        for (let childNode_i of node.childrenIndices) {
+          let childGroup = groups[childNode_i];
+          let parentGroup = groups[node_i];
+          parentGroup.addChild(childGroup);
+          if (node.mesh) {
+            parentGroup.addChild(node.mesh);
+            parentGroup._mesh = mesh;  
+          }
+        }  
       }
     }
+    return groups;
   }
 
-  _setupMesh(glBoostContext, gltfModel) {
-    for (let mesh of gltfModel.meshes) {
-      
-      geometry = glBoostContext.createGeometry();
-      glboostMesh = glBoostContext.createMesh(geometry);
+  _setupMesh(glBoostContext, gltfModel, groups) {
+    for (let group of groups) {
+      let mesh = group._mesh;
+      if (mesh === void 0) {
+        continue;
+      }
+
+      let geometry = glBoostContext.createGeometry();
+      let glboostMesh = glBoostContext.createMesh(geometry);
 
       let _indicesArray = [];
       let _positions = [];
@@ -408,16 +435,20 @@ export default class ModelConverter {
     return dataViewMethod;
   }
   
+  static _isSystemLittleEndian() {
+    return !!(new Uint8Array((new Uint16Array([0x00ff])).buffer))[0];
+  }
+
   _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
     var byteOffset = bufferView.byteOffset + accessor.byteOffset;
-    var bufferStr = bufferView.buffer;
-    var arrayBuffer = accessor.buffer.buffer;
+    var buffer = bufferView.buffer;
+    var arrayBuffer = buffer.buffer;
 
     let componentN = this._checkComponentNumber(accessor);
     let componentBytes = this._checkBytesPerComponent(accessor);
     let dataViewMethod = this._checkDataViewMethod(accessor);
-    if (accessor.extras) {
+    if (accessor.extras === void 0) {
       accessor.extras = {};
     }
 
@@ -430,7 +461,7 @@ export default class ModelConverter {
     var vertexAttributeArray = [];
 
     if (accessor.extras && accessor.extras.toGetAsTypedArray) {
-      if (GLTFLoader._isSystemLittleEndian()) {
+      if (ModelConverter._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / componentBytes);
         } else if (dataViewMethod === 'getInt8') {
