@@ -206,7 +206,11 @@ export default class GLTF2Loader {
         if (node.mesh.extras === void 0) {
           node.mesh.extras = {};
         }
+
         node.mesh.extras._skin = node.skin;
+
+        node.skin.skeletonIndex = node.skin.skeleton;
+        node.skin.skeleton = gltfJson.nodes[node.skin.skeletonIndex];
 
         node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
         node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];

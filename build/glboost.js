@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 984b040a
+// This revision is the commit right after the SHA: e9a4a38d
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17051,7 +17051,11 @@ class GLTF2Loader {
         if (node.mesh.extras === void 0) {
           node.mesh.extras = {};
         }
+
         node.mesh.extras._skin = node.skin;
+
+        node.skin.skeletonIndex = node.skin.skeleton;
+        node.skin.skeleton = gltfJson.nodes[node.skin.skeletonIndex];
 
         node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
         node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];
@@ -17397,6 +17401,9 @@ class ModelConverter {
     // Transfrom
     this._setupTransform(gltfModel, groups);
 
+    // Skeleton
+    this._setupSkeleton(gltfModel, groups, glboostMeshes);
+
     // Animation
     this._setupAnimation(gltfModel, groups);
 
@@ -17481,6 +17488,20 @@ class ModelConverter {
             group.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             group.setActiveAnimationLine('time');
           }
+        }
+      }
+    }
+  }
+
+  _setupSkeleton(gltfModel, groups, glboostMeshes) {
+    for (let node_i in gltfModel.nodes) {
+      let node = gltfModel.nodes[node_i];
+      let group = groups[node_i];
+      if (node.skin && node.skin.skeleton) {
+        group._isRootJointGroup = true;
+        if (node.mesh) {
+          let glboostMesh = glboostMeshes[node.meshIndex];
+          glboostMesh.jointsHierarchy = node.skin.skeleton;
         }
       }
     }

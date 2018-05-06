@@ -52,6 +52,9 @@ export default class ModelConverter {
     // Transfrom
     this._setupTransform(gltfModel, groups);
 
+    // Skeleton
+    this._setupSkeleton(gltfModel, groups, glboostMeshes);
+
     // Animation
     this._setupAnimation(gltfModel, groups);
 
@@ -136,6 +139,20 @@ export default class ModelConverter {
             group.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
             group.setActiveAnimationLine('time');
           }
+        }
+      }
+    }
+  }
+
+  _setupSkeleton(gltfModel, groups, glboostMeshes) {
+    for (let node_i in gltfModel.nodes) {
+      let node = gltfModel.nodes[node_i];
+      let group = groups[node_i];
+      if (node.skin && node.skin.skeleton) {
+        group._isRootJointGroup = true;
+        if (node.mesh) {
+          let glboostMesh = glboostMeshes[node.meshIndex];
+          glboostMesh.jointsHierarchy = node.skin.skeleton;
         }
       }
     }
