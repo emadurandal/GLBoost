@@ -111,7 +111,7 @@ export default class Texture extends AbstractTexture {
     this._width = imgCanvas.width;
     this._height = imgCanvas.height;
 
-    let texture = this._generateTextureInner(imgCanvas, isKeepBound);
+    let texture = this._generateTextureInner(imgCanvas, false);
 
     this._texture = texture;
     this._isTextureReady = true;

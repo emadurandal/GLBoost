@@ -243,7 +243,7 @@ export default class GLTFLoader {
           // TODO: Implement to Make Texture Straight.
         } else {
           // Nothing to do because the texture is straight.
-        }        
+        }
       }
       
       let texture = glBoostContext.createTexture(null, textureName, {
