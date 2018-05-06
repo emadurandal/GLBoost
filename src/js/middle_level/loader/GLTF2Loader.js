@@ -146,6 +146,10 @@ export default class GLTF2Loader {
 
     // Material
     this._loadDependenciesOfMaterials(gltfJson);
+
+    // Texture
+    this._loadDependenciesOfTextures(gltfJson);
+
   }
 
   _loadDependenciesOfScenes(gltfJson) {
@@ -163,25 +167,26 @@ export default class GLTF2Loader {
 
       // Hierarchy
       node.childrenIndices = Object.assign({}, node.children);
+      node.children = [];
       for (let i in node.childrenIndices) {
         node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
       }
  
       // Mesh
-      node.meshIndex = node.mesh;
-      if (node.meshIndex && gltfJson.meshes !== void 0) {
+      if (node.mesh && gltfJson.meshes !== void 0) {
+        node.meshIndex = node.mesh;
         node.mesh = gltfJson.meshes[node.meshIndex];
 
       }
 
       // Skin
-      node.skinIndex = node.skin;
-      if (node.skinIndex && gltfJson.skins !== void 0) {
+      if (node.skin && gltfJson.skins !== void 0) {
+        node.skinIndex = node.skin;
         node.skin = gltfJson.skins[node.skinIndex];
       }
 
       // Camera
-      if (node.cameraIndex && gltfJson.cameras !== void 0) {
+      if (node.camera && gltfJson.cameras !== void 0) {
         node.cameraIndex = node.camera;
         node.camera = gltfJson.cameras[node.cameraIndex];
       }
@@ -215,6 +220,20 @@ export default class GLTF2Loader {
       let normalTexture = material.normalTexture;
       if (normalTexture) {
         normalTexture.texture = normalTexture.index;
+      }
+    }
+  }
+
+  _loadDependenciesOfTextures(gltfJson) {
+    // Material
+    for (let texture of gltfJson.textures) {
+      if (texture.sampler) {
+        texture.samplerIndex = texture.sampler;
+        texture.sampler = gltfJson.samplers[texture.samplerIndex];
+      }
+      if (texture.source) {
+        texture.sourceIndex = texture.source;
+        texture.image = gltfJson.images[texture.sourceIndex];
       }
     }
   }
