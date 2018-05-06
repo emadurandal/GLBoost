@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: b5bae798
+// This revision is the commit right after the SHA: 44f2507e
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -12936,7 +12936,8 @@ class M_SkeletalMesh extends M_Mesh {
     this._jointsHierarchy = null;
     this._inverseBindMatrices = [];
     this._bindShapeMatrix = Matrix44$1$1.identity();
-    this._jointNames = [];
+    this._jointNames = []; // for glTF1.0
+    this._gltfJointIndices = []; // for glTF2.0
     this._joints = [];
 
     // these are calculated by M_SkeletalGeometry
@@ -12954,10 +12955,27 @@ class M_SkeletalMesh extends M_Mesh {
     this._joints = [];
 
     // sort & choice joints according to jointNames for skinning
+    /// for glTF1.0
     let jointCount=0;
     for (let i=0; i<this._jointNames.length; i++) {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
+          this._joints.push(joints[j]);
+          joints[j].skeletalMesh = this;
+//          joints[j].isVisible = true;
+          let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1$1.identity(); 
+          joints[j].inverseBindMatrix = inverseBindMatrix;
+          joints[j].bindMatrix = Matrix44$1$1.invert(inverseBindMatrix);
+          jointCount++;
+          break;
+        }
+      }
+    }
+    /// for glTF2.0
+    jointCount=0;
+    for (let i=0; i<this._gltfJointIndices.length; i++) {
+      for (let j=0; j<joints.length; j++) {
+        if (this._gltfJointIndices[i] === joints[j]._glTFJointIndex) {
           this._joints.push(joints[j]);
           joints[j].skeletalMesh = this;
 //          joints[j].isVisible = true;
@@ -12986,12 +13004,21 @@ class M_SkeletalMesh extends M_Mesh {
           Array.prototype.push.apply(results, result);
         }
 
+        // for glTF1.0
         for (let jointName of this._jointNames) {
           if (parentJoint.userFlavorName === jointName) {
             results.push(parentJoint);
             return results;
           }
         }
+        // for glTF2.0
+        for (let gltfJointIndex of this._gltfJointIndices) {
+          if (parentJoint._glTFJointIndex === gltfJointIndex) {
+            results.push(parentJoint);
+            return results;
+          }
+        }
+
 
         return results;
       }
@@ -13054,6 +13081,13 @@ class M_SkeletalMesh extends M_Mesh {
     return this._jointNames;
   }
 
+  set gltfJointIndices(indices) {
+    this._gltfJointIndices = indices;
+  }
+  get gltfJointIndices() {
+    return this._gltfJointIndices;
+  }
+
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
     let instance = new M_SkeletalMesh(this._glBoostContext, this.geometry, this.material, this._rootJointName);
     this._copy(instance, clonedOriginalRootElement, clonedRootElement, onCompleteFuncs);
@@ -13068,6 +13102,7 @@ class M_SkeletalMesh extends M_Mesh {
     instance._inverseBindMatrices = this._inverseBindMatrices;
     instance._bindShapeMatrix = this._bindShapeMatrix;
     instance._jointNames = this._jointNames;
+    instance._gltfJointIndices = this._gltfJointIndices;
     instance._joints = this._joints;
 
     onCompleteFuncs.push((function(clonedSkeletalMesh, _clonedRootElement, jointRootGroupUserFlavorName) {
@@ -16959,6 +16994,9 @@ class GLTF2Loader {
     // Texture
     this._loadDependenciesOfTextures(gltfJson);
 
+    // Joint
+    this._loadDependenciesOfJoints(gltfJson);
+
     // Animation
     this._loadDependenciesOfAnimations(gltfJson);
 
@@ -17010,6 +17048,13 @@ class GLTF2Loader {
       if (node.skin !== void 0 && gltfJson.skins !== void 0) {
         node.skinIndex = node.skin;
         node.skin = gltfJson.skins[node.skinIndex];
+        if (node.mesh.extras === void 0) {
+          node.mesh.extras = {};
+        }
+        node.mesh.extras._skin = node.skin;
+
+        node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
+        node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];
       }
 
       // Camera
@@ -17082,6 +17127,11 @@ class GLTF2Loader {
     }
   }
 
+  _loadDependenciesOfJoints(gltfJson) {
+
+  }
+
+
   _loadDependenciesOfAnimations(gltfJson) {
     if (gltfJson.animations) {
       for (let animation of gltfJson.animations) {
@@ -17089,15 +17139,20 @@ class GLTF2Loader {
           channel.samplerIndex = channel.sampler;
           channel.sampler = animation.samplers[channel.samplerIndex];
           
-          cannnel.target.nodeIndex = cannnel.target.node;
-          cannnel.target.node = gltfJson.nodes[cannnel.target.nodeIndex];          
+          channel.target.nodeIndex = channel.target.node;
+          channel.target.node = gltfJson.nodes[channel.target.nodeIndex];          
         }
-
-        for (let sampler of animation.samplers) {
-          sampler.inputIndex = sampler.input;
-          sampler.outputIndex = sampler.output;
-          sampler.input = gltfJson.accessors[sampler.inputIndex];
-          sampler.output = gltfJson.accessors[sampler.outputIndex];
+        for (let channel of animation.channels) {
+          channel.sampler.inputIndex = channel.sampler.input;
+          channel.sampler.outputIndex = channel.sampler.output;
+          channel.sampler.input = gltfJson.accessors[channel.sampler.inputIndex];
+          channel.sampler.output = gltfJson.accessors[channel.sampler.outputIndex];
+          if (channel.target.path === 'rotation') {
+            if (channel.sampler.output.extras === void 0) {
+              channel.sampler.output.extras = {};
+            }
+            channel.sampler.output.extras.quaternionIfVec4 = true;
+          }
         }
       }
     }
@@ -17339,7 +17394,11 @@ class ModelConverter {
     // Hierarchy
     let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
-    this._setupTransformOfNodes(gltfModel, groups);
+    // Transfrom
+    this._setupTransform(gltfModel, groups);
+
+    // Animation
+    this._setupAnimation(gltfModel, groups);
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -17357,7 +17416,7 @@ class ModelConverter {
     return rootGroup;
   }
 
-  _setupTransformOfNodes(gltfModel, groups) {
+  _setupTransform(gltfModel, groups) {
     for (let node_i in gltfModel.nodes) {
       let group = groups[node_i];
       let nodeJson = gltfModel.nodes[node_i];
@@ -17399,12 +17458,48 @@ class ModelConverter {
     return groups;
   }
 
+  _setupAnimation(gltfModel, groups) {
+    if (gltfModel.animations) {
+      for (let animation of gltfModel.animations) {
+
+        for (let channel of animation.channels) {
+          let animInputArray = channel.sampler.input.extras.vertexAttributeArray;
+
+          let animOutputArray = channel.sampler.output.extras.vertexAttributeArray;
+
+          let animationAttributeName = '';
+          if (channel.target.path === 'translation') {
+            animationAttributeName = 'translate';
+          } else if (channel.target.path === 'rotation') {
+            animationAttributeName = 'quaternion';
+          } else {
+            animationAttributeName = channel.target.path;
+          }
+
+          let group = groups[channel.target.nodeIndex];
+          if (group) {
+            group.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+            group.setActiveAnimationLine('time');
+          }
+        }
+      }
+    }
+  }
+
   _setupMesh(glBoostContext, gltfModel) {
     let glboostMeshes = [];
     for (let mesh of gltfModel.meshes) {
-
-      let geometry = glBoostContext.createGeometry();
-      let glboostMesh = glBoostContext.createMesh(geometry);
+      let geometry = null;
+      let glboostMesh = null;
+      if (mesh.extras && mesh.extras._skin) {
+        geometry = glBoostContext.createSkeletalGeometry();
+        glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
+        glboostMesh.gltfJointIndices = mesh.extras._skin.joints;
+        glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+      } else {
+        geometry = glBoostContext.createGeometry();
+        glboostMesh = glBoostContext.createMesh(geometry);
+      }
       glboostMeshes.push(glboostMesh);
 
       let options = gltfModel.asset.extras.glboostOptions;

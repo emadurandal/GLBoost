@@ -149,6 +149,9 @@ export default class GLTF2Loader {
     // Texture
     this._loadDependenciesOfTextures(gltfJson);
 
+    // Joint
+    this._loadDependenciesOfJoints(gltfJson);
+
     // Animation
     this._loadDependenciesOfAnimations(gltfJson);
 
@@ -200,6 +203,13 @@ export default class GLTF2Loader {
       if (node.skin !== void 0 && gltfJson.skins !== void 0) {
         node.skinIndex = node.skin;
         node.skin = gltfJson.skins[node.skinIndex];
+        if (node.mesh.extras === void 0) {
+          node.mesh.extras = {};
+        }
+        node.mesh.extras._skin = node.skin;
+
+        node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
+        node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];
       }
 
       // Camera
@@ -272,6 +282,11 @@ export default class GLTF2Loader {
     }
   }
 
+  _loadDependenciesOfJoints(gltfJson) {
+
+  }
+
+
   _loadDependenciesOfAnimations(gltfJson) {
     if (gltfJson.animations) {
       for (let animation of gltfJson.animations) {
@@ -279,15 +294,20 @@ export default class GLTF2Loader {
           channel.samplerIndex = channel.sampler;
           channel.sampler = animation.samplers[channel.samplerIndex];
           
-          cannnel.target.nodeIndex = cannnel.target.node;
-          cannnel.target.node = gltfJson.nodes[cannnel.target.nodeIndex];          
+          channel.target.nodeIndex = channel.target.node;
+          channel.target.node = gltfJson.nodes[channel.target.nodeIndex];          
         }
-
-        for (let sampler of animation.samplers) {
-          sampler.inputIndex = sampler.input;
-          sampler.outputIndex = sampler.output;
-          sampler.input = gltfJson.accessors[sampler.inputIndex];
-          sampler.output = gltfJson.accessors[sampler.outputIndex];
+        for (let channel of animation.channels) {
+          channel.sampler.inputIndex = channel.sampler.input;
+          channel.sampler.outputIndex = channel.sampler.output;
+          channel.sampler.input = gltfJson.accessors[channel.sampler.inputIndex];
+          channel.sampler.output = gltfJson.accessors[channel.sampler.outputIndex];
+          if (channel.target.path === 'rotation') {
+            if (channel.sampler.output.extras === void 0) {
+              channel.sampler.output.extras = {};
+            }
+            channel.sampler.output.extras.quaternionIfVec4 = true;
+          }
         }
       }
     }

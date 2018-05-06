@@ -49,7 +49,11 @@ export default class ModelConverter {
     // Hierarchy
     let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
-    this._setupTransformOfNodes(gltfModel, groups);
+    // Transfrom
+    this._setupTransform(gltfModel, groups);
+
+    // Animation
+    this._setupAnimation(gltfModel, groups);
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -67,7 +71,7 @@ export default class ModelConverter {
     return rootGroup;
   }
 
-  _setupTransformOfNodes(gltfModel, groups) {
+  _setupTransform(gltfModel, groups) {
     for (let node_i in gltfModel.nodes) {
       let group = groups[node_i];
       let nodeJson = gltfModel.nodes[node_i];
@@ -109,12 +113,48 @@ export default class ModelConverter {
     return groups;
   }
 
+  _setupAnimation(gltfModel, groups) {
+    if (gltfModel.animations) {
+      for (let animation of gltfModel.animations) {
+
+        for (let channel of animation.channels) {
+          let animInputArray = channel.sampler.input.extras.vertexAttributeArray;
+
+          let animOutputArray = channel.sampler.output.extras.vertexAttributeArray;;
+
+          let animationAttributeName = '';
+          if (channel.target.path === 'translation') {
+            animationAttributeName = 'translate';
+          } else if (channel.target.path === 'rotation') {
+            animationAttributeName = 'quaternion';
+          } else {
+            animationAttributeName = channel.target.path;
+          }
+
+          let group = groups[channel.target.nodeIndex];
+          if (group) {
+            group.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+            group.setActiveAnimationLine('time');
+          }
+        }
+      }
+    }
+  }
+
   _setupMesh(glBoostContext, gltfModel) {
     let glboostMeshes = [];
     for (let mesh of gltfModel.meshes) {
-
-      let geometry = glBoostContext.createGeometry();
-      let glboostMesh = glBoostContext.createMesh(geometry);
+      let geometry = null;
+      let glboostMesh = null;
+      if (mesh.extras && mesh.extras._skin) {
+        geometry = glBoostContext.createSkeletalGeometry();
+        glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
+        glboostMesh.gltfJointIndices = mesh.extras._skin.joints;
+        glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+      } else {
+        geometry = glBoostContext.createGeometry();
+        glboostMesh = glBoostContext.createMesh(geometry);
+      }
       glboostMeshes.push(glboostMesh);
 
       let options = gltfModel.asset.extras.glboostOptions;
