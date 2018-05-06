@@ -6,6 +6,7 @@ import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
+import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -64,12 +65,21 @@ export default class ModelConverter {
     // Animation
     this._setupAnimation(gltfModel, groups);
 
+    // Root Group
     let rootGroup = glBoostContext.createGroup();
-
     if (gltfModel.scenes[0].nodesIndices) {
       for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
         rootGroup.addChild(groups[nodesIndex]);
       }  
+    }
+
+    // Post Skeletal Proccess
+    for (let glboostMesh of glboostMeshes) {
+      if (glboostMesh instanceof M_SkeletalMesh) {
+        if (!glboostMesh.jointsHierarchy) {
+          glboostMesh.jointsHierarchy = rootGroup;
+        }
+      }
     }
 
     let options = gltfModel.asset.extras.glboostOptions;
@@ -413,6 +423,8 @@ export default class ModelConverter {
   }
 
   _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i) {
+    let options = gltfModel.asset.extras.glboostOptions;
+
     if (accessor) {
       additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
       vertexData.components.texcoord = accessor.extras.componentN;
@@ -423,7 +435,7 @@ export default class ModelConverter {
       let setTextures = (materialJson)=> {
         let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
         if (baseColorTexture) {
-          let sampler = baseColorTexture.sampler;
+          let sampler = baseColorTexture.texture.sampler;
           let texture = glBoostContext.createTexture(baseColorTexture.image, '', {
             'TEXTURE_MAG_FILTER': sampler.magFilter,
             'TEXTURE_MIN_FILTER': sampler.minFilter,
@@ -474,8 +486,6 @@ export default class ModelConverter {
     if (indices !== null) {
       gltfMaterial.setVertexN(geometry, indices.length);
     }
-
-    let options = gltfModel.asset.extras.glboostOptions;
     
     if (options.defaultShader) {
       gltfMaterial.shaderClass = options.defaultShader;
