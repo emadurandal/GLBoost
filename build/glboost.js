@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 6c569d34
+// This revision is the commit right after the SHA: c78043b4
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16947,6 +16947,12 @@ class GLTF2Loader {
     // Texture
     this._loadDependenciesOfTextures(gltfJson);
 
+    // Accessor
+    this._loadDependenciesOfAccessors(gltfJson);
+
+    // BufferView
+    this._loadDependenciesOfBufferViews(gltfJson);
+
   }
 
   _loadDependenciesOfScenes(gltfJson) {
@@ -16999,6 +17005,8 @@ class GLTF2Loader {
       for (let primitive of mesh.primitives) {
         primitive.materialIndex = primitive.material;
         primitive.material = gltfJson.materials[primitive.materialIndex];
+
+
       }
     }
   }
@@ -17022,7 +17030,7 @@ class GLTF2Loader {
   }
 
   _loadDependenciesOfTextures(gltfJson) {
-    // Material
+    // Texture
     for (let texture of gltfJson.textures) {
       if (texture.sampler) {
         texture.samplerIndex = texture.sampler;
@@ -17034,6 +17042,27 @@ class GLTF2Loader {
       }
     }
   }
+
+  _loadDependenciesOfAccessors(gltfJson) {
+    // Accessor
+    for (let accessor of gltfJson.accessors) {
+      if (accessor.bufferView) {
+        accessor.bufferViewIndex = accessor.bufferView;
+        accessor.bufferView = gltfJson.bufferViews[accessor.bufferViewIndex];
+      }
+    }
+  }
+
+  _loadDependenciesOfBufferViews(gltfJson) {
+    // BufferView
+    for (let bufferView of gltfJson.bufferViews) {
+      if (bufferView.buffer) {
+        bufferView.bufferIndex = bufferView.buffer;
+        bufferView.buffer = gltfJson.buffers[bufferView.bufferIndex];
+      }
+    }
+  }
+
   
 //  _loadTransformationsOfNodes(gltfJson) {  }
 
@@ -17084,11 +17113,13 @@ class GLTF2Loader {
       let bufferInfo = gltfJson.buffers[i];
       if (typeof bufferInfo.uri === 'undefined') {
         resources.buffers[i] = arrayBufferBinary;
+        bufferInfo.buffer = arrayBufferBinary;
       } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
             resources.buffers[i] = arrayBuffer;
+            bufferInfo.buffer = arrayBuffer;
             resolve();
           })
         );
@@ -17097,6 +17128,7 @@ class GLTF2Loader {
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
             (resolve, response)=>{
               resources.buffers[i] = response;
+              bufferInfo.buffer = response;
               resolve();
             },
             (reject, error)=>{
@@ -17159,6 +17191,7 @@ class GLTF2Loader {
           img.crossOrigin = 'Anonymous';
         }
         img.onload = () => {
+          imageJson.image = img;
           resolve(img);
         };
 
