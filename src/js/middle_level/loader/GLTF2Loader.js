@@ -155,6 +155,14 @@ export default class GLTF2Loader {
     // BufferView
     this._loadDependenciesOfBufferViews(gltfJson);
 
+    if (gltfJson.asset === void 0) {
+      gltfJson.asset = {};
+    }
+    if (gltfJson.asset.extras === void 0) {
+      gltfJson.asset.extras = {};
+    }
+    gltfJson.asset.extras.glboostOptions = options;
+
   }
 
   _loadDependenciesOfScenes(gltfJson) {

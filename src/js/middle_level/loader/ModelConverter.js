@@ -53,6 +53,11 @@ export default class ModelConverter {
       }  
     }
 
+    let options = gltfModel.asset.extras.glboostOptions;
+    if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
+      options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+    }
+
     return rootGroup;
   }
 
@@ -85,6 +90,11 @@ export default class ModelConverter {
       let geometry = glBoostContext.createGeometry();
       let glboostMesh = glBoostContext.createMesh(geometry);
       glboostMeshes.push(glboostMesh);
+
+      let options = gltfModel.asset.extras.glboostOptions;
+      if (options.isAllMeshesTransparent) {
+        glboostMeshes.isTransparent = true;
+      }
 
       let _indicesArray = [];
       let _positions = [];
@@ -143,14 +153,14 @@ export default class ModelConverter {
           let material = primitive.material;
   
           let glboostMaterial = null;
-//          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-//            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
-//          } else {
+          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
-//          }
-//          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-//            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
- //         }
+          }
+          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
+          }
           //this._materials.push(glboostMaterial);
   
           let accessor = primitive.attributes.TEXCOORD_0;
@@ -160,11 +170,11 @@ export default class ModelConverter {
           materials.push(glboostMaterial);
         } else {
           let glboostMaterial = null;
-//          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-//            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
-//          } else {
+          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
-//          }
+          }
           if (defaultShader) {
             glboostMaterial.shaderClass = defaultShader;
           } else {
@@ -307,9 +317,17 @@ export default class ModelConverter {
           });
           gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
 
-          // if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-          //   gltfMaterial.states.functions.blendFuncSeparate = [1, 771, 1, 771];
-          // }
+          let enables = [];
+          if (options.isBlend) {
+            enables.push(3042);
+          }
+          if (options.isDepthTest) {
+            enables.push(2929);
+          }
+          gltfMaterial.states.enable = enables; // It means, [gl.BLEND];
+          if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+            gltfMaterial.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+          }
           gltfMaterial.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
         }
       };
@@ -339,6 +357,12 @@ export default class ModelConverter {
 
     if (indices !== null) {
       gltfMaterial.setVertexN(geometry, indices.length);
+    }
+
+    let options = gltfModel.asset.extras.glboostOptions;
+    
+    if (options.defaultShader) {
+      gltfMaterial.shaderClass = options.defaultShader;
     }
   }
 
