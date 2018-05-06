@@ -32,7 +32,12 @@ export default class ModelConverter {
   }
 
   convertToGLBoostModel(gltfModel) {
-    //gltfModel.
+    
+    for (accessor of gltfModel.accessors) {
+      this._accessBinaryWithAccessor(accessor)
+    }
+
+    return gltfModel;
   }
 
   _adjustByteAlign(typedArrayClass, arrayBuffer, alignSize, byteOffset, length) {
@@ -128,7 +133,7 @@ export default class ModelConverter {
     return dataViewMethod;
   }
   
-  _accessBinaryWithAccessor(accessor, json, quaternionIfVec4 = false, toGetAsTypedArray = false) {
+  _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
     var byteOffset = bufferView.byteOffset + accessor.byteOffset;
     var bufferStr = bufferView.buffer;
@@ -143,7 +148,7 @@ export default class ModelConverter {
 
     var vertexAttributeArray = [];
 
-    if (toGetAsTypedArray) {
+    if (accessor.extras && accessor.extras.toGetAsTypedArray) {
       if (GLTFLoader._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
@@ -227,7 +232,7 @@ export default class ModelConverter {
             ));
             break;
           case 'VEC4':
-            if (quaternionIfVec4) {
+            if (accessor.extras && accessor.extras.quaternionIfVec4) {
               vertexAttributeArray.push(new Quaternion(
                 dataView[dataViewMethod](pos, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),

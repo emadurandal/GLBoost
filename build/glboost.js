@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 21279900
+// This revision is the commit right after the SHA: 96de9ab5
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -16996,7 +16996,7 @@ class GLTF2Loader {
 
     }
 
- 
+
   }
   
   _loadDependenciesOfMeshes(gltfJson) {
@@ -17008,7 +17008,12 @@ class GLTF2Loader {
 
         primitive.attributesindex = Object.assign({}, primitive.attributes);
         for (let attributeName in primitive.attributesindex) {
-          primitive.attributes[attributeName] = gltfJson.accessors[primitive.attributesindex[attributeName]];
+          let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+          accessor.extras = {
+            toGetAsTypedArray: true
+          };
+          primitive.attributes[attributeName] = accessor;
+
         }
 
         if (primitive.indices) {
@@ -17275,7 +17280,12 @@ class ModelConverter {
   }
 
   convertToGLBoostModel(gltfModel) {
-    //gltfModel.
+    
+    for (accessor of gltfModel.accessors) {
+      this._accessBinaryWithAccessor(accessor);
+    }
+
+    return gltfModel;
   }
 
   _adjustByteAlign(typedArrayClass, arrayBuffer, alignSize, byteOffset, length) {
@@ -17371,7 +17381,7 @@ class ModelConverter {
     return dataViewMethod;
   }
   
-  _accessBinaryWithAccessor(accessor, json, quaternionIfVec4 = false, toGetAsTypedArray = false) {
+  _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
     var byteOffset = bufferView.byteOffset + accessor.byteOffset;
     var bufferStr = bufferView.buffer;
@@ -17386,7 +17396,7 @@ class ModelConverter {
 
     var vertexAttributeArray = [];
 
-    if (toGetAsTypedArray) {
+    if (accessor.extras && accessor.extras.toGetAsTypedArray) {
       if (GLTFLoader._isSystemLittleEndian()) {
         if (dataViewMethod === 'getFloat32') {
           vertexAttributeArray = this._adjustByteAlign(Float32Array, arrayBuffer, 4, byteOffset, byteLength / bytesPerComponent);
@@ -17470,7 +17480,7 @@ class ModelConverter {
             ));
             break;
           case 'VEC4':
-            if (quaternionIfVec4) {
+            if (accessor.extras && accessor.extras.quaternionIfVec4) {
               vertexAttributeArray.push(new Quaternion(
                 dataView[dataViewMethod](pos, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),

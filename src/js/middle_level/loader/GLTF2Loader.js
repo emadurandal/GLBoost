@@ -199,7 +199,7 @@ export default class GLTF2Loader {
 
     }
 
- 
+
   }
   
   _loadDependenciesOfMeshes(gltfJson) {
@@ -211,7 +211,12 @@ export default class GLTF2Loader {
 
         primitive.attributesindex = Object.assign({}, primitive.attributes);
         for (let attributeName in primitive.attributesindex) {
-          primitive.attributes[attributeName] = gltfJson.accessors[primitive.attributesindex[attributeName]];
+          let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+          accessor.extras = {
+            toGetAsTypedArray: true
+          };
+          primitive.attributes[attributeName] = accessor;
+
         }
 
         if (primitive.indices) {
