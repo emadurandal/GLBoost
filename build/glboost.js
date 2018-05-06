@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 2c976661
+// This revision is the commit right after the SHA: 5bb5b3d8
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1104,7 +1104,7 @@ class Vector2$1 {
 
 GLBoost$1["Vector2"] = Vector2$1;
 
-class Vector4$1 {
+class Vector4 {
 
   constructor(x, y, z, w) {
     this.x = x;
@@ -1122,14 +1122,14 @@ class Vector4$1 {
   }
 
   clone() {
-    return new Vector4$1(this.x, this.y, this.z, this.w);
+    return new Vector4(this.x, this.y, this.z, this.w);
   }
 
   /**
    * Zero Vector
    */
   static zero() {
-    return new Vector4$1(0, 0, 0, 1);
+    return new Vector4(0, 0, 0, 1);
   }
 
   length() {
@@ -1145,7 +1145,7 @@ class Vector4$1 {
 
   static normalize(vec4) {
     var length = vec4.length();
-    var newVec = new Vector4$1(vec4.x, vec4.y, vec4.z, vec4.w);
+    var newVec = new Vector4(vec4.x, vec4.y, vec4.z, vec4.w);
     newVec.divide(length);
 
     return newVec;
@@ -1172,7 +1172,7 @@ class Vector4$1 {
    * add value（static version）
    */
   static add(lv, rv) {
-    return new Vector4$1(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
+    return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
   }
 
   /**
@@ -1190,7 +1190,7 @@ class Vector4$1 {
    * add value except w component（static version）
    */
   static addWithOutW(lv, rv) {
-    return new Vector4$1(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
+    return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
   }
 
   multiply(val) {
@@ -1212,11 +1212,11 @@ class Vector4$1 {
   }
 
   static multiply(vec4, val) {
-    return new Vector4$1(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
+    return new Vector4(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
   }
 
   static multiplyVector(vec4, vec) {
-    return new Vector4$1(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
+    return new Vector4(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
   }
 
 
@@ -1232,7 +1232,7 @@ class Vector4$1 {
 
   static divide(vec4, val) {
     console.assert(val != 0, "0 division!");
-    return new Vector4$1(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+    return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
   }
 
   divideVector(vec4) {
@@ -1245,7 +1245,7 @@ class Vector4$1 {
   }
 
   static divideVector(lvec4, rvec4) {
-    return new Vector4$1(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
+    return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
   }
 
   at(i) {
@@ -1262,7 +1262,7 @@ class Vector4$1 {
   }
 }
 
-GLBoost$1["Vector4"] = Vector4$1;
+GLBoost$1["Vector4"] = Vector4;
 
 class Vector3$1 {
 
@@ -1501,7 +1501,7 @@ class Vector3$1 {
 
 
   toVector4() {
-    return new Vector4$1(this.x, this.y, this.z, 1.0);
+    return new Vector4(this.x, this.y, this.z, 1.0);
   }
 
   toString() {
@@ -2377,7 +2377,7 @@ class Matrix44$1$1 {
     var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
     var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
 
-    return new Vector4$1(x, y, z, w);
+    return new Vector4(x, y, z, w);
   }
 
   /**
@@ -3010,7 +3010,7 @@ class MathUtil {
   static arrayToVector(element) {
     if (Array.isArray(element)) {
       if(typeof(element[3]) !== 'undefined') {
-        return new Vector4$1(element[0], element[1], element[2], element[3]);
+        return new Vector4(element[0], element[1], element[2], element[3]);
       } else if (typeof(element[2]) !== 'undefined') {
         return new Vector3$1(element[0], element[1], element[2]);
       } else {
@@ -3038,7 +3038,7 @@ class MathUtil {
       return [element.x, element.y];
     } else if (element instanceof Vector3$1) {
       return [element.x, element.y, element.z];
-    } else if (element instanceof Vector4$1 || element instanceof Quaternion$1) {
+    } else if (element instanceof Vector4 || element instanceof Quaternion$1) {
       return [element.x, element.y, element.z, element.w];
     } else {
       return element;
@@ -3050,7 +3050,7 @@ class MathUtil {
       return 2;
     } else if (element instanceof Vector3$1) {
       return 3;
-    } else if (element instanceof Vector4$1 || element instanceof Quaternion$1) {
+    } else if (element instanceof Vector4 || element instanceof Quaternion$1) {
       return 4;
     } else if (Array.isArray(element)) {
       return element.length;
@@ -3185,7 +3185,7 @@ class L_Element extends GLBoostObject {
       outputComponentN = 2;
     } else if (outputArray[0] instanceof Vector3$1) {
       outputComponentN = 3;
-    } else if (outputArray[0] instanceof Vector4$1) {
+    } else if (outputArray[0] instanceof Vector4) {
       outputComponentN = 4;
     } else if (outputArray[0] instanceof Quaternion$1) {
       outputComponentN = 4;
@@ -5612,10 +5612,10 @@ class DrawKickerLocal {
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
           let cameraPosInLocalCoord = null;
           if (camera) {
-            let cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4$1(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
-            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4$1(cameraPos.x, cameraPos.y, cameraPos.z, 1));
+            let cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
           } else {
-            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4$1(0, 0, 1, 1));
+            cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
           }
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
         }
@@ -5625,11 +5625,11 @@ class DrawKickerLocal {
             let lightVec = null;
             let isPointLight = -9999;
             if (lights[j] instanceof M_PointLight) {
-              lightVec = new Vector4$1(0, 0, 0, 1);
+              lightVec = new Vector4(0, 0, 0, 1);
               lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j].className === 'M_DirectionalLight') {
-              lightVec = new Vector4$1(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+              lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
               isPointLight = 0.0;
@@ -5779,9 +5779,9 @@ class DrawKickerWorld {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
         
         if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-          let cameraPos = new Vector4$1(0, 0, 1, 1);
+          let cameraPos = new Vector4(0, 0, 1, 1);
           if (camera) {
-            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4$1(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
           //  console.log(cameraPos);
           }
           material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
@@ -5790,8 +5790,8 @@ class DrawKickerWorld {
         for (let j = 0; j < lights.length; j++) {
           let light = lights[j];
           if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-            let lightPosition = new Vector4$1(0, 0, 0, 1);            
-            let lightDirection = new Vector4$1(0, 0, 0, 1);
+            let lightPosition = new Vector4(0, 0, 0, 1);            
+            let lightDirection = new Vector4(0, 0, 0, 1);
             // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
             let lightType = 0.0; // M_DirectionalLight
             if (light.className === 'M_PointLight') {
@@ -6109,14 +6109,14 @@ class AABB {
      }
     var newAabb = new AABB();
 
-    let AABB_0 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-    let AABB_1 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-    let AABB_2 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-    let AABB_3 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-    let AABB_4 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-    let AABB_5 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-    let AABB_6 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-    let AABB_7 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+    let AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+    let AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+    let AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+    let AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+    let AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+    let AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+    let AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+    let AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
     newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
     newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
     newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
@@ -6249,7 +6249,7 @@ class FreeShader extends Shader {
         this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, true);
       } else if (value instanceof Vector3$1) {
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, true);
-      } else if (value instanceof Vector4$1) {
+      } else if (value instanceof Vector4) {
         this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
       }
     }
@@ -7376,7 +7376,7 @@ class AbstractTexture extends GLBoostObject {
     this._textureUnitIndex = 0;
 
     // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
-    this._uvTransform = new Vector4$1(1, 1, 0, 0);
+    this._uvTransform = new Vector4(1, 1, 0, 0);
   }
 
   /**
@@ -7464,7 +7464,7 @@ class AbstractTexture extends GLBoostObject {
       byteArray = this.getTexturePixelData();
     }
 
-    let color = new Vector4$1(
+    let color = new Vector4(
       byteArray[(y*this.width + x) * 4+0],
       byteArray[(y*this.width + x) * 4+1],
       byteArray[(y*this.width + x) * 4+2],
@@ -7955,10 +7955,10 @@ class L_AbstractMaterial extends GLBoostObject {
     this._texturePurposeDic = [];
     this._textureContributionRateDic = {};
     this._gl = this._glContext.gl;
-    this._baseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
-    this._diffuseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
-    this._specularColor = new Vector4$1(0.5, 0.5, 0.5, 1.0);
-    this._ambientColor = new Vector4$1(0.25, 0.25, 0.25, 1.0);
+    this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
+    this._ambientColor = new Vector4(0.25, 0.25, 0.25, 1.0);
     this._name = '';
     this._shaderClass = DecalShader;
     this._shaderInstance = null;
@@ -8052,7 +8052,7 @@ class L_AbstractMaterial extends GLBoostObject {
     this._textureDic[texture.userFlavorName] = texture;
     let index = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     this._texturePurposeDic[index] = texture.userFlavorName;
-    this._textureContributionRateDic[texture.userFlavorName] = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+    this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._updateCount();
   }
 
@@ -9336,9 +9336,9 @@ class L_CameraController extends GLBoostObject {
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
       let mat = camera.inverseWorldMatrixWithoutMySelf;
-      newEyeVec = mat.multiplyVector(new Vector4$1(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
-      newCenterVec = mat.multiplyVector(new Vector4$1(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
-      newUpVec = mat.multiplyVector(new Vector4$1(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+      newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
+      newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
+      newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
     } else {
       newUpVec = upVec;
     }
@@ -9970,35 +9970,35 @@ class Cube extends Geometry {
       new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z)
     ];
     var colors = [
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-      new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+      new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
     ];
     var texcoords = [
       new Vector2$1(0.0, 0.0),
@@ -10077,7 +10077,7 @@ class Cube extends Geometry {
 
 GLBoost$1["Cube"] = Cube;
 
-class ArrayUtil$1 {
+class ArrayUtil {
 
   constructor() {
 
@@ -10138,7 +10138,7 @@ class Plane extends Geometry {
     }
 
     var colors = [];
-    var vertexColor = new Vector4$1(1, 1, 1, 1);
+    var vertexColor = new Vector4(1, 1, 1, 1);
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         colors.push(vertexColor);
@@ -10172,7 +10172,7 @@ class Plane extends Geometry {
       normal: normals
     };
 
-    var completeAttributes = ArrayUtil$1.merge(object, customVertexAttributes);
+    var completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
     this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
   }
 
@@ -10199,7 +10199,7 @@ class Sphere extends Geometry {
     var normals = [];
 
     if (!vertexColor) {
-      vertexColor = new Vector4$1(1, 1, 1, 1);
+      vertexColor = new Vector4(1, 1, 1, 1);
     }
 
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
@@ -10291,16 +10291,16 @@ class Axis extends Geometry {
 
     let colors = [
       // X Axis
-      new Vector4$1(1, 0, 0, 1),
-      new Vector4$1(1, 0, 0, 1),
+      new Vector4(1, 0, 0, 1),
+      new Vector4(1, 0, 0, 1),
 
       // Y Axis
-      new Vector4$1(0, 1, 0, 1),
-      new Vector4$1(0, 1, 0, 1),
+      new Vector4(0, 1, 0, 1),
+      new Vector4(0, 1, 0, 1),
 
       // Z Axis
-      new Vector4$1(0, 0, 1, 1),
-      new Vector4$1(0, 0, 1, 1),
+      new Vector4(0, 0, 1, 1),
+      new Vector4(0, 0, 1, 1),
     ];
 
     this.setVerticesData({
@@ -10456,7 +10456,7 @@ class Particle extends Geometry {
     if (needDefaultWhiteColor) {
       this.colors = [];
       let colors = this.colors;
-      var vertexColor = new Vector4$1(1, 1, 1, 1);
+      var vertexColor = new Vector4(1, 1, 1, 1);
       for (let i=0; i<positionArray.length; i++) {
         for (let j=0; j<4; j++) {
           colors.push(vertexColor);
@@ -10465,8 +10465,8 @@ class Particle extends Geometry {
       object.color = colors;
     }
 
-    var tempAttributes = ArrayUtil$1.merge(object, pointData);
-    var completeAttributes = ArrayUtil$1.merge(tempAttributes, customVertexAttributes);
+    var tempAttributes = ArrayUtil.merge(object, pointData);
+    var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
     return {
       vertexAttributes: completeAttributes,
@@ -10538,8 +10538,8 @@ class Particle extends Geometry {
       object.color = this.colors;
     }
 
-    var tempAttributes = ArrayUtil$1.merge(object, pointData);
-    var completeAttributes = ArrayUtil$1.merge(tempAttributes, customVertexAttributes);
+    var tempAttributes = ArrayUtil.merge(object, pointData);
+    var completeAttributes = ArrayUtil.merge(tempAttributes, customVertexAttributes);
 
     return {
       vertexAttributes: completeAttributes,
@@ -10669,7 +10669,7 @@ class Screen extends Geometry {
       normal: normals
     };
 
-    let completeAttributes = ArrayUtil$1.merge(object, customVertexAttributes);
+    let completeAttributes = ArrayUtil.merge(object, customVertexAttributes);
     this.setVerticesData(completeAttributes, [indices], GLBoost$1.TRIANGLE_STRIP);
   }
 
@@ -10696,7 +10696,7 @@ class Screen extends Geometry {
       indices.push(degenerate_left_index);
     }
 
-    let vertexColor = new Vector4$1(1, 1, 1, 1);
+    let vertexColor = new Vector4(1, 1, 1, 1);
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         colors.push(vertexColor);
@@ -11057,7 +11057,7 @@ class M_Mesh extends M_Element {
     let componentN = this._geometry._vertices.components.position;
     let length = positions.length / componentN;
     for (let i=0; i<length; i++) {
-      let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+      let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
       let transformedPosVec = mat.multiplyVector(posVector4);
       positions[i*componentN] = transformedPosVec.x;
       positions[i*componentN+1] = transformedPosVec.y;
@@ -11089,7 +11089,7 @@ class M_Mesh extends M_Element {
     let componentN = this._geometry._vertices.components.position;
     let length = positions.length / componentN;
     for (let i=0; i<length; i++) {
-      let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+      let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
       let transformedPosVec = invMat.multiplyVector(posVector4);
       positions[i*componentN] = transformedPosVec.x;
       positions[i*componentN+1] = transformedPosVec.y;
@@ -11311,35 +11311,35 @@ class CubeAbsolute extends Geometry {
     ];
     if (vertexColor) {
       const colors = [
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
       ];
     }
 
@@ -12180,7 +12180,7 @@ class RenderPass extends GLBoostObject {
       height = this._renderTargetDepthTexture.height;
     }
     if (typeof width !== 'undefined' && typeof height !== 'undefined') {
-      this._viewport = new Vector4$1(0, 0, width, height);
+      this._viewport = new Vector4(0, 0, width, height);
       return true;
     } else {
       return false;
@@ -12582,7 +12582,7 @@ class JointPrimitive extends Geometry {
     super(glBoostContext);
 
     this._colors = [];
-    this.color = new Vector4$1(1, 1, 1, 1);
+    this.color = new Vector4(1, 1, 1, 1);
     this._worldPositionOfThisJoint = new Vector3$1(0, 0, 1);
     this._worldPositionOfParentJoint = new Vector3$1(0, 0, 0);
     this._vertexData = this._setupVertexData();
@@ -12732,7 +12732,7 @@ class M_JointGizmo extends M_Gizmo {
 
     this.isVisible = false;
 
-    this.baseColor = new Vector4$1(0.0, 1.0, 1.0, 0.25);
+    this.baseColor = new Vector4(0.0, 1.0, 1.0, 0.25);
   }
 
   _init(glBoostContext, joint, length) {
@@ -13092,7 +13092,7 @@ class M_SkeletalMesh extends M_Mesh {
   get rootJointsWorldPosition() {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].worldMatrix;
-      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4$1.zero()).toVector3();
+      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
     return Vector3$1.zero();
@@ -13102,7 +13102,7 @@ class M_SkeletalMesh extends M_Mesh {
   getRootJointsWorldPositionAt(inputValue) {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].getWorldMatrixAt(inputValue);
-      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4$1.zero()).toVector3();
+      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
 
@@ -13380,7 +13380,7 @@ class M_Scene extends M_Group {
     this._lightsExceptAmbient = [];
     this._ambientLights = [];    
     this._cameras = [];
-    this._accumulatedAmbientIntensity = Vector4$1.zero();
+    this._accumulatedAmbientIntensity = Vector4.zero();
     
   }
 
@@ -13554,7 +13554,7 @@ class M_Scene extends M_Group {
   }
 
   updateAmountOfAmbientLightsIntensity() {
-    this._accumulatedAmbientIntensity = Vector4$1.zero();
+    this._accumulatedAmbientIntensity = Vector4.zero();
     for (let light of this._ambientLights) {
       this._accumulatedAmbientIntensity.add(light.intensity);
     }
@@ -14188,7 +14188,7 @@ class M_DirectionalLightGizmo extends M_Gizmo {
 
     this.isVisible = false;
 
-    this.baseColor = new Vector4$1(0.8, 0.8, 0, 1);
+    this.baseColor = new Vector4(0.8, 0.8, 0, 1);
   }
 
   _init(glBoostContext, length) {
@@ -14441,7 +14441,7 @@ class Grid extends Geometry {
 GLBoost$1["Grid"] = Grid;
 
 class M_GridGizmo extends M_Gizmo {
-  constructor(glBoostContext, length, division, isXZ = true, isXY = false, isYZ = false, colorVec = new Vector4$1(0.5, 0.5, 0.5, 1)) {
+  constructor(glBoostContext, length, division, isXZ = true, isXY = false, isYZ = false, colorVec = new Vector4(0.5, 0.5, 0.5, 1)) {
     super(glBoostContext, null, null);
     this._init(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
   }
@@ -14776,7 +14776,7 @@ class PhongShader extends DecalShader {
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
     this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
 
-    let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
   }
@@ -15552,7 +15552,7 @@ class LambertShader extends DecalShader {
     let Ka = material.ambientColor;    
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
     
-    let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
 
   }
@@ -15959,7 +15959,7 @@ class GLTFLoader {
             group.addChild(light);
           } else if (lightJson.type === 'directional') {
             const color = lightJson.directional.color;
-            let lightDir = new Vector4$1(0, 0, -1, 1);
+            let lightDir = new Vector4(0, 0, -1, 1);
             const matrix = new Matrix44$1$1(nodeJson.matrix, true);
             lightDir = matrix.multiplyVector(lightDir);
             light = glBoostContext.createDirectionalLight(new Vector3$1(color[0], color[1], color[2]), lightDir.toVector3());
@@ -16123,7 +16123,7 @@ class GLTFLoader {
         if (defaultShader) {
           material.shaderClass = defaultShader;
         } else {
-          material.baseColor = new Vector4$1(0.5, 0.5, 0.5, 1);
+          material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
         }
         materials.push(material);
       }
@@ -16235,7 +16235,7 @@ class GLTFLoader {
       _indicesArray = null;
     }
 
-    geometry.setVerticesData(ArrayUtil$1.merge(vertexData, additional), _indicesArray);
+    geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
     geometry.materials = materials;
 
     return mesh;
@@ -16331,7 +16331,7 @@ class GLTFLoader {
     for (let valueName in materialJson.values) {
       let value = materialJson.values[valueName];
       if (typeof value !== 'string') {
-        material[valueName + 'Color'] = new Vector4$1(value[0], value[1], value[2], value[3]);
+        material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
       }
     }
 
@@ -16423,7 +16423,7 @@ class GLTFLoader {
             uniforms[uniformName] = new Vector3$1(value[0], value[1], value[2]);
             break;
           case 35666:
-            uniforms[uniformName] = new Vector4$1(value[0], value[1], value[2], value[3]);
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
             break;
           case 5124:
             uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
@@ -16435,7 +16435,7 @@ class GLTFLoader {
             uniforms[uniformName] = new Vector3$1(value[0], value[1], value[2]);
             break;
           case 35669:
-            uniforms[uniformName] = new Vector4$1(value[0], value[1], value[2], value[3]);
+            uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
             break;
           case 35678:
             uniforms[uniformName] = 'TEXTURE';
@@ -16782,7 +16782,7 @@ class GLTFLoader {
                 dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
               ));
             } else {
-              vertexAttributeArray.push(new Vector4$1(
+              vertexAttributeArray.push(new Vector4(
                 dataView[dataViewMethod](pos, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
@@ -17302,11 +17302,11 @@ class ModelConverter {
       this._accessBinaryWithAccessor(accessor);
     }
 
-    // Hierarchy
-    let groups = this._setupHierarchy(glBoostContext, gltfModel);
-
     // Mesh data
-    this._setupMesh(glBoostContext, gltfModel, groups);
+    let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
+
+    // Hierarchy
+    let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -17319,7 +17319,7 @@ class ModelConverter {
     return rootGroup;
   }
 
-  _setupHierarchy(glBoostContext, gltfModel) {
+  _setupHierarchy(glBoostContext, gltfModel, glboostMeshes) {
     let groups = [];
     for (let node_i in gltfModel.nodes) {
       let group = glBoostContext.createGroup();
@@ -17334,7 +17334,7 @@ class ModelConverter {
           parentGroup.addChild(childGroup);
           if (node.mesh) {
             parentGroup.addChild(node.mesh);
-            parentGroup._mesh = mesh;  
+            parentGroup.addChild(glboostMeshes[meshIndex]);
           }
         }  
       }
@@ -17342,15 +17342,13 @@ class ModelConverter {
     return groups;
   }
 
-  _setupMesh(glBoostContext, gltfModel, groups) {
-    for (let group of groups) {
-      let mesh = group._mesh;
-      if (mesh === void 0) {
-        continue;
-      }
+  _setupMesh(glBoostContext, gltfModel) {
+    let glboostMeshes = [];
+    for (let mesh of gltfModel.meshes) {
 
       let geometry = glBoostContext.createGeometry();
       let glboostMesh = glBoostContext.createMesh(geometry);
+      glboostMeshes.push(glboostMesh);
 
       let _indicesArray = [];
       let _positions = [];
@@ -17406,22 +17404,22 @@ class ModelConverter {
         if (primitive.material) {
           var texcoords = null;
   
-          let material = primitiveJson.material;
+          let material = primitive.material;
   
           let glboostMaterial = null;
-          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
-          } else {
+//          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+//            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+//          } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
-          }
-          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
-          }
-          this._materials.push(glboostMaterial);
+//          }
+//          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+//            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
+ //         }
+          //this._materials.push(glboostMaterial);
   
           let accessor = primitive.attributes.TEXCOORD_0;
 
-          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
+          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i);
   
           materials.push(glboostMaterial);
         } else {
@@ -17440,9 +17438,9 @@ class ModelConverter {
         }
       }
 
-      if (meshJson.primitives.length > 1) {
+      if (mesh.primitives.length > 1) {
         let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
-        for (let i = 0; i < meshJson.primitives.length; i++) {
+        for (let i = 0; i < mesh.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;
           if (_normals[i]) {
@@ -17483,7 +17481,7 @@ class ModelConverter {
         for (let attribName in dataViewMethodDic) {
           let newTypedArray = getTypedArray(dataViewMethodDic[attribName], lengthDic[attribName]);
           let offset = 0;
-          for (let i = 0; i < meshJson.primitives.length; i++) {
+          for (let i = 0; i < mesh.primitives.length; i++) {
   
             let array = null;
   
@@ -17548,9 +17546,11 @@ class ModelConverter {
       geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
       geometry.materials = materials;
     }
+
+    return glboostMeshes;
   }
 
-  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
+  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i) {
     if (accessor) {
       additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
       vertexData.components.texcoord = accessor.extras.componentN;
@@ -17922,7 +17922,7 @@ phina.namespace(function() {
 
       if (params.fillStyle instanceof Vector3$1) {
         this.fillStyle = `rgb(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},1)`;
-      } else if (params.fillStyle instanceof Vector4$1) {
+      } else if (params.fillStyle instanceof Vector4) {
         this.fillStyle = `rgba(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},${params.fillStyle.w})`;
       } else {
         this.fillStyle = params.fillStyle;
@@ -18047,7 +18047,7 @@ class BlinnPhongShader extends DecalShader {
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
     this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
 
-    let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
   }
@@ -18148,7 +18148,7 @@ class HalfLambertShader extends DecalShader {
     let Ka = material.ambientColor;
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
 
-    let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
   }
 }
@@ -18228,7 +18228,7 @@ class HalfLambertAndWrapLightingShader extends DecalShader {
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_wrap'), this._wrap.x, this._wrap.y, this._wrap.z, true);
 
-    let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+    let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
   }
 

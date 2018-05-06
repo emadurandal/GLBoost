@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
-
+import Vector4 from '../../low_level/math/Vector4';
+import ArrayUtil from '../../low_level/misc/ArrayUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -38,11 +39,11 @@ export default class ModelConverter {
       this._accessBinaryWithAccessor(accessor)
     }
 
-    // Hierarchy
-    let groups = this._setupHierarchy(glBoostContext, gltfModel);
-
     // Mesh data
-    this._setupMesh(glBoostContext, gltfModel, groups);
+    let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
+
+    // Hierarchy
+    let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
     let rootGroup = glBoostContext.createGroup();
 
@@ -55,7 +56,7 @@ export default class ModelConverter {
     return rootGroup;
   }
 
-  _setupHierarchy(glBoostContext, gltfModel) {
+  _setupHierarchy(glBoostContext, gltfModel, glboostMeshes) {
     let groups = [];
     for (let node_i in gltfModel.nodes) {
       let group = glBoostContext.createGroup();
@@ -70,7 +71,7 @@ export default class ModelConverter {
           parentGroup.addChild(childGroup);
           if (node.mesh) {
             parentGroup.addChild(node.mesh);
-            parentGroup._mesh = mesh;  
+            parentGroup.addChild(glboostMeshes[meshIndex]);
           }
         }  
       }
@@ -78,15 +79,13 @@ export default class ModelConverter {
     return groups;
   }
 
-  _setupMesh(glBoostContext, gltfModel, groups) {
-    for (let group of groups) {
-      let mesh = group._mesh;
-      if (mesh === void 0) {
-        continue;
-      }
+  _setupMesh(glBoostContext, gltfModel) {
+    let glboostMeshes = [];
+    for (let mesh of gltfModel.meshes) {
 
       let geometry = glBoostContext.createGeometry();
       let glboostMesh = glBoostContext.createMesh(geometry);
+      glboostMeshes.push(glboostMesh);
 
       let _indicesArray = [];
       let _positions = [];
@@ -142,22 +141,22 @@ export default class ModelConverter {
         if (primitive.material) {
           var texcoords = null;
   
-          let material = primitiveJson.material;
+          let material = primitive.material;
   
           let glboostMaterial = null;
-          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
-          } else {
+//          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+//            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+//          } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
-          }
-          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
-          }
-          this._materials.push(glboostMaterial);
+//          }
+//          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+//            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
+ //         }
+          //this._materials.push(glboostMaterial);
   
           let accessor = primitive.attributes.TEXCOORD_0;
 
-          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, i);
+          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i);
   
           materials.push(glboostMaterial);
         } else {
@@ -176,9 +175,9 @@ export default class ModelConverter {
         }
       }
 
-      if (meshJson.primitives.length > 1) {
+      if (mesh.primitives.length > 1) {
         let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
-        for (let i = 0; i < meshJson.primitives.length; i++) {
+        for (let i = 0; i < mesh.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;
           if (_normals[i]) {
@@ -219,7 +218,7 @@ export default class ModelConverter {
         for (let attribName in dataViewMethodDic) {
           let newTypedArray = getTypedArray(dataViewMethodDic[attribName], lengthDic[attribName]);
           let offset = 0;
-          for (let i = 0; i < meshJson.primitives.length; i++) {
+          for (let i = 0; i < mesh.primitives.length; i++) {
   
             let array = null;
   
@@ -284,9 +283,11 @@ export default class ModelConverter {
       geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
       geometry.materials = materials;
     }
+
+    return glboostMeshes;
   }
 
-  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, i) {
+  _setupMaterial(glBoostContext, gltfModel, gltfMaterial, materialJson, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i) {
     if (accessor) {
       additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
       vertexData.components.texcoord = accessor.extras.componentN;
