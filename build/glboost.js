@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 44f2507e
+// This revision is the commit right after the SHA: 984b040a
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17558,6 +17558,25 @@ class ModelConverter {
           dataViewMethodDic.normal = accessor.extras.dataViewMethod;
         }
 
+        {
+          let accessor = primitive.attributes.JOINTS_0;
+          if (accessor) {
+            additional['joint'][i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.joint = accessor.extras.componentN;
+            vertexData.componentBytes.joint = accessor.extras.componentBytes;
+            vertexData.componentType.joint = accessor.componentType;
+            dataViewMethodDic.joint = accessor.extras.dataViewMethod;
+          }
+          accessor = primitive.attributes.WEIGHTS_0;
+          if (accessor) {
+            additional['weight'][i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.weight = accessor.extras.componentN;
+            vertexData.componentBytes.weight = accessor.extras.componentBytes;
+            vertexData.componentType.weight = accessor.componentType;
+            dataViewMethodDic.weight = accessor.extras.dataViewMethod;
+          }
+        }
+
         if (primitive.material) {
           var texcoords = null;
   
@@ -17576,7 +17595,7 @@ class ModelConverter {
   
           let accessor = primitive.attributes.TEXCOORD_0;
 
-          this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i);
+          texcoords = this._setupMaterial(glBoostContext, gltfModel, glboostMaterial, material, accessor, additional, vertexData, dataViewMethodDic, _positions, indices, geometry, i);
   
           materials.push(glboostMaterial);
         } else {
