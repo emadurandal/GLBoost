@@ -149,6 +149,9 @@ export default class GLTF2Loader {
     // Texture
     this._loadDependenciesOfTextures(gltfJson);
 
+    // Animation
+    this._loadDependenciesOfAnimations(gltfJson);
+
     // Accessor
     this._loadDependenciesOfAccessors(gltfJson);
 
@@ -264,6 +267,27 @@ export default class GLTF2Loader {
         if (texture.source !== void 0) {
           texture.sourceIndex = texture.source;
           texture.image = gltfJson.images[texture.sourceIndex];
+        }
+      }
+    }
+  }
+
+  _loadDependenciesOfAnimations(gltfJson) {
+    if (gltfJson.animations) {
+      for (let animation of gltfJson.animations) {
+        for (let channel of animation.channels) {
+          channel.samplerIndex = channel.sampler;
+          channel.sampler = animation.samplers[channel.samplerIndex];
+          
+          cannnel.target.nodeIndex = cannnel.target.node;
+          cannnel.target.node = gltfJson.nodes[cannnel.target.nodeIndex];          
+        }
+
+        for (let sampler of animation.samplers) {
+          sampler.inputIndex = sampler.input;
+          sampler.outputIndex = sampler.output;
+          sampler.input = gltfJson.accessors[sampler.inputIndex];
+          sampler.output = gltfJson.accessors[sampler.outputIndex];
         }
       }
     }
