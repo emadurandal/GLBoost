@@ -64,16 +64,16 @@ export default class ModelConverter {
     }
     for (let node_i in gltfModel.nodes) {
       let node = gltfModel.nodes[parseInt(node_i)];
-      if (node.childrenIndices) {
-      for (let childNode_i of node.childrenIndices) {
-        let childGroup = groups[childNode_i];
-        let parentGroup = groups[node_i];
-        parentGroup.addChild(childGroup);
-      }  
+      let parentGroup = groups[node_i];
       if (node.mesh) {
-        parentGroup.addChild(glboostMeshes[mesh.meshIndex]);
+        parentGroup.addChild(glboostMeshes[node.meshIndex]);
       }
-    }
+      if (node.childrenIndices) {
+        for (let childNode_i of node.childrenIndices) {
+          let childGroup = groups[childNode_i];
+          parentGroup.addChild(childGroup);
+        }  
+      }
     }
     return groups;
   }
