@@ -135,12 +135,16 @@ export default class GLTF2Loader {
     // Scene
     this._loadDependenciesOfScenes(gltfJson);
 
-    // Node hierarchy
+    // Node
     this._loadDependenciesOfNodes(gltfJson);
 
     // Node Transformation
 //    this._loadTransformationsOfNodes(gltfJson);
-    
+
+    // Mesh
+    this._loadDependenciesOfMeshes(gltfJson);
+
+
   }
 
   _loadDependenciesOfScenes(gltfJson) {
@@ -167,12 +171,6 @@ export default class GLTF2Loader {
       if (node.meshIndex && gltfJson.meshes !== void 0) {
         node.mesh = gltfJson.meshes[node.meshIndex];
 
-        // Material
-        for (primitive of node.mesh.primitives) {
-          primitive.materialIndex = primitive.material;
-          primitive.material = gltfJson.materials[primitive.materialIndex];
-        }
-
       }
 
       // Skin
@@ -192,6 +190,15 @@ export default class GLTF2Loader {
  
   }
   
+  _loadDependenciesOfMeshes(gltfJson) {
+    // Material
+    for (let mesh of gltfJson.meshes) {
+      for (let primitive of mesh.primitives) {
+        primitive.materialIndex = primitive.material;
+        primitive.material = gltfJson.materials[primitive.materialIndex];
+      }
+    }
+  }
   
 //  _loadTransformationsOfNodes(gltfJson) {  }
 
