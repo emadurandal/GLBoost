@@ -27,9 +27,26 @@ export default class M_Group extends M_Element {
    * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
    */
   addChild(element) {
-    this.removeChild(element);
-    element._parent = this;
-    this._elements.push(element);
+    { 
+      //// if forbit duplicated register
+      // this.removeChild(element);
+      // element._parent = this;
+      // this._elements.push(element);
+
+    }
+
+    {
+
+      // if forgive duplicated register by copy
+      let elem = null;
+      if (element._parent) {
+        elem = element.clone();
+      } else {
+        elem = element;
+      }
+      elem._parent = this;
+      this._elements.push(elem);
+    }
   }
 
   /**
