@@ -31,19 +31,22 @@ export default class ModelConverter {
     return this[singleton];
   }
 
-  convertToGLBoostModel(gltfModel) {
+  convertToGLBoostModel(glBoostContext, gltfModel) {
     
     for (accessor of gltfModel.accessors) {
       this._accessBinaryWithAccessor(accessor)
     }
 
-    this._setupMeshGeometries(gltfModel);
+    this._setupMeshGeometries(glBoostContext, gltfModel);
 
     return gltfModel;
   }
 
-  _setupMeshGeometries(gltfModel) {
+  _setupMeshGeometries(glBoostContext, gltfModel) {
     for (let mesh of gltfModel.meshes) {
+      
+      geometry = glBoostContext.createGeometry();
+      glboostMesh = glBoostContext.createMesh(geometry);
 
       let _indicesArray = [];
       let _positions = [];
@@ -62,22 +65,204 @@ export default class ModelConverter {
       };
 
       let dataViewMethodDic = {};
+      let materials = [];
+      let indicesAccumulatedLength = 0;
 
       for (let i in mesh.primitives) {
         let primitive = mesh.primitives[i];
-        for (let attributeName in primitive.attributes) {
-          let accessor =  primitive.attributes[attributeName];
-
-          if (attributeName === 'POSITION') {
-            _positions[i] = accessor.extras.vertexAttributeArray;
-            vertexData.components.position = accessor.extras.componentN;
-            vertexData.componentBytes.position = accessor.extras.componentBytes;
-            vertexData.componentType.position = accessor.componentType;
-            dataViewMethodDic.position = accessor.extras.dataViewMethod;
+        {
+          let accessor = primitive.attributes.POSITION;
+          _positions[i] = accessor.extras.vertexAttributeArray;
+          vertexData.components.position = accessor.extras.componentN;
+          vertexData.componentBytes.position = accessor.extras.componentBytes;
+          vertexData.componentType.position = accessor.componentType;
+          dataViewMethodDic.position = accessor.extras.dataViewMethod;
+        }
+          
+        let indices = null;
+        if (typeof primitive.indices !== 'undefined') {
+          let indicesAccessorStr = primitive.indices;
+          indices = primitive.indices
+          for (let j=0; j<indices.length; j++) {
+            indices[j] = indicesAccumulatedLength + indices[j];
           }
+          _indicesArray[i] = indices;
+          indicesAccumulatedLength += _positions[i].length /  vertexData.components.position;
+        }
 
+        {
+          let accessor = primitive.attributes.NORMAL;
+          _normals[i] = accessor.extras.vertexAttributeArray;
+          vertexData.components.normal = accessor.extras.componentN;
+          vertexData.componentBytes.normal = accessor.extras.componentBytes;
+          vertexData.componentType.normal = accessor.componentType;
+          dataViewMethodDic.normal = accessor.extras.dataViewMethod;
+        }
+
+        if (primitive.material) {
+          var texcoords = null;
+  
+          let material = primitiveJson.material;
+  
+          let glboostMaterial = null;
+          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          } else {
+            glboostMaterial = glBoostContext.createClassicMaterial();
+          }
+          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+            glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
+          }
+          this._materials.push(glboostMaterial);
+  
+          let accessor = primitive.attributes.TEXCOORD_0;
+          if (accessor) {
+            additional['texcoord'][i] =  accessor.extras.vertexAttributeArray;
+            vertexData.components.texcoord = accessor.extras.componentN;
+            vertexData.componentBytes.texcoord = accessor.extras.componentBytes;
+            vertexData.componentType.texcoord = accessor.componentType;
+            dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;  
+          } else {
+            if (typeof vertexData.components.texcoord !== 'undefined') {
+              // If texture coordinates existed even once in the previous loop
+              let emptyTexcoords = [];
+              let componentN = vertexData.components.position;
+              let length = _positions[i].length / componentN;
+              for (let k = 0; k < length; k++) {
+                emptyTexcoords.push(0);
+                emptyTexcoords.push(0);
+              }
+              additional['texcoord'][i] = new Float32Array(emptyTexcoords);
+              vertexData.components.texcoord = 2;
+              vertexData.componentBytes.texcoord = 4;
+              dataViewMethodDic.texcoord = 'getFloat32';
+            }
+          }
+  
+          materials.push(glboostMaterial);
+        } else {
+          let glboostMaterial = null;
+          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          } else {
+            glboostMaterial = glBoostContext.createClassicMaterial();
+          }
+          if (defaultShader) {
+            glboostMaterial.shaderClass = defaultShader;
+          } else {
+            glboostMaterial.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+          }
+          materials.push(glboostMaterial);
         }
       }
+
+      if (meshJson.primitives.length > 1) {
+        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+        for (let i = 0; i < meshJson.primitives.length; i++) {
+          //lengthDic.index += _indicesArray[i].length;
+          lengthDic.position += _positions[i].length;
+          if (_normals[i]) {
+            lengthDic.normal += _normals[i].length;
+          }
+          if (typeof additional['joint'][i] !== 'undefined') {
+            lengthDic.joint += additional['joint'][i].length;
+          }
+          if (typeof additional['weight'][i] !== 'undefined') {
+            lengthDic.weight += additional['weight'][i].length;
+          }
+          if (typeof additional['texcoord'][i] !== 'undefined') {
+            lengthDic.texcoord += additional['texcoord'][i].length;
+          }
+        }
+  
+        function getTypedArray(dataViewMethod, length) {
+          let vertexAttributeArray = null;
+          if (dataViewMethod === 'getInt8') {
+            vertexAttributeArray = new Int8Array(length);
+          } else if (dataViewMethod === 'getUint8') {
+            vertexAttributeArray = new Uint8Array(length);
+          } else if (dataViewMethod === 'getInt16') {
+            vertexAttributeArray = new Int16Array(length);
+          } else if (dataViewMethod === 'getUint16') {
+            vertexAttributeArray = new Uint16Array(length);
+          } else if (dataViewMethod === 'getInt32') {
+            vertexAttributeArray = new Int32Array(length);
+          } else if (dataViewMethod === 'getUint32') {
+            vertexAttributeArray = new Uint32Array(length);
+          } else if (dataViewMethod === 'getFloat32') {
+            vertexAttributeArray = new Float32Array(length);
+          }
+  
+          return vertexAttributeArray;
+        }
+  
+        for (let attribName in dataViewMethodDic) {
+          let newTypedArray = getTypedArray(dataViewMethodDic[attribName], lengthDic[attribName]);
+          let offset = 0;
+          for (let i = 0; i < meshJson.primitives.length; i++) {
+  
+            let array = null;
+  
+            if (attribName === 'position') {
+              array = _positions[i];
+            } else if (attribName === 'normal') {
+              array = _normals[i];
+            } else if (attribName === 'joint') {
+              array = additional['joint'][i];
+            } else if (attribName === 'weight') {
+              array = additional['weight'][i];
+            } else if (attribName === 'texcoord') {
+              array = additional['texcoord'][i];
+            }
+  
+            if (array) {
+              newTypedArray.set(array, offset);
+              offset += array.length;
+            }
+          }
+  
+          if (attribName === 'position') {
+            vertexData.position = newTypedArray;
+          } else if (attribName === 'normal') {
+            vertexData.normal = newTypedArray;
+          } else if (attribName === 'joint') {
+            additional['joint'] = newTypedArray;
+          } else if (attribName === 'weight') {
+            additional['weight'] = newTypedArray;
+          } else if (attribName === 'texcoord') {
+            additional['texcoord'] = newTypedArray;
+          }
+        }
+  
+  
+      } else {
+        vertexData.position = _positions[0];
+        vertexData.normal = _normals[0];
+        additional['joint'] = additional['joint'][0];
+        additional['weight'] = additional['weight'][0];
+        additional['texcoord'] = additional['texcoord'][0];
+      }
+  
+      if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
+        delete vertexData.normal;
+      }
+      if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
+        delete additional['joint'];
+      }
+      if (typeof additional['weight'] === 'undefined' || additional['weight'].length === 0) {
+        delete additional['weight'];
+      }
+      if (typeof additional['texcoord'] === 'undefined' || additional['texcoord'].length === 0) {
+        delete additional['texcoord'];
+      }
+  
+  
+      if (_indicesArray.length === 0) {
+        _indicesArray = null;
+      }
+  
+      geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
+      geometry.materials = materials;
     }
   }
 
