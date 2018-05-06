@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 175e5d5d
+// This revision is the commit right after the SHA: 9e1fe109
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1078,7 +1078,7 @@ GLBoostObject._morphExistArray = [];
 
 GLBoost$1['GLBoostObject'] = GLBoostObject;
 
-class Vector2$1 {
+class Vector2 {
 
   constructor(x, y) {
     this.x = x;
@@ -1086,7 +1086,7 @@ class Vector2$1 {
   }
 
   clone() {
-    return new Vector2$1(this.x, this.y);
+    return new Vector2(this.x, this.y);
   }
 
   multiply(val) {
@@ -1097,12 +1097,12 @@ class Vector2$1 {
   }
 
   static multiply(vec2, val) {
-    return new Vector2$1(vec2.x * val, vec2.y * val);
+    return new Vector2(vec2.x * val, vec2.y * val);
   }
 
 }
 
-GLBoost$1["Vector2"] = Vector2$1;
+GLBoost$1["Vector2"] = Vector2;
 
 class Vector4 {
 
@@ -1153,7 +1153,7 @@ class Vector4 {
   
 
   toVector3() {
-    return new Vector3$1(this.x, this.y, this.z);
+    return new Vector3(this.x, this.y, this.z);
   }
 
   /**
@@ -1264,7 +1264,7 @@ class Vector4 {
 
 GLBoost$1["Vector4"] = Vector4;
 
-class Vector3$1 {
+class Vector3 {
 
   constructor(x, y, z) {
     this.x = x;
@@ -1284,13 +1284,13 @@ class Vector3$1 {
    * Zero Vector
    */
   static zero() {
-    return new Vector3$1(0, 0, 0);
+    return new Vector3(0, 0, 0);
   }
 
 
 
   clone() {
-    return new Vector3$1(this.x, this.y, this.z);
+    return new Vector3(this.x, this.y, this.z);
   }
 
   length() {
@@ -1371,7 +1371,7 @@ class Vector3$1 {
     var y = lv.z*rv.x - lv.x*rv.z;
     var z = lv.x*rv.y - lv.y*rv.x;
 
-    return new Vector3$1(x, y, z);
+    return new Vector3(x, y, z);
   }
 
   /**
@@ -1389,7 +1389,7 @@ class Vector3$1 {
    */
   static normalize(vec3) {
     var length = vec3.length();
-    var newVec = new Vector3$1(vec3.x, vec3.y, vec3.z);
+    var newVec = new Vector3(vec3.x, vec3.y, vec3.z);
     newVec.divide(length);
 
     return newVec;
@@ -1410,7 +1410,7 @@ class Vector3$1 {
    * add value（static version）
    */
   static add(lv, rv) {
-    return new Vector3$1(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
+    return new Vector3(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z);
   }
 
   /**
@@ -1428,7 +1428,7 @@ class Vector3$1 {
    * 減算（static版）
    */
   static subtract(lv, rv) {
-    return new Vector3$1(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
+    return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
   }
 
   /**
@@ -1448,7 +1448,7 @@ class Vector3$1 {
    */
   static divide(vec3, val) {
     console.assert(val != 0, "0 division!");
-    return new Vector3$1(vec3.x / val, vec3.y / val, vec3.z / val);
+    return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
   }
 
   multiply(val) {
@@ -1468,15 +1468,15 @@ class Vector3$1 {
   }
 
   static multiply(vec3, val) {
-    return new Vector3$1(vec3.x * val, vec3.y * val, vec3.z * val);
+    return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }
 
   static multiplyVector(vec3, vec) {
-    return new Vector3$1(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
+    return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
   }
 
   static angleOfVectors(lhv, rhv) {
-    let cos_sita = Vector3$1.dotProduct(lhv, rhv) / ( lhv.length() * rhv.length() );
+    let cos_sita = Vector3.dotProduct(lhv, rhv) / ( lhv.length() * rhv.length() );
 
     let sita = Math.acos(cos_sita);
 
@@ -1496,7 +1496,7 @@ class Vector3$1 {
   }
 
   static divideVector(lvec3, rvec3) {
-    return new Vector3$1(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
+    return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
   }
 
 
@@ -1517,7 +1517,7 @@ class Vector3$1 {
   }
 }
 
-GLBoost$1['Vector3'] = Vector3$1;
+GLBoost$1['Vector3'] = Vector3;
 
 class Matrix33 {
 
@@ -1787,7 +1787,7 @@ class Matrix33 {
     var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z;
     var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z;
 
-    return new Vector3$1(x, y, z);
+    return new Vector3(x, y, z);
   }
 
   /**
@@ -2000,7 +2000,7 @@ class Matrix33 {
   }
 
   getScale() {
-    return new Vector3$1(
+    return new Vector3(
       Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
       Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
       Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
@@ -2131,7 +2131,7 @@ class Matrix44$1$1 {
   }
 
   getTranslate() {
-    return new Vector3$1(this.m03, this.m13, this.m23);
+    return new Vector3(this.m03, this.m13, this.m23);
   }
 
   static translate(vec) {
@@ -2305,11 +2305,11 @@ class Matrix44$1$1 {
       let y   = -Math.asin(this.m20);
       let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
       let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
-      rotate = new Vector3$1(x, y, z);
+      rotate = new Vector3(x, y, z);
     } else if (this.m20 === -1.0) {
-      rotate = new Vector3$1(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
+      rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
     } else {
-      rotate = new Vector3$1(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+      rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
     }
 
     return rotate;
@@ -2721,7 +2721,7 @@ class Matrix44$1$1 {
   }
 
   getScale() {
-    return new Vector3$1(
+    return new Vector3(
       Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
       Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
       Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
@@ -2731,7 +2731,7 @@ class Matrix44$1$1 {
 
 GLBoost$1["Matrix44"] = Matrix44$1$1;
 
-class Quaternion$1 {
+class Quaternion {
 
   constructor(x, y, z, w) {
     this.x = x;
@@ -2749,16 +2749,16 @@ class Quaternion$1 {
   }
 
   clone() {
-    return new Quaternion$1(this.x, this.y, this.z, this.w);
+    return new Quaternion(this.x, this.y, this.z, this.w);
   }
 
   static invert(quat) {
-    return new Quaternion$1(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
   }
 
   static qlerp(lhq, rhq, ratio) {
 
-    var q = new Quaternion$1(0, 0, 0, 1);
+    var q = new Quaternion(0, 0, 0, 1);
     var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
     var ss = 1.0 - qr * qr;
 
@@ -2826,7 +2826,7 @@ class Quaternion$1 {
     var halfAngle = 0.5 * radian;
     var sin = Math.sin(halfAngle);
 
-    var axis = Vector3$1.normalize(axisVec3);
+    var axis = Vector3.normalize(axisVec3);
     this.w = Math.cos(halfAngle);
     this.x = sin * axis.x;
     this.y = sin * axis.y;
@@ -2845,8 +2845,8 @@ class Quaternion$1 {
     var halfAngle = 0.5 * radian;
     var sin = Math.sin(halfAngle);
 
-    var axis = Vector3$1.normalize(axisVec3);
-    return new Quaternion$1(
+    var axis = Vector3.normalize(axisVec3);
+    return new Quaternion(
       sin * axis.x,
       sin * axis.y,
       sin * axis.z,
@@ -2863,7 +2863,7 @@ class Quaternion$1 {
   }
 
   multiply(q) {
-    let result = new Quaternion$1(0, 0, 0, 1);
+    let result = new Quaternion(0, 0, 0, 1);
     result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
     result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
     result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
@@ -2877,7 +2877,7 @@ class Quaternion$1 {
   }
 
   static multiply(q1, q2) {
-    let result = new Quaternion$1(0, 0, 0, 1);
+    let result = new Quaternion(0, 0, 0, 1);
     result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
     result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
     result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
@@ -2887,7 +2887,7 @@ class Quaternion$1 {
 
   static fromMatrix(m) {
     
-    let q = new Quaternion$1();
+    let q = new Quaternion();
     let tr = m.m00 + m.m11 + m.m22;
 
     if (tr > 0) { 
@@ -2991,7 +2991,7 @@ class Quaternion$1 {
 
 }
 
-GLBoost$1["Quaternion"] = Quaternion$1;
+GLBoost$1["Quaternion"] = Quaternion;
 
 class MathUtil {
 
@@ -3012,9 +3012,9 @@ class MathUtil {
       if(typeof(element[3]) !== 'undefined') {
         return new Vector4(element[0], element[1], element[2], element[3]);
       } else if (typeof(element[2]) !== 'undefined') {
-        return new Vector3$1(element[0], element[1], element[2]);
+        return new Vector3(element[0], element[1], element[2]);
       } else {
-        return new Vector2$1(element[0], element[1]);
+        return new Vector2(element[0], element[1]);
       }
     } else {
       return element;
@@ -3034,11 +3034,11 @@ class MathUtil {
   }
 
   static vectorToArray(element) {
-    if(element instanceof Vector2$1) {
+    if(element instanceof Vector2) {
       return [element.x, element.y];
-    } else if (element instanceof Vector3$1) {
+    } else if (element instanceof Vector3) {
       return [element.x, element.y, element.z];
-    } else if (element instanceof Vector4 || element instanceof Quaternion$1) {
+    } else if (element instanceof Vector4 || element instanceof Quaternion) {
       return [element.x, element.y, element.z, element.w];
     } else {
       return element;
@@ -3046,11 +3046,11 @@ class MathUtil {
   }
 
   static compomentNumberOfVector(element) {
-    if(element instanceof Vector2$1) {
+    if(element instanceof Vector2) {
       return 2;
-    } else if (element instanceof Vector3$1) {
+    } else if (element instanceof Vector3) {
       return 3;
-    } else if (element instanceof Vector4 || element instanceof Quaternion$1) {
+    } else if (element instanceof Vector4 || element instanceof Quaternion) {
       return 4;
     } else if (Array.isArray(element)) {
       return element.length;
@@ -3095,8 +3095,8 @@ class AnimationUtil {
     if (componentN === 1) {
       return start * (1 - ratio) + end * ratio;
     } else {
-      if (start instanceof Quaternion$1) {
-        return Quaternion$1.qlerp(start, end, ratio);
+      if (start instanceof Quaternion) {
+        return Quaternion.qlerp(start, end, ratio);
       } else {
         return start.multiply((1 - ratio)).add(end.multiply(ratio));
       }
@@ -3130,10 +3130,10 @@ class L_Element extends GLBoostObject {
     super(glBoostContext, toRegister);
 
     // Live (Static or Animation)
-    this._translate = Vector3$1.zero();
-    this._scale = new Vector3$1(1, 1, 1);
-    this._rotate = Vector3$1.zero();
-    this._quaternion = new Quaternion$1(0, 0, 0, 1);
+    this._translate = Vector3.zero();
+    this._scale = new Vector3(1, 1, 1);
+    this._rotate = Vector3.zero();
+    this._quaternion = new Quaternion(0, 0, 0, 1);
     this._matrix = Matrix44$1$1.identity();
 
 //    this._finalMatrix = Matrix44.identity();
@@ -3181,13 +3181,13 @@ class L_Element extends GLBoostObject {
 
   setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
     var outputComponentN = 0;
-    if (outputArray[0] instanceof Vector2$1) {
+    if (outputArray[0] instanceof Vector2) {
       outputComponentN = 2;
-    } else if (outputArray[0] instanceof Vector3$1) {
+    } else if (outputArray[0] instanceof Vector3) {
       outputComponentN = 3;
     } else if (outputArray[0] instanceof Vector4) {
       outputComponentN = 4;
-    } else if (outputArray[0] instanceof Quaternion$1) {
+    } else if (outputArray[0] instanceof Quaternion) {
       outputComponentN = 4;
     } else {
       outputComponentN = 1;
@@ -3538,9 +3538,9 @@ class L_Element extends GLBoostObject {
       return this._quaternion;
     } else if (!this._is_quaternion_updated) {
       if (this._is_trs_matrix_updated) {
-        value = Quaternion$1.fromMatrix(this._matrix);
+        value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
-        value = Quaternion$1.fromMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        value = Quaternion.fromMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
@@ -3892,7 +3892,7 @@ class M_Element extends L_Element {
 
   set gizmoScale(scale) {
     for (let gizmo of this._gizmos) {
-      gizmo.scale = new Vector3$1(scale, scale, scale);
+      gizmo.scale = new Vector3(scale, scale, scale);
     }
   }
 
@@ -5803,7 +5803,7 @@ class DrawKickerWorld {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-              lightDirection = new Vector3$1(-light.direction.x, -light.direction.y, -light.direction.z);
+              lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
               //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
               lightDirection.normalize();
             }
@@ -5984,8 +5984,8 @@ GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 class AABB {
 
   constructor() {
-    this._AABB_min = new Vector3$1(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-    this._AABB_max = new Vector3$1(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+    this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+    this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
     this._centerPoint = null;
     this._lengthCenterToCorner = null;
 
@@ -6033,8 +6033,8 @@ class AABB {
   }
 
   updateAllInfo() {
-    this._centerPoint = Vector3$1.add(this._AABB_min, this._AABB_max).divide(2);
-    this._lengthCenterToCorner = Vector3$1.lengthBtw(this._centerPoint, this._AABB_max);
+    this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+    this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
 
     return this;
   }
@@ -6245,9 +6245,9 @@ class FreeShader extends Shader {
 
       if (typeof value === 'number') {
         this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_' + uniformName), value, true);
-      } else if (value instanceof Vector2$1) {
+      } else if (value instanceof Vector2) {
         this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, true);
-      } else if (value instanceof Vector3$1) {
+      } else if (value instanceof Vector3) {
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, true);
       } else if (value instanceof Vector4) {
         this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
@@ -6340,17 +6340,17 @@ class Geometry extends GLBoostObject {
 
   _calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2) {
     let cp0 = [
-      new Vector3$1(
+      new Vector3(
         pos0Vec3.x,
         uv0Vec2.x,
         uv0Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos0Vec3.y,
         uv0Vec2.x,
         uv0Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos0Vec3.z,
         uv0Vec2.x,
         uv0Vec2.y
@@ -6358,17 +6358,17 @@ class Geometry extends GLBoostObject {
     ];
 
     let cp1 = [
-      new Vector3$1(
+      new Vector3(
         pos1Vec3.x,
         uv1Vec2.x,
         uv1Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos1Vec3.y,
         uv1Vec2.x,
         uv1Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos1Vec3.z,
         uv1Vec2.x,
         uv1Vec2.y
@@ -6376,17 +6376,17 @@ class Geometry extends GLBoostObject {
     ];
 
     let cp2 = [
-      new Vector3$1(
+      new Vector3(
         pos2Vec3.x,
         uv2Vec2.x,
         uv2Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos2Vec3.y,
         uv2Vec2.x,
         uv2Vec2.y
       ),
-      new Vector3$1(
+      new Vector3(
         pos2Vec3.z,
         uv2Vec2.x,
         uv2Vec2.y
@@ -6397,53 +6397,53 @@ class Geometry extends GLBoostObject {
     let v = [];
 
     for ( let i = 0; i < 3; i++ ) {
-      let v1 = Vector3$1.subtract(cp1[i], cp0[i]);
-      let v2 = Vector3$1.subtract(cp2[i], cp1[i]);
-      let abc = Vector3$1.cross(v1, v2);
+      let v1 = Vector3.subtract(cp1[i], cp0[i]);
+      let v2 = Vector3.subtract(cp2[i], cp1[i]);
+      let abc = Vector3.cross(v1, v2);
 
       let validate = Math.abs(abc.x) < Number.EPSILON;
       if (validate) {
         console.assert(validate, "Polygons or polygons on UV are degenerate!");
-        return new Vector3$1(0, 0, 0);
+        return new Vector3(0, 0, 0);
       }
 
       u[i] = - abc.y / abc.x;
       v[i] = - abc.z / abc.x;
     }
 
-    return (new Vector3$1(u[0], u[1], u[2])).normalize();
+    return (new Vector3(u[0], u[1], u[2])).normalize();
   }
 
   _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, componentNum3) {
-    let pos0Vec3 = new Vector3$1(
+    let pos0Vec3 = new Vector3(
       this._vertices.position[pos0IndexBase],
       this._vertices.position[pos0IndexBase + 1],
       this._vertices.position[pos0IndexBase + 2]
     );
 
-    let pos1Vec3 = new Vector3$1(
+    let pos1Vec3 = new Vector3(
       this._vertices.position[pos1IndexBase],
       this._vertices.position[pos1IndexBase + 1],
       this._vertices.position[pos1IndexBase + 2]
     );
 
-    let pos2Vec3 = new Vector3$1(
+    let pos2Vec3 = new Vector3(
       this._vertices.position[pos2IndexBase],
       this._vertices.position[pos2IndexBase + 1],
       this._vertices.position[pos2IndexBase + 2]
     );
 
-    let uv0Vec2 = new Vector2$1(
+    let uv0Vec2 = new Vector2(
       this._vertices.texcoord[uv0IndexBase],
       this._vertices.texcoord[uv0IndexBase + 1]
     );
 
-    let uv1Vec2 = new Vector2$1(
+    let uv1Vec2 = new Vector2(
       this._vertices.texcoord[uv1IndexBase],
       this._vertices.texcoord[uv1IndexBase + 1]
     );
 
-    let uv2Vec2 = new Vector2$1(
+    let uv2Vec2 = new Vector2(
       this._vertices.texcoord[uv2IndexBase],
       this._vertices.texcoord[uv2IndexBase + 1]
     );
@@ -8461,13 +8461,13 @@ class L_AbstractCamera extends L_Element {
 
   static lookAtRHMatrix(eye, center, up) {
 
-    var f = Vector3$1.normalize(Vector3$1.subtract(center, eye));
-    var s = Vector3$1.normalize(Vector3$1.cross(f, up));
-    var u = Vector3$1.cross(s, f);
+    var f = Vector3.normalize(Vector3.subtract(center, eye));
+    var s = Vector3.normalize(Vector3.cross(f, up));
+    var u = Vector3.cross(s, f);
 
-    return new Matrix44$1$1(s.x, s.y, s.z, -Vector3$1.dotProduct(s,eye),
-      u.x, u.y, u.z, -Vector3$1.dotProduct(u,eye),
-      -f.x, -f.y, -f.z, Vector3$1.dotProduct(f,eye),
+    return new Matrix44$1$1(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+      u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
+      -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
       0, 0, 0, 1);
   }
 
@@ -9074,9 +9074,9 @@ class L_CameraController extends GLBoostObject {
     this._mouse_translate_y = 0;
     this._mouse_translate_x = 0;
 
-    this._mouseTranslateVec = new Vector3$1(0, 0, 0);
+    this._mouseTranslateVec = new Vector3(0, 0, 0);
 
-    this._newUpVec = new Vector3$1(0, 0, 0);
+    this._newUpVec = new Vector3(0, 0, 0);
 
     this._target = null;
 
@@ -9136,11 +9136,11 @@ class L_CameraController extends GLBoostObject {
 
           let scale = this._lengthOfCenterToEye * this._foyvBias * this._scaleOfTraslation;
           if (evt.shiftKey) {
-            this._mouseTranslateVec = Vector3$1.add(this._mouseTranslateVec, Vector3$1.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newEyeToCenterVec).multiply(-this._mouse_translate_y).multiply(scale));
           } else {
-            this._mouseTranslateVec = Vector3$1.add(this._mouseTranslateVec, Vector3$1.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
+            this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newUpVec).multiply(this._mouse_translate_y).multiply(scale));
           }
-          this._mouseTranslateVec = Vector3$1.add(this._mouseTranslateVec, Vector3$1.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
+          this._mouseTranslateVec = Vector3.add(this._mouseTranslateVec, Vector3.normalize(this._newTangentVec).multiply(this._mouse_translate_x).multiply(scale));
 
           this._clickedMouseYOnCanvas = this._movedMouseYOnCanvas;
           this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
@@ -9195,7 +9195,7 @@ class L_CameraController extends GLBoostObject {
 
     this._onMouseDblClick = (evt) => {
       if (evt.shiftKey) {
-        this._mouseTranslateVec = new Vector3$1(0, 0, 0);
+        this._mouseTranslateVec = new Vector3(0, 0, 0);
       } else {
         this._rot_y = 0;
         this._rot_x = 0;
@@ -9234,7 +9234,7 @@ class L_CameraController extends GLBoostObject {
     let newUpVec = null;
 
     if (this._isKeyUp || !this._isForceGrab) {
-      this._eyeVec = (this._shiftCameraTo !== null) ? Vector3$1.add(Vector3$1.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
+      this._eyeVec = (this._shiftCameraTo !== null) ? Vector3.add(Vector3.subtract(this._shiftCameraTo, camera.center), camera.eye) : camera.eye;
       this._centerVec = (this._shiftCameraTo !== null) ? this._shiftCameraTo : camera.center;
       this._upVec = camera.up;
     }
@@ -9242,10 +9242,10 @@ class L_CameraController extends GLBoostObject {
     let fovy = this._getFovyFromCamera(camera);
 
     if (this._isSymmetryMode) {
-      let centerToEyeVec = Vector3$1.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
       this._lengthOfCenterToEye = centerToEyeVec.length();
-      let horizontalAngleOfVectors = Vector3$1.angleOfVectors(new Vector3$1(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3$1(0, 0, 1));
-      let horizontalSign = Vector3$1.cross(new Vector3$1(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3$1(0, 0, 1)).y;
+      let horizontalAngleOfVectors = Vector3.angleOfVectors(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1));
+      let horizontalSign = Vector3.cross(new Vector3(centerToEyeVec.x, 0, centerToEyeVec.z), new Vector3(0, 0, 1)).y;
       if (horizontalSign >= 0) {
         horizontalSign = 1;
       } else {
@@ -9262,15 +9262,15 @@ class L_CameraController extends GLBoostObject {
       this._newUpVec = newUpVec;
       newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
       newCenterVec = this._centerVec.clone();
-      this._newEyeToCenterVec = Vector3$1.subtract(newCenterVec, newEyeVec);
-      this._newTangentVec = Vector3$1.cross(this._newUpVec, this._newEyeToCenterVec);
+      this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+      this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
 
       newEyeVec.add(this._mouseTranslateVec);
       newCenterVec.add(this._mouseTranslateVec);
 
       let horizonResetVec = rotateM_Reset.multiplyVector(centerToEyeVec);
-      this._verticalAngleOfVectors = Vector3$1.angleOfVectors(horizonResetVec, new Vector3$1(0, 0, 1));
-      let verticalSign = Vector3$1.cross(horizonResetVec, new Vector3$1(0, 0, 1)).x;
+      this._verticalAngleOfVectors = Vector3.angleOfVectors(horizonResetVec, new Vector3(0, 0, 1));
+      let verticalSign = Vector3.cross(horizonResetVec, new Vector3(0, 0, 1)).x;
       if (verticalSign >= 0) {
         verticalSign = 1;
       } else {
@@ -9279,7 +9279,7 @@ class L_CameraController extends GLBoostObject {
       this._verticalAngleOfVectors *= verticalSign;
 
     } else {
-      let centerToEyeVec = Vector3$1.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
+      let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
       let rotateM_X = Matrix33.rotateX(this._rot_y);
       let rotateM_Y = Matrix33.rotateY(this._rot_x);
       let rotateM = rotateM_Y.multiply(rotateM_X);
@@ -9288,15 +9288,15 @@ class L_CameraController extends GLBoostObject {
       this._newUpVec = newUpVec;
       newEyeVec = rotateM.multiplyVector(centerToEyeVec).add(this._centerVec);
       newCenterVec = this._centerVec.clone();
-      this._newEyeToCenterVec = Vector3$1.subtract(newCenterVec, newEyeVec);
-      this._newTangentVec = Vector3$1.cross(this._newUpVec, this._newEyeToCenterVec);
+      this._newEyeToCenterVec = Vector3.subtract(newCenterVec, newEyeVec);
+      this._newTangentVec = Vector3.cross(this._newUpVec, this._newEyeToCenterVec);
 
       newEyeVec.add(this._mouseTranslateVec);
       newCenterVec.add(this._mouseTranslateVec);
     }
 
     let newZNear = camera.zNear;
-    let newZFar = camera.zNear + Vector3$1.subtract(newCenterVec, newEyeVec).length();
+    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
     if (this._target) {
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
@@ -9328,10 +9328,10 @@ class L_CameraController extends GLBoostObject {
 
     let newCenterVec = targetAABB.centerPoint;
 
-    let centerToCameraVec = Vector3$1.subtract(eyeVec, centerVec);
-    let centerToCameraVecNormalized = Vector3$1.normalize(centerToCameraVec);
+    let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
+    let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
 
-    let newEyeVec = Vector3$1.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+    let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
 
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
@@ -9363,7 +9363,7 @@ class L_CameraController extends GLBoostObject {
     this._rot_bgn_y = 0;
     this._rot_bgn_x = 0;
     this._wheel_y = 1;
-    this._mouseTranslateVec = new Vector3$1(0, 0, 0);
+    this._mouseTranslateVec = new Vector3(0, 0, 0);
 
     this._camaras.forEach(function (camera) {
       camera._needUpdateView(false);
@@ -9939,35 +9939,35 @@ class Cube extends Geometry {
 
     var positions = [
       // upper
-      new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  widthVector.y, widthVector.z),
-      new Vector3$1(-widthVector.x, widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, widthVector.y, widthVector.z),
       // lower
-      new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  -widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  -widthVector.y, widthVector.z),
-      new Vector3$1(-widthVector.x, -widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, -widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  -widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  -widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, -widthVector.y, widthVector.z),
       // front
-      new Vector3$1(-widthVector.x, -widthVector.y, widthVector.z),
-      new Vector3$1(widthVector.x,  -widthVector.y, widthVector.z),
-      new Vector3$1(widthVector.x,  widthVector.y, widthVector.z),
-      new Vector3$1(-widthVector.x, widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, -widthVector.y, widthVector.z),
+      new Vector3(widthVector.x,  -widthVector.y, widthVector.z),
+      new Vector3(widthVector.x,  widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, widthVector.y, widthVector.z),
       // back
-      new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  -widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  widthVector.y, -widthVector.z),
-      new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z),
+      new Vector3(-widthVector.x, -widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  -widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  widthVector.y, -widthVector.z),
+      new Vector3(-widthVector.x, widthVector.y, -widthVector.z),
       // right
-      new Vector3$1(widthVector.x, -widthVector.y, -widthVector.z),
-      new Vector3$1(widthVector.x,  -widthVector.y, widthVector.z),
-      new Vector3$1(widthVector.x,  widthVector.y, widthVector.z),
-      new Vector3$1(widthVector.x, widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x, -widthVector.y, -widthVector.z),
+      new Vector3(widthVector.x,  -widthVector.y, widthVector.z),
+      new Vector3(widthVector.x,  widthVector.y, widthVector.z),
+      new Vector3(widthVector.x, widthVector.y, -widthVector.z),
       // left
-      new Vector3$1(-widthVector.x, -widthVector.y, -widthVector.z),
-      new Vector3$1(-widthVector.x,  -widthVector.y, widthVector.z),
-      new Vector3$1(-widthVector.x,  widthVector.y, widthVector.z),
-      new Vector3$1(-widthVector.x, widthVector.y, -widthVector.z)
+      new Vector3(-widthVector.x, -widthVector.y, -widthVector.z),
+      new Vector3(-widthVector.x,  -widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x,  widthVector.y, widthVector.z),
+      new Vector3(-widthVector.x, widthVector.y, -widthVector.z)
     ];
     var colors = [
       new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
@@ -10001,68 +10001,68 @@ class Cube extends Geometry {
       new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
     ];
     var texcoords = [
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0)
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0)
     ];
 
     var normals = [
       // upper
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
       // lower
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
       // front
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
       // back
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
       // right
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
       // left
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
     ];
 
     this.setVerticesData({
@@ -10116,7 +10116,7 @@ class Plane extends Geometry {
 
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
-        positions.push(new Vector3$1((j/uSpan - 1/2)*width, 0, (i/vSpan - 1/2)*height));
+        positions.push(new Vector3((j/uSpan - 1/2)*width, 0, (i/vSpan - 1/2)*height));
       }
     }
 
@@ -10149,14 +10149,14 @@ class Plane extends Geometry {
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         if (isUVRepeat) {
-          texcoords.push(new Vector2$1(j, i));
+          texcoords.push(new Vector2(j, i));
         } else {
-          texcoords.push(new Vector2$1(j/uSpan, i/vSpan));
+          texcoords.push(new Vector2(j/uSpan, i/vSpan));
         }
       }
     }
 
-    var normal = new Vector3$1(0, 1, 0);
+    var normal = new Vector3(0, 1, 0);
     var normals = [];
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
@@ -10215,13 +10215,13 @@ class Sphere extends Geometry {
         var x = radius * cosPhi * sinTheta;
         var y = radius * cosTheta;
         var z = radius * sinPhi * sinTheta;
-        var position = new Vector3$1(x, y, z);
+        var position = new Vector3(x, y, z);
         positions.push(position);
         var u = 1 - (longNumber / widthSegments);
         var v = latNumber / heightSegments;
-        texcoords.push(new Vector2$1(u, v));
+        texcoords.push(new Vector2(u, v));
         colors.push(vertexColor);
-        normals.push(Vector3$1.normalize(position));
+        normals.push(Vector3.normalize(position));
       }
     }
     
@@ -10277,16 +10277,16 @@ class Axis extends Geometry {
 
     let positions = [
       // X Axis
-      new Vector3$1(0, nearZeroValue, nearZeroValue),
-      new Vector3$1(length,  nearZeroValue, nearZeroValue),
+      new Vector3(0, nearZeroValue, nearZeroValue),
+      new Vector3(length,  nearZeroValue, nearZeroValue),
 
       // Y Axis
-      new Vector3$1(nearZeroValue, 0, nearZeroValue),
-      new Vector3$1(nearZeroValue, length, nearZeroValue),
+      new Vector3(nearZeroValue, 0, nearZeroValue),
+      new Vector3(nearZeroValue, length, nearZeroValue),
 
       // Z Axis
-      new Vector3$1(nearZeroValue, nearZeroValue, 0),
-      new Vector3$1(nearZeroValue, nearZeroValue, length),
+      new Vector3(nearZeroValue, nearZeroValue, 0),
+      new Vector3(nearZeroValue, nearZeroValue, length),
     ];
 
     let colors = [
@@ -10401,32 +10401,32 @@ class Particle extends Geometry {
     }
 
     for (let i=0; i<positionArray.length; i++) {
-      positions.push(new Vector3$1(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-      positions.push(new Vector3$1(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
-      positions.push(new Vector3$1(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
-      positions.push(new Vector3$1(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x - pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y + pHalfHeight, positionArray[i].z));
+      positions.push(new Vector3(positionArray[i].x + pHalfWidth, positionArray[i].y - pHalfHeight, positionArray[i].z));
     }
     this.centerPositions = [];
     let centerPositions = this.centerPositions;
 
     for (let i=0; i<positionArray.length; i++) {
-      centerPositions.push(new Vector3$1(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      centerPositions.push(new Vector3$1(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      centerPositions.push(new Vector3$1(positionArray[i].x, positionArray[i].y, positionArray[i].z));
-      centerPositions.push(new Vector3$1(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
+      centerPositions.push(new Vector3(positionArray[i].x, positionArray[i].y, positionArray[i].z));
     }
     this.texcoords = [];
     let texcoords = this.texcoords;
     for (let i=0; i<positionArray.length; i++) {
-      texcoords.push(new Vector2$1(0, 0));
-      texcoords.push(new Vector2$1(0, 1));
-      texcoords.push(new Vector2$1(1, 0));
-      texcoords.push(new Vector2$1(1, 1));
+      texcoords.push(new Vector2(0, 0));
+      texcoords.push(new Vector2(0, 1));
+      texcoords.push(new Vector2(1, 0));
+      texcoords.push(new Vector2(1, 1));
     }
 
     this.normals = [];
     let normals = this.normals;
-    var normal = new Vector3$1(0, 0, 1);
+    var normal = new Vector3(0, 0, 1);
     for (let i=0; i<positionArray.length; i++) {
       for (let j=0; j<4; j++) {
         normals.push(normal);
@@ -10623,8 +10623,8 @@ class Screen extends Geometry {
     {
       unit: 'ratio', // or 'pixel'
       range: 'positive-negative', // or 'positive'
-      origin: new Vector2$1(-1, -1),
-      size: new Vector2$1(2, 2),
+      origin: new Vector2(-1, -1),
+      size: new Vector2(2, 2),
     }, customVertexAttributes = null) {
     super(glBoostContext);
 
@@ -10656,8 +10656,8 @@ class Screen extends Geometry {
       sizeY = sizeY*2;
     }
 
-    screen.origin = new Vector2$1(originX, originY);
-    screen.size = new Vector2$1(sizeX, sizeY);
+    screen.origin = new Vector2(originX, originY);
+    screen.size = new Vector2(sizeX, sizeY);
 
     this._setupQuad(positions, indices, colors, texcoords, normals, screen.origin, screen.size, 1, 1, screen.uUVRepeat, screen.vUVRepeat);
 
@@ -10676,7 +10676,7 @@ class Screen extends Geometry {
   _setupQuad(positions, indices, colors, texcoords, normals, originInRatioVec2, sizeInRatioVec2, uSpan, vSpan, uUVRepeat, vUVRepeat) {
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
-        positions.push(new Vector3$1(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
+        positions.push(new Vector3(originInRatioVec2.x + (j/uSpan)*sizeInRatioVec2.x, originInRatioVec2.y + (i/vSpan)*sizeInRatioVec2.y, 0));
       }
     }
 
@@ -10705,11 +10705,11 @@ class Screen extends Geometry {
 
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
-        texcoords.push(new Vector2$1(j, i));
+        texcoords.push(new Vector2(j, i));
       }
     }
 
-    let normal = new Vector3$1(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
+    let normal = new Vector3(0, 0, -1); // specify -1 because This Screen geometry assumes that It doesn't use a projection matrix.
     for(let i=0; i<=vSpan; i++) {
       for(let j=0; j<=uSpan; j++) {
         normals.push(normal);
@@ -11072,7 +11072,7 @@ class M_Mesh extends M_Element {
       var normals = this._geometry._vertices.normal;
       length = normals.length / 3;
       for (let i=0; i<length; i++) {
-        let normalVector3 = new Vector3$1(normals[i*3], normals[i*3+1], normals[i*3+2]);
+        let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
         let transformedNormalVec = Matrix44$1$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
         normals[i*3] = transformedNormalVec.x;
         normals[i*3+1] = transformedNormalVec.y;
@@ -11105,7 +11105,7 @@ class M_Mesh extends M_Element {
       var normals = this._geometry._vertices.normal;
       length = normals.length / 3;
       for (let i=0; i<length; i++) {
-        let normalVector3 = new Vector3$1(normals[i*3], normals[i*3+1], normals[i*3+2]);
+        let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
         let transformedNormalVec = Matrix44$1$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
         normals[i*3] = transformedNormalVec.x;
         normals[i*3+1] = transformedNormalVec.y;
@@ -11261,8 +11261,8 @@ class CubeAbsolute extends Geometry {
 
     const BIG_NUMBER = 999;
     this._vertexData = this._setupVertexData(
-      new Vector3$1(-BIG_NUMBER, -BIG_NUMBER, -BIG_NUMBER),
-      new Vector3$1(-BIG_NUMBER+1, -BIG_NUMBER+1, -BIG_NUMBER+1));
+      new Vector3(-BIG_NUMBER, -BIG_NUMBER, -BIG_NUMBER),
+      new Vector3(-BIG_NUMBER+1, -BIG_NUMBER+1, -BIG_NUMBER+1));
     this.setVerticesData(this._vertexData, [this._indices]);
   }
 
@@ -11279,35 +11279,35 @@ class CubeAbsolute extends Geometry {
 
     const positions = [
       // upper
-      new Vector3$1(minPosition.x, maxPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, maxPosition.z),
-      new Vector3$1(minPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
       // lower
-      new Vector3$1(minPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, minPosition.y, maxPosition.z),
-      new Vector3$1(minPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, minPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, minPosition.y, maxPosition.z),
       // front
-      new Vector3$1(minPosition.x, minPosition.y, maxPosition.z),
-      new Vector3$1(maxPosition.x, minPosition.y, maxPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, maxPosition.z),
-      new Vector3$1(minPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
       // back
-      new Vector3$1(minPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, minPosition.z),
-      new Vector3$1(minPosition.x, maxPosition.y, minPosition.z),
+      new Vector3(minPosition.x, minPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, minPosition.z),
       // right
-      new Vector3$1(maxPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(maxPosition.x, minPosition.y, maxPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, maxPosition.z),
-      new Vector3$1(maxPosition.x, maxPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+      new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
       // left
-      new Vector3$1(minPosition.x, minPosition.y, minPosition.z),
-      new Vector3$1(minPosition.x, minPosition.y, maxPosition.z),
-      new Vector3$1(minPosition.x, maxPosition.y, maxPosition.z),
-      new Vector3$1(minPosition.x, maxPosition.y, minPosition.z)
+      new Vector3(minPosition.x, minPosition.y, minPosition.z),
+      new Vector3(minPosition.x, minPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
+      new Vector3(minPosition.x, maxPosition.y, minPosition.z)
     ];
     if (vertexColor) {
       const colors = [
@@ -11344,68 +11344,68 @@ class CubeAbsolute extends Geometry {
     }
 
     const texcoords = [
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0),
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0),
 
-      new Vector2$1(0.0, 0.0),
-      new Vector2$1(1.0, 0.0),
-      new Vector2$1(1.0, 1.0),
-      new Vector2$1(0.0, 1.0)
+      new Vector2(0.0, 0.0),
+      new Vector2(1.0, 0.0),
+      new Vector2(1.0, 1.0),
+      new Vector2(0.0, 1.0)
     ];
 
     const normals = [
       // upper
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
-      new Vector3$1(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
+      new Vector3(0, 1, 0),
       // lower
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
-      new Vector3$1(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
+      new Vector3(0, -1, 0),
       // front
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
-      new Vector3$1(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
+      new Vector3(0, 0, 1),
       // back
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
-      new Vector3$1(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
+      new Vector3(0, 0, -1),
       // right
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
-      new Vector3$1(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
+      new Vector3(1, 0, 0),
       // left
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
-      new Vector3$1(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
+      new Vector3(-1, 0, 0),
     ];
 
     this._vertexData ={
@@ -12583,8 +12583,8 @@ class JointPrimitive extends Geometry {
 
     this._colors = [];
     this.color = new Vector4(1, 1, 1, 1);
-    this._worldPositionOfThisJoint = new Vector3$1(0, 0, 1);
-    this._worldPositionOfParentJoint = new Vector3$1(0, 0, 0);
+    this._worldPositionOfThisJoint = new Vector3(0, 0, 1);
+    this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
     this._vertexData = this._setupVertexData();
     this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
     this._width = 1;
@@ -12592,41 +12592,41 @@ class JointPrimitive extends Geometry {
 
   _setupVertexData() {
 
-    let length = Vector3$1.lengthBtw(this._worldPositionOfThisJoint, this._worldPositionOfParentJoint);
+    let length = Vector3.lengthBtw(this._worldPositionOfThisJoint, this._worldPositionOfParentJoint);
     let arrowWidth = this._width;
     let arrowheadLength = length/7.5;
     let arrowStickLength = length - arrowheadLength;
 
     let positions = [];
 
-    let deltaVec = Vector3$1.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint);
-    let directionToParent = new Vector3$1(0, 1, 0);
-    if (!deltaVec.isEqual(Vector3$1.zero())) {
-      directionToParent = Vector3$1.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint).normalize();
+    let deltaVec = Vector3.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint);
+    let directionToParent = new Vector3(0, 1, 0);
+    if (!deltaVec.isEqual(Vector3.zero())) {
+      directionToParent = Vector3.subtract(this._worldPositionOfParentJoint, this._worldPositionOfThisJoint).normalize();
     }
-    const arrowStickPosition = Vector3$1.add(this._worldPositionOfThisJoint, Vector3$1.multiply(directionToParent, arrowStickLength));
+    const arrowStickPosition = Vector3.add(this._worldPositionOfThisJoint, Vector3.multiply(directionToParent, arrowStickLength));
 
-    let dummyVector = new Vector3$1(0, 1, 0);
-    let dummyVector2 = new Vector3$1(0, -1, 0);
-    if (Math.abs(Vector3$1.dotProduct(directionToParent, dummyVector)) > 0.4) {
-      dummyVector = new Vector3$1(1, 0, 0);
-      dummyVector2 = new Vector3$1(-1, 0, 0);
+    let dummyVector = new Vector3(0, 1, 0);
+    let dummyVector2 = new Vector3(0, -1, 0);
+    if (Math.abs(Vector3.dotProduct(directionToParent, dummyVector)) > 0.4) {
+      dummyVector = new Vector3(1, 0, 0);
+      dummyVector2 = new Vector3(-1, 0, 0);
     }
-    if (Math.abs(Vector3$1.dotProduct(directionToParent, dummyVector)) > 0.4) {
-      dummyVector = new Vector3$1(0, 0, 1);
-      dummyVector2 = new Vector3$1(0, 0, -1);
+    if (Math.abs(Vector3.dotProduct(directionToParent, dummyVector)) > 0.4) {
+      dummyVector = new Vector3(0, 0, 1);
+      dummyVector2 = new Vector3(0, 0, -1);
     }
-    const crossVector = Vector3$1.multiply(Vector3$1.cross(directionToParent, dummyVector).normalize(), arrowWidth);
-    const crossVector2 = Vector3$1.multiply(Vector3$1.cross(directionToParent, crossVector).normalize(), arrowWidth);
-    const crossVector3 = Vector3$1.multiply(Vector3$1.cross(directionToParent, dummyVector2).normalize(), arrowWidth);
-    const crossVector4 = Vector3$1.multiply(Vector3$1.cross(directionToParent, crossVector3).normalize(), arrowWidth);
+    const crossVector = Vector3.multiply(Vector3.cross(directionToParent, dummyVector).normalize(), arrowWidth);
+    const crossVector2 = Vector3.multiply(Vector3.cross(directionToParent, crossVector).normalize(), arrowWidth);
+    const crossVector3 = Vector3.multiply(Vector3.cross(directionToParent, dummyVector2).normalize(), arrowWidth);
+    const crossVector4 = Vector3.multiply(Vector3.cross(directionToParent, crossVector3).normalize(), arrowWidth);
     //const crossVector = Matrix44.rotate(directionToParent)
 
 
-    const crossPosition = Vector3$1.add(arrowStickPosition, crossVector);
-    const crossPosition2 = Vector3$1.add(arrowStickPosition, crossVector2);
-    const crossPosition3 = Vector3$1.add(arrowStickPosition, crossVector3);
-    const crossPosition4 = Vector3$1.add(arrowStickPosition, crossVector4);
+    const crossPosition = Vector3.add(arrowStickPosition, crossVector);
+    const crossPosition2 = Vector3.add(arrowStickPosition, crossVector2);
+    const crossPosition3 = Vector3.add(arrowStickPosition, crossVector3);
+    const crossPosition4 = Vector3.add(arrowStickPosition, crossVector4);
 
 
       // Long Pyramid
@@ -12818,7 +12818,7 @@ class M_Joint extends M_Element {
     this._childJoints = [];
     this._jointsOfParentHierarchies = [];
 
-    this.length = new Vector3$1(length, length, length);
+    this.length = new Vector3(length, length, length);
 
     this._isCalculatedJointGizmo = false;
     this._jointPoseMatrix = Matrix44$1$1.identity();
@@ -13095,7 +13095,7 @@ class M_SkeletalMesh extends M_Mesh {
       let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
       return rootJointPosWorld;
     }
-    return Vector3$1.zero();
+    return Vector3.zero();
   }
   
 
@@ -13106,7 +13106,7 @@ class M_SkeletalMesh extends M_Mesh {
       return rootJointPosWorld;
     }
 
-    return Vector3$1.zero();
+    return Vector3.zero();
   }
 
   /*
@@ -13732,7 +13732,7 @@ class M_SkeletalGeometry extends Geometry {
 
         for (let i=0; i<matrices.length; i++) {
           let m = matrices[i];
-          let scale = new Vector3$1(
+          let scale = new Vector3(
             Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02),
             Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12),
             Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22)
@@ -13748,7 +13748,7 @@ class M_SkeletalGeometry extends Geometry {
           matrices[i].m21 /= scale.z;
           matrices[i].m22 /= scale.z;
 
-          let q = (Quaternion$1.fromMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           //q.normalize();
           skeletalMesh._qArray[i*4+0] = q.x;
           skeletalMesh._qArray[i*4+1] = q.y;
@@ -13797,7 +13797,7 @@ class M_SkeletalGeometry extends Geometry {
           tZArray.push(Math.abs(t.z));
         }
 
-        skeletalMesh._translationScale = new Vector3$1();
+        skeletalMesh._translationScale = new Vector3();
         let maxX = Math.max.apply(null, tXArray);
         let maxY = Math.max.apply(null, tYArray);
         let maxZ = Math.max.apply(null, tZArray);
@@ -13811,7 +13811,7 @@ class M_SkeletalGeometry extends Geometry {
           // console.log(s.toString());
 
 
-          let q = (Quaternion$1.fromMatrix(matrices[i]));
+          let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
           let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
@@ -14156,20 +14156,20 @@ class Arrow extends Geometry {
         lineOtherOffset = -lineOtherOffset;
       }
       // Stick part
-      positions.push(new Vector3$1(lineOtherOffset, lineOffset, halfLength));
-      positions.push(new Vector3$1(lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -stickLength+halfLength));
 
       // 1st line of a triangle
-      positions.push(new Vector3$1(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
-      positions.push(new Vector3$1(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
 
       // 2nd line of a triangle
-      positions.push(new Vector3$1(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
-      positions.push(new Vector3$1(lineOtherOffset, lineOffset, -length+halfLength));
+      positions.push(new Vector3(-arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -length+halfLength));
 
       // 3rd line of a triangle
-      positions.push(new Vector3$1(lineOtherOffset, lineOffset, -length+halfLength));
-      positions.push(new Vector3$1(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
+      positions.push(new Vector3(lineOtherOffset, lineOffset, -length+halfLength));
+      positions.push(new Vector3(arrowheadWidth+lineOtherOffset, lineOffset, -stickLength+halfLength));
     }
 
     this.setVerticesData({
@@ -14405,29 +14405,29 @@ class Grid extends Geometry {
 
       // XZ grid
       if (isXZ) {
-        positions.push(new Vector3$1(-length, 0, start + oneUnitLength * i));
-        positions.push(new Vector3$1(length, 0, start + oneUnitLength * i));
+        positions.push(new Vector3(-length, 0, start + oneUnitLength * i));
+        positions.push(new Vector3(length, 0, start + oneUnitLength * i));
 
-        positions.push(new Vector3$1(start + oneUnitLength * i, 0, -length));
-        positions.push(new Vector3$1(start + oneUnitLength * i, 0, length));
+        positions.push(new Vector3(start + oneUnitLength * i, 0, -length));
+        positions.push(new Vector3(start + oneUnitLength * i, 0, length));
       }
 
       // XY grid
       if (isXY) {
-        positions.push(new Vector3$1(-length, start + oneUnitLength * i, 0));
-        positions.push(new Vector3$1(length, start + oneUnitLength * i, 0));
+        positions.push(new Vector3(-length, start + oneUnitLength * i, 0));
+        positions.push(new Vector3(length, start + oneUnitLength * i, 0));
 
-        positions.push(new Vector3$1(start + oneUnitLength * i, -length, 0));
-        positions.push(new Vector3$1(start + oneUnitLength * i, length, 0));
+        positions.push(new Vector3(start + oneUnitLength * i, -length, 0));
+        positions.push(new Vector3(start + oneUnitLength * i, length, 0));
       }
 
       // YZ grid
       if (isYZ) {
-        positions.push(new Vector3$1(0, -length, start + oneUnitLength * i));
-        positions.push(new Vector3$1(0, length, start + oneUnitLength * i));
+        positions.push(new Vector3(0, -length, start + oneUnitLength * i));
+        positions.push(new Vector3(0, length, start + oneUnitLength * i));
 
-        positions.push(new Vector3$1(0, start + oneUnitLength * i, -length));
-        positions.push(new Vector3$1(0, start + oneUnitLength * i, length));
+        positions.push(new Vector3(0, start + oneUnitLength * i, -length));
+        positions.push(new Vector3(0, start + oneUnitLength * i, length));
       }
     }
 
@@ -15042,7 +15042,7 @@ class ObjLoader {
         {
           matchArray = objTextRows[i].match(/^(\w+) +(-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
 //          pvCoord[vCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-          pvCoord[vCount] = new Vector3$1();
+          pvCoord[vCount] = new Vector3();
           pvCoord[vCount].x = parseFloat(matchArray[2]);
           pvCoord[vCount].y = parseFloat(matchArray[3]);
           pvCoord[vCount].z = parseFloat(matchArray[4]);
@@ -15054,7 +15054,7 @@ class ObjLoader {
         {
           matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+) (-?[0-9\.]+)/);
 //          pvNormal[vnCount].x=-x;//OBJは右手、Direct3Dは左手座標系。
-          pvNormal[vnCount] = new Vector3$1();
+          pvNormal[vnCount] = new Vector3();
           pvNormal[vnCount].x = parseFloat(matchArray[2]);
           pvNormal[vnCount].y = parseFloat(matchArray[3]);
           pvNormal[vnCount].z = parseFloat(matchArray[4]);
@@ -15065,7 +15065,7 @@ class ObjLoader {
         if (matchArray[1] === "vt")
         {
           matchArray = objTextRows[i].match(/^(\w+) (-?[0-9\.]+) (-?[0-9\.]+)/);
-          pvTexture[vtCount] = new Vector2$1();
+          pvTexture[vtCount] = new Vector2();
           pvTexture[vtCount].x = parseFloat(matchArray[2]);
           pvTexture[vtCount].y = parseFloat(matchArray[3]);
           //pvTexture[vtCount].y = 1 - pvTexture[vtCount].y; //Y成分が逆なので合わせる
@@ -15468,7 +15468,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
   define('VALUE_TARGET_IS_MOBILE', 0);
-  define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3$1(1, 1, 1));
+  define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
   define('VALUE_CONSOLE_OUT_FOR_DEBUGGING', false);
@@ -15874,13 +15874,13 @@ class GLTFLoader {
     group.userFlavorName = nodeStr;
 
     if (nodeJson.translation) {
-      group.translate = new Vector3$1(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+      group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
     }
     if (nodeJson.scale) {
-      group.scale = new Vector3$1(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+      group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
     }
     if (nodeJson.rotation) {
-      group.quaternion = new Quaternion$1(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+      group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
     }
     if (nodeJson.matrix) {
       group.matrix = new Matrix44$1$1(nodeJson.matrix, true);
@@ -15914,9 +15914,9 @@ class GLTFLoader {
         let perspective = cameraJson.perspective;
         camera = glBoostContext.createPerspectiveCamera(
           {
-            eye: new Vector3$1(0.0, 0.0, 0),
-            center: new Vector3$1(1.0, 0.0, 0.0),
-            up: new Vector3$1(0.0, 1.0, 0.0)
+            eye: new Vector3(0.0, 0.0, 0),
+            center: new Vector3(1.0, 0.0, 0.0),
+            up: new Vector3(0.0, 1.0, 0.0)
           },
           {
             fovy: MathUtil.radianToDegree(perspective.yfov),
@@ -15929,9 +15929,9 @@ class GLTFLoader {
         let orthographic = cameraJson.orthographic;
         camera = glBoostContext.createOrthoCamera(
           {
-            eye: new Vector3$1(0.0, 0.0, 0),
-            center: new Vector3$1(1.0, 0.0, 0.0),
-            up: new Vector3$1(0.0, 1.0, 0.0)
+            eye: new Vector3(0.0, 0.0, 0),
+            center: new Vector3(1.0, 0.0, 0.0),
+            up: new Vector3(0.0, 1.0, 0.0)
           },
           {
             xmag: orthographic.xmag,
@@ -15951,18 +15951,18 @@ class GLTFLoader {
           let light = null;
           if (lightJson.type === 'ambient') {
             let color = lightJson.ambient.color;
-            light = glBoostContext.createAmbientLight(new Vector3$1(color[0], color[1], color[2]));
+            light = glBoostContext.createAmbientLight(new Vector3(color[0], color[1], color[2]));
             group.addChild(light);
           } else if (lightJson.type === 'point') {
             let color = lightJson.point.color;
-            light = glBoostContext.createPointLight(new Vector3$1(color[0], color[1], color[2]));
+            light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
             group.addChild(light);
           } else if (lightJson.type === 'directional') {
             const color = lightJson.directional.color;
             let lightDir = new Vector4(0, 0, -1, 1);
             const matrix = new Matrix44$1$1(nodeJson.matrix, true);
             lightDir = matrix.multiplyVector(lightDir);
-            light = glBoostContext.createDirectionalLight(new Vector3$1(color[0], color[1], color[2]), lightDir.toVector3());
+            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
             light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
             group.matrix = Matrix44$1$1.identity();
             group.addChild(light);
@@ -16417,10 +16417,10 @@ class GLTFLoader {
             uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
             break;
           case 35664:
-            uniforms[uniformName] = new Vector2$1(value[0], value[1]);
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
             break;
           case 35665:
-            uniforms[uniformName] = new Vector3$1(value[0], value[1], value[2]);
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
             break;
           case 35666:
             uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
@@ -16429,10 +16429,10 @@ class GLTFLoader {
             uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
             break;
           case 35667:
-            uniforms[uniformName] = new Vector2$1(value[0], value[1]);
+            uniforms[uniformName] = new Vector2(value[0], value[1]);
             break;
           case 35668:
-            uniforms[uniformName] = new Vector3$1(value[0], value[1], value[2]);
+            uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
             break;
           case 35669:
             uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
@@ -16761,13 +16761,13 @@ class GLTFLoader {
             vertexAttributeArray.push(dataView[dataViewMethod](pos, littleEndian));
             break;
           case 'VEC2':
-            vertexAttributeArray.push(new Vector2$1(
+            vertexAttributeArray.push(new Vector2(
               dataView[dataViewMethod](pos, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent, littleEndian)
             ));
             break;
           case 'VEC3':
-            vertexAttributeArray.push(new Vector3$1(
+            vertexAttributeArray.push(new Vector3(
               dataView[dataViewMethod](pos, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
               dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian)
@@ -16775,7 +16775,7 @@ class GLTFLoader {
             break;
           case 'VEC4':
             if (quaternionIfVec4) {
-              vertexAttributeArray.push(new Quaternion$1(
+              vertexAttributeArray.push(new Quaternion(
                 dataView[dataViewMethod](pos, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
                 dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
@@ -17315,6 +17315,8 @@ class ModelConverter {
     // Hierarchy
     let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
+    this._setupTransformOfNodes(gltfModel, groups);
+
     let rootGroup = glBoostContext.createGroup();
 
     if (gltfModel.scenes[0].nodesIndices) {
@@ -17329,6 +17331,26 @@ class ModelConverter {
     }
 
     return rootGroup;
+  }
+
+  _setupTransformOfNodes(gltfModel, groups) {
+    for (let node_i in gltfModel.nodes) {
+      let group = groups[node_i];
+      let nodeJson = gltfModel.nodes[node_i];
+
+      if (nodeJson.translation) {
+        group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+      }
+      if (nodeJson.scale) {
+        group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+      }
+      if (nodeJson.rotation) {
+        group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+      }
+      if (nodeJson.matrix) {
+        group.matrix = new Matrix44$1$1(nodeJson.matrix, true);
+      }
+    }
   }
 
   _setupHierarchy(glBoostContext, gltfModel, glboostMeshes) {
@@ -17859,7 +17881,7 @@ class ModelConverter {
             for (let i=0; i<16; i++) {
               matrixComponents[i] = dataView[dataViewMethod](pos+componentBytes*i, littleEndian);
             }
-            vertexAttributeArray.push(new Matrix44(matrixComponents, true));
+            vertexAttributeArray.push(new Matrix44$1$1(matrixComponents, true));
             break;
         }
 
@@ -17950,7 +17972,7 @@ phina.namespace(function() {
       this.width = params.width;
       this.height = params.height;
 
-      if (params.fillStyle instanceof Vector3$1) {
+      if (params.fillStyle instanceof Vector3) {
         this.fillStyle = `rgb(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},1)`;
       } else if (params.fillStyle instanceof Vector4) {
         this.fillStyle = `rgba(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},${params.fillStyle.w})`;
@@ -18247,7 +18269,7 @@ class HalfLambertAndWrapLightingShader extends DecalShader {
     super(glBoostContext, basicShader);
     HalfLambertAndWrapLightingShader.mixin(HalfLambertAndWrapLightingShaderSource);
 
-    this._wrap = new Vector3$1(0.6, 0.3, 0.0);
+    this._wrap = new Vector3(0.6, 0.3, 0.0);
   }
 
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {

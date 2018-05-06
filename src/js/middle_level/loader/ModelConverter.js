@@ -1,6 +1,10 @@
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
+import Vector3 from '../../low_level/math/Vector3';
+import Vector2 from '../../low_level/math/Vector2';
 import Vector4 from '../../low_level/math/Vector4';
+import Matrix44 from '../../low_level/math/Matrix44';
+import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 
 let singleton = Symbol();
@@ -45,6 +49,8 @@ export default class ModelConverter {
     // Hierarchy
     let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
 
+    this._setupTransformOfNodes(gltfModel, groups);
+
     let rootGroup = glBoostContext.createGroup();
 
     if (gltfModel.scenes[0].nodesIndices) {
@@ -59,6 +65,26 @@ export default class ModelConverter {
     }
 
     return rootGroup;
+  }
+
+  _setupTransformOfNodes(gltfModel, groups) {
+    for (let node_i in gltfModel.nodes) {
+      let group = groups[node_i];
+      let nodeJson = gltfModel.nodes[node_i];
+
+      if (nodeJson.translation) {
+        group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+      }
+      if (nodeJson.scale) {
+        group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+      }
+      if (nodeJson.rotation) {
+        group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+      }
+      if (nodeJson.matrix) {
+        group.matrix = new Matrix44(nodeJson.matrix, true);
+      }
+    }
   }
 
   _setupHierarchy(glBoostContext, gltfModel, glboostMeshes) {
