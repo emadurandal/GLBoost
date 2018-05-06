@@ -38,10 +38,21 @@ export default class ModelConverter {
       this._accessBinaryWithAccessor(accessor)
     }
 
+    // Hierarchy
+    this._setupHierarchy(glBoostContext, gltfModel);
+
     // Mesh data
     this._setupMesh(glBoostContext, gltfModel);
 
     return gltfModel;
+  }
+
+  _setupHierarchy(glBoostContext, gltfModel) {
+    for (let node of gltfModel.nodes) {
+      for (let childNode of node.children) {
+        node.addChild(childNode);
+      }
+    }
   }
 
   _setupMesh(glBoostContext, gltfModel) {
@@ -124,11 +135,11 @@ export default class ModelConverter {
           materials.push(glboostMaterial);
         } else {
           let glboostMaterial = null;
-          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
-          } else {
+//          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+//            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+//          } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
-          }
+//          }
           if (defaultShader) {
             glboostMaterial.shaderClass = defaultShader;
           } else {
