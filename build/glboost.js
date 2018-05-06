@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: e9a4a38d
+// This revision is the commit right after the SHA: cac69522
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17053,12 +17053,6 @@ class GLTF2Loader {
         }
 
         node.mesh.extras._skin = node.skin;
-
-        node.skin.skeletonIndex = node.skin.skeleton;
-        node.skin.skeleton = gltfJson.nodes[node.skin.skeletonIndex];
-
-        node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
-        node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];
       }
 
       // Camera
@@ -17132,7 +17126,23 @@ class GLTF2Loader {
   }
 
   _loadDependenciesOfJoints(gltfJson) {
+    if (gltfJson.skins) {
+      for (let skin of gltfJson.skins) {
+        skin.skeletonIndex = skin.skeleton;
+        skin.skeleton = gltfJson.nodes[skin.skeletonIndex];
 
+        skin.inverseBindMatricesIndex = skin.inverseBindMatrices;
+        skin.inverseBindMatrices = gltfJson.accessors[skin.inverseBindMatricesIndex];
+
+        skin.jointsIndices = skin.joints;
+        skin.joints = [];
+        for (let jointIndex of skin.jointsIndices) {
+          skin.joints.push(gltfJson.nodes[jointIndex]);
+        }
+        
+      }
+  
+    }
   }
 
 
@@ -17395,14 +17405,20 @@ class ModelConverter {
     // Mesh data
     let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
 
-    // Hierarchy
-    let groups = this._setupHierarchy(glBoostContext, gltfModel, glboostMeshes);
+    let groups = [];
+    for (let node_i in gltfModel.nodes) {
+      let group = glBoostContext.createGroup();
+      groups.push(group);
+    }
 
     // Transfrom
     this._setupTransform(gltfModel, groups);
 
     // Skeleton
     this._setupSkeleton(gltfModel, groups, glboostMeshes);
+
+    // Hierarchy
+    this._setupHierarchy(glBoostContext, gltfModel, groups, glboostMeshes);
 
     // Animation
     this._setupAnimation(gltfModel, groups);
@@ -17443,12 +17459,8 @@ class ModelConverter {
     }
   }
 
-  _setupHierarchy(glBoostContext, gltfModel, glboostMeshes) {
-    let groups = [];
-    for (let node_i in gltfModel.nodes) {
-      let group = glBoostContext.createGroup();
-      groups.push(group);
-    }
+  _setupHierarchy(glBoostContext, gltfModel, groups, glboostMeshes) {
+
     for (let node_i in gltfModel.nodes) {
       let node = gltfModel.nodes[parseInt(node_i)];
       let parentGroup = groups[node_i];
@@ -17462,7 +17474,7 @@ class ModelConverter {
         }  
       }
     }
-    return groups;
+
   }
 
   _setupAnimation(gltfModel, groups) {
@@ -17501,7 +17513,19 @@ class ModelConverter {
         group._isRootJointGroup = true;
         if (node.mesh) {
           let glboostMesh = glboostMeshes[node.meshIndex];
-          glboostMesh.jointsHierarchy = node.skin.skeleton;
+          glboostMesh.jointsHierarchy = groups[node.skin.skeletonIndex];
+        }
+      }
+
+      if (node.skin && node.skin.joints) {
+        for (let joint_i of node.skin.jointsIndices) {
+          let joint = node.skin.joints[joint_i];
+          let options = gltfModel.asset.extras.glboostOptions;
+          let glboostJoint = glBoostContext.createJoint(options.isExistJointGizmo);
+          glboostJoint._glTFJointIndex = joint_i;
+//          glboostJoint.userFlavorName = nodeJson.jointName;
+          let group = groups[joint_i];
+          group.addChild(glboostJoint);
         }
       }
     }
@@ -17515,7 +17539,7 @@ class ModelConverter {
       if (mesh.extras && mesh.extras._skin) {
         geometry = glBoostContext.createSkeletalGeometry();
         glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
-        glboostMesh.gltfJointIndices = mesh.extras._skin.joints;
+        glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
         glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
       } else {
         geometry = glBoostContext.createGeometry();

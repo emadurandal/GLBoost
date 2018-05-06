@@ -208,12 +208,6 @@ export default class GLTF2Loader {
         }
 
         node.mesh.extras._skin = node.skin;
-
-        node.skin.skeletonIndex = node.skin.skeleton;
-        node.skin.skeleton = gltfJson.nodes[node.skin.skeletonIndex];
-
-        node.skin.inverseBindMatricesIndex = node.skin.inverseBindMatrices;
-        node.skin.inverseBindMatrices = gltfJson.accessors[node.skin.inverseBindMatricesIndex];
       }
 
       // Camera
@@ -287,7 +281,23 @@ export default class GLTF2Loader {
   }
 
   _loadDependenciesOfJoints(gltfJson) {
+    if (gltfJson.skins) {
+      for (let skin of gltfJson.skins) {
+        skin.skeletonIndex = skin.skeleton;
+        skin.skeleton = gltfJson.nodes[skin.skeletonIndex];
 
+        skin.inverseBindMatricesIndex = skin.inverseBindMatrices;
+        skin.inverseBindMatrices = gltfJson.accessors[skin.inverseBindMatricesIndex];
+
+        skin.jointsIndices = skin.joints;
+        skin.joints = [];
+        for (let jointIndex of skin.jointsIndices) {
+          skin.joints.push(gltfJson.nodes[jointIndex]);
+        }
+        
+      }
+  
+    }
   }
 
 
