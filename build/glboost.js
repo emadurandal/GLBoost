@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 54cb3243
+// This revision is the commit right after the SHA: e72c5614
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17111,14 +17111,17 @@ class GLTF2Loader {
   _loadDependenciesOfMaterials(gltfJson) {
     // Material
     for (let material of gltfJson.materials) {
-      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
-      if (baseColorTexture !== void 0) {
-        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+      if (material.pbrMetallicRoughness) {
+        let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+        if (baseColorTexture !== void 0) {
+          baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+        }
+        let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+        if (metallicRoughnessTexture !== void 0) {
+          metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+        }
       }
-      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
-      if (metallicRoughnessTexture !== void 0) {
-        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
-      }
+
       let normalTexture = material.normalTexture;
       if (normalTexture !== void 0) {
         normalTexture.texture = gltfJson.textures[normalTexture.index];
@@ -17808,33 +17811,35 @@ class ModelConverter {
       dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;
 
       let setTextures = (materialJson)=> {
-        let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
-        if (baseColorTexture) {
-          let sampler = baseColorTexture.texture.sampler;
+        if (materialJson.pbrMetallicRoughness) {
+          let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
+          if (baseColorTexture) {
+            let sampler = baseColorTexture.texture.sampler;
 
-          let isNeededToMultiplyAlphaToColorOfTexture = false;
-          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-            if (options.isTextureImageToLoadPreMultipliedAlpha) {
-              // Nothing to do because premultipling alpha is already done.
-            } else {
-              isNeededToMultiplyAlphaToColorOfTexture = true;
+            let isNeededToMultiplyAlphaToColorOfTexture = false;
+            if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+                // Nothing to do because premultipling alpha is already done.
+              } else {
+                isNeededToMultiplyAlphaToColorOfTexture = true;
+              }
+            } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+                // TODO: Implement to Make Texture Straight.
+              } else {
+                // Nothing to do because the texture is straight.
+              }        
             }
-          } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-            if (options.isTextureImageToLoadPreMultipliedAlpha) {
-              // TODO: Implement to Make Texture Straight.
-            } else {
-              // Nothing to do because the texture is straight.
-            }        
-          }
 
-          let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
-            'TEXTURE_MAG_FILTER': sampler.magFilter,
-            'TEXTURE_MIN_FILTER': sampler.minFilter,
-            'TEXTURE_WRAP_S': sampler.wrapS,
-            'TEXTURE_WRAP_T': sampler.wrapT,
-            'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
-          });
-          gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+            let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler.wrapT,
+              'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+            });
+            gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+          }
 
           let enables = [];
           if (options.isBlend) {
@@ -17869,7 +17874,7 @@ class ModelConverter {
       }
     }
 
-    if (materialJson.pbrMetallicRoughness.baseColorFactor) {
+    if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
       let value = materialJson.pbrMetallicRoughness.baseColorFactor;
       gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
     }

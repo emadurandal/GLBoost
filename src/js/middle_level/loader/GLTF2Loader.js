@@ -249,14 +249,17 @@ export default class GLTF2Loader {
   _loadDependenciesOfMaterials(gltfJson) {
     // Material
     for (let material of gltfJson.materials) {
-      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
-      if (baseColorTexture !== void 0) {
-        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+      if (material.pbrMetallicRoughness) {
+        let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+        if (baseColorTexture !== void 0) {
+          baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+        }
+        let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+        if (metallicRoughnessTexture !== void 0) {
+          metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+        }
       }
-      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
-      if (metallicRoughnessTexture !== void 0) {
-        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
-      }
+
       let normalTexture = material.normalTexture;
       if (normalTexture !== void 0) {
         normalTexture.texture = gltfJson.textures[normalTexture.index];
