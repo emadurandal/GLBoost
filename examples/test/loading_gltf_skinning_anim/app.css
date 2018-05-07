@@ -3,7 +3,9 @@
   padding: 0; }
 
 body {
-  padding: 10px; }
+  padding: 10px;
+  background: linear-gradient(to right, rgba(252,234,187,1) 0%, rgba(252,205,77,1) 50%, rgba(248,181,0,1) 51%, rgba(251,223,147,1) 100%);
+}
 
 .header-title {
   margin: 10px;

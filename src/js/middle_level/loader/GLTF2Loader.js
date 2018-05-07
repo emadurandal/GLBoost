@@ -45,7 +45,7 @@ export default class GLTF2Loader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
-      isAllMeshesTransparent: true
+      isAllMeshesTransparent: false
     }) 
     {
 
@@ -70,14 +70,14 @@ export default class GLTF2Loader {
           for (let i = 0; i < partsOfPath.length - 1; i++) {
             basePath += partsOfPath[i] + '/';
           }
-          let json = JSON.parse(gotText);
+          let gltfJson = JSON.parse(gotText);
 
-          //let glTFVer = this._checkGLTFVersion(json);
+          //let glTFVer = this._checkGLTFVersion(gltfJson);
+          let promise = this._loadInner(null, basePath, gltfJson, options);
 
-          let resourcesPromise = this._loadResources(null, basePath, json, resolve, options);
-
-          resourcesPromise.then(() => {
+          promise.then((gltfJson) => {
             console.log('Resoureces loading done!');
+            resolve(gltfJson[0][0]);
           });
   
           return;
@@ -100,46 +100,279 @@ export default class GLTF2Loader {
 
         let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
         let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
-        let json = JSON.parse(gotText);
+        let gltfJson = JSON.parse(gotText);
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
 
-//        let glTFVer = this._checkGLTFVersion(json);
+//        let glTFVer = this._checkGLTFVersion(gltfJson);
 
-        let resourcesPromise = this._loadResources(arrayBufferBinary, null, json, resolve, options);
+        let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options);
 
-        resourcesPromise.then(() => {
+        promise.then((gltfJson) => {
           console.log('Resoureces loading done!');
+          resolve(gltfJson[0][0]);
         });
       }, (reject, error)=>{}
     );
   }
 
-  _loadResources(arrayBufferBinary, basePath, json, defaultShader, glTFVer, resolve, options) {
-    let shaders = {};
-    let buffers = {};
-    let textures = {};
+  _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
+    let promises = [];
+
+    let resources = {
+      shaders: [],
+      buffers: [],
+      images: []
+    };
+    promises.push(this._loadResources(arrayBufferBinary, basePath, gltfJson, options, resources));
+    this._loadJsonContent(gltfJson, resources, options);
+
+    return Promise.all(promises);
+  }
+
+  _loadJsonContent(gltfJson, resources, options) {
+
+    // Scene
+    this._loadDependenciesOfScenes(gltfJson);
+
+    // Node
+    this._loadDependenciesOfNodes(gltfJson);
+
+    // Node Transformation
+//    this._loadTransformationsOfNodes(gltfJson);
+
+    // Mesh
+    this._loadDependenciesOfMeshes(gltfJson);
+
+    // Material
+    this._loadDependenciesOfMaterials(gltfJson);
+
+    // Texture
+    this._loadDependenciesOfTextures(gltfJson);
+
+    // Joint
+    this._loadDependenciesOfJoints(gltfJson);
+
+    // Animation
+    this._loadDependenciesOfAnimations(gltfJson);
+
+    // Accessor
+    this._loadDependenciesOfAccessors(gltfJson);
+
+    // BufferView
+    this._loadDependenciesOfBufferViews(gltfJson);
+
+    if (gltfJson.asset === void 0) {
+      gltfJson.asset = {};
+    }
+    if (gltfJson.asset.extras === void 0) {
+      gltfJson.asset.extras = {};
+    }
+    gltfJson.asset.extras.glboostOptions = options;
+
+  }
+
+  _loadDependenciesOfScenes(gltfJson) {
+    for (let scene of gltfJson.scenes) {
+      scene.nodesIndices = scene.nodes.concat();
+      for (let i in scene.nodesIndices) {
+        scene.nodes[i] = gltfJson.nodes[scene.nodesIndices[i]];
+      }
+    }
+  }
+
+  _loadDependenciesOfNodes(gltfJson) {
+
+    for (let node of gltfJson.nodes) {
+
+      // Hierarchy
+      if (node.children) {
+        node.childrenIndices = node.children.concat();
+        node.children = [];
+        for (let i in node.childrenIndices) {
+          node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
+        }
+      }
+ 
+      // Mesh
+      if (node.mesh !== void 0 && gltfJson.meshes !== void 0) {
+        node.meshIndex = node.mesh;
+        node.mesh = gltfJson.meshes[node.meshIndex];
+      }
+
+      // Skin
+      if (node.skin !== void 0 && gltfJson.skins !== void 0) {
+        node.skinIndex = node.skin;
+        node.skin = gltfJson.skins[node.skinIndex];
+        if (node.mesh.extras === void 0) {
+          node.mesh.extras = {};
+        }
+
+        node.mesh.extras._skin = node.skin;
+      }
+
+      // Camera
+      if (node.camera !== void 0 && gltfJson.cameras !== void 0) {
+        node.cameraIndex = node.camera;
+        node.camera = gltfJson.cameras[node.cameraIndex];
+      }
+
+    }
+
+
+  }
+  
+  _loadDependenciesOfMeshes(gltfJson) {
+    // Mesh
+    for (let mesh of gltfJson.meshes) {
+      for (let primitive of mesh.primitives) {
+        primitive.materialIndex = primitive.material;
+        primitive.material = gltfJson.materials[primitive.materialIndex];
+
+        primitive.attributesindex = Object.assign({}, primitive.attributes);
+        for (let attributeName in primitive.attributesindex) {
+          let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+          accessor.extras = {
+            toGetAsTypedArray: true
+          };
+          primitive.attributes[attributeName] = accessor;
+
+        }
+
+        if (primitive.indices !== void 0) {
+          primitive.indicesIndex = primitive.indices;
+          primitive.indices = gltfJson.accessors[primitive.indicesIndex];
+        }
+      }
+    }
+  }
+
+  _loadDependenciesOfMaterials(gltfJson) {
+    // Material
+    for (let material of gltfJson.materials) {
+      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+      if (baseColorTexture !== void 0) {
+        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+      }
+      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+      if (metallicRoughnessTexture !== void 0) {
+        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+      }
+      let normalTexture = material.normalTexture;
+      if (normalTexture !== void 0) {
+        normalTexture.texture = gltfJson.textures[normalTexture.index];
+      }
+    }
+  }
+
+  _loadDependenciesOfTextures(gltfJson) {
+    // Texture
+    if (gltfJson.textures) {
+      for (let texture of gltfJson.textures) {
+        if (texture.sampler !== void 0) {
+          texture.samplerIndex = texture.sampler;
+          texture.sampler = gltfJson.samplers[texture.samplerIndex];
+        }
+        if (texture.source !== void 0) {
+          texture.sourceIndex = texture.source;
+          texture.image = gltfJson.images[texture.sourceIndex];
+        }
+      }
+    }
+  }
+
+  _loadDependenciesOfJoints(gltfJson) {
+    if (gltfJson.skins) {
+      for (let skin of gltfJson.skins) {
+        skin.skeletonIndex = skin.skeleton;
+        skin.skeleton = gltfJson.nodes[skin.skeletonIndex];
+
+        skin.inverseBindMatricesIndex = skin.inverseBindMatrices;
+        skin.inverseBindMatrices = gltfJson.accessors[skin.inverseBindMatricesIndex];
+
+        skin.jointsIndices = skin.joints;
+        skin.joints = [];
+        for (let jointIndex of skin.jointsIndices) {
+          skin.joints.push(gltfJson.nodes[jointIndex]);
+        }
+        
+      }
+  
+    }
+  }
+
+
+  _loadDependenciesOfAnimations(gltfJson) {
+    if (gltfJson.animations) {
+      for (let animation of gltfJson.animations) {
+        for (let channel of animation.channels) {
+          channel.samplerIndex = channel.sampler;
+          channel.sampler = animation.samplers[channel.samplerIndex];
+          
+          channel.target.nodeIndex = channel.target.node;
+          channel.target.node = gltfJson.nodes[channel.target.nodeIndex];          
+        }
+        for (let channel of animation.channels) {
+          channel.sampler.inputIndex = channel.sampler.input;
+          channel.sampler.outputIndex = channel.sampler.output;
+          channel.sampler.input = gltfJson.accessors[channel.sampler.inputIndex];
+          channel.sampler.output = gltfJson.accessors[channel.sampler.outputIndex];
+          if (channel.target.path === 'rotation') {
+            if (channel.sampler.output.extras === void 0) {
+              channel.sampler.output.extras = {};
+            }
+            channel.sampler.output.extras.quaternionIfVec4 = true;
+          }
+        }
+      }
+    }
+  }
+
+  _loadDependenciesOfAccessors(gltfJson) {
+    // Accessor
+    for (let accessor of gltfJson.accessors) {
+      if (accessor.bufferView !== void 0) {
+        accessor.bufferViewIndex = accessor.bufferView;
+        accessor.bufferView = gltfJson.bufferViews[accessor.bufferViewIndex];
+      }
+    }
+  }
+
+  _loadDependenciesOfBufferViews(gltfJson) {
+    // BufferView
+    for (let bufferView of gltfJson.bufferViews) {
+      if (bufferView.buffer !== void 0) {
+        bufferView.bufferIndex = bufferView.buffer;
+        bufferView.buffer = gltfJson.buffers[bufferView.bufferIndex];
+      }
+    }
+  }
+
+  
+//  _loadTransformationsOfNodes(gltfJson) {  }
+
+  _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {
     let promisesToLoadResources = [];
 
     // Shaders Async load
-    for (let shaderName in json.shaders) {
-      shaders[shaderName] = {};
+    for (let i in gltfJson.shaders) {
+      resources.shaders[i] = {};
 
-      let shaderJson = shadersJson[shaderName];
+      let shaderJson = gltfJson.shaders[i];
       let shaderType = shaderJson.type;
       if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
-        shaders[shaderName].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary);
-        shaders[shaderName].shaderType = shaderType;
+        resources.shaders[i].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, gltfJson, arrayBufferBinary);
+        resources.shaders[i].shaderType = shaderType;
         continue;
       }
 
       let shaderUri = shaderJson.uri;
       if (shaderUri.match(/^data:/)) {
         promisesToLoadResources.push(
-          new Promise((fulfilled, rejected) => {
+          new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
-            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
-            shaders[shaderName].shaderType = shaderType;
-            fulfilled();
+            resources.shaders[i].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            resources.shaders[i].shaderType = shaderType;
+            resolve();
           })
         );
       } else {
@@ -147,9 +380,9 @@ export default class GLTF2Loader {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(shaderUri, false,
             (resolve, response)=>{
-              shaders[shaderName].shaderText = response;
-              shaders[shaderName].shaderType = shaderType;
-              resolve();
+              resources.shaders[i].shaderText = response;
+              resources.shaders[i].shaderType = shaderType;
+              resolve(gltfJson);
             },
             (reject, error)=>{
 
@@ -160,24 +393,27 @@ export default class GLTF2Loader {
     }
 
     // Buffers Async load
-    for (let i in json.buffers) {
-      let bufferInfo = json.buffers[i];
+    for (let i in gltfJson.buffers) {
+      let bufferInfo = gltfJson.buffers[i];
       if (typeof bufferInfo.uri === 'undefined') {
-        buffers[i] = arrayBufferBinary;
+        resources.buffers[i] = arrayBufferBinary;
+        bufferInfo.buffer = arrayBufferBinary;
       } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
-            buffers[i] = arrayBuffer;
-            resolve();
+            resources.buffers[i] = arrayBuffer;
+            bufferInfo.buffer = arrayBuffer;
+            resolve(gltfJson);
           })
         );
       } else {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
             (resolve, response)=>{
-              buffers[i] = response;
-              resolve();
+              resources.buffers[i] = response;
+              bufferInfo.buffer = response;
+              resolve(gltfJson);
             },
             (reject, error)=>{
 
@@ -188,21 +424,21 @@ export default class GLTF2Loader {
     }
 
     // Textures Async load
-    for (let textureName in json.textures) {
-      let textureJson = json.textures[textureName];
-      let imageJson = json.images[textureJson.source];
-      let samplerJson = json.samplers[textureJson.sampler];
+    for (let i in gltfJson.images) {
+      let imageJson = gltfJson.images[i];
+      //let imageJson = gltfJson.images[textureJson.source];
+      //let samplerJson = gltfJson.samplers[textureJson.sampler];
 
-      let textureUri = null;
+      let imageUri = null;
 
-      if (typeof imageJson.extensions !== 'undefined' && typeof imageJson.extensions.KHR_binary_glTF !== 'undefined') {
-        textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
+      if (typeof imageJson.uri === 'undefined') {
+        imageUri = this._accessBinaryAsImage(imageJson.bufferView, gltfJson, arrayBufferBinary, imageJson.mimeType);
       } else {
         let imageFileStr = imageJson.uri;
         if (imageFileStr.match(/^data:/)) {
-          textureUri = imageFileStr;
+          imageUri = imageFileStr;
         } else {
-          textureUri = basePath + imageFileStr;
+          imageUri = basePath + imageFileStr;
         }
       }
 
@@ -235,21 +471,52 @@ export default class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
-        if (!textureUri.match(/^data:/)) {
-          this._img.crossOrigin = 'Anonymous';
+        if (!imageUri.match(/^data:/)) {
+          img.crossOrigin = 'Anonymous';
         }
-        this.img.onload = () => {
-          resolve(img);
+        img.onload = () => {
+          imageJson.image = img;
+          resolve(gltfJson);
         };
 
-        img.src = textureUri;
+        img.src = imageUri;
 
-        textures[textureName] = texture;
+        resources.images[i] = img;
       }));
     }
 
     return Promise.all(promisesToLoadResources);
   }
+
+  _accessBinaryAsImage(bufferViewStr, gltfJson, arrayBuffer, mimeType) {
+    let bufferViewJson = gltfJson.bufferViews[bufferViewStr];
+    let byteOffset = bufferViewJson.byteOffset;
+    let byteLength = bufferViewJson.byteLength;
+
+    let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+    let bytes = new Uint8Array(arrayBufferSliced);
+    let binaryData = '';
+    for (let i = 0, len = bytes.byteLength; i < len; i++) {
+      binaryData += String.fromCharCode(bytes[i]);
+    }
+    let imgSrc = '';
+    if (mimeType == 'image/jpeg') {
+      imgSrc = "data:image/jpeg;base64,";
+    } else if (mimeType == 'image/png') {
+      imgSrc = "data:image/png;base64,";
+    } else if (mimeType == 'image/gif') {
+      imgSrc = "data:image/gif;base64,";
+    } else if (mimeType == 'image/bmp') {
+      imgSrc = "data:image/bmp;base64,";
+    } else {
+      imgSrc = "data:image/unknown;base64,";
+    }
+    let dataUrl = imgSrc + DataUtil.btoa(binaryData);
+
+    return dataUrl;
+  }
+
+
 }
 
 GLBoost["GLTF2Loader"] = GLTF2Loader;
