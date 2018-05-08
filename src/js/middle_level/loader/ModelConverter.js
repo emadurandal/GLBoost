@@ -57,7 +57,7 @@ export default class ModelConverter {
     this._setupTransform(gltfModel, groups);
 
     // Skeleton
-    this._setupSkeleton(gltfModel, groups, glboostMeshes);
+    this._setupSkeleton(glBoostContext, gltfModel, groups, glboostMeshes);
 
     // Hierarchy
     this._setupHierarchy(glBoostContext, gltfModel, groups, glboostMeshes);
@@ -156,7 +156,7 @@ export default class ModelConverter {
     }
   }
 
-  _setupSkeleton(gltfModel, groups, glboostMeshes) {
+  _setupSkeleton(glBoostContext, gltfModel, groups, glboostMeshes) {
     for (let node_i in gltfModel.nodes) {
       let node = gltfModel.nodes[node_i];
       let group = groups[node_i];
@@ -187,7 +187,7 @@ export default class ModelConverter {
     for (let mesh of gltfModel.meshes) {
       let geometry = null;
       let glboostMesh = null;
-      if (mesh.extras && mesh.extras._skin) {
+      if (mesh.extras && mesh.extras._skin && mesh.extras._skin.inverseBindMatrices) {
         geometry = glBoostContext.createSkeletalGeometry();
         glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
         glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
@@ -216,7 +216,8 @@ export default class ModelConverter {
       let additional = {
         'joint': [],
         'weight': [],
-        'texcoord': []
+        'texcoord': [],
+        'color': []
       };
 
       let dataViewMethodDic = {};
@@ -247,17 +248,29 @@ export default class ModelConverter {
 
         {
           let accessor = primitive.attributes.NORMAL;
-          _normals[i] = accessor.extras.vertexAttributeArray;
-          vertexData.components.normal = accessor.extras.componentN;
-          vertexData.componentBytes.normal = accessor.extras.componentBytes;
-          vertexData.componentType.normal = accessor.componentType;
-          dataViewMethodDic.normal = accessor.extras.dataViewMethod;
+          if (accessor) {
+            _normals[i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.normal = accessor.extras.componentN;
+            vertexData.componentBytes.normal = accessor.extras.componentBytes;
+            vertexData.componentType.normal = accessor.componentType;
+            dataViewMethodDic.normal = accessor.extras.dataViewMethod;
+          }
+          
+          accessor = primitive.attributes.COLOR_0;
+          if (accessor) {
+            additional['color'][i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.color = accessor.extras.componentN;
+            vertexData.componentBytes.color = accessor.extras.componentBytes;
+            vertexData.componentType.color = accessor.componentType;
+            dataViewMethodDic.color = accessor.extras.dataViewMethod;
+          }
         }
+
 
         {
           let accessor = primitive.attributes.JOINTS_0;
           if (accessor) {
-            additional['joint'][i] = accessor.extras.vertexAttributeArray;;
+            additional['joint'][i] = accessor.extras.vertexAttributeArray;
             vertexData.components.joint = accessor.extras.componentN;
             vertexData.componentBytes.joint = accessor.extras.componentBytes;
             vertexData.componentType.joint = accessor.componentType;
@@ -265,7 +278,7 @@ export default class ModelConverter {
           }
           accessor = primitive.attributes.WEIGHTS_0;
           if (accessor) {
-            additional['weight'][i] = accessor.extras.vertexAttributeArray;;
+            additional['weight'][i] = accessor.extras.vertexAttributeArray;
             vertexData.components.weight = accessor.extras.componentN;
             vertexData.componentBytes.weight = accessor.extras.componentBytes;
             vertexData.componentType.weight = accessor.componentType;
@@ -301,8 +314,8 @@ export default class ModelConverter {
           } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
-          if (defaultShader) {
-            glboostMaterial.shaderClass = defaultShader;
+          if (options.defaultShader) {
+            glboostMaterial.shaderClass = options.defaultShader;
           } else {
             glboostMaterial.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
           }
@@ -326,6 +339,9 @@ export default class ModelConverter {
           }
           if (typeof additional['texcoord'][i] !== 'undefined') {
             lengthDic.texcoord += additional['texcoord'][i].length;
+          }
+          if (typeof additional['color'][i] !== 'undefined') {
+            lengthDic.color += additional['color'][i].length;
           }
         }
   
@@ -367,6 +383,8 @@ export default class ModelConverter {
               array = additional['weight'][i];
             } else if (attribName === 'texcoord') {
               array = additional['texcoord'][i];
+            } else if (attribName === 'color') {
+              array = additional['color'][i];
             }
   
             if (array) {
@@ -385,6 +403,8 @@ export default class ModelConverter {
             additional['weight'] = newTypedArray;
           } else if (attribName === 'texcoord') {
             additional['texcoord'] = newTypedArray;
+          } else if (attribName === 'color') {
+            additional['color'] = newTypedArray;
           }
         }
   
@@ -395,6 +415,7 @@ export default class ModelConverter {
         additional['joint'] = additional['joint'][0];
         additional['weight'] = additional['weight'][0];
         additional['texcoord'] = additional['texcoord'][0];
+        additional['color'] = additional['color'][0];
       }
   
       if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
@@ -408,6 +429,9 @@ export default class ModelConverter {
       }
       if (typeof additional['texcoord'] === 'undefined' || additional['texcoord'].length === 0) {
         delete additional['texcoord'];
+      }
+      if (typeof additional['color'] === 'undefined' || additional['color'].length === 0) {
+        delete additional['color'];
       }
   
   
