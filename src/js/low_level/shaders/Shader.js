@@ -431,7 +431,7 @@ export default class Shader extends GLBoostObject {
       shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
     } else {
       // Unknown shader type
-      return null;
+      shader = null;
     }
 
     gl.shaderSource(shader, theSource);
@@ -441,10 +441,12 @@ export default class Shader extends GLBoostObject {
 
     // See if it compiled successfully
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+      console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
       console.error(gl.getShaderInfoLog(shader));
-      return null;
+
+      shader = null;
     }
+  
 
     return shader;
   }
@@ -460,6 +462,10 @@ export default class Shader extends GLBoostObject {
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
 
+    if (vertexShader === null || fragmentShader === null) {
+      return null;
+    }
+
     // Create the shader program
     var shaderProgram = this._glContext.createProgram(this);
     gl.attachShader(shaderProgram, vertexShader);
@@ -470,7 +476,7 @@ export default class Shader extends GLBoostObject {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+      console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
       console.error(gl.getProgramInfoLog(shaderProgram));
     }
 
@@ -487,56 +493,64 @@ export default class Shader extends GLBoostObject {
     var gl = this._glContext.gl;
     var canvasId = this._glContext.belongingCanvasId;
 
-    let lights = this.getDefaultPointLightIfNotExist(lights_);
-
-    lights = lights.filter((light)=>{return !light.isTypeAmbient();});
-
-    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
-
-    // lookup shaderHashTable
-    var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
-    var hash = Hash.toCRC32(baseText);
-    if (!Shader._shaderHashTable[canvasId]) {
-      Shader._shaderHashTable[canvasId] = {};
-    }
     let programToReturn = null;
-    var hashTable = Shader._shaderHashTable[canvasId];
-    if (hash in hashTable) {
-      if (hashTable[hash].code === baseText) {
-        programToReturn = hashTable[hash].program;
-      } else {
-        for (let i=0; i<hashTable[hash].collisionN; i++) {
-          if (hashTable[hash + '_' + i].code === baseText) {
-            programToReturn = hashTable[hash + '_' + i].program;
-            break;
+    let lights = null;
+    
+    do {
+      lights = this.getDefaultPointLightIfNotExist(lights_);
+      lights = lights.filter((light)=>{return !light.isTypeAmbient();});
+
+      var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
+      var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
+
+      // lookup shaderHashTable
+      var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
+      var hash = Hash.toCRC32(baseText);
+      if (!Shader._shaderHashTable[canvasId]) {
+        Shader._shaderHashTable[canvasId] = {};
+      }
+      var hashTable = Shader._shaderHashTable[canvasId];
+      if (hash in hashTable) {
+        if (hashTable[hash].code === baseText) {
+          programToReturn = hashTable[hash].program;
+        } else {
+          for (let i=0; i<hashTable[hash].collisionN; i++) {
+            if (hashTable[hash + '_' + i].code === baseText) {
+              programToReturn = hashTable[hash + '_' + i].program;
+              break;
+            }
           }
+          hashTable[hash].collisionN++;
         }
-        hashTable[hash].collisionN++;
-      }
-    }
-
-    if (programToReturn === null || !gl.isProgram(programToReturn)) {
-    // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-
-      // register it to shaderHashTable.
-      let indexStr = null;
-      if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
-        indexStr = hash + '_' + hashTable[hash].collisionN;
-      } else {
-        indexStr = hash;
       }
 
-      MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
-      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
-      programToReturn.createdAt = performance.now();
-      programToReturn.hashId = indexStr;
-      programToReturn.glslProgramsSelfUsageCount = -1;
+      if (programToReturn === null || !gl.isProgram(programToReturn)) {
+      // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
 
-      hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
-      Shader._shaderHashTable[canvasId] = hashTable;
+        // register it to shaderHashTable.
+        let indexStr = null;
+        if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
+          indexStr = hash + '_' + hashTable[hash].collisionN;
+        } else {
+          indexStr = hash;
+        }
 
-    }
+        MiscUtil.consoleLog(GLBoost.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
+        programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+        if (programToReturn !== null) {
+          programToReturn.createdAt = performance.now();
+          programToReturn.hashId = indexStr;
+          programToReturn.glslProgramsSelfUsageCount = -1;
+
+          hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
+          Shader._shaderHashTable[canvasId] = hashTable;
+        } else if (this.className === "SkeletalShader") {
+          GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL++;
+          console.log('GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL was changed to : '+GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL);
+        }
+
+      }
+    } while (programToReturn === null && this.className === "SkeletalShader" && GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL < 3);
 
     this._glslProgram = programToReturn;
 
@@ -680,7 +694,7 @@ export default class Shader extends GLBoostObject {
       shaderText += '  vec3 normal = normalize(v_normal_world);\n';
       shaderText += '  vec3 normal_world = normal;\n';
     } else if (material.isFlatShading || !Shader._exist(f, GLBoost.NORMAL)) {
-      if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
         shaderText += '  vec3 dx = dFdx(v_position_world);\n';
         shaderText += '  vec3 dy = dFdy(v_position_world);\n';
 
