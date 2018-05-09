@@ -27,9 +27,26 @@ export default class M_Group extends M_Element {
    * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
    */
   addChild(element) {
-    this.removeChild(element);
-    element._parent = this;
-    this._elements.push(element);
+    { 
+      //// if forbit duplicated register
+      // this.removeChild(element);
+      // element._parent = this;
+      // this._elements.push(element);
+
+    }
+
+    {
+
+      // if forgive duplicated register by copy
+      let elem = null;
+      if (element._parent) {
+        elem = element.clone();
+      } else {
+        elem = element;
+      }
+      elem._parent = this;
+      this._elements.push(elem);
+    }
   }
 
   /**
@@ -347,35 +364,26 @@ export default class M_Group extends M_Element {
         //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
       }
       if (elem instanceof M_Mesh) {
-        let aabb = elem.rawAABBInLocal;
+        let aabb = elem.AABBInWorld;
         //console.log(aabb.toString());
         return aabb;
       }
 
       return null;
     })(this);
-    this._AABB = new AABB();
-    this._AABB.mergeAABB(aabb);
-    this._AABB.updateAllInfo();
+    this.AABB.mergeAABB(aabb);
 
-    let world_m = this.worldMatrix;
-    let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
+    let newAABB = this.AABB;
 
 //    this._AABB = aabbInWorld;
 
     this._updateAABBGizmo();
 
-    return aabbInWorld;
+    return newAABB;
   }
 
-  /*
-   * Note that it's in local space
-   */
   get AABB() {
-    let world_m = this.worldMatrix;
-    //let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
-    //return aabbInWorld;
-    return this._AABB;//.clone();
+    return this._AABB;
   }
 
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {

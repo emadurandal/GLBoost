@@ -14,7 +14,8 @@ export default class M_SkeletalMesh extends M_Mesh {
     this._jointsHierarchy = null;
     this._inverseBindMatrices = [];
     this._bindShapeMatrix = Matrix44.identity();
-    this._jointNames = [];
+    this._jointNames = []; // for glTF1.0
+    this._gltfJointIndices = []; // for glTF2.0
     this._joints = [];
 
     // these are calculated by M_SkeletalGeometry
@@ -32,10 +33,27 @@ export default class M_SkeletalMesh extends M_Mesh {
     this._joints = [];
 
     // sort & choice joints according to jointNames for skinning
+    /// for glTF1.0
     let jointCount=0;
     for (let i=0; i<this._jointNames.length; i++) {
       for (let j=0; j<joints.length; j++) {
         if (this._jointNames[i] === joints[j]._userFlavorName) {
+          this._joints.push(joints[j]);
+          joints[j].skeletalMesh = this;
+//          joints[j].isVisible = true;
+          let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44.identity(); 
+          joints[j].inverseBindMatrix = inverseBindMatrix;
+          joints[j].bindMatrix = Matrix44.invert(inverseBindMatrix);
+          jointCount++;
+          break;
+        }
+      }
+    }
+    /// for glTF2.0
+    jointCount=0;
+    for (let i=0; i<this._gltfJointIndices.length; i++) {
+      for (let j=0; j<joints.length; j++) {
+        if (this._gltfJointIndices[i] === joints[j]._glTFJointIndex) {
           this._joints.push(joints[j]);
           joints[j].skeletalMesh = this;
 //          joints[j].isVisible = true;
@@ -64,12 +82,21 @@ export default class M_SkeletalMesh extends M_Mesh {
           Array.prototype.push.apply(results, result);
         }
 
+        // for glTF1.0
         for (let jointName of this._jointNames) {
           if (parentJoint.userFlavorName === jointName) {
             results.push(parentJoint);
             return results;
           }
         }
+        // for glTF2.0
+        for (let gltfJointIndex of this._gltfJointIndices) {
+          if (parentJoint._glTFJointIndex === gltfJointIndex) {
+            results.push(parentJoint);
+            return results;
+          }
+        }
+
 
         return results;
       }
@@ -132,6 +159,13 @@ export default class M_SkeletalMesh extends M_Mesh {
     return this._jointNames;
   }
 
+  set gltfJointIndices(indices) {
+    this._gltfJointIndices = indices;
+  }
+  get gltfJointIndices() {
+    return this._gltfJointIndices;
+  }
+
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
     let instance = new M_SkeletalMesh(this._glBoostContext, this.geometry, this.material, this._rootJointName);
     this._copy(instance, clonedOriginalRootElement, clonedRootElement, onCompleteFuncs);
@@ -146,6 +180,7 @@ export default class M_SkeletalMesh extends M_Mesh {
     instance._inverseBindMatrices = this._inverseBindMatrices;
     instance._bindShapeMatrix = this._bindShapeMatrix;
     instance._jointNames = this._jointNames;
+    instance._gltfJointIndices = this._gltfJointIndices;
     instance._joints = this._joints;
 
     onCompleteFuncs.push((function(clonedSkeletalMesh, _clonedRootElement, jointRootGroupUserFlavorName) {
