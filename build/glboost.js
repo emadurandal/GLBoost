@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 2a186865
+// This revision is the commit right after the SHA: 4437c38a
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -15652,6 +15652,21 @@ class GLTFLoader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      statesOfElements: [
+        {
+          targets: [], //["name_foo", "name_boo"],
+          specifyMethod: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
+          states: {
+            enable: [
+                // 3042,  // BLEND
+            ],
+            functions: {
+              //"blendFuncSeparate": [1, 0, 1, 0],
+            }
+          },
+          globalStatesUsage: GLOBAL_STATES_USAGE_IGNORE // GLOBAL_STATES_USAGE_DO_NOTHING // GLOBAL_STATES_USAGE_INCLUSIVE // GLOBAL_STATES_USAGE_EXCLUSIVE
+        }
+      ],
       isAllMeshesTransparent: true
     }
   ) {
@@ -17082,7 +17097,7 @@ class GLTF2Loader {
     // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
-        if (primitive.material) {
+        if (primitive.material !== void 0) {
           primitive.materialIndex = primitive.material;
           primitive.material = gltfJson.materials[primitive.materialIndex];  
         }

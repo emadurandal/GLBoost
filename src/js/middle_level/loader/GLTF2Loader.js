@@ -228,7 +228,7 @@ export default class GLTF2Loader {
     // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
-        if (primitive.material) {
+        if (primitive.material !== void 0) {
           primitive.materialIndex = primitive.material;
           primitive.material = gltfJson.materials[primitive.materialIndex];  
         }
