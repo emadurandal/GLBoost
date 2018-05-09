@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 42b6d10b
+// This revision is the commit right after the SHA: c3a08414
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3462,6 +3462,7 @@ class L_Element extends GLBoostObject {
   }
 
   isTrsMatrixNeeded(lineName, inputValue) {
+    //console.log(this._animationLine['time']);
     let result = (
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate') === null &&
@@ -4171,14 +4172,14 @@ class SkeletalShaderSource {
     shaderText += `${in_} vec4 aVertex_joint;\n`;
     shaderText += `${in_} vec4 aVertex_weight;\n`;
 
-    if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+    if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
       shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1){
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1){
       shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
       //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
 
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
       // `OneVec4` Version [Begin]
       shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
       shaderText += 'uniform vec3 translationScale;\n';
@@ -4443,19 +4444,19 @@ return mat4(
 
     shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
 
-    if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+    if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
       shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
       shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
       shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
       shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
 
       // `Quaterion (Vec4) Transform(Vec3)` Version
       shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
       shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
       shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
       shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
 
       // `OneVec4` Version
       shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
@@ -4505,11 +4506,11 @@ return mat4(
       }
     });
 
-    if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+    if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
       let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
       material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
       material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
       
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
       material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
@@ -4518,7 +4519,7 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
       material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
       
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
       
       // `OneVec4` Version [Begin]
       let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
@@ -5134,7 +5135,7 @@ class Shader extends GLBoostObject {
       shader = this._glContext.createShader(this, gl.VERTEX_SHADER);
     } else {
       // Unknown shader type
-      return null;
+      shader = null;
     }
 
     gl.shaderSource(shader, theSource);
@@ -5144,10 +5145,12 @@ class Shader extends GLBoostObject {
 
     // See if it compiled successfully
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+      console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
       console.error(gl.getShaderInfoLog(shader));
-      return null;
+
+      shader = null;
     }
+  
 
     return shader;
   }
@@ -5163,6 +5166,10 @@ class Shader extends GLBoostObject {
     var vertexShader = this._getShader(gl, vertexShaderStr, 'x-shader/x-vertex');
     var fragmentShader = this._getShader(gl, fragmentShaderStr, 'x-shader/x-fragment');
 
+    if (vertexShader === null || fragmentShader === null) {
+      return null;
+    }
+
     // Create the shader program
     var shaderProgram = this._glContext.createProgram(this);
     gl.attachShader(shaderProgram, vertexShader);
@@ -5173,7 +5180,7 @@ class Shader extends GLBoostObject {
 
     // If creating the shader program failed, alert
     if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-      alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+      console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
       console.error(gl.getProgramInfoLog(shaderProgram));
     }
 
@@ -5190,56 +5197,64 @@ class Shader extends GLBoostObject {
     var gl = this._glContext.gl;
     var canvasId = this._glContext.belongingCanvasId;
 
-    let lights = this.getDefaultPointLightIfNotExist(lights_);
-
-    lights = lights.filter((light)=>{return !light.isTypeAmbient();});
-
-    var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
-    var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
-
-    // lookup shaderHashTable
-    var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
-    var hash = Hash.toCRC32(baseText);
-    if (!Shader._shaderHashTable[canvasId]) {
-      Shader._shaderHashTable[canvasId] = {};
-    }
     let programToReturn = null;
-    var hashTable = Shader._shaderHashTable[canvasId];
-    if (hash in hashTable) {
-      if (hashTable[hash].code === baseText) {
-        programToReturn = hashTable[hash].program;
-      } else {
-        for (let i=0; i<hashTable[hash].collisionN; i++) {
-          if (hashTable[hash + '_' + i].code === baseText) {
-            programToReturn = hashTable[hash + '_' + i].program;
-            break;
+    let lights = null;
+    
+    do {
+      lights = this.getDefaultPointLightIfNotExist(lights_);
+      lights = lights.filter((light)=>{return !light.isTypeAmbient();});
+
+      var vertexShaderText = this._getVertexShaderString(gl, vertexAttribs, existCamera_f, lights, material, extraData);
+      var fragmentShaderText = this._getFragmentShaderString(gl, vertexAttribs, lights, material,  extraData);
+
+      // lookup shaderHashTable
+      var baseText = vertexShaderText + '\n###SPLIT###\n' + fragmentShaderText;
+      var hash = Hash.toCRC32(baseText);
+      if (!Shader._shaderHashTable[canvasId]) {
+        Shader._shaderHashTable[canvasId] = {};
+      }
+      var hashTable = Shader._shaderHashTable[canvasId];
+      if (hash in hashTable) {
+        if (hashTable[hash].code === baseText) {
+          programToReturn = hashTable[hash].program;
+        } else {
+          for (let i=0; i<hashTable[hash].collisionN; i++) {
+            if (hashTable[hash + '_' + i].code === baseText) {
+              programToReturn = hashTable[hash + '_' + i].program;
+              break;
+            }
           }
+          hashTable[hash].collisionN++;
         }
-        hashTable[hash].collisionN++;
-      }
-    }
-
-    if (programToReturn === null || !gl.isProgram(programToReturn)) {
-    // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
-
-      // register it to shaderHashTable.
-      let indexStr = null;
-      if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
-        indexStr = hash + '_' + hashTable[hash].collisionN;
-      } else {
-        indexStr = hash;
       }
 
-      MiscUtil.consoleLog(GLBoost$1.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
-      programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
-      programToReturn.createdAt = performance.now();
-      programToReturn.hashId = indexStr;
-      programToReturn.glslProgramsSelfUsageCount = -1;
+      if (programToReturn === null || !gl.isProgram(programToReturn)) {
+      // if the current shader codes is not in shaderHashTable, create GLSL Shader Program.
 
-      hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
-      Shader._shaderHashTable[canvasId] = hashTable;
+        // register it to shaderHashTable.
+        let indexStr = null;
+        if (typeof hashTable[hash] !== 'undefined' && hashTable[hash].collisionN > 0) {
+          indexStr = hash + '_' + hashTable[hash].collisionN;
+        } else {
+          indexStr = hash;
+        }
 
-    }
+        MiscUtil.consoleLog(GLBoost$1.LOG_SHADER_CODE, 'ShaderInstance: ' + material.shaderInstance + '   ShaderHashId: ' + indexStr);
+        programToReturn = this._initShaders(gl, vertexShaderText, fragmentShaderText);
+        if (programToReturn !== null) {
+          programToReturn.createdAt = performance.now();
+          programToReturn.hashId = indexStr;
+          programToReturn.glslProgramsSelfUsageCount = -1;
+
+          hashTable[indexStr] = {code:baseText, program:programToReturn, collisionN:0};
+          Shader._shaderHashTable[canvasId] = hashTable;
+        } else if (this.className === "SkeletalShader") {
+          GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL++;
+          console.log('GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL was changed to : '+GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL);
+        }
+
+      }
+    } while (programToReturn === null && this.className === "SkeletalShader" && GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL < 3);
 
     this._glslProgram = programToReturn;
 
@@ -5383,7 +5398,7 @@ class Shader extends GLBoostObject {
       shaderText += '  vec3 normal = normalize(v_normal_world);\n';
       shaderText += '  vec3 normal_world = normal;\n';
     } else if (material.isFlatShading || !Shader._exist(f, GLBoost$1.NORMAL)) {
-      if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
         shaderText += '  vec3 dx = dFdx(v_position_world);\n';
         shaderText += '  vec3 dy = dFdy(v_position_world);\n';
 
@@ -9049,16 +9064,25 @@ class M_AbstractCamera extends M_Element {
 GLBoost['M_AbstractCamera'] = M_AbstractCamera;
 
 class L_CameraController extends GLBoostObject {
-  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
+  constructor(glBoostContext, 
+    options = {
+      isSymmetryMode: true,
+      doResetWhenCameraSettingChanged: false,
+      isForceGrab: false,
+      efficiency: 1.0,
+      onlyAdjustZFar: false,
+    }
+  ) {
     super(glBoostContext);
 
     this._camaras = new Set();
 
     this._isKeyUp = true;
-    this._isForceGrab = isForceGrab;
-    this._isSymmetryMode = isSymmetryMode;
+    this._isForceGrab = options.isForceGrab !== void 0 ? options.isForceGrab : false;
+    this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
-    this._efficiency = 0.5 * efficiency;
+    this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
+    this._onlyAdjustZFar = options.onlyAdjustZFar !== void 0 ? options.onlyAdjustZFar : false;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -9088,7 +9112,7 @@ class L_CameraController extends GLBoostObject {
     this._foyvBias = 1.0;
     this._zFarAdjustingFactorBasedOnAABB = 1.0;
 
-    this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
+    this._doResetWhenCameraSettingChanged = options.doResetWhenCameraSettingChanged !== void 0 ? options.doResetWhenCameraSettingChanged : false;
 
     this._shiftCameraTo = null;
 
@@ -9318,7 +9342,7 @@ class L_CameraController extends GLBoostObject {
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-    if (this._target === null) {
+    if (this._target === null || this._onlyAdjustZFar) {
       return [eyeVec, centerVec, upVec];
     }
 
@@ -12158,8 +12182,8 @@ class GLBoostLowContext {
     return new L_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
-    return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+  createCameraController(options) {
+    return new L_CameraController(this, options);
   }
 
   createTexture(src, userFlavorName, parameters = null) {
@@ -15095,7 +15119,7 @@ class M_SkeletalGeometry extends Geometry {
       matrices[i] = matrix;
   }
 */
-    if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+    if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
 
       let flatMatrices = [];
       for (let i=0; i<matrices.length; i++) {
@@ -15116,7 +15140,7 @@ class M_SkeletalGeometry extends Geometry {
       }
       skeletalMesh._jointMatrices = flatMatrices;
 
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
       {
         // no comporess
 
@@ -15155,7 +15179,7 @@ class M_SkeletalGeometry extends Geometry {
          // console.log(scale);
         }
       }
-    } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+    } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
       /*
       {
         // comporess quaternion only
@@ -15241,13 +15265,13 @@ class M_SkeletalGeometry extends Geometry {
       //var glslProgram = materials[i].shaderInstance.glslProgram;
 //      this._glContext.useProgram(glslProgram);
       
-      if (!GLBoost$1.VALUE_TARGET_IS_MOBILE) {
+      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
-      } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE === 1) {
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
   //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-      } else if (GLBoost$1.VALUE_TARGET_IS_MOBILE > 1) {
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
         
         // `OneVec4` Vertion [Begin]
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 
@@ -16905,7 +16929,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   /// define value of GLBoost global settings.
   let define = defineValueOfGLBoostConstants;
   define('VALUE_TARGET_WEBGL_VERSION', 1);
-  define('VALUE_TARGET_IS_MOBILE', 0);
+  define('VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL', 0);
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
@@ -17046,6 +17070,21 @@ class GLTFLoader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      statesOfElements: [
+        {
+          targets: [], //["name_foo", "name_boo"],
+          specifyMethod: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
+          states: {
+            enable: [
+                // 3042,  // BLEND
+            ],
+            functions: {
+              //"blendFuncSeparate": [1, 0, 1, 0],
+            }
+          },
+          globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
+        }
+      ],
       isAllMeshesTransparent: true
     }
   ) {
@@ -18372,7 +18411,10 @@ class GLTF2Loader {
       images: []
     };
     promises.push(this._loadResources(arrayBufferBinary, basePath, gltfJson, options, resources));
-    this._loadJsonContent(gltfJson, resources, options);
+    promises.push(new Promise(((resolve, reject) => {
+      this._loadJsonContent(gltfJson, resources, options);
+      resolve();
+    })));
 
     return Promise.all(promises);
   }
@@ -18473,17 +18515,22 @@ class GLTF2Loader {
     // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
-        primitive.materialIndex = primitive.material;
-        primitive.material = gltfJson.materials[primitive.materialIndex];
+        if (primitive.material !== void 0) {
+          primitive.materialIndex = primitive.material;
+          primitive.material = gltfJson.materials[primitive.materialIndex];  
+        }
 
         primitive.attributesindex = Object.assign({}, primitive.attributes);
         for (let attributeName in primitive.attributesindex) {
-          let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
-          accessor.extras = {
-            toGetAsTypedArray: true
-          };
-          primitive.attributes[attributeName] = accessor;
-
+          if (primitive.attributesindex[attributeName] >= 0) {
+            let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+            accessor.extras = {
+              toGetAsTypedArray: true
+            };
+            primitive.attributes[attributeName] = accessor;
+          } else {
+            primitive.attributes[attributeName] = void 0;
+          }
         }
 
         if (primitive.indices !== void 0) {
@@ -18496,18 +18543,23 @@ class GLTF2Loader {
 
   _loadDependenciesOfMaterials(gltfJson) {
     // Material
-    for (let material of gltfJson.materials) {
-      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
-      if (baseColorTexture !== void 0) {
-        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
-      }
-      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
-      if (metallicRoughnessTexture !== void 0) {
-        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
-      }
-      let normalTexture = material.normalTexture;
-      if (normalTexture !== void 0) {
-        normalTexture.texture = gltfJson.textures[normalTexture.index];
+    if (gltfJson.materials) {
+      for (let material of gltfJson.materials) {
+        if (material.pbrMetallicRoughness) {
+          let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+          if (baseColorTexture !== void 0) {
+            baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+          }
+          let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+          if (metallicRoughnessTexture !== void 0) {
+            metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+          }
+        }
+
+        let normalTexture = material.normalTexture;
+        if (normalTexture !== void 0) {
+          normalTexture.texture = gltfJson.textures[normalTexture.index];
+        }
       }
     }
   }
@@ -18719,15 +18771,16 @@ class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
-        if (!imageUri.match(/^data:/)) {
-          img.crossOrigin = 'Anonymous';
-        }
-        img.onload = () => {
-          imageJson.image = img;
-          resolve(gltfJson);
-        };
-
         img.src = imageUri;
+        imageJson.image = img;
+        if (imageUri.match(/^data:/)) {
+          resolve(gltfJson);
+        } else {
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            resolve(gltfJson);
+          };
+        }
 
         resources.images[i] = img;
       }));
@@ -18818,7 +18871,7 @@ class ModelConverter {
     this._setupTransform(gltfModel, groups);
 
     // Skeleton
-    this._setupSkeleton(gltfModel, groups, glboostMeshes);
+    this._setupSkeleton(glBoostContext, gltfModel, groups, glboostMeshes);
 
     // Hierarchy
     this._setupHierarchy(glBoostContext, gltfModel, groups, glboostMeshes);
@@ -18917,7 +18970,7 @@ class ModelConverter {
     }
   }
 
-  _setupSkeleton(gltfModel, groups, glboostMeshes) {
+  _setupSkeleton(glBoostContext, gltfModel, groups, glboostMeshes) {
     for (let node_i in gltfModel.nodes) {
       let node = gltfModel.nodes[node_i];
       let group = groups[node_i];
@@ -18948,7 +19001,7 @@ class ModelConverter {
     for (let mesh of gltfModel.meshes) {
       let geometry = null;
       let glboostMesh = null;
-      if (mesh.extras && mesh.extras._skin) {
+      if (mesh.extras && mesh.extras._skin && mesh.extras._skin.inverseBindMatrices) {
         geometry = glBoostContext.createSkeletalGeometry();
         glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
         glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
@@ -18977,7 +19030,8 @@ class ModelConverter {
       let additional = {
         'joint': [],
         'weight': [],
-        'texcoord': []
+        'texcoord': [],
+        'color': []
       };
 
       let dataViewMethodDic = {};
@@ -19008,12 +19062,24 @@ class ModelConverter {
 
         {
           let accessor = primitive.attributes.NORMAL;
-          _normals[i] = accessor.extras.vertexAttributeArray;
-          vertexData.components.normal = accessor.extras.componentN;
-          vertexData.componentBytes.normal = accessor.extras.componentBytes;
-          vertexData.componentType.normal = accessor.componentType;
-          dataViewMethodDic.normal = accessor.extras.dataViewMethod;
+          if (accessor) {
+            _normals[i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.normal = accessor.extras.componentN;
+            vertexData.componentBytes.normal = accessor.extras.componentBytes;
+            vertexData.componentType.normal = accessor.componentType;
+            dataViewMethodDic.normal = accessor.extras.dataViewMethod;
+          }
+          
+          accessor = primitive.attributes.COLOR_0;
+          if (accessor) {
+            additional['color'][i] = accessor.extras.vertexAttributeArray;
+            vertexData.components.color = accessor.extras.componentN;
+            vertexData.componentBytes.color = accessor.extras.componentBytes;
+            vertexData.componentType.color = accessor.componentType;
+            dataViewMethodDic.color = accessor.extras.dataViewMethod;
+          }
         }
+
 
         {
           let accessor = primitive.attributes.JOINTS_0;
@@ -19062,8 +19128,8 @@ class ModelConverter {
           } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
-          if (defaultShader) {
-            glboostMaterial.shaderClass = defaultShader;
+          if (options.defaultShader) {
+            glboostMaterial.shaderClass = options.defaultShader;
           } else {
             glboostMaterial.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
           }
@@ -19087,6 +19153,9 @@ class ModelConverter {
           }
           if (typeof additional['texcoord'][i] !== 'undefined') {
             lengthDic.texcoord += additional['texcoord'][i].length;
+          }
+          if (typeof additional['color'][i] !== 'undefined') {
+            lengthDic.color += additional['color'][i].length;
           }
         }
   
@@ -19128,6 +19197,8 @@ class ModelConverter {
               array = additional['weight'][i];
             } else if (attribName === 'texcoord') {
               array = additional['texcoord'][i];
+            } else if (attribName === 'color') {
+              array = additional['color'][i];
             }
   
             if (array) {
@@ -19146,6 +19217,8 @@ class ModelConverter {
             additional['weight'] = newTypedArray;
           } else if (attribName === 'texcoord') {
             additional['texcoord'] = newTypedArray;
+          } else if (attribName === 'color') {
+            additional['color'] = newTypedArray;
           }
         }
   
@@ -19156,6 +19229,7 @@ class ModelConverter {
         additional['joint'] = additional['joint'][0];
         additional['weight'] = additional['weight'][0];
         additional['texcoord'] = additional['texcoord'][0];
+        additional['color'] = additional['color'][0];
       }
   
       if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
@@ -19169,6 +19243,9 @@ class ModelConverter {
       }
       if (typeof additional['texcoord'] === 'undefined' || additional['texcoord'].length === 0) {
         delete additional['texcoord'];
+      }
+      if (typeof additional['color'] === 'undefined' || additional['color'].length === 0) {
+        delete additional['color'];
       }
   
   
@@ -19194,33 +19271,35 @@ class ModelConverter {
       dataViewMethodDic.texcoord = accessor.extras.dataViewMethod;
 
       let setTextures = (materialJson)=> {
-        let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
-        if (baseColorTexture) {
-          let sampler = baseColorTexture.texture.sampler;
+        if (materialJson.pbrMetallicRoughness) {
+          let baseColorTexture = materialJson.pbrMetallicRoughness.baseColorTexture;
+          if (baseColorTexture) {
+            let sampler = baseColorTexture.texture.sampler;
 
-          let isNeededToMultiplyAlphaToColorOfTexture = false;
-          if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-            if (options.isTextureImageToLoadPreMultipliedAlpha) {
-              // Nothing to do because premultipling alpha is already done.
-            } else {
-              isNeededToMultiplyAlphaToColorOfTexture = true;
+            let isNeededToMultiplyAlphaToColorOfTexture = false;
+            if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+                // Nothing to do because premultipling alpha is already done.
+              } else {
+                isNeededToMultiplyAlphaToColorOfTexture = true;
+              }
+            } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+                // TODO: Implement to Make Texture Straight.
+              } else {
+                // Nothing to do because the texture is straight.
+              }        
             }
-          } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-            if (options.isTextureImageToLoadPreMultipliedAlpha) {
-              // TODO: Implement to Make Texture Straight.
-            } else {
-              // Nothing to do because the texture is straight.
-            }        
-          }
 
-          let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
-            'TEXTURE_MAG_FILTER': sampler.magFilter,
-            'TEXTURE_MIN_FILTER': sampler.minFilter,
-            'TEXTURE_WRAP_S': sampler.wrapS,
-            'TEXTURE_WRAP_T': sampler.wrapT,
-            'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
-          });
-          gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+            let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler.wrapT,
+              'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+            });
+            gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+          }
 
           let enables = [];
           if (options.isBlend) {
@@ -19255,7 +19334,7 @@ class ModelConverter {
       }
     }
 
-    if (materialJson.pbrMetallicRoughness.baseColorFactor) {
+    if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
       let value = materialJson.pbrMetallicRoughness.baseColorFactor;
       gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
     }

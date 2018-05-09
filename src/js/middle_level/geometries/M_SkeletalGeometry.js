@@ -98,7 +98,7 @@ export default class M_SkeletalGeometry extends Geometry {
       matrices[i] = matrix;
   }
 */
-    if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+    if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
 
       let flatMatrices = [];
       for (let i=0; i<matrices.length; i++) {
@@ -119,7 +119,7 @@ export default class M_SkeletalGeometry extends Geometry {
       }
       skeletalMesh._jointMatrices = flatMatrices;
 
-    } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
+    } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
       {
         // no comporess
 
@@ -158,7 +158,7 @@ export default class M_SkeletalGeometry extends Geometry {
          // console.log(scale);
         }
       }
-    } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+    } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
       /*
       {
         // comporess quaternion only
@@ -244,13 +244,13 @@ export default class M_SkeletalGeometry extends Geometry {
       //var glslProgram = materials[i].shaderInstance.glslProgram;
 //      this._glContext.useProgram(glslProgram);
       
-      if (!GLBoost.VALUE_TARGET_IS_MOBILE) {
+      if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINTMATRIX', new Float32Array(skeletalMesh._jointMatrices));
-      } else if (GLBoost.VALUE_TARGET_IS_MOBILE === 1) {
+      } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
   //      Shader.trySettingVec2ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATERNION', skeletalMesh._qArray);
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_TRANSLATION', skeletalMesh._tArray);      
-      } else if (GLBoost.VALUE_TARGET_IS_MOBILE > 1) {
+      } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
         
         // `OneVec4` Vertion [Begin]
         Shader.trySettingVec4ArrayToUniform(gl, glslProgram, material, material._semanticsDic, 'JOINT_QUATTRANSLATION', skeletalMesh._qtArray); // 

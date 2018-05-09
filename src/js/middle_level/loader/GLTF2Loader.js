@@ -124,7 +124,10 @@ export default class GLTF2Loader {
       images: []
     };
     promises.push(this._loadResources(arrayBufferBinary, basePath, gltfJson, options, resources));
-    this._loadJsonContent(gltfJson, resources, options);
+    promises.push(new Promise(((resolve, reject) => {
+      this._loadJsonContent(gltfJson, resources, options);
+      resolve();
+    })));
 
     return Promise.all(promises);
   }
@@ -225,17 +228,22 @@ export default class GLTF2Loader {
     // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
-        primitive.materialIndex = primitive.material;
-        primitive.material = gltfJson.materials[primitive.materialIndex];
+        if (primitive.material !== void 0) {
+          primitive.materialIndex = primitive.material;
+          primitive.material = gltfJson.materials[primitive.materialIndex];  
+        }
 
         primitive.attributesindex = Object.assign({}, primitive.attributes);
         for (let attributeName in primitive.attributesindex) {
-          let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
-          accessor.extras = {
-            toGetAsTypedArray: true
-          };
-          primitive.attributes[attributeName] = accessor;
-
+          if (primitive.attributesindex[attributeName] >= 0) {
+            let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+            accessor.extras = {
+              toGetAsTypedArray: true
+            };
+            primitive.attributes[attributeName] = accessor;
+          } else {
+            primitive.attributes[attributeName] = void 0;
+          }
         }
 
         if (primitive.indices !== void 0) {
@@ -248,18 +256,23 @@ export default class GLTF2Loader {
 
   _loadDependenciesOfMaterials(gltfJson) {
     // Material
-    for (let material of gltfJson.materials) {
-      let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
-      if (baseColorTexture !== void 0) {
-        baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
-      }
-      let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
-      if (metallicRoughnessTexture !== void 0) {
-        metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
-      }
-      let normalTexture = material.normalTexture;
-      if (normalTexture !== void 0) {
-        normalTexture.texture = gltfJson.textures[normalTexture.index];
+    if (gltfJson.materials) {
+      for (let material of gltfJson.materials) {
+        if (material.pbrMetallicRoughness) {
+          let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
+          if (baseColorTexture !== void 0) {
+            baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+          }
+          let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+          if (metallicRoughnessTexture !== void 0) {
+            metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+          }
+        }
+
+        let normalTexture = material.normalTexture;
+        if (normalTexture !== void 0) {
+          normalTexture.texture = gltfJson.textures[normalTexture.index];
+        }
       }
     }
   }
@@ -471,15 +484,16 @@ export default class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
-        if (!imageUri.match(/^data:/)) {
-          img.crossOrigin = 'Anonymous';
-        }
-        img.onload = () => {
-          imageJson.image = img;
-          resolve(gltfJson);
-        };
-
         img.src = imageUri;
+        imageJson.image = img;
+        if (imageUri.match(/^data:/)) {
+          resolve(gltfJson);
+        } else {
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => {
+            resolve(gltfJson);
+          };
+        }
 
         resources.images[i] = img;
       }));
