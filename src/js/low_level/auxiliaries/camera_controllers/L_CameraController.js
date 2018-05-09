@@ -6,16 +6,25 @@ import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_Abstract
 import MathUtil from '../../math/MathUtil';
 
 export default class L_CameraController extends GLBoostObject {
-  constructor(glBoostContext, isSymmetryMode = true, doResetWhenCameraSettingChanged = false, isForceGrab = false, efficiency = 1.0) {
+  constructor(glBoostContext, 
+    options = {
+      isSymmetryMode: true,
+      doResetWhenCameraSettingChanged: false,
+      isForceGrab: false,
+      efficiency: 1.0,
+      onlyAdjustZFar: false,
+    }
+  ) {
     super(glBoostContext);
 
     this._camaras = new Set();
 
     this._isKeyUp = true;
-    this._isForceGrab = isForceGrab;
-    this._isSymmetryMode = isSymmetryMode;
+    this._isForceGrab = options.isForceGrab !== void 0 ? options.isForceGrab : false;
+    this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
-    this._efficiency = 0.5 * efficiency;
+    this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
+    this._onlyAdjustZFar = options.onlyAdjustZFar !== void 0 ? options.onlyAdjustZFar : false;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -45,7 +54,7 @@ export default class L_CameraController extends GLBoostObject {
     this._foyvBias = 1.0;
     this._zFarAdjustingFactorBasedOnAABB = 1.0;
 
-    this._doResetWhenCameraSettingChanged = doResetWhenCameraSettingChanged;
+    this._doResetWhenCameraSettingChanged = options.doResetWhenCameraSettingChanged !== void 0 ? options.doResetWhenCameraSettingChanged : false;
 
     this._shiftCameraTo = null;
 
@@ -275,7 +284,7 @@ export default class L_CameraController extends GLBoostObject {
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-    if (this._target === null) {
+    if (this._target === null || this._onlyAdjustZFar) {
       return [eyeVec, centerVec, upVec];
     }
 
