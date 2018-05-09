@@ -77,7 +77,7 @@ export default class GLTFLoader {
               //"blendFuncSeparate": [1, 0, 1, 0],
             }
           },
-          globalStatesUsage: GLOBAL_STATES_USAGE_IGNORE // GLOBAL_STATES_USAGE_DO_NOTHING // GLOBAL_STATES_USAGE_INCLUSIVE // GLOBAL_STATES_USAGE_EXCLUSIVE
+          globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
       ],
       isAllMeshesTransparent: true
