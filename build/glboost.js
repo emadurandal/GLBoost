@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: ee06ce4b
+// This revision is the commit right after the SHA: 4437c38a
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -17097,7 +17097,7 @@ class GLTF2Loader {
     // Mesh
     for (let mesh of gltfJson.meshes) {
       for (let primitive of mesh.primitives) {
-        if (primitive.material) {
+        if (primitive.material !== void 0) {
           primitive.materialIndex = primitive.material;
           primitive.material = gltfJson.materials[primitive.materialIndex];  
         }
