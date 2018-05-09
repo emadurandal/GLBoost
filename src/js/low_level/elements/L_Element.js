@@ -349,6 +349,7 @@ export default class L_Element extends GLBoostObject {
   }
 
   isTrsMatrixNeeded(lineName, inputValue) {
+    //console.log(this._animationLine['time']);
     let result = (
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
       this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate') === null &&
