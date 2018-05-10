@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 70c82e9b
+// This revision is the commit right after the SHA: e1ac4386
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -7392,6 +7392,8 @@ class AbstractTexture extends GLBoostObject {
 
     // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
     this._uvTransform = new Vector4(1, 1, 0, 0);
+
+    this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
   }
 
   /**
@@ -7550,6 +7552,13 @@ class AbstractTexture extends GLBoostObject {
     this._uvTransform = vec4;
   }
 
+  get toMultiplyAlphaToColorPreviously() {
+    return this._toMultiplyAlphaToColorPreviously;
+  }
+
+  set toMultiplyAlphaToColorPreviously(flag) {
+    this._toMultiplyAlphaToColorPreviously = flag;
+  }
 }
 
 class FragmentSimpleShaderSource {
@@ -7809,6 +7818,7 @@ class DecalShaderSource {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
+    shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
     return shaderText;
   }
@@ -7824,7 +7834,11 @@ class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  vec4 texel = ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  if (uIsTextureToMultiplyAlphaToColorPreviously == 1) {\n`;      
+      shaderText += `    texel.rgb /= texel.a;\n`;
+      shaderText += `  };\n`;
+      shaderText += `  rt0 *= texel;\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';
@@ -7852,6 +7866,11 @@ class DecalShaderSource {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
       diffuseTexture = this._glBoostContext.defaultDummyTexture;
+    }
+
+    if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
+      let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
+      material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
@@ -7908,6 +7927,7 @@ class DecalShader extends FragmentSimpleShader {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 
 
@@ -15671,7 +15691,7 @@ class GLTFLoader {
     options = {
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-      isTextureImageToLoadPreMultipliedAlpha: false,
+//      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
@@ -15687,6 +15707,8 @@ class GLTFLoader {
               //"blendFuncSeparate": [1, 0, 1, 0],
             }
           },
+          isTransparent: true,
+          isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
       ],
@@ -15855,7 +15877,7 @@ class GLTFLoader {
           textureUri = basePath + imageFileStr;
         }
       }
-
+/*
       let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
@@ -15870,13 +15892,13 @@ class GLTFLoader {
           // Nothing to do because the texture is straight.
         }
       }
-      
+      */
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+        'TEXTURE_WRAP_T': samplerJson.wrapT
+//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
@@ -15980,7 +16002,7 @@ class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
@@ -16064,7 +16086,7 @@ class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
+  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -16179,7 +16201,6 @@ class GLTFLoader {
           }
         }
 */
-//        if (material === null) {
         let material = null;
         if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
           material = options.extensionLoader.createClassicMaterial(glBoostContext);
@@ -16190,9 +16211,32 @@ class GLTFLoader {
           material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
-//        }
 
-        texcoords = this._loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
+        if (options.statesOfElements) {
+          for (let statesInfo of options.statesOfElements) {
+            if (statesInfo.targets) {
+              for (let target of statesInfo.targets) {
+                let isMatch = false;
+                let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+                switch (specifyMethod) {
+                  case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                    isMatch = group.userFlavorName === target; break;
+                  case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                    isMatch = group.instanceName === target; break;
+                  case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                    isMatch = group.instanceNameWithUserFlavor === target; break;                      
+                }
+                if (isMatch) {
+                  material.states = statesInfo.states;
+                  group.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                  material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+                }
+              }
+            }
+          }
+        }
+
+        texcoords = this._loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, group, options);
 
         materials.push(material);
       } else {
@@ -16331,7 +16375,7 @@ class GLTFLoader {
     }
   }
 
-  _loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
+  _loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, group, options) {
     let materialJson = json.materials[materialStr];
     material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
@@ -16369,7 +16413,50 @@ class GLTFLoader {
             if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost$1.TEXTURE_PURPOSE_DIFFUSE;
             }
-            material.setTexture(textures[textureStr], texturePurpose);
+
+            let texture = textures[textureStr];
+            
+            let isNeededToMultiplyAlphaToColorOfTexture = false;
+            if (options.statesOfElements) {
+              for (let statesInfo of options.statesOfElements) {
+                if (statesInfo.targets) {
+                  for (let target of statesInfo.targets) {
+                    let isMatch = false;
+                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+                    switch (specifyMethod) {
+                      case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                        isMatch = group.userFlavorName === target; break;
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                        isMatch = group.instanceName === target; break;
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                        isMatch = group.instanceNameWithUserFlavor === target; break;                      
+                    }
+
+                    if (isMatch) {
+                      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                          // Nothing to do because premultipling alpha is already done.
+                        } else {
+                          isNeededToMultiplyAlphaToColorOfTexture = true;
+                        }
+                      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                          // TODO: Implement to Make Texture Straight.
+                        } else {
+                          // Nothing to do because the texture is straight.
+                        }
+                      }
+                    }
+
+                    //texture.setParameter('UNPACK_PREMULTIPLY_ALPHA_WEBGL', isNeededToMultiplyAlphaToColorOfTexture);
+//                    texture.loadWebGLTexture();
+                  }
+                }
+              }
+            }
+
+            material.setTexture(texture, texturePurpose);
+            material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
 
             let enables = [];
             if (options.isBlend) {
@@ -16378,9 +16465,17 @@ class GLTFLoader {
             if (options.isDepthTest) {
               enables.push(2929);
             }
-            material.states.enable = enables; // It means, [gl.BLEND];
+            material.states.enable = material.states.enable.concat(enables);
+
+            // Remove duplicated values
+            material.states.enable = material.states.enable.filter(function (x, i, self) {
+              return self.indexOf(x) === i;
+            });
+
             if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-              material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+              if (material.states.functions.blendFuncSeparate === void 0) {
+                material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+              }
             }
             material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
           }
