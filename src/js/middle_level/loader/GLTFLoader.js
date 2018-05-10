@@ -61,7 +61,7 @@ export default class GLTFLoader {
     options = {
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-      isTextureImageToLoadPreMultipliedAlpha: false,
+//      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
@@ -247,7 +247,7 @@ export default class GLTFLoader {
           textureUri = basePath + imageFileStr;
         }
       }
-
+/*
       let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
@@ -262,13 +262,13 @@ export default class GLTFLoader {
           // Nothing to do because the texture is straight.
         }
       }
-      
+      */
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+        'TEXTURE_WRAP_T': samplerJson.wrapT
+//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
@@ -785,7 +785,7 @@ export default class GLTFLoader {
             }
 
             let texture = textures[textureStr];
-            /*
+            
             let isNeededToMultiplyAlphaToColorOfTexture = false;
             if (options.statesOfElements) {
               for (let statesInfo of options.statesOfElements) {
@@ -824,8 +824,9 @@ export default class GLTFLoader {
                 }
               }
             }
-*/
+
             material.setTexture(texture, texturePurpose);
+            material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
 
             let enables = [];
             if (options.isBlend) {

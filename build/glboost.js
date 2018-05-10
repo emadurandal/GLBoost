@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 50c19e9b
+// This revision is the commit right after the SHA: e1ac4386
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -7392,6 +7392,8 @@ class AbstractTexture extends GLBoostObject {
 
     // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
     this._uvTransform = new Vector4(1, 1, 0, 0);
+
+    this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
   }
 
   /**
@@ -7550,6 +7552,13 @@ class AbstractTexture extends GLBoostObject {
     this._uvTransform = vec4;
   }
 
+  get toMultiplyAlphaToColorPreviously() {
+    return this._toMultiplyAlphaToColorPreviously;
+  }
+
+  set toMultiplyAlphaToColorPreviously(flag) {
+    this._toMultiplyAlphaToColorPreviously = flag;
+  }
 }
 
 class FragmentSimpleShaderSource {
@@ -7809,6 +7818,7 @@ class DecalShaderSource {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
+    shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
     return shaderText;
   }
@@ -7824,7 +7834,11 @@ class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  vec4 texel = ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  if (uIsTextureToMultiplyAlphaToColorPreviously == 1) {\n`;      
+      shaderText += `    texel.rgb /= texel.a;\n`;
+      shaderText += `  };\n`;
+      shaderText += `  rt0 *= texel;\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';
@@ -7852,6 +7866,11 @@ class DecalShaderSource {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
       diffuseTexture = this._glBoostContext.defaultDummyTexture;
+    }
+
+    if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
+      let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
+      material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
@@ -7908,6 +7927,7 @@ class DecalShader extends FragmentSimpleShader {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 
 
@@ -15671,7 +15691,7 @@ class GLTFLoader {
     options = {
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-      isTextureImageToLoadPreMultipliedAlpha: false,
+//      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
@@ -15857,7 +15877,7 @@ class GLTFLoader {
           textureUri = basePath + imageFileStr;
         }
       }
-
+/*
       let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
@@ -15872,13 +15892,13 @@ class GLTFLoader {
           // Nothing to do because the texture is straight.
         }
       }
-      
+      */
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+        'TEXTURE_WRAP_T': samplerJson.wrapT
+//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
@@ -16395,20 +16415,20 @@ class GLTFLoader {
             }
 
             let texture = textures[textureStr];
-            /*
+            
             let isNeededToMultiplyAlphaToColorOfTexture = false;
             if (options.statesOfElements) {
               for (let statesInfo of options.statesOfElements) {
                 if (statesInfo.targets) {
                   for (let target of statesInfo.targets) {
                     let isMatch = false;
-                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
+                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
                     switch (specifyMethod) {
-                      case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
+                      case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
                         isMatch = group.userFlavorName === target; break;
-                      case GLBoost.QUERY_TYPE_INSTANCE_NAME:
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
                         isMatch = group.instanceName === target; break;
-                      case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
                         isMatch = group.instanceNameWithUserFlavor === target; break;                      
                     }
 
@@ -16434,8 +16454,9 @@ class GLTFLoader {
                 }
               }
             }
-*/
+
             material.setTexture(texture, texturePurpose);
+            material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
 
             let enables = [];
             if (options.isBlend) {

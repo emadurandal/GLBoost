@@ -26,6 +26,8 @@ export default class AbstractTexture extends GLBoostObject {
 
     // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
     this._uvTransform = new Vector4(1, 1, 0, 0);
+
+    this._toMultiplyAlphaToColorPreviously = false // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
   }
 
   /**
@@ -184,4 +186,11 @@ export default class AbstractTexture extends GLBoostObject {
     this._uvTransform = vec4;
   }
 
+  get toMultiplyAlphaToColorPreviously() {
+    return this._toMultiplyAlphaToColorPreviously;
+  }
+
+  set toMultiplyAlphaToColorPreviously(flag) {
+    this._toMultiplyAlphaToColorPreviously = flag;
+  }
 }
