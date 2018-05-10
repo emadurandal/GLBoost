@@ -364,9 +364,9 @@ export default class L_Element extends GLBoostObject {
     let input = inputValue;
 
    // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    if (this.isTrsMatrixNeeded(lineName, inputValue)) {
-      return this.getMatrixNotAnimated();
-    } else {
+    //if (this.isTrsMatrixNeeded(lineName, inputValue)) {
+      //return this.getMatrixNotAnimated();
+    //} else {
 
       let rotationMatrix = Matrix44.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
@@ -382,7 +382,7 @@ export default class L_Element extends GLBoostObject {
 
       return this._matrix.clone();
 
-    }
+    //}
 
     this._is_trs_matrix_updated = true;    
   }

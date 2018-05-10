@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 4cdb1c26
+// This revision is the commit right after the SHA: b19b0a40
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3477,9 +3477,9 @@ class L_Element extends GLBoostObject {
     let input = inputValue;
 
    // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    if (this.isTrsMatrixNeeded(lineName, inputValue)) {
-      return this.getMatrixNotAnimated();
-    } else {
+    //if (this.isTrsMatrixNeeded(lineName, inputValue)) {
+      //return this.getMatrixNotAnimated();
+    //} else {
 
       let rotationMatrix = Matrix44$1$1.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
@@ -3495,7 +3495,7 @@ class L_Element extends GLBoostObject {
 
       return this._matrix.clone();
 
-    }
+    //}
 
     this._is_trs_matrix_updated = true;    
   }
