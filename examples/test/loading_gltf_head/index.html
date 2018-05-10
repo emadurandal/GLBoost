@@ -57,7 +57,7 @@ var camera = glBoostContext.createPerspectiveCamera(
       zFar: 300.0
     }
 );
-camera.cameraController = glBoostContext.createCameraController(true, false, false, 1);
+camera.cameraController = glBoostContext.createCameraController();
 scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();

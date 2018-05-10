@@ -117,8 +117,8 @@ export default class GLBoostLowContext {
     return new L_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createCameraController(isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency) {
-    return new L_CameraController(this, isSymmetryMode, doResetWhenCameraSettingChanged, isForceGrab, efficiency);
+  createCameraController(options) {
+    return new L_CameraController(this, options);
   }
 
   createTexture(src, userFlavorName, parameters = null) {
