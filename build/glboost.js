@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 7c5be53e
+// This revision is the commit right after the SHA: 7e1525f4
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -10263,8 +10263,9 @@ class Sphere extends Geometry {
       vertexColor = new Vector4(1, 1, 1, 1);
     }
 
+    let shiftValue = 0.001; // for avoid Singular point
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
-      var theta = latNumber * Math.PI / heightSegments;
+      var theta = latNumber * Math.PI / heightSegments + shiftValue;
       var sinTheta = Math.sin(theta);
       var cosTheta = Math.cos(theta);
 
