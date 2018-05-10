@@ -45,6 +45,15 @@ export class DecalShaderSource {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
+    shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
+
+    return shaderText;
+  }
+
+  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += this._multiplyAlphaToColorOfTexel();
 
     return shaderText;
   }
@@ -60,7 +69,7 @@ export class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';
@@ -88,6 +97,11 @@ export class DecalShaderSource {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
       diffuseTexture = this._glBoostContext.defaultDummyTexture;
+    }
+
+    if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
+      let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
+      material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
@@ -144,6 +158,7 @@ export default class DecalShader extends FragmentSimpleShader {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 
 
