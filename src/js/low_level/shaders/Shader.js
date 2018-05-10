@@ -724,6 +724,21 @@ export default class Shader extends GLBoostObject {
     return shaderText;
   }
 
+  _multiplyAlphaToColorOfTexel(gl) {
+    var gl = this._glContext.gl;
+    let shaderText = "";
+    let textureFunc = Shader._texture_func(gl);
+    shaderText += `vec4 multiplyAlphaToColorOfTexel(sampler2D texture, vec2 texcoord, int toMultiplyAlphaFlag) {\n`;
+    shaderText += `  vec4 texel = ${textureFunc}(texture, texcoord);\n`;
+    shaderText += `  if (toMultiplyAlphaFlag == 1) {\n`;      
+    shaderText += `    texel.rgb /= texel.a;\n`;
+    shaderText += `  }\n`;
+    shaderText += `  return texel;\n`;
+    shaderText += `}\n`;
+
+    return shaderText;
+  }
+
   _sampler2DShadow_func() {
     var gl = this._glContext.gl;
     return GLBoost.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
