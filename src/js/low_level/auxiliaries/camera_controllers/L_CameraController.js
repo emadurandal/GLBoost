@@ -11,8 +11,7 @@ export default class L_CameraController extends GLBoostObject {
       isSymmetryMode: true,
       doResetWhenCameraSettingChanged: false,
       isForceGrab: false,
-      efficiency: 1.0,
-      onlyAdjustZFar: false,
+      efficiency: 1.0
     }
   ) {
     super(glBoostContext);
@@ -24,7 +23,6 @@ export default class L_CameraController extends GLBoostObject {
     this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
     this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
-    this._onlyAdjustZFar = options.onlyAdjustZFar !== void 0 ? options.onlyAdjustZFar : false;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -263,8 +261,9 @@ export default class L_CameraController extends GLBoostObject {
     }
 
     let newZNear = camera.zNear;
-    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+    let newZFar = camera.zFar;
     if (this._target) {
+      newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
 
@@ -284,7 +283,7 @@ export default class L_CameraController extends GLBoostObject {
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-    if (this._target === null || this._onlyAdjustZFar) {
+    if (this._target === null) {
       return [eyeVec, centerVec, upVec];
     }
 
