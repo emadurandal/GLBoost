@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: e1ac4386
+// This revision is the commit right after the SHA: 4cdb1c26
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -5428,6 +5428,21 @@ class Shader extends GLBoostObject {
     return shaderText;
   }
 
+  _multiplyAlphaToColorOfTexel(gl) {
+    var gl = this._glContext.gl;
+    let shaderText = "";
+    let textureFunc = Shader._texture_func(gl);
+    shaderText += `vec4 multiplyAlphaToColorOfTexel(sampler2D texture, vec2 texcoord, int toMultiplyAlphaFlag) {\n`;
+    shaderText += `  vec4 texel = ${textureFunc}(texture, texcoord);\n`;
+    shaderText += `  if (toMultiplyAlphaFlag == 1) {\n`;      
+    shaderText += `    texel.rgb /= texel.a;\n`;
+    shaderText += `  }\n`;
+    shaderText += `  return texel;\n`;
+    shaderText += `}\n`;
+
+    return shaderText;
+  }
+
   _sampler2DShadow_func() {
     var gl = this._glContext.gl;
     return GLBoost$1.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
@@ -7823,6 +7838,14 @@ class DecalShaderSource {
     return shaderText;
   }
 
+  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += this._multiplyAlphaToColorOfTexel();
+
+    return shaderText;
+  }
+
   FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
 
@@ -7834,11 +7857,7 @@ class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  vec4 texel = ${textureFunc}(uTexture, texcoord);\n`;
-      shaderText += `  if (uIsTextureToMultiplyAlphaToColorPreviously == 1) {\n`;      
-      shaderText += `    texel.rgb /= texel.a;\n`;
-      shaderText += `  };\n`;
-      shaderText += `  rt0 *= texel;\n`;
+      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';

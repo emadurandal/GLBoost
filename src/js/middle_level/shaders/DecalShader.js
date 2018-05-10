@@ -50,6 +50,14 @@ export class DecalShaderSource {
     return shaderText;
   }
 
+  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += this._multiplyAlphaToColorOfTexel();
+
+    return shaderText;
+  }
+
   FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
 
@@ -61,11 +69,7 @@ export class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  vec4 texel = ${textureFunc}(uTexture, texcoord);\n`;
-      shaderText += `  if (uIsTextureToMultiplyAlphaToColorPreviously == 1) {\n`;      
-      shaderText += `    texel.rgb /= texel.a;\n`;
-      shaderText += `  };\n`;
-      shaderText += `  rt0 *= texel;\n`;
+      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';
