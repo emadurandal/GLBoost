@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 9a1be146
+// This revision is the commit right after the SHA: 512dd175
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3389,7 +3389,7 @@ class L_Element extends GLBoostObject {
     if (this._is_scale_updated) {
       return this._scale.clone();
     } else if (this._is_trs_matrix_updated) {
-      let m = this._matrix();
+      let m = this._matrix;
       this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
       this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
       this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
@@ -3476,10 +3476,10 @@ class L_Element extends GLBoostObject {
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-   // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    //if (this.isTrsMatrixNeeded(lineName, inputValue)) {
-      //return this.getMatrixNotAnimated();
-    //} else {
+    //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
+    if (this.isTrsMatrixNeeded(lineName, inputValue) && this._is_trs_matrix_updated) {
+      return this.getMatrixNotAnimated();
+    } else {
 
       let rotationMatrix = Matrix44$1$1.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
@@ -3495,9 +3495,9 @@ class L_Element extends GLBoostObject {
 
       return this._matrix.clone();
 
-    //}
+    }
 
-    this._is_trs_matrix_updated = true;    
+    this._is_trs_matrix_updated = true;
   }
 
 
@@ -3545,7 +3545,6 @@ class L_Element extends GLBoostObject {
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
-      this._is_trs_matrix_updated = false;
     }
 
     return this._quaternion;
@@ -9108,8 +9107,7 @@ class L_CameraController extends GLBoostObject {
       isSymmetryMode: true,
       doResetWhenCameraSettingChanged: false,
       isForceGrab: false,
-      efficiency: 1.0,
-      onlyAdjustZFar: false,
+      efficiency: 1.0
     }
   ) {
     super(glBoostContext);
@@ -9121,7 +9119,6 @@ class L_CameraController extends GLBoostObject {
     this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
     this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
-    this._onlyAdjustZFar = options.onlyAdjustZFar !== void 0 ? options.onlyAdjustZFar : false;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -9360,8 +9357,9 @@ class L_CameraController extends GLBoostObject {
     }
 
     let newZNear = camera.zNear;
-    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+    let newZFar = camera.zFar;
     if (this._target) {
+      newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
 
@@ -9381,7 +9379,7 @@ class L_CameraController extends GLBoostObject {
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-    if (this._target === null || this._onlyAdjustZFar) {
+    if (this._target === null) {
       return [eyeVec, centerVec, upVec];
     }
 

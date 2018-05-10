@@ -276,7 +276,7 @@ export default class L_Element extends GLBoostObject {
     if (this._is_scale_updated) {
       return this._scale.clone();
     } else if (this._is_trs_matrix_updated) {
-      let m = this._matrix();
+      let m = this._matrix;
       this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
       this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
       this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
@@ -363,10 +363,10 @@ export default class L_Element extends GLBoostObject {
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-   // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    //if (this.isTrsMatrixNeeded(lineName, inputValue)) {
-      //return this.getMatrixNotAnimated();
-    //} else {
+    //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
+    if (this.isTrsMatrixNeeded(lineName, inputValue) && this._is_trs_matrix_updated) {
+      return this.getMatrixNotAnimated();
+    } else {
 
       let rotationMatrix = Matrix44.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
@@ -382,9 +382,9 @@ export default class L_Element extends GLBoostObject {
 
       return this._matrix.clone();
 
-    //}
+    }
 
-    this._is_trs_matrix_updated = true;    
+    this._is_trs_matrix_updated = true;
   }
 
 
@@ -432,7 +432,6 @@ export default class L_Element extends GLBoostObject {
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
-      this._is_trs_matrix_updated = false;
     }
 
     return this._quaternion;
