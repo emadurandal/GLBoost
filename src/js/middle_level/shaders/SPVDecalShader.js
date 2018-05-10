@@ -60,7 +60,8 @@ export class SPVDecalShaderSource {
     shaderText += 'uniform bool isColorAberration;\n';
     shaderText += 'uniform bool isVignette;\n';
     shaderText += 'uniform vec4 uvTransform;\n';
-    
+    shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
+
     return shaderText;
   }
 
@@ -76,6 +77,7 @@ export class SPVDecalShaderSource {
       return r + g + b;
     }
     `;
+    shaderText += this._multiplyAlphaToColorOfTexel();
 
     return shaderText;
   }
@@ -89,21 +91,27 @@ export class SPVDecalShaderSource {
     if (Shader._exist(f, GLBoost.COLOR)) {
       shaderText += '  rt0 *= color;\n';
     }
+    shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
+
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
       shaderText += `vec2 texcoordTransformed = vec2(texcoord.x * uvTransform.x + uvTransform.z, 1.0 - ((1.0-texcoord.y) * uvTransform.y + uvTransform.w));\n`;      
       shaderText += 'if (isColorAberration) {\n';
       shaderText += `  float offsetTexel = 2.0;\n`;
-      shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
+//      shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
+      shaderText += `  vec4 leftDecal = multiplyAlphaToColorOfTexel(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y), uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       shaderText += `  leftDecal = leftDecal * vec4(1.0, 0.0, 0.0, 1.0);\n`;
-      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, texcoordTransformed);\n`;
+//      shaderText += `  vec4 centerDecal = ${textureFunc}(uTexture, texcoordTransformed);\n`;
+      shaderText += `  vec4 centerDecal = multiplyAlphaToColorOfTexel(uTexture, texcoordTransformed, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       shaderText += `  centerDecal = centerDecal * vec4(0.0, 1.0, 0.0, 1.0);\n`;
-      shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x + offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
+ //     shaderText += `  vec4 rightDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x + offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
+      shaderText += `  vec4 rightDecal = multiplyAlphaToColorOfTexel(uTexture, vec2(texcoordTransformed.x + offsetTexel/splitParameter.x, texcoordTransformed.y), uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       shaderText += `  rightDecal = rightDecal * vec4(0.0, 0.0, 1.0, 1.0);\n`;
       shaderText += `  vec4 decalAberration = leftDecal + centerDecal - (leftDecal * centerDecal);\n`;
       shaderText += `  rt0 *= decalAberration + rightDecal - (decalAberration * rightDecal);\n`;
       shaderText += '} else {\n';
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoordTransformed) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
+ //     shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoordTransformed) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
+      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoordTransformed, uIsTextureToMultiplyAlphaToColorPreviously) * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n`;
       shaderText += '}\n';
 
       shaderText += 'rt0 = rt0 * textureContributionRate + (vec4(1.0, 1.0, 1.0, 1.0) - textureContributionRate);\n';
