@@ -56,35 +56,38 @@ export default class GLTFLoader {
    * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url,
-    options = {
-      extensionLoader: null,
-      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-      isExistJointGizmo: false,
-      isBlend: false,
-      isDepthTest: true,
-      defaultShaderClass: null,
-      statesOfElements: [
-        {
-          targets: [], //["name_foo", "name_boo"],
-          specifyMethod: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
-          states: {
-            enable: [
-                // 3042,  // BLEND
-            ],
-            functions: {
-              //"blendFuncSeparate": [1, 0, 1, 0],
-            }
-          },
-          isTransparent: true,
-          shaderClass: DecalShader, // LambertShader // PhongShader
-          isTextureImageToLoadPreMultipliedAlpha: false,
-          globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
-        }
-      ],
-      isAllMeshesTransparent: true
+  loadGLTF(glBoostContext, url, options) {
+    if (!options) {
+      options = {
+        extensionLoader: null,
+        isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+        isExistJointGizmo: false,
+        isBlend: false,
+        isDepthTest: true,
+        defaultShaderClass: null,
+        statesOfElements: null,
+        isAllMeshesTransparent: true,
+        statesOfElements: [
+          {
+            targets: [], //["name_foo", "name_boo"],
+            specifyMethod: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
+            states: {
+              enable: [
+                  // 3042,  // BLEND
+              ],
+              functions: {
+                //"blendFuncSeparate": [1, 0, 1, 0],
+              }
+            },
+            isTransparent: true,
+            shaderClass: DecalShader, // LambertShader // PhongShader
+            isTextureImageToLoadPreMultipliedAlpha: false,
+            globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
+          }
+        ]
+      };
     }
-  ) {
+
     let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
 
     return DataUtil.loadResourceAsync(url, true,
@@ -378,7 +381,7 @@ export default class GLTFLoader {
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
-    } else if (nodeJson.jointName && options && options.isExistJointGizme) {
+    } else if (nodeJson.jointName) {
       let joint = glBoostContext.createJoint(options.isExistJointGizme);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
