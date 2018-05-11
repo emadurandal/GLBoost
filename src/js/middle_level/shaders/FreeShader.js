@@ -120,6 +120,20 @@ export default class FreeShader extends Shader {
         this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
       }
     }
+
+    for (let parameterName in material.shaderParameters) {
+      let value = material.shaderParameters[parameterName];
+
+      if (typeof value === 'number') {
+        this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_' + parameterName), value, true);
+      } else if (value instanceof Vector2) {
+        this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, true);
+      } else if (value instanceof Vector3) {
+        this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, true);
+      } else if (value instanceof Vector4) {
+        this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, value.w, true);
+      }
+    }
   }
 }
 
