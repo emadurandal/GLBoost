@@ -71,7 +71,7 @@
   var centerLadyOverride = null;
   var rightLadyDontInherit = null;
 
-  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', GLBoost.HalfLambertShader);
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/body/lady.gltf', {defaultShaderClass: GLBoost.HalfLambertShader});
   promise.then(function(group) {
     console.log(group);
 

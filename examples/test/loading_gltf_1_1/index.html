@@ -63,7 +63,7 @@ camera.cameraController = glBoostContext.createCameraController();
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/SimpleTexture/glTF/SimpleTexture.gltf', null);
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/SimpleTexture/glTF/SimpleTexture.gltf');
 promise.then(function(group) {
   console.log(group);
 

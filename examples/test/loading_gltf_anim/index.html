@@ -60,7 +60,9 @@ scene.addChild( camera );
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/pyramid_anim/pyramid_anim2.gltf', GLBoost.PhongShader);
+//var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/pyramid_anim/pyramid_anim2.gltf', GLBoost.PhongShader);
+
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/pyramid_anim/pyramid_anim2.gltf', {defaultShaderClass: GLBoost.PhongShader});
 promise.then(function(group) {
   console.log(group);
 

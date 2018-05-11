@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 512dd175
+// This revision is the commit right after the SHA: f792bc9d
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -6177,27 +6177,27 @@ class FreeShader extends Shader {
 
     let newAttributes = {};
     for (let attributeName in attributes) {
-      switch (attributes[attributeName]) {
+      switch (attributeName) {
         case 'POSITION':
-          newAttributes.position = attributeName;
+          newAttributes.position = attributes[attributeName];
           break;
         case 'NORMAL':
-          newAttributes.normal = attributeName;
+          newAttributes.normal = attributes[attributeName];
           break;
         case 'COLOR':
-          newAttributes.color = attributeName;
+          newAttributes.color = attributes[attributeName];
           break;
         case 'TEXCOORD_0':
-          newAttributes.texcoord = attributeName;
+          newAttributes.texcoord = attributes[attributeName];
           break;
         case 'JOINT':
-          newAttributes.joint = attributeName;
+          newAttributes.joint = attributes[attributeName];
           break;
         case 'WEIGHT':
-          newAttributes.weight = attributeName;
+          newAttributes.weight = attributes[attributeName];
           break;
         default:
-          newAttributes[attributes[attributeName]] = attributeName;
+          newAttributes[attributeName] = attributes[attributeName];
           break;
       }
     }
@@ -6244,14 +6244,16 @@ class FreeShader extends Shader {
         textureCount++;
       }
 
-      switch (this._uniforms[uniformName]) {
+      switch (uniformName) {
+        case 'WORLD':
+        case 'VIEW':
         case 'MODELVIEW':
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
         case 'JOINTMATRIX':
-          material.setUniform(shaderProgram, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
+          material.setUniform(shaderProgram, 'uniform_' + this._uniforms[uniformName], this._glContext.getUniformLocation(shaderProgram, this._uniforms[uniformName]));
         case 'TEXTURE':
-          material.addSemanticsDic(this._uniforms[uniformName], uniformName);
+          material.addSemanticsDic(uniformName, this._uniforms[uniformName]);
           continue;
       }
 
@@ -6280,6 +6282,20 @@ class FreeShader extends Shader {
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, true);
       } else if (value instanceof Vector4) {
         this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
+      }
+    }
+
+    for (let parameterName in material.shaderParameters) {
+      let value = material.shaderParameters[parameterName];
+
+      if (typeof value === 'number') {
+        this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_' + parameterName), value, true);
+      } else if (value instanceof Vector2) {
+        this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, true);
+      } else if (value instanceof Vector3) {
+        this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, true);
+      } else if (value instanceof Vector4) {
+        this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, value.w, true);
       }
     }
   }
@@ -10264,8 +10280,9 @@ class Sphere extends Geometry {
       vertexColor = new Vector4(1, 1, 1, 1);
     }
 
+    let shiftValue = 0.001; // for avoid Singular point
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
-      var theta = latNumber * Math.PI / heightSegments;
+      var theta = latNumber * Math.PI / heightSegments + shiftValue;
       var sinTheta = Math.sin(theta);
       var cosTheta = Math.cos(theta);
 
@@ -17104,17 +17121,18 @@ class GLTFLoader {
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
    * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url, defaultShader = null,
-    options = {
+  loadGLTF(glBoostContext, url, options) {
+    let defaultOptions = {
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-//      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      defaultShaderClass: null,
+      statesOfElements: null,
+      isAllMeshesTransparent: false,
       statesOfElements: [
         {
           targets: [], //["name_foo", "name_boo"],
@@ -17128,13 +17146,25 @@ class GLTFLoader {
             }
           },
           isTransparent: true,
+          shaderClass: DecalShader, // LambertShader // PhongShader
           isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
-      ],
-      isAllMeshesTransparent: true
+      ]
+    };
+
+    if (!options) {
+      options = defaultOptions;
+     } else {
+      for (let optionName in options) {
+        defaultOptions[optionName] = options[optionName];
+      }
+      options = defaultOptions;
     }
-  ) {
+
+
+    let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
+
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
@@ -17379,7 +17409,7 @@ class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
-      if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
+      if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
@@ -17427,7 +17457,7 @@ class GLTFLoader {
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
+      let joint = glBoostContext.createJoint(options.isExistJointGizme);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -17524,7 +17554,7 @@ class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
 
-    if (options.isAllMeshesTransparent) {
+    if (options && options.isAllMeshesTransparent) {
       mesh.isTransparent = true;
     }
 
@@ -17622,17 +17652,17 @@ class GLTFLoader {
         }
 */
         let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+        if (options && options.extensionLoader && options.extensionLoader.createClassicMaterial) {
           material = options.extensionLoader.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
-        if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
           material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
 
-        if (options.statesOfElements) {
+        if (options && options.statesOfElements) {
           for (let statesInfo of options.statesOfElements) {
             if (statesInfo.targets) {
               for (let target of statesInfo.targets) {
@@ -17837,7 +17867,7 @@ class GLTFLoader {
             let texture = textures[textureStr];
             
             let isNeededToMultiplyAlphaToColorOfTexture = false;
-            if (options.statesOfElements) {
+            if (options && options.statesOfElements) {
               for (let statesInfo of options.statesOfElements) {
                 if (statesInfo.targets) {
                   for (let target of statesInfo.targets) {
@@ -17975,6 +18005,32 @@ class GLTFLoader {
       }
     }
 
+    if (options && options.statesOfElements) {
+      for (let statesInfo of options.statesOfElements) {
+        if (statesInfo.targets) {
+          for (let target of statesInfo.targets) {
+            let isMatch = false;
+            let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+            switch (specifyMethod) {
+              case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                isMatch = group.userFlavorName === target; break;
+              case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                isMatch = group.instanceName === target; break;
+              case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                isMatch = group.instanceNameWithUserFlavor === target; break;                      
+            }
+
+            if (isMatch) {
+              if (statesInfo.shaderClass) {
+                material.shaderClass = statesInfo.shaderClass;
+              }
+            }
+
+          }
+        }
+      }
+    }
+
     return texcoords;
   }
 
@@ -17991,7 +18047,7 @@ class GLTFLoader {
       //attributes[attributesJson[attributeName]] = attributeName;
       let parameterName = attributesJson[attributeName];
       let parameterJson = parametersJson[parameterName];
-      attributes[attributeName] = parameterJson.semantic;
+      attributes[parameterJson.semantic] = attributeName;
     }
 
     let uniforms = {};
@@ -18000,7 +18056,7 @@ class GLTFLoader {
       let parameterName = uniformsJson[uniformName];
       let parameterJson = parametersJson[parameterName];
       if (typeof parameterJson.semantic !== 'undefined') {
-        uniforms[uniformName] = parameterJson.semantic;
+        uniforms[parameterJson.semantic] = uniformName;
       } else {
         let value = null;
         if (typeof materialJson.values !== 'undefined' && typeof materialJson.values[parameterName] !== 'undefined') {
