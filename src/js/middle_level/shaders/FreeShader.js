@@ -13,27 +13,27 @@ export default class FreeShader extends Shader {
 
     let newAttributes = {};
     for (let attributeName in attributes) {
-      switch (attributes[attributeName]) {
+      switch (attributeName) {
         case 'POSITION':
-          newAttributes.position = attributeName;
+          newAttributes.position = attributes[attributeName];
           break;
         case 'NORMAL':
-          newAttributes.normal = attributeName;
+          newAttributes.normal = attributes[attributeName];
           break;
         case 'COLOR':
-          newAttributes.color = attributeName;
+          newAttributes.color = attributes[attributeName];
           break;
         case 'TEXCOORD_0':
-          newAttributes.texcoord = attributeName;
+          newAttributes.texcoord = attributes[attributeName];
           break;
         case 'JOINT':
-          newAttributes.joint = attributeName;
+          newAttributes.joint = attributes[attributeName];
           break;
         case 'WEIGHT':
-          newAttributes.weight = attributeName;
+          newAttributes.weight = attributes[attributeName];
           break;
         default:
-          newAttributes[attributes[attributeName]] = attributeName;
+          newAttributes[attributeName] = attributes[attributeName];
           break;
       }
     }
@@ -80,14 +80,16 @@ export default class FreeShader extends Shader {
         textureCount++;
       }
 
-      switch (this._uniforms[uniformName]) {
+      switch (uniformName) {
+        case 'WORLD':
+        case 'VIEW':
         case 'MODELVIEW':
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
         case 'JOINTMATRIX':
-          material.setUniform(shaderProgram, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
+          material.setUniform(shaderProgram, 'uniform_' + this._uniforms[uniformName], this._glContext.getUniformLocation(shaderProgram, this._uniforms[uniformName]));
         case 'TEXTURE':
-          material.addSemanticsDic(this._uniforms[uniformName], uniformName);
+          material.addSemanticsDic(uniformName, this._uniforms[uniformName]);
           continue;
       }
 
