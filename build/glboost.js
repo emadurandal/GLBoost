@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 9ac5a625
+// This revision is the commit right after the SHA: ca56c4dd
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -15721,36 +15721,44 @@ class GLTFLoader {
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
   loadGLTF(glBoostContext, url, options) {
+    let defaultOptions = {
+      extensionLoader: null,
+      isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isExistJointGizmo: false,
+      isBlend: false,
+      isDepthTest: true,
+      defaultShaderClass: null,
+      statesOfElements: null,
+      isAllMeshesTransparent: false,
+      statesOfElements: [
+        {
+          targets: [], //["name_foo", "name_boo"],
+          specifyMethod: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
+          states: {
+            enable: [
+                // 3042,  // BLEND
+            ],
+            functions: {
+              //"blendFuncSeparate": [1, 0, 1, 0],
+            }
+          },
+          isTransparent: true,
+          shaderClass: DecalShader, // LambertShader // PhongShader
+          isTextureImageToLoadPreMultipliedAlpha: false,
+          globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
+        }
+      ]
+    };
+
     if (!options) {
-      options = {
-        extensionLoader: null,
-        isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-        isExistJointGizmo: false,
-        isBlend: false,
-        isDepthTest: true,
-        defaultShaderClass: null,
-        statesOfElements: null,
-        isAllMeshesTransparent: true,
-        statesOfElements: [
-          {
-            targets: [], //["name_foo", "name_boo"],
-            specifyMethod: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
-            states: {
-              enable: [
-                  // 3042,  // BLEND
-              ],
-              functions: {
-                //"blendFuncSeparate": [1, 0, 1, 0],
-              }
-            },
-            isTransparent: true,
-            shaderClass: DecalShader, // LambertShader // PhongShader
-            isTextureImageToLoadPreMultipliedAlpha: false,
-            globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
-          }
-        ]
-      };
+      options = defaultOptions;
+     } else {
+      for (let optionName in options) {
+        defaultOptions[optionName] = options[optionName];
+      }
+      options = defaultOptions;
     }
+
 
     let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
 

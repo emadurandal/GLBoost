@@ -54,7 +54,7 @@
   var directionalLights = [];
 
   var glTFLoader = GLBoost.GLTFLoader.getInstance();
-  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/WalkingLady/WalkingLady.gltf', GLBoost.HalfLambertShader);
+  var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/WalkingLady/WalkingLady.gltf', {defaultShaderClass: GLBoost.HalfLambertShader});
 
   promise.then((character)=> {
     character.updateAABB();
