@@ -11,7 +11,8 @@ export default class L_CameraController extends GLBoostObject {
       isSymmetryMode: true,
       doResetWhenCameraSettingChanged: false,
       isForceGrab: false,
-      efficiency: 1.0
+      efficiency: 1.0,
+      eventTargetDom: document
     }
   ) {
     super(glBoostContext);
@@ -23,6 +24,7 @@ export default class L_CameraController extends GLBoostObject {
     this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
     this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
+    let eventTargetDom = options.eventTargetDom;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -173,15 +175,15 @@ export default class L_CameraController extends GLBoostObject {
       });
     };
 
-    if (document) {
-      document.addEventListener('mousedown', this._onMouseDown);
-      document.addEventListener('mouseup', this._onMouseUp);
-      document.addEventListener('mousemove', this._onMouseMove);
+    if (eventTargetDom) {
+      eventTargetDom.addEventListener('mousedown', this._onMouseDown);
+      eventTargetDom.addEventListener('mouseup', this._onMouseUp);
+      eventTargetDom.addEventListener('mousemove', this._onMouseMove);
       if (window.WheelEvent) {
-        document.addEventListener("wheel", this._onMouseWheel);
+        eventTargetDom.addEventListener("wheel", this._onMouseWheel);
       }
-      document.addEventListener('contextmenu', this._onContexMenu, false);
-      document.addEventListener("dblclick", this._onMouseDblClick);
+      eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
+      eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
     }
   }
 
