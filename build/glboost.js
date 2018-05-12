@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: f792bc9d
+// This revision is the commit right after the SHA: 561b4a52
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3312,6 +3312,7 @@ class L_Element extends GLBoostObject {
     }
     this._rotate = vec.clone();
     this._is_trs_matrix_updated = false;
+    this._is_quaternion_updated = false;
     this._is_euler_angles_updated = true;
     this._needUpdate();
   }
@@ -3507,6 +3508,7 @@ class L_Element extends GLBoostObject {
     }
     this._quaternion = quat.clone();
     this._is_trs_matrix_updated = false;
+    this._is_euler_angles_updated = false;
     this._is_quaternion_updated = true;
     this._needUpdate();
   }
@@ -9123,7 +9125,8 @@ class L_CameraController extends GLBoostObject {
       isSymmetryMode: true,
       doResetWhenCameraSettingChanged: false,
       isForceGrab: false,
-      efficiency: 1.0
+      efficiency: 1.0,
+      eventTargetDom: document
     }
   ) {
     super(glBoostContext);
@@ -9135,6 +9138,7 @@ class L_CameraController extends GLBoostObject {
     this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
     this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
+    let eventTargetDom = options.eventTargetDom;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -9285,15 +9289,15 @@ class L_CameraController extends GLBoostObject {
       });
     };
 
-    if (document) {
-      document.addEventListener('mousedown', this._onMouseDown);
-      document.addEventListener('mouseup', this._onMouseUp);
-      document.addEventListener('mousemove', this._onMouseMove);
+    if (eventTargetDom) {
+      eventTargetDom.addEventListener('mousedown', this._onMouseDown);
+      eventTargetDom.addEventListener('mouseup', this._onMouseUp);
+      eventTargetDom.addEventListener('mousemove', this._onMouseMove);
       if (window.WheelEvent) {
-        document.addEventListener("wheel", this._onMouseWheel);
+        eventTargetDom.addEventListener("wheel", this._onMouseWheel);
       }
-      document.addEventListener('contextmenu', this._onContexMenu, false);
-      document.addEventListener("dblclick", this._onMouseDblClick);
+      eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
+      eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
     }
   }
 

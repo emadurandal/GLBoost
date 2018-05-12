@@ -199,6 +199,7 @@ export default class L_Element extends GLBoostObject {
     }
     this._rotate = vec.clone();
     this._is_trs_matrix_updated = false;
+    this._is_quaternion_updated = false;
     this._is_euler_angles_updated = true;
     this._needUpdate();
   }
@@ -394,6 +395,7 @@ export default class L_Element extends GLBoostObject {
     }
     this._quaternion = quat.clone();
     this._is_trs_matrix_updated = false;
+    this._is_euler_angles_updated = false;
     this._is_quaternion_updated = true;
     this._needUpdate();
   }
