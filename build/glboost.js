@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 1c9eb10c
+// This revision is the commit right after the SHA: f8a8ccbf
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -11703,7 +11703,7 @@ class SPVDecalShaderSource {
     if (Shader._exist(f, GLBoost$1.COLOR)) {
       shaderText += '  rt0 *= color;\n';
     }
-    shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
+//    shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
 
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
@@ -12929,17 +12929,9 @@ class M_Group extends M_Element {
    * [ja] このグループにelementを子供として追加します。
    * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
    */
-  addChild(element) {
-    { 
-      //// if forbit duplicated register
-      // this.removeChild(element);
-      // element._parent = this;
-      // this._elements.push(element);
+  addChild(element, isDuplicateOk = false) {
 
-    }
-
-    {
-
+    if (isDuplicateOk){
       // if forgive duplicated register by copy
       let elem = null;
       if (element._parent) {
@@ -12949,6 +12941,11 @@ class M_Group extends M_Element {
       }
       elem._parent = this;
       this._elements.push(elem);
+    } else {
+      //// if forbit duplicated register
+      this.removeChild(element);
+      element._parent = this;
+      this._elements.push(element);
     }
   }
 
@@ -15832,24 +15829,28 @@ class M_DirectionalLight extends M_AbstractLight {
     }
   }
   
-  set direction(vec3) {
-    console.error("Not supported Now!");
-    
-    /*
-    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3.normalize());
-    super.quaternion = rotationQ;
-    this._gizmo._mesh.quaternion = rotationQ;
+  set direction(_zDir) {
+    let yDir = new Vector3(0, 1, 0);
+    let xDir = Vector3.cross(yDir, _zDir);
+    let zDir = Vector3.cross(yDir, xDir);
+  
+    let result = Matrix44$1$1.identity();
+    result.m11 = xDir.x;
+    result.m21 = xDir.y;
+    result.m31 = xDir.z;
+  
+    result.m12 = yDir.x;
+    result.m22 = yDir.y;
+    result.m32 = yDir.z;
+  
+    result.m13 = zDir.x;
+    result.m23 = zDir.y;
+    result.m33 = zDir.z;
 
-    //console.log('AAAAAAAA' + rotationQ.toString());
+    super.matrix = result;
+    this._gizmo._mesh.matrix = result;
 
-    this._direction = vec3.normalize();
-    //this._direction = vec3.normalize();
-    if (this._camera) {
-      if (this._camera.customFunction) {
-        this._camera.customFunction(this);
-      }
-    }
-    */
+    this.callCameraCustomFunction();
   }
 
 
@@ -15962,6 +15963,29 @@ class M_SpotLight extends M_AbstractLight {
         this._camera.customFunction(this);
       }
     }
+  }
+
+  set direction(_zDir) {
+    let yDir = new Vector3(0, 1, 0);
+    let xDir = Vector3.cross(yDir, _zDir);
+    let zDir = Vector3.cross(yDir, xDir);
+  
+    let result = Matrix44.identity();
+    result.m11 = xDir.x;
+    result.m21 = xDir.y;
+    result.m31 = xDir.z;
+  
+    result.m12 = yDir.x;
+    result.m22 = yDir.y;
+    result.m32 = yDir.z;
+  
+    result.m13 = zDir.x;
+    result.m23 = zDir.y;
+    result.m33 = zDir.z;
+
+    super.matrix = result;
+
+    this.callCameraCustomFunction();
   }
 
   get direction() {
@@ -17132,7 +17156,7 @@ GLBoost$1["ObjLoader"] = ObjLoader;
   define('VALUE_DEFAULT_POINTLIGHT_INTENSITY', new Vector3(1, 1, 1));
   define('VALUE_ANGLE_UNIT', GLBoost$1.DEGREE);
   define('VALUE_WEBGL_ONE_USE_EXTENSIONS', true);
-  define('VALUE_CONSOLE_OUT_FOR_DEBUGGING', false);
+  define('VALUE_CONSOLE_OUT_FOR_DEBUGGING', true);
   define(GLBoost$1.LOG_GENERAL, true);
   define(GLBoost$1.LOG_SHADER_CODE, true);
   define(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, true);
