@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: caeac0cf
+// This revision is the commit right after the SHA: 79b630fe
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -14511,13 +14511,15 @@ class M_SpotLight extends M_AbstractLight {
    * @param {Vector4} direction the light (traveling) direction
    * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
    */
-  constructor(glBoostContext, intensity, direction) {
+  constructor(glBoostContext, intensity, rotation) {
     super(glBoostContext);
 
     this._intensity = intensity;
     
     this._isLightType = 'spot';
-    this._direction = direction;
+    this._direction = new Vector3(0.0, 0.0, 1.0);
+
+    this.rotation = rotation;
 
     this._spotExponent = 1.0;
     this._spotCutoffInDegree = 30;
@@ -14533,7 +14535,12 @@ class M_SpotLight extends M_AbstractLight {
   }
 
   set direction(vec) {
-    this._direction = vec;
+    console.error("Not supported Now!");
+  }
+
+  set rotate(vec3) {
+    super.rotate = vec3;
+
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
@@ -14541,8 +14548,14 @@ class M_SpotLight extends M_AbstractLight {
     }
   }
 
+  get rotate() {
+    return super.rotate;
+  } 
+
+
   get direction() {
-    return this._direction;
+    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    return result;
   }
 
   set spotExponent(val) {
@@ -14832,8 +14845,8 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createDirectionalLight(intensity, direction, length) {
-    return new M_DirectionalLight(this, intensity, direction, length);
+  createDirectionalLight(intensity, rotate, length) {
+    return new M_DirectionalLight(this, intensity, rotate, length);
   }
 
   createPointLight(intensity) {
