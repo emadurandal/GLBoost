@@ -80,6 +80,29 @@ export default class M_SpotLight extends M_AbstractLight {
     }
   }
 
+  set direction(_zDir) {
+    let yDir = new Vector3(0, 1, 0);
+    let xDir = Vector3.cross(yDir, _zDir);
+    let zDir = Vector3.cross(yDir, xDir);
+  
+    let result = Matrix44.identity();
+    result.m11 = xDir.x;
+    result.m21 = xDir.y;
+    result.m31 = xDir.z;
+  
+    result.m12 = yDir.x;
+    result.m22 = yDir.y;
+    result.m32 = yDir.z;
+  
+    result.m13 = zDir.x;
+    result.m23 = zDir.y;
+    result.m33 = zDir.z;
+
+    super.matrix = result;
+
+    this.callCameraCustomFunction();
+  }
+
   get direction() {
     let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
     return result;
