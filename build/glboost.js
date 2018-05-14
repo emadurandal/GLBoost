@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 79b630fe
+// This revision is the commit right after the SHA: e8f00780
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -14412,14 +14412,6 @@ class M_DirectionalLight extends M_AbstractLight {
     return this._gizmo.getMatrixNotAnimated();
   }
 
-  set translate(vec3) {
-    this._gizmo._mesh.translate = vec3;
-  }
-
-  get translate() {
-    return this._gizmo.translate;
-  }
-
   set intensity(vec) {
     this._intensity = vec;
   }
@@ -14432,17 +14424,52 @@ class M_DirectionalLight extends M_AbstractLight {
     this._gizmo._mesh.rotate = vec3;
     super.rotate = vec3;
 
+    this.callCameraCustomFunction();
+  }
+
+  set translate(vec3) {
+    this._gizmo._mesh.translate = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get translate() {
+    return this._gizmo.translate;
+  }
+
+  get rotate() {
+    return super.rotate;
+  }
+
+  set matrix(vec3) {
+    this._gizmo._mesh.matrix = vec3;
+    super.matrix = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get matrix() {
+    return super.matrix;
+  }
+
+  set quaternion(vec3) {
+    this._gizmo._mesh.quaternion = vec3;
+    super.quaternion = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get quaternion() {
+    return super.quaternion;
+  }
+
+  callCameraCustomFunction() {
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
   }
-
-  get rotate() {
-    return super.rotate;
-  } 
-
   
   set direction(vec3) {
     console.error("Not supported Now!");
@@ -14538,20 +14565,43 @@ class M_SpotLight extends M_AbstractLight {
     console.error("Not supported Now!");
   }
 
-  set rotate(vec3) {
-    super.rotate = vec3;
+  get translate() {
+    return this._gizmo.translate;
+  }
 
+  get rotate() {
+    return super.rotate;
+  }
+
+  set matrix(vec3) {
+    this._gizmo._mesh.matrix = vec3;
+    super.matrix = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get matrix() {
+    return super.matrix;
+  }
+
+  set quaternion(vec3) {
+    this._gizmo._mesh.quaternion = vec3;
+    super.quaternion = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get quaternion() {
+    return super.quaternion;
+  }
+
+  callCameraCustomFunction() {
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
   }
-
-  get rotate() {
-    return super.rotate;
-  } 
-
 
   get direction() {
     let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);

@@ -42,20 +42,43 @@ export default class M_SpotLight extends M_AbstractLight {
     console.error("Not supported Now!");
   }
 
-  set rotate(vec3) {
-    super.rotate = vec3;
+  get translate() {
+    return this._gizmo.translate;
+  }
 
+  get rotate() {
+    return super.rotate;
+  }
+
+  set matrix(vec3) {
+    this._gizmo._mesh.matrix = vec3;
+    super.matrix = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get matrix() {
+    return super.matrix;
+  }
+
+  set quaternion(vec3) {
+    this._gizmo._mesh.quaternion = vec3;
+    super.quaternion = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get quaternion() {
+    return super.quaternion;
+  }
+
+  callCameraCustomFunction() {
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
   }
-
-  get rotate() {
-    return super.rotate;
-  } 
-
 
   get direction() {
     let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
