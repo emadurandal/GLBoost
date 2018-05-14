@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "npm run build-middle",
-    "build-middle": "rollup -c src/js/middle_level/rollup.config.js",
+    "build-middle": "rollup -c src/middle_level/rollup.config.js",
     "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
     "esdoc": "esdoc -c esdoc.json",
     "sync-examples": "node scripts/sync-example-codes.js",
