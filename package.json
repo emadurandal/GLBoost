@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "npm run build-middle",
-    "build-middle": "rollup -c src/js/middle_level/rollup.config.js",
+    "build-middle": "rollup -c src/middle_level/rollup.config.js",
     "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
     "esdoc": "esdoc -c esdoc.json",
     "sync-examples": "node scripts/sync-example-codes.js",
@@ -31,7 +31,6 @@
   },
   "homepage": "https://github.com/emadurandal/GLBoost#readme",
   "devDependencies": {
-    "chai": "^4.0.2",
     "esdoc": "^1.1.0",
     "esdoc-flow-type-plugin": "^1.1.0",
     "eslint": "^4.0.0",
@@ -40,9 +39,8 @@
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.60.1",
     "http-server": "^0.10.0",
-    "mocha": "^3.4.2",
-    "rollup": "0.43.0",
-    "selenium-webdriver": "^3.4.0"
+    "jest": "^22.4.3",
+    "rollup": "0.43.0"
   },
   "dependencies": {
     "rollup-plugin-flow": "^1.1.1"
