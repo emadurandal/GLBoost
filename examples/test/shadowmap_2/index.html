@@ -43,7 +43,7 @@
     }
   });
 
-  var directionOfDirectionalLights = [new GLBoost.Vector3(5, -10, 5), new GLBoost.Vector3(3, -10, 1)];
+  var directionOfDirectionalLights = [new GLBoost.Vector3(-60, 0, 0), new GLBoost.Vector3(-60, 90, 0)];
   var expression = glBoostContext.createExpressionAndRenderPasses(directionOfDirectionalLights.length+1
   //+1 // Debug
   );
@@ -123,7 +123,7 @@
           //aabb.updateAllInfo();
           var centerOfAABB = aabb.centerPoint;
           var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
-          var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction);
+          var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction.clone().multiply(-1));
           var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCameras[i_].zNear)));
           var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
 
@@ -174,8 +174,8 @@
       );
       scene.addChild( camera );
 
-      expression.renderPasses[2].scene = scene;
-      expression.renderPasses[2].setClearColor(new GLBoost.Vector4(1, 0.5, 0.5, 1));
+      expression.renderPasses[directionOfDirectionalLights.length].scene = scene;
+      expression.renderPasses[directionOfDirectionalLights.length].setClearColor(new GLBoost.Vector4(1, 0.5, 0.5, 1));
     })();
 
     /*
@@ -193,11 +193,11 @@
 
       scene.addChild(plane);
 
-      expression.renderPasses[3].scene = scene;
+      expression.renderPasses[directionOfDirectionalLights.length].scene = scene;
 
     })();
-    */
-
+  
+*/
     expression.prepareToRender();
 
     var gtime = 0/30;
@@ -205,7 +205,7 @@
 
     var render = function(){
 
-      for (var i = 0; i<3; i++) {
+      for (var i = 0; i<directionOfDirectionalLights.length+1; i++) {
         expression.renderPasses[i].scene.setCurrentAnimationValue('time', gtime);
       }
 
@@ -225,7 +225,7 @@
       camera.eye = rotateMatrixForCamera.multiplyVector(camera.eye);
       var rotateMatrix = GLBoost.Matrix33.rotateY(1.0);
       for (var i=0; i<directionOfDirectionalLights.length; i++) {
-        directionalLights[i].direction = rotateMatrix.multiplyVector(directionalLights[i].direction);
+        directionalLights[i].matrix.multiply(rotateMatrix);
       }
 
       requestAnimationFrame(render);

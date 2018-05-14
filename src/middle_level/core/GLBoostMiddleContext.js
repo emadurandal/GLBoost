@@ -98,8 +98,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_AmbientLight(this, intensity);
   }
 
-  createSpotLight(intensity, direction) {
-    return new M_SpotLight(this, intensity, direction);
+  createSpotLight(intensity, rotate) {
+    return new M_SpotLight(this, intensity, rotate);
   }
 
   createJoint(isExistJointGizmo) {

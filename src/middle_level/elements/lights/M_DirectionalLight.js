@@ -15,16 +15,18 @@ export default class M_DirectionalLight extends M_AbstractLight {
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
    */
-  constructor(glBoostContext, intensity, direction, length = 1.0) {
+  constructor(glBoostContext, intensity, rotate, length = 1.0) {
     super(glBoostContext);
 
     this._intensity = intensity;
-    this._direction = new Vector3(0.0, 0.0, -1.0);
+    this._direction = new Vector3(0.0, 0.0, 1.0);
+//    this._direction = direction;
 
     this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
     this._gizmos.push(this._gizmo);
 
-    this.direction = direction.normalize();
+    //this.direction = direction;
+    this.rotate = rotate;
 
     //this._gizmo._mesh.masterElement = this._gizmo;
     this._isLightType = 'directional';
@@ -70,21 +72,32 @@ export default class M_DirectionalLight extends M_AbstractLight {
     return super.rotate;
   } 
 
+  
   set direction(vec3) {
-    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3);
+    console.error("Not supported Now!");
+    
+    /*
+    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3.normalize());
     super.quaternion = rotationQ;
     this._gizmo._mesh.quaternion = rotationQ;
 
+    //console.log('AAAAAAAA' + rotationQ.toString());
+
+    this._direction = vec3.normalize();
+    //this._direction = vec3.normalize();
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
+    */
   }
 
 
   get direction() {
-    return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
+    //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
+    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    return result;
   }
 
 }

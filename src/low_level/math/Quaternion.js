@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import Matrix44 from './Matrix44';
+import Matrix33 from './Matrix33';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
 import MathUtil from './MathUtil';
@@ -86,6 +87,24 @@ export default class Quaternion {
       2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
       2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
       0.0, 0.0, 0.0, 1.0
+    );
+  }
+
+  get rotationMatrix33() {
+    var sx = this.x * this.x;
+    var sy = this.y * this.y;
+    var sz = this.z * this.z;
+    var cx = this.y * this.z;
+    var cy = this.x * this.z;
+    var cz = this.x * this.y;
+    var wx = this.w * this.x;
+    var wy = this.w * this.y;
+    var wz = this.w * this.z;
+
+    return new Matrix33(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
     );
   }
 
@@ -240,19 +259,6 @@ export default class Quaternion {
     return q;
   }
 
-  /**
-   * 
-   * @param {*} srcDir This must be mormalized
-   * @param {*} distDir This must be mormalized
-   * @return Rotation Quaternion which rotate srcDir to distDir
-   */
-  static quaternionFromTwoDirection(srcDir, distDir) {
-    let srcQ = new Quaternion(srcDir.x, srcDir.y, srcDir.z, 0);
-    let distQ = new Quaternion(distDir.x, distDir.y, distDir.z, 0);
-    let rotationQ = Quaternion.qlerp(srcQ, distQ, 1);
-    return rotationQ;
-  }
-
   at(i) {
     switch (i%4) {
     case 0: return this.x;
@@ -280,6 +286,9 @@ export default class Quaternion {
     return this;
   }
 
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+  }
 }
 
 GLBoost["Quaternion"] = Quaternion;

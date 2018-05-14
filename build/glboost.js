@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 2b639e52
+// This revision is the commit right after the SHA: caeac0cf
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -2824,6 +2824,24 @@ class Quaternion {
     );
   }
 
+  get rotationMatrix33() {
+    var sx = this.x * this.x;
+    var sy = this.y * this.y;
+    var sz = this.z * this.z;
+    var cx = this.y * this.z;
+    var cy = this.x * this.z;
+    var cz = this.x * this.y;
+    var wx = this.w * this.x;
+    var wy = this.w * this.y;
+    var wz = this.w * this.z;
+
+    return new Matrix33(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
+    );
+  }
+
   axisAngle(axisVec3, angle) {
     var radian = 0;
     if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
@@ -2975,19 +2993,6 @@ class Quaternion {
     return q;
   }
 
-  /**
-   * 
-   * @param {*} srcDir This must be mormalized
-   * @param {*} distDir This must be mormalized
-   * @return Rotation Quaternion which rotate srcDir to distDir
-   */
-  static quaternionFromTwoDirection(srcDir, distDir) {
-    let srcQ = new Quaternion(srcDir.x, srcDir.y, srcDir.z, 0);
-    let distQ = new Quaternion(distDir.x, distDir.y, distDir.z, 0);
-    let rotationQ = Quaternion.qlerp(srcQ, distQ, 1);
-    return rotationQ;
-  }
-
   at(i) {
     switch (i%4) {
     case 0: return this.x;
@@ -3015,6 +3020,9 @@ class Quaternion {
     return this;
   }
 
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+  }
 }
 
 GLBoost$1["Quaternion"] = Quaternion;
@@ -5686,7 +5694,7 @@ class DrawKickerLocal {
               lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j].className === 'M_DirectionalLight') {
-              lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+              lightVec = new Vector4(lights[j].direction.x, lights[j].direction.y, lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
               isPointLight = 0.0;
@@ -5860,7 +5868,7 @@ class DrawKickerWorld {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-              lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
+              lightDirection = new Vector3(light.direction.x, light.direction.y, light.direction.z);
               //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
               lightDirection.normalize();
             }
@@ -14378,16 +14386,18 @@ class M_DirectionalLight extends M_AbstractLight {
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
    */
-  constructor(glBoostContext, intensity, direction, length = 1.0) {
+  constructor(glBoostContext, intensity, rotate, length = 1.0) {
     super(glBoostContext);
 
     this._intensity = intensity;
-    this._direction = new Vector3(0.0, 0.0, -1.0);
+    this._direction = new Vector3(0.0, 0.0, 1.0);
+//    this._direction = direction;
 
     this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
     this._gizmos.push(this._gizmo);
 
-    this.direction = direction.normalize();
+    //this.direction = direction;
+    this.rotate = rotate;
 
     //this._gizmo._mesh.masterElement = this._gizmo;
     this._isLightType = 'directional';
@@ -14433,21 +14443,32 @@ class M_DirectionalLight extends M_AbstractLight {
     return super.rotate;
   } 
 
+  
   set direction(vec3) {
-    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3);
+    console.error("Not supported Now!");
+    
+    /*
+    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3.normalize());
     super.quaternion = rotationQ;
     this._gizmo._mesh.quaternion = rotationQ;
 
+    //console.log('AAAAAAAA' + rotationQ.toString());
+
+    this._direction = vec3.normalize();
+    //this._direction = vec3.normalize();
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
+    */
   }
 
 
   get direction() {
-    return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
+    //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
+    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    return result;
   }
 
 }
@@ -14823,8 +14844,8 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_AmbientLight(this, intensity);
   }
 
-  createSpotLight(intensity, direction) {
-    return new M_SpotLight(this, intensity, direction);
+  createSpotLight(intensity, rotate) {
+    return new M_SpotLight(this, intensity, rotate);
   }
 
   createJoint(isExistJointGizmo) {
