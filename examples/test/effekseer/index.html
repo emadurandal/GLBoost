@@ -54,7 +54,7 @@ scene.addChild(camera);
 var gtime = 0;
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
-var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/teapot/teapot.gltf', GLBoost.PhongShader); // monster.gltf
+var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/teapot/teapot.gltf', {defaultShaderClass: GLBoost.PhongShader}); // monster.gltf
 var effekseerElm = glBoostContext.createEffekseerElement();
 effekseerElm.load("https://cdn.rawgit.com/effekseer/EffekseerForWebGL/7a1b035c/Release/Sample/Resource/Laser01.efk").then(function(){
   promise.then(function(mesh) {
