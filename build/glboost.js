@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 9cf0ecd6
+// This revision is the commit right after the SHA: 2b639e52
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1715,6 +1715,14 @@ class Matrix33 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
+  }
+
+  static rotate(vec3) {
+    return (Matrix33.rotateZ(vec3.z).multiply(Matrix33.rotateY(vec3.y).multiply(Matrix33.rotateX(vec3.x))));
+  }
+
   scale(vec) {
     return this.setComponents(
       vec.x, 0, 0,
@@ -2961,6 +2969,24 @@ class Quaternion {
     return q;
   }
 */
+
+  static fromPosition(vec3) {
+    let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+    return q;
+  }
+
+  /**
+   * 
+   * @param {*} srcDir This must be mormalized
+   * @param {*} distDir This must be mormalized
+   * @return Rotation Quaternion which rotate srcDir to distDir
+   */
+  static quaternionFromTwoDirection(srcDir, distDir) {
+    let srcQ = new Quaternion(srcDir.x, srcDir.y, srcDir.z, 0);
+    let distQ = new Quaternion(distDir.x, distDir.y, distDir.z, 0);
+    let rotationQ = Quaternion.qlerp(srcQ, distQ, 1);
+    return rotationQ;
+  }
 
   at(i) {
     switch (i%4) {
@@ -14351,16 +14377,17 @@ class M_DirectionalLight extends M_AbstractLight {
   /**
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
-   * @param {Vector4} direction the light (traveling) direction
    */
   constructor(glBoostContext, intensity, direction, length = 1.0) {
     super(glBoostContext);
 
     this._intensity = intensity;
-    this._direction = direction;
+    this._direction = new Vector3(0.0, 0.0, -1.0);
 
     this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
     this._gizmos.push(this._gizmo);
+
+    this.direction = direction.normalize();
 
     //this._gizmo._mesh.masterElement = this._gizmo;
     this._isLightType = 'directional';
@@ -14391,8 +14418,10 @@ class M_DirectionalLight extends M_AbstractLight {
     return this._intensity;
   }
 
-  set direction(vec) {
-    this._direction = vec;
+  set rotate(vec3) {
+    this._gizmo._mesh.rotate = vec3;
+    super.rotate = vec3;
+
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
@@ -14400,8 +14429,25 @@ class M_DirectionalLight extends M_AbstractLight {
     }
   }
 
+  get rotate() {
+    return super.rotate;
+  } 
+
+  set direction(vec3) {
+    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3);
+    super.quaternion = rotationQ;
+    this._gizmo._mesh.quaternion = rotationQ;
+
+    if (this._camera) {
+      if (this._camera.customFunction) {
+        this._camera.customFunction(this);
+      }
+    }
+  }
+
+
   get direction() {
-    return this._direction;
+    return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
   }
 
 }

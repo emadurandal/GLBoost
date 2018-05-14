@@ -235,6 +235,24 @@ export default class Quaternion {
   }
 */
 
+  static fromPosition(vec3) {
+    let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+    return q;
+  }
+
+  /**
+   * 
+   * @param {*} srcDir This must be mormalized
+   * @param {*} distDir This must be mormalized
+   * @return Rotation Quaternion which rotate srcDir to distDir
+   */
+  static quaternionFromTwoDirection(srcDir, distDir) {
+    let srcQ = new Quaternion(srcDir.x, srcDir.y, srcDir.z, 0);
+    let distQ = new Quaternion(distDir.x, distDir.y, distDir.z, 0);
+    let rotationQ = Quaternion.qlerp(srcQ, distQ, 1);
+    return rotationQ;
+  }
+
   at(i) {
     switch (i%4) {
     case 0: return this.x;
