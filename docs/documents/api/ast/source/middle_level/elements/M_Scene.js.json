@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 7885,
+  "end": 7958,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 268,
+      "line": 272,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 7885,
+    "end": 7958,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 268,
+        "line": 272,
         "column": 0
       }
     },
@@ -559,28 +559,28 @@
       {
         "type": "ExportDefaultDeclaration",
         "start": 614,
-        "end": 7884,
+        "end": 7957,
         "loc": {
           "start": {
             "line": 18,
             "column": 0
           },
           "end": {
-            "line": 267,
+            "line": 271,
             "column": 1
           }
         },
         "declaration": {
           "type": "ClassDeclaration",
           "start": 629,
-          "end": 7884,
+          "end": 7957,
           "loc": {
             "start": {
               "line": 18,
               "column": 15
             },
             "end": {
-              "line": 267,
+              "line": 271,
               "column": 1
             }
           },
@@ -622,14 +622,14 @@
           "body": {
             "type": "ClassBody",
             "start": 659,
-            "end": 7884,
+            "end": 7957,
             "loc": {
               "start": {
                 "line": 18,
                 "column": 45
               },
               "end": {
-                "line": 267,
+                "line": 271,
                 "column": 1
               }
             },
@@ -14638,8 +14638,7 @@
                       }
                     }
                   ],
-                  "directives": [],
-                  "trailingComments": null
+                  "directives": []
                 },
                 "leadingComments": [
                   {
@@ -14658,20 +14657,142 @@
                       }
                     }
                   }
-                ],
+                ]
+              },
+              {
+                "type": "ClassMethod",
+                "start": 7625,
+                "end": 7694,
+                "loc": {
+                  "start": {
+                    "line": 258,
+                    "column": 2
+                  },
+                  "end": {
+                    "line": 260,
+                    "column": 3
+                  }
+                },
+                "static": false,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 7629,
+                  "end": 7648,
+                  "loc": {
+                    "start": {
+                      "line": 258,
+                      "column": 6
+                    },
+                    "end": {
+                      "line": 258,
+                      "column": 25
+                    },
+                    "identifierName": "lightsExceptAmbient"
+                  },
+                  "name": "lightsExceptAmbient"
+                },
+                "kind": "get",
+                "id": null,
+                "generator": false,
+                "expression": false,
+                "async": false,
+                "params": [],
+                "body": {
+                  "type": "BlockStatement",
+                  "start": 7651,
+                  "end": 7694,
+                  "loc": {
+                    "start": {
+                      "line": 258,
+                      "column": 28
+                    },
+                    "end": {
+                      "line": 260,
+                      "column": 3
+                    }
+                  },
+                  "body": [
+                    {
+                      "type": "ReturnStatement",
+                      "start": 7657,
+                      "end": 7690,
+                      "loc": {
+                        "start": {
+                          "line": 259,
+                          "column": 4
+                        },
+                        "end": {
+                          "line": 259,
+                          "column": 37
+                        }
+                      },
+                      "argument": {
+                        "type": "MemberExpression",
+                        "start": 7664,
+                        "end": 7689,
+                        "loc": {
+                          "start": {
+                            "line": 259,
+                            "column": 11
+                          },
+                          "end": {
+                            "line": 259,
+                            "column": 36
+                          }
+                        },
+                        "object": {
+                          "type": "ThisExpression",
+                          "start": 7664,
+                          "end": 7668,
+                          "loc": {
+                            "start": {
+                              "line": 259,
+                              "column": 11
+                            },
+                            "end": {
+                              "line": 259,
+                              "column": 15
+                            }
+                          }
+                        },
+                        "property": {
+                          "type": "Identifier",
+                          "start": 7669,
+                          "end": 7689,
+                          "loc": {
+                            "start": {
+                              "line": 259,
+                              "column": 16
+                            },
+                            "end": {
+                              "line": 259,
+                              "column": 36
+                            },
+                            "identifierName": "_lightsExceptAmbient"
+                          },
+                          "name": "_lightsExceptAmbient"
+                        },
+                        "computed": false
+                      }
+                    }
+                  ],
+                  "directives": [],
+                  "trailingComments": null
+                },
                 "trailingComments": [
                   {
                     "type": "CommentBlock",
                     "value": "*\n   * [en] Get child cameras which belong to this scene.<br>\n   * [ja] このシーンに属していた子供のCamera要素の配列を返します。\n   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素\n   ",
-                    "start": 7625,
-                    "end": 7833,
+                    "start": 7698,
+                    "end": 7906,
                     "loc": {
                       "start": {
-                        "line": 258,
+                        "line": 262,
                         "column": 2
                       },
                       "end": {
-                        "line": 262,
+                        "line": 266,
                         "column": 5
                       }
                     }
@@ -14680,15 +14801,15 @@
               },
               {
                 "type": "ClassMethod",
-                "start": 7836,
-                "end": 7881,
+                "start": 7909,
+                "end": 7954,
                 "loc": {
                   "start": {
-                    "line": 263,
+                    "line": 267,
                     "column": 2
                   },
                   "end": {
-                    "line": 265,
+                    "line": 269,
                     "column": 3
                   }
                 },
@@ -14696,15 +14817,15 @@
                 "computed": false,
                 "key": {
                   "type": "Identifier",
-                  "start": 7840,
-                  "end": 7847,
+                  "start": 7913,
+                  "end": 7920,
                   "loc": {
                     "start": {
-                      "line": 263,
+                      "line": 267,
                       "column": 6
                     },
                     "end": {
-                      "line": 263,
+                      "line": 267,
                       "column": 13
                     },
                     "identifierName": "cameras"
@@ -14719,73 +14840,73 @@
                 "params": [],
                 "body": {
                   "type": "BlockStatement",
-                  "start": 7850,
-                  "end": 7881,
+                  "start": 7923,
+                  "end": 7954,
                   "loc": {
                     "start": {
-                      "line": 263,
+                      "line": 267,
                       "column": 16
                     },
                     "end": {
-                      "line": 265,
+                      "line": 269,
                       "column": 3
                     }
                   },
                   "body": [
                     {
                       "type": "ReturnStatement",
-                      "start": 7856,
-                      "end": 7877,
+                      "start": 7929,
+                      "end": 7950,
                       "loc": {
                         "start": {
-                          "line": 264,
+                          "line": 268,
                           "column": 4
                         },
                         "end": {
-                          "line": 264,
+                          "line": 268,
                           "column": 25
                         }
                       },
                       "argument": {
                         "type": "MemberExpression",
-                        "start": 7863,
-                        "end": 7876,
+                        "start": 7936,
+                        "end": 7949,
                         "loc": {
                           "start": {
-                            "line": 264,
+                            "line": 268,
                             "column": 11
                           },
                           "end": {
-                            "line": 264,
+                            "line": 268,
                             "column": 24
                           }
                         },
                         "object": {
                           "type": "ThisExpression",
-                          "start": 7863,
-                          "end": 7867,
+                          "start": 7936,
+                          "end": 7940,
                           "loc": {
                             "start": {
-                              "line": 264,
+                              "line": 268,
                               "column": 11
                             },
                             "end": {
-                              "line": 264,
+                              "line": 268,
                               "column": 15
                             }
                           }
                         },
                         "property": {
                           "type": "Identifier",
-                          "start": 7868,
-                          "end": 7876,
+                          "start": 7941,
+                          "end": 7949,
                           "loc": {
                             "start": {
-                              "line": 264,
+                              "line": 268,
                               "column": 16
                             },
                             "end": {
-                              "line": 264,
+                              "line": 268,
                               "column": 24
                             },
                             "identifierName": "_cameras"
@@ -14802,15 +14923,15 @@
                   {
                     "type": "CommentBlock",
                     "value": "*\n   * [en] Get child cameras which belong to this scene.<br>\n   * [ja] このシーンに属していた子供のCamera要素の配列を返します。\n   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素\n   ",
-                    "start": 7625,
-                    "end": 7833,
+                    "start": 7698,
+                    "end": 7906,
                     "loc": {
                       "start": {
-                        "line": 258,
+                        "line": 262,
                         "column": 2
                       },
                       "end": {
-                        "line": 262,
+                        "line": 266,
                         "column": 5
                       }
                     }
@@ -15057,15 +15178,15 @@
     {
       "type": "CommentBlock",
       "value": "*\n   * [en] Get child cameras which belong to this scene.<br>\n   * [ja] このシーンに属していた子供のCamera要素の配列を返します。\n   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素\n   ",
-      "start": 7625,
-      "end": 7833,
+      "start": 7698,
+      "end": 7906,
       "loc": {
         "start": {
-          "line": 258,
+          "line": 262,
           "column": 2
         },
         "end": {
-          "line": 262,
+          "line": 266,
           "column": 5
         }
       }
@@ -45703,22 +45824,6 @@
       }
     },
     {
-      "type": "CommentBlock",
-      "value": "*\n   * [en] Get child cameras which belong to this scene.<br>\n   * [ja] このシーンに属していた子供のCamera要素の配列を返します。\n   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素\n   ",
-      "start": 7625,
-      "end": 7833,
-      "loc": {
-        "start": {
-          "line": 258,
-          "column": 2
-        },
-        "end": {
-          "line": 262,
-          "column": 5
-        }
-      }
-    },
-    {
       "type": {
         "label": "name",
         "beforeExpr": false,
@@ -45731,15 +45836,15 @@
         "binop": null
       },
       "value": "get",
-      "start": 7836,
-      "end": 7839,
+      "start": 7625,
+      "end": 7628,
       "loc": {
         "start": {
-          "line": 263,
+          "line": 258,
           "column": 2
         },
         "end": {
-          "line": 263,
+          "line": 258,
           "column": 5
         }
       }
@@ -45756,17 +45861,17 @@
         "postfix": false,
         "binop": null
       },
-      "value": "cameras",
-      "start": 7840,
-      "end": 7847,
+      "value": "lightsExceptAmbient",
+      "start": 7629,
+      "end": 7648,
       "loc": {
         "start": {
-          "line": 263,
+          "line": 258,
           "column": 6
         },
         "end": {
-          "line": 263,
-          "column": 13
+          "line": 258,
+          "column": 25
         }
       }
     },
@@ -45782,16 +45887,16 @@
         "postfix": false,
         "binop": null
       },
-      "start": 7847,
-      "end": 7848,
+      "start": 7648,
+      "end": 7649,
       "loc": {
         "start": {
-          "line": 263,
-          "column": 13
+          "line": 258,
+          "column": 25
         },
         "end": {
-          "line": 263,
-          "column": 14
+          "line": 258,
+          "column": 26
         }
       }
     },
@@ -45807,16 +45912,16 @@
         "postfix": false,
         "binop": null
       },
-      "start": 7848,
-      "end": 7849,
+      "start": 7649,
+      "end": 7650,
       "loc": {
         "start": {
-          "line": 263,
-          "column": 14
+          "line": 258,
+          "column": 26
         },
         "end": {
-          "line": 263,
-          "column": 15
+          "line": 258,
+          "column": 27
         }
       }
     },
@@ -45832,16 +45937,16 @@
         "postfix": false,
         "binop": null
       },
-      "start": 7850,
-      "end": 7851,
+      "start": 7651,
+      "end": 7652,
       "loc": {
         "start": {
-          "line": 263,
-          "column": 16
+          "line": 258,
+          "column": 28
         },
         "end": {
-          "line": 263,
-          "column": 17
+          "line": 258,
+          "column": 29
         }
       }
     },
@@ -45860,15 +45965,15 @@
         "updateContext": null
       },
       "value": "return",
-      "start": 7856,
-      "end": 7862,
+      "start": 7657,
+      "end": 7663,
       "loc": {
         "start": {
-          "line": 264,
+          "line": 259,
           "column": 4
         },
         "end": {
-          "line": 264,
+          "line": 259,
           "column": 10
         }
       }
@@ -45888,15 +45993,15 @@
         "updateContext": null
       },
       "value": "this",
-      "start": 7863,
-      "end": 7867,
+      "start": 7664,
+      "end": 7668,
       "loc": {
         "start": {
-          "line": 264,
+          "line": 259,
           "column": 11
         },
         "end": {
-          "line": 264,
+          "line": 259,
           "column": 15
         }
       }
@@ -45914,15 +46019,317 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 7867,
-      "end": 7868,
+      "start": 7668,
+      "end": 7669,
       "loc": {
         "start": {
-          "line": 264,
+          "line": 259,
           "column": 15
         },
         "end": {
-          "line": 264,
+          "line": 259,
+          "column": 16
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "_lightsExceptAmbient",
+      "start": 7669,
+      "end": 7689,
+      "loc": {
+        "start": {
+          "line": 259,
+          "column": 16
+        },
+        "end": {
+          "line": 259,
+          "column": 36
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 7689,
+      "end": 7690,
+      "loc": {
+        "start": {
+          "line": 259,
+          "column": 36
+        },
+        "end": {
+          "line": 259,
+          "column": 37
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "}",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 7693,
+      "end": 7694,
+      "loc": {
+        "start": {
+          "line": 260,
+          "column": 2
+        },
+        "end": {
+          "line": 260,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n   * [en] Get child cameras which belong to this scene.<br>\n   * [ja] このシーンに属していた子供のCamera要素の配列を返します。\n   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素\n   ",
+      "start": 7698,
+      "end": 7906,
+      "loc": {
+        "start": {
+          "line": 262,
+          "column": 2
+        },
+        "end": {
+          "line": 266,
+          "column": 5
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "get",
+      "start": 7909,
+      "end": 7912,
+      "loc": {
+        "start": {
+          "line": 267,
+          "column": 2
+        },
+        "end": {
+          "line": 267,
+          "column": 5
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "cameras",
+      "start": 7913,
+      "end": 7920,
+      "loc": {
+        "start": {
+          "line": 267,
+          "column": 6
+        },
+        "end": {
+          "line": 267,
+          "column": 13
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "(",
+        "beforeExpr": true,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 7920,
+      "end": 7921,
+      "loc": {
+        "start": {
+          "line": 267,
+          "column": 13
+        },
+        "end": {
+          "line": 267,
+          "column": 14
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ")",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 7921,
+      "end": 7922,
+      "loc": {
+        "start": {
+          "line": 267,
+          "column": 14
+        },
+        "end": {
+          "line": 267,
+          "column": 15
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "{",
+        "beforeExpr": true,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "start": 7923,
+      "end": 7924,
+      "loc": {
+        "start": {
+          "line": 267,
+          "column": 16
+        },
+        "end": {
+          "line": 267,
+          "column": 17
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "return",
+        "keyword": "return",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "return",
+      "start": 7929,
+      "end": 7935,
+      "loc": {
+        "start": {
+          "line": 268,
+          "column": 4
+        },
+        "end": {
+          "line": 268,
+          "column": 10
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "this",
+        "keyword": "this",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "this",
+      "start": 7936,
+      "end": 7940,
+      "loc": {
+        "start": {
+          "line": 268,
+          "column": 11
+        },
+        "end": {
+          "line": 268,
+          "column": 15
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ".",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 7940,
+      "end": 7941,
+      "loc": {
+        "start": {
+          "line": 268,
+          "column": 15
+        },
+        "end": {
+          "line": 268,
           "column": 16
         }
       }
@@ -45940,15 +46347,15 @@
         "binop": null
       },
       "value": "_cameras",
-      "start": 7868,
-      "end": 7876,
+      "start": 7941,
+      "end": 7949,
       "loc": {
         "start": {
-          "line": 264,
+          "line": 268,
           "column": 16
         },
         "end": {
-          "line": 264,
+          "line": 268,
           "column": 24
         }
       }
@@ -45966,15 +46373,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 7876,
-      "end": 7877,
+      "start": 7949,
+      "end": 7950,
       "loc": {
         "start": {
-          "line": 264,
+          "line": 268,
           "column": 24
         },
         "end": {
-          "line": 264,
+          "line": 268,
           "column": 25
         }
       }
@@ -45991,15 +46398,15 @@
         "postfix": false,
         "binop": null
       },
-      "start": 7880,
-      "end": 7881,
+      "start": 7953,
+      "end": 7954,
       "loc": {
         "start": {
-          "line": 265,
+          "line": 269,
           "column": 2
         },
         "end": {
-          "line": 265,
+          "line": 269,
           "column": 3
         }
       }
@@ -46016,15 +46423,15 @@
         "postfix": false,
         "binop": null
       },
-      "start": 7883,
-      "end": 7884,
+      "start": 7956,
+      "end": 7957,
       "loc": {
         "start": {
-          "line": 267,
+          "line": 271,
           "column": 0
         },
         "end": {
-          "line": 267,
+          "line": 271,
           "column": 1
         }
       }
@@ -46042,15 +46449,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 7885,
-      "end": 7885,
+      "start": 7958,
+      "end": 7958,
       "loc": {
         "start": {
-          "line": 268,
+          "line": 272,
           "column": 0
         },
         "end": {
-          "line": 268,
+          "line": 272,
           "column": 0
         }
       }

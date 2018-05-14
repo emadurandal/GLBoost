@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 2306,
+  "end": 1824,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 46,
+      "line": 36,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 2306,
+    "end": 1824,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 46,
+        "line": 36,
         "column": 0
       }
     },
@@ -1257,7 +1257,7 @@
       {
         "type": "ImportDeclaration",
         "start": 925,
-        "end": 971,
+        "end": 972,
         "loc": {
           "start": {
             "line": 19,
@@ -1265,14 +1265,14 @@
           },
           "end": {
             "line": 19,
-            "column": 46
+            "column": 47
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
             "start": 932,
-            "end": 939,
+            "end": 943,
             "loc": {
               "start": {
                 "line": 19,
@@ -1280,13 +1280,13 @@
               },
               "end": {
                 "line": 19,
-                "column": 14
+                "column": 18
               }
             },
             "local": {
               "type": "Identifier",
               "start": 932,
-              "end": 939,
+              "end": 943,
               "loc": {
                 "start": {
                   "line": 19,
@@ -1294,6 +1294,146 @@
                 },
                 "end": {
                   "line": 19,
+                  "column": 18
+                },
+                "identifierName": "GLTF2Loader"
+              },
+              "name": "GLTF2Loader"
+            }
+          }
+        ],
+        "importKind": "value",
+        "source": {
+          "type": "StringLiteral",
+          "start": 949,
+          "end": 971,
+          "loc": {
+            "start": {
+              "line": 19,
+              "column": 24
+            },
+            "end": {
+              "line": 19,
+              "column": 46
+            }
+          },
+          "extra": {
+            "rawValue": "./loader/GLTF2Loader",
+            "raw": "'./loader/GLTF2Loader'"
+          },
+          "value": "./loader/GLTF2Loader"
+        }
+      },
+      {
+        "type": "ImportDeclaration",
+        "start": 973,
+        "end": 1026,
+        "loc": {
+          "start": {
+            "line": 20,
+            "column": 0
+          },
+          "end": {
+            "line": 20,
+            "column": 53
+          }
+        },
+        "specifiers": [
+          {
+            "type": "ImportDefaultSpecifier",
+            "start": 980,
+            "end": 994,
+            "loc": {
+              "start": {
+                "line": 20,
+                "column": 7
+              },
+              "end": {
+                "line": 20,
+                "column": 21
+              }
+            },
+            "local": {
+              "type": "Identifier",
+              "start": 980,
+              "end": 994,
+              "loc": {
+                "start": {
+                  "line": 20,
+                  "column": 7
+                },
+                "end": {
+                  "line": 20,
+                  "column": 21
+                },
+                "identifierName": "ModelConverter"
+              },
+              "name": "ModelConverter"
+            }
+          }
+        ],
+        "importKind": "value",
+        "source": {
+          "type": "StringLiteral",
+          "start": 1000,
+          "end": 1025,
+          "loc": {
+            "start": {
+              "line": 20,
+              "column": 27
+            },
+            "end": {
+              "line": 20,
+              "column": 52
+            }
+          },
+          "extra": {
+            "rawValue": "./loader/ModelConverter",
+            "raw": "'./loader/ModelConverter'"
+          },
+          "value": "./loader/ModelConverter"
+        }
+      },
+      {
+        "type": "ImportDeclaration",
+        "start": 1027,
+        "end": 1073,
+        "loc": {
+          "start": {
+            "line": 21,
+            "column": 0
+          },
+          "end": {
+            "line": 21,
+            "column": 46
+          }
+        },
+        "specifiers": [
+          {
+            "type": "ImportDefaultSpecifier",
+            "start": 1034,
+            "end": 1041,
+            "loc": {
+              "start": {
+                "line": 21,
+                "column": 7
+              },
+              "end": {
+                "line": 21,
+                "column": 14
+              }
+            },
+            "local": {
+              "type": "Identifier",
+              "start": 1034,
+              "end": 1041,
+              "loc": {
+                "start": {
+                  "line": 21,
+                  "column": 7
+                },
+                "end": {
+                  "line": 21,
                   "column": 14
                 },
                 "identifierName": "GLBoost"
@@ -1305,15 +1445,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 945,
-          "end": 970,
+          "start": 1047,
+          "end": 1072,
           "loc": {
             "start": {
-              "line": 19,
+              "line": 21,
               "column": 20
             },
             "end": {
-              "line": 19,
+              "line": 21,
               "column": 45
             }
           },
@@ -1326,44 +1466,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 972,
-        "end": 1030,
+        "start": 1074,
+        "end": 1132,
         "loc": {
           "start": {
-            "line": 20,
+            "line": 22,
             "column": 0
           },
           "end": {
-            "line": 20,
+            "line": 22,
             "column": 58
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 979,
-            "end": 991,
+            "start": 1081,
+            "end": 1093,
             "loc": {
               "start": {
-                "line": 20,
+                "line": 22,
                 "column": 7
               },
               "end": {
-                "line": 20,
+                "line": 22,
                 "column": 19
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 979,
-              "end": 991,
+              "start": 1081,
+              "end": 1093,
               "loc": {
                 "start": {
-                  "line": 20,
+                  "line": 22,
                   "column": 7
                 },
                 "end": {
-                  "line": 20,
+                  "line": 22,
                   "column": 19
                 },
                 "identifierName": "SimpleShader"
@@ -1375,15 +1515,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 997,
-          "end": 1029,
+          "start": 1099,
+          "end": 1131,
           "loc": {
             "start": {
-              "line": 20,
+              "line": 22,
               "column": 25
             },
             "end": {
-              "line": 20,
+              "line": 22,
               "column": 57
             }
           },
@@ -1396,44 +1536,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1031,
-        "end": 1079,
+        "start": 1133,
+        "end": 1181,
         "loc": {
           "start": {
-            "line": 21,
+            "line": 23,
             "column": 0
           },
           "end": {
-            "line": 21,
+            "line": 23,
             "column": 48
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1038,
-            "end": 1049,
+            "start": 1140,
+            "end": 1151,
             "loc": {
               "start": {
-                "line": 21,
+                "line": 23,
                 "column": 7
               },
               "end": {
-                "line": 21,
+                "line": 23,
                 "column": 18
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1038,
-              "end": 1049,
+              "start": 1140,
+              "end": 1151,
               "loc": {
                 "start": {
-                  "line": 21,
+                  "line": 23,
                   "column": 7
                 },
                 "end": {
-                  "line": 21,
+                  "line": 23,
                   "column": 18
                 },
                 "identifierName": "PhongShader"
@@ -1445,15 +1585,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1055,
-          "end": 1078,
+          "start": 1157,
+          "end": 1180,
           "loc": {
             "start": {
-              "line": 21,
+              "line": 23,
               "column": 24
             },
             "end": {
-              "line": 21,
+              "line": 23,
               "column": 47
             }
           },
@@ -1466,44 +1606,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1080,
-        "end": 1138,
+        "start": 1182,
+        "end": 1240,
         "loc": {
           "start": {
-            "line": 22,
+            "line": 24,
             "column": 0
           },
           "end": {
-            "line": 22,
+            "line": 24,
             "column": 58
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1087,
-            "end": 1103,
+            "start": 1189,
+            "end": 1205,
             "loc": {
               "start": {
-                "line": 22,
+                "line": 24,
                 "column": 7
               },
               "end": {
-                "line": 22,
+                "line": 24,
                 "column": 23
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1087,
-              "end": 1103,
+              "start": 1189,
+              "end": 1205,
               "loc": {
                 "start": {
-                  "line": 22,
+                  "line": 24,
                   "column": 7
                 },
                 "end": {
-                  "line": 22,
+                  "line": 24,
                   "column": 23
                 },
                 "identifierName": "BlinnPhongShader"
@@ -1515,15 +1655,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1109,
-          "end": 1137,
+          "start": 1211,
+          "end": 1239,
           "loc": {
             "start": {
-              "line": 22,
+              "line": 24,
               "column": 29
             },
             "end": {
-              "line": 22,
+              "line": 24,
               "column": 57
             }
           },
@@ -1536,44 +1676,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1139,
-        "end": 1191,
+        "start": 1241,
+        "end": 1293,
         "loc": {
           "start": {
-            "line": 23,
+            "line": 25,
             "column": 0
           },
           "end": {
-            "line": 23,
+            "line": 25,
             "column": 52
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1146,
-            "end": 1159,
+            "start": 1248,
+            "end": 1261,
             "loc": {
               "start": {
-                "line": 23,
+                "line": 25,
                 "column": 7
               },
               "end": {
-                "line": 23,
+                "line": 25,
                 "column": 20
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1146,
-              "end": 1159,
+              "start": 1248,
+              "end": 1261,
               "loc": {
                 "start": {
-                  "line": 23,
+                  "line": 25,
                   "column": 7
                 },
                 "end": {
-                  "line": 23,
+                  "line": 25,
                   "column": 20
                 },
                 "identifierName": "LambertShader"
@@ -1585,15 +1725,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1165,
-          "end": 1190,
+          "start": 1267,
+          "end": 1292,
           "loc": {
             "start": {
-              "line": 23,
+              "line": 25,
               "column": 26
             },
             "end": {
-              "line": 23,
+              "line": 25,
               "column": 51
             }
           },
@@ -1606,44 +1746,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1192,
-        "end": 1252,
+        "start": 1294,
+        "end": 1354,
         "loc": {
           "start": {
-            "line": 24,
+            "line": 26,
             "column": 0
           },
           "end": {
-            "line": 24,
+            "line": 26,
             "column": 60
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1199,
-            "end": 1216,
+            "start": 1301,
+            "end": 1318,
             "loc": {
               "start": {
-                "line": 24,
+                "line": 26,
                 "column": 7
               },
               "end": {
-                "line": 24,
+                "line": 26,
                 "column": 24
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1199,
-              "end": 1216,
+              "start": 1301,
+              "end": 1318,
               "loc": {
                 "start": {
-                  "line": 24,
+                  "line": 26,
                   "column": 7
                 },
                 "end": {
-                  "line": 24,
+                  "line": 26,
                   "column": 24
                 },
                 "identifierName": "HalfLambertShader"
@@ -1655,15 +1795,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1222,
-          "end": 1251,
+          "start": 1324,
+          "end": 1353,
           "loc": {
             "start": {
-              "line": 24,
+              "line": 26,
               "column": 30
             },
             "end": {
-              "line": 24,
+              "line": 26,
               "column": 59
             }
           },
@@ -1676,44 +1816,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1253,
-        "end": 1343,
+        "start": 1355,
+        "end": 1445,
         "loc": {
           "start": {
-            "line": 25,
+            "line": 27,
             "column": 0
           },
           "end": {
-            "line": 25,
+            "line": 27,
             "column": 90
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1260,
-            "end": 1292,
+            "start": 1362,
+            "end": 1394,
             "loc": {
               "start": {
-                "line": 25,
+                "line": 27,
                 "column": 7
               },
               "end": {
-                "line": 25,
+                "line": 27,
                 "column": 39
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1260,
-              "end": 1292,
+              "start": 1362,
+              "end": 1394,
               "loc": {
                 "start": {
-                  "line": 25,
+                  "line": 27,
                   "column": 7
                 },
                 "end": {
-                  "line": 25,
+                  "line": 27,
                   "column": 39
                 },
                 "identifierName": "HalfLambertAndWrapLightingShader"
@@ -1725,15 +1865,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1298,
-          "end": 1342,
+          "start": 1400,
+          "end": 1444,
           "loc": {
             "start": {
-              "line": 25,
+              "line": 27,
               "column": 45
             },
             "end": {
-              "line": 25,
+              "line": 27,
               "column": 89
             }
           },
@@ -1746,44 +1886,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1344,
-        "end": 1406,
+        "start": 1446,
+        "end": 1508,
         "loc": {
           "start": {
-            "line": 26,
+            "line": 28,
             "column": 0
           },
           "end": {
-            "line": 26,
+            "line": 28,
             "column": 62
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1351,
-            "end": 1369,
+            "start": 1453,
+            "end": 1471,
             "loc": {
               "start": {
-                "line": 26,
+                "line": 28,
                 "column": 7
               },
               "end": {
-                "line": 26,
+                "line": 28,
                 "column": 25
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1351,
-              "end": 1369,
+              "start": 1453,
+              "end": 1471,
               "loc": {
                 "start": {
-                  "line": 26,
+                  "line": 28,
                   "column": 7
                 },
                 "end": {
-                  "line": 26,
+                  "line": 28,
                   "column": 25
                 },
                 "identifierName": "DepthDisplayShader"
@@ -1795,15 +1935,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1375,
-          "end": 1405,
+          "start": 1477,
+          "end": 1507,
           "loc": {
             "start": {
-              "line": 26,
+              "line": 28,
               "column": 31
             },
             "end": {
-              "line": 26,
+              "line": 28,
               "column": 61
             }
           },
@@ -1816,44 +1956,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1407,
-        "end": 1467,
+        "start": 1509,
+        "end": 1569,
         "loc": {
           "start": {
-            "line": 27,
+            "line": 29,
             "column": 0
           },
           "end": {
-            "line": 27,
+            "line": 29,
             "column": 60
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1414,
-            "end": 1431,
+            "start": 1516,
+            "end": 1533,
             "loc": {
               "start": {
-                "line": 27,
+                "line": 29,
                 "column": 7
               },
               "end": {
-                "line": 27,
+                "line": 29,
                 "column": 24
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1414,
-              "end": 1431,
+              "start": 1516,
+              "end": 1533,
               "loc": {
                 "start": {
-                  "line": 27,
+                  "line": 29,
                   "column": 7
                 },
                 "end": {
-                  "line": 27,
+                  "line": 29,
                   "column": 24
                 },
                 "identifierName": "PassThroughShader"
@@ -1865,15 +2005,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1437,
-          "end": 1466,
+          "start": 1539,
+          "end": 1568,
           "loc": {
             "start": {
-              "line": 27,
+              "line": 29,
               "column": 30
             },
             "end": {
-              "line": 27,
+              "line": 29,
               "column": 59
             }
           },
@@ -1886,44 +2026,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1468,
-        "end": 1539,
+        "start": 1570,
+        "end": 1641,
         "loc": {
           "start": {
-            "line": 28,
+            "line": 30,
             "column": 0
           },
           "end": {
-            "line": 28,
+            "line": 30,
             "column": 71
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1475,
-            "end": 1492,
+            "start": 1577,
+            "end": 1594,
             "loc": {
               "start": {
-                "line": 28,
+                "line": 30,
                 "column": 7
               },
               "end": {
-                "line": 28,
+                "line": 30,
                 "column": 24
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1475,
-              "end": 1492,
+              "start": 1577,
+              "end": 1594,
               "loc": {
                 "start": {
-                  "line": 28,
+                  "line": 30,
                   "column": 7
                 },
                 "end": {
-                  "line": 28,
+                  "line": 30,
                   "column": 24
                 },
                 "identifierName": "JointGizmoUpdater"
@@ -1935,15 +2075,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1498,
-          "end": 1538,
+          "start": 1600,
+          "end": 1640,
           "loc": {
             "start": {
-              "line": 28,
+              "line": 30,
               "column": 30
             },
             "end": {
-              "line": 28,
+              "line": 30,
               "column": 70
             }
           },
@@ -1956,44 +2096,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1540,
-        "end": 1598,
+        "start": 1642,
+        "end": 1700,
         "loc": {
           "start": {
-            "line": 29,
+            "line": 31,
             "column": 0
           },
           "end": {
-            "line": 29,
+            "line": 31,
             "column": 58
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1547,
-            "end": 1559,
+            "start": 1649,
+            "end": 1661,
             "loc": {
               "start": {
-                "line": 29,
+                "line": 31,
                 "column": 7
               },
               "end": {
-                "line": 29,
+                "line": 31,
                 "column": 19
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1547,
-              "end": 1559,
+              "start": 1649,
+              "end": 1661,
               "loc": {
                 "start": {
-                  "line": 29,
+                  "line": 31,
                   "column": 7
                 },
                 "end": {
-                  "line": 29,
+                  "line": 31,
                   "column": 19
                 },
                 "identifierName": "M_ScreenMesh"
@@ -2005,15 +2145,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1565,
-          "end": 1597,
+          "start": 1667,
+          "end": 1699,
           "loc": {
             "start": {
-              "line": 29,
+              "line": 31,
               "column": 25
             },
             "end": {
-              "line": 29,
+              "line": 31,
               "column": 57
             }
           },
@@ -2026,114 +2166,44 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1600,
-        "end": 1661,
+        "start": 1703,
+        "end": 1761,
         "loc": {
           "start": {
-            "line": 31,
+            "line": 34,
             "column": 0
           },
           "end": {
-            "line": 31,
-            "column": 61
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 1607,
-            "end": 1622,
-            "loc": {
-              "start": {
-                "line": 31,
-                "column": 7
-              },
-              "end": {
-                "line": 31,
-                "column": 22
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 1607,
-              "end": 1622,
-              "loc": {
-                "start": {
-                  "line": 31,
-                  "column": 7
-                },
-                "end": {
-                  "line": 31,
-                  "column": 22
-                },
-                "identifierName": "AnimationPlayer"
-              },
-              "name": "AnimationPlayer"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 1628,
-          "end": 1660,
-          "loc": {
-            "start": {
-              "line": 31,
-              "column": 28
-            },
-            "end": {
-              "line": 31,
-              "column": 60
-            }
-          },
-          "extra": {
-            "rawValue": "../auxiliaries/AnimationPlayer",
-            "raw": "'../auxiliaries/AnimationPlayer'"
-          },
-          "value": "../auxiliaries/AnimationPlayer"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 1662,
-        "end": 1720,
-        "loc": {
-          "start": {
-            "line": 32,
-            "column": 0
-          },
-          "end": {
-            "line": 32,
+            "line": 34,
             "column": 58
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1669,
-            "end": 1685,
+            "start": 1710,
+            "end": 1726,
             "loc": {
               "start": {
-                "line": 32,
+                "line": 34,
                 "column": 7
               },
               "end": {
-                "line": 32,
+                "line": 34,
                 "column": 23
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1669,
-              "end": 1685,
+              "start": 1710,
+              "end": 1726,
               "loc": {
                 "start": {
-                  "line": 32,
+                  "line": 34,
                   "column": 7
                 },
                 "end": {
-                  "line": 32,
+                  "line": 34,
                   "column": 23
                 },
                 "identifierName": "EffekseerElement"
@@ -2145,15 +2215,15 @@
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1691,
-          "end": 1719,
+          "start": 1732,
+          "end": 1760,
           "loc": {
             "start": {
-              "line": 32,
+              "line": 34,
               "column": 29
             },
             "end": {
-              "line": 32,
+              "line": 34,
               "column": 57
             }
           },
@@ -2166,78 +2236,8 @@
       },
       {
         "type": "ImportDeclaration",
-        "start": 1722,
-        "end": 1797,
-        "loc": {
-          "start": {
-            "line": 34,
-            "column": 0
-          },
-          "end": {
-            "line": 34,
-            "column": 75
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 1729,
-            "end": 1747,
-            "loc": {
-              "start": {
-                "line": 34,
-                "column": 7
-              },
-              "end": {
-                "line": 34,
-                "column": 25
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 1729,
-              "end": 1747,
-              "loc": {
-                "start": {
-                  "line": 34,
-                  "column": 7
-                },
-                "end": {
-                  "line": 34,
-                  "column": 25
-                },
-                "identifierName": "SPVClassicMaterial"
-              },
-              "name": "SPVClassicMaterial"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 1753,
-          "end": 1796,
-          "loc": {
-            "start": {
-              "line": 34,
-              "column": 31
-            },
-            "end": {
-              "line": 34,
-              "column": 74
-            }
-          },
-          "extra": {
-            "rawValue": "../low_level/materials/SPVClassicMaterial",
-            "raw": "'../low_level/materials/SPVClassicMaterial'"
-          },
-          "value": "../low_level/materials/SPVClassicMaterial"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 1798,
-        "end": 1856,
+        "start": 1762,
+        "end": 1823,
         "loc": {
           "start": {
             "line": 35,
@@ -2245,14 +2245,14 @@
           },
           "end": {
             "line": 35,
-            "column": 58
+            "column": 61
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
-            "start": 1805,
-            "end": 1821,
+            "start": 1769,
+            "end": 1784,
             "loc": {
               "start": {
                 "line": 35,
@@ -2260,13 +2260,13 @@
               },
               "end": {
                 "line": 35,
-                "column": 23
+                "column": 22
               }
             },
             "local": {
               "type": "Identifier",
-              "start": 1805,
-              "end": 1821,
+              "start": 1769,
+              "end": 1784,
               "loc": {
                 "start": {
                   "line": 35,
@@ -2274,524 +2274,34 @@
                 },
                 "end": {
                   "line": 35,
-                  "column": 23
+                  "column": 22
                 },
-                "identifierName": "SPVLambertShader"
+                "identifierName": "AnimationPlayer"
               },
-              "name": "SPVLambertShader"
+              "name": "AnimationPlayer"
             }
           }
         ],
         "importKind": "value",
         "source": {
           "type": "StringLiteral",
-          "start": 1827,
-          "end": 1855,
+          "start": 1790,
+          "end": 1822,
           "loc": {
             "start": {
               "line": 35,
-              "column": 29
+              "column": 28
             },
             "end": {
               "line": 35,
-              "column": 57
+              "column": 60
             }
           },
           "extra": {
-            "rawValue": "./shaders/SPVLambertShader",
-            "raw": "'./shaders/SPVLambertShader'"
+            "rawValue": "../auxiliaries/AnimationPlayer",
+            "raw": "'../auxiliaries/AnimationPlayer'"
           },
-          "value": "./shaders/SPVLambertShader"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 1857,
-        "end": 1911,
-        "loc": {
-          "start": {
-            "line": 36,
-            "column": 0
-          },
-          "end": {
-            "line": 36,
-            "column": 54
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 1864,
-            "end": 1878,
-            "loc": {
-              "start": {
-                "line": 36,
-                "column": 7
-              },
-              "end": {
-                "line": 36,
-                "column": 21
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 1864,
-              "end": 1878,
-              "loc": {
-                "start": {
-                  "line": 36,
-                  "column": 7
-                },
-                "end": {
-                  "line": 36,
-                  "column": 21
-                },
-                "identifierName": "SPVPhongShader"
-              },
-              "name": "SPVPhongShader"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 1884,
-          "end": 1910,
-          "loc": {
-            "start": {
-              "line": 36,
-              "column": 27
-            },
-            "end": {
-              "line": 36,
-              "column": 53
-            }
-          },
-          "extra": {
-            "rawValue": "./shaders/SPVPhongShader",
-            "raw": "'./shaders/SPVPhongShader'"
-          },
-          "value": "./shaders/SPVPhongShader"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 1912,
-        "end": 1966,
-        "loc": {
-          "start": {
-            "line": 37,
-            "column": 0
-          },
-          "end": {
-            "line": 37,
-            "column": 54
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 1919,
-            "end": 1933,
-            "loc": {
-              "start": {
-                "line": 37,
-                "column": 7
-              },
-              "end": {
-                "line": 37,
-                "column": 21
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 1919,
-              "end": 1933,
-              "loc": {
-                "start": {
-                  "line": 37,
-                  "column": 7
-                },
-                "end": {
-                  "line": 37,
-                  "column": 21
-                },
-                "identifierName": "SPVDecalShader"
-              },
-              "name": "SPVDecalShader"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 1939,
-          "end": 1965,
-          "loc": {
-            "start": {
-              "line": 37,
-              "column": 27
-            },
-            "end": {
-              "line": 37,
-              "column": 53
-            }
-          },
-          "extra": {
-            "rawValue": "./shaders/SPVDecalShader",
-            "raw": "'./shaders/SPVDecalShader'"
-          },
-          "value": "./shaders/SPVDecalShader"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 1967,
-        "end": 2021,
-        "loc": {
-          "start": {
-            "line": 38,
-            "column": 0
-          },
-          "end": {
-            "line": 38,
-            "column": 54
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 1974,
-            "end": 1988,
-            "loc": {
-              "start": {
-                "line": 38,
-                "column": 7
-              },
-              "end": {
-                "line": 38,
-                "column": 21
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 1974,
-              "end": 1988,
-              "loc": {
-                "start": {
-                  "line": 38,
-                  "column": 7
-                },
-                "end": {
-                  "line": 38,
-                  "column": 21
-                },
-                "identifierName": "SPVBlinnShader"
-              },
-              "name": "SPVBlinnShader"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 1994,
-          "end": 2020,
-          "loc": {
-            "start": {
-              "line": 38,
-              "column": 27
-            },
-            "end": {
-              "line": 38,
-              "column": 53
-            }
-          },
-          "extra": {
-            "rawValue": "./shaders/SPVBlinnShader",
-            "raw": "'./shaders/SPVBlinnShader'"
-          },
-          "value": "./shaders/SPVBlinnShader"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 2022,
-        "end": 2073,
-        "loc": {
-          "start": {
-            "line": 39,
-            "column": 0
-          },
-          "end": {
-            "line": 39,
-            "column": 51
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 2029,
-            "end": 2042,
-            "loc": {
-              "start": {
-                "line": 39,
-                "column": 7
-              },
-              "end": {
-                "line": 39,
-                "column": 20
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 2029,
-              "end": 2042,
-              "loc": {
-                "start": {
-                  "line": 39,
-                  "column": 7
-                },
-                "end": {
-                  "line": 39,
-                  "column": 20
-                },
-                "identifierName": "SPVGLTFLoader"
-              },
-              "name": "SPVGLTFLoader"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 2048,
-          "end": 2072,
-          "loc": {
-            "start": {
-              "line": 39,
-              "column": 26
-            },
-            "end": {
-              "line": 39,
-              "column": 50
-            }
-          },
-          "extra": {
-            "rawValue": "./loader/SPVGLTFLoader",
-            "raw": "'./loader/SPVGLTFLoader'"
-          },
-          "value": "./loader/SPVGLTFLoader"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 2074,
-        "end": 2151,
-        "loc": {
-          "start": {
-            "line": 40,
-            "column": 0
-          },
-          "end": {
-            "line": 40,
-            "column": 77
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 2081,
-            "end": 2101,
-            "loc": {
-              "start": {
-                "line": 40,
-                "column": 7
-              },
-              "end": {
-                "line": 40,
-                "column": 27
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 2081,
-              "end": 2101,
-              "loc": {
-                "start": {
-                  "line": 40,
-                  "column": 7
-                },
-                "end": {
-                  "line": 40,
-                  "column": 27
-                },
-                "identifierName": "SPVJointGizmoUpdater"
-              },
-              "name": "SPVJointGizmoUpdater"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 2107,
-          "end": 2150,
-          "loc": {
-            "start": {
-              "line": 40,
-              "column": 33
-            },
-            "end": {
-              "line": 40,
-              "column": 76
-            }
-          },
-          "extra": {
-            "rawValue": "./elements/skeletons/SPVJointGizmoUpdater",
-            "raw": "'./elements/skeletons/SPVJointGizmoUpdater'"
-          },
-          "value": "./elements/skeletons/SPVJointGizmoUpdater"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 2153,
-        "end": 2224,
-        "loc": {
-          "start": {
-            "line": 42,
-            "column": 0
-          },
-          "end": {
-            "line": 42,
-            "column": 71
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 2160,
-            "end": 2174,
-            "loc": {
-              "start": {
-                "line": 42,
-                "column": 7
-              },
-              "end": {
-                "line": 42,
-                "column": 21
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 2160,
-              "end": 2174,
-              "loc": {
-                "start": {
-                  "line": 42,
-                  "column": 7
-                },
-                "end": {
-                  "line": 42,
-                  "column": 21
-                },
-                "identifierName": "H_SPVScreenLUT"
-              },
-              "name": "H_SPVScreenLUT"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 2180,
-          "end": 2223,
-          "loc": {
-            "start": {
-              "line": 42,
-              "column": 27
-            },
-            "end": {
-              "line": 42,
-              "column": 70
-            }
-          },
-          "extra": {
-            "rawValue": "../high_level/post_effects/H_SPVScreenLUT",
-            "raw": "'../high_level/post_effects/H_SPVScreenLUT'"
-          },
-          "value": "../high_level/post_effects/H_SPVScreenLUT"
-        }
-      },
-      {
-        "type": "ImportDeclaration",
-        "start": 2225,
-        "end": 2303,
-        "loc": {
-          "start": {
-            "line": 43,
-            "column": 0
-          },
-          "end": {
-            "line": 43,
-            "column": 78
-          }
-        },
-        "specifiers": [
-          {
-            "type": "ImportDefaultSpecifier",
-            "start": 2232,
-            "end": 2248,
-            "loc": {
-              "start": {
-                "line": 43,
-                "column": 7
-              },
-              "end": {
-                "line": 43,
-                "column": 23
-              }
-            },
-            "local": {
-              "type": "Identifier",
-              "start": 2232,
-              "end": 2248,
-              "loc": {
-                "start": {
-                  "line": 43,
-                  "column": 7
-                },
-                "end": {
-                  "line": 43,
-                  "column": 23
-                },
-                "identifierName": "H_SPVUIRectangle"
-              },
-              "name": "H_SPVUIRectangle"
-            }
-          }
-        ],
-        "importKind": "value",
-        "source": {
-          "type": "StringLiteral",
-          "start": 2254,
-          "end": 2302,
-          "loc": {
-            "start": {
-              "line": 43,
-              "column": 29
-            },
-            "end": {
-              "line": 43,
-              "column": 77
-            }
-          },
-          "extra": {
-            "rawValue": "../high_level/user_interfaces/H_SPVUIRectangle",
-            "raw": "'../high_level/user_interfaces/H_SPVUIRectangle'"
-          },
-          "value": "../high_level/user_interfaces/H_SPVUIRectangle"
+          "value": "../auxiliaries/AnimationPlayer"
         }
       }
     ],
@@ -5181,9 +4691,9 @@
         "postfix": false,
         "binop": null
       },
-      "value": "GLBoost",
+      "value": "GLTF2Loader",
       "start": 932,
-      "end": 939,
+      "end": 943,
       "loc": {
         "start": {
           "line": 19,
@@ -5191,6 +4701,272 @@
         },
         "end": {
           "line": 19,
+          "column": 18
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "from",
+      "start": 944,
+      "end": 948,
+      "loc": {
+        "start": {
+          "line": 19,
+          "column": 19
+        },
+        "end": {
+          "line": 19,
+          "column": 23
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "string",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "./loader/GLTF2Loader",
+      "start": 949,
+      "end": 971,
+      "loc": {
+        "start": {
+          "line": 19,
+          "column": 24
+        },
+        "end": {
+          "line": 19,
+          "column": 46
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 971,
+      "end": 972,
+      "loc": {
+        "start": {
+          "line": 19,
+          "column": 46
+        },
+        "end": {
+          "line": 19,
+          "column": 47
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "import",
+        "keyword": "import",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "import",
+      "start": 973,
+      "end": 979,
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 0
+        },
+        "end": {
+          "line": 20,
+          "column": 6
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "ModelConverter",
+      "start": 980,
+      "end": 994,
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 7
+        },
+        "end": {
+          "line": 20,
+          "column": 21
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "from",
+      "start": 995,
+      "end": 999,
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 22
+        },
+        "end": {
+          "line": 20,
+          "column": 26
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "string",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "./loader/ModelConverter",
+      "start": 1000,
+      "end": 1025,
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 27
+        },
+        "end": {
+          "line": 20,
+          "column": 52
+        }
+      }
+    },
+    {
+      "type": {
+        "label": ";",
+        "beforeExpr": true,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 1025,
+      "end": 1026,
+      "loc": {
+        "start": {
+          "line": 20,
+          "column": 52
+        },
+        "end": {
+          "line": 20,
+          "column": 53
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "import",
+        "keyword": "import",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "value": "import",
+      "start": 1027,
+      "end": 1033,
+      "loc": {
+        "start": {
+          "line": 21,
+          "column": 0
+        },
+        "end": {
+          "line": 21,
+          "column": 6
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "name",
+        "beforeExpr": false,
+        "startsExpr": true,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null
+      },
+      "value": "GLBoost",
+      "start": 1034,
+      "end": 1041,
+      "loc": {
+        "start": {
+          "line": 21,
+          "column": 7
+        },
+        "end": {
+          "line": 21,
           "column": 14
         }
       }
@@ -5208,15 +4984,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 940,
-      "end": 944,
+      "start": 1042,
+      "end": 1046,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 15
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 19
         }
       }
@@ -5235,15 +5011,15 @@
         "updateContext": null
       },
       "value": "./plugins/phina.glboost",
-      "start": 945,
-      "end": 970,
+      "start": 1047,
+      "end": 1072,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 20
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 45
         }
       }
@@ -5261,15 +5037,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 970,
-      "end": 971,
+      "start": 1072,
+      "end": 1073,
       "loc": {
         "start": {
-          "line": 19,
+          "line": 21,
           "column": 45
         },
         "end": {
-          "line": 19,
+          "line": 21,
           "column": 46
         }
       }
@@ -5289,15 +5065,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 972,
-      "end": 978,
+      "start": 1074,
+      "end": 1080,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 0
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 6
         }
       }
@@ -5315,15 +5091,15 @@
         "binop": null
       },
       "value": "SimpleShader",
-      "start": 979,
-      "end": 991,
+      "start": 1081,
+      "end": 1093,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 7
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 19
         }
       }
@@ -5341,15 +5117,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 992,
-      "end": 996,
+      "start": 1094,
+      "end": 1098,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 20
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 24
         }
       }
@@ -5368,15 +5144,15 @@
         "updateContext": null
       },
       "value": "./shaders/FragmentSimpleShader",
-      "start": 997,
-      "end": 1029,
+      "start": 1099,
+      "end": 1131,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 25
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 57
         }
       }
@@ -5394,15 +5170,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1029,
-      "end": 1030,
+      "start": 1131,
+      "end": 1132,
       "loc": {
         "start": {
-          "line": 20,
+          "line": 22,
           "column": 57
         },
         "end": {
-          "line": 20,
+          "line": 22,
           "column": 58
         }
       }
@@ -5422,15 +5198,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1031,
-      "end": 1037,
+      "start": 1133,
+      "end": 1139,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 0
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 6
         }
       }
@@ -5448,15 +5224,15 @@
         "binop": null
       },
       "value": "PhongShader",
-      "start": 1038,
-      "end": 1049,
+      "start": 1140,
+      "end": 1151,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 7
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 18
         }
       }
@@ -5474,15 +5250,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1050,
-      "end": 1054,
+      "start": 1152,
+      "end": 1156,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 19
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 23
         }
       }
@@ -5501,15 +5277,15 @@
         "updateContext": null
       },
       "value": "./shaders/PhongShader",
-      "start": 1055,
-      "end": 1078,
+      "start": 1157,
+      "end": 1180,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 24
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 47
         }
       }
@@ -5527,15 +5303,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1078,
-      "end": 1079,
+      "start": 1180,
+      "end": 1181,
       "loc": {
         "start": {
-          "line": 21,
+          "line": 23,
           "column": 47
         },
         "end": {
-          "line": 21,
+          "line": 23,
           "column": 48
         }
       }
@@ -5555,15 +5331,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1080,
-      "end": 1086,
+      "start": 1182,
+      "end": 1188,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 0
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 6
         }
       }
@@ -5581,15 +5357,15 @@
         "binop": null
       },
       "value": "BlinnPhongShader",
-      "start": 1087,
-      "end": 1103,
+      "start": 1189,
+      "end": 1205,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 7
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 23
         }
       }
@@ -5607,15 +5383,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1104,
-      "end": 1108,
+      "start": 1206,
+      "end": 1210,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 24
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 28
         }
       }
@@ -5634,15 +5410,15 @@
         "updateContext": null
       },
       "value": "./shaders/BlinnPhongShader",
-      "start": 1109,
-      "end": 1137,
+      "start": 1211,
+      "end": 1239,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 29
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 57
         }
       }
@@ -5660,15 +5436,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1137,
-      "end": 1138,
+      "start": 1239,
+      "end": 1240,
       "loc": {
         "start": {
-          "line": 22,
+          "line": 24,
           "column": 57
         },
         "end": {
-          "line": 22,
+          "line": 24,
           "column": 58
         }
       }
@@ -5688,15 +5464,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1139,
-      "end": 1145,
+      "start": 1241,
+      "end": 1247,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 25,
           "column": 0
         },
         "end": {
-          "line": 23,
+          "line": 25,
           "column": 6
         }
       }
@@ -5714,15 +5490,15 @@
         "binop": null
       },
       "value": "LambertShader",
-      "start": 1146,
-      "end": 1159,
+      "start": 1248,
+      "end": 1261,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 25,
           "column": 7
         },
         "end": {
-          "line": 23,
+          "line": 25,
           "column": 20
         }
       }
@@ -5740,15 +5516,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1160,
-      "end": 1164,
+      "start": 1262,
+      "end": 1266,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 25,
           "column": 21
         },
         "end": {
-          "line": 23,
+          "line": 25,
           "column": 25
         }
       }
@@ -5767,15 +5543,15 @@
         "updateContext": null
       },
       "value": "./shaders/LambertShader",
-      "start": 1165,
-      "end": 1190,
+      "start": 1267,
+      "end": 1292,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 25,
           "column": 26
         },
         "end": {
-          "line": 23,
+          "line": 25,
           "column": 51
         }
       }
@@ -5793,15 +5569,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1190,
-      "end": 1191,
+      "start": 1292,
+      "end": 1293,
       "loc": {
         "start": {
-          "line": 23,
+          "line": 25,
           "column": 51
         },
         "end": {
-          "line": 23,
+          "line": 25,
           "column": 52
         }
       }
@@ -5821,15 +5597,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1192,
-      "end": 1198,
+      "start": 1294,
+      "end": 1300,
       "loc": {
         "start": {
-          "line": 24,
+          "line": 26,
           "column": 0
         },
         "end": {
-          "line": 24,
+          "line": 26,
           "column": 6
         }
       }
@@ -5847,15 +5623,15 @@
         "binop": null
       },
       "value": "HalfLambertShader",
-      "start": 1199,
-      "end": 1216,
+      "start": 1301,
+      "end": 1318,
       "loc": {
         "start": {
-          "line": 24,
+          "line": 26,
           "column": 7
         },
         "end": {
-          "line": 24,
+          "line": 26,
           "column": 24
         }
       }
@@ -5873,15 +5649,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1217,
-      "end": 1221,
+      "start": 1319,
+      "end": 1323,
       "loc": {
         "start": {
-          "line": 24,
+          "line": 26,
           "column": 25
         },
         "end": {
-          "line": 24,
+          "line": 26,
           "column": 29
         }
       }
@@ -5900,15 +5676,15 @@
         "updateContext": null
       },
       "value": "./shaders/HalfLambertShader",
-      "start": 1222,
-      "end": 1251,
+      "start": 1324,
+      "end": 1353,
       "loc": {
         "start": {
-          "line": 24,
+          "line": 26,
           "column": 30
         },
         "end": {
-          "line": 24,
+          "line": 26,
           "column": 59
         }
       }
@@ -5926,15 +5702,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1251,
-      "end": 1252,
+      "start": 1353,
+      "end": 1354,
       "loc": {
         "start": {
-          "line": 24,
+          "line": 26,
           "column": 59
         },
         "end": {
-          "line": 24,
+          "line": 26,
           "column": 60
         }
       }
@@ -5954,15 +5730,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1253,
-      "end": 1259,
+      "start": 1355,
+      "end": 1361,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 27,
           "column": 0
         },
         "end": {
-          "line": 25,
+          "line": 27,
           "column": 6
         }
       }
@@ -5980,15 +5756,15 @@
         "binop": null
       },
       "value": "HalfLambertAndWrapLightingShader",
-      "start": 1260,
-      "end": 1292,
+      "start": 1362,
+      "end": 1394,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 27,
           "column": 7
         },
         "end": {
-          "line": 25,
+          "line": 27,
           "column": 39
         }
       }
@@ -6006,15 +5782,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1293,
-      "end": 1297,
+      "start": 1395,
+      "end": 1399,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 27,
           "column": 40
         },
         "end": {
-          "line": 25,
+          "line": 27,
           "column": 44
         }
       }
@@ -6033,15 +5809,15 @@
         "updateContext": null
       },
       "value": "./shaders/HalfLambertAndWrapLightingShader",
-      "start": 1298,
-      "end": 1342,
+      "start": 1400,
+      "end": 1444,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 27,
           "column": 45
         },
         "end": {
-          "line": 25,
+          "line": 27,
           "column": 89
         }
       }
@@ -6059,15 +5835,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1342,
-      "end": 1343,
+      "start": 1444,
+      "end": 1445,
       "loc": {
         "start": {
-          "line": 25,
+          "line": 27,
           "column": 89
         },
         "end": {
-          "line": 25,
+          "line": 27,
           "column": 90
         }
       }
@@ -6087,15 +5863,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1344,
-      "end": 1350,
+      "start": 1446,
+      "end": 1452,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 28,
           "column": 0
         },
         "end": {
-          "line": 26,
+          "line": 28,
           "column": 6
         }
       }
@@ -6113,15 +5889,15 @@
         "binop": null
       },
       "value": "DepthDisplayShader",
-      "start": 1351,
-      "end": 1369,
+      "start": 1453,
+      "end": 1471,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 28,
           "column": 7
         },
         "end": {
-          "line": 26,
+          "line": 28,
           "column": 25
         }
       }
@@ -6139,15 +5915,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1370,
-      "end": 1374,
+      "start": 1472,
+      "end": 1476,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 28,
           "column": 26
         },
         "end": {
-          "line": 26,
+          "line": 28,
           "column": 30
         }
       }
@@ -6166,15 +5942,15 @@
         "updateContext": null
       },
       "value": "./shaders/DepthDisplayShader",
-      "start": 1375,
-      "end": 1405,
+      "start": 1477,
+      "end": 1507,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 28,
           "column": 31
         },
         "end": {
-          "line": 26,
+          "line": 28,
           "column": 61
         }
       }
@@ -6192,15 +5968,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1405,
-      "end": 1406,
+      "start": 1507,
+      "end": 1508,
       "loc": {
         "start": {
-          "line": 26,
+          "line": 28,
           "column": 61
         },
         "end": {
-          "line": 26,
+          "line": 28,
           "column": 62
         }
       }
@@ -6220,15 +5996,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1407,
-      "end": 1413,
+      "start": 1509,
+      "end": 1515,
       "loc": {
         "start": {
-          "line": 27,
+          "line": 29,
           "column": 0
         },
         "end": {
-          "line": 27,
+          "line": 29,
           "column": 6
         }
       }
@@ -6246,15 +6022,15 @@
         "binop": null
       },
       "value": "PassThroughShader",
-      "start": 1414,
-      "end": 1431,
+      "start": 1516,
+      "end": 1533,
       "loc": {
         "start": {
-          "line": 27,
+          "line": 29,
           "column": 7
         },
         "end": {
-          "line": 27,
+          "line": 29,
           "column": 24
         }
       }
@@ -6272,15 +6048,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1432,
-      "end": 1436,
+      "start": 1534,
+      "end": 1538,
       "loc": {
         "start": {
-          "line": 27,
+          "line": 29,
           "column": 25
         },
         "end": {
-          "line": 27,
+          "line": 29,
           "column": 29
         }
       }
@@ -6299,15 +6075,15 @@
         "updateContext": null
       },
       "value": "./shaders/PassThroughShader",
-      "start": 1437,
-      "end": 1466,
+      "start": 1539,
+      "end": 1568,
       "loc": {
         "start": {
-          "line": 27,
+          "line": 29,
           "column": 30
         },
         "end": {
-          "line": 27,
+          "line": 29,
           "column": 59
         }
       }
@@ -6325,15 +6101,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1466,
-      "end": 1467,
+      "start": 1568,
+      "end": 1569,
       "loc": {
         "start": {
-          "line": 27,
+          "line": 29,
           "column": 59
         },
         "end": {
-          "line": 27,
+          "line": 29,
           "column": 60
         }
       }
@@ -6353,15 +6129,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1468,
-      "end": 1474,
+      "start": 1570,
+      "end": 1576,
       "loc": {
         "start": {
-          "line": 28,
+          "line": 30,
           "column": 0
         },
         "end": {
-          "line": 28,
+          "line": 30,
           "column": 6
         }
       }
@@ -6379,15 +6155,15 @@
         "binop": null
       },
       "value": "JointGizmoUpdater",
-      "start": 1475,
-      "end": 1492,
+      "start": 1577,
+      "end": 1594,
       "loc": {
         "start": {
-          "line": 28,
+          "line": 30,
           "column": 7
         },
         "end": {
-          "line": 28,
+          "line": 30,
           "column": 24
         }
       }
@@ -6405,15 +6181,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1493,
-      "end": 1497,
+      "start": 1595,
+      "end": 1599,
       "loc": {
         "start": {
-          "line": 28,
+          "line": 30,
           "column": 25
         },
         "end": {
-          "line": 28,
+          "line": 30,
           "column": 29
         }
       }
@@ -6432,15 +6208,15 @@
         "updateContext": null
       },
       "value": "./elements/skeletons/JointGizmoUpdater",
-      "start": 1498,
-      "end": 1538,
+      "start": 1600,
+      "end": 1640,
       "loc": {
         "start": {
-          "line": 28,
+          "line": 30,
           "column": 30
         },
         "end": {
-          "line": 28,
+          "line": 30,
           "column": 70
         }
       }
@@ -6458,15 +6234,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1538,
-      "end": 1539,
+      "start": 1640,
+      "end": 1641,
       "loc": {
         "start": {
-          "line": 28,
+          "line": 30,
           "column": 70
         },
         "end": {
-          "line": 28,
+          "line": 30,
           "column": 71
         }
       }
@@ -6486,15 +6262,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1540,
-      "end": 1546,
+      "start": 1642,
+      "end": 1648,
       "loc": {
         "start": {
-          "line": 29,
+          "line": 31,
           "column": 0
         },
         "end": {
-          "line": 29,
+          "line": 31,
           "column": 6
         }
       }
@@ -6512,15 +6288,15 @@
         "binop": null
       },
       "value": "M_ScreenMesh",
-      "start": 1547,
-      "end": 1559,
+      "start": 1649,
+      "end": 1661,
       "loc": {
         "start": {
-          "line": 29,
+          "line": 31,
           "column": 7
         },
         "end": {
-          "line": 29,
+          "line": 31,
           "column": 19
         }
       }
@@ -6538,15 +6314,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1560,
-      "end": 1564,
+      "start": 1662,
+      "end": 1666,
       "loc": {
         "start": {
-          "line": 29,
+          "line": 31,
           "column": 20
         },
         "end": {
-          "line": 29,
+          "line": 31,
           "column": 24
         }
       }
@@ -6565,15 +6341,15 @@
         "updateContext": null
       },
       "value": "./elements/meshes/M_ScreenMesh",
-      "start": 1565,
-      "end": 1597,
+      "start": 1667,
+      "end": 1699,
       "loc": {
         "start": {
-          "line": 29,
+          "line": 31,
           "column": 25
         },
         "end": {
-          "line": 29,
+          "line": 31,
           "column": 57
         }
       }
@@ -6591,15 +6367,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1597,
-      "end": 1598,
+      "start": 1699,
+      "end": 1700,
       "loc": {
         "start": {
-          "line": 29,
+          "line": 31,
           "column": 57
         },
         "end": {
-          "line": 29,
+          "line": 31,
           "column": 58
         }
       }
@@ -6619,148 +6395,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1600,
-      "end": 1606,
+      "start": 1703,
+      "end": 1709,
       "loc": {
         "start": {
-          "line": 31,
+          "line": 34,
           "column": 0
         },
         "end": {
-          "line": 31,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "AnimationPlayer",
-      "start": 1607,
-      "end": 1622,
-      "loc": {
-        "start": {
-          "line": 31,
-          "column": 7
-        },
-        "end": {
-          "line": 31,
-          "column": 22
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 1623,
-      "end": 1627,
-      "loc": {
-        "start": {
-          "line": 31,
-          "column": 23
-        },
-        "end": {
-          "line": 31,
-          "column": 27
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "../auxiliaries/AnimationPlayer",
-      "start": 1628,
-      "end": 1660,
-      "loc": {
-        "start": {
-          "line": 31,
-          "column": 28
-        },
-        "end": {
-          "line": 31,
-          "column": 60
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 1660,
-      "end": 1661,
-      "loc": {
-        "start": {
-          "line": 31,
-          "column": 60
-        },
-        "end": {
-          "line": 31,
-          "column": 61
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 1662,
-      "end": 1668,
-      "loc": {
-        "start": {
-          "line": 32,
-          "column": 0
-        },
-        "end": {
-          "line": 32,
+          "line": 34,
           "column": 6
         }
       }
@@ -6778,15 +6421,15 @@
         "binop": null
       },
       "value": "EffekseerElement",
-      "start": 1669,
-      "end": 1685,
+      "start": 1710,
+      "end": 1726,
       "loc": {
         "start": {
-          "line": 32,
+          "line": 34,
           "column": 7
         },
         "end": {
-          "line": 32,
+          "line": 34,
           "column": 23
         }
       }
@@ -6804,15 +6447,15 @@
         "binop": null
       },
       "value": "from",
-      "start": 1686,
-      "end": 1690,
+      "start": 1727,
+      "end": 1731,
       "loc": {
         "start": {
-          "line": 32,
+          "line": 34,
           "column": 24
         },
         "end": {
-          "line": 32,
+          "line": 34,
           "column": 28
         }
       }
@@ -6831,15 +6474,15 @@
         "updateContext": null
       },
       "value": "./plugins/EffekseerElement",
-      "start": 1691,
-      "end": 1719,
+      "start": 1732,
+      "end": 1760,
       "loc": {
         "start": {
-          "line": 32,
+          "line": 34,
           "column": 29
         },
         "end": {
-          "line": 32,
+          "line": 34,
           "column": 57
         }
       }
@@ -6857,15 +6500,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1719,
-      "end": 1720,
+      "start": 1760,
+      "end": 1761,
       "loc": {
         "start": {
-          "line": 32,
+          "line": 34,
           "column": 57
         },
         "end": {
-          "line": 32,
+          "line": 34,
           "column": 58
         }
       }
@@ -6885,15 +6528,15 @@
         "updateContext": null
       },
       "value": "import",
-      "start": 1722,
-      "end": 1728,
+      "start": 1762,
+      "end": 1768,
       "loc": {
         "start": {
-          "line": 34,
+          "line": 35,
           "column": 0
         },
         "end": {
-          "line": 34,
+          "line": 35,
           "column": 6
         }
       }
@@ -6910,17 +6553,17 @@
         "postfix": false,
         "binop": null
       },
-      "value": "SPVClassicMaterial",
-      "start": 1729,
-      "end": 1747,
+      "value": "AnimationPlayer",
+      "start": 1769,
+      "end": 1784,
       "loc": {
         "start": {
-          "line": 34,
+          "line": 35,
           "column": 7
         },
         "end": {
-          "line": 34,
-          "column": 25
+          "line": 35,
+          "column": 22
         }
       }
     },
@@ -6937,16 +6580,16 @@
         "binop": null
       },
       "value": "from",
-      "start": 1748,
-      "end": 1752,
+      "start": 1785,
+      "end": 1789,
       "loc": {
         "start": {
-          "line": 34,
-          "column": 26
+          "line": 35,
+          "column": 23
         },
         "end": {
-          "line": 34,
-          "column": 30
+          "line": 35,
+          "column": 27
         }
       }
     },
@@ -6963,17 +6606,17 @@
         "binop": null,
         "updateContext": null
       },
-      "value": "../low_level/materials/SPVClassicMaterial",
-      "start": 1753,
-      "end": 1796,
+      "value": "../auxiliaries/AnimationPlayer",
+      "start": 1790,
+      "end": 1822,
       "loc": {
         "start": {
-          "line": 34,
-          "column": 31
+          "line": 35,
+          "column": 28
         },
         "end": {
-          "line": 34,
-          "column": 74
+          "line": 35,
+          "column": 60
         }
       }
     },
@@ -6990,1080 +6633,16 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 1796,
-      "end": 1797,
-      "loc": {
-        "start": {
-          "line": 34,
-          "column": 74
-        },
-        "end": {
-          "line": 34,
-          "column": 75
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 1798,
-      "end": 1804,
-      "loc": {
-        "start": {
-          "line": 35,
-          "column": 0
-        },
-        "end": {
-          "line": 35,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVLambertShader",
-      "start": 1805,
-      "end": 1821,
-      "loc": {
-        "start": {
-          "line": 35,
-          "column": 7
-        },
-        "end": {
-          "line": 35,
-          "column": 23
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
       "start": 1822,
-      "end": 1826,
+      "end": 1823,
       "loc": {
         "start": {
           "line": 35,
-          "column": 24
+          "column": 60
         },
         "end": {
           "line": 35,
-          "column": 28
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./shaders/SPVLambertShader",
-      "start": 1827,
-      "end": 1855,
-      "loc": {
-        "start": {
-          "line": 35,
-          "column": 29
-        },
-        "end": {
-          "line": 35,
-          "column": 57
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 1855,
-      "end": 1856,
-      "loc": {
-        "start": {
-          "line": 35,
-          "column": 57
-        },
-        "end": {
-          "line": 35,
-          "column": 58
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 1857,
-      "end": 1863,
-      "loc": {
-        "start": {
-          "line": 36,
-          "column": 0
-        },
-        "end": {
-          "line": 36,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVPhongShader",
-      "start": 1864,
-      "end": 1878,
-      "loc": {
-        "start": {
-          "line": 36,
-          "column": 7
-        },
-        "end": {
-          "line": 36,
-          "column": 21
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 1879,
-      "end": 1883,
-      "loc": {
-        "start": {
-          "line": 36,
-          "column": 22
-        },
-        "end": {
-          "line": 36,
-          "column": 26
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./shaders/SPVPhongShader",
-      "start": 1884,
-      "end": 1910,
-      "loc": {
-        "start": {
-          "line": 36,
-          "column": 27
-        },
-        "end": {
-          "line": 36,
-          "column": 53
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 1910,
-      "end": 1911,
-      "loc": {
-        "start": {
-          "line": 36,
-          "column": 53
-        },
-        "end": {
-          "line": 36,
-          "column": 54
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 1912,
-      "end": 1918,
-      "loc": {
-        "start": {
-          "line": 37,
-          "column": 0
-        },
-        "end": {
-          "line": 37,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVDecalShader",
-      "start": 1919,
-      "end": 1933,
-      "loc": {
-        "start": {
-          "line": 37,
-          "column": 7
-        },
-        "end": {
-          "line": 37,
-          "column": 21
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 1934,
-      "end": 1938,
-      "loc": {
-        "start": {
-          "line": 37,
-          "column": 22
-        },
-        "end": {
-          "line": 37,
-          "column": 26
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./shaders/SPVDecalShader",
-      "start": 1939,
-      "end": 1965,
-      "loc": {
-        "start": {
-          "line": 37,
-          "column": 27
-        },
-        "end": {
-          "line": 37,
-          "column": 53
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 1965,
-      "end": 1966,
-      "loc": {
-        "start": {
-          "line": 37,
-          "column": 53
-        },
-        "end": {
-          "line": 37,
-          "column": 54
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 1967,
-      "end": 1973,
-      "loc": {
-        "start": {
-          "line": 38,
-          "column": 0
-        },
-        "end": {
-          "line": 38,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVBlinnShader",
-      "start": 1974,
-      "end": 1988,
-      "loc": {
-        "start": {
-          "line": 38,
-          "column": 7
-        },
-        "end": {
-          "line": 38,
-          "column": 21
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 1989,
-      "end": 1993,
-      "loc": {
-        "start": {
-          "line": 38,
-          "column": 22
-        },
-        "end": {
-          "line": 38,
-          "column": 26
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./shaders/SPVBlinnShader",
-      "start": 1994,
-      "end": 2020,
-      "loc": {
-        "start": {
-          "line": 38,
-          "column": 27
-        },
-        "end": {
-          "line": 38,
-          "column": 53
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2020,
-      "end": 2021,
-      "loc": {
-        "start": {
-          "line": 38,
-          "column": 53
-        },
-        "end": {
-          "line": 38,
-          "column": 54
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 2022,
-      "end": 2028,
-      "loc": {
-        "start": {
-          "line": 39,
-          "column": 0
-        },
-        "end": {
-          "line": 39,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVGLTFLoader",
-      "start": 2029,
-      "end": 2042,
-      "loc": {
-        "start": {
-          "line": 39,
-          "column": 7
-        },
-        "end": {
-          "line": 39,
-          "column": 20
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 2043,
-      "end": 2047,
-      "loc": {
-        "start": {
-          "line": 39,
-          "column": 21
-        },
-        "end": {
-          "line": 39,
-          "column": 25
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./loader/SPVGLTFLoader",
-      "start": 2048,
-      "end": 2072,
-      "loc": {
-        "start": {
-          "line": 39,
-          "column": 26
-        },
-        "end": {
-          "line": 39,
-          "column": 50
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2072,
-      "end": 2073,
-      "loc": {
-        "start": {
-          "line": 39,
-          "column": 50
-        },
-        "end": {
-          "line": 39,
-          "column": 51
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 2074,
-      "end": 2080,
-      "loc": {
-        "start": {
-          "line": 40,
-          "column": 0
-        },
-        "end": {
-          "line": 40,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "SPVJointGizmoUpdater",
-      "start": 2081,
-      "end": 2101,
-      "loc": {
-        "start": {
-          "line": 40,
-          "column": 7
-        },
-        "end": {
-          "line": 40,
-          "column": 27
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 2102,
-      "end": 2106,
-      "loc": {
-        "start": {
-          "line": 40,
-          "column": 28
-        },
-        "end": {
-          "line": 40,
-          "column": 32
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "./elements/skeletons/SPVJointGizmoUpdater",
-      "start": 2107,
-      "end": 2150,
-      "loc": {
-        "start": {
-          "line": 40,
-          "column": 33
-        },
-        "end": {
-          "line": 40,
-          "column": 76
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2150,
-      "end": 2151,
-      "loc": {
-        "start": {
-          "line": 40,
-          "column": 76
-        },
-        "end": {
-          "line": 40,
-          "column": 77
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 2153,
-      "end": 2159,
-      "loc": {
-        "start": {
-          "line": 42,
-          "column": 0
-        },
-        "end": {
-          "line": 42,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "H_SPVScreenLUT",
-      "start": 2160,
-      "end": 2174,
-      "loc": {
-        "start": {
-          "line": 42,
-          "column": 7
-        },
-        "end": {
-          "line": 42,
-          "column": 21
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 2175,
-      "end": 2179,
-      "loc": {
-        "start": {
-          "line": 42,
-          "column": 22
-        },
-        "end": {
-          "line": 42,
-          "column": 26
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "../high_level/post_effects/H_SPVScreenLUT",
-      "start": 2180,
-      "end": 2223,
-      "loc": {
-        "start": {
-          "line": 42,
-          "column": 27
-        },
-        "end": {
-          "line": 42,
-          "column": 70
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2223,
-      "end": 2224,
-      "loc": {
-        "start": {
-          "line": 42,
-          "column": 70
-        },
-        "end": {
-          "line": 42,
-          "column": 71
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "import",
-        "keyword": "import",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "import",
-      "start": 2225,
-      "end": 2231,
-      "loc": {
-        "start": {
-          "line": 43,
-          "column": 0
-        },
-        "end": {
-          "line": 43,
-          "column": 6
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "H_SPVUIRectangle",
-      "start": 2232,
-      "end": 2248,
-      "loc": {
-        "start": {
-          "line": 43,
-          "column": 7
-        },
-        "end": {
-          "line": 43,
-          "column": 23
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "name",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null
-      },
-      "value": "from",
-      "start": 2249,
-      "end": 2253,
-      "loc": {
-        "start": {
-          "line": 43,
-          "column": 24
-        },
-        "end": {
-          "line": 43,
-          "column": 28
-        }
-      }
-    },
-    {
-      "type": {
-        "label": "string",
-        "beforeExpr": false,
-        "startsExpr": true,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "value": "../high_level/user_interfaces/H_SPVUIRectangle",
-      "start": 2254,
-      "end": 2302,
-      "loc": {
-        "start": {
-          "line": 43,
-          "column": 29
-        },
-        "end": {
-          "line": 43,
-          "column": 77
-        }
-      }
-    },
-    {
-      "type": {
-        "label": ";",
-        "beforeExpr": true,
-        "startsExpr": false,
-        "rightAssociative": false,
-        "isLoop": false,
-        "isAssign": false,
-        "prefix": false,
-        "postfix": false,
-        "binop": null,
-        "updateContext": null
-      },
-      "start": 2302,
-      "end": 2303,
-      "loc": {
-        "start": {
-          "line": 43,
-          "column": 77
-        },
-        "end": {
-          "line": 43,
-          "column": 78
+          "column": 61
         }
       }
     },
@@ -8080,15 +6659,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 2306,
-      "end": 2306,
+      "start": 1824,
+      "end": 1824,
       "loc": {
         "start": {
-          "line": 46,
+          "line": 36,
           "column": 0
         },
         "end": {
-          "line": 46,
+          "line": 36,
           "column": 0
         }
       }

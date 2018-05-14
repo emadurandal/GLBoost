@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 70c82e9b
+// This revision is the commit right after the SHA: 9cf0ecd6
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3312,6 +3312,7 @@ class L_Element extends GLBoostObject {
     }
     this._rotate = vec.clone();
     this._is_trs_matrix_updated = false;
+    this._is_quaternion_updated = false;
     this._is_euler_angles_updated = true;
     this._needUpdate();
   }
@@ -3389,7 +3390,7 @@ class L_Element extends GLBoostObject {
     if (this._is_scale_updated) {
       return this._scale.clone();
     } else if (this._is_trs_matrix_updated) {
-      let m = this._matrix();
+      let m = this._matrix;
       this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
       this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
       this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
@@ -3476,8 +3477,8 @@ class L_Element extends GLBoostObject {
   getMatrixAtOrStatic(lineName, inputValue) {
     let input = inputValue;
 
-   // console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
-    if (this.isTrsMatrixNeeded(lineName, inputValue)) {
+    //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
+    if (this.isTrsMatrixNeeded(lineName, inputValue) && this._is_trs_matrix_updated) {
       return this.getMatrixNotAnimated();
     } else {
 
@@ -3497,7 +3498,7 @@ class L_Element extends GLBoostObject {
 
     }
 
-    this._is_trs_matrix_updated = true;    
+    this._is_trs_matrix_updated = true;
   }
 
 
@@ -3507,6 +3508,7 @@ class L_Element extends GLBoostObject {
     }
     this._quaternion = quat.clone();
     this._is_trs_matrix_updated = false;
+    this._is_euler_angles_updated = false;
     this._is_quaternion_updated = true;
     this._needUpdate();
   }
@@ -3545,7 +3547,6 @@ class L_Element extends GLBoostObject {
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
-      this._is_trs_matrix_updated = false;
     }
 
     return this._quaternion;
@@ -5428,6 +5429,21 @@ class Shader extends GLBoostObject {
     return shaderText;
   }
 
+  _multiplyAlphaToColorOfTexel(gl) {
+    var gl = this._glContext.gl;
+    let shaderText = "";
+    let textureFunc = Shader._texture_func(gl);
+    shaderText += `vec4 multiplyAlphaToColorOfTexel(sampler2D texture, vec2 texcoord, int toMultiplyAlphaFlag) {\n`;
+    shaderText += `  vec4 texel = ${textureFunc}(texture, texcoord);\n`;
+    shaderText += `  if (toMultiplyAlphaFlag == 1) {\n`;      
+    shaderText += `    texel.rgb /= texel.a;\n`;
+    shaderText += `  }\n`;
+    shaderText += `  return texel;\n`;
+    shaderText += `}\n`;
+
+    return shaderText;
+  }
+
   _sampler2DShadow_func() {
     var gl = this._glContext.gl;
     return GLBoost$1.isThisGLVersion_2(gl) ? 'sampler2DShadow' : 'sampler2D';
@@ -6163,27 +6179,27 @@ class FreeShader extends Shader {
 
     let newAttributes = {};
     for (let attributeName in attributes) {
-      switch (attributes[attributeName]) {
+      switch (attributeName) {
         case 'POSITION':
-          newAttributes.position = attributeName;
+          newAttributes.position = attributes[attributeName];
           break;
         case 'NORMAL':
-          newAttributes.normal = attributeName;
+          newAttributes.normal = attributes[attributeName];
           break;
         case 'COLOR':
-          newAttributes.color = attributeName;
+          newAttributes.color = attributes[attributeName];
           break;
         case 'TEXCOORD_0':
-          newAttributes.texcoord = attributeName;
+          newAttributes.texcoord = attributes[attributeName];
           break;
         case 'JOINT':
-          newAttributes.joint = attributeName;
+          newAttributes.joint = attributes[attributeName];
           break;
         case 'WEIGHT':
-          newAttributes.weight = attributeName;
+          newAttributes.weight = attributes[attributeName];
           break;
         default:
-          newAttributes[attributes[attributeName]] = attributeName;
+          newAttributes[attributeName] = attributes[attributeName];
           break;
       }
     }
@@ -6230,14 +6246,16 @@ class FreeShader extends Shader {
         textureCount++;
       }
 
-      switch (this._uniforms[uniformName]) {
+      switch (uniformName) {
+        case 'WORLD':
+        case 'VIEW':
         case 'MODELVIEW':
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
         case 'JOINTMATRIX':
-          material.setUniform(shaderProgram, 'uniform_' + uniformName, this._glContext.getUniformLocation(shaderProgram, uniformName));
+          material.setUniform(shaderProgram, 'uniform_' + this._uniforms[uniformName], this._glContext.getUniformLocation(shaderProgram, this._uniforms[uniformName]));
         case 'TEXTURE':
-          material.addSemanticsDic(this._uniforms[uniformName], uniformName);
+          material.addSemanticsDic(uniformName, this._uniforms[uniformName]);
           continue;
       }
 
@@ -6266,6 +6284,20 @@ class FreeShader extends Shader {
         this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, true);
       } else if (value instanceof Vector4) {
         this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
+      }
+    }
+
+    for (let parameterName in material.shaderParameters) {
+      let value = material.shaderParameters[parameterName];
+
+      if (typeof value === 'number') {
+        this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_' + parameterName), value, true);
+      } else if (value instanceof Vector2) {
+        this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, true);
+      } else if (value instanceof Vector3) {
+        this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, true);
+      } else if (value instanceof Vector4) {
+        this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, value.w, true);
       }
     }
   }
@@ -7392,6 +7424,8 @@ class AbstractTexture extends GLBoostObject {
 
     // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
     this._uvTransform = new Vector4(1, 1, 0, 0);
+
+    this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
   }
 
   /**
@@ -7550,6 +7584,13 @@ class AbstractTexture extends GLBoostObject {
     this._uvTransform = vec4;
   }
 
+  get toMultiplyAlphaToColorPreviously() {
+    return this._toMultiplyAlphaToColorPreviously;
+  }
+
+  set toMultiplyAlphaToColorPreviously(flag) {
+    this._toMultiplyAlphaToColorPreviously = flag;
+  }
 }
 
 class FragmentSimpleShaderSource {
@@ -7809,6 +7850,15 @@ class DecalShaderSource {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
+    shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
+
+    return shaderText;
+  }
+
+  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+    let shaderText = '';
+
+    shaderText += this._multiplyAlphaToColorOfTexel();
 
     return shaderText;
   }
@@ -7824,7 +7874,7 @@ class DecalShaderSource {
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
     if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-      shaderText += `  rt0 *= ${textureFunc}(uTexture, texcoord);\n`;
+      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
     //shaderText += '    float shadowRatio = 0.0;\n';
@@ -7852,6 +7902,11 @@ class DecalShaderSource {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
       diffuseTexture = this._glBoostContext.defaultDummyTexture;
+    }
+
+    if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
+      let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
+      material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
 
     let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
@@ -7908,6 +7963,7 @@ class DecalShader extends FragmentSimpleShader {
     let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 
 
@@ -9069,7 +9125,7 @@ class L_CameraController extends GLBoostObject {
       doResetWhenCameraSettingChanged: false,
       isForceGrab: false,
       efficiency: 1.0,
-      onlyAdjustZFar: false,
+      eventTargetDom: document
     }
   ) {
     super(glBoostContext);
@@ -9081,7 +9137,7 @@ class L_CameraController extends GLBoostObject {
     this._isSymmetryMode = options.isSymmetryMode !== void 0 ? options.isSymmetryMode : true;
 
     this._efficiency = options.efficiency !== void 0 ? 0.5 * options.efficiency : 1;
-    this._onlyAdjustZFar = options.onlyAdjustZFar !== void 0 ? options.onlyAdjustZFar : false;
+    let eventTargetDom = options.eventTargetDom;
 
     this._rot_bgn_x = 0;
     this._rot_bgn_y = 0;
@@ -9232,15 +9288,15 @@ class L_CameraController extends GLBoostObject {
       });
     };
 
-    if (document) {
-      document.addEventListener('mousedown', this._onMouseDown);
-      document.addEventListener('mouseup', this._onMouseUp);
-      document.addEventListener('mousemove', this._onMouseMove);
+    if (eventTargetDom) {
+      eventTargetDom.addEventListener('mousedown', this._onMouseDown);
+      eventTargetDom.addEventListener('mouseup', this._onMouseUp);
+      eventTargetDom.addEventListener('mousemove', this._onMouseMove);
       if (window.WheelEvent) {
-        document.addEventListener("wheel", this._onMouseWheel);
+        eventTargetDom.addEventListener("wheel", this._onMouseWheel);
       }
-      document.addEventListener('contextmenu', this._onContexMenu, false);
-      document.addEventListener("dblclick", this._onMouseDblClick);
+      eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
+      eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
     }
   }
 
@@ -9320,8 +9376,9 @@ class L_CameraController extends GLBoostObject {
     }
 
     let newZNear = camera.zNear;
-    let newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
+    let newZFar = camera.zFar;
     if (this._target) {
+      newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
     }
 
@@ -9341,7 +9398,7 @@ class L_CameraController extends GLBoostObject {
   }
 
   _updateTargeting(camera, eyeVec, centerVec, upVec, fovy) {
-    if (this._target === null || this._onlyAdjustZFar) {
+    if (this._target === null) {
       return [eyeVec, centerVec, upVec];
     }
 
@@ -10226,8 +10283,9 @@ class Sphere extends Geometry {
       vertexColor = new Vector4(1, 1, 1, 1);
     }
 
+    let shiftValue = 0.001; // for avoid Singular point
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
-      var theta = latNumber * Math.PI / heightSegments;
+      var theta = latNumber * Math.PI / heightSegments + shiftValue;
       var sinTheta = Math.sin(theta);
       var cosTheta = Math.cos(theta);
 
@@ -15664,17 +15722,18 @@ class GLTFLoader {
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
    * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
    * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
    */
-  loadGLTF(glBoostContext, url, defaultShader = null,
-    options = {
+  loadGLTF(glBoostContext, url, options) {
+    let defaultOptions = {
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
-      isTextureImageToLoadPreMultipliedAlpha: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      defaultShaderClass: null,
+      statesOfElements: null,
+      isAllMeshesTransparent: false,
       statesOfElements: [
         {
           targets: [], //["name_foo", "name_boo"],
@@ -15687,12 +15746,26 @@ class GLTFLoader {
               //"blendFuncSeparate": [1, 0, 1, 0],
             }
           },
+          isTransparent: true,
+          shaderClass: DecalShader, // LambertShader // PhongShader
+          isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
-      ],
-      isAllMeshesTransparent: true
+      ]
+    };
+
+    if (!options) {
+      options = defaultOptions;
+     } else {
+      for (let optionName in options) {
+        defaultOptions[optionName] = options[optionName];
+      }
+      options = defaultOptions;
     }
-  ) {
+
+
+    let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
+
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
@@ -15855,7 +15928,7 @@ class GLTFLoader {
           textureUri = basePath + imageFileStr;
         }
       }
-
+/*
       let isNeededToMultiplyAlphaToColorOfTexture = false;
       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
         if (options.isTextureImageToLoadPreMultipliedAlpha) {
@@ -15870,13 +15943,13 @@ class GLTFLoader {
           // Nothing to do because the texture is straight.
         }
       }
-      
+      */
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
-        'TEXTURE_WRAP_T': samplerJson.wrapT,
-        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
+        'TEXTURE_WRAP_T': samplerJson.wrapT
+//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
@@ -15937,7 +16010,7 @@ class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer);
 
-      if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
+      if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
@@ -15980,12 +16053,12 @@ class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options);
+        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
         mesh.userFlavorName = meshStr;
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
+      let joint = glBoostContext.createJoint(options.isExistJointGizme);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -16064,7 +16137,7 @@ class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, options) {
+  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -16082,7 +16155,7 @@ class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
 
-    if (options.isAllMeshesTransparent) {
+    if (options && options.isAllMeshesTransparent) {
       mesh.isTransparent = true;
     }
 
@@ -16179,20 +16252,42 @@ class GLTFLoader {
           }
         }
 */
-//        if (material === null) {
         let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
+        if (options && options.extensionLoader && options.extensionLoader.createClassicMaterial) {
           material = options.extensionLoader.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
-        if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (options && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
           material.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
         }
         this._materials.push(material);
-//        }
 
-        texcoords = this._loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, options);
+        if (options && options.statesOfElements) {
+          for (let statesInfo of options.statesOfElements) {
+            if (statesInfo.targets) {
+              for (let target of statesInfo.targets) {
+                let isMatch = false;
+                let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+                switch (specifyMethod) {
+                  case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                    isMatch = group.userFlavorName === target; break;
+                  case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                    isMatch = group.instanceName === target; break;
+                  case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                    isMatch = group.instanceNameWithUserFlavor === target; break;                      
+                }
+                if (isMatch) {
+                  material.states = statesInfo.states;
+                  group.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                  material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+                }
+              }
+            }
+          }
+        }
+
+        texcoords = this._loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, i, glTFVer, group, options);
 
         materials.push(material);
       } else {
@@ -16331,7 +16426,7 @@ class GLTFLoader {
     }
   }
 
-  _loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, options) {
+  _loadMaterial(glBoostContext, buffers, json, vertexData, indices, material, materialStr, positions, dataViewMethodDic, additional, texcoords, texcoords0AccessorStr, geometry, defaultShader, shaders, textures, idx, glTFVer, group, options) {
     let materialJson = json.materials[materialStr];
     material.userFlavorName = materialJson.name;
     let originalMaterialJson = materialJson;
@@ -16369,7 +16464,50 @@ class GLTFLoader {
             if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost$1.TEXTURE_PURPOSE_DIFFUSE;
             }
-            material.setTexture(textures[textureStr], texturePurpose);
+
+            let texture = textures[textureStr];
+            
+            let isNeededToMultiplyAlphaToColorOfTexture = false;
+            if (options && options.statesOfElements) {
+              for (let statesInfo of options.statesOfElements) {
+                if (statesInfo.targets) {
+                  for (let target of statesInfo.targets) {
+                    let isMatch = false;
+                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+                    switch (specifyMethod) {
+                      case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                        isMatch = group.userFlavorName === target; break;
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                        isMatch = group.instanceName === target; break;
+                      case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                        isMatch = group.instanceNameWithUserFlavor === target; break;                      
+                    }
+
+                    if (isMatch) {
+                      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                          // Nothing to do because premultipling alpha is already done.
+                        } else {
+                          isNeededToMultiplyAlphaToColorOfTexture = true;
+                        }
+                      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                          // TODO: Implement to Make Texture Straight.
+                        } else {
+                          // Nothing to do because the texture is straight.
+                        }
+                      }
+                    }
+
+                    //texture.setParameter('UNPACK_PREMULTIPLY_ALPHA_WEBGL', isNeededToMultiplyAlphaToColorOfTexture);
+//                    texture.loadWebGLTexture();
+                  }
+                }
+              }
+            }
+
+            material.setTexture(texture, texturePurpose);
+            material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
 
             let enables = [];
             if (options.isBlend) {
@@ -16378,9 +16516,17 @@ class GLTFLoader {
             if (options.isDepthTest) {
               enables.push(2929);
             }
-            material.states.enable = enables; // It means, [gl.BLEND];
+            material.states.enable = material.states.enable.concat(enables);
+
+            // Remove duplicated values
+            material.states.enable = material.states.enable.filter(function (x, i, self) {
+              return self.indexOf(x) === i;
+            });
+
             if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-              material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+              if (material.states.functions.blendFuncSeparate === void 0) {
+                material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+              }
             }
             material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
           }
@@ -16460,6 +16606,32 @@ class GLTFLoader {
       }
     }
 
+    if (options && options.statesOfElements) {
+      for (let statesInfo of options.statesOfElements) {
+        if (statesInfo.targets) {
+          for (let target of statesInfo.targets) {
+            let isMatch = false;
+            let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+            switch (specifyMethod) {
+              case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+                isMatch = group.userFlavorName === target; break;
+              case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+                isMatch = group.instanceName === target; break;
+              case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                isMatch = group.instanceNameWithUserFlavor === target; break;                      
+            }
+
+            if (isMatch) {
+              if (statesInfo.shaderClass) {
+                material.shaderClass = statesInfo.shaderClass;
+              }
+            }
+
+          }
+        }
+      }
+    }
+
     return texcoords;
   }
 
@@ -16476,7 +16648,7 @@ class GLTFLoader {
       //attributes[attributesJson[attributeName]] = attributeName;
       let parameterName = attributesJson[attributeName];
       let parameterJson = parametersJson[parameterName];
-      attributes[attributeName] = parameterJson.semantic;
+      attributes[parameterJson.semantic] = attributeName;
     }
 
     let uniforms = {};
@@ -16485,7 +16657,7 @@ class GLTFLoader {
       let parameterName = uniformsJson[uniformName];
       let parameterJson = parametersJson[parameterName];
       if (typeof parameterJson.semantic !== 'undefined') {
-        uniforms[uniformName] = parameterJson.semantic;
+        uniforms[parameterJson.semantic] = uniformName;
       } else {
         let value = null;
         if (typeof materialJson.values !== 'undefined' && typeof materialJson.values[parameterName] !== 'undefined') {
