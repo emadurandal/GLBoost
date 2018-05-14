@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: c62bc3ce
+// This revision is the commit right after the SHA: 04818e18
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1718,6 +1718,14 @@ class Matrix33 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
+  }
+
+  static rotate(vec3) {
+    return (Matrix33.rotateZ(vec3.z).multiply(Matrix33.rotateY(vec3.y).multiply(Matrix33.rotateX(vec3.x))));
+  }
+
   scale(vec) {
     return this.setComponents(
       vec.x, 0, 0,
@@ -2819,6 +2827,24 @@ class Quaternion {
     );
   }
 
+  get rotationMatrix33() {
+    var sx = this.x * this.x;
+    var sy = this.y * this.y;
+    var sz = this.z * this.z;
+    var cx = this.y * this.z;
+    var cy = this.x * this.z;
+    var cz = this.x * this.y;
+    var wx = this.w * this.x;
+    var wy = this.w * this.y;
+    var wz = this.w * this.z;
+
+    return new Matrix33(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
+    );
+  }
+
   axisAngle(axisVec3, angle) {
     var radian = 0;
     if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
@@ -2965,6 +2991,11 @@ class Quaternion {
   }
 */
 
+  static fromPosition(vec3) {
+    let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+    return q;
+  }
+
   at(i) {
     switch (i%4) {
     case 0: return this.x;
@@ -2992,6 +3023,9 @@ class Quaternion {
     return this;
   }
 
+  toString() {
+    return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+  }
 }
 
 GLBoost$1["Quaternion"] = Quaternion;
@@ -5663,7 +5697,7 @@ class DrawKickerLocal {
               lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j].className === 'M_DirectionalLight') {
-              lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+              lightVec = new Vector4(lights[j].direction.x, lights[j].direction.y, lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
               isPointLight = 0.0;
@@ -5837,7 +5871,7 @@ class DrawKickerWorld {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-              lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
+              lightDirection = new Vector3(light.direction.x, light.direction.y, light.direction.z);
               //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
               lightDirection.normalize();
             }
@@ -14354,16 +14388,19 @@ class M_DirectionalLight extends M_AbstractLight {
   /**
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
-   * @param {Vector4} direction the light (traveling) direction
    */
-  constructor(glBoostContext, intensity, direction, length = 1.0) {
+  constructor(glBoostContext, intensity, rotate, length = 1.0) {
     super(glBoostContext);
 
     this._intensity = intensity;
-    this._direction = direction;
+    this._direction = new Vector3(0.0, 0.0, 1.0);
+//    this._direction = direction;
 
     this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
     this._gizmos.push(this._gizmo);
+
+    //this.direction = direction;
+    this.rotate = rotate;
 
     //this._gizmo._mesh.masterElement = this._gizmo;
     this._isLightType = 'directional';
@@ -14378,14 +14415,6 @@ class M_DirectionalLight extends M_AbstractLight {
     return this._gizmo.getMatrixNotAnimated();
   }
 
-  set translate(vec3) {
-    this._gizmo._mesh.translate = vec3;
-  }
-
-  get translate() {
-    return this._gizmo.translate;
-  }
-
   set intensity(vec) {
     this._intensity = vec;
   }
@@ -14394,17 +14423,82 @@ class M_DirectionalLight extends M_AbstractLight {
     return this._intensity;
   }
 
-  set direction(vec) {
-    this._direction = vec;
+  set rotate(vec3) {
+    this._gizmo._mesh.rotate = vec3;
+    super.rotate = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  set translate(vec3) {
+    this._gizmo._mesh.translate = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get translate() {
+    return this._gizmo.translate;
+  }
+
+  get rotate() {
+    return super.rotate;
+  }
+
+  set matrix(vec3) {
+    this._gizmo._mesh.matrix = vec3;
+    super.matrix = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get matrix() {
+    return super.matrix;
+  }
+
+  set quaternion(vec3) {
+    this._gizmo._mesh.quaternion = vec3;
+    super.quaternion = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get quaternion() {
+    return super.quaternion;
+  }
+
+  callCameraCustomFunction() {
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
       }
     }
   }
+  
+  set direction(vec3) {
+    console.error("Not supported Now!");
+    
+    /*
+    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3.normalize());
+    super.quaternion = rotationQ;
+    this._gizmo._mesh.quaternion = rotationQ;
+
+    //console.log('AAAAAAAA' + rotationQ.toString());
+
+    this._direction = vec3.normalize();
+    //this._direction = vec3.normalize();
+    if (this._camera) {
+      if (this._camera.customFunction) {
+        this._camera.customFunction(this);
+      }
+    }
+    */
+  }
+
 
   get direction() {
-    return this._direction;
+    //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
+    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    return result;
   }
 
 }
@@ -14447,13 +14541,15 @@ class M_SpotLight extends M_AbstractLight {
    * @param {Vector4} direction the light (traveling) direction
    * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
    */
-  constructor(glBoostContext, intensity, direction) {
+  constructor(glBoostContext, intensity, rotation) {
     super(glBoostContext);
 
     this._intensity = intensity;
     
     this._isLightType = 'spot';
-    this._direction = direction;
+    this._direction = new Vector3(0.0, 0.0, 1.0);
+
+    this.rotation = rotation;
 
     this._spotExponent = 1.0;
     this._spotCutoffInDegree = 30;
@@ -14469,7 +14565,40 @@ class M_SpotLight extends M_AbstractLight {
   }
 
   set direction(vec) {
-    this._direction = vec;
+    console.error("Not supported Now!");
+  }
+
+  get translate() {
+    return this._gizmo.translate;
+  }
+
+  get rotate() {
+    return super.rotate;
+  }
+
+  set matrix(vec3) {
+    this._gizmo._mesh.matrix = vec3;
+    super.matrix = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get matrix() {
+    return super.matrix;
+  }
+
+  set quaternion(vec3) {
+    this._gizmo._mesh.quaternion = vec3;
+    super.quaternion = vec3;
+
+    this.callCameraCustomFunction();
+  }
+
+  get quaternion() {
+    return super.quaternion;
+  }
+
+  callCameraCustomFunction() {
     if (this._camera) {
       if (this._camera.customFunction) {
         this._camera.customFunction(this);
@@ -14478,7 +14607,8 @@ class M_SpotLight extends M_AbstractLight {
   }
 
   get direction() {
-    return this._direction;
+    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    return result;
   }
 
   set spotExponent(val) {
@@ -14768,8 +14898,8 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createDirectionalLight(intensity, direction, length) {
-    return new M_DirectionalLight(this, intensity, direction, length);
+  createDirectionalLight(intensity, rotate, length) {
+    return new M_DirectionalLight(this, intensity, rotate, length);
   }
 
   createPointLight(intensity) {
@@ -14780,8 +14910,8 @@ class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_AmbientLight(this, intensity);
   }
 
-  createSpotLight(intensity, direction) {
-    return new M_SpotLight(this, intensity, direction);
+  createSpotLight(intensity, rotate) {
+    return new M_SpotLight(this, intensity, rotate);
   }
 
   createJoint(isExistJointGizmo) {

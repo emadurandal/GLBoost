@@ -134,7 +134,7 @@ export default class DrawKickerWorld {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-              lightDirection = new Vector3(-light.direction.x, -light.direction.y, -light.direction.z);
+              lightDirection = new Vector3(light.direction.x, light.direction.y, light.direction.z);
               //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
               lightDirection.normalize();
             }

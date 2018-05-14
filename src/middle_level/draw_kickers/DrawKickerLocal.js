@@ -102,7 +102,7 @@ export default class DrawKickerLocal {
               lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
               isPointLight = 1.0;
             } else if (lights[j].className === 'M_DirectionalLight') {
-              lightVec = new Vector4(-lights[j].direction.x, -lights[j].direction.y, -lights[j].direction.z, 1);
+              lightVec = new Vector4(lights[j].direction.x, lights[j].direction.y, lights[j].direction.z, 1);
               lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
               lightVec.w = 0.0;
               isPointLight = 0.0;

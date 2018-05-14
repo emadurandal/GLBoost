@@ -86,8 +86,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_OrthoCamera(this, true, lookat, ortho);
   }
 
-  createDirectionalLight(intensity, direction, length) {
-    return new M_DirectionalLight(this, intensity, direction, length);
+  createDirectionalLight(intensity, rotate, length) {
+    return new M_DirectionalLight(this, intensity, rotate, length);
   }
 
   createPointLight(intensity) {
@@ -98,8 +98,8 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_AmbientLight(this, intensity);
   }
 
-  createSpotLight(intensity, direction) {
-    return new M_SpotLight(this, intensity, direction);
+  createSpotLight(intensity, rotate) {
+    return new M_SpotLight(this, intensity, rotate);
   }
 
   createJoint(isExistJointGizmo) {
