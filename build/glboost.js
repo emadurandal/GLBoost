@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 9cf0ecd6
+// This revision is the commit right after the SHA: 2b639e52
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -1222,11 +1222,12 @@ class Vector4 {
 
   divide(val) {
     console.assert(val != 0, "0 division!");
-    this.x /= val;
-    this.y /= val;
-    this.z /= val;
-    this.w /= val;
-
+    if (val !== 0) {
+      this.x /= val;
+      this.y /= val;
+      this.z /= val;
+      this.w /= val;
+    }
     return this;
   }
 
@@ -1436,9 +1437,11 @@ class Vector3 {
    */
   divide(val) {
     console.assert(val != 0, "0 division!");
-    this.x /= val;
-    this.y /= val;
-    this.z /= val;
+    if (val !== 0) {
+      this.x /= val;
+      this.y /= val;
+      this.z /= val;
+    }
 
     return this;
   }
