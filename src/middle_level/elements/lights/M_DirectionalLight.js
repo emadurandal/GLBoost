@@ -3,6 +3,7 @@ import M_DirectionalLightGizmo from '../gizmos/M_DirectionalLightGizmo';
 import Vector3 from '../../../low_level/math/Vector3';
 import Matrix33 from '../../../low_level/math/Matrix33';
 import Quaternion from '../../../low_level/math/Quaternion';
+import Matrix44 from '../../../low_level/math/Matrix44';
 
 
 /**
@@ -100,24 +101,28 @@ export default class M_DirectionalLight extends M_AbstractLight {
     }
   }
   
-  set direction(vec3) {
-    console.error("Not supported Now!");
-    
-    /*
-    let rotationQ = Quaternion.quaternionFromTwoDirection(this._direction, vec3.normalize());
-    super.quaternion = rotationQ;
-    this._gizmo._mesh.quaternion = rotationQ;
+  set direction(_zDir) {
+    let yDir = new Vector3(0, 1, 0);
+    let xDir = Vector3.cross(yDir, _zDir);
+    let zDir = Vector3.cross(yDir, xDir);
+  
+    let result = Matrix44.identity();
+    result.m11 = xDir.x;
+    result.m21 = xDir.y;
+    result.m31 = xDir.z;
+  
+    result.m12 = yDir.x;
+    result.m22 = yDir.y;
+    result.m32 = yDir.z;
+  
+    result.m13 = zDir.x;
+    result.m23 = zDir.y;
+    result.m33 = zDir.z;
 
-    //console.log('AAAAAAAA' + rotationQ.toString());
+    super.matrix = result;
+    this._gizmo._mesh.matrix = result;
 
-    this._direction = vec3.normalize();
-    //this._direction = vec3.normalize();
-    if (this._camera) {
-      if (this._camera.customFunction) {
-        this._camera.customFunction(this);
-      }
-    }
-    */
+    this.callCameraCustomFunction();
   }
 
 
