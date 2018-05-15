@@ -119,11 +119,12 @@ export default class Vector4 {
 
   divide(val) {
     console.assert(val != 0, "0 division!");
-    this.x /= val;
-    this.y /= val;
-    this.z /= val;
-    this.w /= val;
-
+    if (val !== 0) {
+      this.x /= val;
+      this.y /= val;
+      this.z /= val;
+      this.w /= val;
+    }
     return this;
   }
 

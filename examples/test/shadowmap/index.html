@@ -52,7 +52,7 @@
   var depthTexture = null;
   var depthCamera = null;
   var camera = null;
-  var directionOfDirectionalLight = new GLBoost.Vector3(5, -10, 5);
+  var directionOfDirectionalLight = new GLBoost.Vector3(-60, 30, 0);
   var directionalLight = null;
   (function commonProcess(){
     var material = glBoostContext.createClassicMaterial();
@@ -116,7 +116,7 @@
       var aabb = scene.AABB;
       var centerOfAABB = aabb.centerPoint;
       var lengthBtwCenterToCornerOfAABB = aabb.lengthCenterToCorner;
-      var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction);
+      var normalizedLightDirection = GLBoost.Vector3.normalize(light.direction.clone().multiply(-1));
       var cameraEye = GLBoost.Vector3.add(centerOfAABB, GLBoost.Vector3.multiply(normalizedLightDirection, -(lengthBtwCenterToCornerOfAABB + depthCamera.zNear)));
       var cameraCenter = centerOfAABB;//GLBoost.Vector3.add(cameraEye, normalizedLightDirection);
 
@@ -198,8 +198,7 @@
 
     var rotateMatrixForCamera = GLBoost.Matrix33.rotateY(-1.0);
     camera.eye = rotateMatrixForCamera.multiplyVector(camera.eye);
-    var rotateMatrix = GLBoost.Matrix33.rotateY(1.0);
-    directionalLight.direction = rotateMatrix.multiplyVector(directionalLight.direction);
+    directionalLight.rotate = new GLBoost.Vector3(directionalLight.rotate.x, directionalLight.rotate.y - 2.0, directionalLight.rotate.z);
 
     requestAnimationFrame(render);
   };

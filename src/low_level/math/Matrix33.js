@@ -199,6 +199,14 @@ export default class Matrix33 {
     );
   }
 
+  static rotateXYZ(x, y, z) {
+    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
+  }
+
+  static rotate(vec3) {
+    return (Matrix33.rotateZ(vec3.z).multiply(Matrix33.rotateY(vec3.y).multiply(Matrix33.rotateX(vec3.x))));
+  }
+
   scale(vec) {
     return this.setComponents(
       vec.x, 0, 0,
