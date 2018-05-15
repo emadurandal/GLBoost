@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 765e5c68
+// This revision is the commit right after the SHA: 2676d8b2
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3304,7 +3304,11 @@ class L_Element extends GLBoostObject {
       return;
     }
     this._translate = vec.clone();
-    this._is_trs_matrix_updated = false;
+    if (this._is_trs_matrix_updated) {
+      this._matrix.m03 = vec.x;
+      this._matrix.m13 = vec.y;
+      this._matrix.m23 = vec.z;  
+    }
     this._is_translate_updated = true;
     this._needUpdate();
   }
@@ -3396,7 +3400,12 @@ class L_Element extends GLBoostObject {
       return;
     }
     this._scale = vec.clone();
-    this._is_trs_matrix_updated = false;
+    if (this._is_trs_matrix_updated) {
+      let m = this._matrix;
+      m.m00 *= vec.x;
+      m.m11 *= vec.y;
+      m.m22 *= vec.z;
+    }
     this._is_scale_updated = true;
     this._needUpdate();
   }
@@ -3581,6 +3590,8 @@ class L_Element extends GLBoostObject {
         value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
         value = Quaternion.fromMatrix(Matrix44$1$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+      } else {
+        console.log('jojjeoe');
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
@@ -3743,14 +3754,19 @@ class M_Element extends L_Element {
   }
 
   get worldMatrixWithoutMySelf() {
-    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._worldMatrixWithoutMySelf === 'undefined') {
-      this._worldMatrixWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
+    return this.getWorldMatrixWithoutMySelfAt(void 0);
+  }
+
+  getWorldMatrixWithoutMySelfAt(input) {
+
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+  
+    if (this._accumulatedWithoutMySelfAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedWithoutMySelfAncestry === void 0) {
+      this._matrixAccumulatedWithoutMySelfAncestry = this._multiplyMyAndParentTransformMatrices(false, input);
+      this._accumulatedWithoutMySelfAncestryObjectUpdateNumber = tempNumber;
     }
 
-    return this._worldMatrixWithoutMySelf;
+    return this._matrixAccumulatedWithoutMySelfAncestry.clone();
   }
 
   get normalMatrix() {
@@ -5871,8 +5887,9 @@ class DrawKickerWorld {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-              lightDirection = new Vector3(light.direction.x, light.direction.y, light.direction.z);
-              //lightDirection = light.rotateMatrixAccumulatedAncestry.multiplyVector(lightDirection).toVector3();
+//              lightDirection = new Vector3(0, 0, 1);
+//              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
+              lightDirection = light.directionInWorld;
               lightDirection.normalize();
             }
             material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
@@ -14386,7 +14403,7 @@ class M_DirectionalLight extends M_AbstractLight {
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
    */
-  constructor(glBoostContext, intensity, rotate, length = 1.0) {
+  constructor(glBoostContext, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
     super(glBoostContext);
 
     this._intensity = intensity;
@@ -14421,13 +14438,14 @@ class M_DirectionalLight extends M_AbstractLight {
   }
 
   set rotate(vec3) {
-    this._gizmo._mesh.rotate = vec3;
     super.rotate = vec3;
+    this._gizmo._mesh.rotate = vec3;
 
     this.callCameraCustomFunction();
   }
 
   set translate(vec3) {
+    super.translate = vec3;
     this._gizmo._mesh.translate = vec3;
 
     this.callCameraCustomFunction();
@@ -14442,8 +14460,8 @@ class M_DirectionalLight extends M_AbstractLight {
   }
 
   set matrix(vec3) {
-    this._gizmo._mesh.matrix = vec3;
     super.matrix = vec3;
+    this._gizmo._mesh.matrix = vec3;
 
     this.callCameraCustomFunction();
   }
@@ -14453,8 +14471,8 @@ class M_DirectionalLight extends M_AbstractLight {
   }
 
   set quaternion(vec3) {
-    this._gizmo._mesh.quaternion = vec3;
     super.quaternion = vec3;
+    this._gizmo._mesh.quaternion = vec3;
 
     this.callCameraCustomFunction();
   }
@@ -14474,22 +14492,39 @@ class M_DirectionalLight extends M_AbstractLight {
   set direction(_zDir) {
     let yDir = new Vector3(0, 1, 0);
     let xDir = Vector3.cross(yDir, _zDir);
-    let zDir = Vector3.cross(yDir, xDir);
-  
+    let zDir = Vector3.cross(xDir, yDir);
+    
     let result = Matrix44$1$1.identity();
-    result.m11 = xDir.x;
-    result.m21 = xDir.y;
-    result.m31 = xDir.z;
-  
-    result.m12 = yDir.x;
-    result.m22 = yDir.y;
-    result.m32 = yDir.z;
-  
-    result.m13 = zDir.x;
-    result.m23 = zDir.y;
-    result.m33 = zDir.z;
 
-    super.matrix = result;
+    result.m00 = xDir.x;
+    result.m10 = xDir.y;
+    result.m20 = xDir.z;
+  
+    result.m01 = yDir.x;
+    result.m11 = yDir.y;
+    result.m21 = yDir.z;
+  
+    result.m02 = zDir.x;
+    result.m12 = zDir.y;
+    result.m22 = zDir.z;
+/*
+
+    result.m00 = xDir.x;
+    result.m01 = xDir.y;
+    result.m02 = xDir.z;
+
+    result.m10 = yDir.x;
+    result.m11 = yDir.y;
+    result.m12 = yDir.z;
+
+    result.m20 = zDir.x;
+    result.m21 = zDir.y;
+    result.m22 = zDir.z;
+*/
+
+
+
+    this.matrix = result;
     this._gizmo._mesh.matrix = result;
 
     this.callCameraCustomFunction();
@@ -14500,6 +14535,11 @@ class M_DirectionalLight extends M_AbstractLight {
     //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
     let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
     return result;
+  }
+
+  get directionInWorld() {
+    let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+    return direction;
   }
 
 }
@@ -14542,7 +14582,7 @@ class M_SpotLight extends M_AbstractLight {
    * @param {Vector4} direction the light (traveling) direction
    * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
    */
-  constructor(glBoostContext, intensity, rotation) {
+  constructor(glBoostContext, intensity, rotate = new Vector3(0, 0, 0)) {
     super(glBoostContext);
 
     this._intensity = intensity;
@@ -14550,7 +14590,7 @@ class M_SpotLight extends M_AbstractLight {
     this._isLightType = 'spot';
     this._direction = new Vector3(0.0, 0.0, 1.0);
 
-    this.rotation = rotation;
+    this.rotate = rotate;
 
     this._spotExponent = 1.0;
     this._spotCutoffInDegree = 30;
@@ -14573,13 +14613,19 @@ class M_SpotLight extends M_AbstractLight {
     return this._gizmo.translate;
   }
 
+  set rotate(vec3) {
+    super.rotate = vec3;
+  
+    this.callCameraCustomFunction();
+  }
+
   get rotate() {
     return super.rotate;
   }
 
   set matrix(vec3) {
-    this._gizmo._mesh.matrix = vec3;
     super.matrix = vec3;
+    this._gizmo._mesh.matrix = vec3;
 
     this.callCameraCustomFunction();
   }
@@ -14589,8 +14635,8 @@ class M_SpotLight extends M_AbstractLight {
   }
 
   set quaternion(vec3) {
-    this._gizmo._mesh.quaternion = vec3;
     super.quaternion = vec3;
+    this._gizmo._mesh.quaternion = vec3;
 
     this.callCameraCustomFunction();
   }
@@ -14610,30 +14656,52 @@ class M_SpotLight extends M_AbstractLight {
   set direction(_zDir) {
     let yDir = new Vector3(0, 1, 0);
     let xDir = Vector3.cross(yDir, _zDir);
-    let zDir = Vector3.cross(yDir, xDir);
+    let zDir = Vector3.cross(xDir, yDir);
   
     let result = Matrix44.identity();
-    result.m11 = xDir.x;
-    result.m21 = xDir.y;
-    result.m31 = xDir.z;
-  
-    result.m12 = yDir.x;
-    result.m22 = yDir.y;
-    result.m32 = yDir.z;
-  
-    result.m13 = zDir.x;
-    result.m23 = zDir.y;
-    result.m33 = zDir.z;
 
-    super.matrix = result;
+    
+    result.m00 = xDir.x;
+    result.m10 = xDir.y;
+    result.m20 = xDir.z;
+  
+    result.m01 = yDir.x;
+    result.m11 = yDir.y;
+    result.m21 = yDir.z;
+  
+    result.m02 = zDir.x;
+    result.m12 = zDir.y;
+    result.m22 = zDir.z;
+/*
+
+    result.m00 = xDir.x;
+    result.m01 = xDir.y;
+    result.m02 = xDir.z;
+
+    result.m10 = yDir.x;
+    result.m11 = yDir.y;
+    result.m12 = yDir.z;
+
+    result.m20 = zDir.x;
+    result.m21 = zDir.y;
+    result.m22 = zDir.z;
+*/
+
+    this.matrix = result;
 
     this.callCameraCustomFunction();
   }
 
   get direction() {
-    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    let result = this.quaternion.rotationMatrix33.multiplyVector(this._direction);
     return result;
   }
+
+  get directionInWorld() {
+    let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+    return direction;
+  }
+
 
   set spotExponent(val) {
     this._spotExponent = val;
@@ -16178,25 +16246,27 @@ class GLTFLoader {
     resolve(rootGroup);
   }
 
-
+  _setTransform(element, nodeJson) {
+    if (nodeJson.translation) {
+      element.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+    }
+    if (nodeJson.scale) {
+      element.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+    }
+    if (nodeJson.rotation) {
+      element.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+    }
+    if (nodeJson.matrix) {
+      element.matrix = new Matrix44$1$1(nodeJson.matrix, true);
+    }
+  }
 
   _recursiveIterateNode(glBoostContext, nodeStr, buffers, json, defaultShader, shaders, textures, glTFVer, options) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
 
-    if (nodeJson.translation) {
-      group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
-    }
-    if (nodeJson.scale) {
-      group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
-    }
-    if (nodeJson.rotation) {
-      group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
-    }
-    if (nodeJson.matrix) {
-      group.matrix = new Matrix44$1$1(nodeJson.matrix, true);
-    }
+    this._setTransform(group, nodeJson);
 
     if (nodeJson.meshes) {
       for (let i = 0; i < nodeJson.meshes.length; i++) {
@@ -16215,7 +16285,7 @@ class GLTFLoader {
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint(options.isExistJointGizme);
+      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -16268,15 +16338,19 @@ class GLTFLoader {
           } else if (lightJson.type === 'point') {
             let color = lightJson.point.color;
             light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
+            this._setTransform(group, nodeJson);
             group.addChild(light);
           } else if (lightJson.type === 'directional') {
             const color = lightJson.directional.color;
-            let lightDir = new Vector4(0, 0, -1, 1);
-            const matrix = new Matrix44$1$1(nodeJson.matrix, true);
-            lightDir = matrix.multiplyVector(lightDir);
-            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
-            light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
-            group.matrix = Matrix44$1$1.identity();
+            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]));
+            light.rotate = new Vector3(0, 0, 0);
+            this._setTransform(group, nodeJson);
+            group.addChild(light);
+          } else if (lightJson.type === 'spot') {
+            const color = lightJson.spot.color;
+            light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
+            light.rotate = new Vector3(0, 0, 0);
+            this._setTransform(group, nodeJson);
             group.addChild(light);
           }
         }

@@ -154,7 +154,11 @@ export default class L_Element extends GLBoostObject {
       return;
     }
     this._translate = vec.clone();
-    this._is_trs_matrix_updated = false;
+    if (this._is_trs_matrix_updated) {
+      this._matrix.m03 = vec.x;
+      this._matrix.m13 = vec.y;
+      this._matrix.m23 = vec.z;  
+    }
     this._is_translate_updated = true;
     this._needUpdate();
   }
@@ -246,7 +250,12 @@ export default class L_Element extends GLBoostObject {
       return;
     }
     this._scale = vec.clone();
-    this._is_trs_matrix_updated = false;
+    if (this._is_trs_matrix_updated) {
+      let m = this._matrix;
+      m.m00 *= vec.x;
+      m.m11 *= vec.y;
+      m.m22 *= vec.z;
+    }
     this._is_scale_updated = true;
     this._needUpdate();
   }
@@ -431,6 +440,8 @@ export default class L_Element extends GLBoostObject {
         value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
         value = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+      } else {
+        console.log('jojjeoe');
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;

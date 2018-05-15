@@ -353,25 +353,27 @@ export default class GLTFLoader {
     resolve(rootGroup);
   }
 
-
+  _setTransform(element, nodeJson) {
+    if (nodeJson.translation) {
+      element.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
+    }
+    if (nodeJson.scale) {
+      element.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
+    }
+    if (nodeJson.rotation) {
+      element.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
+    }
+    if (nodeJson.matrix) {
+      element.matrix = new Matrix44(nodeJson.matrix, true);
+    }
+  }
 
   _recursiveIterateNode(glBoostContext, nodeStr, buffers, json, defaultShader, shaders, textures, glTFVer, options) {
     var nodeJson = json.nodes[nodeStr];
     var group = glBoostContext.createGroup();
     group.userFlavorName = nodeStr;
 
-    if (nodeJson.translation) {
-      group.translate = new Vector3(nodeJson.translation[0], nodeJson.translation[1], nodeJson.translation[2]);
-    }
-    if (nodeJson.scale) {
-      group.scale = new Vector3(nodeJson.scale[0], nodeJson.scale[1], nodeJson.scale[2]);
-    }
-    if (nodeJson.rotation) {
-      group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
-    }
-    if (nodeJson.matrix) {
-      group.matrix = new Matrix44(nodeJson.matrix, true);
-    }
+    this._setTransform(group, nodeJson);
 
     if (nodeJson.meshes) {
       for (let i = 0; i < nodeJson.meshes.length; i++) {
@@ -390,7 +392,7 @@ export default class GLTFLoader {
         group.addChild(mesh);
       }
     } else if (nodeJson.jointName) {
-      let joint = glBoostContext.createJoint(options.isExistJointGizme);
+      let joint = glBoostContext.createJoint(options.isExistJointGizmo);
       joint.userFlavorName = nodeJson.jointName;
       group.addChild(joint);
     } else if (nodeJson.camera) {
@@ -443,15 +445,19 @@ export default class GLTFLoader {
           } else if (lightJson.type === 'point') {
             let color = lightJson.point.color;
             light = glBoostContext.createPointLight(new Vector3(color[0], color[1], color[2]));
+            this._setTransform(group, nodeJson);
             group.addChild(light);
           } else if (lightJson.type === 'directional') {
             const color = lightJson.directional.color;
-            let lightDir = new Vector4(0, 0, -1, 1);
-            const matrix = new Matrix44(nodeJson.matrix, true);
-            lightDir = matrix.multiplyVector(lightDir);
-            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]), lightDir.toVector3());
-            light.multiplyMatrixGizmo = group.getMatrixNotAnimated();
-            group.matrix = Matrix44.identity();
+            light = glBoostContext.createDirectionalLight(new Vector3(color[0], color[1], color[2]));
+            light.rotate = new Vector3(0, 0, 0);
+            this._setTransform(group, nodeJson);
+            group.addChild(light);
+          } else if (lightJson.type === 'spot') {
+            const color = lightJson.spot.color;
+            light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
+            light.rotate = new Vector3(0, 0, 0);
+            this._setTransform(group, nodeJson);
             group.addChild(light);
           }
         }

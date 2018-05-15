@@ -104,14 +104,19 @@ export default class M_Element extends L_Element {
   }
 
   get worldMatrixWithoutMySelf() {
-    var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    //console.log(tempNumber);
-    if (this._accumulatedAncestryObjectUpdateNumberWithoutMySelf !== tempNumber || typeof this._worldMatrixWithoutMySelf === 'undefined') {
-      this._worldMatrixWithoutMySelf = this._multiplyMyAndParentTransformMatrices(false, null).clone();
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = tempNumber;
+    return this.getWorldMatrixWithoutMySelfAt(void 0);
+  }
+
+  getWorldMatrixWithoutMySelfAt(input) {
+
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+  
+    if (this._accumulatedWithoutMySelfAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedWithoutMySelfAncestry === void 0) {
+      this._matrixAccumulatedWithoutMySelfAncestry = this._multiplyMyAndParentTransformMatrices(false, input);
+      this._accumulatedWithoutMySelfAncestryObjectUpdateNumber = tempNumber;
     }
 
-    return this._worldMatrixWithoutMySelf;
+    return this._matrixAccumulatedWithoutMySelfAncestry.clone();
   }
 
   get normalMatrix() {
