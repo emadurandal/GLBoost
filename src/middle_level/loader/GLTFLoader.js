@@ -986,7 +986,7 @@ export default class GLTFLoader {
       //attributes[attributesJson[attributeName]] = attributeName;
       let parameterName = attributesJson[attributeName];
       let parameterJson = parametersJson[parameterName];
-      attributes[parameterJson.semantic] = attributeName;
+      attributes[attributeName] = parameterJson.semantic;
     }
 
     let uniforms = {};
@@ -995,7 +995,7 @@ export default class GLTFLoader {
       let parameterName = uniformsJson[uniformName];
       let parameterJson = parametersJson[parameterName];
       if (typeof parameterJson.semantic !== 'undefined') {
-        uniforms[parameterJson.semantic] = uniformName;
+        uniforms[uniformName] = parameterJson.semantic;
       } else {
         let value = null;
         if (typeof materialJson.values !== 'undefined' && typeof materialJson.values[parameterName] !== 'undefined') {
