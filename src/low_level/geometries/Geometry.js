@@ -393,6 +393,33 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
+  setUpEnableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      }
+    });
+  }
+
+  setUpDisableAllVertexAttribArrays(gl, glslProgram) {
+
+    for (let i=0; i<8; i++) {
+      gl.disableVertexAttribArray(i);
+    }
+  }
+
+  setUpDisableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.disableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      }
+    });
+  }
+
 
 
   _getVAO() {
