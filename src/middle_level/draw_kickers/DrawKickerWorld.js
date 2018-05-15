@@ -28,10 +28,7 @@ export default class DrawKickerWorld {
 
   draw(gl, glem, expression, mesh, originalMaterials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
 
-    var isVAOBound = false;
-    if (DrawKickerWorld._lastGeometry !== geometryName) {
-      isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-    }
+    var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
     let input = mesh._getCurrentAnimationInputValue('time');
 
@@ -167,6 +164,7 @@ export default class DrawKickerWorld {
       geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
 
+
       if (geometry.isIndexed()) {
         //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
         let vertexN = material.getVertexN(geometry);
@@ -178,6 +176,8 @@ export default class DrawKickerWorld {
       } else {
         gl.drawArrays(primitiveType, 0, vertexN);
       }
+      
+
 
       material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
 
@@ -185,14 +185,14 @@ export default class DrawKickerWorld {
 
       material.tearDownStates();
 
-      //DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
-    //glem.bindVertexArray(gl, null);
 
-  //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    glem.bindVertexArray(gl, null);
+
+//    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+//    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
 
     //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
-    DrawKickerWorld._lastGeometry = geometryName;
   }
 
   _setUpOrTearDownTextures(isSetUp, material) {

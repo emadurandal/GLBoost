@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 3b80700e
+// This revision is the commit right after the SHA: 67066e22
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -5783,10 +5783,7 @@ class DrawKickerWorld {
 
   draw(gl, glem, expression, mesh, originalMaterials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
 
-    var isVAOBound = false;
-    if (DrawKickerWorld._lastGeometry !== geometryName) {
-      isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-    }
+    var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
     let input = mesh._getCurrentAnimationInputValue('time');
 
@@ -5922,6 +5919,7 @@ class DrawKickerWorld {
       geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
 
+
       if (geometry.isIndexed()) {
         //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
         let vertexN = material.getVertexN(geometry);
@@ -5933,6 +5931,8 @@ class DrawKickerWorld {
       } else {
         gl.drawArrays(primitiveType, 0, vertexN);
       }
+      
+
 
       material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
 
@@ -5940,14 +5940,14 @@ class DrawKickerWorld {
 
       material.tearDownStates();
 
-      //DrawKickerWorld._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
     }
-    //glem.bindVertexArray(gl, null);
 
-  //  gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    glem.bindVertexArray(gl, null);
+
+//    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+//    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
 
     //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
-    DrawKickerWorld._lastGeometry = geometryName;
   }
 
   _setUpOrTearDownTextures(isSetUp, material) {
@@ -6737,6 +6737,33 @@ class Geometry extends GLBoostObject {
         gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
         gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
           this._vertices.components[attribName], this._vertices.componentType[attribName], false, 0, 0);
+      }
+    });
+  }
+
+  setUpEnableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      }
+    });
+  }
+
+  setUpDisableAllVertexAttribArrays(gl, glslProgram) {
+
+    for (let i=0; i<8; i++) {
+      gl.disableVertexAttribArray(i);
+    }
+  }
+
+  setUpDisableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.disableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
       }
     });
   }
