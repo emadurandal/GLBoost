@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 9fca34a6
+// This revision is the commit right after the SHA: dd33f4cb
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -3305,10 +3305,11 @@ class L_Element extends GLBoostObject {
     }
     this._translate = vec.clone();
     if (this._is_trs_matrix_updated) {
-      this._matrix.m03 = vec.x;
-      this._matrix.m13 = vec.y;
-      this._matrix.m23 = vec.z;  
+//      this._matrix.m03 = vec.x;
+//      this._matrix.m13 = vec.y;
+//      this._matrix.m23 = vec.z;  
     }
+    this._is_trs_matrix_updated = false;
     this._is_translate_updated = true;
     this._needUpdate();
   }
@@ -3401,11 +3402,12 @@ class L_Element extends GLBoostObject {
     }
     this._scale = vec.clone();
     if (this._is_trs_matrix_updated) {
-      let m = this._matrix;
-      m.m00 *= vec.x;
-      m.m11 *= vec.y;
-      m.m22 *= vec.z;
+//      let m = this._matrix;
+//      m.m00 *= vec.x;
+//      m.m11 *= vec.y;
+//      m.m22 *= vec.z;
     }
+    this._is_trs_matrix_updated = false;
     this._is_scale_updated = true;
     this._needUpdate();
   }
