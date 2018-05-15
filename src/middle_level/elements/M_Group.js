@@ -26,17 +26,9 @@ export default class M_Group extends M_Element {
    * [ja] このグループにelementを子供として追加します。
    * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
    */
-  addChild(element) {
-    { 
-      //// if forbit duplicated register
-      // this.removeChild(element);
-      // element._parent = this;
-      // this._elements.push(element);
+  addChild(element, isDuplicateOk = false) {
 
-    }
-
-    {
-
+    if (isDuplicateOk){
       // if forgive duplicated register by copy
       let elem = null;
       if (element._parent) {
@@ -46,6 +38,11 @@ export default class M_Group extends M_Element {
       }
       elem._parent = this;
       this._elements.push(elem);
+    } else {
+      //// if forbit duplicated register
+      this.removeChild(element);
+      element._parent = this;
+      this._elements.push(element);
     }
   }
 

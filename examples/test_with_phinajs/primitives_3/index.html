@@ -49,21 +49,11 @@
           material.shaderClass = shader;
           material.baseColor = new GLBoost.Vector4(Math.random(), Math.random(), Math.random(), Math.random()*0.5+0.5);
 
-          object.translate.x = Math.random() * 800 - 400;
-          object.translate.y = Math.random() * 800 - 400;
-          object.translate.z = Math.random() * 800 - 400;
+          object.translate = new GLBoost.Vector3(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
 
-          object.rotate.x = Math.random() * 2 * Math.PI;
-          object.rotate.y = Math.random() * 2 * Math.PI;
-          object.rotate.z = Math.random() * 2 * Math.PI;
+          object.rotate = new GLBoost.Vector3(Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI);
 
-          object.scale.x = Math.random() + 0.5;
-          object.scale.y = Math.random() + 0.5;
-          object.scale.z = Math.random() + 0.5;
-
-          //object.rotate = new GLBoost.Vector3(Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI);
-          //object.scale = new GLBoost.Vector3(Math.random() + 0.5, Math.random() + 0.5, Math.random() + 0.5);
-          object.dirty = true;
+          object.scale = new GLBoost.Vector3(Math.random() + 0.5, Math.random() + 0.5, Math.random() + 0.5);
 
           layer.scene.addChild( object );
         }

@@ -174,9 +174,11 @@ export default class Vector3 {
    */
   divide(val) {
     console.assert(val != 0, "0 division!");
-    this.x /= val;
-    this.y /= val;
-    this.z /= val;
+    if (val !== 0) {
+      this.x /= val;
+      this.y /= val;
+      this.z /= val;
+    }
 
     return this;
   }
