@@ -26,7 +26,7 @@ export default class Sphere extends Geometry {
       vertexColor = new Vector4(1, 1, 1, 1);
     }
 
-    let shiftValue = 0.001; // for avoid Singular point
+    let shiftValue = 0.00001; // for avoid Singular point
     for (var latNumber = 0; latNumber <= heightSegments; latNumber++) {
       var theta = latNumber * Math.PI / heightSegments + shiftValue;
       var sinTheta = Math.sin(theta);
