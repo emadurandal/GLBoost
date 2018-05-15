@@ -4,7 +4,7 @@
 	(factory());
 }(this, (function () { 'use strict';
 
-// This revision is the commit right after the SHA: 55960198
+// This revision is the commit right after the SHA: 7e94c89e
 var global = ('global',eval)('this');
 
 (function (global) {
@@ -6303,6 +6303,8 @@ class FreeShader extends Shader {
       }
 
       switch (this._uniforms[uniformName]) {
+        case 'WORLD':
+        case 'VIEW':
         case 'MODELVIEW':
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':

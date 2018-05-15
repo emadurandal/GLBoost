@@ -81,6 +81,8 @@ export default class FreeShader extends Shader {
       }
 
       switch (this._uniforms[uniformName]) {
+        case 'WORLD':
+        case 'VIEW':
         case 'MODELVIEW':
         case 'MODELVIEWINVERSETRANSPOSE':
         case 'PROJECTION':
