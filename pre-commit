@@ -21,12 +21,21 @@ function setCommitVersion() {
 }
 
 child_process.exec('npm run build', { cwd: root }, function (error, stdout, stderr) {
-	if (error) {
-    console.error(`exec error: ${error}`);
+    if (error) {
+        console.error(`exec error: ${error}`);
     
-    process.exit(1);
-  }
+        process.exit(1);
+    }
 
-	setCommitVersion();
+    // if git index has something changes (Modify/Delete/Add)
+    child_process.exec('expr $(git status --porcelain 2>/dev/null| grep "^[M|D|A]" | wc -l)', {cwd: root}, function(error, stdout, stderr) {
+        let count = stdout;
+
+        // if this is not a empty commit,
+        if (parseInt(count) > 0) {
+            // Build GLBoost and insert current commit SHA to it.
+            setCommitVersion();
+        }
+    });
 
 });
