@@ -1,9 +1,14 @@
 import flow from 'rollup-plugin-flow';
+//import sourcemaps from 'rollup-plugin-sourcemaps';
 
 export default {
-  entry: 'src/middle_level/glboost_include.js',
-  dest: 'build/glboost.js',
-  format: 'umd',
-  plugins: [ flow() ],
-  moduleName: 'GLBoost',
+  input: 'src/middle_level/glboost_include.js',
+  output: {
+    file: 'build/glboost.js',
+    name: 'GLBoost',
+    sourcemap: true,
+    format: 'umd',
+
+  },
+  plugins: [ flow() ]
 }
