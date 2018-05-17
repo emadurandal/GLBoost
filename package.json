@@ -40,7 +40,8 @@
     "flow-bin": "^0.60.1",
     "http-server": "^0.10.0",
     "jest": "^22.4.3",
-    "rollup": "0.43.0"
+    "rollup": "^0.59.0",
+    "rollup-plugin-sourcemaps": "^0.4.2"
   },
   "dependencies": {
     "rollup-plugin-flow": "^1.1.1"
