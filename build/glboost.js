@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 828a278d
+  // This revision is the commit right after the SHA: 58b41f8a
   var global = (0, eval)('this');
 
   (function (global) {
@@ -16683,7 +16683,9 @@ return mat4(
       }
 
       if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-        if (material.states.functions.blendFuncSeparate === void 0) ;
+        if (material.states.functions.blendFuncSeparate === void 0) {
+          material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+        }
       }
       material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
 
