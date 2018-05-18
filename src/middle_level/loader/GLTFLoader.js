@@ -798,7 +798,7 @@ export default class GLTFLoader {
 
     if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
       if (material.states.functions.blendFuncSeparate === void 0) {
-        //material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+        material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
       }
     }
     material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
