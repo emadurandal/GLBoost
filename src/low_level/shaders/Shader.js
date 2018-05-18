@@ -731,7 +731,7 @@ export default class Shader extends GLBoostObject {
     shaderText += `vec4 multiplyAlphaToColorOfTexel(sampler2D texture, vec2 texcoord, int toMultiplyAlphaFlag) {\n`;
     shaderText += `  vec4 texel = ${textureFunc}(texture, texcoord);\n`;
     shaderText += `  if (toMultiplyAlphaFlag == 1) {\n`;      
-    shaderText += `    texel.rgb /= texel.a;\n`;
+    shaderText += `    texel.rgb *= texel.a;\n`;
     shaderText += `  }\n`;
     shaderText += `  return texel;\n`;
     shaderText += `}\n`;

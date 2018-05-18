@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 862f20b0
+  // This revision is the commit right after the SHA: d430b740
   var global = (0, eval)('this');
 
   (function (global) {
@@ -5480,7 +5480,7 @@ return mat4(
       shaderText += `vec4 multiplyAlphaToColorOfTexel(sampler2D texture, vec2 texcoord, int toMultiplyAlphaFlag) {\n`;
       shaderText += `  vec4 texel = ${textureFunc}(texture, texcoord);\n`;
       shaderText += `  if (toMultiplyAlphaFlag == 1) {\n`;      
-      shaderText += `    texel.rgb /= texel.a;\n`;
+      shaderText += `    texel.rgb *= texel.a;\n`;
       shaderText += `  }\n`;
       shaderText += `  return texel;\n`;
       shaderText += `}\n`;
@@ -17176,7 +17176,6 @@ return mat4(
         isBlend: false,
         isDepthTest: true,
         defaultShaderClass: null,
-        statesOfElements: null,
         isAllMeshesTransparent: false,
         statesOfElements: [
           {
@@ -17191,6 +17190,7 @@ return mat4(
               }
             },
             isTransparent: true,
+            opacity: 1.0,
             shaderClass: DecalShader, // LambertShader // PhongShader
             isTextureImageToLoadPreMultipliedAlpha: false,
             globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
@@ -17885,6 +17885,35 @@ return mat4(
         materialJson = materialJson.extensions.KHR_materials_common;
       }
 
+
+      let enables = [];
+      if (options.isBlend) {
+        enables.push(3042);
+      }
+      if (options.isDepthTest) {
+        enables.push(2929);
+      }
+      material.states.enable = material.states.enable.concat(enables);
+
+      // Remove duplicated values
+      material.states.enable = material.states.enable.filter(function (x, i, self) {
+        return self.indexOf(x) === i;
+      });
+
+      if (options && options.statesOfElements) {
+        for (let statesInfo of options.statesOfElements) {
+          if (statesInfo.opacity) {
+            group.opacity = statesInfo.opacity;
+          }
+        }
+      }
+
+      if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+        if (material.states.functions.blendFuncSeparate === void 0) ;
+      }
+      material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+
+    
       // Diffuse Texture
       if (texcoords0AccessorStr) {
         texcoords = this._accessBinary(texcoords0AccessorStr, json, buffers, false, true);
@@ -17935,11 +17964,11 @@ return mat4(
 
                       if (isMatch) {
                         if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-                          if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) ; else {
+                          if (statesInfo.isTextureImagePreMultipliedAlpha) ; else {
                             isNeededToMultiplyAlphaToColorOfTexture = true;
                           }
                         } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-                          if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) ;
+                          if (statesInfo.isTextureImagePreMultipliedAlpha) ;
                         }
                       }
 
@@ -17951,28 +17980,7 @@ return mat4(
               }
 
               material.setTexture(texture, texturePurpose);
-              material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
-
-              let enables = [];
-              if (options.isBlend) {
-                enables.push(3042);
-              }
-              if (options.isDepthTest) {
-                enables.push(2929);
-              }
-              material.states.enable = material.states.enable.concat(enables);
-
-              // Remove duplicated values
-              material.states.enable = material.states.enable.filter(function (x, i, self) {
-                return self.indexOf(x) === i;
-              });
-
-              if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-                if (material.states.functions.blendFuncSeparate === void 0) {
-                  material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
-                }
-              }
-              material.globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+              texture.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
             }
           }
         };
