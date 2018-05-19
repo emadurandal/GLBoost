@@ -69,7 +69,7 @@ export default class ModelConverter {
     let rootGroup = glBoostContext.createGroup();
     if (gltfModel.scenes[0].nodesIndices) {
       for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
-        rootGroup.addChild(groups[nodesIndex]);
+        rootGroup.addChild(groups[nodesIndex], true);
       }  
     }
 
@@ -116,12 +116,12 @@ export default class ModelConverter {
       let node = gltfModel.nodes[parseInt(node_i)];
       let parentGroup = groups[node_i];
       if (node.mesh) {
-        parentGroup.addChild(glboostMeshes[node.meshIndex]);
+        parentGroup.addChild(glboostMeshes[node.meshIndex], true);
       }
       if (node.childrenIndices) {
         for (let childNode_i of node.childrenIndices) {
           let childGroup = groups[childNode_i];
-          parentGroup.addChild(childGroup);
+          parentGroup.addChild(childGroup, true);
         }  
       }
     }
@@ -176,7 +176,7 @@ export default class ModelConverter {
           glboostJoint._glTFJointIndex = joint_i;
 //          glboostJoint.userFlavorName = nodeJson.jointName;
           let group = groups[joint_i];
-          group.addChild(glboostJoint);
+          group.addChild(glboostJoint, true);
         }
       }
     }
