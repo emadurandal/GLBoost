@@ -19,7 +19,7 @@ var global = ('global',eval)('this');
     let c = {
       count: 0,
       __existedConstants: [],
-      define: function (constantName, glConstantValue) {
+      define: function (constantName, glConstantValue, aliasName) {
 
         let value = null;
 
@@ -44,7 +44,7 @@ var global = ('global',eval)('this');
 
         GLBoost[constantName] = value;
         GLBoost.GLBOOST_CONSTANT_NAMES[value] = constantName;
-        GLBoost.GLBOOST_CONSTANT_VALUES[value] = (typeof constantValue !== 'undefined') ? constantValue:constantName;
+        GLBoost.GLBOOST_CONSTANT_VALUES[value] = (typeof aliasName !== 'undefined') ? aliasName:constantName;
 
         this.count++;
       }
@@ -355,28 +355,28 @@ var global = ('global',eval)('this');
     c.define('ZERO', 0);
 
     /// GLBoost original constants
-    c.define('POSITION', 'position');
-    c.define('COLOR', 'color');
-    c.define('NORMAL', 'normal');
-    c.define('TEXCOORD', 'texcoord');
-    c.define('TANGENT', 'tangent');
-    c.define('JOINT', 'joint');
-    c.define('WEIGHT', 'weight');
-    c.define('BLENDTARGET1', 'shapetarget_1');
-    c.define('BLENDTARGET2', 'shapetarget_2');
-    c.define('BLENDTARGET3', 'shapetarget_3');
-    c.define('BLENDTARGET4', 'shapetarget_4');
-    c.define('BLENDTARGET5', 'shapetarget_5');
-    c.define('BLENDTARGET6', 'shapetarget_6');
-    c.define('BLENDTARGET7', 'shapetarget_7');
-    c.define('BLENDTARGET8', 'shapetarget_8');
-    c.define('BLENDTARGET9', 'shapetarget_9');
-    c.define('BLENDTARGET10', 'shapetarget_10');
-    c.define('RADIAN', 'radian');
-    c.define('DEGREE', 'degree');
+    c.define('POSITION', void 0, 'position');
+    c.define('COLOR', void 0, 'color');
+    c.define('NORMAL', void 0, 'normal');
+    c.define('TEXCOORD', void 0, 'texcoord');
+    c.define('TANGENT', void 0, 'tangent');
+    c.define('JOINT', void 0, 'joint');
+    c.define('WEIGHT', void 0, 'weight');
+    c.define('BLENDTARGET1', void 0, 'shapetarget_1');
+    c.define('BLENDTARGET2', void 0, 'shapetarget_2');
+    c.define('BLENDTARGET3', void 0, 'shapetarget_3');
+    c.define('BLENDTARGET4', void 0, 'shapetarget_4');
+    c.define('BLENDTARGET5', void 0, 'shapetarget_5');
+    c.define('BLENDTARGET6', void 0, 'shapetarget_6');
+    c.define('BLENDTARGET7', void 0, 'shapetarget_7');
+    c.define('BLENDTARGET8', void 0, 'shapetarget_8');
+    c.define('BLENDTARGET9', void 0, 'shapetarget_9');
+    c.define('BLENDTARGET10', void 0, 'shapetarget_10');
+    c.define('RADIAN', void 0, 'radian');
+    c.define('DEGREE', void 0, 'degree');
 
-    c.define('TEXTURE_PURPOSE_DIFFUSE', 'diffuse');
-    c.define('TEXTURE_PURPOSE_NORMAL', 'normal');
+    c.define('TEXTURE_PURPOSE_DIFFUSE', void 0, 'diffuse');
+    c.define('TEXTURE_PURPOSE_NORMAL', void 0, 'normal');
     c.define('QUERY_TYPE_INSTANCE_NAME');
     c.define('QUERY_TYPE_USER_FLAVOR_NAME');
     c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
