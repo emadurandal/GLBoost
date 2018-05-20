@@ -66,7 +66,6 @@ export default class MathUtil {
     } else if (Array.isArray(element)) {
       return element.length;
     } else {
-      console.error("ompomentNumber is invalid");
       return 0;
     }
   }

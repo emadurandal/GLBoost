@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 81412040
+  // This revision is the commit right after the SHA: 939517f4
   var global = (0, eval)('this');
 
   (function (global) {
@@ -3492,7 +3492,6 @@
       } else if (Array.isArray(element)) {
         return element.length;
       } else {
-        console.error("ompomentNumber is invalid");
         return 0;
       }
     }
