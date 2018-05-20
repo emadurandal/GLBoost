@@ -1,16 +1,26 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import Vector3 from './Vector3';
 
 export default class Vector4 {
+  v: Float32Array;
 
-  constructor(x, y, z, w) {
+  constructor(x:number|Float32Array, y:number, z:number, w:number) {
+    if (x instanceof Float32Array) {
+      this.v = x;
+      return;
+    } else {
+      this.v = new Float32Array(4);
+    }
+
     this.x = x;
     this.y = y;
     this.z = z;
     this.w = w;
   }
 
-  isEqual(vec) {
+  isEqual(vec:Vector4): boolean {
     if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
       return true;
     } else {
@@ -40,7 +50,7 @@ export default class Vector4 {
     return this;
   }
 
-  static normalize(vec4) {
+  static normalize(vec4:Vector4) {
     var length = vec4.length();
     var newVec = new Vector4(vec4.x, vec4.y, vec4.z, vec4.w);
     newVec.divide(length);
@@ -56,7 +66,7 @@ export default class Vector4 {
   /**
    * add value
    */
-  add(v) {
+  add(v:Vector4) {
     this.x += v.x;
     this.y += v.y;
     this.z += v.z;
@@ -68,14 +78,14 @@ export default class Vector4 {
   /**
    * add value（static version）
    */
-  static add(lv, rv) {
+  static add(lv:Vector4, rv:Vector4) {
     return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
   }
 
   /**
    * add value except w component
    */
-  addWithOutW(v) {
+  addWithOutW(v:Vector4|Vector3) {
     this.x += v.x;
     this.y += v.y;
     this.z += v.z;
@@ -86,11 +96,11 @@ export default class Vector4 {
   /**
    * add value except w component（static version）
    */
-  static addWithOutW(lv, rv) {
+  static addWithOutW(lv:Vector4, rv:Vector4) {
     return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
   }
 
-  multiply(val) {
+  multiply(val:number) {
     this.x *= val;
     this.y *= val;
     this.z *= val;
@@ -99,7 +109,7 @@ export default class Vector4 {
     return this;
   }
 
-  multiplyVector(vec) {
+  multiplyVector(vec:Vector4) {
     this.x *= vec.x;
     this.y *= vec.y;
     this.z *= vec.z;
@@ -108,16 +118,16 @@ export default class Vector4 {
     return this;
   }
 
-  static multiply(vec4, val) {
+  static multiply(vec4:Vector4, val:number) {
     return new Vector4(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
   }
 
-  static multiplyVector(vec4, vec) {
+  static multiplyVector(vec4:Vector4, vec:Vector4) {
     return new Vector4(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
   }
 
 
-  divide(val) {
+  divide(val:number) {
     console.assert(val != 0, "0 division!");
     if (val !== 0) {
       this.x /= val;
@@ -128,12 +138,12 @@ export default class Vector4 {
     return this;
   }
 
-  static divide(vec4, val) {
+  static divide(vec4:Vector4, val:number) {
     console.assert(val != 0, "0 division!");
     return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
   }
 
-  divideVector(vec4) {
+  divideVector(vec4:Vector4) {
     this.x /= vec4.x;
     this.y /= vec4.y;
     this.z /= vec4.z;
@@ -142,21 +152,48 @@ export default class Vector4 {
     return this;
   }
 
-  static divideVector(lvec4, rvec4) {
+  static divideVector(lvec4:Vector4, rvec4:Vector4) {
     return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
-  }
-
-  at(i) {
-    switch (i%4) {
-    case 0: return this.x;
-    case 1: return this.y;
-    case 2: return this.z;
-    case 3: return this.w;
-    }
   }
 
   toString() {
     return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+  }
+
+  get x() {
+    return this.v[0];
+  }
+
+  set x(x:number) {
+    this.v[0] = x;
+  }
+
+  get y() {
+    return this.v[1];
+  }
+
+  set y(y:number) {
+    this.v[1] = y;
+  }
+
+  get z() {
+    return this.v[2];
+  }
+
+  set z(z:number) {
+    this.v[2] = z;
+  }
+
+  get w() {
+    return this.v[3];
+  }
+
+  set w(w:number) {
+    this.v[3] = w;
+  }
+
+  get raw() {
+    return this.v;
   }
 }
 
