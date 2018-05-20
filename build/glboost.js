@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 939517f4
+  // This revision is the commit right after the SHA: 0809b167
   var global = (0, eval)('this');
 
   (function (global) {
@@ -1382,21 +1382,22 @@
 
   /*       */
 
-
+                                                                             
+                                                                       
 
   class Vector2 {
-                    
+                  
 
-    constructor(x                    , y       ) {
-      if (x instanceof Float32Array) {
-        this.v = x;
+    constructor(x                  , y        ) {
+      if (ArrayBuffer.isView(x)) {
+        this.v = ((x    )           );
         return;
       } else {
         this.v = new Float32Array(2);
       }
 
-      this.x = x;
-      this.y = y;
+      this.x = ((x    )       );
+      this.y = ((y    )       );
     }
 
     clone() {
@@ -1439,21 +1440,24 @@
 
   /*       */
 
-  class Vector4 {
-                    
+                                                                             
+                                                                       
 
-    constructor(x                    , y       , z       , w       ) {
-      if (x instanceof Float32Array) {
-        this.v = x;
+  class Vector4 {
+                  
+
+    constructor(x                  , y        , z        , w        ) {
+      if (ArrayBuffer.isView(x)) {
+        this.v = ((x    )           );
         return;
       } else {
         this.v = new Float32Array(4);
       }
 
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
+      this.x = ((x    )       );
+      this.y = ((y    )       );
+      this.z = ((z    )       );
+      this.w = ((w    )       );
     }
 
     isEqual(vec        )          {
@@ -1637,20 +1641,23 @@
 
   /*       */
 
-  class Vector3 {
-                    
+                                                                             
+                                                                       
 
-    constructor(x                    , y       , z       ) {
-      if (x instanceof Float32Array) {
-        this.v = x;
+  class Vector3 {
+                  
+
+    constructor(x                  , y        , z        ) {
+      if (ArrayBuffer.isView(x)) {
+        this.v = ((x    )           );
         return;
       } else {
         this.v = new Float32Array(3);
       }
 
-      this.x = x;
-      this.y = y;
-      this.z = z;
+      this.x = ((x    )       );
+      this.y = ((y    )       );
+      this.z = ((z    )       );
     }
 
     isEqual(vec        ) {

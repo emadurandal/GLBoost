@@ -2,21 +2,22 @@
 
 import GLBoost from '../../globals';
 
-
+type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array |
+Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 
 export default class Vector2 {
-  v: Float32Array;
+  v: TypedArray;
 
-  constructor(x:number|Float32Array, y:number) {
-    if (x instanceof Float32Array) {
-      this.v = x;
+  constructor(x:number|TypedArray, y?:number) {
+    if (ArrayBuffer.isView(x)) {
+      this.v = ((x:any):TypedArray);
       return;
     } else {
-      this.v = new Float32Array(2);
+      this.v = new Float32Array(2)
     }
 
-    this.x = x;
-    this.y = y;
+    this.x = ((x:any):number);
+    this.y = ((y:any):number);
   }
 
   clone() {

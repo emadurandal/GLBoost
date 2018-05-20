@@ -3,21 +3,24 @@
 import GLBoost from '../../globals';
 import Vector3 from './Vector3';
 
-export default class Vector4 {
-  v: Float32Array;
+type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array |
+Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 
-  constructor(x:number|Float32Array, y:number, z:number, w:number) {
-    if (x instanceof Float32Array) {
-      this.v = x;
+export default class Vector4 {
+  v: TypedArray;
+
+  constructor(x:number|TypedArray, y?:number, z?:number, w?:number) {
+    if (ArrayBuffer.isView(x)) {
+      this.v = ((x:any):TypedArray);
       return;
     } else {
-      this.v = new Float32Array(4);
+      this.v = new Float32Array(4)
     }
 
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.w = w;
+    this.x = ((x:any):number);
+    this.y = ((y:any):number);
+    this.z = ((z:any):number);
+    this.w = ((w:any):number);
   }
 
   isEqual(vec:Vector4): boolean {
