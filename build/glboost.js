@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 0809b167
+  // This revision is the commit right after the SHA: 953f92ab
   var global = (0, eval)('this');
 
   (function (global) {
@@ -9969,6 +9969,15 @@ return mat4(
     get dolly() {
       return this._wheel_y;
     }
+
+    get rotX() {
+      return this._rot_x;
+    }
+
+    get rotY() {
+      return this._rot_y;
+    }
+
   }
 
   class MutableTexture extends AbstractTexture {

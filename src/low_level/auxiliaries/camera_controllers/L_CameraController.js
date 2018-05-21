@@ -392,4 +392,13 @@ export default class L_CameraController extends GLBoostObject {
   get dolly() {
     return this._wheel_y;
   }
+
+  get rotX() {
+    return this._rot_x;
+  }
+
+  get rotY() {
+    return this._rot_y;
+  }
+
 }
