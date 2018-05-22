@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: cc90b380
+  // This revision is the commit right after the SHA: c07b4fd4
   var global = (0, eval)('this');
 
   (function (global) {
@@ -12160,11 +12160,11 @@ return mat4(
       if (Shader._exist(f, GLBoost$1.COLOR)) {
         shaderText += '  rt0 *= color;\n';
       }
-      shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
 
       shaderText += '    rt0 *= materialBaseColor;\n';
       if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
         shaderText += `vec2 texcoordTransformed = vec2(texcoord.x * uvTransform.x + uvTransform.z, 1.0 - ((1.0-texcoord.y) * uvTransform.y + uvTransform.w));\n`;      
+        shaderText += `rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoordTransformed, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
         shaderText += 'if (isColorAberration) {\n';
         shaderText += `  float offsetTexel = 2.0;\n`;
   //      shaderText += `  vec4 leftDecal = ${textureFunc}(uTexture, vec2(texcoordTransformed.x - offsetTexel/splitParameter.x, texcoordTransformed.y));\n`;
