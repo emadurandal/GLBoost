@@ -96,6 +96,18 @@ export default class Vector4 {
     return this;
   }
 
+  subtract(v:Vector4) {
+    this.x -= v.x;
+    this.y -= v.y;
+    this.z -= v.z;
+    this.w -= v.w;
+
+    return this;
+  }
+
+  static subtract(lv:Vector4, rv:Vector4) {
+    return new Vector4(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z, lv.w  - rv.w);
+  }
   /**
    * add value except w component（static version）
    */
