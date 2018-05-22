@@ -132,11 +132,11 @@ export default class L_CameraController extends GLBoostObject {
 
       // check if rotation angle is within range
       if (this._verticalAngleThrethold - this._verticalAngleOfVectors < this._rot_y) {
-        this._rot_y = this._verticalAngleThrethold + this._verticalAngleOfVectors;
+//        this._rot_y -= this._rot_y - (this._verticalAngleThrethold - this._verticalAngleOfVectors);
       }
 
       if (this._rot_y < -this._verticalAngleThrethold + this._verticalAngleOfVectors) {
-        this._rot_y = -this._verticalAngleThrethold - this._verticalAngleOfVectors;
+ //       this._rot_y += this._rot_y - (this._verticalAngleThrethold - this._verticalAngleOfVectors);
       }
 
       this._camaras.forEach(function (camera) {
@@ -243,7 +243,7 @@ export default class L_CameraController extends GLBoostObject {
       } else {
         verticalSign = -1;
       }
-      this._verticalAngleOfVectors *= verticalSign;
+      //this._verticalAngleOfVectors *= verticalSign;
 
     } else {
       let centerToEyeVec = Vector3.subtract(this._eyeVec, this._centerVec).multiply(this._wheel_y * 1.0/Math.tan(MathUtil.degreeToRadian(fovy/2.0)));
@@ -397,8 +397,26 @@ export default class L_CameraController extends GLBoostObject {
     return this._rot_x;
   }
 
+  set rotX(value) {
+    this._rot_x = value;
+    this._rot_bgn_x = 0;
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(true);
+      camera._needUpdateProjection();
+    });
+  }
+
   get rotY() {
     return this._rot_y;
+  }
+
+  set rotY(value) {
+    this._rot_y = value;
+    this._rot_bgn_y = 0;
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(true);
+      camera._needUpdateProjection();
+    });
   }
 
 }
