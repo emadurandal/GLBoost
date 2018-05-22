@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 26f564eb
+  // This revision is the commit right after the SHA: 287f19ed
   var global = (0, eval)('this');
 
   (function (global) {
@@ -18877,7 +18877,7 @@ return mat4(
 
     _accessBinaryWithAccessor(accessor) {
       var bufferView = accessor.bufferView;
-      var byteOffset = bufferView.byteOffset + accessor.byteOffset;
+      const byteOffset = bufferView.byteOffset + (accessor.byteOffset !== void 0 ? accessor.byteOffset : 0);
       var buffer = bufferView.buffer;
       var arrayBuffer = buffer.buffer;
 
