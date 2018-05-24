@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 43cd873f
+  // This revision is the commit right after the SHA: 3a9681f2
   var global = (0, eval)('this');
 
   (function (global) {
@@ -6187,7 +6187,24 @@ return mat4(
       return this[singleton$2];
     }
 
-    draw(gl, glem, expression, mesh, originalMaterials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+    draw(data) {
+      const gl = data.gl;
+      const glem = data.glem;
+      const expression = data.expression;
+      const mesh = data.mesh;
+      const originalMaterials = data.materials;
+      const camera = data.camera;
+      let lights = data.lights;
+      const scene = data.scene;
+      const vertices = data.vertices;
+      const vaoDic = data.vaoDic;
+      const vboDic = data.vboDic;
+      const iboArrayDic = data.iboArrayDic;
+      const geometry = data.geometry;
+      const geometryName = data.geometryName;
+      const primitiveType = data.primitiveType;
+      const vertexN = data.vertexN;
+      const renderPassIndex = data.renderPassIndex;
 
       var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -7347,15 +7364,34 @@ return mat4(
       this.setUpVertexAttribs(this._glContext.gl, glslProgram, this._getAllVertexAttribs());    
     }
 
-    draw(expression, lights, camera, mesh, scene, renderPassIndex) {
-      var gl = this._glContext.gl;
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+    draw(data) {
+      const gl = this._glContext.gl;
+      const glem = GLExtensionsManager.getInstance(this._glContext);
 
-      let materials = this._getAppropriateMaterials(mesh);
+      const materials = this._getAppropriateMaterials(data.mesh);
 
-      let thisName = this.toString();
+      const thisName = this.toString();
 
-      this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+      this._drawKicker.draw(
+        {
+          gl: gl,
+          glem: glem,
+          expression: data.expression,
+          lights: data.lights,
+          camera: data.camera,
+          mesh: data.mesh,
+          scene: data.scene,
+          renderPassIndex: data.renderPassIndex,
+          materials: materials,
+          vertices: this._vertices,
+          vaoDic: Geometry._vaoDic,
+          vboObj: this._vboObj,
+          iboArrayDic: Geometry._iboArrayDic,
+          geometry: this,
+          geometryName: thisName,
+          primitiveType: this._primitiveType,
+          vertexN: this._vertexN
+        });
 
     }
 
@@ -7718,9 +7754,15 @@ return mat4(
     }
 
 
-    draw(expression, lights, camera, mesh, scene, renderPass_index) {
-      this._currentRenderPassIndex = renderPass_index;
-      super.draw(expression, lights, camera, mesh, scene, renderPass_index);
+    draw(data) {
+      this._currentRenderPassIndex = data.renderPass_index;
+      super.draw({
+        expression: data.expression,
+        lights: data.lights,
+        camera: data.camera,
+        mesh: data.mesh,
+        scene: data.scene,
+        renderPassIndex: data.renderPassIndex});
     }
 
     prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
@@ -11608,8 +11650,17 @@ return mat4(
       */
     }
 
-    draw(expression, lights, camera, scene, renderPassIndex) {
-      this._geometry.draw(expression, lights, camera, this, scene, renderPassIndex);
+    draw(data) {
+      this._geometry.draw(
+        {
+          expression: data.expression,
+          lights: data.lights,
+          camera: data.camera,
+          scene: data.renderPass.scene,
+          renderPassIndex: data.renderPassIndex,
+          mesh: this
+        }
+      );
     }
 
     set geometry(geometry) {
@@ -13857,7 +13908,13 @@ return mat4(
         var opacityMeshes = renderPass.opacityMeshes;
         opacityMeshes.forEach((mesh)=> {
           if (mesh.isVisible) {
-            mesh.draw(expression, lights, camera, renderPass.scene, index);
+            mesh.draw({
+              expression: expression,
+              lights: lights,
+              camera: camera,
+              renderPass: renderPass,
+              renderPassIndex: index
+            });
           }
         });
 
@@ -13870,7 +13927,13 @@ return mat4(
         transparentMeshes.forEach((mesh)=> {
           //console.log(mesh.userFlavorName);
           if (mesh.isVisible) {
-            mesh.draw(expression, lights, camera, renderPass.scene, index);
+            mesh.draw({
+              expression: expression,
+              lights: lights,
+              camera: camera,
+              renderPass: renderPass,
+              renderPassIndex: index
+            });
           }
         });
   //      console.log("END!!");
@@ -13883,7 +13946,13 @@ return mat4(
         let gizmos = renderPass.gizmos;
         for (let gizmo of gizmos) {
           if (gizmo.isVisible) {
-            gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
+            gizmo.mesh.draw({
+              expression: expression,
+              lights: lights,
+              camera: camera,
+              renderPass: renderPass,
+              renderPassIndex: index
+            });
           }
         }
         this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
