@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 43cd873f
+  // This revision is the commit right after the SHA: e1670d6f
   var global = (0, eval)('this');
 
   (function (global) {
@@ -13761,6 +13761,7 @@ return mat4(
       }
 
       this.__animationFrameId = -1;
+      this.__isWebVRMode = false;
     }
 
     /**
@@ -14005,6 +14006,18 @@ return mat4(
     stopRenderLoop() {
       cancelAnimationFrame(this.__animationFrameId);
       this.__animationFrameId = -1;
+    }
+
+    enableWebVR() {
+      this.__isWebVRMode = true;
+    }
+
+    disableWebVR() {
+      this.__isWebVRMode = false;
+    }
+
+    isWebVRMode() {
+      return this.__isWebVRMode;
     }
   }
 

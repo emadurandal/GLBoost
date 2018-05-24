@@ -20,6 +20,7 @@ export default class Renderer extends GLBoostObject {
     }
 
     this.__animationFrameId = -1;
+    this.__isWebVRMode = false;
   }
 
   /**
@@ -264,5 +265,17 @@ export default class Renderer extends GLBoostObject {
   stopRenderLoop() {
     cancelAnimationFrame(this.__animationFrameId);
     this.__animationFrameId = -1;
+  }
+
+  enableWebVR() {
+    this.__isWebVRMode = true;
+  }
+
+  disableWebVR() {
+    this.__isWebVRMode = false;
+  }
+
+  isWebVRMode() {
+    return this.__isWebVRMode;
   }
 }
