@@ -18,6 +18,8 @@ export default class Renderer extends GLBoostObject {
     if (_clearColor) {
       gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
     }
+
+    this.__animationFrameId = -1;
   }
 
   /**
@@ -228,4 +230,39 @@ export default class Renderer extends GLBoostObject {
     this._glContext.canvasHeight = height;
   }
 
+  /**
+   * This method treats the given callback function as a render loop and call it every frame.
+   */
+  doRenderLoop(renderLoopFunc, ...args) {
+
+    renderLoopFunc.apply(renderLoopFunc, args);
+
+    this.__animationFrameId = requestAnimationFrame(()=>{
+      this.doRenderLoop(renderLoopFunc, ...args);
+    });
+  }
+
+  doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
+
+    if (beforeCallback) {
+      beforeCallback.apply(beforeCallback, args);
+    }
+
+    this.clearCanvas();
+    this.update(expression);
+    this.draw(expression);
+
+    if (afterCallback) {
+      afterCallback.apply(afterCallback, args);
+    }
+
+    this.__animationFrameId = requestAnimationFrame(()=>{
+      this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
+    });
+  }
+
+  stopRenderLoop() {
+    cancelAnimationFrame(this.__animationFrameId);
+    this.__animationFrameId = -1;
+  }
 }

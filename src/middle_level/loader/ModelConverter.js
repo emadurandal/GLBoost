@@ -633,7 +633,7 @@ export default class ModelConverter {
 
   _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
-    var byteOffset = bufferView.byteOffset + accessor.byteOffset;
+    const byteOffset = bufferView.byteOffset + (accessor.byteOffset !== void 0 ? accessor.byteOffset : 0);
     var buffer = bufferView.buffer;
     var arrayBuffer = buffer.buffer;
 

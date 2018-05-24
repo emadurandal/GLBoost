@@ -14,7 +14,7 @@ Use this library to spend your time doing cool stuff instead of fighting WebGL.
 
 ## Latest released revision
 
-Currently, **r1** released!
+Currently, **r3** released!
 
 ## Test Examples
 
@@ -123,25 +123,12 @@ expression.renderPasses[0].scene = scene;
 expression.prepareToRender();
 
 // rendering loop
-var render = function() {
-  // clear canvas
-  renderer.clearCanvas();
-
-  // update the expression (for example, calculation of skeletal animaiton)
-  renderer.update(expression);
-
-  // render the expression
-  renderer.draw(expression);
-
+renderer.doConvenientRenderLoop(expression, function(){
   // rotate camera
   var rotateMatrixY = GLBoost.Matrix33.rotateY(-1.0);
   rotatedVector = rotateMatrixY.multiplyVector(camera.eye);
   camera.eye = rotatedVector;
-
-  requestAnimationFrame(render);
-};
-
-render();
+});
 
 ```
 

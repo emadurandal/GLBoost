@@ -32,6 +32,7 @@ import M_ScreenMesh from './elements/meshes/M_ScreenMesh';
 
 import AnimationPlayer from '../auxiliaries/AnimationPlayer';
 import EffekseerElement from './plugins/EffekseerElement';
+import formatDetector from './loader/FormatDetector'
 
 import SPVClassicMaterial from '../low_level/materials/SPVClassicMaterial';
 import SPVLambertShader from './shaders/SPVLambertShader';
