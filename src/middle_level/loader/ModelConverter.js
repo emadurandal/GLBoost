@@ -478,10 +478,10 @@ export default class ModelConverter {
             }
 
             let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
-              'TEXTURE_MAG_FILTER': sampler.magFilter,
-              'TEXTURE_MIN_FILTER': sampler.minFilter,
-              'TEXTURE_WRAP_S': sampler.wrapS,
-              'TEXTURE_WRAP_T': sampler.wrapT,
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT,
               'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
             });
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);

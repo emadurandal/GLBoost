@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 3b31a460
+  // This revision is the commit right after the SHA: 43cd873f
   var global = (0, eval)('this');
 
   (function (global) {
@@ -18759,10 +18759,10 @@ return mat4(
               }
 
               let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
-                'TEXTURE_MAG_FILTER': sampler.magFilter,
-                'TEXTURE_MIN_FILTER': sampler.minFilter,
-                'TEXTURE_WRAP_S': sampler.wrapS,
-                'TEXTURE_WRAP_T': sampler.wrapT,
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT,
                 'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
               });
               gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
