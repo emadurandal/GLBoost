@@ -39,7 +39,10 @@ export default class M_Mesh extends M_Element {
         camera: data.camera,
         scene: data.renderPass.scene,
         renderPassIndex: data.renderPassIndex,
-        mesh: this
+        mesh: this,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData
       }
     );
   }

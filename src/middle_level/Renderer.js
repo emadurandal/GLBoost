@@ -108,21 +108,30 @@ export default class Renderer extends GLBoostObject {
       glem.drawBuffers(gl, renderPass.buffersToDraw);
       //glem.readBuffer(gl, renderPass.buffersToDraw);
 
+      let viewport = null;
       if (renderPass.viewport) {
-        gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
+        viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
       } else {
         if (camera) {
           let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
-          gl.viewport(-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight);
+          viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
         } else {
-          gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
         }
+      }
+      if (!this.isWebVRMode) {
+        gl.viewport.apply(gl, viewport);
       }
 
       this._clearBuffer(gl, renderPass);
 
+      if (this.isWebVRMode) {
+        this.__webvrDisplay.getFrameData(this.__webvrFrameData);
+      }
+
+
       // draw opacity meshes.
-      var opacityMeshes = renderPass.opacityMeshes;
+      const opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
           mesh.draw({
@@ -130,7 +139,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       });
@@ -139,7 +151,7 @@ export default class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+      const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
 //      console.log("START!!");
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
@@ -149,7 +161,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       });
@@ -168,7 +183,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       }
@@ -334,7 +352,7 @@ export default class Renderer extends GLBoostObject {
     this.__isWebVRMode = false;
   }
 
-  isWebVRMode() {
+  get isWebVRMode() {
     return this.__isWebVRMode;
   }
 }

@@ -630,7 +630,10 @@ export default class Geometry extends GLBoostObject {
         geometry: this,
         geometryName: thisName,
         primitiveType: this._primitiveType,
-        vertexN: this._vertexN
+        vertexN: this._vertexN,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData
       });
 
   }
