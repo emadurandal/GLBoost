@@ -22,9 +22,15 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
 
-  draw(expression, lights, camera, mesh, scene, renderPass_index) {
-    this._currentRenderPassIndex = renderPass_index;
-    super.draw(expression, lights, camera, mesh, scene, renderPass_index);
+  draw(data) {
+    this._currentRenderPassIndex = data.renderPass_index;
+    super.draw({
+      expression: data.expression,
+      lights: data.lights,
+      camera: data.camera,
+      mesh: data.mesh,
+      scene: data.scene,
+      renderPassIndex: data.renderPassIndex});
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {
