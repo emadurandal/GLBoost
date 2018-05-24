@@ -255,10 +255,6 @@ export default class M_Scene extends M_Group {
     return this._lights;
   }
 
-  get lightsExceptAmbient() {
-    return this._lightsExceptAmbient;
-  }
-
   /**
    * [en] Get child cameras which belong to this scene.<br>
    * [ja] このシーンに属していた子供のCamera要素の配列を返します。
