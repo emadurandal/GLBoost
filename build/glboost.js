@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: e1670d6f
+  // This revision is the commit right after the SHA: 6ba87cc8
   var global = (0, eval)('this');
 
   (function (global) {
@@ -13762,6 +13762,14 @@ return mat4(
 
       this.__animationFrameId = -1;
       this.__isWebVRMode = false;
+      this.__webvrFrameData = null;
+      this.__webvrDisplay = null;
+      this.__switchAnimationFrameFunctions(window);
+    }
+
+    __switchAnimationFrameFunctions(object) {
+      this.__requestAnimationFrame = object !== void 0 ? object.requestAnimationFrame.bind(object) : null;
+      this.__cancelAnimationFrame = object !== void 0 ? object.cancelAnimationFrame.bind(object) : null;
     }
 
     /**
@@ -13979,7 +13987,7 @@ return mat4(
 
       renderLoopFunc.apply(renderLoopFunc, args);
 
-      this.__animationFrameId = requestAnimationFrame(()=>{
+      this.__animationFrameId = this.__requestAnimationFrame(()=>{
         this.doRenderLoop(renderLoopFunc, ...args);
       });
     }
@@ -13998,21 +14006,54 @@ return mat4(
         afterCallback.apply(afterCallback, args);
       }
 
-      this.__animationFrameId = requestAnimationFrame(()=>{
+      this.__animationFrameId = this.__requestAnimationFrame(()=>{
         this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
       });
     }
 
     stopRenderLoop() {
-      cancelAnimationFrame(this.__animationFrameId);
+      this.__cancelAnimationFrame(this.__animationFrameId);
       this.__animationFrameId = -1;
     }
 
-    enableWebVR() {
+
+
+    // WebVR
+
+    async enableWebVR() {
+      if ( window.VRFrameData ) {
+        this.__webvrFrameData = new window.VRFrameData();
+      }
+
       this.__isWebVRMode = true;
+
+      return new Promise((resolve, reject)=> {
+        if ( navigator.getVRDisplays ) {
+          navigator.getVRDisplays()
+            .then((vrDisplays)=>{
+              if (vrDisplays.length > 0) {
+                const webvrDisplay = vrDisplays[0];
+                this.__switchAnimationFrameFunctions(webvrDisplay);
+                this.__webvrDisplay = webvrDisplay;
+                resolve();
+              } else {
+                console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
+                reject();
+              }
+            })
+            .catch(()=>{
+              console.error('Failed to get VR Displays. Please check your VR Setting.');
+              reject();
+            });
+        } else {
+          console.error('Your browser does not support WebVR. Or it is disabled. Check again.');
+          reject();
+        }
+      });
     }
 
     disableWebVR() {
+      this.__switchAnimationFrameFunctions(window);
       this.__isWebVRMode = false;
     }
 
