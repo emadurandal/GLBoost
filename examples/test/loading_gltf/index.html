@@ -69,17 +69,40 @@ promise.then(function(mesh) {
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
 
-  var render = function(){
-    renderer.clearCanvas();
-    renderer.draw(expression);
 
+  /// Using a GLBoost ConvenientRenderLoop version
+  renderer.doConvenientRenderLoop(expression, function() {
     var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
     camera.eye = rotatedVector;
+  });
 
-    requestAnimationFrame(render);
-  };
-  render();
+
+  /// Using a Normal GLBoost RenderLoop version
+  // renderer.doRenderLoop(function() {
+  //   renderer.clearCanvas();
+  //   renderer.draw(expression);
+  //
+  //   var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
+  //   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+  //   camera.eye = rotatedVector;
+  // });
+
+
+  /// Making manual main loop version
+  // var render = function(){
+  //   renderer.clearCanvas();
+  //   renderer.draw(expression);
+  //
+  //   var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
+  //   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+  //   camera.eye = rotatedVector;
+  //
+  //   requestAnimationFrame(render);
+  // };
+  // render();
+
+
 });
 
 </script>
