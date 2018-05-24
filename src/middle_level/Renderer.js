@@ -125,7 +125,13 @@ export default class Renderer extends GLBoostObject {
       var opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index
+          });
         }
       });
 
@@ -138,7 +144,13 @@ export default class Renderer extends GLBoostObject {
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index
+          });
         }
       });
 //      console.log("END!!");
@@ -151,7 +163,13 @@ export default class Renderer extends GLBoostObject {
       let gizmos = renderPass.gizmos;
       for (let gizmo of gizmos) {
         if (gizmo.isVisible) {
-          gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
+          gizmo.mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index
+          });
         }
       }
       this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;

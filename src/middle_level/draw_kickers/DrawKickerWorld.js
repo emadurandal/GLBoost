@@ -26,7 +26,24 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  draw(gl, glem, expression, mesh, originalMaterials, camera, lights, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
+  draw(data) {
+    const gl = data.gl;
+    const glem = data.glem;
+    const expression = data.expression;
+    const mesh = data.mesh;
+    const originalMaterials = data.materials;
+    const camera = data.camera;
+    let lights = data.lights;
+    const scene = data.scene;
+    const vertices = data.vertices;
+    const vaoDic = data.vaoDic;
+    const vboDic = data.vboDic;
+    const iboArrayDic = data.iboArrayDic;
+    const geometry = data.geometry;
+    const geometryName = data.geometryName;
+    const primitiveType = data.primitiveType;
+    const vertexN = data.vertexN;
+    const renderPassIndex = data.renderPassIndex;
 
     var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
