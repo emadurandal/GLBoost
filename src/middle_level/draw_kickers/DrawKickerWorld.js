@@ -57,13 +57,10 @@ export default class DrawKickerWorld {
   static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
     if (webvrFrameData) {
       let viewMatrix;
-//      const invertCameraWorld = new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix']);
-      let poseMatrix = null;
       if (mesh.isAffectedByViewMatrix) {
-        const invertSittingToStandingTRansform = (new Matrix44(webvrFrameData.sittingToStandingTRansform, true)).invert();
+        const invertSittingToStandingTransform = (new Matrix44(webvrFrameData.sittingToStandingTransform, true)).invert();
         const leftOrRightViewMatrix = new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-        viewMatrix = Matrix44.multiply(new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix'], true), invertSittingToStandingTRansform);
-        //viewMatrix = Matrix44.identity();
+        viewMatrix = Matrix44.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
       } else {
         viewMatrix = Matrix44.identity();
       }
@@ -75,16 +72,11 @@ export default class DrawKickerWorld {
         projectionMatrix = Matrix44.identity();
       }
 
-      //let newWorld = Matrix44.multiply(invertCameraWorld, world_m);
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      //Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', newWorld.flatten());
-      //let newNormal = Matrix44.invert(newWorld).transpose().toMatrix33();
       Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
-      //Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', newNormal.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
-//      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, newWorld).flatten());
 
       camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
     }
