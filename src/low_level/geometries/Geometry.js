@@ -393,6 +393,33 @@ export default class Geometry extends GLBoostObject {
     });
   }
 
+  setUpEnableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      }
+    });
+  }
+
+  setUpDisableAllVertexAttribArrays(gl, glslProgram) {
+
+    for (let i=0; i<8; i++) {
+      gl.disableVertexAttribArray(i);
+    }
+  }
+
+  setUpDisableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
+    var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
+
+    allVertexAttribs.forEach((attribName)=> {
+      if (optimizedVertexAttribs.indexOf(attribName) != -1) {
+        gl.disableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+      }
+    });
+  }
+
 
 
   _getVAO() {
@@ -577,15 +604,37 @@ export default class Geometry extends GLBoostObject {
     this.setUpVertexAttribs(this._glContext.gl, glslProgram, this._getAllVertexAttribs());    
   }
 
-  draw(expression, lights, camera, mesh, scene, renderPassIndex) {
-    var gl = this._glContext.gl;
-    var glem = GLExtensionsManager.getInstance(this._glContext);
+  draw(data) {
+    const gl = this._glContext.gl;
+    const glem = GLExtensionsManager.getInstance(this._glContext);
 
-    let materials = this._getAppropriateMaterials(mesh);
+    const materials = this._getAppropriateMaterials(data.mesh);
 
-    let thisName = this.toString();
+    const thisName = this.toString();
 
-    this._drawKicker.draw(gl, glem, expression, mesh, materials, camera, lights, scene, this._vertices, Geometry._vaoDic, this._vboObj, Geometry._iboArrayDic, this, thisName, this._primitiveType, this._vertexN, renderPassIndex);
+    this._drawKicker.draw(
+      {
+        gl: gl,
+        glem: glem,
+        expression: data.expression,
+        lights: data.lights,
+        camera: data.camera,
+        mesh: data.mesh,
+        scene: data.scene,
+        renderPassIndex: data.renderPassIndex,
+        materials: materials,
+        vertices: this._vertices,
+        vaoDic: Geometry._vaoDic,
+        vboObj: this._vboObj,
+        iboArrayDic: Geometry._iboArrayDic,
+        geometry: this,
+        geometryName: thisName,
+        primitiveType: this._primitiveType,
+        vertexN: this._vertexN,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData
+      });
 
   }
 

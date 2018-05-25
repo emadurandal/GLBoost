@@ -64,7 +64,6 @@ export default class GLTFLoader {
       isBlend: false,
       isDepthTest: true,
       defaultShaderClass: null,
-      statesOfElements: null,
       isAllMeshesTransparent: false,
       statesOfElements: [
         {
@@ -79,6 +78,7 @@ export default class GLTFLoader {
             }
           },
           isTransparent: true,
+          opacity: 1.0,
           shaderClass: DecalShader, // LambertShader // PhongShader
           isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
@@ -773,6 +773,37 @@ export default class GLTFLoader {
       materialJson = materialJson.extensions.KHR_materials_common;
     }
 
+
+    let enables = [];
+    if (options.isBlend) {
+      enables.push(3042);
+    }
+    if (options.isDepthTest) {
+      enables.push(2929);
+    }
+    material.states.enable = material.states.enable.concat(enables);
+
+    // Remove duplicated values
+    material.states.enable = material.states.enable.filter(function (x, i, self) {
+      return self.indexOf(x) === i;
+    });
+
+    if (options && options.statesOfElements) {
+      for (let statesInfo of options.statesOfElements) {
+        if (statesInfo.opacity) {
+          group.opacity = statesInfo.opacity;
+        }
+      }
+    }
+
+    if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+      if (material.states.functions.blendFuncSeparate === void 0) {
+        material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
+      }
+    }
+    material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+
+  
     // Diffuse Texture
     if (texcoords0AccessorStr) {
       texcoords = this._accessBinary(texcoords0AccessorStr, json, buffers, false, true);
@@ -823,13 +854,13 @@ export default class GLTFLoader {
 
                     if (isMatch) {
                       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
                           // Nothing to do because premultipling alpha is already done.
                         } else {
                           isNeededToMultiplyAlphaToColorOfTexture = true;
                         }
                       } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-                        if (options.statesOfElements.isTextureImageToLoadPreMultipliedAlpha) {
+                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
                           // TODO: Implement to Make Texture Straight.
                         } else {
                           // Nothing to do because the texture is straight.
@@ -845,28 +876,7 @@ export default class GLTFLoader {
             }
 
             material.setTexture(texture, texturePurpose);
-            material.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
-
-            let enables = [];
-            if (options.isBlend) {
-              enables.push(3042);
-            }
-            if (options.isDepthTest) {
-              enables.push(2929);
-            }
-            material.states.enable = material.states.enable.concat(enables);
-
-            // Remove duplicated values
-            material.states.enable = material.states.enable.filter(function (x, i, self) {
-              return self.indexOf(x) === i;
-            });
-
-            if (options.isBlend && options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-              if (material.states.functions.blendFuncSeparate === void 0) {
-                material.states.functions.blendFuncSeparate = [1, 771, 1, 771];
-              }
-            }
-            material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+            texture.toMultiplyAlphaToColorPreviously = isNeededToMultiplyAlphaToColorOfTexture;
           }
         }
       };

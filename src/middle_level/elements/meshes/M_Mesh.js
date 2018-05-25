@@ -31,8 +31,20 @@ export default class M_Mesh extends M_Element {
     */
   }
 
-  draw(expression, lights, camera, scene, renderPassIndex) {
-    this._geometry.draw(expression, lights, camera, this, scene, renderPassIndex);
+  draw(data) {
+    this._geometry.draw(
+      {
+        expression: data.expression,
+        lights: data.lights,
+        camera: data.camera,
+        scene: data.renderPass.scene,
+        renderPassIndex: data.renderPassIndex,
+        mesh: this,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData
+      }
+    );
   }
 
   set geometry(geometry) {

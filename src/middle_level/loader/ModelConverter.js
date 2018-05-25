@@ -69,7 +69,7 @@ export default class ModelConverter {
     let rootGroup = glBoostContext.createGroup();
     if (gltfModel.scenes[0].nodesIndices) {
       for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
-        rootGroup.addChild(groups[nodesIndex]);
+        rootGroup.addChild(groups[nodesIndex], true);
       }  
     }
 
@@ -116,12 +116,12 @@ export default class ModelConverter {
       let node = gltfModel.nodes[parseInt(node_i)];
       let parentGroup = groups[node_i];
       if (node.mesh) {
-        parentGroup.addChild(glboostMeshes[node.meshIndex]);
+        parentGroup.addChild(glboostMeshes[node.meshIndex], true);
       }
       if (node.childrenIndices) {
         for (let childNode_i of node.childrenIndices) {
           let childGroup = groups[childNode_i];
-          parentGroup.addChild(childGroup);
+          parentGroup.addChild(childGroup, true);
         }  
       }
     }
@@ -176,7 +176,7 @@ export default class ModelConverter {
           glboostJoint._glTFJointIndex = joint_i;
 //          glboostJoint.userFlavorName = nodeJson.jointName;
           let group = groups[joint_i];
-          group.addChild(glboostJoint);
+          group.addChild(glboostJoint, true);
         }
       }
     }
@@ -478,10 +478,10 @@ export default class ModelConverter {
             }
 
             let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
-              'TEXTURE_MAG_FILTER': sampler.magFilter,
-              'TEXTURE_MIN_FILTER': sampler.minFilter,
-              'TEXTURE_WRAP_S': sampler.wrapS,
-              'TEXTURE_WRAP_T': sampler.wrapT,
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT,
               'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
             });
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
@@ -633,7 +633,7 @@ export default class ModelConverter {
 
   _accessBinaryWithAccessor(accessor) {
     var bufferView = accessor.bufferView;
-    var byteOffset = bufferView.byteOffset + accessor.byteOffset;
+    const byteOffset = bufferView.byteOffset + (accessor.byteOffset !== void 0 ? accessor.byteOffset : 0);
     var buffer = bufferView.buffer;
     var arrayBuffer = buffer.buffer;
 

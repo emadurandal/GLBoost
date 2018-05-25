@@ -17,7 +17,13 @@
 <main>
   <canvas id="world" width="600" height="600"></canvas>
 </main>
+<a href="#" class="enter-web-vr" style="display: none;">Enter WebVR</a>
 <script>
+
+document.querySelector('.enter-web-vr').addEventListener('click', ()=>{
+  renderer.enterWebVR();
+});
+
 
 var arg = new Object;
 var pair = location.search.substring(1).split('&');
@@ -59,9 +65,10 @@ scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/teapot/teapot.gltf', null);
-promise.then(function(mesh) {
+promise.then(async function(mesh) {
   console.log(mesh);
 
+  mesh.scale = new GLBoost.Vector3(0.1, 0.1, 0.1);
   scene.addChild( mesh );
   window.mesh = mesh;
 
@@ -69,17 +76,44 @@ promise.then(function(mesh) {
   expression.renderPasses[0].scene = scene;
   expression.prepareToRender();
 
-  var render = function(){
-    renderer.clearCanvas();
-    renderer.draw(expression);
 
+//  await renderer.enableWebVR().catch(()=>{});
+  //await renderer.disableWebVR();
+
+  /// Using a GLBoost ConvenientRenderLoop version
+  renderer.doConvenientRenderLoop(expression, function() {
     var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+    //camera.eye = rotatedVector;
+    window.mesh.rotate = new GLBoost.Vector3(0, (window.mesh.rotate.y)+1, 0);
+  });
 
-    requestAnimationFrame(render);
-  };
-  render();
+
+  /// Using a Normal GLBoost RenderLoop version
+  // renderer.doRenderLoop(function() {
+  //   renderer.clearCanvas();
+  //   renderer.draw(expression);
+  //
+  //   var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
+  //   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+  //   camera.eye = rotatedVector;
+  // });
+
+
+  /// Making manual main loop version
+  // var render = function(){
+  //   renderer.clearCanvas();
+  //   renderer.draw(expression);
+  //
+  //   var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
+  //   var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+  //   camera.eye = rotatedVector;
+  //
+  //   requestAnimationFrame(render);
+  // };
+  // render();
+
+  renderer.readyForWebVR(document.querySelector('.enter-web-vr'));
 });
 
 </script>

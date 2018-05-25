@@ -1,6 +1,7 @@
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import GLBoostObject from '../low_level/core/GLBoostObject';
-import M_SkeletalMesh from './elements/meshes/M_SkeletalMesh';
+import Matrix44 from '../low_level/math/Matrix44';
+import Vector3 from '../low_level/math/Vector3';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -18,6 +19,19 @@ export default class Renderer extends GLBoostObject {
     if (_clearColor) {
       gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
     }
+
+    this.__animationFrameId = -1;
+    this.__isWebVRMode = false;
+    this.__webvrFrameData = null;
+    this.__webvrDisplay = null;
+    this.__switchAnimationFrameFunctions(window);
+    this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
+    this.__requestedToEnterWebVR = false;
+  }
+
+  __switchAnimationFrameFunctions(object) {
+    this.__requestAnimationFrame = object !== void 0 ? object.requestAnimationFrame.bind(object) : null;
+    this.__cancelAnimationFrame = object !== void 0 ? object.cancelAnimationFrame.bind(object) : null;
   }
 
   /**
@@ -97,24 +111,49 @@ export default class Renderer extends GLBoostObject {
       glem.drawBuffers(gl, renderPass.buffersToDraw);
       //glem.readBuffer(gl, renderPass.buffersToDraw);
 
+      let viewport = null;
       if (renderPass.viewport) {
-        gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
+        viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
       } else {
-        if (camera) {
+        if (this.isWebVRMode) {
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
+        } else if (camera) {
           let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
-          gl.viewport(-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight);
+          viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
         } else {
-          gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
         }
+      }
+      if (!this.isWebVRMode) {
+        gl.viewport.apply(gl, viewport);
       }
 
       this._clearBuffer(gl, renderPass);
 
+      if (this.isWebVRMode) {
+        this.__webvrDisplay.getFrameData(this.__webvrFrameData);
+        if (this.__webvrDisplay.stageParameters) {
+          this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+        } else {
+          this.__webvrFrameData.sittingToStandingTransform = Matrix44.translate(this.__defaultUserSittingPositionInVR).flatten();
+        }
+      }
+
+
       // draw opacity meshes.
-      var opacityMeshes = renderPass.opacityMeshes;
+      const opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
+          });
         }
       });
 
@@ -122,12 +161,21 @@ export default class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+      const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
 //      console.log("START!!");
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
-          mesh.draw(expression, lights, camera, renderPass.scene, index);
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
+          });
         }
       });
 //      console.log("END!!");
@@ -140,7 +188,16 @@ export default class Renderer extends GLBoostObject {
       let gizmos = renderPass.gizmos;
       for (let gizmo of gizmos) {
         if (gizmo.isVisible) {
-          gizmo.mesh.draw(expression, lights, camera, renderPass.scene, index);
+          gizmo.mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
+          });
         }
       }
       this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
@@ -156,6 +213,10 @@ export default class Renderer extends GLBoostObject {
       }
 
       renderPass.postRender(camera ? true:false, lights);
+
+      if (this.isWebVRMode) {
+        this.__webvrDisplay.submitFrame();
+      }
 
     });
   }
@@ -228,4 +289,116 @@ export default class Renderer extends GLBoostObject {
     this._glContext.canvasHeight = height;
   }
 
+  /**
+   * This method treats the given callback function as a render loop and call it every frame.
+   */
+  doRenderLoop(renderLoopFunc, ...args) {
+
+    renderLoopFunc.apply(renderLoopFunc, args);
+
+    this.__animationFrameId = this.__requestAnimationFrame(()=>{
+      this.doRenderLoop(renderLoopFunc, ...args);
+      if (this.__requestedToEnterWebVR) {
+        this.__isWebVRMode = true;
+      }
+    });
+  }
+
+  doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
+
+    if (beforeCallback) {
+      beforeCallback.apply(beforeCallback, args);
+    }
+
+    this.clearCanvas();
+    this.update(expression);
+    this.draw(expression);
+
+    if (afterCallback) {
+      afterCallback.apply(afterCallback, args);
+    }
+
+    this.__animationFrameId = this.__requestAnimationFrame(()=>{
+      this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
+      if (this.__requestedToEnterWebVR) {
+        this.__isWebVRMode = true;
+      }
+    });
+  }
+
+  stopRenderLoop() {
+    this.__cancelAnimationFrame(this.__animationFrameId);
+    this.__animationFrameId = -1;
+  }
+
+
+
+  // WebVR
+  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+    if (initialUserSittingPositionIfStageParametersDoNotExist) {
+      this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
+    }
+    return new Promise((resolve, reject)=> {
+      this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
+        this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+        const leftEye = this.__webvrDisplay.getEyeParameters("left");
+        const rightEye = this.__webvrDisplay.getEyeParameters("right");
+        this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+        this.__requestedToEnterWebVR = true;
+        resolve();
+      }).catch(() => {
+        console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+        reject();
+      });
+    });
+  }
+
+  async readyForWebVR(requestButtonDom) {
+    if ( window.VRFrameData ) {
+      this.__webvrFrameData = new window.VRFrameData();
+    }
+
+    return new Promise((resolve, reject)=> {
+      if ( navigator.getVRDisplays ) {
+        navigator.getVRDisplays()
+          .then((vrDisplays)=>{
+            if (vrDisplays.length > 0) {
+              const webvrDisplay = vrDisplays[vrDisplays.length - 1];
+              webvrDisplay.depthNear = 0.01;
+              webvrDisplay.depthFar = 10000;
+
+              if (webvrDisplay.capabilities.canPresent) {
+                this.__webvrDisplay = webvrDisplay;
+                requestButtonDom.style.display = 'block';
+                resolve();
+              } else {
+                console.error("Can't requestPresent now. try again.");
+                reject();
+              }
+            } else {
+              console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
+              reject();
+            }
+          })
+          .catch(()=>{
+            console.error('Failed to get VR Displays. Please check your VR Setting.');
+            reject();
+          });
+      } else {
+        console.error('Your browser does not support WebVR. Or it is disabled. Check again.');
+        reject();
+      }
+    });
+  }
+
+  disableWebVR() {
+    this.__switchAnimationFrameFunctions(window);
+    this.__webvrDisplay = null;
+    this.__isWebVRMode = false;
+    this.__requestedToEnterWebVR = false;
+  }
+
+  get isWebVRMode() {
+    return this.__isWebVRMode;
+  }
 }
