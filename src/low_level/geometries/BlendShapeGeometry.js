@@ -30,7 +30,10 @@ export default class BlendShapeGeometry extends Geometry {
       camera: data.camera,
       mesh: data.mesh,
       scene: data.scene,
-      renderPassIndex: data.renderPassIndex});
+      renderPassIndex: data.renderPassIndex,
+      viewport: data.viewport,
+      isWebVRMode: data.isWebVRMode,
+      webvrFrameData: data.webvrFrameData});
   }
 
   prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh) {

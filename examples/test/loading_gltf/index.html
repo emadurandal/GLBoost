@@ -17,7 +17,13 @@
 <main>
   <canvas id="world" width="600" height="600"></canvas>
 </main>
+<a href="#" class="enter-web-vr">Enter WebVR (If requestPresent() was failed, try click again only once.)</a>
 <script>
+
+  document.querySelector('.enter-web-vr').addEventListener('click', ()=>{
+    renderer.enableWebVR();
+  });
+
 
 var arg = new Object;
 var pair = location.search.substring(1).split('&');
@@ -59,9 +65,10 @@ scene.addChild( camera );
 
 var glTFLoader = GLBoost.GLTFLoader.getInstance();
 var promise = glTFLoader.loadGLTF(glBoostContext, 'resources/teapot/teapot.gltf', null);
-promise.then(function(mesh) {
+promise.then(async function(mesh) {
   console.log(mesh);
 
+  mesh.scale = new GLBoost.Vector3(0.1, 0.1, 0.1);
   scene.addChild( mesh );
   window.mesh = mesh;
 
@@ -70,11 +77,15 @@ promise.then(function(mesh) {
   expression.prepareToRender();
 
 
+//  await renderer.enableWebVR().catch(()=>{});
+  //await renderer.disableWebVR();
+
   /// Using a GLBoost ConvenientRenderLoop version
   renderer.doConvenientRenderLoop(expression, function() {
     var rotateMatrix = GLBoost.Matrix33.rotateY(-1.0);
     var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
-    camera.eye = rotatedVector;
+    //camera.eye = rotatedVector;
+    window.mesh.rotate = new GLBoost.Vector3(0, (window.mesh.rotate.y)+1, 0);
   });
 
 

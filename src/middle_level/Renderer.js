@@ -20,6 +20,15 @@ export default class Renderer extends GLBoostObject {
     }
 
     this.__animationFrameId = -1;
+    this.__isWebVRMode = false;
+    this.__webvrFrameData = null;
+    this.__webvrDisplay = null;
+    this.__switchAnimationFrameFunctions(window);
+  }
+
+  __switchAnimationFrameFunctions(object) {
+    this.__requestAnimationFrame = object !== void 0 ? object.requestAnimationFrame.bind(object) : null;
+    this.__cancelAnimationFrame = object !== void 0 ? object.cancelAnimationFrame.bind(object) : null;
   }
 
   /**
@@ -99,21 +108,33 @@ export default class Renderer extends GLBoostObject {
       glem.drawBuffers(gl, renderPass.buffersToDraw);
       //glem.readBuffer(gl, renderPass.buffersToDraw);
 
+      let viewport = null;
       if (renderPass.viewport) {
-        gl.viewport(renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w)
+        viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
       } else {
-        if (camera) {
+        if (this.isWebVRMode) {
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
+        } else if (camera) {
           let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
-          gl.viewport(-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight);
+          viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
         } else {
-          gl.viewport(0, 0, glContext.canvasWidth, glContext.canvasHeight);
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
         }
+      }
+      if (!this.isWebVRMode) {
+        gl.viewport.apply(gl, viewport);
       }
 
       this._clearBuffer(gl, renderPass);
 
+      if (this.isWebVRMode) {
+        this.__webvrDisplay.getFrameData(this.__webvrFrameData);
+        this.__webvrFrameData.sitingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+      }
+
+
       // draw opacity meshes.
-      var opacityMeshes = renderPass.opacityMeshes;
+      const opacityMeshes = renderPass.opacityMeshes;
       opacityMeshes.forEach((mesh)=> {
         if (mesh.isVisible) {
           mesh.draw({
@@ -121,7 +142,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       });
@@ -130,7 +154,7 @@ export default class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      var transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+      const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
 //      console.log("START!!");
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
@@ -140,7 +164,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       });
@@ -159,7 +186,10 @@ export default class Renderer extends GLBoostObject {
             lights: lights,
             camera: camera,
             renderPass: renderPass,
-            renderPassIndex: index
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
           });
         }
       }
@@ -176,6 +206,10 @@ export default class Renderer extends GLBoostObject {
       }
 
       renderPass.postRender(camera ? true:false, lights);
+
+      if (this.isWebVRMode) {
+        this.__webvrDisplay.submitFrame();
+      }
 
     });
   }
@@ -255,8 +289,11 @@ export default class Renderer extends GLBoostObject {
 
     renderLoopFunc.apply(renderLoopFunc, args);
 
-    this.__animationFrameId = requestAnimationFrame(()=>{
+    this.__animationFrameId = this.__requestAnimationFrame(()=>{
       this.doRenderLoop(renderLoopFunc, ...args);
+      if (this.__webvrDisplay) {
+        this.__isWebVRMode = true;
+      }
     });
   }
 
@@ -274,13 +311,72 @@ export default class Renderer extends GLBoostObject {
       afterCallback.apply(afterCallback, args);
     }
 
-    this.__animationFrameId = requestAnimationFrame(()=>{
+    this.__animationFrameId = this.__requestAnimationFrame(()=>{
       this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
+      if (this.__webvrDisplay) {
+        this.__isWebVRMode = true;
+      }
     });
   }
 
   stopRenderLoop() {
-    cancelAnimationFrame(this.__animationFrameId);
+    this.__cancelAnimationFrame(this.__animationFrameId);
     this.__animationFrameId = -1;
+  }
+
+
+
+  // WebVR
+
+  async enableWebVR() {
+    if ( window.VRFrameData ) {
+      this.__webvrFrameData = new window.VRFrameData();
+    }
+
+    return new Promise((resolve, reject)=> {
+      if ( navigator.getVRDisplays ) {
+        navigator.getVRDisplays()
+          .then((vrDisplays)=>{
+            if (vrDisplays.length > 0) {
+              const webvrDisplay = vrDisplays[0];
+              webvrDisplay.depthNear = 0.01;
+              webvrDisplay.depthFar = 10000;
+              const leftEye = webvrDisplay.getEyeParameters("left");
+              const rightEye = webvrDisplay.getEyeParameters("right");
+              this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+
+              window.addEventListener('vrdisplayactivate', this.enableWebVR.bind(this));
+              webvrDisplay.requestPresent([{ source: this._glContext.canvas }]).then(() => {
+                this.__switchAnimationFrameFunctions(webvrDisplay);
+                this.__webvrDisplay = webvrDisplay;
+                resolve();
+              }).catch(()=>{
+                console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+                reject();
+              });
+            } else {
+              console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
+              reject();
+            }
+          })
+          .catch(()=>{
+            console.error('Failed to get VR Displays. Please check your VR Setting.');
+            reject();
+          });
+      } else {
+        console.error('Your browser does not support WebVR. Or it is disabled. Check again.');
+        reject();
+      }
+    });
+  }
+
+  disableWebVR() {
+    this.__switchAnimationFrameFunctions(window);
+    this.__webvrDisplay = null;
+    this.__isWebVRMode = false;
+  }
+
+  get isWebVRMode() {
+    return this.__isWebVRMode;
   }
 }
