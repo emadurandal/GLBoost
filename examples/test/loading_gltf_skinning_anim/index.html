@@ -38,7 +38,7 @@
 
   var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
 
-  var renderer = glBoostContext.createRenderer({ clearColor: {red:0.5, green:0.2, blue:0.4, alpha:0.5}});
+  var renderer = glBoostContext.createRenderer({ clearColor: {red:0.3, green:0.4, blue:0.7, alpha:1.0}});
 
   var scene = glBoostContext.createScene();
 
@@ -56,7 +56,7 @@
   var axisGizmo = glBoostContext.createAxisGizmo(1);
   scene.addChild(axisGizmo);
 
-  var gridGizmo = glBoostContext.createGridGizmo(3, 4, true, false, true, new GLBoost.Vector4(1, 1, 1, 1));
+  var gridGizmo = glBoostContext.createGridGizmo(3, 4, true, false, false, new GLBoost.Vector4(1, 1, 1, 1));
   scene.addChild(gridGizmo);
 
   var camera = glBoostContext.createPerspectiveCamera(
