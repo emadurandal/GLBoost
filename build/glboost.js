@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: bbc3ad71
+  // This revision is the commit right after the SHA: 34152106
   var global = (0, eval)('this');
 
   (function (global) {
@@ -13882,6 +13882,7 @@ return mat4(
       this.__webvrFrameData = null;
       this.__webvrDisplay = null;
       this.__switchAnimationFrameFunctions(window);
+      this.__defaultUserHeightInVR = 1.6;
     }
 
     __switchAnimationFrameFunctions(object) {
@@ -13987,7 +13988,11 @@ return mat4(
 
         if (this.isWebVRMode) {
           this.__webvrDisplay.getFrameData(this.__webvrFrameData);
-          this.__webvrFrameData.sitingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+          if (this.__webvrDisplay.stageParameters) {
+            this.__webvrFrameData.sitingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+          } else {
+            this.__webvrFrameData.sitingToStandingTransform = Matrix44.translate(0, this.__defaultUserHeightInVR, 0);
+          }
         }
 
 
