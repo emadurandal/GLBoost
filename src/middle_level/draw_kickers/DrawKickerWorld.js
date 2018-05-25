@@ -26,7 +26,7 @@ export default class DrawKickerWorld {
     return this[singleton];
   }
 
-  static setCamera(glslProgram, material, world_m, camera, mesh) {
+  static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
     if (camera) {
       let viewMatrix;
       if (mesh.isAffectedByViewMatrix) {
@@ -44,6 +44,8 @@ export default class DrawKickerWorld {
         projectionMatrix = Matrix44.identity();
       }
 
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
@@ -52,25 +54,37 @@ export default class DrawKickerWorld {
     }
   }
 
-  static setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, leftOrRight) {
-    if (camera) {
+  static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
+    if (webvrFrameData) {
       let viewMatrix;
+//      const invertCameraWorld = new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix']);
+      let poseMatrix = null;
       if (mesh.isAffectedByViewMatrix) {
-        viewMatrix = webvrFrameData[leftOrRight + 'ViewMatrix'];
+        const invertSittingToStandingTRansform = (new Matrix44(webvrFrameData.sittingToStandingTRansform, true)).invert();
+        const leftOrRightViewMatrix = new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
+        viewMatrix = Matrix44.multiply(new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix'], true), invertSittingToStandingTRansform);
+        //viewMatrix = Matrix44.identity();
       } else {
         viewMatrix = Matrix44.identity();
       }
 
       let projectionMatrix;
       if (mesh.isAffectedByProjectionMatrix) {
-        projectionMatrix = webvrFrameData[leftOrRight + 'ProjectionMatrix'];
+        projectionMatrix = new Matrix44(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
       } else {
         projectionMatrix = Matrix44.identity();
       }
 
+      //let newWorld = Matrix44.multiply(invertCameraWorld, world_m);
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      //Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', newWorld.flatten());
+      //let newNormal = Matrix44.invert(newWorld).transpose().toMatrix33();
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+      //Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', newNormal.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
+//      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, newWorld).flatten());
 
       camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
     }
@@ -149,10 +163,6 @@ export default class DrawKickerWorld {
         normal_m = Matrix33.identity();
       }
 
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
-
-
       if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
         lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
         
@@ -215,16 +225,18 @@ export default class DrawKickerWorld {
 
       if (isWebVRMode) {
         // Left Eye
-        gl.viewport.apply(gl, [viewport.x, viewport.y, viewport.z * 0.5, viewport.w]);
-        DrawKickerWorld.setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, 'left');
+ //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+
+        gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
+        DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
         DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
         // Right Eye
-        gl.viewport.apply(gl, [viewport.z * 0.5, viewport.y, viewport.z * 0.5, viewport.w]);
-        DrawKickerWorld.setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, 'right');
+        gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
+        DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
         DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
       } else {
-        DrawKickerWorld.setCamera(glslProgram, material, world_m, camera, mesh);
+        DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
         DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
       }
 

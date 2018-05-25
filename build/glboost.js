@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 48d9ab69
+  // This revision is the commit right after the SHA: e4a5bded
   var global = (0, eval)('this');
 
   (function (global) {
@@ -6187,7 +6187,7 @@ return mat4(
       return this[singleton$2];
     }
 
-    static setCamera(glslProgram, material, world_m, camera, mesh) {
+    static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
       if (camera) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
@@ -6205,6 +6205,8 @@ return mat4(
           projectionMatrix = Matrix44$2.identity();
         }
 
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+        Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
@@ -6213,25 +6215,35 @@ return mat4(
       }
     }
 
-    static setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, leftOrRight) {
-      if (camera) {
+    static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
+      if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
-          viewMatrix = webvrFrameData[leftOrRight + 'ViewMatrix'];
+          const invertSittingToStandingTRansform = (new Matrix44$2(webvrFrameData.sittingToStandingTRansform, true)).invert();
+          const leftOrRightViewMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
+          viewMatrix = Matrix44$2.multiply(new Matrix44$2(webvrFrameData[leftOrRight + 'ViewMatrix'], true), invertSittingToStandingTRansform);
+          //viewMatrix = Matrix44.identity();
         } else {
           viewMatrix = Matrix44$2.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
-          projectionMatrix = webvrFrameData[leftOrRight + 'ProjectionMatrix'];
+          projectionMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
         } else {
           projectionMatrix = Matrix44$2.identity();
         }
 
+        //let newWorld = Matrix44.multiply(invertCameraWorld, world_m);
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+        //Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', newWorld.flatten());
+        //let newNormal = Matrix44.invert(newWorld).transpose().toMatrix33();
+        Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+        //Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', newNormal.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+  //      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, newWorld).flatten());
 
         camera._lastPVMatrixFromLight = Matrix44$2.multiply(projectionMatrix, viewMatrix);
       }
@@ -6310,10 +6322,6 @@ return mat4(
           normal_m = Matrix33.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-        Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
-
-
         if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
           lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
           
@@ -6374,16 +6382,18 @@ return mat4(
 
         if (isWebVRMode) {
           // Left Eye
-          gl.viewport.apply(gl, [viewport.x, viewport.y, viewport.z * 0.5, viewport.w]);
-          DrawKickerWorld.setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, 'left');
+   //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+
+          gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
+          DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
           DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
           // Right Eye
-          gl.viewport.apply(gl, [viewport.z * 0.5, viewport.y, viewport.z * 0.5, viewport.w]);
-          DrawKickerWorld.setVRCamera(glslProgram, material, world_m, webvrFrameData, mesh, 'right');
+          gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
+          DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
           DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
         } else {
-          DrawKickerWorld.setCamera(glslProgram, material, world_m, camera, mesh);
+          DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
           DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
         }
 
@@ -13960,7 +13970,9 @@ return mat4(
         if (renderPass.viewport) {
           viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
         } else {
-          if (camera) {
+          if (this.isWebVRMode) {
+            viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
+          } else if (camera) {
             let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
             viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
           } else {
@@ -13975,6 +13987,7 @@ return mat4(
 
         if (this.isWebVRMode) {
           this.__webvrDisplay.getFrameData(this.__webvrFrameData);
+          this.__webvrFrameData.sitingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
         }
 
 
@@ -14051,6 +14064,10 @@ return mat4(
         }
 
         renderPass.postRender(camera ? true:false, lights);
+
+        if (this.isWebVRMode) {
+          this.__webvrDisplay.submitFrame();
+        }
 
       });
     }
@@ -14132,6 +14149,9 @@ return mat4(
 
       this.__animationFrameId = this.__requestAnimationFrame(()=>{
         this.doRenderLoop(renderLoopFunc, ...args);
+        if (this.__webvrDisplay) {
+          this.__isWebVRMode = true;
+        }
       });
     }
 
@@ -14151,6 +14171,9 @@ return mat4(
 
       this.__animationFrameId = this.__requestAnimationFrame(()=>{
         this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
+        if (this.__webvrDisplay) {
+          this.__isWebVRMode = true;
+        }
       });
     }
 
@@ -14168,17 +14191,27 @@ return mat4(
         this.__webvrFrameData = new window.VRFrameData();
       }
 
-      this.__isWebVRMode = true;
-
       return new Promise((resolve, reject)=> {
         if ( navigator.getVRDisplays ) {
           navigator.getVRDisplays()
             .then((vrDisplays)=>{
               if (vrDisplays.length > 0) {
                 const webvrDisplay = vrDisplays[0];
-                this.__switchAnimationFrameFunctions(webvrDisplay);
-                this.__webvrDisplay = webvrDisplay;
-                resolve();
+                webvrDisplay.depthNear = 0.01;
+                webvrDisplay.depthFar = 10000;
+                const leftEye = webvrDisplay.getEyeParameters("left");
+                const rightEye = webvrDisplay.getEyeParameters("right");
+                this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+
+                window.addEventListener('vrdisplayactivate', this.enableWebVR.bind(this));
+                webvrDisplay.requestPresent([{ source: this._glContext.canvas }]).then(() => {
+                  this.__switchAnimationFrameFunctions(webvrDisplay);
+                  this.__webvrDisplay = webvrDisplay;
+                  resolve();
+                }).catch(()=>{
+                  console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+                  reject();
+                });
               } else {
                 console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
                 reject();
@@ -14197,6 +14230,7 @@ return mat4(
 
     disableWebVR() {
       this.__switchAnimationFrameFunctions(window);
+      this.__webvrDisplay = null;
       this.__isWebVRMode = false;
     }
 
