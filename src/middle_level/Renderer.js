@@ -25,6 +25,7 @@ export default class Renderer extends GLBoostObject {
     this.__webvrDisplay = null;
     this.__switchAnimationFrameFunctions(window);
     this.__defaultUserHeightInVR = 1.6;
+    this.__requestedToEnterWebVR = false;
   }
 
   __switchAnimationFrameFunctions(object) {
@@ -296,7 +297,7 @@ export default class Renderer extends GLBoostObject {
 
     this.__animationFrameId = this.__requestAnimationFrame(()=>{
       this.doRenderLoop(renderLoopFunc, ...args);
-      if (this.__webvrDisplay) {
+      if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
       }
     });
@@ -318,7 +319,7 @@ export default class Renderer extends GLBoostObject {
 
     this.__animationFrameId = this.__requestAnimationFrame(()=>{
       this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
-      if (this.__webvrDisplay) {
+      if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
       }
     });
@@ -332,8 +333,23 @@ export default class Renderer extends GLBoostObject {
 
 
   // WebVR
+  async enterWebVR() {
+    return new Promise((resolve, reject)=> {
+      this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
+        this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+        const leftEye = this.__webvrDisplay.getEyeParameters("left");
+        const rightEye = this.__webvrDisplay.getEyeParameters("right");
+        this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+        this.__requestedToEnterWebVR = true;
+        resolve();
+      }).catch(() => {
+        console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+        reject();
+      });
+    });
+  }
 
-  async enableWebVR() {
+  async readyForWebVR(requestButtonDom) {
     if ( window.VRFrameData ) {
       this.__webvrFrameData = new window.VRFrameData();
     }
@@ -343,22 +359,18 @@ export default class Renderer extends GLBoostObject {
         navigator.getVRDisplays()
           .then((vrDisplays)=>{
             if (vrDisplays.length > 0) {
-              const webvrDisplay = vrDisplays[0];
+              const webvrDisplay = vrDisplays[vrDisplays.length - 1];
               webvrDisplay.depthNear = 0.01;
               webvrDisplay.depthFar = 10000;
-              const leftEye = webvrDisplay.getEyeParameters("left");
-              const rightEye = webvrDisplay.getEyeParameters("right");
-              this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
 
-              window.addEventListener('vrdisplayactivate', this.enableWebVR.bind(this));
-              webvrDisplay.requestPresent([{ source: this._glContext.canvas }]).then(() => {
-                this.__switchAnimationFrameFunctions(webvrDisplay);
+              if (webvrDisplay.capabilities.canPresent) {
                 this.__webvrDisplay = webvrDisplay;
+                requestButtonDom.style.display = 'block';
                 resolve();
-              }).catch(()=>{
-                console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+              } else {
+                console.error("Can't requestPresent now. try again.");
                 reject();
-              });
+              }
             } else {
               console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
               reject();
@@ -379,6 +391,7 @@ export default class Renderer extends GLBoostObject {
     this.__switchAnimationFrameFunctions(window);
     this.__webvrDisplay = null;
     this.__isWebVRMode = false;
+    this.__requestedToEnterWebVR = false;
   }
 
   get isWebVRMode() {

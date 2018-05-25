@@ -18,12 +18,12 @@
 <main>
   <canvas id="world" width="600" height="600"></canvas>
 </main>
-<a href="#" class="enter-web-vr">Enter WebVR (If requestPresent() was failed, try click again only once.)</a>
+<a href="#" class="enter-web-vr" style="display: none;">Enter WebVR</a>
 <script>
 
   document.querySelector('.enter-web-vr').addEventListener('click', ()=>{
     window.model.scale = new GLBoost.Vector3(0.3,0.3,0.3);
-    renderer.enableWebVR();
+    renderer.enterWebVR();
   });
 
   var arg = new Object;
@@ -133,6 +133,8 @@
       camera.eye = rotatedVector;
 
     });
+
+    renderer.readyForWebVR(document.querySelector('.enter-web-vr'));
   });
 </script>
 </body>

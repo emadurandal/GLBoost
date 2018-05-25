@@ -17,12 +17,12 @@
 <main>
   <canvas id="world" width="600" height="600"></canvas>
 </main>
-<a href="#" class="enter-web-vr">Enter WebVR (If requestPresent() was failed, try click again only once.)</a>
+<a href="#" class="enter-web-vr" style="display: none;">Enter WebVR</a>
 <script>
 
-  document.querySelector('.enter-web-vr').addEventListener('click', ()=>{
-    renderer.enableWebVR();
-  });
+document.querySelector('.enter-web-vr').addEventListener('click', ()=>{
+  renderer.enterWebVR();
+});
 
 
 var arg = new Object;
@@ -113,7 +113,7 @@ promise.then(async function(mesh) {
   // };
   // render();
 
-
+  renderer.readyForWebVR(document.querySelector('.enter-web-vr'));
 });
 
 </script>
