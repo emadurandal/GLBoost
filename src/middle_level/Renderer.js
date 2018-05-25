@@ -1,6 +1,7 @@
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import GLBoostObject from '../low_level/core/GLBoostObject';
-import M_SkeletalMesh from './elements/meshes/M_SkeletalMesh';
+import Matrix44 from '../low_level/math/Matrix44';
+import Vector3 from '../low_level/math/Vector3';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -24,7 +25,7 @@ export default class Renderer extends GLBoostObject {
     this.__webvrFrameData = null;
     this.__webvrDisplay = null;
     this.__switchAnimationFrameFunctions(window);
-    this.__defaultUserHeightInVR = 1.6;
+    this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
     this.__requestedToEnterWebVR = false;
   }
 
@@ -132,9 +133,9 @@ export default class Renderer extends GLBoostObject {
       if (this.isWebVRMode) {
         this.__webvrDisplay.getFrameData(this.__webvrFrameData);
         if (this.__webvrDisplay.stageParameters) {
-          this.__webvrFrameData.sitingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+          this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
         } else {
-          this.__webvrFrameData.sitingToStandingTransform = Matrix44.translate(0, this.__defaultUserHeightInVR, 0);
+          this.__webvrFrameData.sittingToStandingTransform = Matrix44.translate(this.__defaultUserSittingPositionInVR).flatten();
         }
       }
 
@@ -333,7 +334,10 @@ export default class Renderer extends GLBoostObject {
 
 
   // WebVR
-  async enterWebVR() {
+  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+    if (initialUserSittingPositionIfStageParametersDoNotExist) {
+      this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
+    }
     return new Promise((resolve, reject)=> {
       this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
         this.__switchAnimationFrameFunctions(this.__webvrDisplay);
