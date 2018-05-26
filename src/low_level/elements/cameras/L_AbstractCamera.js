@@ -11,8 +11,12 @@ export default class L_AbstractCamera extends L_Element {
     }
 
     this._translate = lookat.eye;
+    this._translateInner = super.translate.clone();
     this._center = lookat.center;
     this._up = lookat.up;
+    this._upInner = lookat.up;
+    this._centerInner = this._up.clone();
+
 
     this._cameraController = null;
 
