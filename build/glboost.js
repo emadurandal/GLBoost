@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: 7f85da07
+  // This revision is the commit right after the SHA: f94ae8d8
   var global = (0, eval)('this');
 
   (function (global) {
@@ -9035,8 +9035,12 @@ return mat4(
       }
 
       this._translate = lookat.eye;
+      this._translateInner = super.translate.clone();
       this._center = lookat.center;
       this._up = lookat.up;
+      this._upInner = lookat.up;
+      this._centerInner = this._up.clone();
+
 
       this._cameraController = null;
 
