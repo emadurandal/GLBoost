@@ -96,7 +96,14 @@ export default class GLTFLoader {
     }
 
 
-    let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
+    let defaultShader = null;
+    if (options && typeof options.defaultShaderClass !== "undefined") {
+      if (typeof options.defaultShaderClass === "string") {
+        defaultShader = GLBoost[options.defaultShaderClass];
+      } else {
+        defaultShader = options.defaultShaderClass;
+      }
+    }
 
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
