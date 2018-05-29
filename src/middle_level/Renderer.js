@@ -27,6 +27,7 @@ export default class Renderer extends GLBoostObject {
     this.__switchAnimationFrameFunctions(window);
     this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
     this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
   }
 
   __switchAnimationFrameFunctions(object) {
@@ -214,10 +215,6 @@ export default class Renderer extends GLBoostObject {
 
       renderPass.postRender(camera ? true:false, lights);
 
-      if (this.isWebVRMode) {
-        this.__webvrDisplay.submitFrame();
-      }
-
     });
   }
 
@@ -318,6 +315,10 @@ export default class Renderer extends GLBoostObject {
       afterCallback.apply(afterCallback, args);
     }
 
+    if (this.isWebVRMode) {
+      this.__webvrDisplay.submitFrame();
+    }
+
     this.__animationFrameId = this.__requestAnimationFrame(()=>{
       this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
       if (this.__requestedToEnterWebVR) {
@@ -369,7 +370,24 @@ export default class Renderer extends GLBoostObject {
 
               if (webvrDisplay.capabilities.canPresent) {
                 this.__webvrDisplay = webvrDisplay;
-                requestButtonDom.style.display = 'block';
+
+                if (requestButtonDom) {
+                  requestButtonDom.style.display = 'block';
+                } else {
+                  const paragrach = document.createElement("p");
+                  const anchor = document.createElement("a");
+                  anchor.setAttribute("id", 'enter-vr');
+                  const enterVr = document.createTextNode("Enter VR");
+
+                  anchor.appendChild(enterVr);
+                  paragrach.appendChild(anchor);
+
+                  const canvas = this.glContext.canvas;
+                  canvas.parent.insertBefore(paragrach, canvas);
+                  window.addEventListener('click', this.enterWebVR.bind(this));
+                }
+
+                this.__isReadyForWebVR = true;
                 resolve();
               } else {
                 console.error("Can't requestPresent now. try again.");
@@ -391,14 +409,24 @@ export default class Renderer extends GLBoostObject {
     });
   }
 
-  disableWebVR() {
+  async disableWebVR() {
+    await this.__webvrDisplay.exitPresent();
     this.__switchAnimationFrameFunctions(window);
     this.__webvrDisplay = null;
     this.__isWebVRMode = false;
     this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
   }
 
   get isWebVRMode() {
     return this.__isWebVRMode;
+  }
+
+  get isReadyForWebVR() {
+    return this.__isReadyForWebVR;
+  }
+
+  webVrSubmitFrame() {
+    this.__webvrDisplay.submitFrame();
   }
 }
