@@ -112,13 +112,18 @@ export default class L_AbstractMaterial extends GLBoostObject {
       return;
     }
     this._textureDic[texture.userFlavorName] = texture;
-    let index = (typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE);
-    this._texturePurposeDic[index] = texture.userFlavorName;
+    let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+    this._texturePurposeDic[_purpose] = texture.userFlavorName;
+    texture.purpose = _purpose;
     this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
     this._updateCount();
   }
 
-  removeTexture(userFlavorName) {
+  removeTexture(userFlavorName, discardTexture=true) {
+    if (discardTexture) {
+      this._textureDic[userFlavorName].readyForDiscard();
+    }
+    delete this._texturePurposeDic[this._textureDic[userFlavorName].purpose];
     delete this._textureDic[userFlavorName];
     delete this._textureContributionRateDic[userFlavorName];
     this._updateCount();
@@ -422,7 +427,15 @@ export default class L_AbstractMaterial extends GLBoostObject {
     delete this._semanticsDic[uniform];
   }
 
-
+  readyForDiscard() {
+    for (let userFlavorName in this._textureDic) {
+      this.removeTexture(userFlavorName, true);
+    }
+    if (this._shaderInstance) {
+      this._shaderInstance.readyForDiscard();
+    }
+    this._shaderInstance = null;
+  }
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;

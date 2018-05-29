@@ -1,6 +1,4 @@
 import Vector3 from '../../low_level/math/Vector3';
-import Vector4 from '../../low_level/math/Vector4';
-import Quaternion from '../../low_level/math/Quaternion';
 import Matrix44 from '../../low_level/math/Matrix44';
 import L_Element from '../../low_level/elements/L_Element';
 
@@ -459,5 +457,14 @@ export default class M_Element extends L_Element {
       this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
     }
     return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
+  }
+
+  readyForDiscard() {
+    if (this instanceof this.className.indexOf('Mesh') !== -1) {
+      const materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        material.readyForDiscard();
+      }
+    }
   }
 }

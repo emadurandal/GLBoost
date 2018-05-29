@@ -439,4 +439,23 @@ export default class M_Group extends M_Element {
 
 //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
   }
+
+  readyForDiscard() {
+    let collectElements = function(elem, elementsType) {
+      if (elem instanceof M_Group) {
+        const children = elem.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          collectElements(children[i]);
+        }
+      } else if (elem instanceof M_Element) {
+        // Must be M_Element
+        elem.readyForDiscard();
+      } else {
+        console.error('not M_Group nor M_Element');
+      }
+    };
+
+    this.removeAll();
+  }
+
 }
