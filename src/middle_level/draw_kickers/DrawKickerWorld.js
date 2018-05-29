@@ -78,7 +78,7 @@ export default class DrawKickerWorld {
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
       Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
 
-      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
+//      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
     }
   }
 
