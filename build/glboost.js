@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: d855f583
+  // This revision is the commit right after the SHA: bddf6a61
   var global = (0, eval)('this');
 
   (function (global) {
@@ -13599,7 +13599,7 @@ return mat4(
         afterCallback.apply(afterCallback, args);
       }
 
-      if (this.__webvrDisplay.isPresenting) {
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         this.__webvrDisplay.submitFrame();
       }
 
@@ -13698,7 +13698,7 @@ return mat4(
 
     async exitWebVR() {
       this.__isWebVRMode = false;
-      if (this.__webvrDisplay.isPresenting) {
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         await this.__webvrDisplay.exitPresent();
       }
       this.__isReadyForWebVR = false;
@@ -13710,7 +13710,7 @@ return mat4(
       this.__isWebVRMode = false;
       this.__requestedToEnterWebVR = false;
       this.__isReadyForWebVR = false;
-      if (this.__webvrDisplay.isPresenting) {
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         await this.__webvrDisplay.exitPresent();
       }
       this.__animationFrameObject = window;
@@ -13726,7 +13726,7 @@ return mat4(
     }
 
     webVrSubmitFrame() {
-      if (this.__webvrDisplay.isPresenting) {
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         this.__webvrDisplay.submitFrame();
       }
     }

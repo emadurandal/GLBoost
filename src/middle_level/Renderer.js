@@ -311,7 +311,7 @@ export default class Renderer extends GLBoostObject {
       afterCallback.apply(afterCallback, args);
     }
 
-    if (this.__webvrDisplay.isPresenting) {
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       this.__webvrDisplay.submitFrame();
     }
 
@@ -410,7 +410,7 @@ export default class Renderer extends GLBoostObject {
 
   async exitWebVR() {
     this.__isWebVRMode = false;
-    if (this.__webvrDisplay.isPresenting) {
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       await this.__webvrDisplay.exitPresent();
     }
     this.__isReadyForWebVR = false;
@@ -422,7 +422,7 @@ export default class Renderer extends GLBoostObject {
     this.__isWebVRMode = false;
     this.__requestedToEnterWebVR = false;
     this.__isReadyForWebVR = false;
-    if (this.__webvrDisplay.isPresenting) {
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       await this.__webvrDisplay.exitPresent();
     }
     this.__animationFrameObject = window;
@@ -438,7 +438,7 @@ export default class Renderer extends GLBoostObject {
   }
 
   webVrSubmitFrame() {
-    if (this.__webvrDisplay.isPresenting) {
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       this.__webvrDisplay.submitFrame();
     }
   }
