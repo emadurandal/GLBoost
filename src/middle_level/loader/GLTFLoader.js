@@ -50,6 +50,33 @@ export default class GLTFLoader {
     return this[singleton];
   }
 
+  getDefaultShader(options) {
+    let defaultShader = null;
+
+    if (options && typeof options.defaultShaderClass !== "undefined") {
+      if (typeof options.defaultShaderClass === "string") {
+        defaultShader = GLBoost[options.defaultShaderClass];
+      } else {
+        defaultShader = options.defaultShaderClass;
+      }
+    }
+
+    return defaultShader;
+  }
+
+  getOptions(defaultOptions, json, options) {
+    if (json.asset && json.asset.extras && json.asset.extras.loadOptions) {
+      for (let optionName in json.asset.extras.loadOptions) {
+        defaultOptions[optionName] = json.asset.extras.loadOptions[optionName];
+      }
+    }
+
+    for (let optionName in options) {
+      defaultOptions[optionName] = options[optionName];
+    }
+    return defaultOptions;
+  }
+
   /**
    * [en] the method to load glTF file.<br>
    * [ja] glTF fileをロードするためのメソッド。
@@ -86,24 +113,7 @@ export default class GLTFLoader {
       ]
     };
 
-    if (!options) {
-      options = defaultOptions;
-     } else {
-      for (let optionName in options) {
-        defaultOptions[optionName] = options[optionName];
-      }
-      options = defaultOptions;
-    }
-
-
     let defaultShader = null;
-    if (options && typeof options.defaultShaderClass !== "undefined") {
-      if (typeof options.defaultShaderClass === "string") {
-        defaultShader = GLBoost[options.defaultShaderClass];
-      } else {
-        defaultShader = options.defaultShaderClass;
-      }
-    }
 
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
@@ -133,6 +143,10 @@ export default class GLTFLoader {
 
           let glTFVer = this._checkGLTFVersion(json);
 
+
+          options = this.getOptions(defaultOptions, json, options);
+          defaultShader = this.getDefaultShader(options);
+
           this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
 
           return;
@@ -158,6 +172,9 @@ export default class GLTFLoader {
         let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
         let glTFVer = this._checkGLTFVersion(json);
+
+        options = this.getOptions(defaultOptions, json, options);
+        defaultShader = this.getDefaultShader(options);
 
         this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
       }, (reject, error)=>{

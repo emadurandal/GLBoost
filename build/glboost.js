@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: bddf6a61
+  // This revision is the commit right after the SHA: c46f7d05
   var global = (0, eval)('this');
 
   (function (global) {
@@ -16734,6 +16734,33 @@ return mat4(
       return this[singleton$5];
     }
 
+    getDefaultShader(options) {
+      let defaultShader = null;
+
+      if (options && typeof options.defaultShaderClass !== "undefined") {
+        if (typeof options.defaultShaderClass === "string") {
+          defaultShader = GLBoost$1[options.defaultShaderClass];
+        } else {
+          defaultShader = options.defaultShaderClass;
+        }
+      }
+
+      return defaultShader;
+    }
+
+    getOptions(defaultOptions, json, options) {
+      if (json.asset && json.asset.extras && json.asset.extras.loadOptions) {
+        for (let optionName in json.asset.extras.loadOptions) {
+          defaultOptions[optionName] = json.asset.extras.loadOptions[optionName];
+        }
+      }
+
+      for (let optionName in options) {
+        defaultOptions[optionName] = options[optionName];
+      }
+      return defaultOptions;
+    }
+
     /**
      * [en] the method to load glTF file.<br>
      * [ja] glTF fileをロードするためのメソッド。
@@ -16770,24 +16797,7 @@ return mat4(
         ]
       };
 
-      if (!options) {
-        options = defaultOptions;
-       } else {
-        for (let optionName in options) {
-          defaultOptions[optionName] = options[optionName];
-        }
-        options = defaultOptions;
-      }
-
-
       let defaultShader = null;
-      if (options && typeof options.defaultShaderClass !== "undefined") {
-        if (typeof options.defaultShaderClass === "string") {
-          defaultShader = GLBoost$1[options.defaultShaderClass];
-        } else {
-          defaultShader = options.defaultShaderClass;
-        }
-      }
 
       return DataUtil.loadResourceAsync(url, true,
         (resolve, response)=>{
@@ -16817,6 +16827,10 @@ return mat4(
 
             let glTFVer = this._checkGLTFVersion(json);
 
+
+            options = this.getOptions(defaultOptions, json, options);
+            defaultShader = this.getDefaultShader(options);
+
             this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
 
             return;
@@ -16842,6 +16856,9 @@ return mat4(
           let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
           let glTFVer = this._checkGLTFVersion(json);
+
+          options = this.getOptions(defaultOptions, json, options);
+          defaultShader = this.getDefaultShader(options);
 
           this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
         }, (reject, error)=>{
