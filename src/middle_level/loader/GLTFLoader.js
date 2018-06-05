@@ -364,7 +364,7 @@ export default class GLTFLoader {
       });
 
       // Animation
-      this._loadAnimation(group, buffers, json, glTFVer);
+      this._loadAnimation(group, buffers, json, glTFVer, options);
 
       if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
         options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
@@ -1098,7 +1098,7 @@ export default class GLTFLoader {
     material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
-  _loadAnimation(element, buffers, json, glTFVer) {
+  _loadAnimation(element, buffers, json, glTFVer, options) {
     let animationJson = null;
     for (let anim in json.animations) {
       animationJson = json.animations[anim];
@@ -1116,14 +1116,15 @@ export default class GLTFLoader {
 
           let animInputAccessorStr = null;
           let animOutputAccessorStr = null;
-          if (glTFVer < 1.1) {
-            let animInputStr = samplerJson.input;
-            let animOutputStr = samplerJson.output;
-            animInputAccessorStr = animationJson.parameters[animInputStr];
-            animOutputAccessorStr = animationJson.parameters[animOutputStr];
-          } else {
-            animInputAccessorStr = samplerJson.input;
-            animOutputAccessorStr = samplerJson.output;
+          let animInputStr = samplerJson.input;
+          let animOutputStr = samplerJson.output;
+          animInputAccessorStr = animationJson.parameters[animInputStr];
+          animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+          let interpolationMethod = GLBoost.INTERPOLATION_LINEAR;
+
+          if (options.extensionLoader && options.extensionLoader.getAnimationInterpolationMethod) {
+            interpolationMethod = options.extensionLoader.getAnimationInterpolationMethod(samplerJson.interpolation);
           }
 
           let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
@@ -1135,7 +1136,6 @@ export default class GLTFLoader {
           } else {
             animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
           }
-
           let animationAttributeName = '';
           if (targetPathStr === 'translation') {
             animationAttributeName = 'translate';
@@ -1145,9 +1145,10 @@ export default class GLTFLoader {
             animationAttributeName = targetPathStr;
           }
 
+
           let hitElement = element.searchElement(targetMeshStr);
           if (hitElement) {
-            hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+            hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray, interpolationMethod);
             hitElement.setActiveAnimationLine('time');
           }
         }

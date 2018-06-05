@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: b91cc597
+  // This revision is the commit right after the SHA: cd033ea0
   var global = (0, eval)('this');
 
   (function (global) {
@@ -378,6 +378,9 @@
       c.define('BLENDTARGET8', void 0, 'shapetarget_8');
       c.define('BLENDTARGET9', void 0, 'shapetarget_9');
       c.define('BLENDTARGET10', void 0, 'shapetarget_10');
+      c.define('INTERPOLATION_LINEAR');
+      c.define('INTERPOLATION_STEP');
+      c.define('INTERPOLATION_CUBICSPLINE');
       c.define('RADIAN', void 0, 'radian');
       c.define('DEGREE', void 0, 'degree');
 
@@ -3559,7 +3562,7 @@
       }
     }
 
-    static interpolate(inputArray, outputArray, input, componentN) {
+    static interpolate(inputArray, outputArray, input, componentN, method = GLBoost$1.INTERPOLATION_LINEAR) {
       if (input < inputArray[0]) {
         return outputArray[0].clone(); // out of range!
       }
@@ -3567,14 +3570,25 @@
         return outputArray[outputArray.length-1].clone(); // out of range!
       }
 
-      for (let i = 0; i<inputArray.length; i++) {
-        if (typeof inputArray[i+1] === "undefined") {
-          break;
+      if (method === GLBoost$1.INTERPOLATION_LINEAR) {
+        for (let i = 0; i<inputArray.length; i++) {
+          if (typeof inputArray[i+1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i+1]) {
+            let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
+            let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
+            return resultValue;
+          }
         }
-        if (inputArray[i] <= input && input < inputArray[i+1]) {
-          let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
-          let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
-          return resultValue;
+      } else if (method === GLBoost$1.INTERPOLATION_STEP) {
+        for (let i = 0; i<inputArray.length; i++) {
+          if (typeof inputArray[i+1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i+1]) {
+            return outputArray[i].clone();
+          }
         }
       }
       return outputArray[0].clone(); // out of range!
@@ -3619,7 +3633,7 @@
 
     _getAnimatedTransformValue(value, animation, type) {
       if (typeof animation !== 'undefined' && animation[type] && value !== null && value !== void 0) {
-        return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+        return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN, animation[type].interpolationMethod);
       } else {
         //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
         return null;
@@ -3635,7 +3649,7 @@
       }
     }
 
-    setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    setAnimationAtLine(lineName, attributeName, inputArray, outputArray, interpolationMethod) {
       var outputComponentN = 0;
       if (outputArray[0] instanceof Vector2) {
         outputComponentN = 2;
@@ -3655,7 +3669,8 @@
         input: inputArray,
         output: outputArray,
         outputAttribute: attributeName,
-        outputComponentN: outputComponentN
+        outputComponentN: outputComponentN,
+        interpolationMethod: interpolationMethod
       };
     }
 
@@ -17050,7 +17065,7 @@ return mat4(
         });
 
         // Animation
-        this._loadAnimation(group, buffers, json, glTFVer);
+        this._loadAnimation(group, buffers, json, glTFVer, options);
 
         if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
           options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
@@ -17778,7 +17793,7 @@ return mat4(
       material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
     }
 
-    _loadAnimation(element, buffers, json, glTFVer) {
+    _loadAnimation(element, buffers, json, glTFVer, options) {
       let animationJson = null;
       for (let anim in json.animations) {
         animationJson = json.animations[anim];
@@ -17796,14 +17811,15 @@ return mat4(
 
             let animInputAccessorStr = null;
             let animOutputAccessorStr = null;
-            if (glTFVer < 1.1) {
-              let animInputStr = samplerJson.input;
-              let animOutputStr = samplerJson.output;
-              animInputAccessorStr = animationJson.parameters[animInputStr];
-              animOutputAccessorStr = animationJson.parameters[animOutputStr];
-            } else {
-              animInputAccessorStr = samplerJson.input;
-              animOutputAccessorStr = samplerJson.output;
+            let animInputStr = samplerJson.input;
+            let animOutputStr = samplerJson.output;
+            animInputAccessorStr = animationJson.parameters[animInputStr];
+            animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+            let interpolationMethod = GLBoost$1.INTERPOLATION_LINEAR;
+
+            if (options.extensionLoader && options.extensionLoader.getAnimationInterpolationMethod) {
+              interpolationMethod = options.extensionLoader.getAnimationInterpolationMethod(samplerJson.interpolation);
             }
 
             let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
@@ -17815,7 +17831,6 @@ return mat4(
             } else {
               animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
             }
-
             let animationAttributeName = '';
             if (targetPathStr === 'translation') {
               animationAttributeName = 'translate';
@@ -17825,9 +17840,10 @@ return mat4(
               animationAttributeName = targetPathStr;
             }
 
+
             let hitElement = element.searchElement(targetMeshStr);
             if (hitElement) {
-              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray, interpolationMethod);
               hitElement.setActiveAnimationLine('time');
             }
           }

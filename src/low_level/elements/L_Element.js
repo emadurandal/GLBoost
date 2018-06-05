@@ -50,7 +50,7 @@ export default class L_Element extends GLBoostObject {
 
   _getAnimatedTransformValue(value, animation, type) {
     if (typeof animation !== 'undefined' && animation[type] && value !== null && value !== void 0) {
-      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+      return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN, animation[type].interpolationMethod);
     } else {
       //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
       return null;
@@ -66,7 +66,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+  setAnimationAtLine(lineName, attributeName, inputArray, outputArray, interpolationMethod) {
     var outputComponentN = 0;
     if (outputArray[0] instanceof Vector2) {
       outputComponentN = 2;
@@ -86,7 +86,8 @@ export default class L_Element extends GLBoostObject {
       input: inputArray,
       output: outputArray,
       outputAttribute: attributeName,
-      outputComponentN: outputComponentN
+      outputComponentN: outputComponentN,
+      interpolationMethod: interpolationMethod
     };
   }
 

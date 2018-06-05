@@ -1,3 +1,4 @@
+import GLBoost from '../../globals';
 import Quaternion from '../../low_level/math/Quaternion';
 
 export default class AnimationUtil {
@@ -18,7 +19,7 @@ export default class AnimationUtil {
     }
   }
 
-  static interpolate(inputArray, outputArray, input, componentN) {
+  static interpolate(inputArray, outputArray, input, componentN, method = GLBoost.INTERPOLATION_LINEAR) {
     if (input < inputArray[0]) {
       return outputArray[0].clone(); // out of range!
     }
@@ -26,14 +27,25 @@ export default class AnimationUtil {
       return outputArray[outputArray.length-1].clone(); // out of range!
     }
 
-    for (let i = 0; i<inputArray.length; i++) {
-      if (typeof inputArray[i+1] === "undefined") {
-        break;
+    if (method === GLBoost.INTERPOLATION_LINEAR) {
+      for (let i = 0; i<inputArray.length; i++) {
+        if (typeof inputArray[i+1] === "undefined") {
+          break;
+        }
+        if (inputArray[i] <= input && input < inputArray[i+1]) {
+          let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
+          let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
+          return resultValue;
+        }
       }
-      if (inputArray[i] <= input && input < inputArray[i+1]) {
-        let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
-        let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
-        return resultValue;
+    } else if (method === GLBoost.INTERPOLATION_STEP) {
+      for (let i = 0; i<inputArray.length; i++) {
+        if (typeof inputArray[i+1] === "undefined") {
+          break;
+        }
+        if (inputArray[i] <= input && input < inputArray[i+1]) {
+          return outputArray[i].clone();
+        }
       }
     }
     return outputArray[0].clone(); // out of range!
