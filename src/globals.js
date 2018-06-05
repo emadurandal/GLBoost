@@ -372,6 +372,9 @@ var global = ('global',eval)('this');
     c.define('BLENDTARGET8', void 0, 'shapetarget_8');
     c.define('BLENDTARGET9', void 0, 'shapetarget_9');
     c.define('BLENDTARGET10', void 0, 'shapetarget_10');
+    c.define('INTERPOLATION_LINEAR');
+    c.define('INTERPOLATION_STEP');
+    c.define('INTERPOLATION_CUBICSPLINE');
     c.define('RADIAN', void 0, 'radian');
     c.define('DEGREE', void 0, 'degree');
 
