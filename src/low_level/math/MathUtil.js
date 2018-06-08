@@ -92,6 +92,26 @@ export default class MathUtil {
     
     return [v0, v1];
   }
+
+  // https://ja.wikipedia.org/wiki/%E4%BA%8C%E5%88%86%E6%8E%A2%E7%B4%A2
+  static findNearestByBinarySearch(ary, key, imin, imax) {
+    if (imax < imin) {
+      return null;
+    } else if (imax === imin) {
+      return imin;
+    } else {
+      const imid = imin + Math.floor((imax - imin) / 2);
+      if (ary[imid] <= key && imid+1 <= imax && key <= ary[imid+1]) {
+        return imid;
+      } else if (ary[imid] > key) {
+        return MathUtil.findNearestByBinarySearch(ary, key, imin, imid - 1);
+      } else if (ary[imid] < key) {
+        return MathUtil.findNearestByBinarySearch(ary, key, imid + 1, imax);
+      } else {
+        return imid;
+      }
+    }
+  }
 }
 
 GLBoost["MathUtil"] = MathUtil;
