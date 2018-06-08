@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import Quaternion from '../../low_level/math/Quaternion';
+import MathUtil from '../../low_level/math/MathUtil';
 
 export default class AnimationUtil {
 
@@ -26,18 +27,16 @@ export default class AnimationUtil {
     if (inputArray[inputArray.length-1] <= input) {
       return outputArray[outputArray.length-1].clone(); // out of range!
     }
+    if (inputArray.length === 1) {
+      return outputArray[0].clone(); // there is one only!
+    }
+
 
     if (method === GLBoost.INTERPOLATION_LINEAR) {
-      for (let i = 0; i<inputArray.length; i++) {
-        if (typeof inputArray[i+1] === "undefined") {
-          break;
-        }
-        if (inputArray[i] <= input && input < inputArray[i+1]) {
-          let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
-          let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
-          return resultValue;
-        }
-      }
+      const i = MathUtil.findNearestByBinarySearch(inputArray, input, 0, inputArray.length-1);
+      let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
+      let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
+      return resultValue;
     } else if (method === GLBoost.INTERPOLATION_STEP) {
       for (let i = 0; i<inputArray.length; i++) {
         if (typeof inputArray[i+1] === "undefined") {
