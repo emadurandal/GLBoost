@@ -4,7 +4,7 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: f94ae8d8
+  // This revision is the commit right after the SHA: cd033ea0
   var global = (0, eval)('this');
 
   (function (global) {
@@ -378,6 +378,9 @@
       c.define('BLENDTARGET8', void 0, 'shapetarget_8');
       c.define('BLENDTARGET9', void 0, 'shapetarget_9');
       c.define('BLENDTARGET10', void 0, 'shapetarget_10');
+      c.define('INTERPOLATION_LINEAR');
+      c.define('INTERPOLATION_STEP');
+      c.define('INTERPOLATION_CUBICSPLINE');
       c.define('RADIAN', void 0, 'radian');
       c.define('DEGREE', void 0, 'degree');
 
@@ -3559,7 +3562,7 @@
       }
     }
 
-    static interpolate(inputArray, outputArray, input, componentN) {
+    static interpolate(inputArray, outputArray, input, componentN, method = GLBoost$1.INTERPOLATION_LINEAR) {
       if (input < inputArray[0]) {
         return outputArray[0].clone(); // out of range!
       }
@@ -3567,14 +3570,25 @@
         return outputArray[outputArray.length-1].clone(); // out of range!
       }
 
-      for (let i = 0; i<inputArray.length; i++) {
-        if (typeof inputArray[i+1] === "undefined") {
-          break;
+      if (method === GLBoost$1.INTERPOLATION_LINEAR) {
+        for (let i = 0; i<inputArray.length; i++) {
+          if (typeof inputArray[i+1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i+1]) {
+            let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
+            let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
+            return resultValue;
+          }
         }
-        if (inputArray[i] <= input && input < inputArray[i+1]) {
-          let ratio = (input - inputArray[i]) / (inputArray[i+1] - inputArray[i]);
-          let resultValue = this.lerp(outputArray[i].clone(), outputArray[i+1].clone(), ratio, componentN);
-          return resultValue;
+      } else if (method === GLBoost$1.INTERPOLATION_STEP) {
+        for (let i = 0; i<inputArray.length; i++) {
+          if (typeof inputArray[i+1] === "undefined") {
+            break;
+          }
+          if (inputArray[i] <= input && input < inputArray[i+1]) {
+            return outputArray[i].clone();
+          }
         }
       }
       return outputArray[0].clone(); // out of range!
@@ -3619,7 +3633,7 @@
 
     _getAnimatedTransformValue(value, animation, type) {
       if (typeof animation !== 'undefined' && animation[type] && value !== null && value !== void 0) {
-        return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN);
+        return AnimationUtil.interpolate(animation[type].input, animation[type].output, value, animation[type].outputComponentN, animation[type].interpolationMethod);
       } else {
         //  console.warn(this._instanceName + 'doesn't have ' + type + ' animation data. GLBoost returned default ' + type + ' value.');
         return null;
@@ -3635,7 +3649,7 @@
       }
     }
 
-    setAnimationAtLine(lineName, attributeName, inputArray, outputArray) {
+    setAnimationAtLine(lineName, attributeName, inputArray, outputArray, interpolationMethod) {
       var outputComponentN = 0;
       if (outputArray[0] instanceof Vector2) {
         outputComponentN = 2;
@@ -3655,7 +3669,8 @@
         input: inputArray,
         output: outputArray,
         outputAttribute: attributeName,
-        outputComponentN: outputComponentN
+        outputComponentN: outputComponentN,
+        interpolationMethod: interpolationMethod
       };
     }
 
@@ -4519,6 +4534,15 @@
         this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
       return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
+    }
+
+    readyForDiscard() {
+      if (this instanceof this.className.indexOf('Mesh') !== -1) {
+        const materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          material.readyForDiscard();
+        }
+      }
     }
   }
 
@@ -6188,6 +6212,9 @@ return mat4(
     }
 
     static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+
       if (camera) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
@@ -6205,8 +6232,6 @@ return mat4(
           projectionMatrix = Matrix44$2.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-        Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
@@ -6216,6 +6241,9 @@ return mat4(
     }
 
     static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
+      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
+      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+
       if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
@@ -6233,13 +6261,11 @@ return mat4(
           projectionMatrix = Matrix44$2.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-        Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
 
-        camera._lastPVMatrixFromLight = Matrix44$2.multiply(projectionMatrix, viewMatrix);
+  //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
     }
 
@@ -8696,13 +8722,18 @@ return mat4(
         return;
       }
       this._textureDic[texture.userFlavorName] = texture;
-      let index = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-      this._texturePurposeDic[index] = texture.userFlavorName;
+      let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      this._texturePurposeDic[_purpose] = texture.userFlavorName;
+      texture.purpose = _purpose;
       this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
       this._updateCount();
     }
 
-    removeTexture(userFlavorName) {
+    removeTexture(userFlavorName, discardTexture=true) {
+      if (discardTexture) {
+        this._textureDic[userFlavorName].readyForDiscard();
+      }
+      delete this._texturePurposeDic[this._textureDic[userFlavorName].purpose];
       delete this._textureDic[userFlavorName];
       delete this._textureContributionRateDic[userFlavorName];
       this._updateCount();
@@ -9006,7 +9037,15 @@ return mat4(
       delete this._semanticsDic[uniform];
     }
 
-
+    readyForDiscard() {
+      for (let userFlavorName in this._textureDic) {
+        this.removeTexture(userFlavorName, true);
+      }
+      if (this._shaderInstance) {
+        this._shaderInstance.readyForDiscard();
+      }
+      this._shaderInstance = null;
+    }
   }
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
@@ -12555,6 +12594,12 @@ return mat4(
 
   //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
     }
+
+    readyForDiscard() {
+
+      this.removeAll();
+    }
+
   }
 
   let singleton$3 = Symbol();
@@ -13284,15 +13329,12 @@ return mat4(
       this.__isWebVRMode = false;
       this.__webvrFrameData = null;
       this.__webvrDisplay = null;
-      this.__switchAnimationFrameFunctions(window);
       this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
       this.__requestedToEnterWebVR = false;
+      this.__isReadyForWebVR = false;
+      this.__animationFrameObject = window;
     }
 
-    __switchAnimationFrameFunctions(object) {
-      this.__requestAnimationFrame = object !== void 0 ? object.requestAnimationFrame.bind(object) : null;
-      this.__cancelAnimationFrame = object !== void 0 ? object.cancelAnimationFrame.bind(object) : null;
-    }
 
     /**
      * en: update things of elements of the expression.<br>
@@ -13390,7 +13432,7 @@ return mat4(
 
         this._clearBuffer(gl, renderPass);
 
-        if (this.isWebVRMode) {
+        if (this.__animationFrameObject === this.__webvrDisplay) {
           this.__webvrDisplay.getFrameData(this.__webvrFrameData);
           if (this.__webvrDisplay.stageParameters) {
             this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
@@ -13474,10 +13516,6 @@ return mat4(
 
         renderPass.postRender(camera ? true:false, lights);
 
-        if (this.isWebVRMode) {
-          this.__webvrDisplay.submitFrame();
-        }
-
       });
     }
 
@@ -13556,7 +13594,7 @@ return mat4(
 
       renderLoopFunc.apply(renderLoopFunc, args);
 
-      this.__animationFrameId = this.__requestAnimationFrame(()=>{
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
         this.doRenderLoop(renderLoopFunc, ...args);
         if (this.__requestedToEnterWebVR) {
           this.__isWebVRMode = true;
@@ -13578,7 +13616,11 @@ return mat4(
         afterCallback.apply(afterCallback, args);
       }
 
-      this.__animationFrameId = this.__requestAnimationFrame(()=>{
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+        this.__webvrDisplay.submitFrame();
+      }
+
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
         this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
         if (this.__requestedToEnterWebVR) {
           this.__isWebVRMode = true;
@@ -13599,17 +13641,20 @@ return mat4(
         this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
       }
       return new Promise((resolve, reject)=> {
-        this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
-          this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-          const leftEye = this.__webvrDisplay.getEyeParameters("left");
-          const rightEye = this.__webvrDisplay.getEyeParameters("right");
-          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
-          this.__requestedToEnterWebVR = true;
-          resolve();
-        }).catch(() => {
-          console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
-          reject();
-        });
+        if (!this.__webvrDisplay.isPresenting) {
+          this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
+            //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+            this.__animationFrameObject = this.__webvrDisplay;
+            const leftEye = this.__webvrDisplay.getEyeParameters("left");
+            const rightEye = this.__webvrDisplay.getEyeParameters("right");
+            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+            this.__requestedToEnterWebVR = true;
+            resolve();
+          }).catch(() => {
+            console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+            reject();
+          });
+        }
       });
     }
 
@@ -13629,7 +13674,24 @@ return mat4(
 
                 if (webvrDisplay.capabilities.canPresent) {
                   this.__webvrDisplay = webvrDisplay;
-                  requestButtonDom.style.display = 'block';
+
+                  if (requestButtonDom) {
+                    requestButtonDom.style.display = 'block';
+                  } else {
+                    const paragrach = document.createElement("p");
+                    const anchor = document.createElement("a");
+                    anchor.setAttribute("id", 'enter-vr');
+                    const enterVr = document.createTextNode("Enter VR");
+
+                    anchor.appendChild(enterVr);
+                    paragrach.appendChild(anchor);
+
+                    const canvas = this.glContext.canvas;
+                    canvas.parent.insertBefore(paragrach, canvas);
+                    window.addEventListener('click', this.enterWebVR.bind(this));
+                  }
+
+                  this.__isReadyForWebVR = true;
                   resolve();
                 } else {
                   console.error("Can't requestPresent now. try again.");
@@ -13651,15 +13713,39 @@ return mat4(
       });
     }
 
-    disableWebVR() {
-      this.__switchAnimationFrameFunctions(window);
-      this.__webvrDisplay = null;
+    async exitWebVR() {
+      this.__isWebVRMode = false;
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+        await this.__webvrDisplay.exitPresent();
+      }
+      this.__isReadyForWebVR = false;
+      this.__animationFrameObject = window;
+    }
+
+
+    async disableWebVR() {
       this.__isWebVRMode = false;
       this.__requestedToEnterWebVR = false;
+      this.__isReadyForWebVR = false;
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+        await this.__webvrDisplay.exitPresent();
+      }
+      this.__animationFrameObject = window;
+      this.__webvrDisplay = null;
     }
 
     get isWebVRMode() {
       return this.__isWebVRMode;
+    }
+
+    get isReadyForWebVR() {
+      return this.__isReadyForWebVR;
+    }
+
+    webVrSubmitFrame() {
+      if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+        this.__webvrDisplay.submitFrame();
+      }
     }
   }
 
@@ -16665,6 +16751,33 @@ return mat4(
       return this[singleton$5];
     }
 
+    getDefaultShader(options) {
+      let defaultShader = null;
+
+      if (options && typeof options.defaultShaderClass !== "undefined") {
+        if (typeof options.defaultShaderClass === "string") {
+          defaultShader = GLBoost$1[options.defaultShaderClass];
+        } else {
+          defaultShader = options.defaultShaderClass;
+        }
+      }
+
+      return defaultShader;
+    }
+
+    getOptions(defaultOptions, json, options) {
+      if (json.asset && json.asset.extras && json.asset.extras.loadOptions) {
+        for (let optionName in json.asset.extras.loadOptions) {
+          defaultOptions[optionName] = json.asset.extras.loadOptions[optionName];
+        }
+      }
+
+      for (let optionName in options) {
+        defaultOptions[optionName] = options[optionName];
+      }
+      return defaultOptions;
+    }
+
     /**
      * [en] the method to load glTF file.<br>
      * [ja] glTF fileをロードするためのメソッド。
@@ -16701,17 +16814,7 @@ return mat4(
         ]
       };
 
-      if (!options) {
-        options = defaultOptions;
-       } else {
-        for (let optionName in options) {
-          defaultOptions[optionName] = options[optionName];
-        }
-        options = defaultOptions;
-      }
-
-
-      let defaultShader = (options && typeof options.defaultShaderClass !== "undefined") ? options.defaultShaderClass : null;
+      let defaultShader = null;
 
       return DataUtil.loadResourceAsync(url, true,
         (resolve, response)=>{
@@ -16741,6 +16844,10 @@ return mat4(
 
             let glTFVer = this._checkGLTFVersion(json);
 
+
+            options = this.getOptions(defaultOptions, json, options);
+            defaultShader = this.getDefaultShader(options);
+
             this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
 
             return;
@@ -16766,6 +16873,9 @@ return mat4(
           let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
 
           let glTFVer = this._checkGLTFVersion(json);
+
+          options = this.getOptions(defaultOptions, json, options);
+          defaultShader = this.getDefaultShader(options);
 
           this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
         }, (reject, error)=>{
@@ -16955,7 +17065,7 @@ return mat4(
         });
 
         // Animation
-        this._loadAnimation(group, buffers, json, glTFVer);
+        this._loadAnimation(group, buffers, json, glTFVer, options);
 
         if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
           options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
@@ -17683,7 +17793,7 @@ return mat4(
       material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
     }
 
-    _loadAnimation(element, buffers, json, glTFVer) {
+    _loadAnimation(element, buffers, json, glTFVer, options) {
       let animationJson = null;
       for (let anim in json.animations) {
         animationJson = json.animations[anim];
@@ -17701,14 +17811,15 @@ return mat4(
 
             let animInputAccessorStr = null;
             let animOutputAccessorStr = null;
-            if (glTFVer < 1.1) {
-              let animInputStr = samplerJson.input;
-              let animOutputStr = samplerJson.output;
-              animInputAccessorStr = animationJson.parameters[animInputStr];
-              animOutputAccessorStr = animationJson.parameters[animOutputStr];
-            } else {
-              animInputAccessorStr = samplerJson.input;
-              animOutputAccessorStr = samplerJson.output;
+            let animInputStr = samplerJson.input;
+            let animOutputStr = samplerJson.output;
+            animInputAccessorStr = animationJson.parameters[animInputStr];
+            animOutputAccessorStr = animationJson.parameters[animOutputStr];
+
+            let interpolationMethod = GLBoost$1.INTERPOLATION_LINEAR;
+
+            if (options.extensionLoader && options.extensionLoader.getAnimationInterpolationMethod) {
+              interpolationMethod = options.extensionLoader.getAnimationInterpolationMethod(samplerJson.interpolation);
             }
 
             let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
@@ -17720,7 +17831,6 @@ return mat4(
             } else {
               animOutputArray = this._accessBinary(animOutputAccessorStr, json, buffers);
             }
-
             let animationAttributeName = '';
             if (targetPathStr === 'translation') {
               animationAttributeName = 'translate';
@@ -17730,9 +17840,10 @@ return mat4(
               animationAttributeName = targetPathStr;
             }
 
+
             let hitElement = element.searchElement(targetMeshStr);
             if (hitElement) {
-              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray);
+              hitElement.setAnimationAtLine('time', animationAttributeName, animInputArray, animOutputArray, interpolationMethod);
               hitElement.setActiveAnimationLine('time');
             }
           }

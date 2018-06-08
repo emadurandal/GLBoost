@@ -24,15 +24,12 @@ export default class Renderer extends GLBoostObject {
     this.__isWebVRMode = false;
     this.__webvrFrameData = null;
     this.__webvrDisplay = null;
-    this.__switchAnimationFrameFunctions(window);
     this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
     this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
+    this.__animationFrameObject = window;
   }
 
-  __switchAnimationFrameFunctions(object) {
-    this.__requestAnimationFrame = object !== void 0 ? object.requestAnimationFrame.bind(object) : null;
-    this.__cancelAnimationFrame = object !== void 0 ? object.cancelAnimationFrame.bind(object) : null;
-  }
 
   /**
    * en: update things of elements of the expression.<br>
@@ -130,7 +127,7 @@ export default class Renderer extends GLBoostObject {
 
       this._clearBuffer(gl, renderPass);
 
-      if (this.isWebVRMode) {
+      if (this.__animationFrameObject === this.__webvrDisplay) {
         this.__webvrDisplay.getFrameData(this.__webvrFrameData);
         if (this.__webvrDisplay.stageParameters) {
           this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
@@ -214,10 +211,6 @@ export default class Renderer extends GLBoostObject {
 
       renderPass.postRender(camera ? true:false, lights);
 
-      if (this.isWebVRMode) {
-        this.__webvrDisplay.submitFrame();
-      }
-
     });
   }
 
@@ -296,7 +289,7 @@ export default class Renderer extends GLBoostObject {
 
     renderLoopFunc.apply(renderLoopFunc, args);
 
-    this.__animationFrameId = this.__requestAnimationFrame(()=>{
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
       this.doRenderLoop(renderLoopFunc, ...args);
       if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
@@ -318,7 +311,11 @@ export default class Renderer extends GLBoostObject {
       afterCallback.apply(afterCallback, args);
     }
 
-    this.__animationFrameId = this.__requestAnimationFrame(()=>{
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+      this.__webvrDisplay.submitFrame();
+    }
+
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
       this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
       if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
@@ -339,17 +336,20 @@ export default class Renderer extends GLBoostObject {
       this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
     }
     return new Promise((resolve, reject)=> {
-      this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
-        this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-        const leftEye = this.__webvrDisplay.getEyeParameters("left");
-        const rightEye = this.__webvrDisplay.getEyeParameters("right");
-        this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
-        this.__requestedToEnterWebVR = true;
-        resolve();
-      }).catch(() => {
-        console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
-        reject();
-      });
+      if (!this.__webvrDisplay.isPresenting) {
+        this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
+          //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+          this.__animationFrameObject = this.__webvrDisplay;
+          const leftEye = this.__webvrDisplay.getEyeParameters("left");
+          const rightEye = this.__webvrDisplay.getEyeParameters("right");
+          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+          this.__requestedToEnterWebVR = true;
+          resolve();
+        }).catch(() => {
+          console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
+          reject();
+        });
+      }
     });
   }
 
@@ -369,7 +369,24 @@ export default class Renderer extends GLBoostObject {
 
               if (webvrDisplay.capabilities.canPresent) {
                 this.__webvrDisplay = webvrDisplay;
-                requestButtonDom.style.display = 'block';
+
+                if (requestButtonDom) {
+                  requestButtonDom.style.display = 'block';
+                } else {
+                  const paragrach = document.createElement("p");
+                  const anchor = document.createElement("a");
+                  anchor.setAttribute("id", 'enter-vr');
+                  const enterVr = document.createTextNode("Enter VR");
+
+                  anchor.appendChild(enterVr);
+                  paragrach.appendChild(anchor);
+
+                  const canvas = this.glContext.canvas;
+                  canvas.parent.insertBefore(paragrach, canvas);
+                  window.addEventListener('click', this.enterWebVR.bind(this));
+                }
+
+                this.__isReadyForWebVR = true;
                 resolve();
               } else {
                 console.error("Can't requestPresent now. try again.");
@@ -391,14 +408,38 @@ export default class Renderer extends GLBoostObject {
     });
   }
 
-  disableWebVR() {
-    this.__switchAnimationFrameFunctions(window);
-    this.__webvrDisplay = null;
+  async exitWebVR() {
+    this.__isWebVRMode = false;
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+      await this.__webvrDisplay.exitPresent();
+    }
+    this.__isReadyForWebVR = false;
+    this.__animationFrameObject = window;
+  }
+
+
+  async disableWebVR() {
     this.__isWebVRMode = false;
     this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+      await this.__webvrDisplay.exitPresent();
+    }
+    this.__animationFrameObject = window;
+    this.__webvrDisplay = null;
   }
 
   get isWebVRMode() {
     return this.__isWebVRMode;
+  }
+
+  get isReadyForWebVR() {
+    return this.__isReadyForWebVR;
+  }
+
+  webVrSubmitFrame() {
+    if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
+      this.__webvrDisplay.submitFrame();
+    }
   }
 }
