@@ -85,6 +85,11 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, options) {
     let defaultOptions = {
+      files: { 
+        //        "foo.gltf": content of file as ArrayBuffer, 
+        //        "foo.bin": content of file as ArrayBuffer, 
+        //        "boo.png": content of file as ArrayBuffer 
+      },
       extensionLoader: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
       isExistJointGizmo: false,
@@ -114,33 +119,51 @@ export default class GLTFLoader {
     };
 
     let defaultShader = null;
+    this._materials = [];
+
+    let mustBeReadFromFile = false;
+    if (options.files) {
+      for (let fileName in options.files) {
+        const splitted = fileName.split('.');
+        const fileExtension = splitted[splitted.length - 1];
+
+        if (fileExtension === 'gltf' || fileExtension === 'glb') {
+          return new Promise((resolve, response)=>{
+            this.checkArrayBufferOfGltf(options.files[fileName], null, options, defaultOptions, defaultShader, glBoostContext, resolve);
+          }, (reject, error)=>{
+    
+          });
+        }
+      }      
+    }
 
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
 
-        this._materials = [];
-
-        let dataView = new DataView(arrayBuffer, 0, 20);
-        let isLittleEndian = true;
-
-        // Magic field
-        let magicStr = '';
-        magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
-
-        if (magicStr !== 'glTF') {
-          this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);          
-        } else {
-          this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve);
-        }
-
+        this.checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);
       }, (reject, error)=>{
 
-      });
+      }
+    );
 
+  }
+
+  checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+    let dataView = new DataView(arrayBuffer, 0, 20);
+    let isLittleEndian = true;
+    // Magic field
+    let magicStr = '';
+    magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
+    if (magicStr !== 'glTF') {
+      this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);
+    }
+    else {
+      this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve);
+    }
   }
 
   loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve) {
@@ -167,11 +190,17 @@ export default class GLTFLoader {
 
   loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve) {
     let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-    let partsOfPath = url.split('/');
+
     let basePath = '';
-    for (let i = 0; i < partsOfPath.length - 1; i++) {
-      basePath += partsOfPath[i] + '/';
+    if (url) {
+      let partsOfPath = url.split('/');
+      for (let i = 0; i < partsOfPath.length - 1; i++) {
+        basePath += partsOfPath[i] + '/';
+      }  
+    } else {
+      basePath = null;
     }
+
     let json = JSON.parse(gotText);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
@@ -208,6 +237,18 @@ export default class GLTFLoader {
       }
 
       let shaderUri = shaderJson.uri;
+
+      if (options.files) {
+        const splitted = shaderUri.split('/');
+        const filename = splitted[splitted.length - 1];
+        if (options.files[filename]) {
+          const arrayBuffer = options.files[filename];
+          shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+          shaders[shaderName].shaderType = shaderType;
+          continue;
+        }
+      }
+
       if (shaderUri.match(/^data:/)) {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
@@ -237,7 +278,8 @@ export default class GLTFLoader {
     // Buffers Async load
     for (let bufferName in json.buffers) {
       let bufferInfo = json.buffers[bufferName];
-
+      const splitted = bufferInfo.uri.split('/');
+      const filename = splitted[splitted.length - 1];
       if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
@@ -248,6 +290,9 @@ export default class GLTFLoader {
         );
       } else if (bufferInfo.uri === 'data:,') {
         buffers[bufferName] = arrayBufferBinary;
+      } else if (options.files && options.files[filename]) {
+        const arrayBuffer = options.files[filename];
+        buffers[bufferName] = arrayBuffer;
       } else {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
@@ -275,7 +320,16 @@ export default class GLTFLoader {
         textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
       } else {
         let imageFileStr = imageJson.uri;
-        if (imageFileStr.match(/^data:/)) {
+        const splitted = imageFileStr.split('/');
+        const filename = splitted[splitted.length - 1];
+        if (options.files) {
+          if (options.files[filename]) {
+            const arrayBuffer = options.files[filename];
+            const splitted = filename.split('.');
+            const fileExtension = splitted[splitted.length - 1];
+            textureUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
+          }
+        } else if (imageFileStr.match(/^data:/)) {
           textureUri = imageFileStr;
         } else {
           textureUri = basePath + imageFileStr;
@@ -1147,34 +1201,44 @@ export default class GLTFLoader {
     return DataUtil.arrayBufferToString(arrayBufferSliced);
   }
 
-  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+  _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
     let byteOffset = bufferViewJson.byteOffset;
     let byteLength = bufferViewJson.byteLength;
-
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
-    let bytes = new Uint8Array(arrayBufferSliced);
+    return arrayBufferSliced;
+  }
+
+  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+    let arrayBufferSliced = this._sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer);
+    return this._accessArrayBufferAsImage(arrayBufferSliced, mimeType);
+  }
+
+  _accessArrayBufferAsImage(arrayBuffer, imageType) {
+    let bytes = new Uint8Array(arrayBuffer);
     let binaryData = '';
     for (let i = 0, len = bytes.byteLength; i < len; i++) {
       binaryData += String.fromCharCode(bytes[i]);
     }
     let imgSrc = '';
-    if (mimeType == 'image/jpeg') {
+    if (imageType === 'image/jpeg' || imageType.toLowerCase() === 'jpg' || imageType.toLowerCase() === 'jpeg') {
       imgSrc = "data:image/jpeg;base64,";
-    } else if (mimeType == 'image/png') {
+    }
+    else if (imageType == 'image/png' || imageType.toLowerCase() === 'png') {
       imgSrc = "data:image/png;base64,";
-    } else if (mimeType == 'image/gif') {
+    }
+    else if (imageType == 'image/gif' || imageType.toLowerCase() === 'gif') {
       imgSrc = "data:image/gif;base64,";
-    } else if (mimeType == 'image/bmp') {
+    }
+    else if (imageType == 'image/bmp' || imageType.toLowerCase() === 'bmp') {
       imgSrc = "data:image/bmp;base64,";
-    } else {
+    }
+    else {
       imgSrc = "data:image/unknown;base64,";
     }
     let dataUrl = imgSrc + DataUtil.btoa(binaryData);
-
     return dataUrl;
   }
-
 
   static _isSystemLittleEndian() {
     return !!(new Uint8Array((new Uint16Array([0x00ff])).buffer))[0];
