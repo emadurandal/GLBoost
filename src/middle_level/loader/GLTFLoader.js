@@ -132,55 +132,52 @@ export default class GLTFLoader {
         magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
 
         if (magicStr !== 'glTF') {
-          // It must be normal glTF (NOT binary) file...
-          let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-          let partsOfPath = url.split('/');
-          let basePath = '';
-          for (let i = 0; i < partsOfPath.length - 1; i++) {
-            basePath += partsOfPath[i] + '/';
-          }
-          let json = JSON.parse(gotText);
-
-          let glTFVer = this._checkGLTFVersion(json);
-
-
-          options = this.getOptions(defaultOptions, json, options);
-          defaultShader = this.getDefaultShader(options);
-
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
-
-          return;
+          this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);          
+        } else {
+          this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve);
         }
 
-        let gltfVer = dataView.getUint32(4, isLittleEndian);
-        if (gltfVer !== 1) {
-          reject('invalid version field in this binary glTF file.');
-        }
-
-        let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
-        let lengthOfContent = dataView.getUint32(12, isLittleEndian);
-        let contentFormat = dataView.getUint32(16, isLittleEndian);
-
-        if (contentFormat !== 0) { // 0 means JSON format
-          reject('invalid contentFormat field in this binary glTF file.');
-        }
-
-
-        let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
-        let gotText = DataUtil.arrayBufferToString(arrayBufferContent);
-        let json = JSON.parse(gotText);
-        let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
-
-        let glTFVer = this._checkGLTFVersion(json);
-
-        options = this.getOptions(defaultOptions, json, options);
-        defaultShader = this.getDefaultShader(options);
-
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
       }, (reject, error)=>{
 
       });
 
+  }
+
+  loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+    let gltfVer = dataView.getUint32(4, isLittleEndian);
+    if (gltfVer !== 1) {
+      reject('invalid version field in this binary glTF file.');
+    }
+    let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+    let lengthOfContent = dataView.getUint32(12, isLittleEndian);
+    let contentFormat = dataView.getUint32(16, isLittleEndian);
+    if (contentFormat !== 0) { // 0 means JSON format
+      reject('invalid contentFormat field in this binary glTF file.');
+    }
+    let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
+    let gotText = DataUtil.arrayBufferToString(arrayBufferContent);
+    let json = JSON.parse(gotText);
+    let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
+    let glTFVer = this._checkGLTFVersion(json);
+    options = this.getOptions(defaultOptions, json, options);
+    defaultShader = this.getDefaultShader(options);
+    this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
+    return { options, defaultShader };
+  }
+
+  loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+    let gotText = DataUtil.arrayBufferToString(arrayBuffer);
+    let partsOfPath = url.split('/');
+    let basePath = '';
+    for (let i = 0; i < partsOfPath.length - 1; i++) {
+      basePath += partsOfPath[i] + '/';
+    }
+    let json = JSON.parse(gotText);
+    let glTFVer = this._checkGLTFVersion(json);
+    options = this.getOptions(defaultOptions, json, options);
+    defaultShader = this.getDefaultShader(options);
+    this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
+    return { options, defaultShader };
   }
 
   _checkGLTFVersion(json) {
