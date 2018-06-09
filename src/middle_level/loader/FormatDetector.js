@@ -32,7 +32,7 @@ export default async function formatDetector(uri) {
         return;
       }
 
-      let gltfVer = dataView.getUint32(4, isLittleEndian);
+      let glTFVer = dataView.getUint32(4, isLittleEndian);
       resolve("glTF"+glTFVer);
      }
   );
