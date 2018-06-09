@@ -284,28 +284,12 @@ export default class GLTFLoader {
           textureUri = basePath + imageFileStr;
         }
       }
-/*
-      let isNeededToMultiplyAlphaToColorOfTexture = false;
-      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-        if (options.isTextureImageToLoadPreMultipliedAlpha) {
-          // Nothing to do because premultipling alpha is already done.
-        } else {
-          isNeededToMultiplyAlphaToColorOfTexture = true;
-        }
-      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-        if (options.isTextureImageToLoadPreMultipliedAlpha) {
-          // TODO: Implement to Make Texture Straight.
-        } else {
-          // Nothing to do because the texture is straight.
-        }
-      }
-      */
+
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT
-//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
       if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
