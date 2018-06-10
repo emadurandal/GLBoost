@@ -76,7 +76,7 @@ export default class GLTFLoader {
     }
 
     if (defaultOptions.loaderExtension && typeof defaultOptions.loaderExtension === "string") {
-      defaultOptions.loaderExtension = GLBoost[options.defaultShaderClass].getInstance();
+      defaultOptions.loaderExtension = GLBoost[options.loaderExtension].getInstance();
     }
 
     if (defaultOptions.statesOfElements) {
