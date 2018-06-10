@@ -74,6 +74,19 @@ export default class GLTFLoader {
     for (let optionName in options) {
       defaultOptions[optionName] = options[optionName];
     }
+
+    if (defaultOptions.loaderExtension && typeof defaultOptions.loaderExtension === "string") {
+      defaultOptions.loaderExtension = GLBoost[options.loaderExtension].getInstance();
+    }
+
+    if (defaultOptions.statesOfElements) {
+      for (let state of defaultOptions.statesOfElements) {
+        if (state.shaderClass && typeof state.shaderClass === "string") {
+          state.shaderClass = GLBoost[state.shaderClass];
+        }
+      }
+    }
+
     return defaultOptions;
   }
 
@@ -85,13 +98,19 @@ export default class GLTFLoader {
    */
   loadGLTF(glBoostContext, url, options) {
     let defaultOptions = {
-      extensionLoader: null,
+      files: { 
+        //        "foo.gltf": content of file as ArrayBuffer, 
+        //        "foo.bin": content of file as ArrayBuffer, 
+        //        "boo.png": content of file as ArrayBuffer 
+      },
+      loaderExtension: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlphaAsDefault: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
       defaultShaderClass: null,
-      isAllMeshesTransparent: false,
+      isMeshTransparentAsDefault: false,
       statesOfElements: [
         {
           targets: [], //["name_foo", "name_boo"],
@@ -113,74 +132,94 @@ export default class GLTFLoader {
       ]
     };
 
-    let defaultShader = null;
+    this._materials = [];
+
+    let mustBeReadFromFile = false;
+    if (options.files) {
+      for (let fileName in options.files) {
+        const splitted = fileName.split('.');
+        const fileExtension = splitted[splitted.length - 1];
+
+        if (fileExtension === 'gltf' || fileExtension === 'glb') {
+          return new Promise((resolve, response)=>{
+            this.checkArrayBufferOfGltf(options.files[fileName], null, options, defaultOptions, glBoostContext, resolve);
+          }, (reject, error)=>{
+    
+          });
+        }
+      }      
+    }
 
     return DataUtil.loadResourceAsync(url, true,
       (resolve, response)=>{
         var arrayBuffer = response;
 
-        this._materials = [];
-
-        let dataView = new DataView(arrayBuffer, 0, 20);
-        let isLittleEndian = true;
-
-        // Magic field
-        let magicStr = '';
-        magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
-        magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
-
-        if (magicStr !== 'glTF') {
-          // It must be normal glTF (NOT binary) file...
-          let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-          let partsOfPath = url.split('/');
-          let basePath = '';
-          for (let i = 0; i < partsOfPath.length - 1; i++) {
-            basePath += partsOfPath[i] + '/';
-          }
-          let json = JSON.parse(gotText);
-
-          let glTFVer = this._checkGLTFVersion(json);
-
-
-          options = this.getOptions(defaultOptions, json, options);
-          defaultShader = this.getDefaultShader(options);
-
-          this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
-
-          return;
-        }
-
-        let gltfVer = dataView.getUint32(4, isLittleEndian);
-        if (gltfVer !== 1) {
-          reject('invalid version field in this binary glTF file.');
-        }
-
-        let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
-        let lengthOfContent = dataView.getUint32(12, isLittleEndian);
-        let contentFormat = dataView.getUint32(16, isLittleEndian);
-
-        if (contentFormat !== 0) { // 0 means JSON format
-          reject('invalid contentFormat field in this binary glTF file.');
-        }
-
-
-        let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
-        let gotText = DataUtil.arrayBufferToString(arrayBufferContent);
-        let json = JSON.parse(gotText);
-        let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
-
-        let glTFVer = this._checkGLTFVersion(json);
-
-        options = this.getOptions(defaultOptions, json, options);
-        defaultShader = this.getDefaultShader(options);
-
-        this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
+        this.checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve);
       }, (reject, error)=>{
 
-      });
+      }
+    );
 
+  }
+
+  checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve) {
+    let dataView = new DataView(arrayBuffer, 0, 20);
+    let isLittleEndian = true;
+    // Magic field
+    let magicStr = '';
+    magicStr += String.fromCharCode(dataView.getUint8(0, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(1, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
+    magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
+    if (magicStr !== 'glTF') {
+      this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve);
+    }
+    else {
+      this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, glBoostContext, resolve);
+    }
+  }
+
+  loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, glBoostContext, resolve) {
+    let gltfVer = dataView.getUint32(4, isLittleEndian);
+    if (gltfVer !== 1) {
+      reject('invalid version field in this binary glTF file.');
+    }
+    let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+    let lengthOfContent = dataView.getUint32(12, isLittleEndian);
+    let contentFormat = dataView.getUint32(16, isLittleEndian);
+    if (contentFormat !== 0) { // 0 means JSON format
+      reject('invalid contentFormat field in this binary glTF file.');
+    }
+    let arrayBufferContent = arrayBuffer.slice(20, lengthOfContent + 20);
+    let gotText = DataUtil.arrayBufferToString(arrayBufferContent);
+    let json = JSON.parse(gotText);
+    let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
+    let glTFVer = this._checkGLTFVersion(json);
+    options = this.getOptions(defaultOptions, json, options);
+    const defaultShader = this.getDefaultShader(options);
+    this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
+    return { options, defaultShader };
+  }
+
+  loadAsTextJson(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve) {
+    let gotText = DataUtil.arrayBufferToString(arrayBuffer);
+
+    let basePath = '';
+    if (url) {
+      let partsOfPath = url.split('/');
+      for (let i = 0; i < partsOfPath.length - 1; i++) {
+        basePath += partsOfPath[i] + '/';
+      }  
+    } else {
+      basePath = null;
+    }
+
+    let json = JSON.parse(gotText);
+    let glTFVer = this._checkGLTFVersion(json);
+    options = this.getOptions(defaultOptions, json, options);
+    const defaultShader = this.getDefaultShader(options);
+    this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
+    return { options, defaultShader };
   }
 
   _checkGLTFVersion(json) {
@@ -211,6 +250,18 @@ export default class GLTFLoader {
       }
 
       let shaderUri = shaderJson.uri;
+
+      if (options.files) {
+        const splitted = shaderUri.split('/');
+        const filename = splitted[splitted.length - 1];
+        if (options.files[filename]) {
+          const arrayBuffer = options.files[filename];
+          shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+          shaders[shaderName].shaderType = shaderType;
+          continue;
+        }
+      }
+
       if (shaderUri.match(/^data:/)) {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
@@ -240,7 +291,8 @@ export default class GLTFLoader {
     // Buffers Async load
     for (let bufferName in json.buffers) {
       let bufferInfo = json.buffers[bufferName];
-
+      const splitted = bufferInfo.uri.split('/');
+      const filename = splitted[splitted.length - 1];
       if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
@@ -251,6 +303,9 @@ export default class GLTFLoader {
         );
       } else if (bufferInfo.uri === 'data:,') {
         buffers[bufferName] = arrayBufferBinary;
+      } else if (options.files && options.files[filename]) {
+        const arrayBuffer = options.files[filename];
+        buffers[bufferName] = arrayBuffer;
       } else {
         promisesToLoadResources.push(
           DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
@@ -278,38 +333,31 @@ export default class GLTFLoader {
         textureUri = this._accessBinaryAsImage(imageJson.extensions.KHR_binary_glTF.bufferView, json, arrayBufferBinary, imageJson.extensions.KHR_binary_glTF.mimeType);
       } else {
         let imageFileStr = imageJson.uri;
-        if (imageFileStr.match(/^data:/)) {
+        const splitted = imageFileStr.split('/');
+        const filename = splitted[splitted.length - 1];
+        if (options.files) {
+          if (options.files[filename]) {
+            const arrayBuffer = options.files[filename];
+            const splitted = filename.split('.');
+            const fileExtension = splitted[splitted.length - 1];
+            textureUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
+          }
+        } else if (imageFileStr.match(/^data:/)) {
           textureUri = imageFileStr;
         } else {
           textureUri = basePath + imageFileStr;
         }
       }
-/*
-      let isNeededToMultiplyAlphaToColorOfTexture = false;
-      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-        if (options.isTextureImageToLoadPreMultipliedAlpha) {
-          // Nothing to do because premultipling alpha is already done.
-        } else {
-          isNeededToMultiplyAlphaToColorOfTexture = true;
-        }
-      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-        if (options.isTextureImageToLoadPreMultipliedAlpha) {
-          // TODO: Implement to Make Texture Straight.
-        } else {
-          // Nothing to do because the texture is straight.
-        }
-      }
-      */
+
       let texture = glBoostContext.createTexture(null, textureName, {
         'TEXTURE_MAG_FILTER': samplerJson.magFilter,
         'TEXTURE_MIN_FILTER': samplerJson.minFilter,
         'TEXTURE_WRAP_S': samplerJson.wrapS,
         'TEXTURE_WRAP_T': samplerJson.wrapT
-//        'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
       });
       
-      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
-        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      if (options.loaderExtension && options.loaderExtension.setUVTransformToTexture) {
+        options.loaderExtension.setUVTransformToTexture(texture, samplerJson);
       }
 
       let promise = texture.generateTextureFromUri(textureUri, false);
@@ -366,8 +414,8 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer, options);
 
-      if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
-        options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
       rootGroup.addChild(group);
@@ -517,7 +565,7 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
 
-    if (options && options.isAllMeshesTransparent) {
+    if (options && options.isMeshTransparentAsDefault) {
       mesh.isTransparent = true;
     }
 
@@ -615,8 +663,8 @@ export default class GLTFLoader {
         }
 */
         let material = null;
-        if (options && options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+          material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
@@ -654,8 +702,8 @@ export default class GLTFLoader {
         materials.push(material);
       } else {
         let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+          material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
@@ -861,6 +909,21 @@ export default class GLTFLoader {
             let texture = textures[textureStr];
             
             let isNeededToMultiplyAlphaToColorOfTexture = false;
+
+            if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
+                // Nothing to do because premultipling alpha is already done.
+              } else {
+                isNeededToMultiplyAlphaToColorOfTexture = true;
+              }
+            } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
+                // TODO: Implement to Make Texture Straight.
+              } else {
+                // Nothing to do because the texture is straight.
+              }
+            }
+
             if (options && options.statesOfElements) {
               for (let statesInfo of options.statesOfElements) {
                 if (statesInfo.targets) {
@@ -878,13 +941,13 @@ export default class GLTFLoader {
 
                     if (isMatch) {
                       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
                           // Nothing to do because premultipling alpha is already done.
                         } else {
                           isNeededToMultiplyAlphaToColorOfTexture = true;
                         }
                       } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
                           // TODO: Implement to Make Texture Straight.
                         } else {
                           // Nothing to do because the texture is straight.
@@ -945,22 +1008,22 @@ export default class GLTFLoader {
     } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
       switch (techniqueStr) {
         case 'CONSTANT':
-          if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-            material.shaderClass = options.extensionLoader.getDecalShader();
+          if (options.loaderExtension && options.loaderExtension.getDecalShader) {
+            material.shaderClass = options.loaderExtension.getDecalShader();
           } else {
             material.shaderClass = DecalShader;
           }
           break;
         case 'LAMBERT':
-          if (options.extensionLoader && options.extensionLoader.getLambertShader) {
-            material.shaderClass = options.extensionLoader.getLambertShader();
+          if (options.loaderExtension && options.loaderExtension.getLambertShader) {
+            material.shaderClass = options.loaderExtension.getLambertShader();
           } else {
             material.shaderClass = LambertShader;
           }
           break;
         case 'PHONG':
-          if (options.extensionLoader && options.extensionLoader.getPhongShader) {
-            material.shaderClass = options.extensionLoader.getPhongShader();
+          if (options.loaderExtension && options.loaderExtension.getPhongShader) {
+            material.shaderClass = options.loaderExtension.getPhongShader();
           } else {
             material.shaderClass = PhongShader;
           }
@@ -970,8 +1033,8 @@ export default class GLTFLoader {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
-        if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-          material.shaderClass = options.extensionLoader.getDecalShader();
+        if (options.loaderExtension && options.loaderExtension.getDecalShader) {
+          material.shaderClass = options.loaderExtension.getDecalShader();
         } else {
           material.shaderClass = DecalShader;
         }
@@ -1123,8 +1186,8 @@ export default class GLTFLoader {
 
           let interpolationMethod = GLBoost.INTERPOLATION_LINEAR;
 
-          if (options.extensionLoader && options.extensionLoader.getAnimationInterpolationMethod) {
-            interpolationMethod = options.extensionLoader.getAnimationInterpolationMethod(samplerJson.interpolation);
+          if (options.loaderExtension && options.loaderExtension.getAnimationInterpolationMethod) {
+            interpolationMethod = options.loaderExtension.getAnimationInterpolationMethod(samplerJson.interpolation);
           }
 
           let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
@@ -1166,34 +1229,44 @@ export default class GLTFLoader {
     return DataUtil.arrayBufferToString(arrayBufferSliced);
   }
 
-  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+  _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
     let byteOffset = bufferViewJson.byteOffset;
     let byteLength = bufferViewJson.byteLength;
-
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
-    let bytes = new Uint8Array(arrayBufferSliced);
+    return arrayBufferSliced;
+  }
+
+  _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
+    let arrayBufferSliced = this._sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer);
+    return this._accessArrayBufferAsImage(arrayBufferSliced, mimeType);
+  }
+
+  _accessArrayBufferAsImage(arrayBuffer, imageType) {
+    let bytes = new Uint8Array(arrayBuffer);
     let binaryData = '';
     for (let i = 0, len = bytes.byteLength; i < len; i++) {
       binaryData += String.fromCharCode(bytes[i]);
     }
     let imgSrc = '';
-    if (mimeType == 'image/jpeg') {
+    if (imageType === 'image/jpeg' || imageType.toLowerCase() === 'jpg' || imageType.toLowerCase() === 'jpeg') {
       imgSrc = "data:image/jpeg;base64,";
-    } else if (mimeType == 'image/png') {
+    }
+    else if (imageType == 'image/png' || imageType.toLowerCase() === 'png') {
       imgSrc = "data:image/png;base64,";
-    } else if (mimeType == 'image/gif') {
+    }
+    else if (imageType == 'image/gif' || imageType.toLowerCase() === 'gif') {
       imgSrc = "data:image/gif;base64,";
-    } else if (mimeType == 'image/bmp') {
+    }
+    else if (imageType == 'image/bmp' || imageType.toLowerCase() === 'bmp') {
       imgSrc = "data:image/bmp;base64,";
-    } else {
+    }
+    else {
       imgSrc = "data:image/unknown;base64,";
     }
     let dataUrl = imgSrc + DataUtil.btoa(binaryData);
-
     return dataUrl;
   }
-
 
   static _isSystemLittleEndian() {
     return !!(new Uint8Array((new Uint16Array([0x00ff])).buffer))[0];
