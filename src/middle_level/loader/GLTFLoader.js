@@ -105,11 +105,12 @@ export default class GLTFLoader {
       },
       loaderExtension: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
+      isTextureImageToLoadPreMultipliedAlphaAsDefault: false,
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
       defaultShaderClass: null,
-      isAllMeshesTransparent: false,
+      isMeshTransparentAsDefault: false,
       statesOfElements: [
         {
           targets: [], //["name_foo", "name_boo"],
@@ -564,7 +565,7 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
 
-    if (options && options.isAllMeshesTransparent) {
+    if (options && options.isMeshTransparentAsDefault) {
       mesh.isTransparent = true;
     }
 
@@ -908,6 +909,21 @@ export default class GLTFLoader {
             let texture = textures[textureStr];
             
             let isNeededToMultiplyAlphaToColorOfTexture = false;
+
+            if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
+                // Nothing to do because premultipling alpha is already done.
+              } else {
+                isNeededToMultiplyAlphaToColorOfTexture = true;
+              }
+            } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
+                // TODO: Implement to Make Texture Straight.
+              } else {
+                // Nothing to do because the texture is straight.
+              }
+            }
+
             if (options && options.statesOfElements) {
               for (let statesInfo of options.statesOfElements) {
                 if (statesInfo.targets) {
@@ -925,13 +941,13 @@ export default class GLTFLoader {
 
                     if (isMatch) {
                       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
                           // Nothing to do because premultipling alpha is already done.
                         } else {
                           isNeededToMultiplyAlphaToColorOfTexture = true;
                         }
                       } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-                        if (statesInfo.isTextureImagePreMultipliedAlpha) {
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
                           // TODO: Implement to Make Texture Straight.
                         } else {
                           // Nothing to do because the texture is straight.
