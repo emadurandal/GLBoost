@@ -52,67 +52,70 @@ export default class GLTF2Loader {
     return DataUtil.loadResourceAsync(uri, true,
       (resolve, response)=>{
         var arrayBuffer = response;
+        this._checkArrayBufferOfGltf(arrayBuffer, uri, options, resolve);
+      }, (reject, error)=>{}
+    );
+  }
 
-        this._materials = [];
+  _checkArrayBufferOfGltf(arrayBuffer, uri, options, resolve) {
+    this._materials = [];
 
-        let dataView = new DataView(arrayBuffer, 0, 20);
-        let isLittleEndian = true;
+    let dataView = new DataView(arrayBuffer, 0, 20);
+    let isLittleEndian = true;
 
-        // Magic field
-        let magic = dataView.getUint32(0, isLittleEndian);
+    // Magic field
+    let magic = dataView.getUint32(0, isLittleEndian);
 
-        // 0x46546C67 is 'glTF' in ASCII codes.
-        if (magic !== 0x46546C67) {
-          // It must be normal glTF (NOT binary) file...
-          let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-          let partsOfPath = uri.split('/');
-          let basePath = '';
-          for (let i = 0; i < partsOfPath.length - 1; i++) {
-            basePath += partsOfPath[i] + '/';
-          }
-          let gltfJson = JSON.parse(gotText);
+    // 0x46546C67 is 'glTF' in ASCII codes.
+    if (magic !== 0x46546C67) {
+      // It must be normal glTF (NOT binary) file...
+      let gotText = DataUtil.arrayBufferToString(arrayBuffer);
+      let partsOfPath = uri.split('/');
+      let basePath = '';
+      for (let i = 0; i < partsOfPath.length - 1; i++) {
+        basePath += partsOfPath[i] + '/';
+      }
+      let gltfJson = JSON.parse(gotText);
 
-          //let glTFVer = this._checkGLTFVersion(gltfJson);
-          let promise = this._loadInner(null, basePath, gltfJson, options);
+      //let glTFVer = this._checkGLTFVersion(gltfJson);
+      let promise = this._loadInner(null, basePath, gltfJson, options);
 
-          promise.then((gltfJson) => {
-            console.log('Resoureces loading done!');
-            resolve(gltfJson[0][0]);
-          });
-  
-          return;
-        }
+      promise.then((gltfJson) => {
+        console.log('Resoureces loading done!');
+        resolve(gltfJson[0][0]);
+      });
 
-        let gltfVer = dataView.getUint32(4, isLittleEndian);
-        if (gltfVer !== 2) {
-          reject('invalid version field in this binary glTF file.');
-        }
+      return;
+    }
 
-        let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
-        let lengthOfJSonChunkData = dataView.getUint32(12, isLittleEndian);
-        let chunkType = dataView.getUint32(16, isLittleEndian);
+    let gltfVer = dataView.getUint32(4, isLittleEndian);
+    if (gltfVer !== 2) {
+      reject('invalid version field in this binary glTF file.');
+    }
 
-        // 0x4E4F534A means JSON format (0x4E4F534A is 'JSON' in ASCII codes)
-        if (chunkType !== 0x4E4F534A) {
-          reject('invalid chunkType of chunk0 in this binary glTF file.');
-        }
+    let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
+    let lengthOfJSonChunkData = dataView.getUint32(12, isLittleEndian);
+    let chunkType = dataView.getUint32(16, isLittleEndian);
+
+    // 0x4E4F534A means JSON format (0x4E4F534A is 'JSON' in ASCII codes)
+    if (chunkType !== 0x4E4F534A) {
+      reject('invalid chunkType of chunk0 in this binary glTF file.');
+    }
 
 
-        let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
-        let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
-        let gltfJson = JSON.parse(gotText);
-        let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
+    let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
+    let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
+    let gltfJson = JSON.parse(gotText);
+    let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
 
 //        let glTFVer = this._checkGLTFVersion(gltfJson);
 
-        let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options);
+    let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options);
 
-        promise.then((gltfJson) => {
-          console.log('Resoureces loading done!');
-          resolve(gltfJson[0][0]);
-        });
-      }, (reject, error)=>{}
-    );
+    promise.then((gltfJson) => {
+      console.log('Resoureces loading done!');
+      resolve(gltfJson[0][0]);
+    });
   }
 
   _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
@@ -409,8 +412,13 @@ export default class GLTF2Loader {
     for (let i in gltfJson.buffers) {
       let bufferInfo = gltfJson.buffers[i];
       if (typeof bufferInfo.uri === 'undefined') {
-        resources.buffers[i] = arrayBufferBinary;
-        bufferInfo.buffer = arrayBufferBinary;
+        promisesToLoadResources.push(
+          new Promise((resolve, rejected) => {
+            resources.buffers[i] = arrayBufferBinary;
+            bufferInfo.buffer = arrayBufferBinary;
+            resolve(gltfJson);
+          }
+        ));
       } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
