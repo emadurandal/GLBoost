@@ -74,6 +74,19 @@ export default class GLTFLoader {
     for (let optionName in options) {
       defaultOptions[optionName] = options[optionName];
     }
+
+    if (defaultOptions.loaderExtension && typeof defaultOptions.loaderExtension === "string") {
+      defaultOptions.loaderExtension = GLBoost[options.defaultShaderClass].getInstance();
+    }
+
+    if (defaultOptions.statesOfElements) {
+      for (let state of defaultOptions.statesOfElements) {
+        if (state.shaderClass && typeof state.shaderClass === "string") {
+          state.shaderClass = GLBoost[state.shaderClass];
+        }
+      }
+    }
+
     return defaultOptions;
   }
 
@@ -90,7 +103,7 @@ export default class GLTFLoader {
         //        "foo.bin": content of file as ArrayBuffer, 
         //        "boo.png": content of file as ArrayBuffer 
       },
-      extensionLoader: null,
+      loaderExtension: null,
       isNeededToMultiplyAlphaToColorOfPixelOutput: true,
       isExistJointGizmo: false,
       isBlend: false,
@@ -118,7 +131,6 @@ export default class GLTFLoader {
       ]
     };
 
-    let defaultShader = null;
     this._materials = [];
 
     let mustBeReadFromFile = false;
@@ -129,7 +141,7 @@ export default class GLTFLoader {
 
         if (fileExtension === 'gltf' || fileExtension === 'glb') {
           return new Promise((resolve, response)=>{
-            this.checkArrayBufferOfGltf(options.files[fileName], null, options, defaultOptions, defaultShader, glBoostContext, resolve);
+            this.checkArrayBufferOfGltf(options.files[fileName], null, options, defaultOptions, glBoostContext, resolve);
           }, (reject, error)=>{
     
           });
@@ -141,7 +153,7 @@ export default class GLTFLoader {
       (resolve, response)=>{
         var arrayBuffer = response;
 
-        this.checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);
+        this.checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve);
       }, (reject, error)=>{
 
       }
@@ -149,7 +161,7 @@ export default class GLTFLoader {
 
   }
 
-  checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+  checkArrayBufferOfGltf(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve) {
     let dataView = new DataView(arrayBuffer, 0, 20);
     let isLittleEndian = true;
     // Magic field
@@ -159,14 +171,14 @@ export default class GLTFLoader {
     magicStr += String.fromCharCode(dataView.getUint8(2, isLittleEndian));
     magicStr += String.fromCharCode(dataView.getUint8(3, isLittleEndian));
     if (magicStr !== 'glTF') {
-      this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve);
+      this.loadAsTextJson(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve);
     }
     else {
-      this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve);
+      this.loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, glBoostContext, resolve);
     }
   }
 
-  loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+  loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, glBoostContext, resolve) {
     let gltfVer = dataView.getUint32(4, isLittleEndian);
     if (gltfVer !== 1) {
       reject('invalid version field in this binary glTF file.');
@@ -183,12 +195,12 @@ export default class GLTFLoader {
     let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    defaultShader = this.getDefaultShader(options);
+    const defaultShader = this.getDefaultShader(options);
     this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
 
-  loadAsTextJson(arrayBuffer, url, options, defaultOptions, defaultShader, glBoostContext, resolve) {
+  loadAsTextJson(arrayBuffer, url, options, defaultOptions, glBoostContext, resolve) {
     let gotText = DataUtil.arrayBufferToString(arrayBuffer);
 
     let basePath = '';
@@ -204,7 +216,7 @@ export default class GLTFLoader {
     let json = JSON.parse(gotText);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    defaultShader = this.getDefaultShader(options);
+    const defaultShader = this.getDefaultShader(options);
     this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
@@ -343,8 +355,8 @@ export default class GLTFLoader {
         'TEXTURE_WRAP_T': samplerJson.wrapT
       });
       
-      if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
-        options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
+      if (options.loaderExtension && options.loaderExtension.setUVTransformToTexture) {
+        options.loaderExtension.setUVTransformToTexture(texture, samplerJson);
       }
 
       let promise = texture.generateTextureFromUri(textureUri, false);
@@ -401,8 +413,8 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer, options);
 
-      if (options && options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
-        options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
 
       rootGroup.addChild(group);
@@ -650,8 +662,8 @@ export default class GLTFLoader {
         }
 */
         let material = null;
-        if (options && options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+          material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
@@ -689,8 +701,8 @@ export default class GLTFLoader {
         materials.push(material);
       } else {
         let material = null;
-        if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-          material = options.extensionLoader.createClassicMaterial(glBoostContext);
+        if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+          material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
         }
@@ -980,22 +992,22 @@ export default class GLTFLoader {
     } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
       switch (techniqueStr) {
         case 'CONSTANT':
-          if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-            material.shaderClass = options.extensionLoader.getDecalShader();
+          if (options.loaderExtension && options.loaderExtension.getDecalShader) {
+            material.shaderClass = options.loaderExtension.getDecalShader();
           } else {
             material.shaderClass = DecalShader;
           }
           break;
         case 'LAMBERT':
-          if (options.extensionLoader && options.extensionLoader.getLambertShader) {
-            material.shaderClass = options.extensionLoader.getLambertShader();
+          if (options.loaderExtension && options.loaderExtension.getLambertShader) {
+            material.shaderClass = options.loaderExtension.getLambertShader();
           } else {
             material.shaderClass = LambertShader;
           }
           break;
         case 'PHONG':
-          if (options.extensionLoader && options.extensionLoader.getPhongShader) {
-            material.shaderClass = options.extensionLoader.getPhongShader();
+          if (options.loaderExtension && options.loaderExtension.getPhongShader) {
+            material.shaderClass = options.loaderExtension.getPhongShader();
           } else {
             material.shaderClass = PhongShader;
           }
@@ -1005,8 +1017,8 @@ export default class GLTFLoader {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
       } else {
-        if (options.extensionLoader && options.extensionLoader.getDecalShader) {
-          material.shaderClass = options.extensionLoader.getDecalShader();
+        if (options.loaderExtension && options.loaderExtension.getDecalShader) {
+          material.shaderClass = options.loaderExtension.getDecalShader();
         } else {
           material.shaderClass = DecalShader;
         }
@@ -1158,8 +1170,8 @@ export default class GLTFLoader {
 
           let interpolationMethod = GLBoost.INTERPOLATION_LINEAR;
 
-          if (options.extensionLoader && options.extensionLoader.getAnimationInterpolationMethod) {
-            interpolationMethod = options.extensionLoader.getAnimationInterpolationMethod(samplerJson.interpolation);
+          if (options.loaderExtension && options.loaderExtension.getAnimationInterpolationMethod) {
+            interpolationMethod = options.loaderExtension.getAnimationInterpolationMethod(samplerJson.interpolation);
           }
 
           let animInputArray = this._accessBinary(animInputAccessorStr, json, buffers);
