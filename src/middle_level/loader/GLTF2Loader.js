@@ -492,8 +492,13 @@ export default class GLTF2Loader {
     // Buffers Async load
     for (let i in gltfJson.buffers) {
       let bufferInfo = gltfJson.buffers[i];
-      const splitted = bufferInfo.uri.split('/');
-      const filename = splitted[splitted.length - 1];
+
+      let splitted = null;
+      let filename = null;
+      if (bufferInfo.uri) {
+        splitted = bufferInfo.uri.split('/');
+        filename = splitted[splitted.length - 1];  
+      }
       if (typeof bufferInfo.uri === 'undefined') {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
