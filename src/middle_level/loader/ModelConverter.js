@@ -37,6 +37,20 @@ export default class ModelConverter {
     return this[singleton];
   }
 
+  _getDefaultShader(options) {
+    let defaultShader = null;
+
+    if (options && typeof options.defaultShaderClass !== "undefined") {
+      if (typeof options.defaultShaderClass === "string") {
+        defaultShader = GLBoost[options.defaultShaderClass];
+      } else {
+        defaultShader = options.defaultShaderClass;
+      }
+    }
+
+    return defaultShader;
+  }
+
   convertToGLBoostModel(glBoostContext, gltfModel) {
 
     // load binary data
@@ -83,8 +97,8 @@ export default class ModelConverter {
     }
 
     let options = gltfModel.asset.extras.glboostOptions;
-    if (options.extensionLoader && options.extensionLoader.setAssetPropertiesToRootGroup) {
-      options.extensionLoader.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+    if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
     }
 
     return rootGroup;
@@ -199,7 +213,7 @@ export default class ModelConverter {
       glboostMeshes.push(glboostMesh);
 
       let options = gltfModel.asset.extras.glboostOptions;
-      if (options.isAllMeshesTransparent) {
+      if (options.isMeshTransparentAsDefault) {
         glboostMeshes.isTransparent = true;
       }
 
@@ -292,8 +306,8 @@ export default class ModelConverter {
           let material = primitive.material;
   
           let glboostMaterial = null;
-          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+            glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
           } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
@@ -309,13 +323,16 @@ export default class ModelConverter {
           materials.push(glboostMaterial);
         } else {
           let glboostMaterial = null;
-          if (options.extensionLoader && options.extensionLoader.createClassicMaterial) {
-            glboostMaterial = options.extensionLoader.createClassicMaterial(glBoostContext);
+          if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+            glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
           } else {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
-          if (options.defaultShader) {
-            glboostMaterial.shaderClass = options.defaultShader;
+
+          let options = gltfModel.asset.extras.glboostOptions;
+          const defaultShader = this._getDefaultShader(options);
+          if (defaultShader) {
+            glboostMaterial.shaderClass = defaultShader;
           } else {
             glboostMaterial.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
           }
@@ -463,18 +480,57 @@ export default class ModelConverter {
             let sampler = baseColorTexture.texture.sampler;
 
             let isNeededToMultiplyAlphaToColorOfTexture = false;
+
             if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
-              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
                 // Nothing to do because premultipling alpha is already done.
               } else {
                 isNeededToMultiplyAlphaToColorOfTexture = true;
               }
             } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-              if (options.isTextureImageToLoadPreMultipliedAlpha) {
+              if (options.isTextureImageToLoadPreMultipliedAlphaAsDefault) {
                 // TODO: Implement to Make Texture Straight.
               } else {
                 // Nothing to do because the texture is straight.
-              }        
+              }
+            }
+
+            if (options && options.statesOfElements) {
+              for (let statesInfo of options.statesOfElements) {
+                if (statesInfo.targets) {
+                  for (let target of statesInfo.targets) {
+                    let isMatch = false;
+                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
+                    switch (specifyMethod) {
+                      case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
+                        isMatch = group.userFlavorName === target; break;
+                      case GLBoost.QUERY_TYPE_INSTANCE_NAME:
+                        isMatch = group.instanceName === target; break;
+                      case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+                        isMatch = group.instanceNameWithUserFlavor === target; break;                      
+                    }
+
+                    if (isMatch) {
+                      if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
+                          // Nothing to do because premultipling alpha is already done.
+                        } else {
+                          isNeededToMultiplyAlphaToColorOfTexture = true;
+                        }
+                      } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+                        if (statesInfo.isTextureImageToLoadPreMultipliedAlpha) {
+                          // TODO: Implement to Make Texture Straight.
+                        } else {
+                          // Nothing to do because the texture is straight.
+                        }
+                      }
+                    }
+
+                    //texture.setParameter('UNPACK_PREMULTIPLY_ALPHA_WEBGL', isNeededToMultiplyAlphaToColorOfTexture);
+//                    texture.loadWebGLTexture();
+                  }
+                }
+              }
             }
 
             let texture = glBoostContext.createTexture(baseColorTexture.texture.image.image, '', {
@@ -529,8 +585,9 @@ export default class ModelConverter {
       gltfMaterial.setVertexN(geometry, indices.length);
     }
     
-    if (options.defaultShader) {
-      gltfMaterial.shaderClass = options.defaultShader;
+    const defaultShader = this._getDefaultShader(options);
+    if (defaultShader) {
+      gltfMaterial.shaderClass = defaultShader;
     }
   }
 
