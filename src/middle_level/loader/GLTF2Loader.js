@@ -162,7 +162,7 @@ export default class GLTF2Loader {
     let basePath = null;
     if (uri) {
       //Set the location of glb file as basePath
-      uri.substring(0, uri.lastIndexOf('/')) + '/';
+      basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
 
     let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
@@ -177,7 +177,7 @@ export default class GLTF2Loader {
     let basePath = null;
     if (uri) {
       //Set the location of gltf file as basePath
-      uri.substring(0, uri.lastIndexOf('/')) + '/';
+      basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
     let gltfJson = JSON.parse(gotText);
     options = this._getOptions(defaultOptions, gltfJson, options);
