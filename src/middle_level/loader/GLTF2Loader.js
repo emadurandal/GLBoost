@@ -174,15 +174,10 @@ export default class GLTF2Loader {
 
   _loadAsTextJson(arrayBuffer, uri, options, defaultOptions, resolve) {
     let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-    let basePath = '';
+    let basePath = null;
     if (uri) {
-      let partsOfPath = uri.split('/');
-      for (let i = 0; i < partsOfPath.length - 1; i++) {
-        basePath += partsOfPath[i] + '/';
-      }
-    }
-    else {
-      basePath = null;
+      //Set the location of gltf file as basePath
+      uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
     let gltfJson = JSON.parse(gotText);
     options = this._getOptions(defaultOptions, gltfJson, options);
