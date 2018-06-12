@@ -137,11 +137,11 @@ export default class GLTF2Loader {
     if (magic !== 0x46546C67) {
       this._loadAsTextJson(arrayBuffer, uri, options, defaultOptions, resolve);
     } else {
-      this._loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, resolve);
+      this._loadAsBinaryJson(dataView, uri, isLittleEndian, arrayBuffer, options, defaultOptions, resolve);
     }
   }
 
-  _loadAsBinaryJson(dataView, isLittleEndian, arrayBuffer, options, defaultOptions, resolve) {
+  _loadAsBinaryJson(dataView, uri, isLittleEndian, arrayBuffer, options, defaultOptions, resolve) {
     let gltfVer = dataView.getUint32(4, isLittleEndian);
     if (gltfVer !== 2) {
       reject('invalid version field in this binary glTF file.');
@@ -158,8 +158,14 @@ export default class GLTF2Loader {
     let gltfJson = JSON.parse(gotText);
     options = this._getOptions(defaultOptions, gltfJson, options);
     let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfJSonChunkData + 8);
-    //        let glTFVer = this._checkGLTFVersion(gltfJson);
-    let promise = this._loadInner(arrayBufferBinary, null, gltfJson, options);
+
+    let basePath = null;
+    if (uri) {
+      //Set the location of glb file as basePath
+      uri.substring(0, uri.lastIndexOf('/')) + '/';
+    }
+
+    let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
     promise.then((gltfJson) => {
       console.log('Resoureces loading done!');
       resolve(gltfJson[0][0]);
@@ -168,15 +174,10 @@ export default class GLTF2Loader {
 
   _loadAsTextJson(arrayBuffer, uri, options, defaultOptions, resolve) {
     let gotText = DataUtil.arrayBufferToString(arrayBuffer);
-    let basePath = '';
+    let basePath = null;
     if (uri) {
-      let partsOfPath = uri.split('/');
-      for (let i = 0; i < partsOfPath.length - 1; i++) {
-        basePath += partsOfPath[i] + '/';
-      }
-    }
-    else {
-      basePath = null;
+      //Set the location of gltf file as basePath
+      uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
     let gltfJson = JSON.parse(gotText);
     options = this._getOptions(defaultOptions, gltfJson, options);
