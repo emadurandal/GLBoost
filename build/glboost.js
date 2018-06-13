@@ -18750,13 +18750,11 @@ return mat4(
           let imageFileStr = imageJson.uri;
           const splitted = imageFileStr.split('/');
           const filename = splitted[splitted.length - 1];
-          if (options.files) {
-            if (options.files[filename]) {
-              const arrayBuffer = options.files[filename];
-              const splitted = filename.split('.');
-              const fileExtension = splitted[splitted.length - 1];
-              imageUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
-            }
+          if (options.files && options.files[filename]) {
+            const arrayBuffer = options.files[filename];
+            const splitted = filename.split('.');
+            const fileExtension = splitted[splitted.length - 1];
+            imageUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
           } else if (imageFileStr.match(/^data:/)) {
             imageUri = imageFileStr;
           } else {
