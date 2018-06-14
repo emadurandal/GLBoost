@@ -143,19 +143,28 @@ export default class Vector4 {
 
 
   divide(val:number) {
-    console.assert(val != 0, "0 division!");
     if (val !== 0) {
       this.x /= val;
       this.y /= val;
       this.z /= val;
       this.w /= val;
+    } else {
+      console.warn("0 division occured!");
+      this.x = Infinity;
+      this.y = Infinity;
+      this.z = Infinity;
+      this.w = Infinity;
     }
     return this;
   }
 
   static divide(vec4:Vector4, val:number) {
-    console.assert(val != 0, "0 division!");
-    return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+    if (val !== 0) {
+      return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+    } else {
+      console.warn("0 division occured!");
+      return new Vector4(Inifinity, Inifinity, Inifinity, Inifinity);
+    }
   }
 
   divideVector(vec4:Vector4) {

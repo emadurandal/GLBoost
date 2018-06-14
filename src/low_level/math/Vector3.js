@@ -186,11 +186,15 @@ export default class Vector3 {
    * 除算
    */
   divide(val:number) {
-    console.assert(val != 0, "0 division!");
     if (val !== 0) {
       this.x /= val;
       this.y /= val;
       this.z /= val;
+    } else {
+      console.warn("0 division occured!");
+      this.x = Infinity;
+      this.y = Infinity;
+      this.z = Infinity;
     }
 
     return this;
@@ -200,8 +204,12 @@ export default class Vector3 {
    * 除算（static版）
    */
   static divide(vec3:Vector3, val:number) {
-    console.assert(val != 0, "0 division!");
-    return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+    if (val !== 0) {
+      return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+    } else {
+      console.warn("0 division occured!");
+      return new Vector3(Inifinity, Inifinity, Inifinity);
+    }
   }
 
   multiply(val:number) {
