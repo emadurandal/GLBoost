@@ -7,7 +7,8 @@
     "example": "examples"
   },
   "scripts": {
-    "build": "npm run build-middle",
+    "setup": "cp ./pre-commit ./.git/hooks",
+    "build": "npm run setup && npm run build-middle && npx uglifyjs --source-map \"base='./build/',url='glboost.min.js.map'\" -o ./build/glboost.min.js -- ./build/glboost.js && bash versioning.sh",
     "build-middle": "rollup -c src/middle_level/rollup.config.js",
     "test": "mocha --compilers js:babel-register --timeout 10000 --recursive test/*.spec.js",
     "esdoc": "esdoc -c esdoc.json",
@@ -38,13 +39,12 @@
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.72.0",
     "http-server": "^0.10.0",
     "jest": "^22.4.3",
-    "rollup": "^0.59.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "flow-bin": "^0.72.0"
+    "rollup": "^0.59.4",
+    "rollup-plugin-flow": "^1.1.1",
+    "uglify-es": "^3.3.9"
   },
-  "dependencies": {
-    "rollup-plugin-flow": "^1.1.1"
-  }
+  "dependencies": {}
 }

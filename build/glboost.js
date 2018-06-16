@@ -11468,7 +11468,7 @@ return mat4(
     constructor(canvas, initParameter, gl, width, height) {
       this._setName();
 
-      console.log('*** GLBoost ' + GLBoost$1.Version + ' ***');
+      console.log('*** GLBoost ' + GLBoost$1.VERSION + ' ***');
 
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
@@ -20380,4 +20380,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-mod branch: feature/improve-versioning';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-1-g1ab08-mod branch: feature/improve-versioning';
