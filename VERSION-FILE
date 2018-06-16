@@ -1,0 +1,6 @@
+version: 0.0.4-mod
+branch: feature/improve-versioning
+3132c33707418e93b3229441bfa8a802d9d68b100f83fbd616987db2af0128d9 ./build/glboost.js
+3132c33707418e93b3229441bfa8a802d9d68b100f83fbd616987db2af0128d9 ./build/glboost.js
+3a879149d8f8ec75fa1a782a449f3d549afdcb18ed7be5cce0083baf431c216a ./build/glboost.min.js
+7f56f483bb12c6aad2da4e5ecef70a4a523ddd33173c0311b322c7414b25eea2 ./build/glboost.min.js.map
