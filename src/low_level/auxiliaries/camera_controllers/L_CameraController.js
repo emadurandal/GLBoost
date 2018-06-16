@@ -176,9 +176,16 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     if (eventTargetDom) {
-      eventTargetDom.addEventListener('mousedown', this._onMouseDown);
-      eventTargetDom.addEventListener('mouseup', this._onMouseUp);
-      eventTargetDom.addEventListener('mousemove', this._onMouseMove);
+      if ('ontouchend' in document) {
+        eventTargetDom.addEventListener('touchstart', this._onMouseDown);
+        eventTargetDom.addEventListener('touchend', this._onMouseUp);
+        eventTargetDom.addEventListener('touchmove', this._onMouseMove);          
+      }
+      if ('onmouseup' in document) {
+        eventTargetDom.addEventListener('mousedown', this._onMouseDown);
+        eventTargetDom.addEventListener('mouseup', this._onMouseUp);
+        eventTargetDom.addEventListener('mousemove', this._onMouseMove);          
+      }
       if (window.WheelEvent) {
         eventTargetDom.addEventListener("wheel", this._onMouseWheel);
       }
