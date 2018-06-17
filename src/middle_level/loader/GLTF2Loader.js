@@ -101,7 +101,7 @@ export default class GLTF2Loader {
       ]
     };
 
-    if (options.files) {
+    if (options && options.files) {
       for (let fileName in options.files) {
         const splitted = fileName.split('.');
         const fileExtension = splitted[splitted.length - 1];

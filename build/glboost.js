@@ -16872,7 +16872,7 @@ return mat4(
       };
 
       this._materials = [];
-      if (options.files) {
+      if (options && options.files) {
         for (let fileName in options.files) {
           const splitted = fileName.split('.');
           const fileExtension = splitted[splitted.length - 1];
@@ -18331,7 +18331,7 @@ return mat4(
         ]
       };
 
-      if (options.files) {
+      if (options && options.files) {
         for (let fileName in options.files) {
           const splitted = fileName.split('.');
           const fileExtension = splitted[splitted.length - 1];
@@ -20407,4 +20407,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-4-gd121-mod branch: refactor/code-organization';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-6-g576d97-mod branch: develop';

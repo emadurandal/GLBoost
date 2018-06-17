@@ -135,7 +135,7 @@ export default class GLTFLoader {
     this._materials = [];
 
     let mustBeReadFromFile = false;
-    if (options.files) {
+    if (options && options.files) {
       for (let fileName in options.files) {
         const splitted = fileName.split('.');
         const fileExtension = splitted[splitted.length - 1];
