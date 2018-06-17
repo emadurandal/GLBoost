@@ -3,7 +3,19 @@
 import GLBoost from '../globals';
 
 export default class AnimationPlayer {
+  __FpsForPlaying: number;
+  __animationStartTime: number;
+  __animationEndTime: number;
+  __animationStartRange: number;
+  __animationEndRange: number;
+  __animationCurrentTime: number;
+  __animationLength: number;
   __animationLastTime: number;
+  __currentMillisecondAtStart: number;
+  __isPlaying: boolean;
+  __currentMotion: string;
+
+  __animationMotions: Array<any>;
 
   constructor() {
   }
@@ -20,7 +32,7 @@ export default class AnimationPlayer {
     this.__animationLastTime = 0;
 
     this.__currentMillisecondAtStart = 0;
-    this.__isPlaying = 0;
+    this.__isPlaying = false;
     this.__currentMotion = "All";
     this.__animationMotions = [];
 
@@ -32,7 +44,7 @@ export default class AnimationPlayer {
     this.__currentMillisecondAtStart = Date.now();
   }
 
-  calcAnimationTime(speedRatio = 1) {
+  calcAnimationTime(speedRatio:number = 1) {
     if (!this.__isPlaying) {
       this.__currentMillisecondAtStart = Date.now();
       return this.__animationCurrentTime;
