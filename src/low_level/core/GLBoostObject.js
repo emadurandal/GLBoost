@@ -14,7 +14,12 @@ export default class GLBoostObject {
   _userFlavorName: string;
   _readyForDiscard: boolean;
   _classUniqueNumber: number;
-  _objectIndex:number;
+  _objectIndex: number;
+  _lightIndex: number;
+  _jointSetIndex: number;
+  _morphIndex: number;
+  _materialIndex: number;
+  _glContext: GLContext;
 
   constructor(glBoostContext:GLBoostLowContext, toRegister:boolean = true) {
     if (this.constructor === GLBoostObject) {

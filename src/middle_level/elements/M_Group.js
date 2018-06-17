@@ -1,10 +1,14 @@
 /* @flow */
 
+import type GLBoost from '../../globals';
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
 import M_Mesh from './meshes/M_Mesh';
 import M_AABBGizmo from '../elements/gizmos/M_AABBGizmo';
+import GLBoostObject from '../../low_level/core/GLBoostObject';
+
+type QueryMeta = {type: number, format: number};
 
 export default class M_Group extends M_Element {
   _elements:Array<M_Element>;
@@ -97,7 +101,7 @@ export default class M_Group extends M_Element {
     }
   }
 
-  _validateByQuery(object, query, queryMeta) {
+  _validateByQuery(object: GLBoostObject, query: string, queryMeta: QueryMeta) {
     let propertyName = '';
     if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME) {
       propertyName = 'instanceName';
@@ -123,7 +127,7 @@ export default class M_Group extends M_Element {
 
   }
 
-  searchElement(query, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElement(query: string, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     /*
     if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
       return element;
@@ -146,7 +150,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElementByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
@@ -164,7 +168,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElementsByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     let resultElements = [];
 
     if (element instanceof M_Group) {
@@ -188,12 +192,12 @@ export default class M_Group extends M_Element {
     return resultElements;
   }
 
-  searchElementsByType(type, element = this) {
+  searchElementsByType(type: GLBoostObject, element:M_Element = this) {
     if (element instanceof type) {
       return element;
     }
 
-    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+    if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
       let gizmos = element._gizmos;
       for (let gizmo of gizmos) {
         if (gizmo instanceof type) {
@@ -218,7 +222,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchGLBoostObjectByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchGLBoostObjectByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
     if (element instanceof M_Group) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
@@ -251,7 +255,7 @@ export default class M_Group extends M_Element {
     }
   }
 
-  searchGLBoostObjectsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchGLBoostObjectsByNameAndType(query, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
     let objects = [];
     if (element instanceof M_Group) {
       let children = element.getChildren();

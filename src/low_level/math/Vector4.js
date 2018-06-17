@@ -163,7 +163,7 @@ export default class Vector4 {
       return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
     } else {
       console.warn("0 division occured!");
-      return new Vector4(Inifinity, Inifinity, Inifinity, Inifinity);
+      return new Vector4(Infinity, Infinity, Infinity, Infinity);
     }
   }
 
