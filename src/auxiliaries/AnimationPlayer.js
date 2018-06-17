@@ -15,7 +15,7 @@ export default class AnimationPlayer {
   __isPlaying: boolean;
   __currentMotion: string;
 
-  __animationMotions: Array<any>;
+  __animationMotions: [];
 
   constructor() {
   }
@@ -115,7 +115,7 @@ export default class AnimationPlayer {
     return this.__animationMotions;
   }
 
-  set animationMotions(motions) {
+  set animationMotions(motions: []) {
     this.__animationMotions = motions;
   }
 }
