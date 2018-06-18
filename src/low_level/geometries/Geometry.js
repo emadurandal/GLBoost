@@ -170,7 +170,7 @@ export default class Geometry extends GLBoostObject {
     return (new Vector3(u[0], u[1], u[2])).normalize();
   }
 
-  _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, componentNum3) {
+  _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum) {
     let pos0Vec3 = new Vector3(
       this._vertices.position[pos0IndexBase],
       this._vertices.position[pos0IndexBase + 1],
@@ -204,6 +204,7 @@ export default class Geometry extends GLBoostObject {
       this._vertices.texcoord[uv2IndexBase + 1]
     );
 
+    const componentNum3 = 3;
     let tan0IndexBase = (i    ) * componentNum3;
     let tan1IndexBase = (i + 1) * componentNum3;
     let tan2IndexBase = (i + 2) * componentNum3;
@@ -237,7 +238,7 @@ export default class Geometry extends GLBoostObject {
 
     let incrementNum = 3; // gl.TRIANGLES
     if (primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
-      //incrementNum = 1;
+      incrementNum = 1;
     }
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
@@ -914,6 +915,12 @@ export default class Geometry extends GLBoostObject {
   rayCast(origVec3, dirVec3) {
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
+
+    const positionElementNumPerVertex = this._vertices.components.position;
+    let incrementNum = 3; // gl.TRIANGLES
+    if (this._primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+      incrementNum = 1;
+    }
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
         for (let i=0; i<vertexNum; i++) {
@@ -921,7 +928,7 @@ export default class Geometry extends GLBoostObject {
           let pos0IndexBase = j * positionElementNumPerVertex;
           let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-          const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
           if (result === null) {
             continue;
           }
@@ -939,7 +946,11 @@ export default class Geometry extends GLBoostObject {
             let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
             let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
             let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
-            const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+
+            if (!vertexIndices[k + 2]) {
+              break;
+            }
+            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
             if (result === null) {
               continue;
             }
@@ -957,7 +968,10 @@ export default class Geometry extends GLBoostObject {
   }
 
   _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
-    const vec3 = Vector3.subtract(origVec3,  this._vertices.arenberg3rdPosition[i]);
+    if (!this._vertices.arenberg3rdPosition[i]) {
+      return null;
+    }
+    const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
     const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
     const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
 
@@ -977,7 +991,7 @@ export default class Geometry extends GLBoostObject {
       return null;
     }
 
-    const fDat = 1.0 - U - V;
+    const fDat = 1.0 - u - v;
 
     const pos0Vec3 = new Vector3(
       this._vertices.position[pos0IndexBase],
@@ -998,9 +1012,9 @@ export default class Geometry extends GLBoostObject {
     );
 
 
-    const pos0 = pos0Vec3.multiply(fDat);
-    const pos1 = pos1Vec3.multiply(U);
-    const pos2 = pos2Vec3.multiply(V);
+    const pos0 = Vector3.multiply(pos0Vec3, u);
+    const pos1 = Vector3.multiply(pos1Vec3, v);
+    const pos2 = Vector3.multiply(pos2Vec3, fDat);
     const intersectedPosVec3 = Vector3.add(Vector3.add(pos0, pos1), pos2);
 
     return [t, intersectedPosVec3];
@@ -1009,13 +1023,13 @@ export default class Geometry extends GLBoostObject {
   _calcArenbergInverseMatrices(primitiveType) {
 
     const positionElementNumPerVertex = this._vertices.components.position;
-    const normalElementNumPerVertex = 3;
 
     let incrementNum = 3; // gl.TRIANGLES
     if (primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
-      //incrementNum = 1;
+      incrementNum = 1;
     }
     this._vertices.inverseArenbergMatrix = [];
+    this._vertices.arenberg3rdPosition = [];
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
         for (let i=0; i<vertexNum; i+=incrementNum) {
@@ -1034,6 +1048,9 @@ export default class Geometry extends GLBoostObject {
             let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
             let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
+            if (!vertexIndices[j + 2]) {
+              break;
+            }
             this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
 
           }
@@ -1083,24 +1100,25 @@ export default class Geometry extends GLBoostObject {
 
     const arenbergMatrix = new Matrix33(
       pos0Vec3.x - pos2Vec3.x, pos1Vec3.x - pos2Vec3.x, nx - pos2Vec3.x,
-      pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.x, ny - pos2Vec3.y,
-      pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.x, nz - pos2Vec3.z
+      pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.y, ny - pos2Vec3.y,
+      pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.z, nz - pos2Vec3.z
     );
 
     const inverseArenbergMatrix = arenbergMatrix.invert();
 
-    let arenberg0IndexBase = (i    ) * incrementNum;
-    let arenberg1IndexBase = (i + 1) * incrementNum;
-    let arenberg2IndexBase = (i + 2) * incrementNum;
+
+    let arenberg0IndexBase = (i    );
+    let arenberg1IndexBase = (i + 1);
+    let arenberg2IndexBase = (i + 2);
     if (vertexIndices) {
-      arenberg0IndexBase = vertexIndices[i] * incrementNum;
-      arenberg1IndexBase = vertexIndices[i + 1] * incrementNum;
-      arenberg2IndexBase = vertexIndices[i + 2] * incrementNum;
+      arenberg0IndexBase = vertexIndices[i];
+      arenberg1IndexBase = vertexIndices[i + 1];
+      arenberg2IndexBase = vertexIndices[i + 2];
     }
 
-    const triangleIdx = i/incrementNum;
-    this._vertices.inverseArenbergMatrix[triangleIdx] = inverseArenbergMatrix;
-    this._vertices.arenberg3rdPosition[triangleIdx] = pos2Vec3;
+//    const triangleIdx = i/incrementNum;
+    this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
+    this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
   }
 
 }

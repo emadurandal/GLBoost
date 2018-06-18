@@ -3561,6 +3561,30 @@
       
       return [v0, v1];
     }
+
+    static unProject(windowPosVec3, inversePVMat44, viewportVec4, zNear, zFar) {
+      const input = new Vector4(
+        (windowPosVec3.x - viewportVec4.x) / viewportVec4.z * 2 - 1.0,
+        (windowPosVec3.y - viewportVec4.y) / viewportVec4.w * 2 - 1.0,
+  //      (windowPosVec3.z - zNear) / (zFar - zNear),
+        2 * windowPosVec3.z - 1.0,
+        1.0
+      );
+
+      const PVMat44 = inversePVMat44;//Matrix44.transpose(inversePVMat44);
+
+      const out = PVMat44.multiplyVector(input);
+  //    const a = input.x * PVMat44.m03 + input.y * PVMat44.m13 + input.z * PVMat44.m23 + PVMat44.m33;
+  //    const a = input.x * PVMat44.m30 + input.y * PVMat44.m31 + input.z * PVMat44.m32 + PVMat44.m33;
+
+      if (out.w === 0) {
+        console.warn("Zero division!");
+      }
+
+      const output = out.multiply(1/out.w).toVector3();
+
+      return output;
+    }
   }
 
   GLBoost$1["MathUtil"] = MathUtil;
@@ -7046,7 +7070,7 @@ return mat4(
       return (new Vector3(u[0], u[1], u[2])).normalize();
     }
 
-    _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, componentNum3) {
+    _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum) {
       let pos0Vec3 = new Vector3(
         this._vertices.position[pos0IndexBase],
         this._vertices.position[pos0IndexBase + 1],
@@ -7080,6 +7104,7 @@ return mat4(
         this._vertices.texcoord[uv2IndexBase + 1]
       );
 
+      const componentNum3 = 3;
       let tan0IndexBase = (i    ) * componentNum3;
       let tan1IndexBase = (i + 1) * componentNum3;
       let tan2IndexBase = (i + 2) * componentNum3;
@@ -7112,7 +7137,9 @@ return mat4(
       this._vertices.componentType.tangent = 5126; // gl.FLOAT
 
       let incrementNum = 3; // gl.TRIANGLES
-      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) ;
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
           for (let i=0; i<vertexNum; i+=incrementNum) {
@@ -7785,6 +7812,12 @@ return mat4(
     rayCast(origVec3, dirVec3) {
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
+
+      const positionElementNumPerVertex = this._vertices.components.position;
+      let incrementNum = 3; // gl.TRIANGLES
+      if (this._primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
           for (let i=0; i<vertexNum; i++) {
@@ -7792,7 +7825,7 @@ return mat4(
             let pos0IndexBase = j * positionElementNumPerVertex;
             let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-            const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+            const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
             if (result === null) {
               continue;
             }
@@ -7810,7 +7843,11 @@ return mat4(
               let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
               let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
               let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
-              const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+
+              if (!vertexIndices[k + 2]) {
+                break;
+              }
+              const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
               if (result === null) {
                 continue;
               }
@@ -7828,7 +7865,10 @@ return mat4(
     }
 
     _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
-      const vec3 = Vector3.subtract(origVec3,  this._vertices.arenberg3rdPosition[i]);
+      if (!this._vertices.arenberg3rdPosition[i]) {
+        return null;
+      }
+      const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
       const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
       const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
 
@@ -7848,7 +7888,7 @@ return mat4(
         return null;
       }
 
-      const fDat = 1.0 - U - V;
+      const fDat = 1.0 - u - v;
 
       const pos0Vec3 = new Vector3(
         this._vertices.position[pos0IndexBase],
@@ -7869,9 +7909,9 @@ return mat4(
       );
 
 
-      const pos0 = pos0Vec3.multiply(fDat);
-      const pos1 = pos1Vec3.multiply(U);
-      const pos2 = pos2Vec3.multiply(V);
+      const pos0 = Vector3.multiply(pos0Vec3, u);
+      const pos1 = Vector3.multiply(pos1Vec3, v);
+      const pos2 = Vector3.multiply(pos2Vec3, fDat);
       const intersectedPosVec3 = Vector3.add(Vector3.add(pos0, pos1), pos2);
 
       return [t, intersectedPosVec3];
@@ -7882,8 +7922,11 @@ return mat4(
       const positionElementNumPerVertex = this._vertices.components.position;
 
       let incrementNum = 3; // gl.TRIANGLES
-      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) ;
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
       this._vertices.inverseArenbergMatrix = [];
+      this._vertices.arenberg3rdPosition = [];
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
           for (let i=0; i<vertexNum; i+=incrementNum) {
@@ -7902,6 +7945,9 @@ return mat4(
               let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
               let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
+              if (!vertexIndices[j + 2]) {
+                break;
+              }
               this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
 
             }
@@ -7951,24 +7997,25 @@ return mat4(
 
       const arenbergMatrix = new Matrix33(
         pos0Vec3.x - pos2Vec3.x, pos1Vec3.x - pos2Vec3.x, nx - pos2Vec3.x,
-        pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.x, ny - pos2Vec3.y,
-        pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.x, nz - pos2Vec3.z
+        pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.y, ny - pos2Vec3.y,
+        pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.z, nz - pos2Vec3.z
       );
 
       const inverseArenbergMatrix = arenbergMatrix.invert();
 
-      let arenberg0IndexBase = (i    ) * incrementNum;
-      let arenberg1IndexBase = (i + 1) * incrementNum;
-      let arenberg2IndexBase = (i + 2) * incrementNum;
+
+      let arenberg0IndexBase = (i    );
+      let arenberg1IndexBase = (i + 1);
+      let arenberg2IndexBase = (i + 2);
       if (vertexIndices) {
-        arenberg0IndexBase = vertexIndices[i] * incrementNum;
-        arenberg1IndexBase = vertexIndices[i + 1] * incrementNum;
-        arenberg2IndexBase = vertexIndices[i + 2] * incrementNum;
+        arenberg0IndexBase = vertexIndices[i];
+        arenberg1IndexBase = vertexIndices[i + 1];
+        arenberg2IndexBase = vertexIndices[i + 2];
       }
 
-      const triangleIdx = i/incrementNum;
-      this._vertices.inverseArenbergMatrix[triangleIdx] = inverseArenbergMatrix;
-      this._vertices.arenberg3rdPosition[triangleIdx] = pos2Vec3;
+  //    const triangleIdx = i/incrementNum;
+      this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
+      this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
     }
 
   }
@@ -12205,11 +12252,19 @@ return mat4(
       return this.geometry._getAppropriateMaterials(this);
     }
 
-    rayCast(origVec3InWorld, dirVec3InWorld) {
-      const origVec3 = this.inverseWorldMatrix.multiplyVector(origVec3InWorld.toVector4()).toVector3();
-      const dirVec3 = this.inverseWorldMatrix.multiplyVector(dirVec3InWorld.toVector4()).toVector3();
+    rayCast(x, y) {
 
-      this.geometry.rayCast(origVec3, dirVec3);
+      const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+      const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
+      const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
+      const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+
+      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal);
+      let intersectPositionInWorld = null;
+      if (result[0]) {
+        intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+      }
+      return [intersectPositionInWorld, result[1]];
     }
 
     clone() {
@@ -12844,6 +12899,24 @@ return mat4(
       this.removeAll();
     }
 
+    rayCast(x, y) {
+      const meshes = this.searchElementsByType(M_Mesh);
+      let currentShortestT = Number.MAX_VALUE;
+      let currentShortestIntersectedPosVec3 = null;
+      for (let mesh of meshes) {
+        const result = mesh.rayCast(x, y);
+        if (result === null) {
+          return [null, null];
+        }
+        const t = result[1];
+        if (t < currentShortestT) {
+          currentShortestT = t;
+          currentShortestIntersectedPosVec3 = result[0];
+        }
+      }
+
+      return [currentShortestIntersectedPosVec3, currentShortestT];
+    }
   }
 
   let singleton$3 = Symbol();
@@ -20621,4 +20694,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-11-g5239-mod branch: feature/raycast-picking';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-12-g42ab-mod branch: feature/raycast-picking';

@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import Vector2 from './Vector2';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
+import Matrix44 from './Matrix44';
 import Quaternion from './Quaternion';
 
 export default class MathUtil {
@@ -91,6 +92,30 @@ export default class MathUtil {
     v1 =iba / criteria; 
     
     return [v0, v1];
+  }
+
+  static unProject(windowPosVec3, inversePVMat44, viewportVec4, zNear, zFar) {
+    const input = new Vector4(
+      (windowPosVec3.x - viewportVec4.x) / viewportVec4.z * 2 - 1.0,
+      (windowPosVec3.y - viewportVec4.y) / viewportVec4.w * 2 - 1.0,
+//      (windowPosVec3.z - zNear) / (zFar - zNear),
+      2 * windowPosVec3.z - 1.0,
+      1.0
+    );
+
+    const PVMat44 = inversePVMat44;//Matrix44.transpose(inversePVMat44);
+
+    const out = PVMat44.multiplyVector(input);
+//    const a = input.x * PVMat44.m03 + input.y * PVMat44.m13 + input.z * PVMat44.m23 + PVMat44.m33;
+//    const a = input.x * PVMat44.m30 + input.y * PVMat44.m31 + input.z * PVMat44.m32 + PVMat44.m33;
+
+    if (out.w === 0) {
+      console.warn("Zero division!");
+    }
+
+    const output = out.multiply(1/out.w).toVector3();
+
+    return output;
   }
 }
 
