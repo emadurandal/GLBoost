@@ -422,6 +422,21 @@ export default class M_Element extends L_Element {
   
   }
 
+  get inverseWorldMatrix() {
+    return this.getInverseWorldMatrixAt(void 0);
+  }
+
+  getInverseWorldMatrixAt(input) {
+    let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+  
+    if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
+      this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
+      this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
+    }
+
+    return this._inverseMatrixAccumulatedAncestry.clone();
+  }
+
   get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
     if (this._parent === null) {
       return Matrix44$1.identity();

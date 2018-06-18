@@ -1,6 +1,6 @@
-version: 0.0.4-7-g3e73f-mod
+version: 0.0.4-8-gee75-mod
 branch: feature/raycast-picking
-02128ccdb6eb695790ed93e981670e4cf1de7464d136673deb89b63af27830a6 ./build/glboost.js
-02128ccdb6eb695790ed93e981670e4cf1de7464d136673deb89b63af27830a6 ./build/glboost.js
-373ed5158d761417cac7668eb2dbb76ebc3b604ada9530ba00ebaa536a26eaf7 ./build/glboost.min.js
-e93a359a3b613491e9fe0f0f3f1eea36fecb2e07be6749763ad41ff2cedd834b ./build/glboost.min.js.map
+ee2c36e3164076f4f711d5e26f86954a7f3470ec786063144cc77a73a1d5d9b6 ./build/glboost.js
+ee2c36e3164076f4f711d5e26f86954a7f3470ec786063144cc77a73a1d5d9b6 ./build/glboost.js
+e0a376311ac962b46313db1c4f4a859754666c0383a811b1907c00b525a33e2a ./build/glboost.min.js
+7bd8b5afd836906cef27d90c343d4fcc23fc9f274b1169cc482bb183bcbd70bd ./build/glboost.min.js.map

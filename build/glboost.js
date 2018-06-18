@@ -4519,6 +4519,21 @@
     
     }
 
+    get inverseWorldMatrix() {
+      return this.getInverseWorldMatrixAt(void 0);
+    }
+
+    getInverseWorldMatrixAt(input) {
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    
+      if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
+        this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
+        this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
+      }
+
+      return this._inverseMatrixAccumulatedAncestry.clone();
+    }
+
     get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
       if (this._parent === null) {
         return Matrix44$1.identity();
@@ -11996,6 +12011,10 @@ return mat4(
 
     getAppropriateMaterials() {
       return this.geometry._getAppropriateMaterials(this);
+    }
+
+    rayCast(origVec3InWorld, dirVec3InWorld) {
+      
     }
 
     clone() {
@@ -20407,4 +20426,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-7-g3e73f-mod branch: feature/raycast-picking';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-8-gee75-mod branch: feature/raycast-picking';
