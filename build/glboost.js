@@ -7783,7 +7783,98 @@ return mat4(
     }
 
     rayCast(origVec3, dirVec3) {
+      let currentShortestT = Number.MAX_VALUE;
+      let currentShortestIntersectedPosVec3 = null;
+      if ( this._vertices.texcoord ) {
+        if (!this._indicesArray) {
+          for (let i=0; i<vertexNum; i++) {
+            const j = i * incrementNum;
+            let pos0IndexBase = j * positionElementNumPerVertex;
+            let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
+            let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
+            const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+            if (result === null) {
+              continue;
+            }
+            const t = result[0];
+            if (result[0] < currentShortestT) {
+              currentShortestT = t;
+              currentShortestIntersectedPosVec3 = result[1];
+            }
+          }
+        } else {
+          for (let i=0; i<this._indicesArray.length; i++) {
+            let vertexIndices = this._indicesArray[i];
+            for (let j=0; j<vertexIndices.length; j++) {
+              const k = j * incrementNum;
+              let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
+              let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
+              let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+              const result = this._rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+              if (result === null) {
+                continue;
+              }
+              const t = result[0];
+              if (result[0] < currentShortestT) {
+                currentShortestT = t;
+                currentShortestIntersectedPosVec3 = result[1];
+              }
+            }
+          }
+        }
+      }
+      
+      return [currentShortestIntersectedPosVec3, currentShortestT];
+    }
 
+    _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
+      const vec3 = Vector3.subtract(origVec3,  this._vertices.arenberg3rdPosition[i]);
+      const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
+      const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
+
+      if (convertedDirVec3.z >= -(1e-6) && convertedDirVec3.z <= (1e-6)) {
+        return null;
+      }
+
+      const t = -convertedOrigVec3.z / convertedDirVec3.z;
+      
+      if(t <= (1e-5)) {
+        return null;
+      }
+
+      const u = convertedOrigVec3.x + t * convertedDirVec3.x;
+      const v = convertedOrigVec3.y + t * convertedDirVec3.y;
+      if (u < 0.0 || v < 0.0 || (u + v) > 1.0) {
+        return null;
+      }
+
+      const fDat = 1.0 - U - V;
+
+      const pos0Vec3 = new Vector3(
+        this._vertices.position[pos0IndexBase],
+        this._vertices.position[pos0IndexBase + 1],
+        this._vertices.position[pos0IndexBase + 2]
+      );
+
+      const pos1Vec3 = new Vector3(
+        this._vertices.position[pos1IndexBase],
+        this._vertices.position[pos1IndexBase + 1],
+        this._vertices.position[pos1IndexBase + 2]
+      );
+
+      const pos2Vec3 = new Vector3(
+        this._vertices.position[pos2IndexBase],
+        this._vertices.position[pos2IndexBase + 1],
+        this._vertices.position[pos2IndexBase + 2]
+      );
+
+
+      const pos0 = pos0Vec3.multiply(fDat);
+      const pos1 = pos1Vec3.multiply(U);
+      const pos2 = pos2Vec3.multiply(V);
+      const intersectedPosVec3 = Vector3.add(Vector3.add(pos0, pos1), pos2);
+
+      return [t, intersectedPosVec3];
     }
 
     _calcArenbergInverseMatrices(primitiveType) {
@@ -7877,8 +7968,7 @@ return mat4(
 
       const triangleIdx = i/incrementNum;
       this._vertices.inverseArenbergMatrix[triangleIdx] = inverseArenbergMatrix;
-      this._vertices.inverseArenbergMatrix[triangleIdx] = inverseArenbergMatrix;
-      this._vertices.inverseArenbergMatrix[triangleIdx] = inverseArenbergMatrix;
+      this._vertices.arenberg3rdPosition[triangleIdx] = pos2Vec3;
     }
 
   }
@@ -20531,4 +20621,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-10-gf2bf-mod branch: feature/raycast-picking';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-11-g5239-mod branch: feature/raycast-picking';
