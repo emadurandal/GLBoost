@@ -20407,4 +20407,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-6-g576d97-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-7-g3e73f-mod branch: feature/raycast-picking';
