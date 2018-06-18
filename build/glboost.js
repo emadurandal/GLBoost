@@ -12014,7 +12014,10 @@ return mat4(
     }
 
     rayCast(origVec3InWorld, dirVec3InWorld) {
-      
+      const origVec3 = this.inverseWorldMatrix.multiplyVector(origVec3InWorld.toVector4()).toVector3();
+      const dirVec3 = this.inverseWorldMatrix.multiplyVector(dirVec3InWorld.toVector4()).toVector3();
+
+      this.geometry.rayCast(origVec3, dirVec3);
     }
 
     clone() {
@@ -20426,4 +20429,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-8-gee75-mod branch: feature/raycast-picking';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-9-ge5ac-mod branch: feature/raycast-picking';

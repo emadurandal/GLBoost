@@ -251,6 +251,13 @@ export default class M_Mesh extends M_Element {
     return this.geometry._getAppropriateMaterials(this);
   }
 
+  rayCast(origVec3InWorld, dirVec3InWorld) {
+    const origVec3 = this.inverseWorldMatrix.multiplyVector(origVec3InWorld.toVector4()).toVector3();
+    const dirVec3 = this.inverseWorldMatrix.multiplyVector(dirVec3InWorld.toVector4()).toVector3();
+
+    this.geometry.rayCast(origVec3, dirVec3);
+  }
+
   clone() {
     let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
     this._copy(instance);
