@@ -1048,7 +1048,7 @@ export default class Geometry extends GLBoostObject {
             let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
             let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
-            if (!vertexIndices[j + 2]) {
+            if (vertexIndices[j + 2] === void 0) {
               break;
             }
             this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
