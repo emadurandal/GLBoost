@@ -251,7 +251,7 @@ export default class M_Mesh extends M_Element {
     return this.geometry._getAppropriateMaterials(this);
   }
 
-  rayCast(x, y) {
+  rayCast(x, y, camera, viewport) {
 
     const invPVW = GLBoost.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
     const origVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 0), invPVW, viewport);

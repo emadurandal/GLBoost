@@ -462,12 +462,12 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(x, y) {
+  rayCast(x, y, camera, viewport) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
     for (let mesh of meshes) {
-      const result = mesh.rayCast(x, y);
+      const result = mesh.rayCast(x, y, camera, viewport);
       if (result === null) {
         return [null, null];
       }

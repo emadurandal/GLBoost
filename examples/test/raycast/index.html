@@ -79,7 +79,7 @@ canvas.addEventListener("mousedown", (e)=>{
 
 
   let intersectPos, distance;
-  [intersectPos, distance] = scene.rayCast(x, y);
+  [intersectPos, distance] = scene.rayCast(x, y, camera, viewport);
 
   console.log(intersectPos ? intersectPos.toString() : "Not Hit", distance);
 

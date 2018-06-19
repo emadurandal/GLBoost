@@ -1,6 +1,6 @@
-version: 0.0.4-12-g42ab-mod
-branch: feature/raycast-picking
-ec91e8593d25abb8fb18078031f1db360aa1f62cca02057d264b0567020f3315 ./build/glboost.js
-ec91e8593d25abb8fb18078031f1db360aa1f62cca02057d264b0567020f3315 ./build/glboost.js
-a9efd2de9a1527bc79a389fdf24522ae0ea4be05add5508cf6a3a3d88b97b88a ./build/glboost.min.js
-7f1a46ebd1b6f003f600d485411338502ecf42fff3ea34bb35b26b2a783eaaef ./build/glboost.min.js.map
+version: 0.0.4-15-g42841-mod
+branch: develop
+4ee89f71d67f9c4e7c4180cf0559c42a5239f2c0e924a943f1a5032ed7722d82 ./build/glboost.js
+4ee89f71d67f9c4e7c4180cf0559c42a5239f2c0e924a943f1a5032ed7722d82 ./build/glboost.js
+3639c4a75869ba05dca11d17eb56396b2cfa54f8534d415d8f50bbde85b32632 ./build/glboost.min.js
+8be0f1c6f6049ca5f36984de4c5c59de3899275063cfe2abf5e4c720d923be28 ./build/glboost.min.js.map

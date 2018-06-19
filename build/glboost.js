@@ -12252,7 +12252,7 @@ return mat4(
       return this.geometry._getAppropriateMaterials(this);
     }
 
-    rayCast(x, y) {
+    rayCast(x, y, camera, viewport) {
 
       const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
       const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
@@ -12899,12 +12899,12 @@ return mat4(
       this.removeAll();
     }
 
-    rayCast(x, y) {
+    rayCast(x, y, camera, viewport) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
       for (let mesh of meshes) {
-        const result = mesh.rayCast(x, y);
+        const result = mesh.rayCast(x, y, camera, viewport);
         if (result === null) {
           return [null, null];
         }
@@ -20694,4 +20694,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-12-g42ab-mod branch: feature/raycast-picking';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-15-g42841-mod branch: develop';
