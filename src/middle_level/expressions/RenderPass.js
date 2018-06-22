@@ -441,17 +441,19 @@ export default class RenderPass extends GLBoostObject {
     this._gizmos = [];
     if (this._scene) {
       let elements = [];
+      Array.prototype.push.apply(this._gizmos, this._scene._gizmos);
       this._scene.getChildren().forEach((elm)=> {
+
+        // collect gizmos from elements
+        Array.prototype.push.apply(this._gizmos, elm._gizmos);
+
         // collect meshes
         this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
 
         // collect meshes
         elements = elements.concat(collectElements(elm, M_Element));
 
-        // collect gizmos from elements
-        for (let element of elements) {
-          Array.prototype.push.apply(this._gizmos, element._gizmos);
-        }
+
       });
     }
 

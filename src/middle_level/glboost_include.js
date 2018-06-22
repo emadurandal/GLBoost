@@ -12,6 +12,7 @@ import ObjLoader from './loader/ObjLoader';
 import '../InitialSettings';
 import Plane from '../low_level/primitives/Plane';
 import Cube from '../low_level/primitives/Cube';
+import Line from '../low_level/primitives/Line';
 import Sphere from '../low_level/primitives/Sphere';
 import Particle from '../low_level/primitives/Particle';
 import M_Group from './elements/M_Group';

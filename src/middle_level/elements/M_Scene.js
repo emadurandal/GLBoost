@@ -182,8 +182,8 @@ export default class M_Scene extends M_Group {
           callPrepareToRenderMethodOfAllElements(child);
         });
 
-        for (let meshGizmo of elem._gizmos) {
-          meshGizmo.prepareToRender(expression, existCamera_f, []);
+        for (let gizmo of elem._gizmos) {
+          gizmo.mesh.prepareToRender(expression, existCamera_f, []);
         }
       } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(expression, existCamera_f, this._lights);

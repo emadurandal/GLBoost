@@ -483,4 +483,8 @@ export default class M_Element extends L_Element {
       }
     }
   }
+
+  addGizmo(gizmo) {
+    this._gizmos.push(gizmo);
+  }
 }
