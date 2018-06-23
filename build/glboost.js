@@ -15955,7 +15955,8 @@ return mat4(
       this.__endPos = endPos;
 
       this._color = new GLBoost$1.Vector4(1, 1, 1, 1);
-      this._setupVertexData(startPos, endPos);
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+      this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
     }
 
     _setupVertexData(startPos, endPos) {
@@ -15970,10 +15971,12 @@ return mat4(
       colors.push(this._color);
       colors.push(this._color);
 
-      this.setVerticesData({
+      this._vertexData = {
         position: positions,
         color: colors
-      }, null, GLBoost$1.LINES);
+      };
+
+      return this._vertexData;
     }
 
     update() {
@@ -16026,7 +16029,8 @@ return mat4(
       this._primitive = new Line(glBoostContext);
 
       //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
-      this._mesh = new M_Mesh(glBoostContext, this._primitive, null);
+      const material = glBoostContext.createClassicMaterial();
+      this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
       this._mesh.masterElement = this;
       this.addChild(this._mesh);
 
@@ -20820,4 +20824,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-19-gf6e5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-21-g3527-mod branch: develop';

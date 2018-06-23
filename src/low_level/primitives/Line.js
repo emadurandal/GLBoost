@@ -10,7 +10,8 @@ export default class Line extends Geometry {
     this.__endPos = endPos;
 
     this._color = new GLBoost.Vector4(1, 1, 1, 1);
-    this._setupVertexData(startPos, endPos);
+    this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+    this.setVerticesData(this._vertexData, null, GLBoost.LINES);
   }
 
   _setupVertexData(startPos, endPos) {
@@ -25,10 +26,12 @@ export default class Line extends Geometry {
     colors.push(this._color);
     colors.push(this._color);
 
-    this.setVerticesData({
+    this._vertexData = {
       position: positions,
       color: colors
-    }, null, GLBoost.LINES);
+    };
+
+    return this._vertexData;
   }
 
   update() {
