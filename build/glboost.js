@@ -17535,11 +17535,12 @@ return mat4(
     _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
       let rootGroup = glBoostContext.createGroup();
+      rootGroup.userFlavorName = 'glTFFileRoot';
 
       for (let sceneStr in json.scenes) {
         let sceneJson = json.scenes[sceneStr];
         let group = glBoostContext.createGroup();
-        group.userFlavorName = 'TopGroup';
+        group.userFlavorName = 'Scene_' + sceneStr;
         let nodeStr = null;
         for (let i = 0; i < sceneJson.nodes.length; i++) {
           nodeStr = sceneJson.nodes[i];
@@ -19369,6 +19370,7 @@ return mat4(
 
       // Root Group
       let rootGroup = glBoostContext.createGroup();
+      rootGroup.userFlavorName = 'FileRoot';
       if (gltfModel.scenes[0].nodesIndices) {
         for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
           rootGroup.addChild(groups[nodesIndex], true);
@@ -20824,4 +20826,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-21-g3527-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-22-ge0b5-mod branch: develop';
