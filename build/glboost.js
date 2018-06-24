@@ -20826,4 +20826,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-22-ge0b5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-24-g3ed7-mod branch: feature/camera-walk-through';
