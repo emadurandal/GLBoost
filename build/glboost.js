@@ -19777,7 +19777,6 @@ return mat4(
               glboostMaterial = glBoostContext.createClassicMaterial();
             }
 
-            let options = gltfModel.asset.extras.glboostOptions;
             const defaultShader = this._getDefaultShader(options);
             if (defaultShader) {
               glboostMaterial.shaderClass = defaultShader;
@@ -20985,4 +20984,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-27-gfea5-mod branch: feature/camera-walk-through';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-26-g5494-mod branch: develop';

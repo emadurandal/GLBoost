@@ -330,7 +330,6 @@ export default class ModelConverter {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
 
-          let options = gltfModel.asset.extras.glboostOptions;
           const defaultShader = this._getDefaultShader(options);
           if (defaultShader) {
             glboostMaterial.shaderClass = defaultShader;
