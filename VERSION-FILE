@@ -1,6 +1,6 @@
-version: 0.0.4-22-ge0b5-mod
-branch: develop
-b6deac496fa549338a43ba4bff7fa036df20897c8e8efd052d31003fb2500282 ./build/glboost.js
-b6deac496fa549338a43ba4bff7fa036df20897c8e8efd052d31003fb2500282 ./build/glboost.js
-86907249cdc8d1bc8bbaed11b7c302be0fdabf450ffa2ded1b45d176f60c3f1f ./build/glboost.min.js
-dd683cc2d05a7ecfe9a5c2d7f31c877f055a1bc9dc3d5418ddc80b045dca8ee8 ./build/glboost.min.js.map
+version: 0.0.4-27-gfea5-mod
+branch: feature/camera-walk-through
+6a6b6b717c323fe65ea0e84c391da664aa719772c526a752f2d4c6e406b35241 ./build/glboost.js
+6a6b6b717c323fe65ea0e84c391da664aa719772c526a752f2d4c6e406b35241 ./build/glboost.js
+ed9b43d3735cd57ed730011951d4797e249473c66ed393d79baa7a8d34eb51c7 ./build/glboost.min.js
+556cb0d28e9cfa72c840423ac819f50d59e46a7146139b2631dd54cb698c5112 ./build/glboost.min.js.map
