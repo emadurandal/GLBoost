@@ -1,6 +1,6 @@
-version: 0.0.4-26-g3732-mod
+version: 0.0.4-27-gfea5-mod
 branch: feature/camera-walk-through
-abc397a8be7d413a124d017e4c0985c5e3432c949b8ec506c3db4e690cb4249e ./build/glboost.js
-abc397a8be7d413a124d017e4c0985c5e3432c949b8ec506c3db4e690cb4249e ./build/glboost.js
-20823c03d4d4dd7003a0a9b468f6afed6b1a851eaabe2318ca4b848fecfb1de4 ./build/glboost.min.js
-64ade6cdd64a0cb20a1d9d03f227dc02e597a4dcce9a5baeff40af17d91ea316 ./build/glboost.min.js.map
+6a6b6b717c323fe65ea0e84c391da664aa719772c526a752f2d4c6e406b35241 ./build/glboost.js
+6a6b6b717c323fe65ea0e84c391da664aa719772c526a752f2d4c6e406b35241 ./build/glboost.js
+ed9b43d3735cd57ed730011951d4797e249473c66ed393d79baa7a8d34eb51c7 ./build/glboost.min.js
+556cb0d28e9cfa72c840423ac819f50d59e46a7146139b2631dd54cb698c5112 ./build/glboost.min.js.map

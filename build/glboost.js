@@ -10080,10 +10080,8 @@ return mat4(
         this._isKeyUp = false;
 
         if (typeof evt.buttons !== 'undefined') {
-          this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-            camera._needUpdateProjection();
-          });
+          this.updateCamera();
+
         }
         return false;
       };
@@ -10123,10 +10121,8 @@ return mat4(
             this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
           }
 
-          this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-            camera._needUpdateProjection();
-          });
+          this.updateCamera();
+
 
           if (!button_l) {
             return;
@@ -10145,10 +10141,8 @@ return mat4(
 
         if (this._rot_y < -this._verticalAngleThrethold + this._verticalAngleOfVectors) ;
 
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
 
       };
 
@@ -10175,12 +10169,14 @@ return mat4(
           this._rot_bgn_y = 0;
           this._rot_bgn_x = 0;
         }
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
       };
 
+      this.registerEventListeners(eventTargetDom);
+    }
+
+    registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
         if ('ontouchend' in document) {
           eventTargetDom.addEventListener('touchstart', this._onMouseDown);
@@ -10197,6 +10193,26 @@ return mat4(
         }
         eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
         eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
+      }
+    }
+
+    unregisterEventListeners(eventTargetDom = document) {
+      if (eventTargetDom) {
+        if ('ontouchend' in document) {
+          eventTargetDom.removeEventListener('touchstart', this._onMouseDown);
+          eventTargetDom.removeEventListener('touchend', this._onMouseUp);
+          eventTargetDom.removeEventListener('touchmove', this._onMouseMove);          
+        }
+        if ('onmouseup' in document) {
+          eventTargetDom.removeEventListener('mousedown', this._onMouseDown);
+          eventTargetDom.removeEventListener('mouseup', this._onMouseUp);
+          eventTargetDom.removeEventListener('mousemove', this._onMouseMove);          
+        }
+        if (window.WheelEvent) {
+          eventTargetDom.removeEventListener("wheel", this._onMouseWheel);
+        }
+        eventTargetDom.removeEventListener('contextmenu', this._onContexMenu, false);
+        eventTargetDom.removeEventListener("dblclick", this._onMouseDblClick);
       }
     }
 
@@ -10360,6 +10376,13 @@ return mat4(
       });
     }
 
+    updateCamera() {
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+    }
+
     addCamera(camera) {
       this._camaras.add(camera);
     }
@@ -10396,10 +10419,7 @@ return mat4(
       this._wheel_y = Math.min(this._wheel_y, 3);
       this._wheel_y = Math.max(this._wheel_y, 0.01);
 
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-        camera._needUpdateProjection();
-      });
+      this.updateCamera();
     }
 
     get dolly() {
@@ -10434,12 +10454,12 @@ return mat4(
 
   }
 
+  GLBoost$1['L_CameraController'] = L_CameraController;
+
   class L_WalkThroughCameraController extends GLBoostObject {
     constructor(glBoostContext, options = {
       eventTargetDom: document,
-      forwardSpeed: 1,
-      backSpeed: 1,
-      virticalSpeed: 1,
+      horizontalSpeed: 1,
       turnSpeed: 5
     })
     {
@@ -10447,8 +10467,7 @@ return mat4(
 
       this._camaras = new Set();
 
-      this._forwardSpeed = options.forwardSpeed;
-      this._backSpeed = options.backSpeed;
+      this._horizontalSpeed = options.horizontalSpeed;
       this._virticalSpeed = options.virticalSpeed;
       this._turnSpeed = options.turnSpeed;
 
@@ -10461,10 +10480,7 @@ return mat4(
       this._onKeydown = (e)=> {
         this._isKeyDown = true;
         this._lastKeyCode = e.keyCode;
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
       };
 
       this._onKeyup = (e)=> {
@@ -10474,9 +10490,27 @@ return mat4(
 
       const eventTargetDom = options.eventTargetDom;
 
+      this.registerEventListeners(eventTargetDom);
+    }
+
+    updateCamera() {
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+    }
+
+    registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
         eventTargetDom.addEventListener('keydown', this._onKeydown);
         eventTargetDom.addEventListener('keyup', this._onKeyup);
+      }
+    }
+
+    unregisterEventListeners(eventTargetDom = document) {
+      if (eventTargetDom) {
+        eventTargetDom.removeEventListener('keydown', this._onKeydown);
+        eventTargetDom.removeEventListener('keyup', this._onKeyup);
       }
     }
 
@@ -10502,8 +10536,8 @@ return mat4(
       let newEyeToCenter = null;
       switch(this._lastKeyCode) {
         case 87: // w key
-          this._currentPos.add(Vector3.multiply(this._currentDir, this._forwardSpeed));
-          this._currentCenter.add(Vector3.multiply(this._currentDir, this._forwardSpeed));
+          this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
         break;
         case 65: // a key
           this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
@@ -10511,13 +10545,27 @@ return mat4(
           this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
         break;
         case 83: // s key
-          this._currentPos.add(Vector3.multiply(this._currentDir, -this._backSpeed));
-          this._currentCenter.add(Vector3.multiply(this._currentDir, -this._backSpeed));
+          this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
         break;
         case 68: // d key
           this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
           newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
           this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+        break;
+        case 81: // q key
+        {
+          const leftDir = Matrix33.rotateY(90).multiplyVector(this._currentDir);
+          this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+        }
+        break;
+        case 69: // e key
+        {
+          const rightDir = Matrix33.rotateY(-90).multiplyVector(this._currentDir);
+          this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+        }
         break;
         case 82: // r key
           this._currentPos.add(new Vector3(0, this._virticalSpeed, 0));
@@ -10529,7 +10577,7 @@ return mat4(
         break;
       }
 
-      console.log(this._currentPos.toString(), this._currentCenter.toString());
+  //    console.log(this._currentPos.toString(), this._currentCenter.toString());
 
       return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
     }
@@ -10538,6 +10586,8 @@ return mat4(
       return (this._currentCenter !== null) ? this._currentDir.clone() : null;
     }
   }
+
+  GLBoost$1['L_WalkThroughCameraController'] = L_WalkThroughCameraController;
 
   class MutableTexture extends AbstractTexture {
     constructor(glBoostContext, width, height, level = 0,
@@ -20935,4 +20985,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-26-g3732-mod branch: feature/camera-walk-through';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-27-gfea5-mod branch: feature/camera-walk-through';
