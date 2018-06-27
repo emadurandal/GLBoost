@@ -10533,6 +10533,10 @@ return mat4(
 
       return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
     }
+
+    getDirection() {
+      return (this._currentCenter !== null) ? this._currentDir.clone() : null;
+    }
   }
 
   class MutableTexture extends AbstractTexture {
@@ -20931,4 +20935,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-25-ge68ce-mod branch: feature/camera-walk-through';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-26-g3732-mod branch: feature/camera-walk-through';
