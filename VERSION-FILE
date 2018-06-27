@@ -1,6 +1,6 @@
-version: 0.0.4-24-g3ed7-mod
+version: 0.0.4-25-ge68ce-mod
 branch: feature/camera-walk-through
-e204de82ed0f4034379cb625f2d8851b7837467288144b7b6d1ff58af4b5fba7 ./build/glboost.js
-e204de82ed0f4034379cb625f2d8851b7837467288144b7b6d1ff58af4b5fba7 ./build/glboost.js
-eaa3477c6ee6f41f4347ef89976de23ccd562429be78e49f134e8dd7412a7a13 ./build/glboost.min.js
-dd683cc2d05a7ecfe9a5c2d7f31c877f055a1bc9dc3d5418ddc80b045dca8ee8 ./build/glboost.min.js.map
+6b18bc6fda19df3b305cf12b267fa0873327aad87a6b2ccb749dc75968e0ef48 ./build/glboost.js
+6b18bc6fda19df3b305cf12b267fa0873327aad87a6b2ccb749dc75968e0ef48 ./build/glboost.js
+77a29542da3c0e6236140ec4e571fbfed0f208a17174acbcd407f93830b7985d ./build/glboost.min.js
+f883c1011b89f86f6501a32ed34e6ec0534b2624e77a5c14b05fea1dffd19488 ./build/glboost.min.js.map
