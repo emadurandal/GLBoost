@@ -381,11 +381,12 @@ export default class GLTFLoader {
   _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
     let rootGroup = glBoostContext.createGroup();
+    rootGroup.userFlavorName = 'glTFFileRoot';
 
     for (let sceneStr in json.scenes) {
       let sceneJson = json.scenes[sceneStr];
       let group = glBoostContext.createGroup();
-      group.userFlavorName = 'TopGroup';
+      group.userFlavorName = 'Scene_' + sceneStr;
       let nodeStr = null;
       for (let i = 0; i < sceneJson.nodes.length; i++) {
         nodeStr = sceneJson.nodes[i];
