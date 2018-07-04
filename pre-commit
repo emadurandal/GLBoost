@@ -1,5 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
-npm rum build
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+if [[ $CURRENT_BRANCH = master || $CURRENT_BRANCH = develop ]]
+then
+    npm rum build
+fi
 
 git add ./VERSION-FILE ./build/glboost.js ./build/glboost.min.js ./build/glboost.min.js.map
