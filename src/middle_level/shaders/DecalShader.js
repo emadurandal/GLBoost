@@ -1,6 +1,6 @@
 import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
-import FragmentSimpleShader from './FragmentSimpleShader';
+import WireframeShader from './WireframeShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import Matrix44 from '../../low_level/math/Matrix44';
 
@@ -138,7 +138,7 @@ export class DecalShaderSource {
   }
 }
 
-export default class DecalShader extends FragmentSimpleShader {
+export default class DecalShader extends WireframeShader {
   constructor(glBoostContext) {
 
     super(glBoostContext);

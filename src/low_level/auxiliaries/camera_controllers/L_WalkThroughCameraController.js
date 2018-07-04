@@ -25,14 +25,12 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._currentDir = null;
 
     this._onKeydown = (e)=> {
-      e.preventDefault();
       this._isKeyDown = true;
       this._lastKeyCode = e.keyCode;
       this.updateCamera();
     };
 
     this._onKeyup = (e)=> {
-      e.preventDefault();
       this._isKeyDown = false;
       this._lastKeyCode = null;
     }
