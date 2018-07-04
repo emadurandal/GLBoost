@@ -25,12 +25,14 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._currentDir = null;
 
     this._onKeydown = (e)=> {
+      e.preventDefault();
       this._isKeyDown = true;
       this._lastKeyCode = e.keyCode;
       this.updateCamera();
     };
 
     this._onKeyup = (e)=> {
+      e.preventDefault();
       this._isKeyDown = false;
       this._lastKeyCode = null;
     }
@@ -83,19 +85,23 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     let newEyeToCenter = null;
     switch(this._lastKeyCode) {
       case 87: // w key
+      case 38: // arrow upper key
         this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
         this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
       break;
       case 65: // a key
+      case 37: // arrow left key
         this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
         newEyeToCenter = Matrix33.rotateY(this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
         this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
       break;
       case 83: // s key
+      case 40: // arrow down key
         this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
         this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
       break;
       case 68: // d key
+      case 39: // arrow right key
         this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
         newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
         this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
