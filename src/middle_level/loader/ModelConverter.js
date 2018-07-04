@@ -55,7 +55,7 @@ export default class ModelConverter {
 
     // load binary data
     for (let accessor of gltfModel.accessors) {
-      this._accessBinaryWithAccessor(accessor)
+      this._accessBinaryWithAccessor(accessor);
     }
 
     // Mesh data
@@ -99,7 +99,7 @@ export default class ModelConverter {
 
     let options = gltfModel.asset.extras.glboostOptions;
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
     }
 
     return rootGroup;

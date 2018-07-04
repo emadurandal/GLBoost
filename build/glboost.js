@@ -19547,7 +19547,7 @@ return mat4(
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
       }
 
       return rootGroup;
@@ -20984,4 +20984,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-36-g02e83-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-36-g3b2e-mod branch: develop';
