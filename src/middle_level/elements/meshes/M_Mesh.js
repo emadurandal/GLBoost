@@ -251,6 +251,21 @@ export default class M_Mesh extends M_Element {
     return this.geometry._getAppropriateMaterials(this);
   }
 
+  rayCast(x, y, camera, viewport) {
+
+    const invPVW = GLBoost.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+    const origVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 0), invPVW, viewport);
+    const distVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
+    const dirVecInLocal = GLBoost.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+
+    const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal);
+    let intersectPositionInWorld = null;
+    if (result[0]) {
+      intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+    }
+    return [intersectPositionInWorld, result[1]];
+  }
+
   clone() {
     let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
     this._copy(instance);

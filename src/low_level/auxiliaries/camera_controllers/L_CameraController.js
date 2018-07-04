@@ -4,6 +4,7 @@ import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
 import MathUtil from '../../math/MathUtil';
+import GLBoost from '../../../globals';
 
 export default class L_CameraController extends GLBoostObject {
   constructor(glBoostContext, 
@@ -70,10 +71,8 @@ export default class L_CameraController extends GLBoostObject {
       this._isKeyUp = false;
 
       if (typeof evt.buttons !== 'undefined') {
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
       }
       return false;
     };
@@ -113,10 +112,8 @@ export default class L_CameraController extends GLBoostObject {
           this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
         }
 
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
 
         if (!button_l) {
           return;
@@ -139,10 +136,8 @@ export default class L_CameraController extends GLBoostObject {
  //       this._rot_y += this._rot_y - (this._verticalAngleThrethold - this._verticalAngleOfVectors);
       }
 
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-        camera._needUpdateProjection();
-      });
+      this.updateCamera();
+
 
     };
 
@@ -169,12 +164,14 @@ export default class L_CameraController extends GLBoostObject {
         this._rot_bgn_y = 0;
         this._rot_bgn_x = 0;
       }
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-        camera._needUpdateProjection();
-      });
+      this.updateCamera();
+
     };
 
+    this.registerEventListeners(eventTargetDom);
+  }
+
+  registerEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
       if ('ontouchend' in document) {
         eventTargetDom.addEventListener('touchstart', this._onMouseDown);
@@ -191,6 +188,26 @@ export default class L_CameraController extends GLBoostObject {
       }
       eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
       eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
+    }
+  }
+
+  unregisterEventListeners(eventTargetDom = document) {
+    if (eventTargetDom) {
+      if ('ontouchend' in document) {
+        eventTargetDom.removeEventListener('touchstart', this._onMouseDown);
+        eventTargetDom.removeEventListener('touchend', this._onMouseUp);
+        eventTargetDom.removeEventListener('touchmove', this._onMouseMove);          
+      }
+      if ('onmouseup' in document) {
+        eventTargetDom.removeEventListener('mousedown', this._onMouseDown);
+        eventTargetDom.removeEventListener('mouseup', this._onMouseUp);
+        eventTargetDom.removeEventListener('mousemove', this._onMouseMove);          
+      }
+      if (window.WheelEvent) {
+        eventTargetDom.removeEventListener("wheel", this._onMouseWheel);
+      }
+      eventTargetDom.removeEventListener('contextmenu', this._onContexMenu, false);
+      eventTargetDom.removeEventListener("dblclick", this._onMouseDblClick);
     }
   }
 
@@ -354,6 +371,13 @@ export default class L_CameraController extends GLBoostObject {
     });
   }
 
+  updateCamera() {
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+      camera._needUpdateProjection();
+    });
+  }
+
   addCamera(camera) {
     this._camaras.add(camera);
   }
@@ -390,10 +414,7 @@ export default class L_CameraController extends GLBoostObject {
     this._wheel_y = Math.min(this._wheel_y, 3);
     this._wheel_y = Math.max(this._wheel_y, 0.01);
 
-    this._camaras.forEach(function (camera) {
-      camera._needUpdateView(false);
-      camera._needUpdateProjection();
-    });
+    this.updateCamera();
   }
 
   get dolly() {
@@ -427,3 +448,5 @@ export default class L_CameraController extends GLBoostObject {
   }
 
 }
+
+GLBoost['L_CameraController'] = L_CameraController;

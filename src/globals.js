@@ -1,8 +1,8 @@
 var global = ('global',eval)('this');
 
 (function (global) {
-  let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r3-dev' };
-
+  global.GLBoost = (typeof global.GLBoost !== 'undefined') ? global.GLBoost : {};
+  const GLBoost = global.GLBoost;
   if (typeof define === 'function' && define.amd) {
     define(function() { return GLBoost; });
   } else if (typeof exports === 'object') {

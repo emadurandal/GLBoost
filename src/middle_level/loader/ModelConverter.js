@@ -81,6 +81,7 @@ export default class ModelConverter {
 
     // Root Group
     let rootGroup = glBoostContext.createGroup();
+    rootGroup.userFlavorName = 'FileRoot';
     if (gltfModel.scenes[0].nodesIndices) {
       for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
         rootGroup.addChild(groups[nodesIndex], true);
@@ -329,7 +330,6 @@ export default class ModelConverter {
             glboostMaterial = glBoostContext.createClassicMaterial();
           }
 
-          let options = gltfModel.asset.extras.glboostOptions;
           const defaultShader = this._getDefaultShader(options);
           if (defaultShader) {
             glboostMaterial.shaderClass = defaultShader;

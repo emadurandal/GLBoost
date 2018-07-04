@@ -3,6 +3,7 @@
 import M_Element from './M_Element';
 import M_AbstractCamera from '../elements/cameras/M_AbstractCamera';
 import M_AbstractLight from './lights/M_AbstractLight';
+import type M_AmbientLight from './lights/M_AmbientLight';
 import M_Mesh from './meshes/M_Mesh';
 import M_Group from './M_Group';
 import AABB from '../../low_level/math/AABB';
@@ -16,7 +17,15 @@ import Vector4 from '../../low_level/math/Vector4';
  *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
  */
 export default class M_Scene extends M_Group {
-  _gl:WebGLRenderingContext;
+  _gl: WebGLRenderingContext;
+  _meshes: Array<M_Mesh>;
+  _elements: Array<M_Element>;
+  _accumulatedAmbientIntensity: Vector4;
+  _lights: M_AbstractLight;
+  _lightsExceptAmbient: M_AbstractLight;
+  _ambientLights: M_AmbientLight;
+  _cameras: Array<M_AbstractCamera>;
+  _currentAnimationInputValues: Object;
   
   /**
    * [en] constructor
@@ -173,8 +182,8 @@ export default class M_Scene extends M_Group {
           callPrepareToRenderMethodOfAllElements(child);
         });
 
-        for (let meshGizmo of elem._gizmos) {
-          meshGizmo.prepareToRender(expression, existCamera_f, []);
+        for (let gizmo of elem._gizmos) {
+          gizmo.mesh.prepareToRender(expression, existCamera_f, []);
         }
       } else if (elem instanceof M_Mesh) {
         elem.prepareToRender(expression, existCamera_f, this._lights);

@@ -208,7 +208,7 @@ export default class Vector3 {
       return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
     } else {
       console.warn("0 division occured!");
-      return new Vector3(Inifinity, Inifinity, Inifinity);
+      return new Vector3(Infinity, Infinity, Infinity);
     }
   }
 

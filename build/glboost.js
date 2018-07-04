@@ -4,12 +4,11 @@
   (factory());
 }(this, (function () { 'use strict';
 
-  // This revision is the commit right after the SHA: ########
   var global = (0, eval)('this');
 
   (function (global) {
-    let GLBoost = typeof global.GLBoost !== 'undefined' ? global.GLBoost : { REVISION: 'r3-dev' };
-
+    global.GLBoost = (typeof global.GLBoost !== 'undefined') ? global.GLBoost : {};
+    const GLBoost = global.GLBoost;
     if (typeof define === 'function' && define.amd) {
       define(function() { return GLBoost; });
     } else if (typeof exports === 'object') {
@@ -1225,7 +1224,12 @@
                             
                               
                                
+                         
                         
+                           
+                        
+                           
+                          
 
     constructor(glBoostContext                  , toRegister         = true) {
       if (this.constructor === GLBoostObject) {
@@ -1583,19 +1587,28 @@
 
 
     divide(val       ) {
-      console.assert(val != 0, "0 division!");
       if (val !== 0) {
         this.x /= val;
         this.y /= val;
         this.z /= val;
         this.w /= val;
+      } else {
+        console.warn("0 division occured!");
+        this.x = Infinity;
+        this.y = Infinity;
+        this.z = Infinity;
+        this.w = Infinity;
       }
       return this;
     }
 
     static divide(vec4        , val       ) {
-      console.assert(val != 0, "0 division!");
-      return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+      if (val !== 0) {
+        return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+      } else {
+        console.warn("0 division occured!");
+        return new Vector4(Infinity, Infinity, Infinity, Infinity);
+      }
     }
 
     divideVector(vec4        ) {
@@ -1838,11 +1851,15 @@
      * 除算
      */
     divide(val       ) {
-      console.assert(val != 0, "0 division!");
       if (val !== 0) {
         this.x /= val;
         this.y /= val;
         this.z /= val;
+      } else {
+        console.warn("0 division occured!");
+        this.x = Infinity;
+        this.y = Infinity;
+        this.z = Infinity;
       }
 
       return this;
@@ -1852,8 +1869,12 @@
      * 除算（static版）
      */
     static divide(vec3        , val       ) {
-      console.assert(val != 0, "0 division!");
-      return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+      if (val !== 0) {
+        return new Vector3(vec3.x / val, vec3.y / val, vec3.z / val);
+      } else {
+        console.warn("0 division occured!");
+        return new Vector3(Infinity, Infinity, Infinity);
+      }
     }
 
     multiply(val       ) {
@@ -3540,6 +3561,30 @@
       
       return [v0, v1];
     }
+
+    static unProject(windowPosVec3, inversePVMat44, viewportVec4, zNear, zFar) {
+      const input = new Vector4(
+        (windowPosVec3.x - viewportVec4.x) / viewportVec4.z * 2 - 1.0,
+        (windowPosVec3.y - viewportVec4.y) / viewportVec4.w * 2 - 1.0,
+  //      (windowPosVec3.z - zNear) / (zFar - zNear),
+        2 * windowPosVec3.z - 1.0,
+        1.0
+      );
+
+      const PVMat44 = inversePVMat44;//Matrix44.transpose(inversePVMat44);
+
+      const out = PVMat44.multiplyVector(input);
+  //    const a = input.x * PVMat44.m03 + input.y * PVMat44.m13 + input.z * PVMat44.m23 + PVMat44.m33;
+  //    const a = input.x * PVMat44.m30 + input.y * PVMat44.m31 + input.z * PVMat44.m32 + PVMat44.m33;
+
+      if (out.w === 0) {
+        console.warn("Zero division!");
+      }
+
+      const output = out.multiply(1/out.w).toVector3();
+
+      return output;
+    }
   }
 
   GLBoost$1["MathUtil"] = MathUtil;
@@ -4498,6 +4543,21 @@
     
     }
 
+    get inverseWorldMatrix() {
+      return this.getInverseWorldMatrixAt(void 0);
+    }
+
+    getInverseWorldMatrixAt(input) {
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    
+      if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
+        this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
+        this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
+      }
+
+      return this._inverseMatrixAccumulatedAncestry.clone();
+    }
+
     get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
       if (this._parent === null) {
         return Matrix44$1.identity();
@@ -4543,6 +4603,10 @@
           material.readyForDiscard();
         }
       }
+    }
+
+    addGizmo(gizmo) {
+      this._gizmos.push(gizmo);
     }
   }
 
@@ -7010,7 +7074,7 @@ return mat4(
       return (new Vector3(u[0], u[1], u[2])).normalize();
     }
 
-    _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, componentNum3) {
+    _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum) {
       let pos0Vec3 = new Vector3(
         this._vertices.position[pos0IndexBase],
         this._vertices.position[pos0IndexBase + 1],
@@ -7044,6 +7108,7 @@ return mat4(
         this._vertices.texcoord[uv2IndexBase + 1]
       );
 
+      const componentNum3 = 3;
       let tan0IndexBase = (i    ) * componentNum3;
       let tan1IndexBase = (i + 1) * componentNum3;
       let tan2IndexBase = (i + 2) * componentNum3;
@@ -7076,7 +7141,9 @@ return mat4(
       this._vertices.componentType.tangent = 5126; // gl.FLOAT
 
       let incrementNum = 3; // gl.TRIANGLES
-      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) ;
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
           for (let i=0; i<vertexNum; i+=incrementNum) {
@@ -7161,6 +7228,9 @@ return mat4(
       if (this._vertices.texcoord) {
         this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex, primitiveType);
       }
+
+      // for Raycast Picking
+      this._calcArenbergInverseMatrices(primitiveType);
 
       // Normal Array to Float32Array
       allVertexAttribs.forEach((attribName)=> {
@@ -7741,6 +7811,215 @@ return mat4(
         count = this._vertices.position.length;
       }
       return count;
+    }
+
+    rayCast(origVec3, dirVec3) {
+      let currentShortestT = Number.MAX_VALUE;
+      let currentShortestIntersectedPosVec3 = null;
+
+      const positionElementNumPerVertex = this._vertices.components.position;
+      let incrementNum = 3; // gl.TRIANGLES
+      if (this._primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
+      if ( this._vertices.texcoord ) {
+        if (!this._indicesArray) {
+          for (let i=0; i<vertexNum; i++) {
+            const j = i * incrementNum;
+            let pos0IndexBase = j * positionElementNumPerVertex;
+            let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
+            let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
+            const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+            if (result === null) {
+              continue;
+            }
+            const t = result[0];
+            if (result[0] < currentShortestT) {
+              currentShortestT = t;
+              currentShortestIntersectedPosVec3 = result[1];
+            }
+          }
+        } else {
+          for (let i=0; i<this._indicesArray.length; i++) {
+            let vertexIndices = this._indicesArray[i];
+            for (let j=0; j<vertexIndices.length; j++) {
+              const k = j * incrementNum;
+              let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
+              let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
+              let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+
+              if (vertexIndices[k + 2] === void 0) {
+                break;
+              }
+              const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
+              if (result === null) {
+                continue;
+              }
+              const t = result[0];
+              if (result[0] < currentShortestT) {
+                currentShortestT = t;
+                currentShortestIntersectedPosVec3 = result[1];
+              }
+            }
+          }
+        }
+      }
+      
+      return [currentShortestIntersectedPosVec3, currentShortestT];
+    }
+
+    _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
+      if (!this._vertices.arenberg3rdPosition[i]) {
+        return null;
+      }
+      const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
+      const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
+      const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
+
+      if (convertedDirVec3.z >= -(1e-6) && convertedDirVec3.z <= (1e-6)) {
+        return null;
+      }
+
+      const t = -convertedOrigVec3.z / convertedDirVec3.z;
+      
+      if(t <= (1e-5)) {
+        return null;
+      }
+
+      const u = convertedOrigVec3.x + t * convertedDirVec3.x;
+      const v = convertedOrigVec3.y + t * convertedDirVec3.y;
+      if (u < 0.0 || v < 0.0 || (u + v) > 1.0) {
+        return null;
+      }
+
+      const fDat = 1.0 - u - v;
+
+      const pos0Vec3 = new Vector3(
+        this._vertices.position[pos0IndexBase],
+        this._vertices.position[pos0IndexBase + 1],
+        this._vertices.position[pos0IndexBase + 2]
+      );
+
+      const pos1Vec3 = new Vector3(
+        this._vertices.position[pos1IndexBase],
+        this._vertices.position[pos1IndexBase + 1],
+        this._vertices.position[pos1IndexBase + 2]
+      );
+
+      const pos2Vec3 = new Vector3(
+        this._vertices.position[pos2IndexBase],
+        this._vertices.position[pos2IndexBase + 1],
+        this._vertices.position[pos2IndexBase + 2]
+      );
+
+
+      const pos0 = Vector3.multiply(pos0Vec3, u);
+      const pos1 = Vector3.multiply(pos1Vec3, v);
+      const pos2 = Vector3.multiply(pos2Vec3, fDat);
+      const intersectedPosVec3 = Vector3.add(Vector3.add(pos0, pos1), pos2);
+
+      return [t, intersectedPosVec3];
+    }
+
+    _calcArenbergInverseMatrices(primitiveType) {
+
+      const positionElementNumPerVertex = this._vertices.components.position;
+
+      let incrementNum = 3; // gl.TRIANGLES
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+        incrementNum = 1;
+      }
+      this._vertices.inverseArenbergMatrix = [];
+      this._vertices.arenberg3rdPosition = [];
+      if ( this._vertices.texcoord ) {
+        if (!this._indicesArray) {
+          for (let i=0; i<vertexNum; i+=incrementNum) {
+            let pos0IndexBase = i * positionElementNumPerVertex;
+            let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
+            let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
+
+            this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+
+          }
+        } else {
+          for (let i=0; i<this._indicesArray.length; i++) {
+            let vertexIndices = this._indicesArray[i];
+            for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+              let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
+              let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
+              let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+
+              if (vertexIndices[j + 2] === void 0) {
+                break;
+              }
+              this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+
+            }
+          }
+        }
+      }
+
+    }
+
+    _calcArenbergMatrixFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum) {
+      const pos0Vec3 = new Vector3(
+        this._vertices.position[pos0IndexBase],
+        this._vertices.position[pos0IndexBase + 1],
+        this._vertices.position[pos0IndexBase + 2]
+      );
+
+      const pos1Vec3 = new Vector3(
+        this._vertices.position[pos1IndexBase],
+        this._vertices.position[pos1IndexBase + 1],
+        this._vertices.position[pos1IndexBase + 2]
+      );
+
+      const pos2Vec3 = new Vector3(
+        this._vertices.position[pos2IndexBase],
+        this._vertices.position[pos2IndexBase + 1],
+        this._vertices.position[pos2IndexBase + 2]
+      );
+
+      const ax = pos0Vec3.x - pos2Vec3.x;
+      const ay = pos0Vec3.y - pos2Vec3.y;
+      const az = pos0Vec3.z - pos2Vec3.z;
+      const bx = pos1Vec3.x - pos2Vec3.x;
+      const by = pos1Vec3.y - pos2Vec3.y;
+      const bz = pos1Vec3.z - pos2Vec3.z;
+
+      let nx = ay * bz - az * by;
+      let ny = az * bx - ax * bz;
+      let nz = ax * by - ay * bx;
+      let da = Math.sqrt(nx * nx + ny * ny + nz * nz);
+      if (da <= 1e-6) {
+        return 0;
+      }
+      da = 1.0 / da;
+      nx *= da;
+      ny *= da;
+      nz *= da;
+
+      const arenbergMatrix = new Matrix33(
+        pos0Vec3.x - pos2Vec3.x, pos1Vec3.x - pos2Vec3.x, nx - pos2Vec3.x,
+        pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.y, ny - pos2Vec3.y,
+        pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.z, nz - pos2Vec3.z
+      );
+
+      const inverseArenbergMatrix = arenbergMatrix.invert();
+
+
+      let arenberg0IndexBase = (i    );
+      let arenberg1IndexBase = (i + 1);
+      let arenberg2IndexBase = (i + 2);
+      if (vertexIndices) {
+        arenberg0IndexBase = vertexIndices[i];
+        arenberg1IndexBase = vertexIndices[i + 1];
+        arenberg2IndexBase = vertexIndices[i + 2];
+      }
+
+  //    const triangleIdx = i/incrementNum;
+      this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
+      this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
     }
 
   }
@@ -9801,10 +10080,8 @@ return mat4(
         this._isKeyUp = false;
 
         if (typeof evt.buttons !== 'undefined') {
-          this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-            camera._needUpdateProjection();
-          });
+          this.updateCamera();
+
         }
         return false;
       };
@@ -9844,10 +10121,8 @@ return mat4(
             this._clickedMouseXOnCanvas = this._movedMouseXOnCanvas;
           }
 
-          this._camaras.forEach(function (camera) {
-            camera._needUpdateView(false);
-            camera._needUpdateProjection();
-          });
+          this.updateCamera();
+
 
           if (!button_l) {
             return;
@@ -9866,10 +10141,8 @@ return mat4(
 
         if (this._rot_y < -this._verticalAngleThrethold + this._verticalAngleOfVectors) ;
 
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
 
       };
 
@@ -9896,21 +10169,50 @@ return mat4(
           this._rot_bgn_y = 0;
           this._rot_bgn_x = 0;
         }
-        this._camaras.forEach(function (camera) {
-          camera._needUpdateView(false);
-          camera._needUpdateProjection();
-        });
+        this.updateCamera();
+
       };
 
+      this.registerEventListeners(eventTargetDom);
+    }
+
+    registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        eventTargetDom.addEventListener('mousedown', this._onMouseDown);
-        eventTargetDom.addEventListener('mouseup', this._onMouseUp);
-        eventTargetDom.addEventListener('mousemove', this._onMouseMove);
+        if ('ontouchend' in document) {
+          eventTargetDom.addEventListener('touchstart', this._onMouseDown);
+          eventTargetDom.addEventListener('touchend', this._onMouseUp);
+          eventTargetDom.addEventListener('touchmove', this._onMouseMove);          
+        }
+        if ('onmouseup' in document) {
+          eventTargetDom.addEventListener('mousedown', this._onMouseDown);
+          eventTargetDom.addEventListener('mouseup', this._onMouseUp);
+          eventTargetDom.addEventListener('mousemove', this._onMouseMove);          
+        }
         if (window.WheelEvent) {
           eventTargetDom.addEventListener("wheel", this._onMouseWheel);
         }
         eventTargetDom.addEventListener('contextmenu', this._onContexMenu, false);
         eventTargetDom.addEventListener("dblclick", this._onMouseDblClick);
+      }
+    }
+
+    unregisterEventListeners(eventTargetDom = document) {
+      if (eventTargetDom) {
+        if ('ontouchend' in document) {
+          eventTargetDom.removeEventListener('touchstart', this._onMouseDown);
+          eventTargetDom.removeEventListener('touchend', this._onMouseUp);
+          eventTargetDom.removeEventListener('touchmove', this._onMouseMove);          
+        }
+        if ('onmouseup' in document) {
+          eventTargetDom.removeEventListener('mousedown', this._onMouseDown);
+          eventTargetDom.removeEventListener('mouseup', this._onMouseUp);
+          eventTargetDom.removeEventListener('mousemove', this._onMouseMove);          
+        }
+        if (window.WheelEvent) {
+          eventTargetDom.removeEventListener("wheel", this._onMouseWheel);
+        }
+        eventTargetDom.removeEventListener('contextmenu', this._onContexMenu, false);
+        eventTargetDom.removeEventListener("dblclick", this._onMouseDblClick);
       }
     }
 
@@ -10074,6 +10376,13 @@ return mat4(
       });
     }
 
+    updateCamera() {
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+    }
+
     addCamera(camera) {
       this._camaras.add(camera);
     }
@@ -10110,10 +10419,7 @@ return mat4(
       this._wheel_y = Math.min(this._wheel_y, 3);
       this._wheel_y = Math.max(this._wheel_y, 0.01);
 
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-        camera._needUpdateProjection();
-      });
+      this.updateCamera();
     }
 
     get dolly() {
@@ -10147,6 +10453,141 @@ return mat4(
     }
 
   }
+
+  GLBoost$1['L_CameraController'] = L_CameraController;
+
+  class L_WalkThroughCameraController extends GLBoostObject {
+    constructor(glBoostContext, options = {
+      eventTargetDom: document,
+      horizontalSpeed: 1,
+      turnSpeed: 5
+    })
+    {
+      super(glBoostContext);
+
+      this._camaras = new Set();
+
+      this._horizontalSpeed = options.horizontalSpeed;
+      this._virticalSpeed = options.virticalSpeed;
+      this._turnSpeed = options.turnSpeed;
+
+      this._isKeyDown = false;
+      this._lastKeyCode = null;
+      this._currentPos = null;
+      this._currentCenter = null;
+      this._currentDir = null;
+
+      this._onKeydown = (e)=> {
+        this._isKeyDown = true;
+        this._lastKeyCode = e.keyCode;
+        this.updateCamera();
+      };
+
+      this._onKeyup = (e)=> {
+        this._isKeyDown = false;
+        this._lastKeyCode = null;
+      };
+
+      const eventTargetDom = options.eventTargetDom;
+
+      this.registerEventListeners(eventTargetDom);
+    }
+
+    updateCamera() {
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+        camera._needUpdateProjection();
+      });
+    }
+
+    registerEventListeners(eventTargetDom = document) {
+      if (eventTargetDom) {
+        eventTargetDom.addEventListener('keydown', this._onKeydown);
+        eventTargetDom.addEventListener('keyup', this._onKeyup);
+      }
+    }
+
+    unregisterEventListeners(eventTargetDom = document) {
+      if (eventTargetDom) {
+        eventTargetDom.removeEventListener('keydown', this._onKeydown);
+        eventTargetDom.removeEventListener('keyup', this._onKeyup);
+      }
+    }
+
+    tryReset() {
+
+    }
+
+    addCamera(camera) {
+      this._camaras.add(camera);
+    }
+
+    convert(camera) {
+      if (this._currentPos === null) {
+        this._currentPos = camera.eye.clone();
+      }
+      if (this._currentCenter === null) {
+        this._currentCenter = camera.center.clone();
+      }
+      if (this._currentDir === null) {
+        this._currentDir = Vector3.subtract(camera.center, camera.eye).normalize();
+      }
+
+      let newEyeToCenter = null;
+      switch(this._lastKeyCode) {
+        case 87: // w key
+          this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
+        break;
+        case 65: // a key
+          this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
+          newEyeToCenter = Matrix33.rotateY(this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+          this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+        break;
+        case 83: // s key
+          this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
+        break;
+        case 68: // d key
+          this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
+          newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+          this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+        break;
+        case 81: // q key
+        {
+          const leftDir = Matrix33.rotateY(90).multiplyVector(this._currentDir);
+          this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+        }
+        break;
+        case 69: // e key
+        {
+          const rightDir = Matrix33.rotateY(-90).multiplyVector(this._currentDir);
+          this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+        }
+        break;
+        case 82: // r key
+          this._currentPos.add(new Vector3(0, this._virticalSpeed, 0));
+          this._currentCenter.add(new Vector3(0, this._virticalSpeed, 0));
+        break;
+        case 70: // f key
+          this._currentPos.add(new Vector3(0, -this._virticalSpeed, 0));
+          this._currentCenter.add(new Vector3(0, -this._virticalSpeed, 0));
+        break;
+      }
+
+  //    console.log(this._currentPos.toString(), this._currentCenter.toString());
+
+      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
+    }
+
+    getDirection() {
+      return (this._currentCenter !== null) ? this._currentDir.clone() : null;
+    }
+  }
+
+  GLBoost$1['L_WalkThroughCameraController'] = L_WalkThroughCameraController;
 
   class MutableTexture extends AbstractTexture {
     constructor(glBoostContext, width, height, level = 0,
@@ -11445,7 +11886,7 @@ return mat4(
     constructor(canvas, initParameter, gl, width, height) {
       this._setName();
 
-      console.log('*** GLBoost revision ' + GLBoost$1.REVISION + ' ***');
+      console.log('*** GLBoost ' + GLBoost$1.VERSION + ' ***');
 
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
@@ -11538,6 +11979,10 @@ return mat4(
 
     createCameraController(options) {
       return new L_CameraController(this, options);
+    }
+
+    createWalkThroughCameraController(options) {
+      return new L_WalkThroughCameraController(this, options);
     }
 
     createTexture(src, userFlavorName, parameters = null) {
@@ -11970,6 +12415,21 @@ return mat4(
       return this.geometry._getAppropriateMaterials(this);
     }
 
+    rayCast(x, y, camera, viewport) {
+
+      const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+      const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
+      const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
+      const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+
+      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal);
+      let intersectPositionInWorld = null;
+      if (result[0]) {
+        intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+      }
+      return [intersectPositionInWorld, result[1]];
+    }
+
     clone() {
       let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
       this._copy(instance);
@@ -12161,6 +12621,8 @@ return mat4(
 
   /*       */
 
+                                                  
+
   class M_Group extends M_Element {
                                
 
@@ -12252,7 +12714,7 @@ return mat4(
       }
     }
 
-    _validateByQuery(object, query, queryMeta) {
+    _validateByQuery(object               , query        , queryMeta           ) {
       let propertyName = '';
       if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME) {
         propertyName = 'instanceName';
@@ -12278,7 +12740,7 @@ return mat4(
 
     }
 
-    searchElement(query, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElement(query        , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -12301,7 +12763,7 @@ return mat4(
       return null;
     }
 
-    searchElementByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
@@ -12319,7 +12781,7 @@ return mat4(
       return null;
     }
 
-    searchElementsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
@@ -12343,12 +12805,12 @@ return mat4(
       return resultElements;
     }
 
-    searchElementsByType(type, element = this) {
+    searchElementsByType(type               , element           = this) {
       if (element instanceof type) {
         return element;
       }
 
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
         for (let gizmo of gizmos) {
           if (gizmo instanceof type) {
@@ -12373,7 +12835,7 @@ return mat4(
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -12406,7 +12868,7 @@ return mat4(
       }
     }
 
-    searchGLBoostObjectsByNameAndType(query, type, queryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -12600,6 +13062,24 @@ return mat4(
       this.removeAll();
     }
 
+    rayCast(x, y, camera, viewport) {
+      const meshes = this.searchElementsByType(M_Mesh);
+      let currentShortestT = Number.MAX_VALUE;
+      let currentShortestIntersectedPosVec3 = null;
+      for (let mesh of meshes) {
+        const result = mesh.rayCast(x, y, camera, viewport);
+        if (result === null) {
+          return [null, null];
+        }
+        const t = result[1];
+        if (t < currentShortestT) {
+          currentShortestT = t;
+          currentShortestIntersectedPosVec3 = result[0];
+        }
+      }
+
+      return [currentShortestIntersectedPosVec3, currentShortestT];
+    }
   }
 
   let singleton$3 = Symbol();
@@ -13187,17 +13667,19 @@ return mat4(
       this._gizmos = [];
       if (this._scene) {
         let elements = [];
+        Array.prototype.push.apply(this._gizmos, this._scene._gizmos);
         this._scene.getChildren().forEach((elm)=> {
+
+          // collect gizmos from elements
+          Array.prototype.push.apply(this._gizmos, elm._gizmos);
+
           // collect meshes
           this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
 
           // collect meshes
           elements = elements.concat(collectElements(elm, M_Element));
 
-          // collect gizmos from elements
-          for (let element of elements) {
-            Array.prototype.push.apply(this._gizmos, element._gizmos);
-          }
+
         });
       }
 
@@ -13759,7 +14241,15 @@ return mat4(
    *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
    */
   class M_Scene extends M_Group {
-                              
+                               
+                           
+                                
+                                          
+                             
+                                          
+                                   
+                                      
+                                         
     
     /**
      * [en] constructor
@@ -13914,8 +14404,8 @@ return mat4(
             callPrepareToRenderMethodOfAllElements(child);
           });
 
-          for (let meshGizmo of elem._gizmos) {
-            meshGizmo.prepareToRender(expression, existCamera_f, []);
+          for (let gizmo of elem._gizmos) {
+            gizmo.mesh.prepareToRender(expression, existCamera_f, []);
           }
         } else if (elem instanceof M_Mesh) {
           elem.prepareToRender(expression, existCamera_f, this._lights);
@@ -15616,6 +16106,126 @@ return mat4(
     }
   }
 
+  class Line extends Geometry {
+    constructor(glBoostContext, startPos = Vector3.zero(), endPos = Vector3.zero()) {
+      super(glBoostContext);
+
+      this.__startPos = startPos;
+      this.__endPos = endPos;
+
+      this._color = new GLBoost$1.Vector4(1, 1, 1, 1);
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+      this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
+    }
+
+    _setupVertexData(startPos, endPos) {
+
+      let positions = [];
+
+      positions.push(startPos);
+      positions.push(endPos);
+
+      let colors = [];
+
+      colors.push(this._color);
+      colors.push(this._color);
+
+      this._vertexData = {
+        position: positions,
+        color: colors
+      };
+
+      return this._vertexData;
+    }
+
+    update() {
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+      this.updateVerticesData(this._vertexData, true);
+    }
+
+    set startPosition(startPos) {
+      this.__startPos = startPos;
+    }
+
+    get startPosition() {
+      return this.__startPos;
+    }
+    
+    set endPosition(endPos) {
+      this.__endPos = endPos;
+    }
+
+    get endPosition() {
+      return this.__endPos;
+    }
+
+    set color(vec) {
+      this._color = vec;
+
+      this._colors = [];
+      for(let i=0; i<2; i++) {
+        this._colors.push(this._color);
+      }
+    }
+
+    get color() {
+      return this._color;
+    }
+
+  }
+
+  GLBoost$1["Line"] = Line;
+
+  class M_HeightLineGizmo extends M_Gizmo {
+    constructor(glBoostContext) {
+      super(glBoostContext, null, null);
+      this._init(glBoostContext);
+
+      this.isVisible = false;
+    }
+
+    _init(glBoostContext) {
+      this._primitive = new Line(glBoostContext);
+
+      //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
+      const material = glBoostContext.createClassicMaterial();
+      this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
+      this._mesh.masterElement = this;
+      this.addChild(this._mesh);
+
+    }
+
+    set startPosition(startPos) {
+      this._primitive.startPosition = startPos;
+    }
+
+    get startPosition() {
+      return this._primitive.startPosition;
+    }
+    
+    set endPosition(endPos) {
+      this._primitive.endPosition = endPos;
+    }
+
+    get endPosition() {
+      return this._primitive.endPosition;
+    }
+
+    update() {
+      this._primitive.update();
+    }
+    
+    set isVisible(flag) {
+      this._mesh.isVisible = flag;
+    }
+
+    get isVisible() {
+      return this._mesh.isVisible;
+    }
+  }
+
+  GLBoost['M_HeightLineGizmo'] = M_HeightLineGizmo;
+
   class EffekseerElement extends M_Element {
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -15829,6 +16439,10 @@ return mat4(
 
     createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
       return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
+    }
+
+    createHeightLineGizmo(startPos, endPos) {
+      return new M_HeightLineGizmo(this, startPos, endPos);
     }
 
     createEffekseerElement() {
@@ -16834,7 +17448,7 @@ return mat4(
       };
 
       this._materials = [];
-      if (options.files) {
+      if (options && options.files) {
         for (let fileName in options.files) {
           const splitted = fileName.split('.');
           const fileExtension = splitted[splitted.length - 1];
@@ -17034,13 +17648,11 @@ return mat4(
           let imageFileStr = imageJson.uri;
           const splitted = imageFileStr.split('/');
           const filename = splitted[splitted.length - 1];
-          if (options.files) {
-            if (options.files[filename]) {
-              const arrayBuffer = options.files[filename];
-              const splitted = filename.split('.');
-              const fileExtension = splitted[splitted.length - 1];
-              textureUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
-            }
+          if (options.files && options.files[filename]) {
+            const arrayBuffer = options.files[filename];
+            const splitted = filename.split('.');
+            const fileExtension = splitted[splitted.length - 1];
+            textureUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
           } else if (imageFileStr.match(/^data:/)) {
             textureUri = imageFileStr;
           } else {
@@ -17082,11 +17694,12 @@ return mat4(
     _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
 
       let rootGroup = glBoostContext.createGroup();
+      rootGroup.userFlavorName = 'glTFFileRoot';
 
       for (let sceneStr in json.scenes) {
         let sceneJson = json.scenes[sceneStr];
         let group = glBoostContext.createGroup();
-        group.userFlavorName = 'TopGroup';
+        group.userFlavorName = 'Scene_' + sceneStr;
         let nodeStr = null;
         for (let i = 0; i < sceneJson.nodes.length; i++) {
           nodeStr = sceneJson.nodes[i];
@@ -18295,7 +18908,7 @@ return mat4(
         ]
       };
 
-      if (options.files) {
+      if (options && options.files) {
         for (let fileName in options.files) {
           const splitted = fileName.split('.');
           const fileExtension = splitted[splitted.length - 1];
@@ -18916,6 +19529,7 @@ return mat4(
 
       // Root Group
       let rootGroup = glBoostContext.createGroup();
+      rootGroup.userFlavorName = 'FileRoot';
       if (gltfModel.scenes[0].nodesIndices) {
         for (let nodesIndex of gltfModel.scenes[0].nodesIndices) {
           rootGroup.addChild(groups[nodesIndex], true);
@@ -19163,7 +19777,6 @@ return mat4(
               glboostMaterial = glBoostContext.createClassicMaterial();
             }
 
-            let options = gltfModel.asset.extras.glboostOptions;
             const defaultShader = this._getDefaultShader(options);
             if (defaultShader) {
               glboostMaterial.shaderClass = defaultShader;
@@ -20188,7 +20801,19 @@ return mat4(
   /*       */
 
   class AnimationPlayer {
+                            
+                                 
+                               
+                                  
                                 
+                                   
+                              
+                                
+                                        
+                         
+                            
+
+                           
 
     constructor() {
     }
@@ -20205,7 +20830,7 @@ return mat4(
       this.__animationLastTime = 0;
 
       this.__currentMillisecondAtStart = 0;
-      this.__isPlaying = 0;
+      this.__isPlaying = false;
       this.__currentMotion = "All";
       this.__animationMotions = [];
 
@@ -20217,7 +20842,7 @@ return mat4(
       this.__currentMillisecondAtStart = Date.now();
     }
 
-    calcAnimationTime(speedRatio = 1) {
+    calcAnimationTime(speedRatio        = 1) {
       if (!this.__isPlaying) {
         this.__currentMillisecondAtStart = Date.now();
         return this.__animationCurrentTime;
@@ -20288,7 +20913,7 @@ return mat4(
       return this.__animationMotions;
     }
 
-    set animationMotions(motions) {
+    set animationMotions(motions    ) {
       this.__animationMotions = motions;
     }
   }
@@ -20358,4 +20983,5 @@ return mat4(
   GLBoost$1["formatDetector"] = formatDetector;
 
 })));
-//# sourceMappingURL=glboost.js.map
+
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-36-g02e83-mod branch: develop';

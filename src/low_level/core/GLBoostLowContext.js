@@ -8,6 +8,7 @@ import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_FrustumCamera from '../elements/cameras/L_FrustumCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
 import L_CameraController from '../auxiliaries/camera_controllers/L_CameraController'
+import L_WalkThroughCameraController from '../auxiliaries/camera_controllers/L_WalkThroughCameraController'
 import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import PhinaTexture from '../textures/PhinaTexture';
@@ -23,7 +24,7 @@ export default class GLBoostLowContext {
   constructor(canvas, initParameter, gl, width, height) {
     this._setName();
 
-    console.log('*** GLBoost revision ' + GLBoost.REVISION + ' ***');
+    console.log('*** GLBoost ' + GLBoost.VERSION + ' ***');
 
     if (gl) {
       this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
@@ -116,6 +117,10 @@ export default class GLBoostLowContext {
 
   createCameraController(options) {
     return new L_CameraController(this, options);
+  }
+
+  createWalkThroughCameraController(options) {
+    return new L_WalkThroughCameraController(this, options);
   }
 
   createTexture(src, userFlavorName, parameters = null) {
