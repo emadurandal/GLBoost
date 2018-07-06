@@ -37,7 +37,7 @@ export class HalfLambertAndWrapLightingShaderSource {
       shaderText += '    diffuse *= diffuse;\n';
       shaderText += '    vec3 diffuseVec = vec3(diffuse, diffuse, diffuse);\n';
       shaderText += '    diffuseVec = (diffuseVec+wrap) / (1.0 + wrap);\n';  
-      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuseVec, 0.0) * surfaceColor;\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuseVec, 1.0) * surfaceColor;\n`;
       shaderText += '  }\n';
     }
     shaderText += '  rt0.xyz += ambient.xyz;\n';

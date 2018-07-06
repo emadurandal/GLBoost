@@ -33,7 +33,7 @@ export class LambertShaderSource {
       shaderText +=      Shader._generateLightStr(i);
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
       shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
-      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 0.0) * surfaceColor;\n`;
+      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
       shaderText += `  }\n`;
     }
     shaderText += '  rt0.xyz += ambient.xyz;\n';

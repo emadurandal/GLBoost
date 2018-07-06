@@ -152,7 +152,7 @@ export default class M_DirectionalLight extends M_AbstractLight {
   }
 
   get directionInWorld() {
-    let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+    let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
     return direction;
   }
 

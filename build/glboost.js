@@ -2472,6 +2472,294 @@
 
   GLBoost$1['Matrix33'] = Matrix33;
 
+  class Quaternion {
+
+    constructor(x, y, z, w) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    isEqual(vec) {
+      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    clone() {
+      return new Quaternion(this.x, this.y, this.z, this.w);
+    }
+
+    static invert(quat) {
+      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    }
+
+    static qlerp(lhq, rhq, ratio) {
+
+      var q = new Quaternion(0, 0, 0, 1);
+      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+      var ss = 1.0 - qr * qr;
+
+      if (ss === 0.0) {
+        q.w = lhq.w;
+        q.x = lhq.x;
+        q.y = lhq.y;
+        q.z = lhq.z;
+
+        return q;
+      } else {
+
+        if (qr > 1) {
+          qr = 0.999;
+        } else if (qr < -1) {
+          qr = -0.999;
+        }
+
+        let ph = Math.acos(qr);
+        let s2;
+        if(qr < 0.0 && ph > Math.PI / 2.0){
+          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+          ph = Math.acos(qr);
+          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+        } else {
+          s2 = Math.sin(ph * ratio) / Math.sin(ph);
+        }
+        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+        q.x = lhq.x * s1 + rhq.x * s2;
+        q.y = lhq.y * s1 + rhq.y * s2;
+        q.z = lhq.z * s1 + rhq.z * s2;
+        q.w = lhq.w * s1 + rhq.w * s2;
+
+        return q;
+      }
+    }
+
+    get rotationMatrix() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix44$2(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        0.0, 0.0, 0.0, 1.0
+      );
+    }
+
+    get rotationMatrix33() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix33(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
+      );
+    }
+
+    axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      this.w = Math.cos(halfAngle);
+      this.x = sin * axis.x;
+      this.y = sin * axis.y;
+      this.z = sin * axis.z;
+
+      return this;
+    }
+
+    static axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      return new Quaternion(
+        sin * axis.x,
+        sin * axis.y,
+        sin * axis.z,
+        Math.cos(halfAngle));
+    }
+
+    add(q) {
+      this.x += q.x;
+      this.y += q.y;
+      this.z += q.z;
+      this.w += q.w;
+
+      return this;
+    }
+
+    multiply(q) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
+      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
+      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
+      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+      this.x = result.x;
+      this.y = result.y;
+      this.z = result.z;
+      this.w = result.w;
+      
+      return this;
+    }
+
+    static multiply(q1, q2) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
+      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
+      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
+      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+      return result;
+    }
+
+    static fromMatrix(m) {
+      
+      let q = new Quaternion();
+      let tr = m.m00 + m.m11 + m.m22;
+
+      if (tr > 0) { 
+        let S = 0.5 / Math.sqrt(tr+1.0);
+        q.w = 0.25 / S;
+        q.x = (m.m21 - m.m12) * S;
+        q.y = (m.m02 - m.m20) * S; 
+        q.z = (m.m10 - m.m01) * S; 
+      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
+        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
+        q.w = (m.m21 - m.m12) / S;
+        q.x = 0.25 * S;
+        q.y = (m.m01 + m.m10) / S; 
+        q.z = (m.m02 + m.m20) / S; 
+      } else if (m.m11 > m.m22) { 
+        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+        q.w = (m.m02 - m.m20) / S;
+        q.x = (m.m01 + m.m10) / S; 
+        q.y = 0.25 * S;
+        q.z = (m.m12 + m.m21) / S; 
+      } else { 
+        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+        q.w = (m.m10 - m.m01) / S;
+        q.x = (m.m02 + m.m20) / S;
+        q.y = (m.m12 + m.m21) / S;
+        q.z = 0.25 * S;
+      }
+
+      return q;
+    }
+  /*
+    static fromMatrix(m) {
+      let fTrace = m.m[0] + m.m[4] + m.m[8];
+      let fRoot;
+      let q = new Quaternion();
+      if ( fTrace > 0.0 ) {
+        // |w| > 1/2, may as well choose w > 1/2
+        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+        q.w = 0.5 * fRoot;
+        fRoot = 0.5/fRoot;  // 1/(4w)
+        q.x = (m.m[5]-m.m[7])*fRoot;
+        q.y = (m.m[6]-m.m[2])*fRoot;
+        q.z = (m.m[1]-m.m[3])*fRoot;
+      } else {
+        // |w| <= 1/2
+        let i = 0;
+        if ( m.m[4] > m.m[0] )
+          i = 1;
+        if ( m.m[8] > m.m[i*3+i] )
+          i = 2;
+        let j = (i+1)%3;
+        let k = (i+2)%3;
+        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
+        
+        let setValue = function(q, i, value) {
+          switch (i) {
+            case 0: q.x = value; break;
+            case 1: q.y = value; break;
+            case 2: q.z = value; break;
+          }
+        }
+
+        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
+        fRoot = 0.5 / fRoot;
+        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
+
+        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
+        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
+      }
+
+      return q;
+    }
+  */
+
+    static fromPosition(vec3) {
+      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+      return q;
+    }
+
+    at(i) {
+      switch (i%4) {
+      case 0: return this.x;
+      case 1: return this.y;
+      case 2: return this.z;
+      case 3: return this.w;
+      }
+    }
+
+    setAt(i, val) {
+      switch (i%4) {
+      case 0: this.x = val; break;
+      case 1: this.y = val; break;
+      case 2: this.z = val; break;
+      case 3: this.w = val; break;
+      }
+    }
+
+    normalize() {
+      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+      this.x /= norm;
+      this.y /= norm;
+      this.z /= norm;
+      this.w /= norm;
+      return this;
+    }
+
+    toString() {
+      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+    }
+  }
+
+  GLBoost$1["Quaternion"] = Quaternion;
+
   class Matrix44$2 {
 
     constructor(m, isColumnMajor = false, notCopyFloat32Array = false
@@ -3181,297 +3469,15 @@
         Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
       );
     }
+
+    getRotate() {
+      const quat = Quaternion.fromMatrix(this);
+      const rotateMat = quat.rotationMatrix;
+      return rotateMat;
+    }
   }
 
   GLBoost$1["Matrix44"] = Matrix44$2;
-
-  class Quaternion {
-
-    constructor(x, y, z, w) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    isEqual(vec) {
-      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    clone() {
-      return new Quaternion(this.x, this.y, this.z, this.w);
-    }
-
-    static invert(quat) {
-      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
-    }
-
-    static qlerp(lhq, rhq, ratio) {
-
-      var q = new Quaternion(0, 0, 0, 1);
-      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
-      var ss = 1.0 - qr * qr;
-
-      if (ss === 0.0) {
-        q.w = lhq.w;
-        q.x = lhq.x;
-        q.y = lhq.y;
-        q.z = lhq.z;
-
-        return q;
-      } else {
-
-        if (qr > 1) {
-          qr = 0.999;
-        } else if (qr < -1) {
-          qr = -0.999;
-        }
-
-        let ph = Math.acos(qr);
-        let s2;
-        if(qr < 0.0 && ph > Math.PI / 2.0){
-          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
-          ph = Math.acos(qr);
-          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
-        } else {
-          s2 = Math.sin(ph * ratio) / Math.sin(ph);
-        }
-        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
-
-        q.x = lhq.x * s1 + rhq.x * s2;
-        q.y = lhq.y * s1 + rhq.y * s2;
-        q.z = lhq.z * s1 + rhq.z * s2;
-        q.w = lhq.w * s1 + rhq.w * s2;
-
-        return q;
-      }
-    }
-
-    get rotationMatrix() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix44$2(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
-        0.0, 0.0, 0.0, 1.0
-      );
-    }
-
-    get rotationMatrix33() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix33(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
-      );
-    }
-
-    axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      this.w = Math.cos(halfAngle);
-      this.x = sin * axis.x;
-      this.y = sin * axis.y;
-      this.z = sin * axis.z;
-
-      return this;
-    }
-
-    static axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      return new Quaternion(
-        sin * axis.x,
-        sin * axis.y,
-        sin * axis.z,
-        Math.cos(halfAngle));
-    }
-
-    add(q) {
-      this.x += q.x;
-      this.y += q.y;
-      this.z += q.z;
-      this.w += q.w;
-
-      return this;
-    }
-
-    multiply(q) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
-      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
-      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
-      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
-      this.x = result.x;
-      this.y = result.y;
-      this.z = result.z;
-      this.w = result.w;
-      
-      return this;
-    }
-
-    static multiply(q1, q2) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
-      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
-      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
-      return result;
-    }
-
-    static fromMatrix(m) {
-      
-      let q = new Quaternion();
-      let tr = m.m00 + m.m11 + m.m22;
-
-      if (tr > 0) { 
-        let S = 0.5 / Math.sqrt(tr+1.0);
-        q.w = 0.25 / S;
-        q.x = (m.m21 - m.m12) * S;
-        q.y = (m.m02 - m.m20) * S; 
-        q.z = (m.m10 - m.m01) * S; 
-      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
-        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
-        q.w = (m.m21 - m.m12) / S;
-        q.x = 0.25 * S;
-        q.y = (m.m01 + m.m10) / S; 
-        q.z = (m.m02 + m.m20) / S; 
-      } else if (m.m11 > m.m22) { 
-        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
-        q.w = (m.m02 - m.m20) / S;
-        q.x = (m.m01 + m.m10) / S; 
-        q.y = 0.25 * S;
-        q.z = (m.m12 + m.m21) / S; 
-      } else { 
-        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
-        q.w = (m.m10 - m.m01) / S;
-        q.x = (m.m02 + m.m20) / S;
-        q.y = (m.m12 + m.m21) / S;
-        q.z = 0.25 * S;
-      }
-
-      return q;
-    }
-  /*
-    static fromMatrix(m) {
-      let fTrace = m.m[0] + m.m[4] + m.m[8];
-      let fRoot;
-      let q = new Quaternion();
-      if ( fTrace > 0.0 ) {
-        // |w| > 1/2, may as well choose w > 1/2
-        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
-        q.w = 0.5 * fRoot;
-        fRoot = 0.5/fRoot;  // 1/(4w)
-        q.x = (m.m[5]-m.m[7])*fRoot;
-        q.y = (m.m[6]-m.m[2])*fRoot;
-        q.z = (m.m[1]-m.m[3])*fRoot;
-      } else {
-        // |w| <= 1/2
-        let i = 0;
-        if ( m.m[4] > m.m[0] )
-          i = 1;
-        if ( m.m[8] > m.m[i*3+i] )
-          i = 2;
-        let j = (i+1)%3;
-        let k = (i+2)%3;
-        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
-        
-        let setValue = function(q, i, value) {
-          switch (i) {
-            case 0: q.x = value; break;
-            case 1: q.y = value; break;
-            case 2: q.z = value; break;
-          }
-        }
-
-        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
-        fRoot = 0.5 / fRoot;
-        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
-
-        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
-        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
-      }
-
-      return q;
-    }
-  */
-
-    static fromPosition(vec3) {
-      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
-      return q;
-    }
-
-    at(i) {
-      switch (i%4) {
-      case 0: return this.x;
-      case 1: return this.y;
-      case 2: return this.z;
-      case 3: return this.w;
-      }
-    }
-
-    setAt(i, val) {
-      switch (i%4) {
-      case 0: this.x = val; break;
-      case 1: this.y = val; break;
-      case 2: this.z = val; break;
-      case 3: this.w = val; break;
-      }
-    }
-
-    normalize() {
-      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
-      this.x /= norm;
-      this.y /= norm;
-      this.z /= norm;
-      this.w /= norm;
-      return this;
-    }
-
-    toString() {
-      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
-    }
-  }
-
-  GLBoost$1["Quaternion"] = Quaternion;
 
   class MathUtil {
 
@@ -5894,7 +5900,6 @@ return mat4(
     static _generateLightStr(i) {
       let shaderText = '';
       
-      // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
       shaderText += `    vec3 lightDirection = lightDirection_world[${i}];\n`;    
       shaderText += `    if (0.4 < lightSpotInfo[${i}].x) {\n`; // is pointlight or spotlight
       shaderText += `      lightDirection = normalize(lightPosition_world[${i}] - v_position_world.xyz);\n`;
@@ -8690,6 +8695,238 @@ return mat4(
 
   GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
 
+  class WireframeShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_WireframeShaderSource(in_, out_, f) {
+      var shaderText = '';
+      shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
+      shaderText += `${out_} vec3 barycentricCoord;\n`;
+
+      // for Unfold UV
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+        shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
+      }
+      return shaderText;
+    }
+
+    VSTransform_WireframeShaderSource(existCamera_f, f) {
+      var shaderText = '';
+
+
+      // UV Unfold
+      shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
+      shaderText +=   '  gl_Position = position_world;\n';
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
+        shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
+        shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
+        shaderText += '  uvScaled.y = - uvScaled.y;\n';
+        shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+        shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
+      }
+
+      if (existCamera_f) {
+        shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+        shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
+      }
+
+      shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
+      return shaderText;
+    }
+
+    FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `${in_} vec3 barycentricCoord;\n`;
+
+      shaderText += 'uniform bool isWireframe;\n';
+      //shaderText += 'uniform bool isWireframeOnShade;\n';
+      shaderText += 'uniform float wireframeWidth;\n';
+
+      return shaderText;
+    }
+
+    FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `
+    float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
+        vec3 d = fwidth(bary3);
+        vec3 x = bary3+vec3(1.0 - wireframeWidthInner)*d;
+        vec3 a3 = smoothstep(vec3(0.0), d, x);
+        float factor = min(min(a3.x, a3.y), a3.z);
+        
+        return clamp((1.0 - factor), 0.0, 1.0);
+    }
+    `;
+
+      return shaderText;
+    }
+
+    FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'bool isWireframeInner = false;\n';
+      shaderText += 'float wireframeWidthRelativeScale = 1.0;\n';
+      
+      return shaderText;
+    }
+
+    FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
+      shaderText += 'float threshold = 0.001;\n';
+      shaderText += 'vec4 wireframeResult = rt0;\n';
+      shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
+      shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
+      shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
+      shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
+      // if r0.a is 0.0, it is wireframe not on shaded
+      shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
+      shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+      shaderText += '}\n';
+
+      shaderText += 'if ( isWireframe ) {\n';
+      shaderText += '  rt0 = wireframeResult;\n';
+      shaderText += '}\n';
+
+      shaderText += '    if (rt0.a < 0.05) {\n';
+      shaderText += '      discard;\n';
+      shaderText += '    }\n';
+
+      /*
+      //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += '  rt0 = vec4(normalize(v_normal)*0.5+0.5, 1.0);\n';
+      }
+      */
+
+      return shaderText;
+    }
+
+    prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+      shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
+      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
+      vertexAttribsAsResult.push('barycentricCoord');
+
+      let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
+      material.setUniform(shaderProgram, 'uniform_isWireframe', uniform_isWireframe);
+      this._glContext.uniform1i( uniform_isWireframe, 0, true);
+
+      let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidth', uniform_wireframeWidth);
+      this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
+
+      let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
+      this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
+
+      if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+        material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+        material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
+      }
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class WireframeShader extends FragmentSimpleShader {
+    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+
+      super(glBoostContext);
+
+      if (basicShader === VertexWorldShaderSource) {
+        WireframeShader.mixin(VertexWorldShadowShaderSource);
+      }
+      WireframeShader.mixin(WireframeShaderSource);
+
+      this._unfoldUVRatio = void 0;
+
+      this._AABB = null;
+
+    }
+
+    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let isWifeframe = false;
+      let isWireframeOnShade = false;
+      let wireframeWidth = 0.0;
+      let wireframeWidthRelativeScale = 0.0;
+
+      if (typeof material.isWireframe !== 'undefined') {
+        isWifeframe = material.isWireframe;
+        isWireframeOnShade = material.isWireframeOnShade;
+        wireframeWidth = material.wireframeWidth;
+        wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
+      }
+
+      let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
+      if (uniformLocationIsWireframe) {
+        this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
+      }
+      if (isWifeframe && !isWireframeOnShade) {
+        material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), 0.0, true);
+      }
+      let uniformLocationWireframeWidth = material.getUniform(glslProgram, 'uniform_wireframeWidth');
+      if (uniformLocationWireframeWidth) {
+        this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
+      }
+      let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram, 'uniform_wireframeWidthRelativeScale');
+      if (uniformLocationWireframeWidthRelativeScale) {
+        this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
+      }
+
+      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
+      if (uniformLocationAABBLengthCenterToCorner) {
+        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
+      }
+      let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
+      if (uniformLocationAABBCenterPositionAndRatio) {
+        let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
+        this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
+      }
+
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
+      if (uniformLocationDepthBias) {
+        let depthBias = this.getShaderParameter(material, 'depthBias', false);
+        if (depthBias) {
+          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
+        }
+      }
+    }
+
+    set unfoldUVRatio(value) {
+      this._unfoldUVRatio = value;
+    }
+
+    get unfoldUVRatio() {
+      return this._unfoldUVRatio;
+    }
+
+    set AABB(aabb) {
+      this._AABB = aabb;
+    }
+
+    get AABB() {
+      return this._AABB;
+    }
+
+  }
+
+  GLBoost['WireframeShader'] = WireframeShader;
+
   class DecalShaderSource {
     // In the context within these member methods,
     // this is the instance of the corresponding shader class.
@@ -8823,7 +9060,7 @@ return mat4(
     }
   }
 
-  class DecalShader extends FragmentSimpleShader {
+  class DecalShader extends WireframeShader {
     constructor(glBoostContext) {
 
       super(glBoostContext);
@@ -10536,19 +10773,23 @@ return mat4(
       let newEyeToCenter = null;
       switch(this._lastKeyCode) {
         case 87: // w key
+        case 38: // arrow upper key
           this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
           this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
         break;
         case 65: // a key
+        case 37: // arrow left key
           this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
           newEyeToCenter = Matrix33.rotateY(this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
           this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
         break;
         case 83: // s key
+        case 40: // arrow down key
           this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
           this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
         break;
         case 68: // d key
+        case 39: // arrow right key
           this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
           newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
           this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
@@ -15841,7 +16082,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
       return direction;
     }
 
@@ -15891,7 +16132,7 @@ return mat4(
       this._intensity = intensity;
       
       this._isLightType = 'spot';
-      this._direction = new Vector3(0.0, 0.0, 1.0);
+      this._direction = new Vector3(0.0, 1.0, 0.0);
 
       this.rotate = rotate;
 
@@ -16001,7 +16242,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
       return direction;
     }
 
@@ -17841,6 +18082,9 @@ return mat4(
               const color = lightJson.spot.color;
               light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
               light.rotate = new Vector3(0, 0, 0);
+              if (lightJson.spot.falloffAngle) {
+                light.spotCutoffInDegree = lightJson.spot.falloffAngle * 180 / Math.PI;
+              }
               this._setTransform(group, nodeJson);
               group.addChild(light);
             }
@@ -20984,4 +21228,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-36-g3b2e-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-39-ge3c3-mod branch: develop';

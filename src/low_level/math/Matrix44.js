@@ -2,8 +2,8 @@ import GLBoost from '../../globals';
 import Vector4 from './Vector4';
 import Vector3 from './Vector3';
 import Matrix33 from './Matrix33';
+import Quaternion from './Quaternion';
 import MathUtil from './MathUtil';
-
 
 export default class Matrix44 {
 
@@ -713,6 +713,12 @@ export default class Matrix44 {
       Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
       Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
     );
+  }
+
+  getRotate() {
+    const quat = Quaternion.fromMatrix(this);
+    const rotateMat = quat.rotationMatrix;
+    return rotateMat;
   }
 }
 

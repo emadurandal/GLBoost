@@ -187,7 +187,7 @@ export default class DrawKickerWorld {
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
 //              lightDirection = new Vector3(0, 0, 1);
 //              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
-              lightDirection = light.directionInWorld
+              lightDirection = light.directionInWorld;
               lightDirection.normalize();
             }
             material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);

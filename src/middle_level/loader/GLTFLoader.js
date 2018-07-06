@@ -528,6 +528,9 @@ export default class GLTFLoader {
             const color = lightJson.spot.color;
             light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
             light.rotate = new Vector3(0, 0, 0);
+            if (lightJson.spot.falloffAngle) {
+              light.spotCutoffInDegree = lightJson.spot.falloffAngle * 180 / Math.PI;
+            }
             this._setTransform(group, nodeJson);
             group.addChild(light);
           }
