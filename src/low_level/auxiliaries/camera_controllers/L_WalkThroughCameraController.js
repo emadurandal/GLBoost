@@ -202,7 +202,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     if (this._isMouseDrag) {
       const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
       this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
-      this._deltaY = Math.max(-50, Math.min(50, this._deltaY));
+      this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
       this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
 
       newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
@@ -225,6 +225,22 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   getDirection() {
     return (this._currentCenter !== null) ? this._newDir.clone() : null;
+  }
+
+  set horizontalSpeed(value) {
+    this._horizontalSpeed = value; 
+  }
+
+  get horizontalSpeed() {
+    return this._horizontalSpeed;
+  }
+
+  set virticalSpeed(value) {
+    this._virticalSpeed = value; 
+  }
+
+  get virticalSpeed() {
+    return this._virticalSpeed;
   }
 }
 
