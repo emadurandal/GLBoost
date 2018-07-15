@@ -124,6 +124,18 @@ export default class AABB {
     return this._lengthCenterToCorner;
   }
 
+  get sizeX() {
+    return (this._AABB_max.x - this._AABB_min.x);
+  }
+
+  get sizeY() {
+    return (this._AABB_max.y - this._AABB_min.y);
+  }
+
+  get sizeZ() {
+    return (this._AABB_max.z - this._AABB_min.z);
+  }
+
   static multiplyMatrix(matrix, aabb) {
      if (aabb.isVanilla()) {
        return aabb.clone();
