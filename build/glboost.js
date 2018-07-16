@@ -6288,8 +6288,8 @@ return mat4(
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-  //          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+            viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+  //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
           viewMatrix = Matrix44$2.identity();
         }
@@ -6754,6 +6754,18 @@ return mat4(
 
     get lengthCenterToCorner() {
       return this._lengthCenterToCorner;
+    }
+
+    get sizeX() {
+      return (this._AABB_max.x - this._AABB_min.x);
+    }
+
+    get sizeY() {
+      return (this._AABB_max.y - this._AABB_min.y);
+    }
+
+    get sizeZ() {
+      return (this._AABB_max.z - this._AABB_min.z);
     }
 
     static multiplyMatrix(matrix, aabb) {
@@ -10528,6 +10540,26 @@ return mat4(
         newCenterVec.add(this._mouseTranslateVec);
       }
 
+
+      let newLeft = camera.left;
+      let newRight = camera.right;
+      let newTop = camera.top;
+      let newBottom = camera.bottom;
+      let ratio = 1;
+      if (typeof newLeft !== 'undefined') {
+        if (typeof this._lengthCenterToCorner !== 'undefined') {
+          ratio = camera.zNear / this._lengthCameraToObject;
+          if (ratio < 1.0) {
+            ratio = 1;
+          }
+        }
+        let scale = this._wheel_y / ratio;
+        newLeft *= scale;
+        newRight *= scale;
+        newTop *= scale;
+        newBottom *= scale;
+      }
+
       let newZNear = camera.zNear;
       let newZFar = camera.zFar;
       if (this._target) {
@@ -10537,7 +10569,7 @@ return mat4(
 
       this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy/2.0));
 
-      return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
+      return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar, newLeft, newRight, newTop, newBottom];
     }
 
     _getTargetAABB() {
@@ -10558,14 +10590,14 @@ return mat4(
       let targetAABB = this._getTargetAABB();
 
       this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-      let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+      this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
       let newCenterVec = targetAABB.centerPoint;
 
       let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
       let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
 
-      let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+      let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, this._lengthCameraToObject).add(newCenterVec);
 
       let newUpVec = null;
       if (camera instanceof M_AbstractCamera) {
@@ -10648,7 +10680,7 @@ return mat4(
     resetDolly() {
       this.dolly = 1;
 
-      this._updateCameras();
+      this.updateCamera();
     }
 
     set dolly(value) {
@@ -10892,7 +10924,7 @@ return mat4(
       if (this._isMouseDrag) {
         const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
         this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
-        this._deltaY = Math.max(-50, Math.min(50, this._deltaY));
+        this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
         this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
 
         newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
@@ -10907,14 +10939,34 @@ return mat4(
     
       }
 
+      let newLeft = camera.left;
+      let newRight = camera.right;
+      let newTop = camera.top;
+      let newBottom = camera.bottom;
 
 
 
-      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
+      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
     }
 
     getDirection() {
       return (this._currentCenter !== null) ? this._newDir.clone() : null;
+    }
+
+    set horizontalSpeed(value) {
+      this._horizontalSpeed = value; 
+    }
+
+    get horizontalSpeed() {
+      return this._horizontalSpeed;
+    }
+
+    set virticalSpeed(value) {
+      this._virticalSpeed = value; 
+    }
+
+    get virticalSpeed() {
+      return this._virticalSpeed;
     }
   }
 
@@ -15792,6 +15844,8 @@ return mat4(
     }
 
   }
+
+  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
 
   class M_FrustumCamera extends M_AbstractCamera {
     constructor(glBoostContext, toRegister, lookat, perspective) {
@@ -21316,6 +21370,108 @@ return mat4(
 
   GLBoost$1["formatDetector"] = formatDetector;
 
+  let singleton$8 = Symbol();
+  let singletonEnforcer$6 = Symbol();
+
+  /**
+   * This is a loader class of glTF StylePort extension Data.
+   */
+  class StylePortGLTFLoaderExtension {
+
+    /**
+     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer) {
+      if (enforcer !== singletonEnforcer$6) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return {ObjLoader} the singleton instance of ObjLoader class
+     */
+    static getInstance() {
+      if (!this[singleton$8]) {
+        this[singleton$8] = new StylePortGLTFLoaderExtension(singletonEnforcer$6);
+      }
+      return this[singleton$8];
+    }
+
+    setAssetPropertiesToRootGroup(rootGroup, asset) {
+      // Animation FPS
+      if (asset && asset.animationFps) {
+        rootGroup.animationFps = asset.animationFps;
+      }
+
+      // other information
+      if (asset && asset.spv_version) {
+        rootGroup.version = asset.spv_version;
+      }
+      if (asset && asset.LastSaved_ApplicationVendor) {
+        rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
+      }
+      if (asset && asset.LastSaved_ApplicationName) {
+        rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
+      }
+      if (asset && asset.LastSaved_ApplicationVersion) {
+        rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+      }
+
+      // Animation Tracks
+      if (asset && asset.extras && asset.extras.animation_tracks) {
+        rootGroup.animationTracks = asset.extras.animation_tracks;
+      }
+
+      // Transparent Meshes Draw Order
+      if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+        rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
+        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        rootGroup.transparentMeshes = [];
+        for (let name of rootGroup.transparentMeshesDrawOrder) {
+          for (let mesh of meshes) {
+            if (mesh.userFlavorName === name) {
+              rootGroup.transparentMeshes.push(mesh);
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    createClassicMaterial(glBoostContext) {
+      return glBoostContext.createClassicMaterial();
+    }
+
+    getDecalShader() {
+      return DecalShader;
+    }
+
+    getLambertShader() {
+      return LambertShader;
+    }
+
+    getPhongShader() {
+      return PhongShader;
+    }
+
+    getAnimationInterpolationMethod(interpolationMethodName) {
+      if (!interpolationMethodName) {
+        return GLBoost$1.INTERPOLATION_LINEAR
+      }
+      switch (interpolationMethodName) {
+        case 'LINEAR': return GLBoost$1.INTERPOLATION_LINEAR;
+        case 'STEP': return GLBoost$1.INTERPOLATION_STEP;
+        case 'CUBICSPLINE': return GLBoost$1.INTERPOLATION_CUBICSPLINE;
+      }
+    }
+
+  }
+
+
+  GLBoost$1["StylePortGLTFLoaderExtension"] = StylePortGLTFLoaderExtension;
+
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-40-g003d-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-51-ge805-mod branch: styleport/develop';

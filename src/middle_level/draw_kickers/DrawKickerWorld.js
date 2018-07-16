@@ -34,8 +34,8 @@ export default class DrawKickerWorld {
       let viewMatrix;
       if (mesh.isAffectedByViewMatrix) {
         let cameraMatrix = camera.lookAtRHMatrix();
-//          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+//        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
       } else {
         viewMatrix = Matrix44.identity();
       }
