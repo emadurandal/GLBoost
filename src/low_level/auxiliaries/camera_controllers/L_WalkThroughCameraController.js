@@ -217,10 +217,14 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   
     }
 
+    let newLeft = camera.left;
+    let newRight = camera.right;
+    let newTop = camera.top;
+    let newBottom = camera.bottom;
 
 
 
-    return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
+    return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
   }
 
   getDirection() {

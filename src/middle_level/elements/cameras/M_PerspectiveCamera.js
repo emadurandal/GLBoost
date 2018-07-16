@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_AbstractCamera from './M_AbstractCamera';
 import L_PerspectiveCamera from '../../../low_level/elements/cameras/L_PerspectiveCamera';
 
@@ -56,3 +57,5 @@ export default class M_PerspectiveCamera extends M_AbstractCamera {
   }
 
 }
+
+GLBoost['M_PerspectiveCamera'] = M_PerspectiveCamera;
