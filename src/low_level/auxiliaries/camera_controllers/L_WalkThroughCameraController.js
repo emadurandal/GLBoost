@@ -60,8 +60,8 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   registerEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      eventTargetDom.addEventListener('keydown', this._onKeydown);
-      eventTargetDom.addEventListener('keyup', this._onKeyup);
+      document.addEventListener('keydown', this._onKeydown);
+      document.addEventListener('keyup', this._onKeyup);
       eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
       eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
       eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
@@ -70,8 +70,8 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   unregisterEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      eventTargetDom.removeEventListener('keydown', this._onKeydown);
-      eventTargetDom.removeEventListener('keyup', this._onKeyup);
+      document.removeEventListener('keydown', this._onKeydown);
+      document.removeEventListener('keyup', this._onKeyup);
       eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
       eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
       eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
