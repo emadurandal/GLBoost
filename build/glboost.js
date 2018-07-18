@@ -10342,6 +10342,7 @@ return mat4(
       };
 
       this._onMouseMove = (evt) => {
+        evt.preventDefault();
         if (this._isKeyUp) {
           return;
         }
@@ -10782,8 +10783,8 @@ return mat4(
 
     registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        eventTargetDom.addEventListener('keydown', this._onKeydown);
-        eventTargetDom.addEventListener('keyup', this._onKeyup);
+        document.addEventListener('keydown', this._onKeydown);
+        document.addEventListener('keyup', this._onKeyup);
         eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
         eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
         eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
@@ -10792,8 +10793,8 @@ return mat4(
 
     unregisterEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        eventTargetDom.removeEventListener('keydown', this._onKeydown);
-        eventTargetDom.removeEventListener('keyup', this._onKeyup);
+        document.removeEventListener('keydown', this._onKeydown);
+        document.removeEventListener('keyup', this._onKeyup);
         eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
         eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
         eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
@@ -21370,108 +21371,6 @@ return mat4(
 
   GLBoost$1["formatDetector"] = formatDetector;
 
-  let singleton$8 = Symbol();
-  let singletonEnforcer$6 = Symbol();
-
-  /**
-   * This is a loader class of glTF StylePort extension Data.
-   */
-  class StylePortGLTFLoaderExtension {
-
-    /**
-     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
-     */
-    constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$6) {
-        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
-      }
-    }
-
-    /**
-     * The static method to get singleton instance of this class.
-     * @return {ObjLoader} the singleton instance of ObjLoader class
-     */
-    static getInstance() {
-      if (!this[singleton$8]) {
-        this[singleton$8] = new StylePortGLTFLoaderExtension(singletonEnforcer$6);
-      }
-      return this[singleton$8];
-    }
-
-    setAssetPropertiesToRootGroup(rootGroup, asset) {
-      // Animation FPS
-      if (asset && asset.animationFps) {
-        rootGroup.animationFps = asset.animationFps;
-      }
-
-      // other information
-      if (asset && asset.spv_version) {
-        rootGroup.version = asset.spv_version;
-      }
-      if (asset && asset.LastSaved_ApplicationVendor) {
-        rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
-      }
-      if (asset && asset.LastSaved_ApplicationName) {
-        rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
-      }
-      if (asset && asset.LastSaved_ApplicationVersion) {
-        rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
-      }
-
-      // Animation Tracks
-      if (asset && asset.extras && asset.extras.animation_tracks) {
-        rootGroup.animationTracks = asset.extras.animation_tracks;
-      }
-
-      // Transparent Meshes Draw Order
-      if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
-        rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
-        let meshes = rootGroup.searchElementsByType(M_Mesh);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
-          for (let mesh of meshes) {
-            if (mesh.userFlavorName === name) {
-              rootGroup.transparentMeshes.push(mesh);
-              break;
-            }
-          }
-        }
-      }
-    }
-
-    createClassicMaterial(glBoostContext) {
-      return glBoostContext.createClassicMaterial();
-    }
-
-    getDecalShader() {
-      return DecalShader;
-    }
-
-    getLambertShader() {
-      return LambertShader;
-    }
-
-    getPhongShader() {
-      return PhongShader;
-    }
-
-    getAnimationInterpolationMethod(interpolationMethodName) {
-      if (!interpolationMethodName) {
-        return GLBoost$1.INTERPOLATION_LINEAR
-      }
-      switch (interpolationMethodName) {
-        case 'LINEAR': return GLBoost$1.INTERPOLATION_LINEAR;
-        case 'STEP': return GLBoost$1.INTERPOLATION_STEP;
-        case 'CUBICSPLINE': return GLBoost$1.INTERPOLATION_CUBICSPLINE;
-      }
-    }
-
-  }
-
-
-  GLBoost$1["StylePortGLTFLoaderExtension"] = StylePortGLTFLoaderExtension;
-
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-51-ge805-mod branch: styleport/develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-47-g8947-mod branch: develop';

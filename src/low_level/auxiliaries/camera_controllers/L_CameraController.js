@@ -84,6 +84,7 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseMove = (evt) => {
+      evt.preventDefault();
       if (this._isKeyUp) {
         return;
       }
