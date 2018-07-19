@@ -18,21 +18,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._virticalSpeed = options.virticalSpeed;
     this._turnSpeed = options.turnSpeed;
 
-    this._isKeyDown = false;
-    this._lastKeyCode = null;
-    this._currentPos = null;
-    this._currentCenter = null;
-    this._currentDir = null;
-    this._isMouseDown = false;
-    this._isMouseDrag = false;
-    this._draggedMouseXOnCanvas = null;
-    this._draggedMouseYOnCanvas = null;
-    this._deltaMouseXOnCanvas = null;
-    this._deltaMouseYOnCanvas = null;
-    this._mouseXAdjustScale = 0.1;
-    this._mouseYAdjustScale = 0.1;
-    this._deltaY = 0;
-    this._newDir = Vector3.zero();
+    this.reset();
 
     this._onKeydown = (e)=> {
       this._isKeyDown = true;
@@ -114,6 +100,28 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   tryReset() {
 
+  }
+
+  reset() {
+    this._isKeyDown = false;
+    this._lastKeyCode = null;
+    this._currentPos = null;
+    this._currentCenter = null;
+    this._currentDir = null;
+    this._isMouseDown = false;
+    this._isMouseDrag = false;
+    this._draggedMouseXOnCanvas = null;
+    this._draggedMouseYOnCanvas = null;
+    this._deltaMouseXOnCanvas = null;
+    this._deltaMouseYOnCanvas = null;
+    this._mouseXAdjustScale = 0.1;
+    this._mouseYAdjustScale = 0.1;
+    this._deltaY = 0;
+    this._newDir = Vector3.zero();
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
   }
 
   addCamera(camera) {
