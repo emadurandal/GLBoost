@@ -160,6 +160,11 @@ export default class L_Element extends GLBoostObject {
 //      this._matrix.m13 = vec.y;
 //      this._matrix.m23 = vec.z;  
     }
+
+    this.updateTranslate();
+  }
+
+  updateTranslate() {
     this._is_trs_matrix_updated = false;
     this._is_translate_updated = true;
     this._needUpdate();
@@ -204,6 +209,11 @@ export default class L_Element extends GLBoostObject {
       return;
     }
     this._rotate = vec.clone();
+
+    this.updateRotate();
+  }
+
+  updateRotate() {
     this._is_trs_matrix_updated = false;
     this._is_quaternion_updated = false;
     this._is_euler_angles_updated = true;
@@ -258,6 +268,11 @@ export default class L_Element extends GLBoostObject {
 //      m.m11 *= vec.y;
 //      m.m22 *= vec.z;
     }
+
+    this.updateScale();
+  }
+
+  updateScale() {
     this._is_trs_matrix_updated = false;
     this._is_scale_updated = true;
     this._needUpdate();
@@ -301,6 +316,10 @@ export default class L_Element extends GLBoostObject {
 
   set matrix(mat) {
     this._matrix = mat.clone();
+    this.updateMatrix();
+  }
+
+  updateMatrix() {
     this._is_trs_matrix_updated = true;
     this._is_scale_updated = false;
     this._is_translate_updated = false;
@@ -406,6 +425,11 @@ export default class L_Element extends GLBoostObject {
       return;
     }
     this._quaternion = quat.clone();
+
+    this.updateQuaternion();
+  }
+
+  updateQuaternion() {
     this._is_trs_matrix_updated = false;
     this._is_euler_angles_updated = false;
     this._is_quaternion_updated = true;
