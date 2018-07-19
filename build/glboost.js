@@ -3790,6 +3790,11 @@
       }
       this._translate = vec.clone();
       if (this._is_trs_matrix_updated) ;
+
+      this.updateTranslate();
+    }
+
+    updateTranslate() {
       this._is_trs_matrix_updated = false;
       this._is_translate_updated = true;
       this._needUpdate();
@@ -3834,6 +3839,11 @@
         return;
       }
       this._rotate = vec.clone();
+
+      this.updateRotate();
+    }
+
+    updateRotate() {
       this._is_trs_matrix_updated = false;
       this._is_quaternion_updated = false;
       this._is_euler_angles_updated = true;
@@ -3883,6 +3893,11 @@
       }
       this._scale = vec.clone();
       if (this._is_trs_matrix_updated) ;
+
+      this.updateScale();
+    }
+
+    updateScale() {
       this._is_trs_matrix_updated = false;
       this._is_scale_updated = true;
       this._needUpdate();
@@ -3926,6 +3941,10 @@
 
     set matrix(mat) {
       this._matrix = mat.clone();
+      this.updateMatrix();
+    }
+
+    updateMatrix() {
       this._is_trs_matrix_updated = true;
       this._is_scale_updated = false;
       this._is_translate_updated = false;
@@ -4031,6 +4050,11 @@
         return;
       }
       this._quaternion = quat.clone();
+
+      this.updateQuaternion();
+    }
+
+    updateQuaternion() {
       this._is_trs_matrix_updated = false;
       this._is_euler_angles_updated = false;
       this._is_quaternion_updated = true;
@@ -10741,21 +10765,7 @@ return mat4(
       this._virticalSpeed = options.virticalSpeed;
       this._turnSpeed = options.turnSpeed;
 
-      this._isKeyDown = false;
-      this._lastKeyCode = null;
-      this._currentPos = null;
-      this._currentCenter = null;
-      this._currentDir = null;
-      this._isMouseDown = false;
-      this._isMouseDrag = false;
-      this._draggedMouseXOnCanvas = null;
-      this._draggedMouseYOnCanvas = null;
-      this._deltaMouseXOnCanvas = null;
-      this._deltaMouseYOnCanvas = null;
-      this._mouseXAdjustScale = 0.1;
-      this._mouseYAdjustScale = 0.1;
-      this._deltaY = 0;
-      this._newDir = Vector3.zero();
+      this.reset();
 
       this._onKeydown = (e)=> {
         this._isKeyDown = true;
@@ -10837,6 +10847,48 @@ return mat4(
 
     tryReset() {
 
+    }
+
+    reset() {
+      this._isKeyDown = false;
+      this._lastKeyCode = null;
+      this._currentPos = null;
+      this._currentCenter = null;
+      this._currentDir = null;
+      this._isMouseDown = false;
+      this._isMouseDrag = false;
+      this._draggedMouseXOnCanvas = null;
+      this._draggedMouseYOnCanvas = null;
+      this._deltaMouseXOnCanvas = null;
+      this._deltaMouseYOnCanvas = null;
+      this._mouseXAdjustScale = 0.1;
+      this._mouseYAdjustScale = 0.1;
+      this._deltaY = 0;
+      this._newDir = Vector3.zero();
+
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+      });
+    }
+
+    resetPartially() {
+      this._isKeyDown = false;
+      this._lastKeyCode = null;
+      this._currentDir = null;
+      this._isMouseDown = false;
+      this._isMouseDrag = false;
+      this._draggedMouseXOnCanvas = null;
+      this._draggedMouseYOnCanvas = null;
+      this._deltaMouseXOnCanvas = null;
+      this._deltaMouseYOnCanvas = null;
+      this._mouseXAdjustScale = 0.1;
+      this._mouseYAdjustScale = 0.1;
+      this._deltaY = 0;
+      this._newDir = Vector3.zero();
+
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+      });
     }
 
     addCamera(camera) {
@@ -14456,16 +14508,16 @@ return mat4(
     /**
      * This method treats the given callback function as a render loop and call it every frame.
      */
-    doRenderLoop(renderLoopFunc, ...args) {
-
+    doRenderLoop(renderLoopFunc, time, ...args) {
+      args.splice(0, 0, time);
       renderLoopFunc.apply(renderLoopFunc, args);
 
-      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-        this.doRenderLoop(renderLoopFunc, ...args);
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
+        this.doRenderLoop(renderLoopFunc, _time, args[1]);
         if (this.__requestedToEnterWebVR) {
           this.__isWebVRMode = true;
         }
-      });
+      }, time);
     }
 
     doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
@@ -21373,4 +21425,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-47-g8947-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-48-g79d2-mod branch: develop';

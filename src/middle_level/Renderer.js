@@ -285,16 +285,16 @@ export default class Renderer extends GLBoostObject {
   /**
    * This method treats the given callback function as a render loop and call it every frame.
    */
-  doRenderLoop(renderLoopFunc, ...args) {
-
+  doRenderLoop(renderLoopFunc, time, ...args) {
+    args.splice(0, 0, time);
     renderLoopFunc.apply(renderLoopFunc, args);
 
-    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-      this.doRenderLoop(renderLoopFunc, ...args);
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
+      this.doRenderLoop(renderLoopFunc, _time, args[1]);
       if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
       }
-    });
+    }, time);
   }
 
   doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
