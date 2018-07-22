@@ -1,6 +1,6 @@
 /* @flow */
 
-import type GLBoost from '../../globals';
+import GLBoost from '../../globals';
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
@@ -415,8 +415,8 @@ export default class M_Group extends M_Element {
     instance._isRootJointGroup = this._isRootJointGroup;
   }
 
-  set isVisible(flg) {
-    let collectVisibility = function(elem) {
+  set isVisible(flg:boolean) {
+    let collectVisibility = function(elem:M_Group) {
       elem._isVisible = flg;
       if (elem instanceof M_Group) {
         let children = elem.getChildren();

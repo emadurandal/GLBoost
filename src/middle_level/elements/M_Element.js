@@ -1,15 +1,40 @@
-
+/* @flow */
+import type M_Group from './M_Group';
 import Vector3 from '../../low_level/math/Vector3';
 import Matrix44 from '../../low_level/math/Matrix44';
 import L_Element from '../../low_level/elements/L_Element';
+import type M_Gizmo from './gizmos/M_Gizmo';
 
 export default class M_Element extends L_Element {
+  _isVisible: boolean;
+  _matrixAccumulatedWithoutMySelfAncestry: Matrix44;
+  _matrixAccumulatedAncestry: Matrix44;
+  _accumulatedWithoutMySelfAncestryObjectUpdateNumber: number;
+  _normalMatrix: Matrix44;
+  _accumulatedAncestryObjectUpdateNumberNormal: number;
+  _accumulatedAncestryObjectUpdateNumberInv: number;
+  _accumulatedAncestryObjectUpdateNumber: number;
+  _accumulatedAncestryObjectUpdateNumberWithoutMySelf: number;
+  _accumulatedAncestryObjectUpdateNumberJoint: number;
+  _opacity: number;
+  _transparentByUser: boolean;
+  _parent: M_Group;
+  _invMatrix: Matrix44;
+  _isAffectedByWorldMatrix: boolean;
+  _isAffectedByWorldMatrixAccumulatedAncestry: boolean;
+  _isAffectedByViewMatrix: boolean;
+  _isAffectedByProjectionMatrix: boolean;
+  _toInheritCurrentAnimationInputValue: boolean;
+  _customFunction: Function | null;
+  _gizmos: Array<M_Gizmo>;
+  _masterElement: M_Element | null;
+  _worldMatrix: Matrix44;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
     this._parent = null;
     this._invMatrix = Matrix44.identity();
-    this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
     this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
     this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
@@ -41,7 +66,7 @@ export default class M_Element extends L_Element {
     }
   }
 
-  set toInheritCurrentAnimationInputValue(flg) {
+  set toInheritCurrentAnimationInputValue(flg: boolean) {
     this._toInheritCurrentAnimationInputValue = flg;
   }
 
@@ -105,7 +130,7 @@ export default class M_Element extends L_Element {
     return this.getWorldMatrixWithoutMySelfAt(void 0);
   }
 
-  getWorldMatrixWithoutMySelfAt(input) {
+  getWorldMatrixWithoutMySelfAt(input: number) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
   
@@ -170,7 +195,7 @@ export default class M_Element extends L_Element {
     return this._accumulateMyAndParentOpacity(this);
   }
 
-  set opacity(opacity) {
+  set opacity(opacity: number) {
     this._opacity = opacity;
   }
 
@@ -182,11 +207,11 @@ export default class M_Element extends L_Element {
     return this._transparentByUser;
   }
 
-  set isTransparent(flg) {
+  set isTransparent(flg: boolean) {
     this._transparentByUser = flg;
   }
 
-  set dirty(flg) {
+  set dirty(flg: number) {
     if (flg) {
       this._needUpdate();
     }
@@ -223,7 +248,6 @@ export default class M_Element extends L_Element {
 
     instance._parent = this._parent;
     instance._invMatrix = this._invMatrix.clone();
-    instance._matrixGetMode = this._matrixGetMode;
     instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
     instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
     instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
@@ -369,7 +393,7 @@ export default class M_Element extends L_Element {
   }
 
 
-  getWorldMatrixAt(input) {
+  getWorldMatrixAt(input: number) {
 
     let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
   
@@ -467,14 +491,14 @@ export default class M_Element extends L_Element {
 
   readyForDiscard() {
     if (this instanceof this.className.indexOf('Mesh') !== -1) {
-      const materials = element.getAppropriateMaterials();
+      const materials = this.getAppropriateMaterials();
       for (let material of materials) {
         material.readyForDiscard();
       }
     }
   }
 
-  addGizmo(gizmo) {
+  addGizmo(gizmo: M_Gizmo) {
     this._gizmos.push(gizmo);
   }
 }
