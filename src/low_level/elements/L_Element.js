@@ -41,6 +41,7 @@ export default class L_Element extends GLBoostObject {
     this._rotate = Vector3.zero();
     this._quaternion = new Quaternion(0, 0, 0, 1);
     this._matrix = Matrix44.identity();
+    this._invMatrix = Matrix44.identity();
 
 //    this._finalMatrix = Matrix44.identity();
 
@@ -54,7 +55,7 @@ export default class L_Element extends GLBoostObject {
     this._is_scale_updated = true;
     this._is_quaternion_updated = true;
     this._is_euler_angles_updated = true;
-    this._is_inverse_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = true;
   }
 
 
@@ -63,7 +64,6 @@ export default class L_Element extends GLBoostObject {
   }
 
   _needUpdate() {
-    this._is_inverse_trs_matrix_updated = false;
     this._updateCountAsElement++;
   }
 
@@ -184,7 +184,9 @@ export default class L_Element extends GLBoostObject {
   }
 
   updateTranslate() {
+    this.__updateFromMatrix(false, !this._is_euler_angles_updated, !this._is_scale_updated, !this._is_quaternion_updated);
     this._is_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._is_translate_updated = true;
     this._needUpdate();
   }
@@ -232,7 +234,9 @@ export default class L_Element extends GLBoostObject {
   }
 
   updateRotate() {
+    this.__updateFromMatrix(!this._is_translate_updated, false, !this._is_scale_updated, false);
     this._is_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._is_quaternion_updated = false;
     this._is_euler_angles_updated = true;
     this._needUpdate();
@@ -291,7 +295,9 @@ export default class L_Element extends GLBoostObject {
   }
 
   updateScale() {
+    this.__updateFromMatrix(!this._is_translate_updated, !this._is_euler_angles_updated, false, !this._is_quaternion_updated);
     this._is_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._is_scale_updated = true;
     this._needUpdate();
   }
@@ -334,29 +340,40 @@ export default class L_Element extends GLBoostObject {
   set matrix(mat: Matrix44) {
     this._matrix = mat.clone();
     this._is_trs_matrix_updated = true;
-
-    // Update Scale
-    const m = this._matrix;
-    this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
-    this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
-    this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
-    this._is_scale_updated = true;
-
-    // Update translate
-    this._translate.x = this._matrix.m03;
-    this._translate.y = this._matrix.m13;
-    this._translate.z = this._matrix.m23;
-    this._is_translate_updated = true;
-
-    // Update Quaterniion
-    this._quaternion = Quaternion.fromMatrix(this._matrix);
-    this._is_quaternion_updated = true;
-
-    // Update Euler Rotation
-    this._rotate = this._matrix.toEulerAngles();
-    this._is_euler_angles_updated = true;
+    this._is_translate_updated = false;
+    this._is_euler_angles_updated = false;
+    this._is_scale_updated = false;
+    this._is_quaternion_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
 
     this._needUpdate();
+  }
+
+  __updateFromMatrix(updateTranslate, updateRotation, updateScale, updateQuaternion) {
+    if (updateTranslate) {
+      this._translate.x = this._matrix.m03;
+      this._translate.y = this._matrix.m13;
+      this._translate.z = this._matrix.m23;
+      this._is_translate_updated = true;
+    }
+
+    if (updateScale) {
+      const m = this._matrix;
+      this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+      this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+      this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._is_scale_updated = true;
+    }
+
+    if (updateQuaternion) {
+      this._quaternion = Quaternion.fromMatrix(this._matrix);
+      this._is_quaternion_updated = true;
+    }
+
+    if (updateRotation) {
+      this._rotate = this._matrix.toEulerAngles();
+      this._is_euler_angles_updated = true;
+    }
   }
 
   get matrix() {
@@ -462,7 +479,9 @@ export default class L_Element extends GLBoostObject {
   }
 
   updateQuaternion() {
+    this.__updateFromMatrix(!this._is_translate_updated, false, !this._is_scale_updated, false);
     this._is_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
     this._is_euler_angles_updated = false;
     this._is_quaternion_updated = true;
     this._needUpdate();
