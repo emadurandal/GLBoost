@@ -76,7 +76,7 @@ export default class M_Element extends L_Element {
   }
 
   _getCurrentAnimationInputValue(inputName: number): number | null {
-    let value = parent._currentAnimationInputValues[inputName];
+    let value = this._parent._currentAnimationInputValues[inputName];
     if (typeof(value) === 'number') {
       return value;
     } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
