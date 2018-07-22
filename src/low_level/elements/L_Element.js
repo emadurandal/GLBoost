@@ -209,8 +209,7 @@ export default class L_Element extends GLBoostObject {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
     if (value !== null) {
       this._translate = value;
-      this._is_translate_updated = true;  
-      this._is_trs_matrix_updated = false;
+      this._is_translate_updated = true;
     }
     return value;
   }
@@ -306,7 +305,6 @@ export default class L_Element extends GLBoostObject {
     if (value !== null) {
       this._scale = value.clone();
       this._is_scale_updated = true;  
-      this._is_trs_matrix_updated = false;
     }
     return value;
   }
@@ -335,15 +333,29 @@ export default class L_Element extends GLBoostObject {
 
   set matrix(mat: Matrix44) {
     this._matrix = mat.clone();
-    this.updateMatrix();
-  }
-
-  updateMatrix() {
     this._is_trs_matrix_updated = true;
-    this._is_scale_updated = false;
-    this._is_translate_updated = false;
-    this._is_quaternion_updated = false;
-    this._is_euler_angles_updated = false;
+
+    // Update Scale
+    const m = this._matrix;
+    this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+    this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+    this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+    this._is_scale_updated = true;
+
+    // Update translate
+    this._translate.x = this._matrix.m03;
+    this._translate.y = this._matrix.m13;
+    this._translate.z = this._matrix.m23;
+    this._is_translate_updated = true;
+
+    // Update Quaterniion
+    this._quaternion = Quaternion.fromMatrix(this._matrix);
+    this._is_quaternion_updated = true;
+
+    // Update Euler Rotation
+    this._rotate = this._matrix.toEulerAngles();
+    this._is_euler_angles_updated = true;
+
     this._needUpdate();
   }
 
@@ -354,6 +366,7 @@ export default class L_Element extends GLBoostObject {
     }
 
     let value = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+
     return value;
   }
 
@@ -464,7 +477,6 @@ export default class L_Element extends GLBoostObject {
     if (value !== null) {
       this._quaternion = value;
       this._is_quaternion_updated = true;  
-      this._is_trs_matrix_updated = false;
     }
     return value;
   }
