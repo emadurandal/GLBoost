@@ -2436,7 +2436,7 @@
     }
 
     toMatrix44() {
-      return new Matrix44$2(
+      return new Matrix44$1(
         this.m00, this.m01, this.m02, 0,
         this.m10, this.m11, this.m12, 0,
         this.m20, this.m21, this.m22, 0,
@@ -2445,7 +2445,7 @@
     }
 
     static toMatrix44(mat) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         mat.m00, mat.m01, mat.m02, 0,
         mat.m10, mat.m11, mat.m12, 0,
         mat.m20, mat.m21, mat.m22, 0,
@@ -2549,7 +2549,7 @@
       var wy = this.w * this.y;
       var wz = this.w * this.z;
 
-      return new Matrix44$2(
+      return new Matrix44$1(
         1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
         2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
         2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
@@ -2760,7 +2760,7 @@
 
   GLBoost$1["Quaternion"] = Quaternion;
 
-  class Matrix44$2 {
+  class Matrix44$1 {
 
     constructor(m, isColumnMajor = false, notCopyFloat32Array = false
     ) {
@@ -2824,7 +2824,7 @@
     }
 
     clone() {
-      return new Matrix44$2(
+      return new Matrix44$1(
         this.m[0], this.m[4], this.m[8], this.m[12],
         this.m[1], this.m[5], this.m[9], this.m[13],
         this.m[2], this.m[6], this.m[10], this.m[14],
@@ -2849,7 +2849,7 @@
      * 単位行列にする（static版）
      */
     static identity() {
-      return new Matrix44$2(
+      return new Matrix44$1(
           1, 0, 0, 0,
           0, 1, 0, 0,
           0, 0, 1, 0,
@@ -2877,7 +2877,7 @@
     }
 
     static translate(vec) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         1, 0, 0, vec.x,
         0, 1, 0, vec.y,
         0, 0, 1, vec.z,
@@ -2895,7 +2895,7 @@
     }
 
     static scale(vec) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         vec.x, 0, 0, 0,
         0, vec.y, 0, 0,
         0, 0, vec.z, 0,
@@ -2944,7 +2944,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         1, 0, 0, 0,
         0, cos, -sin, 0,
         0, sin, cos, 0,
@@ -2985,7 +2985,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         cos, 0, sin, 0,
         0, 1, 0, 0,
         -sin, 0, cos, 0,
@@ -3026,7 +3026,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         cos, -sin, 0, 0,
         sin, cos, 0, 0,
         0, 0, 1, 0,
@@ -3066,7 +3066,7 @@
     }
 
     static zero() {
-      return new Matrix44$2(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      return new Matrix44$1(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     flatten() {
@@ -3103,7 +3103,7 @@
      */
     static transpose(mat) {
 
-      var mat_t = new Matrix44$2(
+      var mat_t = new Matrix44$1(
         mat.m00, mat.m10, mat.m20, mat.m30,
         mat.m01, mat.m11, mat.m21, mat.m31,
         mat.m02, mat.m12, mat.m22, mat.m32,
@@ -3207,7 +3207,7 @@
       var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
       var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
 
-      return new Matrix44$2(
+      return new Matrix44$1(
           m00, m01, m02, m03,
           m10, m11, m12, m13,
           m20, m21, m22, m23,
@@ -3301,7 +3301,7 @@
       var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
       var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
 
-      return new Matrix44$2(
+      return new Matrix44$1(
         m00, m01, m02, m03,
         m10, m11, m12, m13,
         m20, m21, m22, m23,
@@ -3477,7 +3477,7 @@
     }
   }
 
-  GLBoost$1["Matrix44"] = Matrix44$2;
+  GLBoost$1["Matrix44"] = Matrix44$1;
 
   class MathUtil {
 
@@ -3646,8 +3646,27 @@
     }
   }
 
+  /*       */
+
   class L_Element extends GLBoostObject {
-    constructor(glBoostContext, toRegister = true) {
+                           
+                                         
+                                            
+                        
+                     
+                    
+                            
+                      
+                                  
+                                    
+                                   
+                               
+                                    
+                                      
+                                            
+
+
+    constructor(glBoostContext, toRegister          = true) {
       super(glBoostContext, toRegister);
 
       // Live (Static or Animation)
@@ -3655,7 +3674,7 @@
       this._scale = new Vector3(1, 1, 1);
       this._rotate = Vector3.zero();
       this._quaternion = new Quaternion(0, 0, 0, 1);
-      this._matrix = Matrix44$2.identity();
+      this._matrix = Matrix44$1.identity();
 
   //    this._finalMatrix = Matrix44.identity();
 
@@ -3691,7 +3710,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName) {
+    _getCurrentAnimationInputValue(inputName        )                {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -3700,7 +3719,7 @@
       }
     }
 
-    setAnimationAtLine(lineName, attributeName, inputArray, outputArray, interpolationMethod) {
+    setAnimationAtLine(lineName        , attributeName        , inputArray            , outputArray            , interpolationMethod        ) {
       var outputComponentN = 0;
       if (outputArray[0] instanceof Vector2) {
         outputComponentN = 2;
@@ -3725,7 +3744,7 @@
       };
     }
 
-    hasAnimation(lineName) {
+    hasAnimation(lineName        ) {
       if (this._animationLine[lineName]) {
         return true;
       } else {
@@ -3733,7 +3752,7 @@
       }
     }
 
-    getStartInputValueOfAnimation(lineName) {
+    getStartInputValueOfAnimation(lineName        ) {
       let inputLine = this._animationLine[lineName];
       let latestInputValue = Number.MAX_VALUE;
       if (typeof inputLine === 'undefined') {
@@ -3749,7 +3768,7 @@
       return latestInputValue;
     }
 
-    getEndInputValueOfAnimation(lineName) {
+    getEndInputValueOfAnimation(lineName        ) {
       let inputLine = this._animationLine[lineName];
       let latestInputValue = - Number.MAX_VALUE;
       if (typeof inputLine === 'undefined') {
@@ -3771,20 +3790,20 @@
      * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
      * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
      */
-    setCurrentAnimationValue(inputName, inputValue) {
+    setCurrentAnimationValue(inputName        , inputValue     ) {
       this._setDirtyToAnimatedElement(inputName);
       this._currentAnimationInputValues[inputName] = inputValue;
     }
 
-    removeCurrentAnimationValue(inputName) {
+    removeCurrentAnimationValue(inputName        ) {
       delete this._currentAnimationInputValues[inputName];
     }
 
-    setActiveAnimationLine(lineName) {
+    setActiveAnimationLine(lineName        ) {
       this._activeAnimationLineName = lineName;
     }
 
-    set translate(vec) {
+    set translate(vec         ) {
       if (this._translate.isEqual(vec)) {
         return;
       }
@@ -3816,7 +3835,7 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName, inputValue) {
+    getTranslateAt(lineName        , inputValue         )          {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
@@ -3826,7 +3845,7 @@
       return value;
     }
 
-    getTranslateAtOrStatic(lineName, inputValue) {
+    getTranslateAtOrStatic(lineName        , inputValue         ) {
       let value = this.getTranslateAt(lineName, inputValue);
       if (value === null) {
         return this.getTranslateNotAnimated();
@@ -3834,7 +3853,7 @@
       return value;
     }
 
-    set rotate(vec) {
+    set rotate(vec         ) {
       if (this._rotate.isEqual(vec)) {
         return;
       }
@@ -3854,7 +3873,7 @@
       return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getRotateAt(lineName, inputValue) {
+    getRotateAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
       if (value !== null) {
         this._rotate = value;
@@ -3863,7 +3882,7 @@
       return value;
     }
 
-    getRotateAtOrStatic(lineName, inputValue) {
+    getRotateAtOrStatic(lineName        , inputValue         ) {
       let value = null;
       if (this._activeAnimationLineName) {
         value = this.getRotateAt(this._activeAnimationLineName, inputValue);
@@ -3887,7 +3906,7 @@
       return this._rotate.clone();
     }
 
-    set scale(vec) {
+    set scale(vec         ) {
       if (this._scale.isEqual(vec)) {
         return;
       }
@@ -3907,7 +3926,7 @@
       return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getScaleAt(lineName, inputValue) {
+    getScaleAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
       if (value !== null) {
         this._scale = value.clone();
@@ -3917,7 +3936,7 @@
       return value;
     }
 
-    getScaleAtOrStatic(lineName, inputValue) {
+    getScaleAtOrStatic(lineName        , inputValue         ) {
       let value = this.getScaleAt(lineName, inputValue);
       if (value === null) {
         return this.getScaleNotAnimated();
@@ -3939,7 +3958,7 @@
       return this._scale.clone();
     }
 
-    set matrix(mat) {
+    set matrix(mat          ) {
       this._matrix = mat.clone();
       this.updateMatrix();
     }
@@ -3963,7 +3982,7 @@
       return value;
     }
 
-    getMatrixAt(lineName, inputValue) {
+    getMatrixAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'matrix');
       if (value !== null) {
         this._translate = value;
@@ -3978,12 +3997,12 @@
         return this._matrix.clone();
       }
 
-      let rotationMatrix = Matrix44$2.identity();
+      let rotationMatrix = Matrix44$1.identity();
       rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
 
       let scale = this.getScaleNotAnimated();
 
-      this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+      this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
       let translateVec = this.getTranslateNotAnimated();
       this._matrix.m03 = translateVec.x;
       this._matrix.m13 = translateVec.y;
@@ -4005,7 +4024,7 @@
       return matrix;
     }
 
-    isTrsMatrixNeeded(lineName, inputValue) {
+    isTrsMatrixNeeded(lineName        , inputValue        ) {
       //console.log(this._animationLine['time']);
       let result = (
         this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
@@ -4017,7 +4036,7 @@
     }
 
 
-    getMatrixAtOrStatic(lineName, inputValue) {
+    getMatrixAtOrStatic(lineName        , inputValue        ) {
       let input = inputValue;
 
       //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
@@ -4025,13 +4044,13 @@
         return this.getMatrixNotAnimated();
       } else {
 
-        let rotationMatrix = Matrix44$2.identity();
+        let rotationMatrix = Matrix44$1.identity();
         let quaternion = this.getQuaternionAtOrStatic(lineName, input);
         rotationMatrix = quaternion.rotationMatrix;
 
         let scale = this.getScaleAtOrStatic(lineName, input);
         
-        this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
         let translateVec = this.getTranslateAtOrStatic(lineName, input);
         this._matrix.m03 = translateVec.x;
         this._matrix.m13 = translateVec.y;
@@ -4045,7 +4064,7 @@
     }
 
 
-    set quaternion(quat) {
+    set quaternion(quat            ) {
       if (this._quaternion.isEqual(quat)) {
         return;
       }
@@ -4065,7 +4084,7 @@
       return this.getQuaternionAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getQuaternionAt(lineName, inputValue) {
+    getQuaternionAt(lineName        , inputValue        ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion');
       if (value !== null) {
         this._quaternion = value;
@@ -4075,7 +4094,7 @@
       return value;
     }
 
-    getQuaternionAtOrStatic(lineName, inputValue) {
+    getQuaternionAtOrStatic(lineName        , inputValue        ) {
       let value = this.getQuaternionAt(lineName, inputValue);
       if (value === null) {
         return this.getQuaternionNotAnimated();
@@ -4091,7 +4110,7 @@
         if (this._is_trs_matrix_updated) {
           value = Quaternion.fromMatrix(this._matrix);
         } else if (this._is_euler_angles_updated) {
-          value = Quaternion.fromMatrix(Matrix44$2.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+          value = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
         } else {
           console.log('jojjeoe');
         }
@@ -4111,10 +4130,10 @@
     }
 
     get normalMatrix() {
-      return Matrix44$2.invert(this.transformMatrix).transpose().toMatrix33();
+      return Matrix44$1.invert(this.transformMatrix).transpose().toMatrix33();
     }
 
-    _copy(instance) {
+    _copy(instance           ) {
       super._copy(instance);
 
       instance._translate = this._translate.clone();
@@ -4156,18 +4175,44 @@
     }
   }
 
+  /*       */
+                                              
+
   class M_Element extends L_Element {
-    constructor(glBoostContext) {
+                        
+                                                      
+                                         
+                                                                
+                            
+                                                         
+                                                      
+                                                   
+                                                                
+                                                        
+                     
+                                
+                            
+                         
+                                      
+                                                         
+                                     
+                                           
+                                                  
+                                     
+                            
+                                     
+                           
+
+    constructor(glBoostContext                      ) {
       super(glBoostContext);
 
       this._parent = null;
-      this._invMatrix = Matrix44$2.identity();
-      this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-      this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
-      this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
+      this._invMatrix = Matrix44$1.identity();
+      this._accumulatedAncestryObjectUpdateNumber = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Number.MAX_VALUE;    
+      this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
       this._transparentByUser = false;
       this._opacity = 1.0;
       this._isAffectedByWorldMatrix = true;
@@ -4177,14 +4222,13 @@
 
       this._toInheritCurrentAnimationInputValue = true;
 
-      this._camera = null;
       this._customFunction = null;
       this._isVisible = true;
 
       this._gizmos = [];
       this._masterElement = null;
 
-      this._worldMatrix = new Matrix44$2();
+      this._worldMatrix = new Matrix44$1();
     }
 
     _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
@@ -4195,7 +4239,7 @@
       }
     }
 
-    set toInheritCurrentAnimationInputValue(flg) {
+    set toInheritCurrentAnimationInputValue(flg         ) {
       this._toInheritCurrentAnimationInputValue = flg;
     }
 
@@ -4203,8 +4247,8 @@
       return this._toInheritCurrentAnimationInputValue;
     }
 
-    _getCurrentAnimationInputValue(inputName) {
-      let value = this._currentAnimationInputValues[inputName];
+    _getCurrentAnimationInputValue(inputName        )                {
+      let value = parent._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
       } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
@@ -4218,14 +4262,14 @@
       }
     }
 
-    _setDirtyToAnimatedElement(inputName) {
+    _setDirtyToAnimatedElement(inputName        ) {
       if (this.hasAnimation(inputName)) {
         this._needUpdate();
       }
     }
 
 
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
+    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf         , input        ) {
       if (input === void 0 && this._activeAnimationLineName !== null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
@@ -4240,7 +4284,7 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
     
         if (this._parent === null) {
@@ -4248,7 +4292,7 @@
           return currentMatrix;
         }
 
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
         this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
@@ -4259,7 +4303,7 @@
       return this.getWorldMatrixWithoutMySelfAt(void 0);
     }
 
-    getWorldMatrixWithoutMySelfAt(input) {
+    getWorldMatrixWithoutMySelfAt(input         ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4276,7 +4320,7 @@
       //console.log(tempNumber);
       if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
         let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-        this._normalMatrix = Matrix44$2.invert(world_m).transpose().toMatrix33();
+        this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
         this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
       }
 
@@ -4286,25 +4330,25 @@
 
     get inverseWorldMatrixWithoutMySelf() {
       if (this._parent === null) {
-        return Matrix44$2.identity();
+        return Matrix44$1.identity();
       }
 
       return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
     }
 
-    _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+    _multiplyMyAndParentRotateMatrices(currentElem           , withMySelf         ) {
       if (currentElem._parent === null) {
         if (withMySelf) {
           return currentElem.transformMatrixOnlyRotate;
         } else {
-          return Matrix44$2.identity();
+          return Matrix44$1.identity();
         }
       } else {
-        let currentMatrix = Matrix44$2.identity();
+        let currentMatrix = Matrix44$1.identity();
         if (withMySelf) {
           currentMatrix = currentElem.transformMatrixOnlyRotate;
         }
-        return Matrix44$2.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
+        return Matrix44$1.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
       }
     }
 
@@ -4312,7 +4356,7 @@
       return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
     }
 
-    _accumulateMyAndParentOpacity(currentElem) {
+    _accumulateMyAndParentOpacity(currentElem           ) {
       if (currentElem._parent === null) {
         return currentElem.opacity;
       } else {
@@ -4324,7 +4368,7 @@
       return this._accumulateMyAndParentOpacity(this);
     }
 
-    set opacity(opacity) {
+    set opacity(opacity        ) {
       this._opacity = opacity;
     }
 
@@ -4336,11 +4380,11 @@
       return this._transparentByUser;
     }
 
-    set isTransparent(flg) {
+    set isTransparent(flg         ) {
       this._transparentByUser = flg;
     }
 
-    set dirty(flg) {
+    set dirty(flg        ) {
       if (flg) {
         this._needUpdate();
       }
@@ -4360,15 +4404,7 @@
       return this._instanceName + this._updateCountAsElement;                // faster
     }
 
-    set camera(camera) {
-      this._camera = camera;
-    }
-
-    get camera() {
-      return this._camera;
-    }
-
-    set customFunction(func) {
+    set customFunction(func          ) {
       this._customFunction = func;
     }
 
@@ -4380,12 +4416,11 @@
 
     }
 
-    _copy(instance) {
+    _copy(instance           ) {
       super._copy(instance);
 
       instance._parent = this._parent;
       instance._invMatrix = this._invMatrix.clone();
-      instance._matrixGetMode = this._matrixGetMode;
       instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
       instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
       instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
@@ -4403,11 +4438,10 @@
 
       instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
 
-      instance._camera = this._camera;
       instance._customFunction = this._customFunction;
     }
 
-    set isVisible(flg) {
+    set isVisible(flg         ) {
       this._isVisible = flg;
     }
 
@@ -4415,7 +4449,7 @@
       return this._isVisible;
     }
 
-    set isAffectedByWorldMatrix(flg) {
+    set isAffectedByWorldMatrix(flg         ) {
       this._isAffectedByWorldMatrix = flg;
     }
 
@@ -4423,7 +4457,7 @@
       return this._isAffectedByWorldMatrix;
     }
 
-    set isAffectedByWorldMatrixAccumulatedAncestry(flg) {
+    set isAffectedByWorldMatrixAccumulatedAncestry(flg         ) {
       this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
     }
 
@@ -4431,7 +4465,7 @@
       return this._isAffectedByWorldMatrixAccumulatedAncestry;
     }
 
-    set isAffectedByViewMatrix(flg) {
+    set isAffectedByViewMatrix(flg         ) {
       this._isAffectedByViewMatrix = flg;
     }
 
@@ -4439,7 +4473,7 @@
       return this._isAffectedByViewMatrix;
     }
 
-    set isAffectedByProjectionMatrix(flg) {
+    set isAffectedByProjectionMatrix(flg         ) {
       this._isAffectedByProjectionMatrix = flg;
     }
 
@@ -4447,7 +4481,7 @@
       return this._isAffectedByProjectionMatrix;
     }
 
-    set gizmoScale(scale) {
+    set gizmoScale(scale        ) {
       for (let gizmo of this._gizmos) {
         gizmo.scale = new Vector3(scale, scale, scale);
       }
@@ -4460,7 +4494,7 @@
       return this._gizmos[0].scale.x;
     }
 
-    set isGizmoVisible(flg) {
+    set isGizmoVisible(flg         ) {
       for (let gizmo of this._gizmos) {
         gizmo.isVisible = flg;
       }
@@ -4470,7 +4504,7 @@
       return this._gizmos[0].isVisible;
     }
 
-    set masterElement(element) {
+    set masterElement(element           ) {
       this._masterElement = element;
     }
 
@@ -4482,7 +4516,7 @@
       return this.getWorldMatrixForJointsAt(void 0);
     }
 
-    getWorldMatrixForJointsAt(input) {
+    getWorldMatrixForJointsAt(input         ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
       
@@ -4510,7 +4544,7 @@
           if (withMySelf) {
             currentMatrix = this.getRotateTranslateAt(input);
           } else {
-            currentMatrix = Matrix44$2.identity();
+            currentMatrix = Matrix44$1.identity();
           }
       
           if (this._parent === null) {
@@ -4518,7 +4552,7 @@
             return currentMatrix;
           }
 
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
           this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
       }
@@ -4532,7 +4566,7 @@
     }
 
 
-    getWorldMatrixAt(input) {
+    getWorldMatrixAt(input        ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4559,13 +4593,13 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
         if (this._parent === null) {
           this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
           return currentMatrix;
         }
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
         this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
       }
@@ -4577,7 +4611,7 @@
       return this.getInverseWorldMatrixAt(void 0);
     }
 
-    getInverseWorldMatrixAt(input) {
+    getInverseWorldMatrixAt(input         ) {
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
       if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
@@ -4611,7 +4645,7 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
     
         if (this._parent === null) {
@@ -4619,7 +4653,7 @@
           return currentMatrix;
         }
 
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
         this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
@@ -4628,14 +4662,14 @@
 
     readyForDiscard() {
       if (this instanceof this.className.indexOf('Mesh') !== -1) {
-        const materials = element.getAppropriateMaterials();
+        const materials = this.getAppropriateMaterials();
         for (let material of materials) {
           material.readyForDiscard();
         }
       }
     }
 
-    addGizmo(gizmo) {
+    addGizmo(gizmo         ) {
       this._gizmos.push(gizmo);
     }
   }
@@ -4655,6 +4689,7 @@
 
       this._isCastingShadow = true;
       this._isLightType = '';
+      this._camera = null;
     }
 
     prepareToRender() {
@@ -4691,6 +4726,14 @@
 
     isTypeSpot() {
       return this._isLightType === 'spot';
+    }
+
+    set camera(camera) {
+      this._camera = camera;
+    }
+
+    get camera() {
+      return this._camera;
     }
   }
 
@@ -6315,21 +6358,21 @@ return mat4(
             viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
   //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
           projectionMatrix = camera.projectionRHMatrix();
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
-        camera._lastPVMatrixFromLight = Matrix44$2.multiply(projectionMatrix, viewMatrix);
+        camera._lastPVMatrixFromLight = Matrix44$1.multiply(projectionMatrix, viewMatrix);
       }
     }
 
@@ -6340,23 +6383,23 @@ return mat4(
       if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
-          const invertSittingToStandingTransform = (new Matrix44$2(webvrFrameData.sittingToStandingTransform, true)).invert();
-          const leftOrRightViewMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-          viewMatrix = Matrix44$2.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
+          const invertSittingToStandingTransform = (new Matrix44$1(webvrFrameData.sittingToStandingTransform, true)).invert();
+          const leftOrRightViewMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
+          viewMatrix = Matrix44$1.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
-          projectionMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
+          projectionMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
   //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
@@ -6431,7 +6474,7 @@ return mat4(
             normal_m = mesh.normalMatrix;
           }
         } else {
-          world_m = Matrix44$2.identity();
+          world_m = Matrix44$1.identity();
           normal_m = Matrix33.identity();
         }
 
@@ -9126,7 +9169,7 @@ return mat4(
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$2.multiply(projectionMatrix, viewMatrix).flatten());
+          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -9706,7 +9749,7 @@ return mat4(
       var s = Vector3.normalize(Vector3.cross(f, up));
       var u = Vector3.cross(s, f);
 
-      return new Matrix44$2(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+      return new Matrix44$1(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
         u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
         -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
         0, 0, 0, 1);
@@ -9830,14 +9873,14 @@ return mat4(
       var xscale = yscale / aspect;
 
       if (zFar) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
           0.0, 0.0, -1.0, 0.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, -1,0, -2*zNear,
@@ -9935,7 +9978,7 @@ return mat4(
     }
 
     static frustumRHMatrix(left, right, top, bottom, zNear, zFar) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         2*zNear/(right-left), 0.0, (right+left)/(right-left), 0.0,
         0.0, 2*zNear/(top-bottom), (top+bottom)/(top-bottom), 0.0,
         0.0, 0.0, - (zFar+zNear)/(zFar-zNear), -1*2*zFar*zNear/(zFar-zNear),
@@ -10059,14 +10102,14 @@ return mat4(
     static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
 
       if (xmag && ymag) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           1/xmag, 0.0, 0.0, 0,
           0.0, 1/ymag, 0.0, 0,
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
           0.0, 0.0, 0.0, 1.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           2/(right-left), 0.0, 0.0, -(right+left)/(right-left),
           0.0, 2/(top-bottom), 0.0, -(top+bottom)/(top-bottom),
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
@@ -10854,26 +10897,6 @@ return mat4(
       this._lastKeyCode = null;
       this._currentPos = null;
       this._currentCenter = null;
-      this._currentDir = null;
-      this._isMouseDown = false;
-      this._isMouseDrag = false;
-      this._draggedMouseXOnCanvas = null;
-      this._draggedMouseYOnCanvas = null;
-      this._deltaMouseXOnCanvas = null;
-      this._deltaMouseYOnCanvas = null;
-      this._mouseXAdjustScale = 0.1;
-      this._mouseYAdjustScale = 0.1;
-      this._deltaY = 0;
-      this._newDir = Vector3.zero();
-
-      this._camaras.forEach(function (camera) {
-        camera._needUpdateView(false);
-      });
-    }
-
-    resetPartially() {
-      this._isKeyDown = false;
-      this._lastKeyCode = null;
       this._currentDir = null;
       this._isMouseDown = false;
       this._isMouseDrag = false;
@@ -12687,7 +12710,7 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$2.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -12720,7 +12743,7 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$2.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -12807,7 +12830,7 @@ return mat4(
       var viewMatrix = camera.lookAtRHMatrix();
       var m_m = null;
       if (this.bindShapeMatrix) {
-        m_m = Matrix44$2.multiply(this.worldMatrix, this.bindShapeMatrix);
+        m_m = Matrix44$1.multiply(this.worldMatrix, this.bindShapeMatrix);
       } else {
         m_m = this.worldMatrix;
       }
@@ -13152,23 +13175,23 @@ return mat4(
 
     _validateByQuery(object               , query        , queryMeta           ) {
       let propertyName = '';
-      if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME) {
+      if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME) {
         propertyName = 'instanceName';
-      } else if (queryMeta.type === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
         propertyName = 'userFlavorName';
-      } else if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
         propertyName = 'instanceNameWithUserFlavor';
       }
 
-      if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
+      if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
         if (object[propertyName] === query) {
           return object;
         }
-      } else if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
           if (object[propertyName].indexOf(query) !== -1) {
             return object;
           }
-      } else if (queryMeta.format === GLBoost.QUERY_FORMAT_REGEXP) {
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_REGEXP) {
         if (object[propertyName].match(query)) {
           return object;
         }
@@ -13176,7 +13199,7 @@ return mat4(
 
     }
 
-    searchElement(query        , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -13199,7 +13222,7 @@ return mat4(
       return null;
     }
 
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
@@ -13217,7 +13240,7 @@ return mat4(
       return null;
     }
 
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
@@ -13271,7 +13294,7 @@ return mat4(
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -13304,7 +13327,7 @@ return mat4(
       }
     }
 
-    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -13464,8 +13487,8 @@ return mat4(
       instance._isRootJointGroup = this._isRootJointGroup;
     }
 
-    set isVisible(flg) {
-      let collectVisibility = function(elem) {
+    set isVisible(flg        ) {
+      let collectVisibility = function(elem        ) {
         elem._isVisible = flg;
         if (elem instanceof M_Group) {
           let children = elem.getChildren();
@@ -14355,7 +14378,7 @@ return mat4(
           if (this.__webvrDisplay.stageParameters) {
             this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
           } else {
-            this.__webvrFrameData.sittingToStandingTransform = Matrix44$2.translate(this.__defaultUserSittingPositionInVR).flatten();
+            this.__webvrFrameData.sittingToStandingTransform = Matrix44$1.translate(this.__defaultUserSittingPositionInVR).flatten();
           }
         }
 
@@ -15132,7 +15155,7 @@ return mat4(
 
     // Use master element's worldMatrix.
     get worldMatrixInner() {
-      return Matrix44$2.identity();
+      return Matrix44$1.identity();
     }
 
     set worldPositionOfThisJoint(vec3) {
@@ -15194,10 +15217,10 @@ return mat4(
       this.length = new Vector3(length, length, length);
 
       this._isCalculatedJointGizmo = false;
-      this._jointPoseMatrix = Matrix44$2.identity();
+      this._jointPoseMatrix = Matrix44$1.identity();
       this._length = 1;
 
-      this._inverseBindMatrix = Matrix44$2.identity();
+      this._inverseBindMatrix = Matrix44$1.identity();
 
       this._skeletalMesh = null;
 
@@ -15308,7 +15331,7 @@ return mat4(
       this._rootJointName = rootJointName;
       this._jointsHierarchy = null;
       this._inverseBindMatrices = [];
-      this._bindShapeMatrix = Matrix44$2.identity();
+      this._bindShapeMatrix = Matrix44$1.identity();
       this._jointNames = []; // for glTF1.0
       this._gltfJointIndices = []; // for glTF2.0
       this._joints = [];
@@ -15336,9 +15359,9 @@ return mat4(
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -15352,9 +15375,9 @@ return mat4(
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -15556,7 +15579,7 @@ return mat4(
       let jointZeroWorldMatrix = null;
       let skeletalMeshWorldMatrix = null;
       let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getWorldMatrixAt(input);
-      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$2.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
+      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$1.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
 
       for (let i=joints.length-1; i>=0; i--) {
         let globalJointTransform = null;
@@ -15568,7 +15591,7 @@ return mat4(
           globalJointTransform = skeletalMeshTransformMatrixAccmulatedAncestry;
           skeletalMeshWorldMatrix = globalJointTransform;
           let bindMat = joints[i].bindMatrix;
-          globalJointTransform = Matrix44$2.multiply(skeletalMeshWorldMatrix, bindMat);
+          globalJointTransform = Matrix44$1.multiply(skeletalMeshWorldMatrix, bindMat);
         }
         if (i === 0) {
           jointZeroWorldMatrix = globalJointTransform;
@@ -15577,12 +15600,12 @@ return mat4(
         if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
           matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
         } else {
-          matrices[i] = Matrix44$2.identity();
+          matrices[i] = Matrix44$1.identity();
         }
-        matrices[i] = Matrix44$2.multiply(matrices[i], globalJointTransform);
-        joints[i].jointPoseMatrix = Matrix44$2.multiply(Matrix44$2.identity(), globalJointTransform);
-        matrices[i] = Matrix44$2.multiply(matrices[i], inverseBindMatrix);
-        matrices[i] = Matrix44$2.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], globalJointTransform);
+        joints[i].jointPoseMatrix = Matrix44$1.multiply(Matrix44$1.identity(), globalJointTransform);
+        matrices[i] = Matrix44$1.multiply(matrices[i], inverseBindMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
       }
 
       GLBoost$1.JointGizmoUpdater.update(joints, jointZeroWorldMatrix);
@@ -16235,7 +16258,7 @@ return mat4(
       let xDir = Vector3.cross(yDir, _zDir);
       let zDir = Vector3.cross(xDir, yDir);
       
-      let result = Matrix44$2.identity();
+      let result = Matrix44$1.identity();
 
       result.m00 = xDir.x;
       result.m10 = xDir.y;
@@ -18186,7 +18209,7 @@ return mat4(
         element.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
       }
       if (nodeJson.matrix) {
-        element.matrix = new Matrix44$2(nodeJson.matrix, true);
+        element.matrix = new Matrix44$1(nodeJson.matrix, true);
       }
     }
 
@@ -18308,7 +18331,7 @@ return mat4(
         mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
         let skin = json.skins[skinStr];
 
-        mesh.bindShapeMatrix = new Matrix44$2(skin.bindShapeMatrix, true);
+        mesh.bindShapeMatrix = new Matrix44$1(skin.bindShapeMatrix, true);
         mesh.jointNames = skin.jointNames;
 
         let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
@@ -19236,7 +19259,7 @@ return mat4(
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -20009,7 +20032,7 @@ return mat4(
           group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
         }
         if (nodeJson.matrix) {
-          group.matrix = new Matrix44$2(nodeJson.matrix, true);
+          group.matrix = new Matrix44$1(nodeJson.matrix, true);
         }
       }
     }
@@ -20690,7 +20713,7 @@ return mat4(
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+componentBytes*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -21425,4 +21448,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-48-g79d2-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-55-g2c2e-mod branch: develop';
