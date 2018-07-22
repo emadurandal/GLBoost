@@ -341,7 +341,7 @@ export default class ModelConverter {
       }
 
       if (mesh.primitives.length > 1) {
-        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0, color: 0};
         for (let i = 0; i < mesh.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;

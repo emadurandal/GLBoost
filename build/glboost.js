@@ -18389,7 +18389,8 @@ return mat4(
       let additional = {
         'joint': [],
         'weight': [],
-        'texcoord': []
+        'texcoord': [],
+        'color': []
       };
 
       let dataViewMethodDic = {};
@@ -18430,6 +18431,16 @@ return mat4(
           vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json);
           vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json);
           dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json);
+        }
+
+        let colorsAccessorStr = primitiveJson.attributes.COLOR;
+        if (colorsAccessorStr) {
+          let colors = this._accessBinary(colorsAccessorStr, json, buffers, false, true);
+          additional['color'][i] = colors;
+          vertexData.components.color = this._checkComponentNumber(colorsAccessorStr, json);
+          vertexData.componentBytes.color = this._checkBytesPerComponent(colorsAccessorStr, json);
+          vertexData.componentType.color = this._getDataType(normalsAccessocolorsAccessorStrrStr, json);
+          dataViewMethodDic.color = this._checkDataViewMethod(colorsAccessorStr, json);
         }
 
         /// if Skeletal
@@ -18525,12 +18536,15 @@ return mat4(
       }
 
       if (meshJson.primitives.length > 1) {
-        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+        let lengthDic = {index: 0, position: 0, normal: 0, color: 0, joint: 0, weight: 0, texcoord: 0};
         for (let i = 0; i < meshJson.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;
           if (_normals[i]) {
             lengthDic.normal += _normals[i].length;
+          }
+          if (typeof additional['color'][i] !== 'undefined') {
+            lengthDic.color += additional['color'][i].length;
           }
           if (typeof additional['joint'][i] !== 'undefined') {
             lengthDic.joint += additional['joint'][i].length;
@@ -18575,6 +18589,8 @@ return mat4(
               array = _positions[i];
             } else if (attribName === 'normal') {
               array = _normals[i];
+            } else if (attribName === 'color') {
+              array = additional['color'][i];
             } else if (attribName === 'joint') {
               array = additional['joint'][i];
             } else if (attribName === 'weight') {
@@ -18593,6 +18609,8 @@ return mat4(
             vertexData.position = newTypedArray;
           } else if (attribName === 'normal') {
             vertexData.normal = newTypedArray;
+          } else if (attribName === 'color') {
+            additional['color'] = newTypedArray;
           } else if (attribName === 'joint') {
             additional['joint'] = newTypedArray;
           } else if (attribName === 'weight') {
@@ -18606,6 +18624,7 @@ return mat4(
       } else {
         vertexData.position = _positions[0];
         vertexData.normal = _normals[0];
+        additional['color'] = additional['color'][0];
         additional['joint'] = additional['joint'][0];
         additional['weight'] = additional['weight'][0];
         additional['texcoord'] = additional['texcoord'][0];
@@ -18613,6 +18632,9 @@ return mat4(
 
       if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
         delete vertexData.normal;
+      }
+      if (typeof additional['color'] === 'undefined' || additional['color'].length === 0) {
+        delete additional['color'];
       }
       if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
         delete additional['joint'];
@@ -20283,7 +20305,7 @@ return mat4(
         }
 
         if (mesh.primitives.length > 1) {
-          let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+          let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0, color: 0};
           for (let i = 0; i < mesh.primitives.length; i++) {
             //lengthDic.index += _indicesArray[i].length;
             lengthDic.position += _positions[i].length;
@@ -21479,4 +21501,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-59-g1dcfb-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-60-g10ed-mod branch: develop';
