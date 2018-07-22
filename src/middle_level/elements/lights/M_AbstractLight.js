@@ -15,6 +15,7 @@ export default class M_AbstractLight extends M_Element {
 
     this._isCastingShadow = true;
     this._isLightType = '';
+    this._camera = null;
   }
 
   prepareToRender() {
@@ -51,5 +52,13 @@ export default class M_AbstractLight extends M_Element {
 
   isTypeSpot() {
     return this._isLightType === 'spot';
+  }
+
+  set camera(camera) {
+    this._camera = camera;
+  }
+
+  get camera() {
+    return this._camera;
   }
 }

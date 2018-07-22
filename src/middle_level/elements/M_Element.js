@@ -24,7 +24,6 @@ export default class M_Element extends L_Element {
 
     this._toInheritCurrentAnimationInputValue = true;
 
-    this._camera = null;
     this._customFunction = null;
     this._isVisible = true;
 
@@ -207,14 +206,6 @@ export default class M_Element extends L_Element {
     return this._instanceName + this._updateCountAsElement;                // faster
   }
 
-  set camera(camera) {
-    this._camera = camera;
-  }
-
-  get camera() {
-    return this._camera;
-  }
-
   set customFunction(func) {
     this._customFunction = func;
   }
@@ -250,7 +241,6 @@ export default class M_Element extends L_Element {
 
     instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
 
-    instance._camera = this._camera;
     instance._customFunction = this._customFunction;
   }
 
