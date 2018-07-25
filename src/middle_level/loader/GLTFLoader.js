@@ -421,6 +421,8 @@ export default class GLTFLoader {
 
     }
 
+    rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
     resolve(rootGroup);
   }
 

@@ -7,6 +7,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -101,6 +102,8 @@ export default class ModelConverter {
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
     }
+
+    rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
 
     return rootGroup;
   }
