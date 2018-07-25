@@ -18,6 +18,7 @@ import M_SpotLight from '../elements/lights/M_SpotLight';
 import M_Joint from '../elements/skeletons/M_Joint';
 import M_AxisGizmo from '../elements/gizmos/M_AxisGizmo';
 import M_GridGizmo from '../elements/gizmos/M_GridGizmo';
+import M_OutlineGizmo from '../elements/gizmos/M_OutlineGizmo';
 import M_HeightLineGizmo from '../elements/gizmos/M_HeightLineGizmo';
 import EffekseerElement from '../plugins/EffekseerElement';
 import M_ScreenMesh from '../elements/meshes/M_ScreenMesh';
@@ -114,6 +115,11 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
     return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
   }
+
+  createOutlineGizmo(mesh) {
+    return new M_OutlineGizmo(this, mesh);
+  }
+
 
   createHeightLineGizmo(startPos, endPos) {
     return new M_HeightLineGizmo(this, startPos, endPos);

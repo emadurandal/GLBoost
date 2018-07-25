@@ -16,6 +16,7 @@ export default class M_Mesh extends M_Element {
       this.material = material;
     }
     this._transformedDepth = 0;
+    this._outlineGizmo = null;
   }
 
   prepareToRender(expression, existCamera_f, lights) {
@@ -264,6 +265,27 @@ export default class M_Mesh extends M_Element {
       intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
     }
     return [intersectPositionInWorld, result[1]];
+  }
+
+  get gizmos() {
+    if (this.isOutlineVisible) {
+      return this._gizmos.concat([this._outlineGizmo]);
+    } else {
+      return this._gizmos;
+    }
+  }
+
+  set isOutlineVisible(flg) {
+    if (flg) {
+      this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+    } else {
+      this._outlineGizmo.readyForDiscard();
+      this._outlineGizmo = null;
+    }
+  }
+
+  get isOutlineVisible() {
+    return !!this._outlineGizmo;
   }
 
   clone() {
