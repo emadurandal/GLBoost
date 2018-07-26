@@ -502,4 +502,8 @@ export default class M_Element extends L_Element {
   addGizmo(gizmo: M_Gizmo) {
     this._gizmos.push(gizmo);
   }
+
+  get gizmos() {
+    return this._gizmos;
+  }
 }

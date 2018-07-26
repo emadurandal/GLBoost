@@ -105,6 +105,7 @@ export default class DrawKickerWorld {
     const viewport = data.viewport;
     const isWebVRMode = data.isWebVRMode;
     const webvrFrameData = data.webvrFrameData;
+    const forceThisMaterial = data.forceThisMaterial;
 
     var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -114,6 +115,9 @@ export default class DrawKickerWorld {
 
     for (let i=0; i<originalMaterials.length;i++) {
       let material = originalMaterials[i];
+      if (forceThisMaterial) {
+        material = forceThisMaterial;
+      }
       if (!material.isVisible) {
         continue;
       }
@@ -217,21 +221,23 @@ export default class DrawKickerWorld {
 
       geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
+      let vertexN = originalMaterials[i].getVertexN(geometry);
+
       if (isWebVRMode) {
         // Left Eye
  //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
         gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
         DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
 
         // Right Eye
         gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
         DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
       } else {
         DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
       }
 
 
@@ -251,10 +257,9 @@ export default class DrawKickerWorld {
     //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
   }
 
-  static drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN) {
+  static drawGeometry(geometry, glem, gl, i, primitiveType, vertexN) {
     if (geometry.isIndexed()) {
-      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
-      let vertexN = material.getVertexN(geometry);
+      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);      
       let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
       let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
       let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);

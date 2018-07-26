@@ -136,6 +136,8 @@ export default class Renderer extends GLBoostObject {
         }
       }
 
+      // draw pre gizmos
+      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport);
 
       // draw opacity meshes.
       const opacityMeshes = renderPass.opacityMeshes;
@@ -159,7 +161,7 @@ export default class Renderer extends GLBoostObject {
       }
       // draw transparent meshes.
       const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
-//      console.log("START!!");
+
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
@@ -175,30 +177,9 @@ export default class Renderer extends GLBoostObject {
           });
         }
       });
-//      console.log("END!!");
       
-      const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
-      this._glBoostContext.currentGlobalStates = [
-        3042, // gl.BLEND
-      ];
-      let gizmos = renderPass.gizmos;
-      for (let gizmo of gizmos) {
-        if (gizmo.isVisible) {
-          gizmo.mesh.draw({
-            expression: expression,
-            lights: lights,
-            camera: camera,
-            renderPass: renderPass,
-            renderPassIndex: index,
-            viewport: viewport,
-            isWebVRMode: this.isWebVRMode,
-            webvrFrameData: this.__webvrFrameData
-          });
-        }
-      }
-      this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-      this._glBoostContext.restoreGlobalStatesToDefault();
+      // draw post gizmos
+      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
@@ -212,6 +193,34 @@ export default class Renderer extends GLBoostObject {
       renderPass.postRender(camera ? true:false, lights);
 
     });
+  }
+
+  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport) {
+    const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
+    this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
+    this._glBoostContext.currentGlobalStates = [
+      3042, // gl.BLEND
+    ];
+
+    for (let gizmo of gizmos) {
+      if (gizmo.isVisible) {
+        gizmo.mesh.draw({
+          expression: expression,
+          lights: lights,
+          camera: camera,
+          renderPass: renderPass,
+          renderPassIndex: index,
+          viewport: viewport,
+          isWebVRMode: this.isWebVRMode,
+          webvrFrameData: this.__webvrFrameData,
+          forceThisMaterial: gizmo.forceThisMaterial
+        });
+      }
+    }
+
+    this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostContext.restoreGlobalStatesToDefault();
+
   }
 
   _clearBuffer(gl, renderPass) {

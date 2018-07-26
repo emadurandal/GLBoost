@@ -22,7 +22,6 @@ export default class M_Group extends M_Element {
 //    this._aabbGizmo = null;
 //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
 //    this._gizmos.push(this._aabbGizmo);
-
   }
 
   /**
@@ -480,4 +479,5 @@ export default class M_Group extends M_Element {
 
     return [currentShortestIntersectedPosVec3, currentShortestT];
   }
+
 }
