@@ -10413,8 +10413,17 @@ return mat4(
 
       this._onMouseDown = (evt) => {
         let rect = evt.target.getBoundingClientRect();
-        this._clickedMouseXOnCanvas = evt.clientX - rect.left;
-        this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+        let clientX = null;
+        let clientY = null;
+        if (evt.clientX) {
+          clientX = evt.clientX;
+          clientY = evt.clientY;
+        } else {
+          clientX = evt.touches[0].clientX;
+          clientY = evt.touches[0].clientY;
+        }
+        this._clickedMouseXOnCanvas = clientX - rect.left;
+        this._clickedMouseYOnCanvas = clientY - rect.top;
         this._movedMouseYOnCanvas = -1;
         this._movedMouseXOnCanvas = -1;
         this._rot_bgn_x = this._rot_x;
@@ -10442,8 +10451,17 @@ return mat4(
         }
 
         let rect = evt.target.getBoundingClientRect();
-        this._movedMouseXOnCanvas = evt.clientX - rect.left;
-        this._movedMouseYOnCanvas = evt.clientY - rect.top;
+        let clientX = null;
+        let clientY = null;
+        if (evt.clientX) {
+          clientX = evt.clientX;
+          clientY = evt.clientY;
+        } else {
+          clientX = evt.touches[0].clientX;
+          clientY = evt.touches[0].clientY;
+        }
+        this._movedMouseXOnCanvas = clientX - rect.left;
+        this._movedMouseYOnCanvas = clientY - rect.top;
 
         if (typeof evt.buttons !== 'undefined') {
           let data = evt.buttons;
@@ -21614,4 +21632,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-66-ga72fb-mod branch: feature/outline-of-mesh';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-69-ge6ff-mod branch: develop';

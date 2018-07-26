@@ -1,6 +1,6 @@
-version: 0.0.4-66-ga72fb-mod
-branch: feature/outline-of-mesh
-58c6e58c600a868bf25d173b94157e24c7988ce7159b074ca12cfc6e7ce8dea1 ./build/glboost.js
-58c6e58c600a868bf25d173b94157e24c7988ce7159b074ca12cfc6e7ce8dea1 ./build/glboost.js
-7add29e3f6a034b473a6c38266fa2799e31d686bbda5f6abc7884180ce164b2e ./build/glboost.min.js
-c4aeb3cc935e5cc9410e0b43b04a8220a288364a78d0de5eb79fed6a06ce17bd ./build/glboost.min.js.map
+version: 0.0.4-69-ge6ff-mod
+branch: develop
+649f634aab1700bf85dfab1ba00eddb540b9d2eb4ef93649ef7b2565f8acf697 ./build/glboost.js
+649f634aab1700bf85dfab1ba00eddb540b9d2eb4ef93649ef7b2565f8acf697 ./build/glboost.js
+987f529ca1b6283110ca195bbb257eb48856437e451ab56c6c349055d3d53bf1 ./build/glboost.min.js
+ddc94854ffae45f432465a6460190747483fd40f6ee7196fb1efa43ab18d51ca ./build/glboost.min.js.map
