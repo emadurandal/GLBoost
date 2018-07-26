@@ -277,16 +277,31 @@ export default class M_Mesh extends M_Element {
   }
 
   set isOutlineVisible(flg) {
-    if (flg) {
+    if (flg && this._outlineGizmo === null) {
       this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
-    } else {
-      this._outlineGizmo.readyForDiscard();
-      this._outlineGizmo = null;
+    }
+
+    if (this._outlineGizmo) {
+      this._outlineGizmo.isVisible = flg;
     }
   }
 
   get isOutlineVisible() {
-    return !!this._outlineGizmo;
+    if (this._outlineGizmo === null) {
+      return false;
+    }
+    return this._outlineGizmo.isVisible;
+  }
+
+  set isVisible(flg) {
+    super.isVisible = flg;
+    if (this._outlineGizmo) {
+      this._outlineGizmo.isVisible = flg;
+    }
+  }
+
+  get isVisible() {
+    return super.isVisible;
   }
 
   clone() {

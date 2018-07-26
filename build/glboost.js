@@ -12927,16 +12927,31 @@ return mat4(
     }
 
     set isOutlineVisible(flg) {
-      if (flg) {
+      if (flg && this._outlineGizmo === null) {
         this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
-      } else {
-        this._outlineGizmo.readyForDiscard();
-        this._outlineGizmo = null;
+      }
+
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
       }
     }
 
     get isOutlineVisible() {
-      return !!this._outlineGizmo;
+      if (this._outlineGizmo === null) {
+        return false;
+      }
+      return this._outlineGizmo.isVisible;
+    }
+
+    set isVisible(flg) {
+      super.isVisible = flg;
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
+      }
+    }
+
+    get isVisible() {
+      return super.isVisible;
     }
 
     clone() {
@@ -16659,7 +16674,7 @@ return mat4(
   }
 
   class M_OutlineGizmo extends M_Gizmo {
-    constructor(glBoostContext, mesh, scale = 0.1) {
+    constructor(glBoostContext, mesh, scale = 0.05) {
       super(glBoostContext, null, null);
 
       this._init(glBoostContext, mesh, scale);
@@ -16682,10 +16697,6 @@ return mat4(
 
       const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-
-  //    this.addChild(this._mesh);
-  //    this.matrix = Matrix44.multiply(Matrix44.scale(2, 2, 2), worldMatrix);
-      //this._mesh.scale = new Vector3(2, 2, 2);
       this.scale = new Vector3(1+scale, 1+scale, 1+scale);
       this.translate = Vector3.multiply(centerPoint, -1*scale);
     }
@@ -21603,4 +21614,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-65-g6724-mod branch: feature/outline-of-mesh';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-66-ga72fb-mod branch: feature/outline-of-mesh';

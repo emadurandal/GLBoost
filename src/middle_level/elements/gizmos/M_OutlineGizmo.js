@@ -7,7 +7,7 @@ import Vector3 from '../../../low_level/math/Vector3';
 import Matrix44 from '../../../low_level/math/Matrix44';
 
 export default class M_OutlineGizmo extends M_Gizmo {
-  constructor(glBoostContext, mesh, scale = 0.1) {
+  constructor(glBoostContext, mesh, scale = 0.05) {
     super(glBoostContext, null, null);
 
     this._init(glBoostContext, mesh, scale);
@@ -30,10 +30,6 @@ export default class M_OutlineGizmo extends M_Gizmo {
 
     const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-
-//    this.addChild(this._mesh);
-//    this.matrix = Matrix44.multiply(Matrix44.scale(2, 2, 2), worldMatrix);
-    //this._mesh.scale = new Vector3(2, 2, 2);
     this.scale = new Vector3(1+scale, 1+scale, 1+scale);
     this.translate = Vector3.multiply(centerPoint, -1*scale);
   }
