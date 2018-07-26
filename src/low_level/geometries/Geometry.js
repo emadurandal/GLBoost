@@ -435,17 +435,10 @@ export default class Geometry extends GLBoostObject {
     return Geometry._allVertexAttribs(this._vertices);
   } 
 
-  prepareGLSLProgram(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
-    let gl = this._glContext.gl;
+  prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
     let vertices = this._vertices;
 
-   //let glem = GLExtensionsManager.getInstance(this._glContext);
     let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
-
-//    if (doSetupVertexAttribs) {
-//      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-//    }
-
 
     let shaderInstance = null;
     if (argShaderInstance) {
@@ -458,14 +451,7 @@ export default class Geometry extends GLBoostObject {
       }  
     }
 
-    let glslProgram = shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
-//    if (doSetupVertexAttribs) {
-    //  this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-//    }
-
-//    if (doSetupVertexAttribs) {
-    //  glem.bindVertexArray(gl, null);
-//    }
+    shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
 
     return shaderInstance;
   }
@@ -582,9 +568,9 @@ export default class Geometry extends GLBoostObject {
       } else {
         */
         if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, void 0, materials[i].shaderInstance);
         } else {
-          shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+          shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, shaderClass);
         }  
 //      }
 
@@ -613,7 +599,7 @@ export default class Geometry extends GLBoostObject {
     const gl = this._glContext.gl;
     const glem = GLExtensionsManager.getInstance(this._glContext);
 
-    const materials = this._getAppropriateMaterials(data.mesh);
+    let materials = this._getAppropriateMaterials(data.mesh);
 
     const thisName = this.toString();
 
@@ -638,7 +624,8 @@ export default class Geometry extends GLBoostObject {
         vertexN: this._vertexN,
         viewport: data.viewport,
         isWebVRMode: data.isWebVRMode,
-        webvrFrameData: data.webvrFrameData
+        webvrFrameData: data.webvrFrameData,
+        forceThisMaterial: data.forceThisMaterial
       });
 
   }

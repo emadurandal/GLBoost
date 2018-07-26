@@ -346,7 +346,7 @@ export default class RenderPass extends GLBoostObject {
             if (!this._newShaderInstance) {
 //              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
 //              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-              let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+              let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
               this._oldShaderClass = material.shaderClass;
               this._newShaderInstance = material.shaderInstance;
             }
@@ -376,7 +376,7 @@ export default class RenderPass extends GLBoostObject {
         if(!shaderInstance) {
 //          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
 //          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-          material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+          material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
           
         }
 

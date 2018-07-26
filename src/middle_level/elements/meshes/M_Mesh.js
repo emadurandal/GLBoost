@@ -43,7 +43,8 @@ export default class M_Mesh extends M_Element {
         mesh: this,
         viewport: data.viewport,
         isWebVRMode: data.isWebVRMode,
-        webvrFrameData: data.webvrFrameData
+        webvrFrameData: data.webvrFrameData,
+        forceThisMaterial: data.forceThisMaterial,
       }
     );
   }

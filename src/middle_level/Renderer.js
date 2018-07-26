@@ -212,7 +212,8 @@ export default class Renderer extends GLBoostObject {
           renderPassIndex: index,
           viewport: viewport,
           isWebVRMode: this.isWebVRMode,
-          webvrFrameData: this.__webvrFrameData
+          webvrFrameData: this.__webvrFrameData,
+          forceThisMaterial: gizmo.forceThisMaterial
         });
       }
     }
