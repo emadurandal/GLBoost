@@ -296,7 +296,7 @@ export default class GLBoostLowContext {
   }
 
   get currentGlobalStates() {
-    return this._currentGlobalStates.concat();
+    return this._currentGlobalStates;
   }
 
   restoreGlobalStatesToDefault() {

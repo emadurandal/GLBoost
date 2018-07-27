@@ -1,6 +1,6 @@
-version: 0.0.4-70-g989ed-mod
+version: 0.0.4-71-gbcbdd-mod
 branch: develop
-d1cd582a18340e14027e43532009f222eabc50835e3e336cc70cf82aea191f53 ./build/glboost.js
-d1cd582a18340e14027e43532009f222eabc50835e3e336cc70cf82aea191f53 ./build/glboost.js
-70cf199d3b0718f3a641885232443d4d961961401a08981003c4528ee1731a37 ./build/glboost.min.js
-d18d0e8e18e4cbac317de7dd65bb5569ec20b2f08176b4a12047193997159005 ./build/glboost.min.js.map
+bb5fdcfbcdbb6181bb17decf975371b0addf3d2f4520835b232652ebb07ee33f ./build/glboost.js
+bb5fdcfbcdbb6181bb17decf975371b0addf3d2f4520835b232652ebb07ee33f ./build/glboost.js
+5026fa8a61bb5fc5493387d36428a9a5d356a33d1e9718b32a6b199451b1938b ./build/glboost.min.js
+667174b8bb3af365677f5aea9dcd20d6c75459e95c873539e05f823d26365039 ./build/glboost.min.js.map

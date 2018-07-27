@@ -9518,7 +9518,10 @@ return mat4(
       if (typeof states.functions === 'undefined') {
         states.functions = this._stateFunctionsToReset;
       }
-      this._states = states;
+      this._states.enable = states.enable;
+      if (typeof states.functions !== 'undefined') {
+        this._states.functions = states.functions;
+      }
       this._updateCount();
     }
 
@@ -12702,7 +12705,7 @@ return mat4(
     }
 
     get currentGlobalStates() {
-      return this._currentGlobalStates.concat();
+      return this._currentGlobalStates;
     }
 
     restoreGlobalStatesToDefault() {
@@ -14518,7 +14521,7 @@ return mat4(
         }
 
         // draw pre gizmos
-        this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport);
+        this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
 
         // draw opacity meshes.
         const opacityMeshes = renderPass.opacityMeshes;
@@ -14560,7 +14563,7 @@ return mat4(
         });
         
         // draw post gizmos
-        this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport);
+        this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //      glem.drawBuffers(gl, [gl.BACK]);
@@ -14576,12 +14579,15 @@ return mat4(
       });
     }
 
-    _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport) {
+    _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
       const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
+      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
       this._glBoostContext.currentGlobalStates = [
         3042, // gl.BLEND
       ];
+      if (isDepthTest) {
+        this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+      }
 
       for (let gizmo of gizmos) {
         if (gizmo.isVisible) {
@@ -16745,9 +16751,15 @@ return mat4(
       this._material = new ClassicMaterial$1(glBoostContext);
       this._material.baseColor = new Vector4(0, 1, 0, 1);
 
+      
+      this._material.states.enable = [2884]; // gl.CULL_FACE
+      this._material.states.functions.cullFace = [1028]; // gl.front
+      this._material.states.functions.depthMask = [true]; // Write depth value
+      this._material.userFlavorName = "M_OutlineGizmoMaterial";
+
       this._forceThisMaterial = this._material;
 
-      this._mesh.material = this._material;
+      //this._mesh.material = this._material;
       this._group = this._glBoostContext.createGroup();
       this._group.matrix = mesh.worldMatrix;
       this._group.addChild(this._mesh);
@@ -21672,4 +21684,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-70-g989ed-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-71-gbcbdd-mod branch: develop';

@@ -137,7 +137,7 @@ export default class Renderer extends GLBoostObject {
       }
 
       // draw pre gizmos
-      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport);
+      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
 
       // draw opacity meshes.
       const opacityMeshes = renderPass.opacityMeshes;
@@ -179,7 +179,7 @@ export default class Renderer extends GLBoostObject {
       });
       
       // draw post gizmos
-      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport);
+      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
@@ -195,12 +195,15 @@ export default class Renderer extends GLBoostObject {
     });
   }
 
-  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport) {
+  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
     const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-    this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
+    this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
     this._glBoostContext.currentGlobalStates = [
       3042, // gl.BLEND
     ];
+    if (isDepthTest) {
+      this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+    }
 
     for (let gizmo of gizmos) {
       if (gizmo.isVisible) {

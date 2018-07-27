@@ -20,9 +20,15 @@ export default class M_OutlineGizmo extends M_Gizmo {
     this._material = new ClassicMaterial(glBoostContext);
     this._material.baseColor = new Vector4(0, 1, 0, 1);
 
+    
+    this._material.states.enable = [2884]; // gl.CULL_FACE
+    this._material.states.functions.cullFace = [1028]; // gl.front
+    this._material.states.functions.depthMask = [true]; // Write depth value
+    this._material.userFlavorName = "M_OutlineGizmoMaterial";
+
     this._forceThisMaterial = this._material;
 
-    this._mesh.material = this._material;
+    //this._mesh.material = this._material;
     this._group = this._glBoostContext.createGroup();
     this._group.matrix = mesh.worldMatrix;
     this._group.addChild(this._mesh);
