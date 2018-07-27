@@ -5,6 +5,7 @@ import Vector3 from '../math/Vector3';
 import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
 import Matrix44 from '../math/Matrix44';
+import MathUtil from '../math/MathUtil';
 import GLBoostObject from '../core/GLBoostObject';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
 
@@ -578,5 +579,17 @@ export default class L_Element extends GLBoostObject {
     instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
 
     instance._updateCountAsElement = this._updateCountAsElement;
+  }
+
+  setPropertiesFromJson(json: Object) {
+    for(let key in json) {
+      if(json.hasOwnProperty(key)) {
+        if (key === "quaternion") {
+          this[key] = MathUtil.arrayToQuaternion(json[key]);
+        } else {
+          this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+        }
+      }
+    }
   }
 }
