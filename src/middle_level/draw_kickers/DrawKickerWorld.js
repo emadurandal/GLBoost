@@ -115,8 +115,12 @@ export default class DrawKickerWorld {
 
     for (let i=0; i<originalMaterials.length;i++) {
       let material = originalMaterials[i];
+      let isOutlineVisible = false;
       if (forceThisMaterial) {
         material = forceThisMaterial;
+        if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
+          isOutlineVisible = true;
+        }
       }
       if (!material.isVisible) {
         continue;
@@ -140,7 +144,7 @@ export default class DrawKickerWorld {
         }
       }
 
-      material._glContext.uniform2i(material.getUniform(glslProgram, 'uniform_objectIds'), mesh.objectIndex, 0, true);
+      material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
       let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');

@@ -24,7 +24,7 @@ export default class M_OutlineGizmo extends M_Gizmo {
     this._material.states.enable = [2884]; // gl.CULL_FACE
     this._material.states.functions.cullFace = [1028]; // gl.front
     this._material.states.functions.depthMask = [true]; // Write depth value
-    this._material.userFlavorName = "M_OutlineGizmoMaterial";
+    this._material.userFlavorName = "OutlineGizmoMaterial";
 
     this._forceThisMaterial = this._material;
 
@@ -36,7 +36,7 @@ export default class M_OutlineGizmo extends M_Gizmo {
 
     const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
-    this.translate = Vector3.multiply(centerPoint, -1*scale);
+//    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
+//    this.translate = Vector3.multiply(centerPoint, -1*scale);
   }
 }

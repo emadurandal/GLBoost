@@ -5272,7 +5272,7 @@ return mat4(
       shaderText +=      'uniform mat4 viewMatrix;\n';
       shaderText +=      'uniform mat4 projectionMatrix;\n';
       shaderText +=      'uniform mat3 normalMatrix;\n';
-      shaderText += `     uniform highp ivec2 objectIds;\n`;
+      shaderText += `     uniform highp ivec3 objectIds;\n`;
 
       shaderText += `${out_} vec3 v_position_world;\n`;
 
@@ -5290,6 +5290,15 @@ return mat4(
     VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
       var shaderText = '';
 
+      // calc Projection * View * World matrix
+      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+  //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
+  //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
+        shaderText += '  float borderWidth = 2.0;\n';
+        shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
+      }
+      
       // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
       shaderText += '  if (!isSkinning) {\n';
       shaderText += '    position_world = worldMatrix * position_local;\n';
@@ -5297,9 +5306,6 @@ return mat4(
         shaderText += '  normal_world = normalMatrix * normal_local;\n';
       }
       shaderText += '  }\n';
-
-      // calc Projection * View * World matrix
-      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
       // calc vertex position in world space
       shaderText += '  v_position_world = position_world.xyz;\n';
@@ -5336,7 +5342,7 @@ return mat4(
     FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
       let shaderText = '';
 
-      shaderText += `uniform highp ivec2 objectIds;\n`;
+      shaderText += `uniform highp ivec3 objectIds;\n`;
       shaderText += `uniform vec3 viewPosition_world;\n`;
 
       let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -5380,7 +5386,7 @@ return mat4(
         }
       });
 
-      material.setUniform(shaderProgram, 'uniform_objectIds', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
+      material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
 
       material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
       material._semanticsDic['WORLD'] = 'worldMatrix';
@@ -6511,8 +6517,12 @@ return mat4(
 
       for (let i=0; i<originalMaterials.length;i++) {
         let material = originalMaterials[i];
+        let isOutlineVisible = false;
         if (forceThisMaterial) {
           material = forceThisMaterial;
+          if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
+            isOutlineVisible = true;
+          }
         }
         if (!material.isVisible) {
           continue;
@@ -6536,7 +6546,7 @@ return mat4(
           }
         }
 
-        material._glContext.uniform2i(material.getUniform(glslProgram, 'uniform_objectIds'), mesh.objectIndex, 0, true);
+        material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
 
         let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
         let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
@@ -16755,7 +16765,7 @@ return mat4(
       this._material.states.enable = [2884]; // gl.CULL_FACE
       this._material.states.functions.cullFace = [1028]; // gl.front
       this._material.states.functions.depthMask = [true]; // Write depth value
-      this._material.userFlavorName = "M_OutlineGizmoMaterial";
+      this._material.userFlavorName = "OutlineGizmoMaterial";
 
       this._forceThisMaterial = this._material;
 
@@ -16767,8 +16777,8 @@ return mat4(
 
       const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-      this.scale = new Vector3(1+scale, 1+scale, 1+scale);
-      this.translate = Vector3.multiply(centerPoint, -1*scale);
+  //    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
+  //    this.translate = Vector3.multiply(centerPoint, -1*scale);
     }
   }
 
@@ -21684,4 +21694,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-71-gbcbdd-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-72-g9e6c-mod branch: develop';

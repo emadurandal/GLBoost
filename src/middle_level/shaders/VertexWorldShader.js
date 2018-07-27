@@ -24,7 +24,7 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 viewMatrix;\n';
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
-    shaderText += `     uniform highp ivec2 objectIds;\n`;
+    shaderText += `     uniform highp ivec3 objectIds;\n`;
 
     shaderText += `${out_} vec3 v_position_world;\n`;
 
@@ -42,6 +42,15 @@ export default class VertexWorldShaderSource {
   VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
     var shaderText = '';
 
+    // calc Projection * View * World matrix
+    shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+//      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
+//      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
+      shaderText += '  float borderWidth = 2.0;\n';
+      shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
+    }
+    
     // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
     shaderText += '  if (!isSkinning) {\n';
     shaderText += '    position_world = worldMatrix * position_local;\n';
@@ -49,9 +58,6 @@ export default class VertexWorldShaderSource {
       shaderText += '  normal_world = normalMatrix * normal_local;\n';
     }
     shaderText += '  }\n';
-
-    // calc Projection * View * World matrix
-    shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
     // calc vertex position in world space
     shaderText += '  v_position_world = position_world.xyz;\n';
@@ -88,7 +94,7 @@ export default class VertexWorldShaderSource {
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     let shaderText = '';
 
-    shaderText += `uniform highp ivec2 objectIds;\n`;
+    shaderText += `uniform highp ivec3 objectIds;\n`;
     shaderText += `uniform vec3 viewPosition_world;\n`;
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -132,7 +138,7 @@ export default class VertexWorldShaderSource {
       }
     });
 
-    material.setUniform(shaderProgram, 'uniform_objectIds', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
+    material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
 
     material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
     material._semanticsDic['WORLD'] = 'worldMatrix';
