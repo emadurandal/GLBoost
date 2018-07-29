@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_Element from '../M_Element';
 
 /**
@@ -62,3 +63,5 @@ export default class M_AbstractLight extends M_Element {
     return this._camera;
   }
 }
+
+GLBoost['M_AbstractLight'] = M_AbstractLight;
