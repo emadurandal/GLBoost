@@ -457,7 +457,8 @@ export default class RenderPass extends GLBoostObject {
         children.forEach((child)=> {
           collectGizmos(child);
         });
-      } else if (elem.gizmos) {
+      } 
+      if (elem.gizmos) {
         elem.gizmos.filter((gizmo)=>{
           if (gizmo.isPreDraw) {
             this._preGizmos.push(gizmo);

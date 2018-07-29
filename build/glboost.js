@@ -14278,7 +14278,8 @@ return mat4(
           children.forEach((child)=> {
             collectGizmos(child);
           });
-        } else if (elem.gizmos) {
+        } 
+        if (elem.gizmos) {
           elem.gizmos.filter((gizmo)=>{
             if (gizmo.isPreDraw) {
               this._preGizmos.push(gizmo);
@@ -21694,4 +21695,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-72-g9e6c-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-73-gc50a-mod branch: develop';
