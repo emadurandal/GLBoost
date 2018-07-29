@@ -1,6 +1,6 @@
-version: 0.0.4-73-gc50a-mod
+version: 0.0.4-74-ga2a5-mod
 branch: develop
-dcefc0d3a3e3c9c6c823098d48f15fbbc46abc6db0f82cc9cb12ce75f0e41e2d ./build/glboost.js
-dcefc0d3a3e3c9c6c823098d48f15fbbc46abc6db0f82cc9cb12ce75f0e41e2d ./build/glboost.js
-06cc8c768ff5adb59739f7cdc72fa6aa2fae8b4d2e64f6342fd0ecebf9fb4d00 ./build/glboost.min.js
-9bdaca20da792c9b07a69611b78442a292bfa477a82c77792bb9ca34a8af9390 ./build/glboost.min.js.map
+f51ff0cf050247903c0f24d708987223dee15872de2fe97900627d6fbca97f11 ./build/glboost.js
+f51ff0cf050247903c0f24d708987223dee15872de2fe97900627d6fbca97f11 ./build/glboost.js
+d473ed1bfa299d25232af0921f106f1e7966b30b121eee595661529ad09af419 ./build/glboost.min.js
+5055ce39cec551aa9355d36deb60848df995f390ccdf6f49cd6f610227cc9af3 ./build/glboost.min.js.map
