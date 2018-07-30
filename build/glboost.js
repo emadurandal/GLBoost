@@ -2547,6 +2547,12 @@
         rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
       }
 
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        rotate.x = MathUtil.radianToDegree(rotate.x);
+        rotate.y = MathUtil.radianToDegree(rotate.y);
+        rotate.z = MathUtil.radianToDegree(rotate.z);
+      }
+
       return rotate;
     }
 
@@ -3833,6 +3839,9 @@
 
     set translate(vec         ) {
       if (this._translate.isEqual(vec)) {
+        this._is_trs_matrix_updated = false;
+        this._is_inverse_trs_matrix_updated = false;
+        this._is_translate_updated = true;
         return;
       }
       this._translate = vec.clone();
@@ -3884,6 +3893,10 @@
 
     set rotate(vec         ) {
       if (this._rotate.isEqual(vec)) {
+        this._is_quaternion_updated = false;
+        this._is_trs_matrix_updated = false;
+        this._is_inverse_trs_matrix_updated = false;
+        this._is_euler_angles_updated = true;
         return;
       }
       this._rotate = vec.clone();
@@ -3939,6 +3952,9 @@
 
     set scale(vec         ) {
       if (this._scale.isEqual(vec)) {
+        this._is_trs_matrix_updated = false;
+        this._is_inverse_trs_matrix_updated = false;
+        this._is_scale_updated = true;
         return;
       }
       this._scale = vec.clone();
@@ -4124,6 +4140,10 @@
 
     set quaternion(quat            ) {
       if (this._quaternion.isEqual(quat)) {
+        this._is_trs_matrix_updated = false;
+        this._is_inverse_trs_matrix_updated = false;
+        this._is_euler_angles_updated = false;
+        this._is_quaternion_updated = true;
         return;
       }
       this._quaternion = quat.clone();
@@ -14426,6 +14446,8 @@ return mat4(
       this.__isWebVRMode = false;
       this.__webvrFrameData = null;
       this.__webvrDisplay = null;
+      this.__canvasWidthBackup = null;
+      this.__canvasHeightBackup = null;
       this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
       this.__requestedToEnterWebVR = false;
       this.__isReadyForWebVR = false;
@@ -14745,18 +14767,29 @@ return mat4(
 
 
     // WebVR
-    async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+    async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
       if (initialUserSittingPositionIfStageParametersDoNotExist) {
         this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
       }
+      this.__minRenderWidthFromUser = minRenderWidth;
+      this.__minRenderHeightFromUser = minRenderHeight;
+
       return new Promise((resolve, reject)=> {
         if (!this.__webvrDisplay.isPresenting) {
+          this.__animationFrameObject = this.__webvrDisplay;
+          const leftEye = this.__webvrDisplay.getEyeParameters("left");
+          const rightEye = this.__webvrDisplay.getEyeParameters("right");
+
+          this.__canvasWidthBackup = this._glContext.canvasWidth;
+          this.__canvasHeightBackup = this._glContext.canvaHeight;
+
+          if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
+            this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+          } else {
+            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+          }
           this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
             //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-            this.__animationFrameObject = this.__webvrDisplay;
-            const leftEye = this.__webvrDisplay.getEyeParameters("left");
-            const rightEye = this.__webvrDisplay.getEyeParameters("right");
-            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
             this.__requestedToEnterWebVR = true;
             resolve();
           }).catch(() => {
@@ -14827,6 +14860,7 @@ return mat4(
       if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         await this.__webvrDisplay.exitPresent();
       }
+      this.resize(this.__canvasWidthBackup, this.__canvasHeightBackup);
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
     }
@@ -21702,4 +21736,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-74-ga2a5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-77-g261f-mod branch: develop';

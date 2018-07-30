@@ -24,6 +24,8 @@ export default class Renderer extends GLBoostObject {
     this.__isWebVRMode = false;
     this.__webvrFrameData = null;
     this.__webvrDisplay = null;
+    this.__canvasWidthBackup = null;
+    this.__canvasHeightBackup = null;
     this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
     this.__requestedToEnterWebVR = false;
     this.__isReadyForWebVR = false;
@@ -343,18 +345,29 @@ export default class Renderer extends GLBoostObject {
 
 
   // WebVR
-  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
     if (initialUserSittingPositionIfStageParametersDoNotExist) {
       this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
     }
+    this.__minRenderWidthFromUser = minRenderWidth;
+    this.__minRenderHeightFromUser = minRenderHeight;
+
     return new Promise((resolve, reject)=> {
       if (!this.__webvrDisplay.isPresenting) {
+        this.__animationFrameObject = this.__webvrDisplay;
+        const leftEye = this.__webvrDisplay.getEyeParameters("left");
+        const rightEye = this.__webvrDisplay.getEyeParameters("right");
+
+        this.__canvasWidthBackup = this._glContext.canvasWidth;
+        this.__canvasHeightBackup = this._glContext.canvaHeight;
+
+        if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
+          this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+        } else {
+          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+        }
         this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
           //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-          this.__animationFrameObject = this.__webvrDisplay;
-          const leftEye = this.__webvrDisplay.getEyeParameters("left");
-          const rightEye = this.__webvrDisplay.getEyeParameters("right");
-          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
           this.__requestedToEnterWebVR = true;
           resolve();
         }).catch(() => {
@@ -425,6 +438,7 @@ export default class Renderer extends GLBoostObject {
     if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       await this.__webvrDisplay.exitPresent();
     }
+    this.resize(this.__canvasWidthBackup, this.__canvasHeightBackup);
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
   }
