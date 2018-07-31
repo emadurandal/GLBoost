@@ -53,7 +53,7 @@ export default class M_SkeletalGeometry extends Geometry {
         jointZeroWorldMatrix = globalJointTransform;
       }
 //      if (true) {
-      if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
+      if (this._materialForSkeletals[0].shaderInstance && this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
         matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
       } else {
         matrices[i] = Matrix44.identity();

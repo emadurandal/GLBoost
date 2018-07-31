@@ -444,7 +444,7 @@ export default class M_Group extends M_Element {
   }
 
   readyForDiscard() {
-    let collectElements = function(elem, elementsType) {
+    let collectElements = function(elem) {
       if (elem instanceof M_Group) {
         const children = elem.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -457,6 +457,7 @@ export default class M_Group extends M_Element {
         console.error('not M_Group nor M_Element');
       }
     };
+    collectElements(this);
 
     this.removeAll();
   }
