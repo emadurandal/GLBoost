@@ -55,7 +55,8 @@ export default class AABB {
 
   updateAllInfo() {
     this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-    this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+    const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+    this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
     return this;
   }
