@@ -12771,6 +12771,8 @@ return mat4(
       }
       const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
       object.setPropertiesFromJson(json);
+
+      return object;
     }
 
   }
@@ -21798,4 +21800,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-84-g343b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-85-g6ce1-mod branch: develop';

@@ -318,6 +318,8 @@ export default class GLBoostLowContext {
     }
     const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
     object.setPropertiesFromJson(json);
+
+    return object;
   }
 
 }
