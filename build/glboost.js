@@ -3838,24 +3838,12 @@
     }
 
     set translate(vec         ) {
-      if (this._translate.isEqual(vec)) {
-        this._is_trs_matrix_updated = false;
-        this._is_inverse_trs_matrix_updated = false;
-        this._is_translate_updated = true;
-        return;
-      }
       this._translate = vec.clone();
-      if (this._is_trs_matrix_updated) ;
-
-      this.updateTranslate();
-    }
-
-    updateTranslate() {
-      this.__updateFromMatrix(false, !this._is_euler_angles_updated, !this._is_scale_updated, !this._is_quaternion_updated);
+      this._is_translate_updated = true;
       this._is_trs_matrix_updated = false;
       this._is_inverse_trs_matrix_updated = false;
-      this._is_translate_updated = true;
-      this._needUpdate();
+
+      this.__updateTransform();
     }
 
     getTranslateNotAnimated() {
@@ -3892,25 +3880,15 @@
     }
 
     set rotate(vec         ) {
-      if (this._rotate.isEqual(vec)) {
-        this._is_quaternion_updated = false;
-        this._is_trs_matrix_updated = false;
-        this._is_inverse_trs_matrix_updated = false;
-        this._is_euler_angles_updated = true;
-        return;
-      }
+
       this._rotate = vec.clone();
-
-      this.updateRotate();
-    }
-
-    updateRotate() {
-      this.__updateFromMatrix(!this._is_translate_updated, false, !this._is_scale_updated, false);
+      this._is_euler_angles_updated = true;
+      this._is_quaternion_updated = false;
       this._is_trs_matrix_updated = false;
       this._is_inverse_trs_matrix_updated = false;
-      this._is_quaternion_updated = false;
-      this._is_euler_angles_updated = true;
-      this._needUpdate();
+
+
+      this.__updateTransform();
     }
 
     get rotate() {
@@ -3951,24 +3929,11 @@
     }
 
     set scale(vec         ) {
-      if (this._scale.isEqual(vec)) {
-        this._is_trs_matrix_updated = false;
-        this._is_inverse_trs_matrix_updated = false;
-        this._is_scale_updated = true;
-        return;
-      }
       this._scale = vec.clone();
-      if (this._is_trs_matrix_updated) ;
-
-      this.updateScale();
-    }
-
-    updateScale() {
-      this.__updateFromMatrix(!this._is_translate_updated, !this._is_euler_angles_updated, false, !this._is_quaternion_updated);
+      this._is_scale_updated = true;
       this._is_trs_matrix_updated = false;
       this._is_inverse_trs_matrix_updated = false;
-      this._is_scale_updated = true;
-      this._needUpdate();
+      this.__updateTransform();
     }
 
     get scale() {
@@ -4011,39 +3976,13 @@
       this._is_trs_matrix_updated = true;
       this._is_translate_updated = false;
       this._is_euler_angles_updated = false;
-      this._is_scale_updated = false;
       this._is_quaternion_updated = false;
-      this._is_inverse_trs_matrix_updated = false;
+      this._is_scale_updated = false;
+      this.__updateTransform();
 
-      this._needUpdate();
     }
 
-    __updateFromMatrix(updateTranslate, updateRotation, updateScale, updateQuaternion) {
-      if (updateTranslate) {
-        this._translate.x = this._matrix.m03;
-        this._translate.y = this._matrix.m13;
-        this._translate.z = this._matrix.m23;
-        this._is_translate_updated = true;
-      }
 
-      if (updateScale) {
-        const m = this._matrix;
-        this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
-        this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
-        this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
-        this._is_scale_updated = true;
-      }
-
-      if (updateQuaternion) {
-        this._quaternion = Quaternion.fromMatrix(this._matrix);
-        this._is_quaternion_updated = true;
-      }
-
-      if (updateRotation) {
-        this._rotate = this._matrix.toEulerAngles();
-        this._is_euler_angles_updated = true;
-      }
-    }
 
     get matrix() {
       let input = void 0;
@@ -4139,25 +4078,12 @@
 
 
     set quaternion(quat            ) {
-      if (this._quaternion.isEqual(quat)) {
-        this._is_trs_matrix_updated = false;
-        this._is_inverse_trs_matrix_updated = false;
-        this._is_euler_angles_updated = false;
-        this._is_quaternion_updated = true;
-        return;
-      }
       this._quaternion = quat.clone();
-
-      this.updateQuaternion();
-    }
-
-    updateQuaternion() {
-      this.__updateFromMatrix(!this._is_translate_updated, false, !this._is_scale_updated, false);
+      this._is_quaternion_updated = true;
+      this._is_euler_angles_updated = false;
       this._is_trs_matrix_updated = false;
       this._is_inverse_trs_matrix_updated = false;
-      this._is_euler_angles_updated = false;
-      this._is_quaternion_updated = true;
-      this._needUpdate();
+      this.__updateTransform();
     }
 
     get quaternion() {
@@ -4211,6 +4137,68 @@
     get normalMatrix() {
       return Matrix44$1.invert(this.transformMatrix).transpose().toMatrix33();
     }
+
+    __updateTransform() {
+      this.__updateRotation();
+      this.__updateTranslate();
+      this.__updateScale();
+      this.__updateMatrix();
+      this._needUpdate();
+    }
+
+    __updateRotation() {
+      if (this._is_euler_angles_updated && !this._is_quaternion_updated) {
+        this._quaternion = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        this._is_quaternion_updated = true;
+      } else if (!this._is_euler_angles_updated && this._is_quaternion_updated) {
+        this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+        this._is_euler_angles_updated = true;
+      } else if (!this._is_euler_angles_updated && !this._is_quaternion_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._quaternion = Quaternion.fromMatrix(m);
+        this._is_quaternion_updated = true;
+        this._rotate = m.toEulerAngles();
+        this._is_euler_angles_updated = true;
+      }
+    }
+
+    __updateTranslate() {
+      if (!this._is_translate_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._translate.x = m.m03;
+        this._translate.y = m.m13;
+        this._translate.z = m.m23;
+        this._is_translate_updated = true;
+      }
+    }
+
+    __updateScale() {
+      if (!this._is_scale_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+        this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+        this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+        this._is_scale_updated = true;
+      }
+    }
+
+    __updateMatrix() {
+      if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
+        let rotationMatrix = Matrix44$1.identity();
+        rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+    
+        let scale = this.getScaleNotAnimated();
+    
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
+        let translateVec = this.getTranslateNotAnimated();
+        this._matrix.m03 = translateVec.x;
+        this._matrix.m13 = translateVec.y;
+        this._matrix.m23 = translateVec.z;
+    
+        this._is_trs_matrix_updated = true;
+      }
+    }
+
 
     _copy(instance           ) {
       super._copy(instance);
@@ -21736,4 +21724,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-77-g261f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-78-g3ecf2-mod branch: develop';

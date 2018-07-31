@@ -299,6 +299,12 @@ export default class Matrix44 {
       rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
     }
 
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
+      rotate.x = MathUtil.radianToDegree(rotate.x);
+      rotate.y = MathUtil.radianToDegree(rotate.y);
+      rotate.z = MathUtil.radianToDegree(rotate.z);
+    }
+
     return rotate;
   }
 
