@@ -576,7 +576,7 @@ export default class L_Element extends GLBoostObject {
 
   setPropertiesFromJson(json: Object) {
     for(let key in json) {
-      if(json.hasOwnProperty(key)) {
+      if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
           this[key] = MathUtil.arrayToQuaternion(json[key]);
         } else {

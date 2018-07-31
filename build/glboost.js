@@ -3732,7 +3732,6 @@
     }
 
     _needUpdate() {
-      console.log("L_Element");
       this._updateCountAsElement++;
     }
 
@@ -4244,7 +4243,7 @@
 
     setPropertiesFromJson(json        ) {
       for(let key in json) {
-        if(json.hasOwnProperty(key)) {
+        if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
             this[key] = MathUtil.arrayToQuaternion(json[key]);
           } else {
@@ -4759,7 +4758,6 @@
 
     _needUpdate() {
       super._needUpdate();
-      console.log("M_Element");
     }
 
   }
@@ -13062,7 +13060,6 @@ return mat4(
 
     _needUpdate() {
       super._needUpdate();
-      console.log("M_Mesh");
     }
   }
   M_Mesh._geometries = {};
@@ -13733,8 +13730,6 @@ return mat4(
         }
       };
       collectElements(this);
-
-      console.log("M_Group");
     }
 
   }
@@ -16848,15 +16843,12 @@ return mat4(
 
       //this._mesh.material = this._material;
       this._group = this._glBoostContext.createGroup();
-  //    this._group.matrix = mesh.worldMatrix;
       this.updateMatrix(mesh);
       this._group.addChild(this._mesh);
       this.addChild(this._group);
 
       const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-  //    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
-  //    this.translate = Vector3.multiply(centerPoint, -1*scale);
     }
 
     updateMatrix(mesh) {
@@ -21776,4 +21768,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-82-g2e68-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-83-g272d7-mod branch: develop';
