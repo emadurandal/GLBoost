@@ -303,6 +303,23 @@ export default class GLBoostLowContext {
     this._currentGlobalStates = this._defaultGlobalStates.concat();
   }
 
+  get glBoostMonitor() {
+    return this._glBoostMonitor;
+  }
+
+  setPropertiesFromJson(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    if (!json.targetInstanceName) {
+      console.warn(`Faild! This json doesn't include targetInstanceName field!`);
+      return;
+    }
+    const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+    object.setPropertiesFromJson(json);
+  }
+
 }
 
 GLBoost['GLBoostLowContext'] = GLBoostLowContext;

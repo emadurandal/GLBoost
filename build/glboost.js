@@ -711,25 +711,34 @@
     }
 
     registerGLBoostObject(glBoostObject) {
-      this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+      this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
     }
 
     deregisterGLBoostObject(glBoostObject) {
-      delete this._glBoostObjects[glBoostObject.toString()];
+      delete this._glBoostObjects[glBoostObject.instanceName];
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
     }
 
 
-    getGLBoostObjects(partOfGlBoostObjectClassName) {
+    getGLBoostObjects(partOfGlBoostObjectInstanceName) {
       let glBoostObjects = [];
       for (let instanceName in this._glBoostObjects) {
-        if (instanceName.indexOf(partOfGlBoostObjectClassName)>0) {
+        if (instanceName.indexOf(partOfGlBoostObjectInstanceName)>0) {
           glBoostObjects.push(this._glBoostObjects[instanceName]);
         }
       }
 
       return glBoostObjects;
+    }
+
+    getGLBoostObject(glBoostObjectInstanceName) {
+      for (let instanceName in this._glBoostObjects) {
+        if (instanceName === glBoostObjectInstanceName) {
+          return this._glBoostObjects[instanceName];
+        }
+      }
+      return null;
     }
 
     getGLBoostObjectWhichHasThisObjectId(objectId) {
@@ -4241,7 +4250,11 @@
       instance._updateCountAsElement = this._updateCountAsElement;
     }
 
-    setPropertiesFromJson(json        ) {
+    setPropertiesFromJson(arg        ) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
@@ -12741,6 +12754,23 @@ return mat4(
 
     restoreGlobalStatesToDefault() {
       this._currentGlobalStates = this._defaultGlobalStates.concat();
+    }
+
+    get glBoostMonitor() {
+      return this._glBoostMonitor;
+    }
+
+    setPropertiesFromJson(arg) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      if (!json.targetInstanceName) {
+        console.warn(`Faild! This json doesn't include targetInstanceName field!`);
+        return;
+      }
+      const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      object.setPropertiesFromJson(json);
     }
 
   }
@@ -21768,4 +21798,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-83-g272d7-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-84-g343b-mod branch: develop';

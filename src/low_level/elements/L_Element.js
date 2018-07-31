@@ -574,7 +574,11 @@ export default class L_Element extends GLBoostObject {
     instance._updateCountAsElement = this._updateCountAsElement;
   }
 
-  setPropertiesFromJson(json: Object) {
+  setPropertiesFromJson(arg: Object) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
