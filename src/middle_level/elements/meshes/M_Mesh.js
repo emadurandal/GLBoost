@@ -315,6 +315,10 @@ export default class M_Mesh extends M_Element {
     super._copy(instance);
     instance._transformedDepth = this._transformedDepth;
   }
+
+  _needUpdate() {
+    super._needUpdate();
+  }
 }
 M_Mesh._geometries = {};
 

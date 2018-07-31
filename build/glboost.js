@@ -3732,6 +3732,7 @@
     }
 
     _needUpdate() {
+      console.log("L_Element");
       this._updateCountAsElement++;
     }
 
@@ -4740,7 +4741,7 @@
     }
 
     readyForDiscard() {
-      if (this instanceof this.className.indexOf('Mesh') !== -1) {
+      if (this.className.indexOf('Mesh') !== -1) {
         const materials = this.getAppropriateMaterials();
         for (let material of materials) {
           material.readyForDiscard();
@@ -4755,6 +4756,12 @@
     get gizmos() {
       return this._gizmos;
     }
+
+    _needUpdate() {
+      super._needUpdate();
+      console.log("M_Element");
+    }
+
   }
 
   /**
@@ -6859,7 +6866,8 @@ return mat4(
 
     updateAllInfo() {
       this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-      this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
       return this;
     }
@@ -13051,6 +13059,11 @@ return mat4(
       super._copy(instance);
       instance._transformedDepth = this._transformedDepth;
     }
+
+    _needUpdate() {
+      super._needUpdate();
+      console.log("M_Mesh");
+    }
   }
   M_Mesh._geometries = {};
 
@@ -13667,6 +13680,20 @@ return mat4(
     }
 
     readyForDiscard() {
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Element) {
+          // Must be M_Element
+          elem.readyForDiscard();
+        } else {
+          console.error('not M_Group nor M_Element');
+        }
+      };
+      collectElements(this);
 
       this.removeAll();
     }
@@ -13688,6 +13715,26 @@ return mat4(
       }
 
       return [currentShortestIntersectedPosVec3, currentShortestT];
+    }
+
+    _needUpdate() {
+      super._needUpdate();
+
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Mesh) {
+          if (elem._outlineGizmo) {
+            elem._outlineGizmo.updateMatrix(elem);
+          }
+        }
+      };
+      collectElements(this);
+
+      console.log("M_Group");
     }
 
   }
@@ -15807,7 +15854,7 @@ return mat4(
           jointZeroWorldMatrix = globalJointTransform;
         }
   //      if (true) {
-        if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
+        if (this._materialForSkeletals[0].shaderInstance && this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
           matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
         } else {
           matrices[i] = Matrix44$1.identity();
@@ -16801,7 +16848,8 @@ return mat4(
 
       //this._mesh.material = this._material;
       this._group = this._glBoostContext.createGroup();
-      this._group.matrix = mesh.worldMatrix;
+  //    this._group.matrix = mesh.worldMatrix;
+      this.updateMatrix(mesh);
       this._group.addChild(this._mesh);
       this.addChild(this._group);
 
@@ -16809,6 +16857,10 @@ return mat4(
 
   //    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
   //    this.translate = Vector3.multiply(centerPoint, -1*scale);
+    }
+
+    updateMatrix(mesh) {
+      this._group.matrix = mesh.worldMatrix;
     }
   }
 
@@ -21724,4 +21776,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-79-ga192-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-82-g2e68-mod branch: develop';

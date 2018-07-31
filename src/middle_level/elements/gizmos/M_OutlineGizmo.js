@@ -30,13 +30,15 @@ export default class M_OutlineGizmo extends M_Gizmo {
 
     //this._mesh.material = this._material;
     this._group = this._glBoostContext.createGroup();
-    this._group.matrix = mesh.worldMatrix;
+    this.updateMatrix(mesh);
     this._group.addChild(this._mesh);
     this.addChild(this._group);
 
     const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
 
-//    this.scale = new Vector3(1+scale, 1+scale, 1+scale);
-//    this.translate = Vector3.multiply(centerPoint, -1*scale);
+  }
+
+  updateMatrix(mesh) {
+    this._group.matrix = mesh.worldMatrix;
   }
 }

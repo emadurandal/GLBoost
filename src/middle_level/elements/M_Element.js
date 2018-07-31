@@ -506,4 +506,9 @@ export default class M_Element extends L_Element {
   get gizmos() {
     return this._gizmos;
   }
+
+  _needUpdate() {
+    super._needUpdate();
+  }
+
 }

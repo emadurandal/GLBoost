@@ -481,4 +481,22 @@ export default class M_Group extends M_Element {
     return [currentShortestIntersectedPosVec3, currentShortestT];
   }
 
+  _needUpdate() {
+    super._needUpdate();
+
+    let collectElements = function(elem) {
+      if (elem instanceof M_Group) {
+        const children = elem.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          collectElements(children[i]);
+        }
+      } else if (elem instanceof M_Mesh) {
+        if (elem._outlineGizmo) {
+          elem._outlineGizmo.updateMatrix(elem);
+        }
+      }
+    };
+    collectElements(this);
+  }
+
 }
