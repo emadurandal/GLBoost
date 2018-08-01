@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_AbstractLight from './M_AbstractLight';
 import MathUtil from '../../../low_level/math/MathUtil';
 import Vector3 from '../../../low_level/math/Vector3';
@@ -157,3 +158,5 @@ export default class M_SpotLight extends M_AbstractLight {
   }
 
 }
+
+GLBoost['M_SpotLight'] = M_SpotLight;
