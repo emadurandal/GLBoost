@@ -130,6 +130,11 @@ export default class DrawKickerWorld {
       if (renderpassSpecificMaterial) {
         material = renderpassSpecificMaterial;
       }
+
+      if (!material.shaderInstance) {
+        console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+        continue;
+      }
       this._glslProgram = material.shaderInstance.glslProgram;
 
       material._glContext.useProgram(this._glslProgram);
