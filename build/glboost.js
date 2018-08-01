@@ -21810,4 +21810,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-86-g00e2c6-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-89-ga7eb-mod branch: develop';
