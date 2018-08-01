@@ -494,7 +494,9 @@ export default class M_Element extends L_Element {
     if (this.className.indexOf('Mesh') !== -1) {
       const materials = this.getAppropriateMaterials();
       for (let material of materials) {
-        material.readyForDiscard();
+        if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
+          material.readyForDiscard();
+        }
       }
     }
   }

@@ -47,6 +47,7 @@ export default class GLBoostLowContext {
     this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
     this._defaultMaterial = this.createClassicMaterial();
+    this._defaultMaterial.userFlavorName = 'GLBoostSystemDefaultMaterial';
 
     // effekseer
     if (typeof effekseer !== "undefined") {

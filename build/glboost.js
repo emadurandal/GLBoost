@@ -4756,7 +4756,9 @@
       if (this.className.indexOf('Mesh') !== -1) {
         const materials = this.getAppropriateMaterials();
         for (let material of materials) {
-          material.readyForDiscard();
+          if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
+            material.readyForDiscard();
+          }
         }
       }
     }
@@ -6559,6 +6561,11 @@ return mat4(
         let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
         if (renderpassSpecificMaterial) {
           material = renderpassSpecificMaterial;
+        }
+
+        if (!material.shaderInstance) {
+          console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+          continue;
         }
         this._glslProgram = material.shaderInstance.glslProgram;
 
@@ -12500,6 +12507,7 @@ return mat4(
       this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
       this._defaultMaterial = this.createClassicMaterial();
+      this._defaultMaterial.userFlavorName = 'GLBoostSystemDefaultMaterial';
 
       // effekseer
       if (typeof effekseer !== "undefined") {
@@ -16772,6 +16780,8 @@ return mat4(
     }
 
   }
+
+  GLBoost$1['M_SpotLight'] = M_SpotLight;
 
   class M_AxisGizmo extends M_Gizmo {
     constructor(glBoostContext, length) {
@@ -21800,4 +21810,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-85-g6ce1-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-86-g00e2c6-mod branch: develop';
