@@ -466,6 +466,7 @@ export default class M_Group extends M_Element {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
+    let selectedMesh = null;
     for (let mesh of meshes) {
       const result = mesh.rayCast(x, y, camera, viewport);
       if (result === null) {
@@ -475,10 +476,11 @@ export default class M_Group extends M_Element {
       if (t < currentShortestT) {
         currentShortestT = t;
         currentShortestIntersectedPosVec3 = result[0];
+        selectedMesh = mesh;
       }
     }
 
-    return [currentShortestIntersectedPosVec3, currentShortestT];
+    return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
   }
 
   _needUpdate() {

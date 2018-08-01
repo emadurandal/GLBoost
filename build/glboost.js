@@ -13739,6 +13739,7 @@ return mat4(
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
+      let selectedMesh = null;
       for (let mesh of meshes) {
         const result = mesh.rayCast(x, y, camera, viewport);
         if (result === null) {
@@ -13748,10 +13749,11 @@ return mat4(
         if (t < currentShortestT) {
           currentShortestT = t;
           currentShortestIntersectedPosVec3 = result[0];
+          selectedMesh = mesh;
         }
       }
 
-      return [currentShortestIntersectedPosVec3, currentShortestT];
+      return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
     }
 
     _needUpdate() {
@@ -21810,4 +21812,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-89-ga7eb-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-90-g5c29-mod branch: develop';
