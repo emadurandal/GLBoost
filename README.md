@@ -18,6 +18,8 @@ Currently, **r4** released!
 
 ## GLBoost Viewer
 
+<img src="assets/viewer-image.jpg" alt="GLBoostViewer" title="GLBoostViewer" width="800">
+
 This is a demo viewer using GLBoost.
 https://viewer.glboost.org/
 
