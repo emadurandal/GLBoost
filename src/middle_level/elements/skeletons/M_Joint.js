@@ -115,7 +115,9 @@ export default class M_Joint extends M_Element {
   }
 
   updateGizmoDisplay() {
-    this._gizmo.update();
+    if (this._gizmo instanceof M_JointGizmo) {
+      this._gizmo.update();
+    }
   }
 
   clone() {
