@@ -4265,6 +4265,48 @@
         }
       }
     }
+
+    setRotationFromNewUpAndFront(UpVec, FrontVec) {
+      let yDir = UpVec;
+      let xDir = Vector3.cross(yDir, FrontVec);
+      let zDir = Vector3.cross(xDir, yDir);
+      
+      let rotateMatrix = Matrix44$1.identity();
+
+      rotateMatrix.m00 = xDir.x;
+      rotateMatrix.m10 = xDir.y;
+      rotateMatrix.m20 = xDir.z;
+    
+      rotateMatrix.m01 = yDir.x;
+      rotateMatrix.m11 = yDir.y;
+      rotateMatrix.m21 = yDir.z;
+    
+      rotateMatrix.m02 = zDir.x;
+      rotateMatrix.m12 = zDir.y;
+      rotateMatrix.m22 = zDir.z;
+    
+      this.rotateMatrix33 = rotateMatrix;
+    }
+
+    headToDirection(fromVec, toVec) {
+      const fromDir = Vector3.normalize(fromVec);
+      const toDir = Vector3.normalize(toVec);
+      const rotationDir = Vector3.cross(fromDir, toDir);
+      const cosTheta = Vector3.dotProduct(fromDir, toDir);
+      let theta = Math.acos(cosTheta);
+      if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
+        theta = MathUtil.radianToDegree(theta);
+      }
+      this.quaternion = Quaternion.axisAngle(rotationDir, theta);
+    }
+
+    set rotateMatrix33(rotateMatrix) {
+      this.quaternion = Quaternion.fromMatrix(rotateMatrix);
+    }
+
+    get rotateMatrix33() {
+      return this.quaternion.rotationMatrix33();
+    }
   }
 
   /*       */
@@ -16901,18 +16943,18 @@ return mat4(
   }
 
   class Line extends Geometry {
-    constructor(glBoostContext, startPos = Vector3.zero(), endPos = Vector3.zero()) {
+    constructor(glBoostContext, startPos = Vector3.zero(), endPos = Vector3.zero(), terminalMark=false) {
       super(glBoostContext);
 
       this.__startPos = startPos;
       this.__endPos = endPos;
 
       this._color = new GLBoost$1.Vector4(1, 1, 1, 1);
-      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, terminalMark);
       this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
     }
 
-    _setupVertexData(startPos, endPos) {
+    _setupVertexData(startPos, endPos, terminalMark) {
 
       let positions = [];
 
@@ -16923,6 +16965,12 @@ return mat4(
 
       colors.push(this._color);
       colors.push(this._color);
+
+      if (terminalMark) {
+        const length = startPos.lengthTo(endPos);
+  //      positions.push(startPos);
+  //      positions.push(endPos);  
+      }
 
       this._vertexData = {
         position: positions,
@@ -21812,4 +21860,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-90-g5c29-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-92-gce05-mod branch: develop';
