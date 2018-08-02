@@ -24,6 +24,8 @@ export default class Renderer extends GLBoostObject {
     this.__isWebVRMode = false;
     this.__webvrFrameData = null;
     this.__webvrDisplay = null;
+    this.__canvasWidthBackup = null;
+    this.__canvasHeightBackup = null;
     this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
     this.__requestedToEnterWebVR = false;
     this.__isReadyForWebVR = false;
@@ -136,6 +138,8 @@ export default class Renderer extends GLBoostObject {
         }
       }
 
+      // draw pre gizmos
+      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
 
       // draw opacity meshes.
       const opacityMeshes = renderPass.opacityMeshes;
@@ -159,7 +163,7 @@ export default class Renderer extends GLBoostObject {
       }
       // draw transparent meshes.
       const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
-//      console.log("START!!");
+
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
         if (mesh.isVisible) {
@@ -175,30 +179,9 @@ export default class Renderer extends GLBoostObject {
           });
         }
       });
-//      console.log("END!!");
       
-      const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
-      this._glBoostContext.currentGlobalStates = [
-        3042, // gl.BLEND
-      ];
-      let gizmos = renderPass.gizmos;
-      for (let gizmo of gizmos) {
-        if (gizmo.isVisible) {
-          gizmo.mesh.draw({
-            expression: expression,
-            lights: lights,
-            camera: camera,
-            renderPass: renderPass,
-            renderPassIndex: index,
-            viewport: viewport,
-            isWebVRMode: this.isWebVRMode,
-            webvrFrameData: this.__webvrFrameData
-          });
-        }
-      }
-      this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-      this._glBoostContext.restoreGlobalStatesToDefault();
+      // draw post gizmos
+      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
@@ -212,6 +195,37 @@ export default class Renderer extends GLBoostObject {
       renderPass.postRender(camera ? true:false, lights);
 
     });
+  }
+
+  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
+    const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
+    this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    this._glBoostContext.currentGlobalStates = [
+      3042, // gl.BLEND
+    ];
+    if (isDepthTest) {
+      this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+    }
+
+    for (let gizmo of gizmos) {
+      if (gizmo.isVisible) {
+        gizmo.mesh.draw({
+          expression: expression,
+          lights: lights,
+          camera: camera,
+          renderPass: renderPass,
+          renderPassIndex: index,
+          viewport: viewport,
+          isWebVRMode: this.isWebVRMode,
+          webvrFrameData: this.__webvrFrameData,
+          forceThisMaterial: gizmo.forceThisMaterial
+        });
+      }
+    }
+
+    this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostContext.restoreGlobalStatesToDefault();
+
   }
 
   _clearBuffer(gl, renderPass) {
@@ -285,16 +299,16 @@ export default class Renderer extends GLBoostObject {
   /**
    * This method treats the given callback function as a render loop and call it every frame.
    */
-  doRenderLoop(renderLoopFunc, ...args) {
-
+  doRenderLoop(renderLoopFunc, time, ...args) {
+    args.splice(0, 0, time);
     renderLoopFunc.apply(renderLoopFunc, args);
 
-    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-      this.doRenderLoop(renderLoopFunc, ...args);
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
+      this.doRenderLoop(renderLoopFunc, _time, args[1]);
       if (this.__requestedToEnterWebVR) {
         this.__isWebVRMode = true;
       }
-    });
+    }, time);
   }
 
   doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
@@ -331,18 +345,29 @@ export default class Renderer extends GLBoostObject {
 
 
   // WebVR
-  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
     if (initialUserSittingPositionIfStageParametersDoNotExist) {
       this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
     }
+    this.__minRenderWidthFromUser = minRenderWidth;
+    this.__minRenderHeightFromUser = minRenderHeight;
+
     return new Promise((resolve, reject)=> {
       if (!this.__webvrDisplay.isPresenting) {
+        this.__animationFrameObject = this.__webvrDisplay;
+        const leftEye = this.__webvrDisplay.getEyeParameters("left");
+        const rightEye = this.__webvrDisplay.getEyeParameters("right");
+
+        this.__canvasWidthBackup = this._glContext.canvasWidth;
+        this.__canvasHeightBackup = this._glContext.canvaHeight;
+
+        if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
+          this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+        } else {
+          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+        }
         this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
           //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-          this.__animationFrameObject = this.__webvrDisplay;
-          const leftEye = this.__webvrDisplay.getEyeParameters("left");
-          const rightEye = this.__webvrDisplay.getEyeParameters("right");
-          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
           this.__requestedToEnterWebVR = true;
           resolve();
         }).catch(() => {
@@ -413,6 +438,7 @@ export default class Renderer extends GLBoostObject {
     if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
       await this.__webvrDisplay.exitPresent();
     }
+    this.resize(this.__canvasWidthBackup, this.__canvasHeightBackup);
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
   }

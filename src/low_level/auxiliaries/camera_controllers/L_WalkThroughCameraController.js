@@ -18,15 +18,12 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._virticalSpeed = options.virticalSpeed;
     this._turnSpeed = options.turnSpeed;
 
-    this._isKeyDown = false;
-    this._lastKeyCode = null;
-    this._currentPos = null;
-    this._currentCenter = null;
-    this._currentDir = null;
+    this.reset();
 
     this._onKeydown = (e)=> {
       this._isKeyDown = true;
       this._lastKeyCode = e.keyCode;
+
       this.updateCamera();
     };
 
@@ -49,20 +46,82 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   registerEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      eventTargetDom.addEventListener('keydown', this._onKeydown);
-      eventTargetDom.addEventListener('keyup', this._onKeyup);
+      document.addEventListener('keydown', this._onKeydown);
+      document.addEventListener('keyup', this._onKeyup);
+      eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
+      eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
+      eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
     }
   }
 
   unregisterEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      eventTargetDom.removeEventListener('keydown', this._onKeydown);
-      eventTargetDom.removeEventListener('keyup', this._onKeyup);
+      document.removeEventListener('keydown', this._onKeydown);
+      document.removeEventListener('keyup', this._onKeyup);
+      eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
+      eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
+      eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
     }
+  }
+
+  _mouseDown(evt) {
+    this._isMouseDown = true;
+
+    let rect = evt.target.getBoundingClientRect();
+    this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+    this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+
+  }
+
+  _mouseMove(evt) {
+    let rect = evt.target.getBoundingClientRect();
+    this._draggedMouseXOnCanvas = evt.clientX - rect.left;
+    this._draggedMouseYOnCanvas = evt.clientY - rect.top;
+    if (this._isMouseDown) {
+      this._isMouseDrag = true;
+    }
+
+    this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
+    this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
+
+    this.updateCamera();
+
+  }
+
+  _mouseUp(evt) {
+    this._isMouseDown = false;
+    this._isMouseDrag = false;
+
+    let rect = evt.target.getBoundingClientRect();
+    this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+    this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+    
   }
 
   tryReset() {
 
+  }
+
+  reset() {
+    this._isKeyDown = false;
+    this._lastKeyCode = null;
+    this._currentPos = null;
+    this._currentCenter = null;
+    this._currentDir = null;
+    this._isMouseDown = false;
+    this._isMouseDrag = false;
+    this._draggedMouseXOnCanvas = null;
+    this._draggedMouseYOnCanvas = null;
+    this._deltaMouseXOnCanvas = null;
+    this._deltaMouseYOnCanvas = null;
+    this._mouseXAdjustScale = 0.1;
+    this._mouseYAdjustScale = 0.1;
+    this._deltaY = 0;
+    this._newDir = Vector3.zero();
+
+    this._camaras.forEach(function (camera) {
+      camera._needUpdateView(false);
+    });
   }
 
   addCamera(camera) {
@@ -81,37 +140,58 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     }
 
     let newEyeToCenter = null;
+
+    const t = this._deltaY / 90;
+    this._newDir.x = this._currentDir.x * (1 - t);
+    this._newDir.y = t;
+    this._newDir.z = this._currentDir.z * (1 - t);
+    this._newDir.normalize();
+
     switch(this._lastKeyCode) {
       case 87: // w key
-        this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
+      case 38: // arrow upper key
+      {
+        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+        this._currentPos.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
+      }
       break;
       case 65: // a key
-        this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
-        newEyeToCenter = Matrix33.rotateY(this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
-        this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
-      break;
+      case 37: // arrow left key
+      {
+        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+        const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
+        this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+      }
+    break;
       case 83: // s key
-        this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
+      case 40: // arrow down key
+      {
+        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+        this._currentPos.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
+      }
       break;
       case 68: // d key
-        this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
-        newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
-        this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+      case 39: // arrow right key
+      {
+        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+        const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
+        this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+      }
       break;
       case 81: // q key
       {
-        const leftDir = Matrix33.rotateY(90).multiplyVector(this._currentDir);
-        this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+        this._currentPos.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
       }
       break;
       case 69: // e key
       {
-        const rightDir = Matrix33.rotateY(-90).multiplyVector(this._currentDir);
-        this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+        this._currentPos.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
+        this._currentCenter.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
       }
       break;
       case 82: // r key
@@ -124,13 +204,55 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
       break;
     }
 
-//    console.log(this._currentPos.toString(), this._currentCenter.toString());
 
-    return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
+
+
+    if (this._isMouseDrag) {
+      const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+      this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
+      this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
+      this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
+
+      newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+      newEyeToCenter.x = newEyeToCenter.x * (1 - t);
+      newEyeToCenter.y = t;
+      newEyeToCenter.z = newEyeToCenter.z * (1 - t);
+      newEyeToCenter.normalize();
+      this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+
+      this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
+      this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
+  
+    }
+
+    let newLeft = camera.left;
+    let newRight = camera.right;
+    let newTop = camera.top;
+    let newBottom = camera.bottom;
+
+
+
+    return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
   }
 
   getDirection() {
-    return (this._currentCenter !== null) ? this._currentDir.clone() : null;
+    return (this._currentCenter !== null) ? this._newDir.clone() : null;
+  }
+
+  set horizontalSpeed(value) {
+    this._horizontalSpeed = value; 
+  }
+
+  get horizontalSpeed() {
+    return this._horizontalSpeed;
+  }
+
+  set virticalSpeed(value) {
+    this._virticalSpeed = value; 
+  }
+
+  get virticalSpeed() {
+    return this._virticalSpeed;
   }
 }
 

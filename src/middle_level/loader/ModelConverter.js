@@ -7,6 +7,7 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
+import M_Mesh from '../elements/meshes/M_Mesh';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -55,7 +56,7 @@ export default class ModelConverter {
 
     // load binary data
     for (let accessor of gltfModel.accessors) {
-      this._accessBinaryWithAccessor(accessor)
+      this._accessBinaryWithAccessor(accessor);
     }
 
     // Mesh data
@@ -99,8 +100,10 @@ export default class ModelConverter {
 
     let options = gltfModel.asset.extras.glboostOptions;
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
     }
+
+    rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
 
     return rootGroup;
   }
@@ -341,7 +344,7 @@ export default class ModelConverter {
       }
 
       if (mesh.primitives.length > 1) {
-        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0, color: 0};
         for (let i = 0; i < mesh.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;

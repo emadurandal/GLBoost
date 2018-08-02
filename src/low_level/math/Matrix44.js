@@ -2,8 +2,8 @@ import GLBoost from '../../globals';
 import Vector4 from './Vector4';
 import Vector3 from './Vector3';
 import Matrix33 from './Matrix33';
+import Quaternion from './Quaternion';
 import MathUtil from './MathUtil';
-
 
 export default class Matrix44 {
 
@@ -297,6 +297,12 @@ export default class Matrix44 {
       rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
     } else {
       rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+    }
+
+    if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
+      rotate.x = MathUtil.radianToDegree(rotate.x);
+      rotate.y = MathUtil.radianToDegree(rotate.y);
+      rotate.z = MathUtil.radianToDegree(rotate.z);
     }
 
     return rotate;
@@ -713,6 +719,12 @@ export default class Matrix44 {
       Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
       Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
     );
+  }
+
+  getRotate() {
+    const quat = Quaternion.fromMatrix(this);
+    const rotateMat = quat.rotationMatrix;
+    return rotateMat;
   }
 }
 

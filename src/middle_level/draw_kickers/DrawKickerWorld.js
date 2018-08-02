@@ -34,8 +34,8 @@ export default class DrawKickerWorld {
       let viewMatrix;
       if (mesh.isAffectedByViewMatrix) {
         let cameraMatrix = camera.lookAtRHMatrix();
-//          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+//        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
       } else {
         viewMatrix = Matrix44.identity();
       }
@@ -105,6 +105,7 @@ export default class DrawKickerWorld {
     const viewport = data.viewport;
     const isWebVRMode = data.isWebVRMode;
     const webvrFrameData = data.webvrFrameData;
+    const forceThisMaterial = data.forceThisMaterial;
 
     var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -114,6 +115,13 @@ export default class DrawKickerWorld {
 
     for (let i=0; i<originalMaterials.length;i++) {
       let material = originalMaterials[i];
+      let isOutlineVisible = false;
+      if (forceThisMaterial) {
+        material = forceThisMaterial;
+        if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
+          isOutlineVisible = true;
+        }
+      }
       if (!material.isVisible) {
         continue;
       }
@@ -121,6 +129,11 @@ export default class DrawKickerWorld {
       let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
       if (renderpassSpecificMaterial) {
         material = renderpassSpecificMaterial;
+      }
+
+      if (!material.shaderInstance) {
+        console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+        continue;
       }
       this._glslProgram = material.shaderInstance.glslProgram;
 
@@ -136,7 +149,7 @@ export default class DrawKickerWorld {
         }
       }
 
-      material._glContext.uniform2i(material.getUniform(glslProgram, 'uniform_objectIds'), mesh.objectIndex, 0, true);
+      material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
       let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
@@ -174,6 +187,11 @@ export default class DrawKickerWorld {
           if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
             let lightPosition = new Vector4(0, 0, 0, 1);            
             let lightDirection = new Vector4(0, 0, 0, 1);
+            let lightIntensity = light.intensity;
+            if (!light.isVisible) {
+              lightIntensity = Vector3.zero();
+            }
+
             // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
             let lightType = 0.0; // M_DirectionalLight
             if (light.className === 'M_PointLight') {
@@ -187,12 +205,12 @@ export default class DrawKickerWorld {
             if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
 //              lightDirection = new Vector3(0, 0, 1);
 //              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
-              lightDirection = light.directionInWorld
+              lightDirection = light.directionInWorld;
               lightDirection.normalize();
             }
             material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
             material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightDirection_${j}`), lightDirection.x, lightDirection.y, lightDirection.z, true);
-            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), light.intensity.x, light.intensity.y, light.intensity.z, 1.0, true);
+            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lightIntensity.x, lightIntensity.y, lightIntensity.z, 1.0, true);
             if (light.className === 'M_SpotLight') {
               material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, light.spotCosCutoff, light.spotExponent, true);              
             } else {
@@ -217,21 +235,23 @@ export default class DrawKickerWorld {
 
       geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
+      let vertexN = originalMaterials[i].getVertexN(geometry);
+
       if (isWebVRMode) {
         // Left Eye
  //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
         gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
         DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
 
         // Right Eye
         gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
         DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
       } else {
         DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
-        DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
       }
 
 
@@ -251,10 +271,9 @@ export default class DrawKickerWorld {
     //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
   }
 
-  static drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN) {
+  static drawGeometry(geometry, glem, gl, i, primitiveType, vertexN) {
     if (geometry.isIndexed()) {
-      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
-      let vertexN = material.getVertexN(geometry);
+      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);      
       let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
       let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
       let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);

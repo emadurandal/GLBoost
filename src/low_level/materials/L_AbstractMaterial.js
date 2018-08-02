@@ -246,7 +246,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
     if (typeof states.functions === 'undefined') {
       states.functions = this._stateFunctionsToReset;
     }
-    this._states = states;
+    this._states.enable = states.enable;
+    if (typeof states.functions !== 'undefined') {
+      this._states.functions = states.functions;
+    }
     this._updateCount();
   }
 

@@ -638,7 +638,6 @@ export default class Shader extends GLBoostObject {
   static _generateLightStr(i) {
     let shaderText = '';
     
-    // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
     shaderText += `    vec3 lightDirection = lightDirection_world[${i}];\n`;    
     shaderText += `    if (0.4 < lightSpotInfo[${i}].x) {\n`; // is pointlight or spotlight
     shaderText += `      lightDirection = normalize(lightPosition_world[${i}] - v_position_world.xyz);\n`;

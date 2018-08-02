@@ -711,25 +711,34 @@
     }
 
     registerGLBoostObject(glBoostObject) {
-      this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+      this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
     }
 
     deregisterGLBoostObject(glBoostObject) {
-      delete this._glBoostObjects[glBoostObject.toString()];
+      delete this._glBoostObjects[glBoostObject.instanceName];
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
     }
 
 
-    getGLBoostObjects(partOfGlBoostObjectClassName) {
+    getGLBoostObjects(partOfGlBoostObjectInstanceName) {
       let glBoostObjects = [];
       for (let instanceName in this._glBoostObjects) {
-        if (instanceName.indexOf(partOfGlBoostObjectClassName)>0) {
+        if (instanceName.indexOf(partOfGlBoostObjectInstanceName)>0) {
           glBoostObjects.push(this._glBoostObjects[instanceName]);
         }
       }
 
       return glBoostObjects;
+    }
+
+    getGLBoostObject(glBoostObjectInstanceName) {
+      for (let instanceName in this._glBoostObjects) {
+        if (instanceName === glBoostObjectInstanceName) {
+          return this._glBoostObjects[instanceName];
+        }
+      }
+      return null;
     }
 
     getGLBoostObjectWhichHasThisObjectId(objectId) {
@@ -1965,6 +1974,1019 @@
 
   GLBoost$1['Vector3'] = Vector3;
 
+  class Quaternion {
+
+    constructor(x, y, z, w) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    isEqual(vec) {
+      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    clone() {
+      return new Quaternion(this.x, this.y, this.z, this.w);
+    }
+
+    static invert(quat) {
+      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    }
+
+    static qlerp(lhq, rhq, ratio) {
+
+      var q = new Quaternion(0, 0, 0, 1);
+      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+      var ss = 1.0 - qr * qr;
+
+      if (ss === 0.0) {
+        q.w = lhq.w;
+        q.x = lhq.x;
+        q.y = lhq.y;
+        q.z = lhq.z;
+
+        return q;
+      } else {
+
+        if (qr > 1) {
+          qr = 0.999;
+        } else if (qr < -1) {
+          qr = -0.999;
+        }
+
+        let ph = Math.acos(qr);
+        let s2;
+        if(qr < 0.0 && ph > Math.PI / 2.0){
+          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+          ph = Math.acos(qr);
+          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+        } else {
+          s2 = Math.sin(ph * ratio) / Math.sin(ph);
+        }
+        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+        q.x = lhq.x * s1 + rhq.x * s2;
+        q.y = lhq.y * s1 + rhq.y * s2;
+        q.z = lhq.z * s1 + rhq.z * s2;
+        q.w = lhq.w * s1 + rhq.w * s2;
+
+        return q;
+      }
+    }
+
+    get rotationMatrix() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix44$1(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        0.0, 0.0, 0.0, 1.0
+      );
+    }
+
+    get rotationMatrix33() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix33(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
+      );
+    }
+
+    axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      this.w = Math.cos(halfAngle);
+      this.x = sin * axis.x;
+      this.y = sin * axis.y;
+      this.z = sin * axis.z;
+
+      return this;
+    }
+
+    static axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      return new Quaternion(
+        sin * axis.x,
+        sin * axis.y,
+        sin * axis.z,
+        Math.cos(halfAngle));
+    }
+
+    add(q) {
+      this.x += q.x;
+      this.y += q.y;
+      this.z += q.z;
+      this.w += q.w;
+
+      return this;
+    }
+
+    multiply(q) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
+      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
+      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
+      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+      this.x = result.x;
+      this.y = result.y;
+      this.z = result.z;
+      this.w = result.w;
+      
+      return this;
+    }
+
+    static multiply(q1, q2) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
+      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
+      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
+      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+      return result;
+    }
+
+    static fromMatrix(m) {
+      
+      let q = new Quaternion();
+      let tr = m.m00 + m.m11 + m.m22;
+
+      if (tr > 0) { 
+        let S = 0.5 / Math.sqrt(tr+1.0);
+        q.w = 0.25 / S;
+        q.x = (m.m21 - m.m12) * S;
+        q.y = (m.m02 - m.m20) * S; 
+        q.z = (m.m10 - m.m01) * S; 
+      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
+        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
+        q.w = (m.m21 - m.m12) / S;
+        q.x = 0.25 * S;
+        q.y = (m.m01 + m.m10) / S; 
+        q.z = (m.m02 + m.m20) / S; 
+      } else if (m.m11 > m.m22) { 
+        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+        q.w = (m.m02 - m.m20) / S;
+        q.x = (m.m01 + m.m10) / S; 
+        q.y = 0.25 * S;
+        q.z = (m.m12 + m.m21) / S; 
+      } else { 
+        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+        q.w = (m.m10 - m.m01) / S;
+        q.x = (m.m02 + m.m20) / S;
+        q.y = (m.m12 + m.m21) / S;
+        q.z = 0.25 * S;
+      }
+
+      return q;
+    }
+  /*
+    static fromMatrix(m) {
+      let fTrace = m.m[0] + m.m[4] + m.m[8];
+      let fRoot;
+      let q = new Quaternion();
+      if ( fTrace > 0.0 ) {
+        // |w| > 1/2, may as well choose w > 1/2
+        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+        q.w = 0.5 * fRoot;
+        fRoot = 0.5/fRoot;  // 1/(4w)
+        q.x = (m.m[5]-m.m[7])*fRoot;
+        q.y = (m.m[6]-m.m[2])*fRoot;
+        q.z = (m.m[1]-m.m[3])*fRoot;
+      } else {
+        // |w| <= 1/2
+        let i = 0;
+        if ( m.m[4] > m.m[0] )
+          i = 1;
+        if ( m.m[8] > m.m[i*3+i] )
+          i = 2;
+        let j = (i+1)%3;
+        let k = (i+2)%3;
+        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
+        
+        let setValue = function(q, i, value) {
+          switch (i) {
+            case 0: q.x = value; break;
+            case 1: q.y = value; break;
+            case 2: q.z = value; break;
+          }
+        }
+
+        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
+        fRoot = 0.5 / fRoot;
+        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
+
+        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
+        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
+      }
+
+      return q;
+    }
+  */
+
+    static fromPosition(vec3) {
+      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+      return q;
+    }
+
+    at(i) {
+      switch (i%4) {
+      case 0: return this.x;
+      case 1: return this.y;
+      case 2: return this.z;
+      case 3: return this.w;
+      }
+    }
+
+    setAt(i, val) {
+      switch (i%4) {
+      case 0: this.x = val; break;
+      case 1: this.y = val; break;
+      case 2: this.z = val; break;
+      case 3: this.w = val; break;
+      }
+    }
+
+    normalize() {
+      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+      this.x /= norm;
+      this.y /= norm;
+      this.z /= norm;
+      this.w /= norm;
+      return this;
+    }
+
+    toString() {
+      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+    }
+  }
+
+  GLBoost$1["Quaternion"] = Quaternion;
+
+  class Matrix44$1 {
+
+    constructor(m, isColumnMajor = false, notCopyFloat32Array = false
+    ) {
+      if (arguments.length >= 16) {
+        this.m = new Float32Array(16); // Data order is column major
+        if (isColumnMajor === true) {
+          let m = arguments;
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+        this.m = new Float32Array(16);
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        this.m = new Float32Array(16);
+        if (notCopyFloat32Array) {
+          this.m = m;
+        } else {
+          this.m = new Float32Array(16);
+          if (isColumnMajor === true) {
+            this.setComponents(
+              m[0], m[4], m[8], m[12],
+              m[1], m[5], m[9], m[13],
+              m[2], m[6], m[10], m[14],
+              m[3], m[7], m[11], m[15]);
+          } else {
+            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+          }  
+        }
+      } else {
+        this.m = new Float32Array(16);
+        this.identity();
+      }
+    }
+
+    setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+      this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
+      this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
+      this.m20 = m20; this.m21 = m21; this.m22 = m22; this.m23 = m23;
+      this.m30 = m30; this.m31 = m31; this.m32 = m32; this.m33 = m33;
+
+      return this;
+    }
+
+    copyComponents(mat4) {
+      //this.m.set(mat4.m);
+      this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
+    }
+
+    clone() {
+      return new Matrix44$1(
+        this.m[0], this.m[4], this.m[8], this.m[12],
+        this.m[1], this.m[5], this.m[9], this.m[13],
+        this.m[2], this.m[6], this.m[10], this.m[14],
+        this.m[3], this.m[7], this.m[11], this.m[15]
+      );
+    }
+
+    /**
+     * 単位行列にする
+     */
+    identity() {
+      this.setComponents(
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1
+      );
+      return this;
+    }
+
+    /**
+     * 単位行列にする（static版）
+     */
+    static identity() {
+      return new Matrix44$1(
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1
+      );
+    }
+
+    translate(vec) {
+      return this.setComponents(
+        1, 0, 0, vec.x,
+        0, 1, 0, vec.y,
+        0, 0, 1, vec.z,
+        0, 0, 0, 1
+      );
+    }
+
+    putTranslate(vec) {
+      this.m03 = vec.x;
+      this.m13 = vec.y;
+      this.m23 = vec.z;
+    }
+
+    getTranslate() {
+      return new Vector3(this.m03, this.m13, this.m23);
+    }
+
+    static translate(vec) {
+      return new Matrix44$1(
+        1, 0, 0, vec.x,
+        0, 1, 0, vec.y,
+        0, 0, 1, vec.z,
+        0, 0, 0, 1
+      );
+    }
+
+    scale(vec) {
+      return this.setComponents(
+        vec.x, 0, 0, 0,
+        0, vec.y, 0, 0,
+        0, 0, vec.z, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    static scale(vec) {
+      return new Matrix44$1(
+        vec.x, 0, 0, 0,
+        0, vec.y, 0, 0,
+        0, 0, vec.z, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    addScale(vec) {
+      this.m00 *= vec.x;
+      this.m11 *= vec.y;
+      this.m22 *= vec.z;
+
+      return this;
+    }
+
+    /**
+     * Create X oriented Rotation Matrix
+     */
+    rotateX(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        1, 0, 0, 0,
+        0, cos, -sin, 0,
+        0, sin, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create X oriented Rotation Matrix
+    */
+    static rotateX(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        1, 0, 0, 0,
+        0, cos, -sin, 0,
+        0, sin, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    /**
+     * Create Y oriented Rotation Matrix
+     */
+    rotateY(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        cos, 0, sin, 0,
+        0, 1, 0, 0,
+        -sin, 0, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create Y oriented Rotation Matrix
+     */
+    static rotateY(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        cos, 0, sin, 0,
+        0, 1, 0, 0,
+        -sin, 0, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    /**
+     * Create Z oriented Rotation Matrix
+     */
+    rotateZ(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        cos, -sin, 0, 0,
+        sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create Z oriented Rotation Matrix
+     */
+    static rotateZ(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        cos, -sin, 0, 0,
+        sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    static rotateXYZ(x, y, z) {
+      return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
+    }
+
+    /**
+     * @return Euler Angles Rotation (x, y, z)
+     */
+    toEulerAngles() {
+      let rotate = null;
+      if (Math.abs(this.m20) != 1.0) {
+        let y   = -Math.asin(this.m20);
+        let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
+        let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
+        rotate = new Vector3(x, y, z);
+      } else if (this.m20 === -1.0) {
+        rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
+      } else {
+        rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+      }
+
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        rotate.x = MathUtil.radianToDegree(rotate.x);
+        rotate.y = MathUtil.radianToDegree(rotate.y);
+        rotate.z = MathUtil.radianToDegree(rotate.z);
+      }
+
+      return rotate;
+    }
+
+    /**
+     * ゼロ行列
+     */
+    zero() {
+      this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      return this;
+    }
+
+    static zero() {
+      return new Matrix44$1(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    flatten() {
+      return this.m;
+    }
+
+    flattenAsArray() {
+      return [this.m[0], this.m[1], this.m[2], this.m[3],
+        this.m[4], this.m[5], this.m[6], this.m[7],
+        this.m[8], this.m[9], this.m[10], this.m[11],
+        this.m[12], this.m[13], this.m[14], this.m[15]];
+    }
+
+    _swap(l, r) {
+      this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
+    }
+
+    /**
+     * 転置
+     */
+    transpose() {
+      this._swap(1, 4);
+      this._swap(2, 8);
+      this._swap(3, 12);
+      this._swap(6, 9);
+      this._swap(7, 13);
+      this._swap(11, 14);
+
+      return this;
+    }
+
+    /**
+     * 転置（static版）
+     */
+    static transpose(mat) {
+
+      var mat_t = new Matrix44$1(
+        mat.m00, mat.m10, mat.m20, mat.m30,
+        mat.m01, mat.m11, mat.m21, mat.m31,
+        mat.m02, mat.m12, mat.m22, mat.m32,
+        mat.m03, mat.m13, mat.m23, mat.m33
+      );
+
+      return mat_t;
+    }
+
+    multiplyVector(vec) {
+      var x = this.m00*vec.x + this.m01*vec.y + this.m02*vec.z + this.m03*vec.w;
+      var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z + this.m13*vec.w;
+      var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
+      var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
+
+      return new Vector4(x, y, z, w);
+    }
+
+    /**
+     * 行列同士の乗算
+     */
+    multiply(mat) {
+      var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
+      var m01 = this.m00*mat.m01 + this.m01*mat.m11 + this.m02*mat.m21 + this.m03*mat.m31;
+      var m02 = this.m00*mat.m02 + this.m01*mat.m12 + this.m02*mat.m22 + this.m03*mat.m32;
+      var m03 = this.m00*mat.m03 + this.m01*mat.m13 + this.m02*mat.m23 + this.m03*mat.m33;
+
+      var m10 = this.m10*mat.m00 + this.m11*mat.m10 + this.m12*mat.m20 + this.m13*mat.m30;
+      var m11 = this.m10*mat.m01 + this.m11*mat.m11 + this.m12*mat.m21 + this.m13*mat.m31;
+      var m12 = this.m10*mat.m02 + this.m11*mat.m12 + this.m12*mat.m22 + this.m13*mat.m32;
+      var m13 = this.m10*mat.m03 + this.m11*mat.m13 + this.m12*mat.m23 + this.m13*mat.m33;
+
+      var m20 = this.m20*mat.m00 + this.m21*mat.m10 + this.m22*mat.m20 + this.m23*mat.m30;
+      var m21 = this.m20*mat.m01 + this.m21*mat.m11 + this.m22*mat.m21 + this.m23*mat.m31;
+      var m22 = this.m20*mat.m02 + this.m21*mat.m12 + this.m22*mat.m22 + this.m23*mat.m32;
+      var m23 = this.m20*mat.m03 + this.m21*mat.m13 + this.m22*mat.m23 + this.m23*mat.m33;
+
+      var m30 = this.m30*mat.m00 + this.m31*mat.m10 + this.m32*mat.m20 + this.m33*mat.m30;
+      var m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
+      var m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
+      var m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
+
+      return this.setComponents(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    multiplyByLeft(mat) {
+      var m00 = mat.m00*this.m00 + mat.m01*this.m10 + mat.m02*this.m20 + mat.m03*this.m30;
+      var m01 = mat.m00*this.m01 + mat.m01*this.m11 + mat.m02*this.m21 + mat.m03*this.m31;
+      var m02 = mat.m00*this.m02 + mat.m01*this.m12 + mat.m02*this.m22 + mat.m03*this.m32;
+      var m03 = mat.m00*this.m03 + mat.m01*this.m13 + mat.m02*this.m23 + mat.m03*this.m33;
+
+      var m10 = mat.m10*this.m00 + mat.m11*this.m10 + mat.m12*this.m20 + mat.m13*this.m30;
+      var m11 = mat.m10*this.m01 + mat.m11*this.m11 + mat.m12*this.m21 + mat.m13*this.m31;
+      var m12 = mat.m10*this.m02 + mat.m11*this.m12 + mat.m12*this.m22 + mat.m13*this.m32;
+      var m13 = mat.m10*this.m03 + mat.m11*this.m13 + mat.m12*this.m23 + mat.m13*this.m33;
+
+      var m20 = mat.m20*this.m00 + mat.m21*this.m10 + mat.m22*this.m20 + mat.m23*this.m30;
+      var m21 = mat.m20*this.m01 + mat.m21*this.m11 + mat.m22*this.m21 + mat.m23*this.m31;
+      var m22 = mat.m20*this.m02 + mat.m21*this.m12 + mat.m22*this.m22 + mat.m23*this.m32;
+      var m23 = mat.m20*this.m03 + mat.m21*this.m13 + mat.m22*this.m23 + mat.m23*this.m33;
+
+      var m30 = mat.m30*this.m00 + mat.m31*this.m10 + mat.m32*this.m20 + mat.m33*this.m30;
+      var m31 = mat.m30*this.m01 + mat.m31*this.m11 + mat.m32*this.m21 + mat.m33*this.m31;
+      var m32 = mat.m30*this.m02 + mat.m31*this.m12 + mat.m32*this.m22 + mat.m33*this.m32;
+      var m33 = mat.m30*this.m03 + mat.m31*this.m13 + mat.m32*this.m23 + mat.m33*this.m33;
+
+      return this.setComponents(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    /**
+     * 行列同士の乗算（static版）
+     */
+    static multiply(l_m, r_m) {
+      var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
+      var m10 = l_m.m10*r_m.m00 + l_m.m11*r_m.m10 + l_m.m12*r_m.m20 + l_m.m13*r_m.m30;
+      var m20 = l_m.m20*r_m.m00 + l_m.m21*r_m.m10 + l_m.m22*r_m.m20 + l_m.m23*r_m.m30;
+      var m30 = l_m.m30*r_m.m00 + l_m.m31*r_m.m10 + l_m.m32*r_m.m20 + l_m.m33*r_m.m30;
+
+      var m01 = l_m.m00*r_m.m01 + l_m.m01*r_m.m11 + l_m.m02*r_m.m21 + l_m.m03*r_m.m31;
+      var m11 = l_m.m10*r_m.m01 + l_m.m11*r_m.m11 + l_m.m12*r_m.m21 + l_m.m13*r_m.m31;
+      var m21 = l_m.m20*r_m.m01 + l_m.m21*r_m.m11 + l_m.m22*r_m.m21 + l_m.m23*r_m.m31;
+      var m31 = l_m.m30*r_m.m01 + l_m.m31*r_m.m11 + l_m.m32*r_m.m21 + l_m.m33*r_m.m31;
+
+      var m02 = l_m.m00*r_m.m02 + l_m.m01*r_m.m12 + l_m.m02*r_m.m22 + l_m.m03*r_m.m32;
+      var m12 = l_m.m10*r_m.m02 + l_m.m11*r_m.m12 + l_m.m12*r_m.m22 + l_m.m13*r_m.m32;
+      var m22 = l_m.m20*r_m.m02 + l_m.m21*r_m.m12 + l_m.m22*r_m.m22 + l_m.m23*r_m.m32;
+      var m32 = l_m.m30*r_m.m02 + l_m.m31*r_m.m12 + l_m.m32*r_m.m22 + l_m.m33*r_m.m32;
+
+      var m03 = l_m.m00*r_m.m03 + l_m.m01*r_m.m13 + l_m.m02*r_m.m23 + l_m.m03*r_m.m33;
+      var m13 = l_m.m10*r_m.m03 + l_m.m11*r_m.m13 + l_m.m12*r_m.m23 + l_m.m13*r_m.m33;
+      var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
+      var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
+
+      return new Matrix44$1(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    toMatrix33() {
+      return new Matrix33(
+        this.m00, this.m01, this.m02,
+        this.m10, this.m11, this.m12,
+        this.m20, this.m21, this.m22
+      );
+    }
+
+    static toMatrix33(mat) {
+      return new Matrix33(
+        mat.m00, mat.m01, mat.m02,
+        mat.m10, mat.m11, mat.m12,
+        mat.m20, mat.m21, mat.m22
+      );
+    }
+
+    determinant() {
+      return this.m00*this.m11*this.m22*this.m33 + this.m00*this.m12*this.m23*this.m31 + this.m00*this.m13*this.m21*this.m32 +
+        this.m01*this.m10*this.m23*this.m32 + this.m01*this.m12*this.m20*this.m33 + this.m01*this.m13*this.m22*this.m30 +
+        this.m02*this.m10*this.m21*this.m33 + this.m02*this.m11*this.m23*this.m30 + this.m02*this.m13*this.m20*this.m31 +
+        this.m03*this.m10*this.m22*this.m31 + this.m03*this.m11*this.m20*this.m32 + this.m03*this.m12*this.m21*this.m30 -
+
+        this.m00*this.m11*this.m23*this.m32 - this.m00*this.m12*this.m21*this.m33 - this.m00*this.m13*this.m22*this.m31 -
+        this.m01*this.m10*this.m22*this.m33 - this.m01*this.m12*this.m23*this.m30 - this.m01*this.m13*this.m20*this.m32 -
+        this.m02*this.m10*this.m23*this.m31 - this.m02*this.m11*this.m20*this.m33 - this.m02*this.m13*this.m21*this.m30 -
+        this.m03*this.m10*this.m21*this.m32 - this.m03*this.m11*this.m22*this.m30 - this.m03*this.m12*this.m20*this.m31;
+    }
+
+    static determinant(mat) {
+      return mat.m00*mat.m11*mat.m22*mat.m33 + mat.m00*mat.m12*mat.m23*mat.m31 + mat.m00*mat.m13*mat.m21*mat.m32 +
+        mat.m01*mat.m10*mat.m23*mat.m32 + mat.m01*mat.m12*mat.m20*mat.m33 + mat.m01*mat.m13*mat.m22*mat.m30 +
+        mat.m02*mat.m10*mat.m21*mat.m33 + mat.m02*mat.m11*mat.m23*mat.m30 + mat.m02*mat.m13*mat.m20*mat.m31 +
+        mat.m03*mat.m10*mat.m22*mat.m31 + mat.m03*mat.m11*mat.m20*mat.m32 + mat.m03*mat.m12*mat.m21*mat.m30 -
+
+        mat.m00*mat.m11*mat.m23*mat.m32 - mat.m00*mat.m12*mat.m21*mat.m33 - mat.m00*mat.m13*mat.m22*mat.m31 -
+        mat.m01*mat.m10*mat.m22*mat.m33 - mat.m01*mat.m12*mat.m23*mat.m30 - mat.m01*mat.m13*mat.m20*mat.m32 -
+        mat.m02*mat.m10*mat.m23*mat.m31 - mat.m02*mat.m11*mat.m20*mat.m33 - mat.m02*mat.m13*mat.m21*mat.m30 -
+        mat.m03*mat.m10*mat.m21*mat.m32 - mat.m03*mat.m11*mat.m22*mat.m30 - mat.m03*mat.m12*mat.m20*mat.m31;
+    }
+
+    invert() {
+      var det = this.determinant();
+      var m00 = (this.m11*this.m22*this.m33 + this.m12*this.m23*this.m31 + this.m13*this.m21*this.m32 - this.m11*this.m23*this.m32 - this.m12*this.m21*this.m33 - this.m13*this.m22*this.m31) / det;
+      var m01 = (this.m01*this.m23*this.m32 + this.m02*this.m21*this.m33 + this.m03*this.m22*this.m31 - this.m01*this.m22*this.m33 - this.m02*this.m23*this.m31 - this.m03*this.m21*this.m32) / det;
+      var m02 = (this.m01*this.m12*this.m33 + this.m02*this.m13*this.m31 + this.m03*this.m11*this.m32 - this.m01*this.m13*this.m32 - this.m02*this.m11*this.m33 - this.m03*this.m12*this.m31) / det;
+      var m03 = (this.m01*this.m13*this.m22 + this.m02*this.m11*this.m23 + this.m03*this.m12*this.m21 - this.m01*this.m12*this.m23 - this.m02*this.m13*this.m21 - this.m03*this.m11*this.m22) / det;
+      var m10 = (this.m10*this.m23*this.m32 + this.m12*this.m20*this.m33 + this.m13*this.m22*this.m30 - this.m10*this.m22*this.m33 - this.m12*this.m23*this.m30 - this.m13*this.m20*this.m32) / det;
+      var m11 = (this.m00*this.m22*this.m33 + this.m02*this.m23*this.m30 + this.m03*this.m20*this.m32 - this.m00*this.m23*this.m32 - this.m02*this.m20*this.m33 - this.m03*this.m22*this.m30) / det;
+      var m12 = (this.m00*this.m13*this.m32 + this.m02*this.m10*this.m33 + this.m03*this.m12*this.m30 - this.m00*this.m12*this.m33 - this.m02*this.m13*this.m30 - this.m03*this.m10*this.m32) / det;
+      var m13 = (this.m00*this.m12*this.m23 + this.m02*this.m13*this.m20 + this.m03*this.m10*this.m22 - this.m00*this.m13*this.m22 - this.m02*this.m10*this.m23 - this.m03*this.m12*this.m20) / det;
+      var m20 = (this.m10*this.m21*this.m33 + this.m11*this.m23*this.m30 + this.m13*this.m20*this.m31 - this.m10*this.m23*this.m31 - this.m11*this.m20*this.m33 - this.m13*this.m21*this.m30) / det;
+      var m21 = (this.m00*this.m23*this.m31 + this.m01*this.m20*this.m33 + this.m03*this.m21*this.m30 - this.m00*this.m21*this.m33 - this.m01*this.m23*this.m30 - this.m03*this.m20*this.m31) / det;
+      var m22 = (this.m00*this.m11*this.m33 + this.m01*this.m13*this.m30 + this.m03*this.m10*this.m31 - this.m00*this.m13*this.m31 - this.m01*this.m10*this.m33 - this.m03*this.m11*this.m30) / det;
+      var m23 = (this.m00*this.m13*this.m21 + this.m01*this.m10*this.m23 + this.m03*this.m11*this.m20 - this.m00*this.m11*this.m23 - this.m01*this.m13*this.m20 - this.m03*this.m10*this.m21) / det;
+      var m30 = (this.m10*this.m22*this.m31 + this.m11*this.m20*this.m32 + this.m12*this.m21*this.m30 - this.m10*this.m21*this.m32 - this.m11*this.m22*this.m30 - this.m12*this.m20*this.m31) / det;
+      var m31 = (this.m00*this.m21*this.m32 + this.m01*this.m22*this.m30 + this.m02*this.m20*this.m31 - this.m00*this.m22*this.m31 - this.m01*this.m20*this.m32 - this.m02*this.m21*this.m30) / det;
+      var m32 = (this.m00*this.m12*this.m31 + this.m01*this.m10*this.m32 + this.m02*this.m11*this.m30 - this.m00*this.m11*this.m32 - this.m01*this.m12*this.m30 - this.m02*this.m10*this.m31) / det;
+      var m33 = (this.m00*this.m11*this.m22 + this.m01*this.m12*this.m20 + this.m02*this.m10*this.m21 - this.m00*this.m12*this.m21 - this.m01*this.m10*this.m22 - this.m02*this.m11*this.m20) / det;
+
+      return this.setComponents(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+      );
+    }
+
+    static invert(mat) {
+      var det = mat.determinant();
+      var m00 = (mat.m11*mat.m22*mat.m33 + mat.m12*mat.m23*mat.m31 + mat.m13*mat.m21*mat.m32 - mat.m11*mat.m23*mat.m32 - mat.m12*mat.m21*mat.m33 - mat.m13*mat.m22*mat.m31) / det;
+      var m01 = (mat.m01*mat.m23*mat.m32 + mat.m02*mat.m21*mat.m33 + mat.m03*mat.m22*mat.m31 - mat.m01*mat.m22*mat.m33 - mat.m02*mat.m23*mat.m31 - mat.m03*mat.m21*mat.m32) / det;
+      var m02 = (mat.m01*mat.m12*mat.m33 + mat.m02*mat.m13*mat.m31 + mat.m03*mat.m11*mat.m32 - mat.m01*mat.m13*mat.m32 - mat.m02*mat.m11*mat.m33 - mat.m03*mat.m12*mat.m31) / det;
+      var m03 = (mat.m01*mat.m13*mat.m22 + mat.m02*mat.m11*mat.m23 + mat.m03*mat.m12*mat.m21 - mat.m01*mat.m12*mat.m23 - mat.m02*mat.m13*mat.m21 - mat.m03*mat.m11*mat.m22) / det;
+      var m10 = (mat.m10*mat.m23*mat.m32 + mat.m12*mat.m20*mat.m33 + mat.m13*mat.m22*mat.m30 - mat.m10*mat.m22*mat.m33 - mat.m12*mat.m23*mat.m30 - mat.m13*mat.m20*mat.m32) / det;
+      var m11 = (mat.m00*mat.m22*mat.m33 + mat.m02*mat.m23*mat.m30 + mat.m03*mat.m20*mat.m32 - mat.m00*mat.m23*mat.m32 - mat.m02*mat.m20*mat.m33 - mat.m03*mat.m22*mat.m30) / det;
+      var m12 = (mat.m00*mat.m13*mat.m32 + mat.m02*mat.m10*mat.m33 + mat.m03*mat.m12*mat.m30 - mat.m00*mat.m12*mat.m33 - mat.m02*mat.m13*mat.m30 - mat.m03*mat.m10*mat.m32) / det;
+      var m13 = (mat.m00*mat.m12*mat.m23 + mat.m02*mat.m13*mat.m20 + mat.m03*mat.m10*mat.m22 - mat.m00*mat.m13*mat.m22 - mat.m02*mat.m10*mat.m23 - mat.m03*mat.m12*mat.m20) / det;
+      var m20 = (mat.m10*mat.m21*mat.m33 + mat.m11*mat.m23*mat.m30 + mat.m13*mat.m20*mat.m31 - mat.m10*mat.m23*mat.m31 - mat.m11*mat.m20*mat.m33 - mat.m13*mat.m21*mat.m30) / det;
+      var m21 = (mat.m00*mat.m23*mat.m31 + mat.m01*mat.m20*mat.m33 + mat.m03*mat.m21*mat.m30 - mat.m00*mat.m21*mat.m33 - mat.m01*mat.m23*mat.m30 - mat.m03*mat.m20*mat.m31) / det;
+      var m22 = (mat.m00*mat.m11*mat.m33 + mat.m01*mat.m13*mat.m30 + mat.m03*mat.m10*mat.m31 - mat.m00*mat.m13*mat.m31 - mat.m01*mat.m10*mat.m33 - mat.m03*mat.m11*mat.m30) / det;
+      var m23 = (mat.m00*mat.m13*mat.m21 + mat.m01*mat.m10*mat.m23 + mat.m03*mat.m11*mat.m20 - mat.m00*mat.m11*mat.m23 - mat.m01*mat.m13*mat.m20 - mat.m03*mat.m10*mat.m21) / det;
+      var m30 = (mat.m10*mat.m22*mat.m31 + mat.m11*mat.m20*mat.m32 + mat.m12*mat.m21*mat.m30 - mat.m10*mat.m21*mat.m32 - mat.m11*mat.m22*mat.m30 - mat.m12*mat.m20*mat.m31) / det;
+      var m31 = (mat.m00*mat.m21*mat.m32 + mat.m01*mat.m22*mat.m30 + mat.m02*mat.m20*mat.m31 - mat.m00*mat.m22*mat.m31 - mat.m01*mat.m20*mat.m32 - mat.m02*mat.m21*mat.m30) / det;
+      var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
+      var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
+
+      return new Matrix44$1(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+      );
+    }
+
+    set m00(val) {
+      this.m[0] = val;
+    }
+
+    get m00() {
+      return this.m[0];
+    }
+
+    set m10(val) {
+      this.m[1] = val;
+    }
+
+    get m10() {
+      return this.m[1];
+    }
+
+    set m20(val) {
+      this.m[2] = val;
+    }
+
+    get m20() {
+      return this.m[2];
+    }
+
+    set m30(val) {
+      this.m[3] = val;
+    }
+
+    get m30() {
+      return this.m[3];
+    }
+
+    set m01(val) {
+      this.m[4] = val;
+    }
+
+    get m01() {
+      return this.m[4];
+    }
+
+    set m11(val) {
+      this.m[5] = val;
+    }
+
+    get m11() {
+      return this.m[5];
+    }
+
+    set m21(val) {
+      this.m[6] = val;
+    }
+
+    get m21() {
+      return this.m[6];
+    }
+
+    set m31(val) {
+      this.m[7] = val;
+    }
+
+    get m31() {
+      return this.m[7];
+    }
+
+    set m02(val) {
+      this.m[8] = val;
+    }
+
+    get m02() {
+      return this.m[8];
+    }
+
+    set m12(val) {
+      this.m[9] = val;
+    }
+
+    get m12() {
+      return this.m[9];
+    }
+
+    set m22(val) {
+      this.m[10] = val;
+    }
+
+    get m22() {
+      return this.m[10];
+    }
+
+    set m32(val) {
+      this.m[11] = val;
+    }
+
+    get m32() {
+      return this.m[11];
+    }
+
+    set m03(val) {
+      this.m[12] = val;
+    }
+
+    get m03() {
+      return this.m[12];
+    }
+
+    set m13(val) {
+      this.m[13] = val;
+    }
+
+    get m13() {
+      return this.m[13];
+    }
+
+    set m23(val) {
+      this.m[14] = val;
+    }
+
+    get m23() {
+      return this.m[14];
+    }
+
+    set m33(val) {
+      this.m[15] = val;
+    }
+
+    get m33() {
+      return this.m[15];
+    }
+
+    toString() {
+      return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' +
+        this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' +
+        this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' +
+        this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
+    }
+
+    nearZeroToZero(value) {
+      if (Math.abs(value) < 0.00001) {
+        value = 0;
+      } else if (0.99999 < value && value < 1.00001) {
+        value = 1;
+      } else if (-1.00001 < value && value < -0.99999) {
+        value = -1;
+      }
+      return value;
+    }
+
+    toStringApproximately() {
+      return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' +
+        this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' +
+        this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' +
+        this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+    }
+
+    getScale() {
+      return new Vector3(
+        Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+        Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+        Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+      );
+    }
+
+    getRotate() {
+      const quat = Quaternion.fromMatrix(this);
+      const rotateMat = quat.rotationMatrix;
+      return rotateMat;
+    }
+  }
+
+  GLBoost$1["Matrix44"] = Matrix44$1;
+
   class Matrix33 {
 
     constructor(m, isColumnMajor = false,
@@ -2436,7 +3458,7 @@
     }
 
     toMatrix44() {
-      return new Matrix44$2(
+      return new Matrix44$1(
         this.m00, this.m01, this.m02, 0,
         this.m10, this.m11, this.m12, 0,
         this.m20, this.m21, this.m22, 0,
@@ -2445,7 +3467,7 @@
     }
 
     static toMatrix44(mat) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         mat.m00, mat.m01, mat.m02, 0,
         mat.m10, mat.m11, mat.m12, 0,
         mat.m20, mat.m21, mat.m22, 0,
@@ -2472,1007 +3494,6 @@
 
   GLBoost$1['Matrix33'] = Matrix33;
 
-  class Matrix44$2 {
-
-    constructor(m, isColumnMajor = false, notCopyFloat32Array = false
-    ) {
-      if (arguments.length >= 16) {
-        this.m = new Float32Array(16); // Data order is column major
-        if (isColumnMajor === true) {
-          let m = arguments;
-          this.setComponents(
-            m[0], m[4], m[8], m[12],
-            m[1], m[5], m[9], m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
-        }
-      } else if (Array.isArray(m)) {
-        this.m = new Float32Array(16);
-        if (isColumnMajor === true) {
-          this.setComponents(
-            m[0], m[4], m[8], m[12],
-            m[1], m[5], m[9], m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else if (m instanceof Float32Array) {
-        this.m = new Float32Array(16);
-        if (notCopyFloat32Array) {
-          this.m = m;
-        } else {
-          this.m = new Float32Array(16);
-          if (isColumnMajor === true) {
-            this.setComponents(
-              m[0], m[4], m[8], m[12],
-              m[1], m[5], m[9], m[13],
-              m[2], m[6], m[10], m[14],
-              m[3], m[7], m[11], m[15]);
-          } else {
-            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-          }  
-        }
-      } else {
-        this.m = new Float32Array(16);
-        this.identity();
-      }
-    }
-
-    setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-      this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
-      this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
-      this.m20 = m20; this.m21 = m21; this.m22 = m22; this.m23 = m23;
-      this.m30 = m30; this.m31 = m31; this.m32 = m32; this.m33 = m33;
-
-      return this;
-    }
-
-    copyComponents(mat4) {
-      //this.m.set(mat4.m);
-      this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
-    }
-
-    clone() {
-      return new Matrix44$2(
-        this.m[0], this.m[4], this.m[8], this.m[12],
-        this.m[1], this.m[5], this.m[9], this.m[13],
-        this.m[2], this.m[6], this.m[10], this.m[14],
-        this.m[3], this.m[7], this.m[11], this.m[15]
-      );
-    }
-
-    /**
-     * 単位行列にする
-     */
-    identity() {
-      this.setComponents(
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1
-      );
-      return this;
-    }
-
-    /**
-     * 単位行列にする（static版）
-     */
-    static identity() {
-      return new Matrix44$2(
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1
-      );
-    }
-
-    translate(vec) {
-      return this.setComponents(
-        1, 0, 0, vec.x,
-        0, 1, 0, vec.y,
-        0, 0, 1, vec.z,
-        0, 0, 0, 1
-      );
-    }
-
-    putTranslate(vec) {
-      this.m03 = vec.x;
-      this.m13 = vec.y;
-      this.m23 = vec.z;
-    }
-
-    getTranslate() {
-      return new Vector3(this.m03, this.m13, this.m23);
-    }
-
-    static translate(vec) {
-      return new Matrix44$2(
-        1, 0, 0, vec.x,
-        0, 1, 0, vec.y,
-        0, 0, 1, vec.z,
-        0, 0, 0, 1
-      );
-    }
-
-    scale(vec) {
-      return this.setComponents(
-        vec.x, 0, 0, 0,
-        0, vec.y, 0, 0,
-        0, 0, vec.z, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    static scale(vec) {
-      return new Matrix44$2(
-        vec.x, 0, 0, 0,
-        0, vec.y, 0, 0,
-        0, 0, vec.z, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    addScale(vec) {
-      this.m00 *= vec.x;
-      this.m11 *= vec.y;
-      this.m22 *= vec.z;
-
-      return this;
-    }
-
-    /**
-     * Create X oriented Rotation Matrix
-     */
-    rotateX(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        1, 0, 0, 0,
-        0, cos, -sin, 0,
-        0, sin, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create X oriented Rotation Matrix
-    */
-    static rotateX(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$2(
-        1, 0, 0, 0,
-        0, cos, -sin, 0,
-        0, sin, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    /**
-     * Create Y oriented Rotation Matrix
-     */
-    rotateY(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        cos, 0, sin, 0,
-        0, 1, 0, 0,
-        -sin, 0, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create Y oriented Rotation Matrix
-     */
-    static rotateY(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$2(
-        cos, 0, sin, 0,
-        0, 1, 0, 0,
-        -sin, 0, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    /**
-     * Create Z oriented Rotation Matrix
-     */
-    rotateZ(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        cos, -sin, 0, 0,
-        sin, cos, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create Z oriented Rotation Matrix
-     */
-    static rotateZ(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$2(
-        cos, -sin, 0, 0,
-        sin, cos, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    static rotateXYZ(x, y, z) {
-      return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
-    }
-
-    /**
-     * @return Euler Angles Rotation (x, y, z)
-     */
-    toEulerAngles() {
-      let rotate = null;
-      if (Math.abs(this.m20) != 1.0) {
-        let y   = -Math.asin(this.m20);
-        let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
-        let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
-        rotate = new Vector3(x, y, z);
-      } else if (this.m20 === -1.0) {
-        rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
-      } else {
-        rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
-      }
-
-      return rotate;
-    }
-
-    /**
-     * ゼロ行列
-     */
-    zero() {
-      this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      return this;
-    }
-
-    static zero() {
-      return new Matrix44$2(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    }
-
-    flatten() {
-      return this.m;
-    }
-
-    flattenAsArray() {
-      return [this.m[0], this.m[1], this.m[2], this.m[3],
-        this.m[4], this.m[5], this.m[6], this.m[7],
-        this.m[8], this.m[9], this.m[10], this.m[11],
-        this.m[12], this.m[13], this.m[14], this.m[15]];
-    }
-
-    _swap(l, r) {
-      this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-    }
-
-    /**
-     * 転置
-     */
-    transpose() {
-      this._swap(1, 4);
-      this._swap(2, 8);
-      this._swap(3, 12);
-      this._swap(6, 9);
-      this._swap(7, 13);
-      this._swap(11, 14);
-
-      return this;
-    }
-
-    /**
-     * 転置（static版）
-     */
-    static transpose(mat) {
-
-      var mat_t = new Matrix44$2(
-        mat.m00, mat.m10, mat.m20, mat.m30,
-        mat.m01, mat.m11, mat.m21, mat.m31,
-        mat.m02, mat.m12, mat.m22, mat.m32,
-        mat.m03, mat.m13, mat.m23, mat.m33
-      );
-
-      return mat_t;
-    }
-
-    multiplyVector(vec) {
-      var x = this.m00*vec.x + this.m01*vec.y + this.m02*vec.z + this.m03*vec.w;
-      var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z + this.m13*vec.w;
-      var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
-      var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
-
-      return new Vector4(x, y, z, w);
-    }
-
-    /**
-     * 行列同士の乗算
-     */
-    multiply(mat) {
-      var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
-      var m01 = this.m00*mat.m01 + this.m01*mat.m11 + this.m02*mat.m21 + this.m03*mat.m31;
-      var m02 = this.m00*mat.m02 + this.m01*mat.m12 + this.m02*mat.m22 + this.m03*mat.m32;
-      var m03 = this.m00*mat.m03 + this.m01*mat.m13 + this.m02*mat.m23 + this.m03*mat.m33;
-
-      var m10 = this.m10*mat.m00 + this.m11*mat.m10 + this.m12*mat.m20 + this.m13*mat.m30;
-      var m11 = this.m10*mat.m01 + this.m11*mat.m11 + this.m12*mat.m21 + this.m13*mat.m31;
-      var m12 = this.m10*mat.m02 + this.m11*mat.m12 + this.m12*mat.m22 + this.m13*mat.m32;
-      var m13 = this.m10*mat.m03 + this.m11*mat.m13 + this.m12*mat.m23 + this.m13*mat.m33;
-
-      var m20 = this.m20*mat.m00 + this.m21*mat.m10 + this.m22*mat.m20 + this.m23*mat.m30;
-      var m21 = this.m20*mat.m01 + this.m21*mat.m11 + this.m22*mat.m21 + this.m23*mat.m31;
-      var m22 = this.m20*mat.m02 + this.m21*mat.m12 + this.m22*mat.m22 + this.m23*mat.m32;
-      var m23 = this.m20*mat.m03 + this.m21*mat.m13 + this.m22*mat.m23 + this.m23*mat.m33;
-
-      var m30 = this.m30*mat.m00 + this.m31*mat.m10 + this.m32*mat.m20 + this.m33*mat.m30;
-      var m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
-      var m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
-      var m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
-
-      return this.setComponents(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    multiplyByLeft(mat) {
-      var m00 = mat.m00*this.m00 + mat.m01*this.m10 + mat.m02*this.m20 + mat.m03*this.m30;
-      var m01 = mat.m00*this.m01 + mat.m01*this.m11 + mat.m02*this.m21 + mat.m03*this.m31;
-      var m02 = mat.m00*this.m02 + mat.m01*this.m12 + mat.m02*this.m22 + mat.m03*this.m32;
-      var m03 = mat.m00*this.m03 + mat.m01*this.m13 + mat.m02*this.m23 + mat.m03*this.m33;
-
-      var m10 = mat.m10*this.m00 + mat.m11*this.m10 + mat.m12*this.m20 + mat.m13*this.m30;
-      var m11 = mat.m10*this.m01 + mat.m11*this.m11 + mat.m12*this.m21 + mat.m13*this.m31;
-      var m12 = mat.m10*this.m02 + mat.m11*this.m12 + mat.m12*this.m22 + mat.m13*this.m32;
-      var m13 = mat.m10*this.m03 + mat.m11*this.m13 + mat.m12*this.m23 + mat.m13*this.m33;
-
-      var m20 = mat.m20*this.m00 + mat.m21*this.m10 + mat.m22*this.m20 + mat.m23*this.m30;
-      var m21 = mat.m20*this.m01 + mat.m21*this.m11 + mat.m22*this.m21 + mat.m23*this.m31;
-      var m22 = mat.m20*this.m02 + mat.m21*this.m12 + mat.m22*this.m22 + mat.m23*this.m32;
-      var m23 = mat.m20*this.m03 + mat.m21*this.m13 + mat.m22*this.m23 + mat.m23*this.m33;
-
-      var m30 = mat.m30*this.m00 + mat.m31*this.m10 + mat.m32*this.m20 + mat.m33*this.m30;
-      var m31 = mat.m30*this.m01 + mat.m31*this.m11 + mat.m32*this.m21 + mat.m33*this.m31;
-      var m32 = mat.m30*this.m02 + mat.m31*this.m12 + mat.m32*this.m22 + mat.m33*this.m32;
-      var m33 = mat.m30*this.m03 + mat.m31*this.m13 + mat.m32*this.m23 + mat.m33*this.m33;
-
-      return this.setComponents(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    /**
-     * 行列同士の乗算（static版）
-     */
-    static multiply(l_m, r_m) {
-      var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
-      var m10 = l_m.m10*r_m.m00 + l_m.m11*r_m.m10 + l_m.m12*r_m.m20 + l_m.m13*r_m.m30;
-      var m20 = l_m.m20*r_m.m00 + l_m.m21*r_m.m10 + l_m.m22*r_m.m20 + l_m.m23*r_m.m30;
-      var m30 = l_m.m30*r_m.m00 + l_m.m31*r_m.m10 + l_m.m32*r_m.m20 + l_m.m33*r_m.m30;
-
-      var m01 = l_m.m00*r_m.m01 + l_m.m01*r_m.m11 + l_m.m02*r_m.m21 + l_m.m03*r_m.m31;
-      var m11 = l_m.m10*r_m.m01 + l_m.m11*r_m.m11 + l_m.m12*r_m.m21 + l_m.m13*r_m.m31;
-      var m21 = l_m.m20*r_m.m01 + l_m.m21*r_m.m11 + l_m.m22*r_m.m21 + l_m.m23*r_m.m31;
-      var m31 = l_m.m30*r_m.m01 + l_m.m31*r_m.m11 + l_m.m32*r_m.m21 + l_m.m33*r_m.m31;
-
-      var m02 = l_m.m00*r_m.m02 + l_m.m01*r_m.m12 + l_m.m02*r_m.m22 + l_m.m03*r_m.m32;
-      var m12 = l_m.m10*r_m.m02 + l_m.m11*r_m.m12 + l_m.m12*r_m.m22 + l_m.m13*r_m.m32;
-      var m22 = l_m.m20*r_m.m02 + l_m.m21*r_m.m12 + l_m.m22*r_m.m22 + l_m.m23*r_m.m32;
-      var m32 = l_m.m30*r_m.m02 + l_m.m31*r_m.m12 + l_m.m32*r_m.m22 + l_m.m33*r_m.m32;
-
-      var m03 = l_m.m00*r_m.m03 + l_m.m01*r_m.m13 + l_m.m02*r_m.m23 + l_m.m03*r_m.m33;
-      var m13 = l_m.m10*r_m.m03 + l_m.m11*r_m.m13 + l_m.m12*r_m.m23 + l_m.m13*r_m.m33;
-      var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
-      var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
-
-      return new Matrix44$2(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    toMatrix33() {
-      return new Matrix33(
-        this.m00, this.m01, this.m02,
-        this.m10, this.m11, this.m12,
-        this.m20, this.m21, this.m22
-      );
-    }
-
-    static toMatrix33(mat) {
-      return new Matrix33(
-        mat.m00, mat.m01, mat.m02,
-        mat.m10, mat.m11, mat.m12,
-        mat.m20, mat.m21, mat.m22
-      );
-    }
-
-    determinant() {
-      return this.m00*this.m11*this.m22*this.m33 + this.m00*this.m12*this.m23*this.m31 + this.m00*this.m13*this.m21*this.m32 +
-        this.m01*this.m10*this.m23*this.m32 + this.m01*this.m12*this.m20*this.m33 + this.m01*this.m13*this.m22*this.m30 +
-        this.m02*this.m10*this.m21*this.m33 + this.m02*this.m11*this.m23*this.m30 + this.m02*this.m13*this.m20*this.m31 +
-        this.m03*this.m10*this.m22*this.m31 + this.m03*this.m11*this.m20*this.m32 + this.m03*this.m12*this.m21*this.m30 -
-
-        this.m00*this.m11*this.m23*this.m32 - this.m00*this.m12*this.m21*this.m33 - this.m00*this.m13*this.m22*this.m31 -
-        this.m01*this.m10*this.m22*this.m33 - this.m01*this.m12*this.m23*this.m30 - this.m01*this.m13*this.m20*this.m32 -
-        this.m02*this.m10*this.m23*this.m31 - this.m02*this.m11*this.m20*this.m33 - this.m02*this.m13*this.m21*this.m30 -
-        this.m03*this.m10*this.m21*this.m32 - this.m03*this.m11*this.m22*this.m30 - this.m03*this.m12*this.m20*this.m31;
-    }
-
-    static determinant(mat) {
-      return mat.m00*mat.m11*mat.m22*mat.m33 + mat.m00*mat.m12*mat.m23*mat.m31 + mat.m00*mat.m13*mat.m21*mat.m32 +
-        mat.m01*mat.m10*mat.m23*mat.m32 + mat.m01*mat.m12*mat.m20*mat.m33 + mat.m01*mat.m13*mat.m22*mat.m30 +
-        mat.m02*mat.m10*mat.m21*mat.m33 + mat.m02*mat.m11*mat.m23*mat.m30 + mat.m02*mat.m13*mat.m20*mat.m31 +
-        mat.m03*mat.m10*mat.m22*mat.m31 + mat.m03*mat.m11*mat.m20*mat.m32 + mat.m03*mat.m12*mat.m21*mat.m30 -
-
-        mat.m00*mat.m11*mat.m23*mat.m32 - mat.m00*mat.m12*mat.m21*mat.m33 - mat.m00*mat.m13*mat.m22*mat.m31 -
-        mat.m01*mat.m10*mat.m22*mat.m33 - mat.m01*mat.m12*mat.m23*mat.m30 - mat.m01*mat.m13*mat.m20*mat.m32 -
-        mat.m02*mat.m10*mat.m23*mat.m31 - mat.m02*mat.m11*mat.m20*mat.m33 - mat.m02*mat.m13*mat.m21*mat.m30 -
-        mat.m03*mat.m10*mat.m21*mat.m32 - mat.m03*mat.m11*mat.m22*mat.m30 - mat.m03*mat.m12*mat.m20*mat.m31;
-    }
-
-    invert() {
-      var det = this.determinant();
-      var m00 = (this.m11*this.m22*this.m33 + this.m12*this.m23*this.m31 + this.m13*this.m21*this.m32 - this.m11*this.m23*this.m32 - this.m12*this.m21*this.m33 - this.m13*this.m22*this.m31) / det;
-      var m01 = (this.m01*this.m23*this.m32 + this.m02*this.m21*this.m33 + this.m03*this.m22*this.m31 - this.m01*this.m22*this.m33 - this.m02*this.m23*this.m31 - this.m03*this.m21*this.m32) / det;
-      var m02 = (this.m01*this.m12*this.m33 + this.m02*this.m13*this.m31 + this.m03*this.m11*this.m32 - this.m01*this.m13*this.m32 - this.m02*this.m11*this.m33 - this.m03*this.m12*this.m31) / det;
-      var m03 = (this.m01*this.m13*this.m22 + this.m02*this.m11*this.m23 + this.m03*this.m12*this.m21 - this.m01*this.m12*this.m23 - this.m02*this.m13*this.m21 - this.m03*this.m11*this.m22) / det;
-      var m10 = (this.m10*this.m23*this.m32 + this.m12*this.m20*this.m33 + this.m13*this.m22*this.m30 - this.m10*this.m22*this.m33 - this.m12*this.m23*this.m30 - this.m13*this.m20*this.m32) / det;
-      var m11 = (this.m00*this.m22*this.m33 + this.m02*this.m23*this.m30 + this.m03*this.m20*this.m32 - this.m00*this.m23*this.m32 - this.m02*this.m20*this.m33 - this.m03*this.m22*this.m30) / det;
-      var m12 = (this.m00*this.m13*this.m32 + this.m02*this.m10*this.m33 + this.m03*this.m12*this.m30 - this.m00*this.m12*this.m33 - this.m02*this.m13*this.m30 - this.m03*this.m10*this.m32) / det;
-      var m13 = (this.m00*this.m12*this.m23 + this.m02*this.m13*this.m20 + this.m03*this.m10*this.m22 - this.m00*this.m13*this.m22 - this.m02*this.m10*this.m23 - this.m03*this.m12*this.m20) / det;
-      var m20 = (this.m10*this.m21*this.m33 + this.m11*this.m23*this.m30 + this.m13*this.m20*this.m31 - this.m10*this.m23*this.m31 - this.m11*this.m20*this.m33 - this.m13*this.m21*this.m30) / det;
-      var m21 = (this.m00*this.m23*this.m31 + this.m01*this.m20*this.m33 + this.m03*this.m21*this.m30 - this.m00*this.m21*this.m33 - this.m01*this.m23*this.m30 - this.m03*this.m20*this.m31) / det;
-      var m22 = (this.m00*this.m11*this.m33 + this.m01*this.m13*this.m30 + this.m03*this.m10*this.m31 - this.m00*this.m13*this.m31 - this.m01*this.m10*this.m33 - this.m03*this.m11*this.m30) / det;
-      var m23 = (this.m00*this.m13*this.m21 + this.m01*this.m10*this.m23 + this.m03*this.m11*this.m20 - this.m00*this.m11*this.m23 - this.m01*this.m13*this.m20 - this.m03*this.m10*this.m21) / det;
-      var m30 = (this.m10*this.m22*this.m31 + this.m11*this.m20*this.m32 + this.m12*this.m21*this.m30 - this.m10*this.m21*this.m32 - this.m11*this.m22*this.m30 - this.m12*this.m20*this.m31) / det;
-      var m31 = (this.m00*this.m21*this.m32 + this.m01*this.m22*this.m30 + this.m02*this.m20*this.m31 - this.m00*this.m22*this.m31 - this.m01*this.m20*this.m32 - this.m02*this.m21*this.m30) / det;
-      var m32 = (this.m00*this.m12*this.m31 + this.m01*this.m10*this.m32 + this.m02*this.m11*this.m30 - this.m00*this.m11*this.m32 - this.m01*this.m12*this.m30 - this.m02*this.m10*this.m31) / det;
-      var m33 = (this.m00*this.m11*this.m22 + this.m01*this.m12*this.m20 + this.m02*this.m10*this.m21 - this.m00*this.m12*this.m21 - this.m01*this.m10*this.m22 - this.m02*this.m11*this.m20) / det;
-
-      return this.setComponents(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        m30, m31, m32, m33
-      );
-    }
-
-    static invert(mat) {
-      var det = mat.determinant();
-      var m00 = (mat.m11*mat.m22*mat.m33 + mat.m12*mat.m23*mat.m31 + mat.m13*mat.m21*mat.m32 - mat.m11*mat.m23*mat.m32 - mat.m12*mat.m21*mat.m33 - mat.m13*mat.m22*mat.m31) / det;
-      var m01 = (mat.m01*mat.m23*mat.m32 + mat.m02*mat.m21*mat.m33 + mat.m03*mat.m22*mat.m31 - mat.m01*mat.m22*mat.m33 - mat.m02*mat.m23*mat.m31 - mat.m03*mat.m21*mat.m32) / det;
-      var m02 = (mat.m01*mat.m12*mat.m33 + mat.m02*mat.m13*mat.m31 + mat.m03*mat.m11*mat.m32 - mat.m01*mat.m13*mat.m32 - mat.m02*mat.m11*mat.m33 - mat.m03*mat.m12*mat.m31) / det;
-      var m03 = (mat.m01*mat.m13*mat.m22 + mat.m02*mat.m11*mat.m23 + mat.m03*mat.m12*mat.m21 - mat.m01*mat.m12*mat.m23 - mat.m02*mat.m13*mat.m21 - mat.m03*mat.m11*mat.m22) / det;
-      var m10 = (mat.m10*mat.m23*mat.m32 + mat.m12*mat.m20*mat.m33 + mat.m13*mat.m22*mat.m30 - mat.m10*mat.m22*mat.m33 - mat.m12*mat.m23*mat.m30 - mat.m13*mat.m20*mat.m32) / det;
-      var m11 = (mat.m00*mat.m22*mat.m33 + mat.m02*mat.m23*mat.m30 + mat.m03*mat.m20*mat.m32 - mat.m00*mat.m23*mat.m32 - mat.m02*mat.m20*mat.m33 - mat.m03*mat.m22*mat.m30) / det;
-      var m12 = (mat.m00*mat.m13*mat.m32 + mat.m02*mat.m10*mat.m33 + mat.m03*mat.m12*mat.m30 - mat.m00*mat.m12*mat.m33 - mat.m02*mat.m13*mat.m30 - mat.m03*mat.m10*mat.m32) / det;
-      var m13 = (mat.m00*mat.m12*mat.m23 + mat.m02*mat.m13*mat.m20 + mat.m03*mat.m10*mat.m22 - mat.m00*mat.m13*mat.m22 - mat.m02*mat.m10*mat.m23 - mat.m03*mat.m12*mat.m20) / det;
-      var m20 = (mat.m10*mat.m21*mat.m33 + mat.m11*mat.m23*mat.m30 + mat.m13*mat.m20*mat.m31 - mat.m10*mat.m23*mat.m31 - mat.m11*mat.m20*mat.m33 - mat.m13*mat.m21*mat.m30) / det;
-      var m21 = (mat.m00*mat.m23*mat.m31 + mat.m01*mat.m20*mat.m33 + mat.m03*mat.m21*mat.m30 - mat.m00*mat.m21*mat.m33 - mat.m01*mat.m23*mat.m30 - mat.m03*mat.m20*mat.m31) / det;
-      var m22 = (mat.m00*mat.m11*mat.m33 + mat.m01*mat.m13*mat.m30 + mat.m03*mat.m10*mat.m31 - mat.m00*mat.m13*mat.m31 - mat.m01*mat.m10*mat.m33 - mat.m03*mat.m11*mat.m30) / det;
-      var m23 = (mat.m00*mat.m13*mat.m21 + mat.m01*mat.m10*mat.m23 + mat.m03*mat.m11*mat.m20 - mat.m00*mat.m11*mat.m23 - mat.m01*mat.m13*mat.m20 - mat.m03*mat.m10*mat.m21) / det;
-      var m30 = (mat.m10*mat.m22*mat.m31 + mat.m11*mat.m20*mat.m32 + mat.m12*mat.m21*mat.m30 - mat.m10*mat.m21*mat.m32 - mat.m11*mat.m22*mat.m30 - mat.m12*mat.m20*mat.m31) / det;
-      var m31 = (mat.m00*mat.m21*mat.m32 + mat.m01*mat.m22*mat.m30 + mat.m02*mat.m20*mat.m31 - mat.m00*mat.m22*mat.m31 - mat.m01*mat.m20*mat.m32 - mat.m02*mat.m21*mat.m30) / det;
-      var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
-      var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
-
-      return new Matrix44$2(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        m30, m31, m32, m33
-      );
-    }
-
-    set m00(val) {
-      this.m[0] = val;
-    }
-
-    get m00() {
-      return this.m[0];
-    }
-
-    set m10(val) {
-      this.m[1] = val;
-    }
-
-    get m10() {
-      return this.m[1];
-    }
-
-    set m20(val) {
-      this.m[2] = val;
-    }
-
-    get m20() {
-      return this.m[2];
-    }
-
-    set m30(val) {
-      this.m[3] = val;
-    }
-
-    get m30() {
-      return this.m[3];
-    }
-
-    set m01(val) {
-      this.m[4] = val;
-    }
-
-    get m01() {
-      return this.m[4];
-    }
-
-    set m11(val) {
-      this.m[5] = val;
-    }
-
-    get m11() {
-      return this.m[5];
-    }
-
-    set m21(val) {
-      this.m[6] = val;
-    }
-
-    get m21() {
-      return this.m[6];
-    }
-
-    set m31(val) {
-      this.m[7] = val;
-    }
-
-    get m31() {
-      return this.m[7];
-    }
-
-    set m02(val) {
-      this.m[8] = val;
-    }
-
-    get m02() {
-      return this.m[8];
-    }
-
-    set m12(val) {
-      this.m[9] = val;
-    }
-
-    get m12() {
-      return this.m[9];
-    }
-
-    set m22(val) {
-      this.m[10] = val;
-    }
-
-    get m22() {
-      return this.m[10];
-    }
-
-    set m32(val) {
-      this.m[11] = val;
-    }
-
-    get m32() {
-      return this.m[11];
-    }
-
-    set m03(val) {
-      this.m[12] = val;
-    }
-
-    get m03() {
-      return this.m[12];
-    }
-
-    set m13(val) {
-      this.m[13] = val;
-    }
-
-    get m13() {
-      return this.m[13];
-    }
-
-    set m23(val) {
-      this.m[14] = val;
-    }
-
-    get m23() {
-      return this.m[14];
-    }
-
-    set m33(val) {
-      this.m[15] = val;
-    }
-
-    get m33() {
-      return this.m[15];
-    }
-
-    toString() {
-      return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' +
-        this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' +
-        this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' +
-        this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
-    }
-
-    nearZeroToZero(value) {
-      if (Math.abs(value) < 0.00001) {
-        value = 0;
-      } else if (0.99999 < value && value < 1.00001) {
-        value = 1;
-      } else if (-1.00001 < value && value < -0.99999) {
-        value = -1;
-      }
-      return value;
-    }
-
-    toStringApproximately() {
-      return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' +
-        this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' +
-        this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' +
-        this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
-    }
-
-    getScale() {
-      return new Vector3(
-        Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
-        Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
-        Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
-      );
-    }
-  }
-
-  GLBoost$1["Matrix44"] = Matrix44$2;
-
-  class Quaternion {
-
-    constructor(x, y, z, w) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
-    }
-
-    isEqual(vec) {
-      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    clone() {
-      return new Quaternion(this.x, this.y, this.z, this.w);
-    }
-
-    static invert(quat) {
-      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
-    }
-
-    static qlerp(lhq, rhq, ratio) {
-
-      var q = new Quaternion(0, 0, 0, 1);
-      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
-      var ss = 1.0 - qr * qr;
-
-      if (ss === 0.0) {
-        q.w = lhq.w;
-        q.x = lhq.x;
-        q.y = lhq.y;
-        q.z = lhq.z;
-
-        return q;
-      } else {
-
-        if (qr > 1) {
-          qr = 0.999;
-        } else if (qr < -1) {
-          qr = -0.999;
-        }
-
-        let ph = Math.acos(qr);
-        let s2;
-        if(qr < 0.0 && ph > Math.PI / 2.0){
-          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
-          ph = Math.acos(qr);
-          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
-        } else {
-          s2 = Math.sin(ph * ratio) / Math.sin(ph);
-        }
-        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
-
-        q.x = lhq.x * s1 + rhq.x * s2;
-        q.y = lhq.y * s1 + rhq.y * s2;
-        q.z = lhq.z * s1 + rhq.z * s2;
-        q.w = lhq.w * s1 + rhq.w * s2;
-
-        return q;
-      }
-    }
-
-    get rotationMatrix() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix44$2(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
-        0.0, 0.0, 0.0, 1.0
-      );
-    }
-
-    get rotationMatrix33() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix33(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
-      );
-    }
-
-    axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      this.w = Math.cos(halfAngle);
-      this.x = sin * axis.x;
-      this.y = sin * axis.y;
-      this.z = sin * axis.z;
-
-      return this;
-    }
-
-    static axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      return new Quaternion(
-        sin * axis.x,
-        sin * axis.y,
-        sin * axis.z,
-        Math.cos(halfAngle));
-    }
-
-    add(q) {
-      this.x += q.x;
-      this.y += q.y;
-      this.z += q.z;
-      this.w += q.w;
-
-      return this;
-    }
-
-    multiply(q) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
-      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
-      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
-      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
-      this.x = result.x;
-      this.y = result.y;
-      this.z = result.z;
-      this.w = result.w;
-      
-      return this;
-    }
-
-    static multiply(q1, q2) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
-      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
-      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
-      return result;
-    }
-
-    static fromMatrix(m) {
-      
-      let q = new Quaternion();
-      let tr = m.m00 + m.m11 + m.m22;
-
-      if (tr > 0) { 
-        let S = 0.5 / Math.sqrt(tr+1.0);
-        q.w = 0.25 / S;
-        q.x = (m.m21 - m.m12) * S;
-        q.y = (m.m02 - m.m20) * S; 
-        q.z = (m.m10 - m.m01) * S; 
-      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
-        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
-        q.w = (m.m21 - m.m12) / S;
-        q.x = 0.25 * S;
-        q.y = (m.m01 + m.m10) / S; 
-        q.z = (m.m02 + m.m20) / S; 
-      } else if (m.m11 > m.m22) { 
-        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
-        q.w = (m.m02 - m.m20) / S;
-        q.x = (m.m01 + m.m10) / S; 
-        q.y = 0.25 * S;
-        q.z = (m.m12 + m.m21) / S; 
-      } else { 
-        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
-        q.w = (m.m10 - m.m01) / S;
-        q.x = (m.m02 + m.m20) / S;
-        q.y = (m.m12 + m.m21) / S;
-        q.z = 0.25 * S;
-      }
-
-      return q;
-    }
-  /*
-    static fromMatrix(m) {
-      let fTrace = m.m[0] + m.m[4] + m.m[8];
-      let fRoot;
-      let q = new Quaternion();
-      if ( fTrace > 0.0 ) {
-        // |w| > 1/2, may as well choose w > 1/2
-        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
-        q.w = 0.5 * fRoot;
-        fRoot = 0.5/fRoot;  // 1/(4w)
-        q.x = (m.m[5]-m.m[7])*fRoot;
-        q.y = (m.m[6]-m.m[2])*fRoot;
-        q.z = (m.m[1]-m.m[3])*fRoot;
-      } else {
-        // |w| <= 1/2
-        let i = 0;
-        if ( m.m[4] > m.m[0] )
-          i = 1;
-        if ( m.m[8] > m.m[i*3+i] )
-          i = 2;
-        let j = (i+1)%3;
-        let k = (i+2)%3;
-        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
-        
-        let setValue = function(q, i, value) {
-          switch (i) {
-            case 0: q.x = value; break;
-            case 1: q.y = value; break;
-            case 2: q.z = value; break;
-          }
-        }
-
-        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
-        fRoot = 0.5 / fRoot;
-        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
-
-        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
-        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
-      }
-
-      return q;
-    }
-  */
-
-    static fromPosition(vec3) {
-      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
-      return q;
-    }
-
-    at(i) {
-      switch (i%4) {
-      case 0: return this.x;
-      case 1: return this.y;
-      case 2: return this.z;
-      case 3: return this.w;
-      }
-    }
-
-    setAt(i, val) {
-      switch (i%4) {
-      case 0: this.x = val; break;
-      case 1: this.y = val; break;
-      case 2: this.z = val; break;
-      case 3: this.w = val; break;
-      }
-    }
-
-    normalize() {
-      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
-      this.x /= norm;
-      this.y /= norm;
-      this.z /= norm;
-      this.w /= norm;
-      return this;
-    }
-
-    toString() {
-      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
-    }
-  }
-
-  GLBoost$1["Quaternion"] = Quaternion;
-
   class MathUtil {
 
     constructor() {
@@ -3495,6 +3516,34 @@
           return new Vector3(element[0], element[1], element[2]);
         } else {
           return new Vector2(element[0], element[1]);
+        }
+      } else {
+        return element;
+      }
+    }
+
+    static arrayToVectorOrMatrix(element) {
+      if (Array.isArray(element)) {
+        if(typeof(element[15]) !== 'undefined') {
+          return new Matrix44$1(element);
+        } else if(typeof(element[8]) !== 'undefined') {
+          return new Matrix33(element);
+        } else if(typeof(element[3]) !== 'undefined') {
+          return new Vector4(element[0], element[1], element[2], element[3]);
+        } else if (typeof(element[2]) !== 'undefined') {
+          return new Vector3(element[0], element[1], element[2]);
+        } else {
+          return new Vector2(element[0], element[1]);
+        }
+      } else {
+        return element;
+      }
+    }
+
+    static arrayToQuaternion(element) {
+      if (Array.isArray(element)) {
+        if(typeof(element[3]) !== 'undefined') {
+          return new Quaternion(element[0], element[1], element[2], element[3]);
         }
       } else {
         return element;
@@ -3640,8 +3689,27 @@
     }
   }
 
+  /*       */
+
   class L_Element extends GLBoostObject {
-    constructor(glBoostContext, toRegister = true) {
+                           
+                                         
+                                            
+                        
+                     
+                    
+                            
+                      
+                                  
+                                    
+                                   
+                               
+                                    
+                                      
+                                            
+
+
+    constructor(glBoostContext, toRegister          = true) {
       super(glBoostContext, toRegister);
 
       // Live (Static or Animation)
@@ -3649,7 +3717,8 @@
       this._scale = new Vector3(1, 1, 1);
       this._rotate = Vector3.zero();
       this._quaternion = new Quaternion(0, 0, 0, 1);
-      this._matrix = Matrix44$2.identity();
+      this._matrix = Matrix44$1.identity();
+      this._invMatrix = Matrix44$1.identity();
 
   //    this._finalMatrix = Matrix44.identity();
 
@@ -3663,7 +3732,7 @@
       this._is_scale_updated = true;
       this._is_quaternion_updated = true;
       this._is_euler_angles_updated = true;
-      this._is_inverse_trs_matrix_updated = false;
+      this._is_inverse_trs_matrix_updated = true;
     }
 
 
@@ -3672,7 +3741,6 @@
     }
 
     _needUpdate() {
-      this._is_inverse_trs_matrix_updated = false;
       this._updateCountAsElement++;
     }
 
@@ -3685,7 +3753,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName) {
+    _getCurrentAnimationInputValue(inputName        )                {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -3694,7 +3762,7 @@
       }
     }
 
-    setAnimationAtLine(lineName, attributeName, inputArray, outputArray, interpolationMethod) {
+    setAnimationAtLine(lineName        , attributeName        , inputArray            , outputArray            , interpolationMethod        ) {
       var outputComponentN = 0;
       if (outputArray[0] instanceof Vector2) {
         outputComponentN = 2;
@@ -3719,7 +3787,7 @@
       };
     }
 
-    hasAnimation(lineName) {
+    hasAnimation(lineName        ) {
       if (this._animationLine[lineName]) {
         return true;
       } else {
@@ -3727,7 +3795,7 @@
       }
     }
 
-    getStartInputValueOfAnimation(lineName) {
+    getStartInputValueOfAnimation(lineName        ) {
       let inputLine = this._animationLine[lineName];
       let latestInputValue = Number.MAX_VALUE;
       if (typeof inputLine === 'undefined') {
@@ -3743,7 +3811,7 @@
       return latestInputValue;
     }
 
-    getEndInputValueOfAnimation(lineName) {
+    getEndInputValueOfAnimation(lineName        ) {
       let inputLine = this._animationLine[lineName];
       let latestInputValue = - Number.MAX_VALUE;
       if (typeof inputLine === 'undefined') {
@@ -3765,28 +3833,26 @@
      * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
      * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
      */
-    setCurrentAnimationValue(inputName, inputValue) {
+    setCurrentAnimationValue(inputName        , inputValue     ) {
       this._setDirtyToAnimatedElement(inputName);
       this._currentAnimationInputValues[inputName] = inputValue;
     }
 
-    removeCurrentAnimationValue(inputName) {
+    removeCurrentAnimationValue(inputName        ) {
       delete this._currentAnimationInputValues[inputName];
     }
 
-    setActiveAnimationLine(lineName) {
+    setActiveAnimationLine(lineName        ) {
       this._activeAnimationLineName = lineName;
     }
 
-    set translate(vec) {
-      if (this._translate.isEqual(vec)) {
-        return;
-      }
+    set translate(vec         ) {
       this._translate = vec.clone();
-      if (this._is_trs_matrix_updated) ;
-      this._is_trs_matrix_updated = false;
       this._is_translate_updated = true;
-      this._needUpdate();
+      this._is_trs_matrix_updated = false;
+      this._is_inverse_trs_matrix_updated = false;
+
+      this.__updateTransform();
     }
 
     getTranslateNotAnimated() {
@@ -3805,17 +3871,16 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName, inputValue) {
+    getTranslateAt(lineName        , inputValue         )          {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
-        this._is_translate_updated = true;  
-        this._is_trs_matrix_updated = false;
+        this._is_translate_updated = true;
       }
       return value;
     }
 
-    getTranslateAtOrStatic(lineName, inputValue) {
+    getTranslateAtOrStatic(lineName        , inputValue         ) {
       let value = this.getTranslateAt(lineName, inputValue);
       if (value === null) {
         return this.getTranslateNotAnimated();
@@ -3823,22 +3888,23 @@
       return value;
     }
 
-    set rotate(vec) {
-      if (this._rotate.isEqual(vec)) {
-        return;
-      }
+    set rotate(vec         ) {
+
       this._rotate = vec.clone();
-      this._is_trs_matrix_updated = false;
-      this._is_quaternion_updated = false;
       this._is_euler_angles_updated = true;
-      this._needUpdate();
+      this._is_quaternion_updated = false;
+      this._is_trs_matrix_updated = false;
+      this._is_inverse_trs_matrix_updated = false;
+
+
+      this.__updateTransform();
     }
 
     get rotate() {
       return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getRotateAt(lineName, inputValue) {
+    getRotateAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
       if (value !== null) {
         this._rotate = value;
@@ -3847,7 +3913,7 @@
       return value;
     }
 
-    getRotateAtOrStatic(lineName, inputValue) {
+    getRotateAtOrStatic(lineName        , inputValue         ) {
       let value = null;
       if (this._activeAnimationLineName) {
         value = this.getRotateAt(this._activeAnimationLineName, inputValue);
@@ -3871,32 +3937,28 @@
       return this._rotate.clone();
     }
 
-    set scale(vec) {
-      if (this._scale.isEqual(vec)) {
-        return;
-      }
+    set scale(vec         ) {
       this._scale = vec.clone();
-      if (this._is_trs_matrix_updated) ;
-      this._is_trs_matrix_updated = false;
       this._is_scale_updated = true;
-      this._needUpdate();
+      this._is_trs_matrix_updated = false;
+      this._is_inverse_trs_matrix_updated = false;
+      this.__updateTransform();
     }
 
     get scale() {
       return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getScaleAt(lineName, inputValue) {
+    getScaleAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
       if (value !== null) {
         this._scale = value.clone();
         this._is_scale_updated = true;  
-        this._is_trs_matrix_updated = false;
       }
       return value;
     }
 
-    getScaleAtOrStatic(lineName, inputValue) {
+    getScaleAtOrStatic(lineName        , inputValue         ) {
       let value = this.getScaleAt(lineName, inputValue);
       if (value === null) {
         return this.getScaleNotAnimated();
@@ -3918,15 +3980,18 @@
       return this._scale.clone();
     }
 
-    set matrix(mat) {
+    set matrix(mat          ) {
       this._matrix = mat.clone();
       this._is_trs_matrix_updated = true;
-      this._is_scale_updated = false;
       this._is_translate_updated = false;
-      this._is_quaternion_updated = false;
       this._is_euler_angles_updated = false;
-      this._needUpdate();
+      this._is_quaternion_updated = false;
+      this._is_scale_updated = false;
+      this.__updateTransform();
+
     }
+
+
 
     get matrix() {
       let input = void 0;
@@ -3935,10 +4000,11 @@
       }
 
       let value = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+
       return value;
     }
 
-    getMatrixAt(lineName, inputValue) {
+    getMatrixAt(lineName        , inputValue         ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'matrix');
       if (value !== null) {
         this._translate = value;
@@ -3953,12 +4019,12 @@
         return this._matrix.clone();
       }
 
-      let rotationMatrix = Matrix44$2.identity();
+      let rotationMatrix = Matrix44$1.identity();
       rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
 
       let scale = this.getScaleNotAnimated();
 
-      this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+      this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
       let translateVec = this.getTranslateNotAnimated();
       this._matrix.m03 = translateVec.x;
       this._matrix.m13 = translateVec.y;
@@ -3980,7 +4046,7 @@
       return matrix;
     }
 
-    isTrsMatrixNeeded(lineName, inputValue) {
+    isTrsMatrixNeeded(lineName        , inputValue        ) {
       //console.log(this._animationLine['time']);
       let result = (
         this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate') === null &&
@@ -3992,7 +4058,7 @@
     }
 
 
-    getMatrixAtOrStatic(lineName, inputValue) {
+    getMatrixAtOrStatic(lineName        , inputValue        ) {
       let input = inputValue;
 
       //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
@@ -4000,13 +4066,13 @@
         return this.getMatrixNotAnimated();
       } else {
 
-        let rotationMatrix = Matrix44$2.identity();
+        let rotationMatrix = Matrix44$1.identity();
         let quaternion = this.getQuaternionAtOrStatic(lineName, input);
         rotationMatrix = quaternion.rotationMatrix;
 
         let scale = this.getScaleAtOrStatic(lineName, input);
         
-        this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
         let translateVec = this.getTranslateAtOrStatic(lineName, input);
         this._matrix.m03 = translateVec.x;
         this._matrix.m13 = translateVec.y;
@@ -4020,32 +4086,29 @@
     }
 
 
-    set quaternion(quat) {
-      if (this._quaternion.isEqual(quat)) {
-        return;
-      }
+    set quaternion(quat            ) {
       this._quaternion = quat.clone();
-      this._is_trs_matrix_updated = false;
-      this._is_euler_angles_updated = false;
       this._is_quaternion_updated = true;
-      this._needUpdate();
+      this._is_euler_angles_updated = false;
+      this._is_trs_matrix_updated = false;
+      this._is_inverse_trs_matrix_updated = false;
+      this.__updateTransform();
     }
 
     get quaternion() {
       return this.getQuaternionAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getQuaternionAt(lineName, inputValue) {
+    getQuaternionAt(lineName        , inputValue        ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'quaternion');
       if (value !== null) {
         this._quaternion = value;
         this._is_quaternion_updated = true;  
-        this._is_trs_matrix_updated = false;
       }
       return value;
     }
 
-    getQuaternionAtOrStatic(lineName, inputValue) {
+    getQuaternionAtOrStatic(lineName        , inputValue        ) {
       let value = this.getQuaternionAt(lineName, inputValue);
       if (value === null) {
         return this.getQuaternionNotAnimated();
@@ -4061,7 +4124,7 @@
         if (this._is_trs_matrix_updated) {
           value = Quaternion.fromMatrix(this._matrix);
         } else if (this._is_euler_angles_updated) {
-          value = Quaternion.fromMatrix(Matrix44$2.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+          value = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
         } else {
           console.log('jojjeoe');
         }
@@ -4081,10 +4144,72 @@
     }
 
     get normalMatrix() {
-      return Matrix44$2.invert(this.transformMatrix).transpose().toMatrix33();
+      return Matrix44$1.invert(this.transformMatrix).transpose().toMatrix33();
     }
 
-    _copy(instance) {
+    __updateTransform() {
+      this.__updateRotation();
+      this.__updateTranslate();
+      this.__updateScale();
+      this.__updateMatrix();
+      this._needUpdate();
+    }
+
+    __updateRotation() {
+      if (this._is_euler_angles_updated && !this._is_quaternion_updated) {
+        this._quaternion = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        this._is_quaternion_updated = true;
+      } else if (!this._is_euler_angles_updated && this._is_quaternion_updated) {
+        this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+        this._is_euler_angles_updated = true;
+      } else if (!this._is_euler_angles_updated && !this._is_quaternion_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._quaternion = Quaternion.fromMatrix(m);
+        this._is_quaternion_updated = true;
+        this._rotate = m.toEulerAngles();
+        this._is_euler_angles_updated = true;
+      }
+    }
+
+    __updateTranslate() {
+      if (!this._is_translate_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._translate.x = m.m03;
+        this._translate.y = m.m13;
+        this._translate.z = m.m23;
+        this._is_translate_updated = true;
+      }
+    }
+
+    __updateScale() {
+      if (!this._is_scale_updated && this._is_trs_matrix_updated) {
+        const m = this._matrix;
+        this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
+        this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
+        this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+        this._is_scale_updated = true;
+      }
+    }
+
+    __updateMatrix() {
+      if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
+        let rotationMatrix = Matrix44$1.identity();
+        rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+    
+        let scale = this.getScaleNotAnimated();
+    
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
+        let translateVec = this.getTranslateNotAnimated();
+        this._matrix.m03 = translateVec.x;
+        this._matrix.m13 = translateVec.y;
+        this._matrix.m23 = translateVec.z;
+    
+        this._is_trs_matrix_updated = true;
+      }
+    }
+
+
+    _copy(instance           ) {
       super._copy(instance);
 
       instance._translate = this._translate.clone();
@@ -4124,20 +4249,62 @@
 
       instance._updateCountAsElement = this._updateCountAsElement;
     }
+
+    setPropertiesFromJson(arg        ) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      for(let key in json) {
+        if(json.hasOwnProperty(key) && key in this) {
+          if (key === "quaternion") {
+            this[key] = MathUtil.arrayToQuaternion(json[key]);
+          } else {
+            this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+          }
+        }
+      }
+    }
   }
 
+  /*       */
+                                              
+
   class M_Element extends L_Element {
-    constructor(glBoostContext) {
+                        
+                                                      
+                                         
+                                                                
+                            
+                                                         
+                                                      
+                                                   
+                                                                
+                                                        
+                     
+                                
+                            
+                         
+                                      
+                                                         
+                                     
+                                           
+                                                  
+                                     
+                            
+                                     
+                           
+
+    constructor(glBoostContext                      ) {
       super(glBoostContext);
 
       this._parent = null;
-      this._invMatrix = Matrix44$2.identity();
-      this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
-      this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
-      this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
+      this._invMatrix = Matrix44$1.identity();
+      this._accumulatedAncestryObjectUpdateNumber = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Number.MAX_VALUE;    
+      this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
       this._transparentByUser = false;
       this._opacity = 1.0;
       this._isAffectedByWorldMatrix = true;
@@ -4147,14 +4314,13 @@
 
       this._toInheritCurrentAnimationInputValue = true;
 
-      this._camera = null;
       this._customFunction = null;
       this._isVisible = true;
 
       this._gizmos = [];
       this._masterElement = null;
 
-      this._worldMatrix = new Matrix44$2();
+      this._worldMatrix = new Matrix44$1();
     }
 
     _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
@@ -4165,7 +4331,7 @@
       }
     }
 
-    set toInheritCurrentAnimationInputValue(flg) {
+    set toInheritCurrentAnimationInputValue(flg         ) {
       this._toInheritCurrentAnimationInputValue = flg;
     }
 
@@ -4173,7 +4339,7 @@
       return this._toInheritCurrentAnimationInputValue;
     }
 
-    _getCurrentAnimationInputValue(inputName) {
+    _getCurrentAnimationInputValue(inputName        )                {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4188,14 +4354,14 @@
       }
     }
 
-    _setDirtyToAnimatedElement(inputName) {
+    _setDirtyToAnimatedElement(inputName        ) {
       if (this.hasAnimation(inputName)) {
         this._needUpdate();
       }
     }
 
 
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
+    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf         , input        ) {
       if (input === void 0 && this._activeAnimationLineName !== null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
@@ -4210,7 +4376,7 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
     
         if (this._parent === null) {
@@ -4218,7 +4384,7 @@
           return currentMatrix;
         }
 
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
         this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
@@ -4229,7 +4395,7 @@
       return this.getWorldMatrixWithoutMySelfAt(void 0);
     }
 
-    getWorldMatrixWithoutMySelfAt(input) {
+    getWorldMatrixWithoutMySelfAt(input         ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4246,7 +4412,7 @@
       //console.log(tempNumber);
       if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
         let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-        this._normalMatrix = Matrix44$2.invert(world_m).transpose().toMatrix33();
+        this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
         this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
       }
 
@@ -4256,25 +4422,25 @@
 
     get inverseWorldMatrixWithoutMySelf() {
       if (this._parent === null) {
-        return Matrix44$2.identity();
+        return Matrix44$1.identity();
       }
 
       return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
     }
 
-    _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
+    _multiplyMyAndParentRotateMatrices(currentElem           , withMySelf         ) {
       if (currentElem._parent === null) {
         if (withMySelf) {
           return currentElem.transformMatrixOnlyRotate;
         } else {
-          return Matrix44$2.identity();
+          return Matrix44$1.identity();
         }
       } else {
-        let currentMatrix = Matrix44$2.identity();
+        let currentMatrix = Matrix44$1.identity();
         if (withMySelf) {
           currentMatrix = currentElem.transformMatrixOnlyRotate;
         }
-        return Matrix44$2.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
+        return Matrix44$1.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
       }
     }
 
@@ -4282,7 +4448,7 @@
       return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
     }
 
-    _accumulateMyAndParentOpacity(currentElem) {
+    _accumulateMyAndParentOpacity(currentElem           ) {
       if (currentElem._parent === null) {
         return currentElem.opacity;
       } else {
@@ -4294,7 +4460,7 @@
       return this._accumulateMyAndParentOpacity(this);
     }
 
-    set opacity(opacity) {
+    set opacity(opacity        ) {
       this._opacity = opacity;
     }
 
@@ -4306,11 +4472,11 @@
       return this._transparentByUser;
     }
 
-    set isTransparent(flg) {
+    set isTransparent(flg         ) {
       this._transparentByUser = flg;
     }
 
-    set dirty(flg) {
+    set dirty(flg        ) {
       if (flg) {
         this._needUpdate();
       }
@@ -4330,15 +4496,7 @@
       return this._instanceName + this._updateCountAsElement;                // faster
     }
 
-    set camera(camera) {
-      this._camera = camera;
-    }
-
-    get camera() {
-      return this._camera;
-    }
-
-    set customFunction(func) {
+    set customFunction(func          ) {
       this._customFunction = func;
     }
 
@@ -4350,12 +4508,11 @@
 
     }
 
-    _copy(instance) {
+    _copy(instance           ) {
       super._copy(instance);
 
       instance._parent = this._parent;
       instance._invMatrix = this._invMatrix.clone();
-      instance._matrixGetMode = this._matrixGetMode;
       instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
       instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
       instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
@@ -4373,11 +4530,10 @@
 
       instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
 
-      instance._camera = this._camera;
       instance._customFunction = this._customFunction;
     }
 
-    set isVisible(flg) {
+    set isVisible(flg         ) {
       this._isVisible = flg;
     }
 
@@ -4385,7 +4541,7 @@
       return this._isVisible;
     }
 
-    set isAffectedByWorldMatrix(flg) {
+    set isAffectedByWorldMatrix(flg         ) {
       this._isAffectedByWorldMatrix = flg;
     }
 
@@ -4393,7 +4549,7 @@
       return this._isAffectedByWorldMatrix;
     }
 
-    set isAffectedByWorldMatrixAccumulatedAncestry(flg) {
+    set isAffectedByWorldMatrixAccumulatedAncestry(flg         ) {
       this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
     }
 
@@ -4401,7 +4557,7 @@
       return this._isAffectedByWorldMatrixAccumulatedAncestry;
     }
 
-    set isAffectedByViewMatrix(flg) {
+    set isAffectedByViewMatrix(flg         ) {
       this._isAffectedByViewMatrix = flg;
     }
 
@@ -4409,7 +4565,7 @@
       return this._isAffectedByViewMatrix;
     }
 
-    set isAffectedByProjectionMatrix(flg) {
+    set isAffectedByProjectionMatrix(flg         ) {
       this._isAffectedByProjectionMatrix = flg;
     }
 
@@ -4417,7 +4573,7 @@
       return this._isAffectedByProjectionMatrix;
     }
 
-    set gizmoScale(scale) {
+    set gizmoScale(scale        ) {
       for (let gizmo of this._gizmos) {
         gizmo.scale = new Vector3(scale, scale, scale);
       }
@@ -4430,7 +4586,7 @@
       return this._gizmos[0].scale.x;
     }
 
-    set isGizmoVisible(flg) {
+    set isGizmoVisible(flg         ) {
       for (let gizmo of this._gizmos) {
         gizmo.isVisible = flg;
       }
@@ -4440,7 +4596,7 @@
       return this._gizmos[0].isVisible;
     }
 
-    set masterElement(element) {
+    set masterElement(element           ) {
       this._masterElement = element;
     }
 
@@ -4452,7 +4608,7 @@
       return this.getWorldMatrixForJointsAt(void 0);
     }
 
-    getWorldMatrixForJointsAt(input) {
+    getWorldMatrixForJointsAt(input         ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
       
@@ -4480,7 +4636,7 @@
           if (withMySelf) {
             currentMatrix = this.getRotateTranslateAt(input);
           } else {
-            currentMatrix = Matrix44$2.identity();
+            currentMatrix = Matrix44$1.identity();
           }
       
           if (this._parent === null) {
@@ -4488,7 +4644,7 @@
             return currentMatrix;
           }
 
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
           this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
       }
@@ -4502,7 +4658,7 @@
     }
 
 
-    getWorldMatrixAt(input) {
+    getWorldMatrixAt(input        ) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4529,13 +4685,13 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
         if (this._parent === null) {
           this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
           return currentMatrix;
         }
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
         this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
       }
@@ -4547,7 +4703,7 @@
       return this.getInverseWorldMatrixAt(void 0);
     }
 
-    getInverseWorldMatrixAt(input) {
+    getInverseWorldMatrixAt(input         ) {
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
       if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
@@ -4581,7 +4737,7 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
     
         if (this._parent === null) {
@@ -4589,7 +4745,7 @@
           return currentMatrix;
         }
 
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
         this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
@@ -4597,17 +4753,28 @@
     }
 
     readyForDiscard() {
-      if (this instanceof this.className.indexOf('Mesh') !== -1) {
-        const materials = element.getAppropriateMaterials();
+      if (this.className.indexOf('Mesh') !== -1) {
+        const materials = this.getAppropriateMaterials();
         for (let material of materials) {
-          material.readyForDiscard();
+          if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
+            material.readyForDiscard();
+          }
         }
       }
     }
 
-    addGizmo(gizmo) {
+    addGizmo(gizmo         ) {
       this._gizmos.push(gizmo);
     }
+
+    get gizmos() {
+      return this._gizmos;
+    }
+
+    _needUpdate() {
+      super._needUpdate();
+    }
+
   }
 
   /**
@@ -4625,6 +4792,7 @@
 
       this._isCastingShadow = true;
       this._isLightType = '';
+      this._camera = null;
     }
 
     prepareToRender() {
@@ -4662,7 +4830,17 @@
     isTypeSpot() {
       return this._isLightType === 'spot';
     }
+
+    set camera(camera) {
+      this._camera = camera;
+    }
+
+    get camera() {
+      return this._camera;
+    }
   }
+
+  GLBoost$1['M_AbstractLight'] = M_AbstractLight;
 
   /**
    * This is a Point Light class.
@@ -5124,7 +5302,7 @@ return mat4(
       shaderText +=      'uniform mat4 viewMatrix;\n';
       shaderText +=      'uniform mat4 projectionMatrix;\n';
       shaderText +=      'uniform mat3 normalMatrix;\n';
-      shaderText += `     uniform highp ivec2 objectIds;\n`;
+      shaderText += `     uniform highp ivec3 objectIds;\n`;
 
       shaderText += `${out_} vec3 v_position_world;\n`;
 
@@ -5142,6 +5320,15 @@ return mat4(
     VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
       var shaderText = '';
 
+      // calc Projection * View * World matrix
+      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+  //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
+  //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
+        shaderText += '  float borderWidth = 2.0;\n';
+        shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
+      }
+      
       // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
       shaderText += '  if (!isSkinning) {\n';
       shaderText += '    position_world = worldMatrix * position_local;\n';
@@ -5149,9 +5336,6 @@ return mat4(
         shaderText += '  normal_world = normalMatrix * normal_local;\n';
       }
       shaderText += '  }\n';
-
-      // calc Projection * View * World matrix
-      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
 
       // calc vertex position in world space
       shaderText += '  v_position_world = position_world.xyz;\n';
@@ -5188,7 +5372,7 @@ return mat4(
     FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
       let shaderText = '';
 
-      shaderText += `uniform highp ivec2 objectIds;\n`;
+      shaderText += `uniform highp ivec3 objectIds;\n`;
       shaderText += `uniform vec3 viewPosition_world;\n`;
 
       let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -5232,7 +5416,7 @@ return mat4(
         }
       });
 
-      material.setUniform(shaderProgram, 'uniform_objectIds', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
+      material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
 
       material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
       material._semanticsDic['WORLD'] = 'worldMatrix';
@@ -5894,7 +6078,6 @@ return mat4(
     static _generateLightStr(i) {
       let shaderText = '';
       
-      // if PointLight: lightPosition[i].w === 1.0      if DirectionalLight: lightPosition[i].w === 0.0
       shaderText += `    vec3 lightDirection = lightDirection_world[${i}];\n`;    
       shaderText += `    if (0.4 < lightSpotInfo[${i}].x) {\n`; // is pointlight or spotlight
       shaderText += `      lightDirection = normalize(lightPosition_world[${i}] - v_position_world.xyz);\n`;
@@ -6283,24 +6466,24 @@ return mat4(
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-  //          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+            viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+  //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
           projectionMatrix = camera.projectionRHMatrix();
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
-        camera._lastPVMatrixFromLight = Matrix44$2.multiply(projectionMatrix, viewMatrix);
+        camera._lastPVMatrixFromLight = Matrix44$1.multiply(projectionMatrix, viewMatrix);
       }
     }
 
@@ -6311,23 +6494,23 @@ return mat4(
       if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
-          const invertSittingToStandingTransform = (new Matrix44$2(webvrFrameData.sittingToStandingTransform, true)).invert();
-          const leftOrRightViewMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-          viewMatrix = Matrix44$2.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
+          const invertSittingToStandingTransform = (new Matrix44$1(webvrFrameData.sittingToStandingTransform, true)).invert();
+          const leftOrRightViewMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
+          viewMatrix = Matrix44$1.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
-          projectionMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
+          projectionMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
   //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
@@ -6354,6 +6537,7 @@ return mat4(
       const viewport = data.viewport;
       const isWebVRMode = data.isWebVRMode;
       const webvrFrameData = data.webvrFrameData;
+      const forceThisMaterial = data.forceThisMaterial;
 
       var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -6363,6 +6547,13 @@ return mat4(
 
       for (let i=0; i<originalMaterials.length;i++) {
         let material = originalMaterials[i];
+        let isOutlineVisible = false;
+        if (forceThisMaterial) {
+          material = forceThisMaterial;
+          if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
+            isOutlineVisible = true;
+          }
+        }
         if (!material.isVisible) {
           continue;
         }
@@ -6370,6 +6561,11 @@ return mat4(
         let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
         if (renderpassSpecificMaterial) {
           material = renderpassSpecificMaterial;
+        }
+
+        if (!material.shaderInstance) {
+          console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+          continue;
         }
         this._glslProgram = material.shaderInstance.glslProgram;
 
@@ -6385,7 +6581,7 @@ return mat4(
           }
         }
 
-        material._glContext.uniform2i(material.getUniform(glslProgram, 'uniform_objectIds'), mesh.objectIndex, 0, true);
+        material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
 
         let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
         let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
@@ -6402,7 +6598,7 @@ return mat4(
             normal_m = mesh.normalMatrix;
           }
         } else {
-          world_m = Matrix44$2.identity();
+          world_m = Matrix44$1.identity();
           normal_m = Matrix33.identity();
         }
 
@@ -6423,6 +6619,11 @@ return mat4(
             if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
               let lightPosition = new Vector4(0, 0, 0, 1);            
               let lightDirection = new Vector4(0, 0, 0, 1);
+              let lightIntensity = light.intensity;
+              if (!light.isVisible) {
+                lightIntensity = Vector3.zero();
+              }
+
               // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
               let lightType = 0.0; // M_DirectionalLight
               if (light.className === 'M_PointLight') {
@@ -6441,7 +6642,7 @@ return mat4(
               }
               material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
               material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightDirection_${j}`), lightDirection.x, lightDirection.y, lightDirection.z, true);
-              material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), light.intensity.x, light.intensity.y, light.intensity.z, 1.0, true);
+              material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lightIntensity.x, lightIntensity.y, lightIntensity.z, 1.0, true);
               if (light.className === 'M_SpotLight') {
                 material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, light.spotCosCutoff, light.spotExponent, true);              
               } else {
@@ -6464,21 +6665,23 @@ return mat4(
 
         geometry.drawIntermediate(gl, glslProgram, mesh, material);
 
+        let vertexN = originalMaterials[i].getVertexN(geometry);
+
         if (isWebVRMode) {
           // Left Eye
    //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
           gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
           DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
-          DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
 
           // Right Eye
           gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
           DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
-          DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
         } else {
           DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
-          DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
         }
 
 
@@ -6498,10 +6701,9 @@ return mat4(
       //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     }
 
-    static drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN) {
+    static drawGeometry(geometry, glem, gl, i, primitiveType, vertexN) {
       if (geometry.isIndexed()) {
-        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
-        let vertexN = material.getVertexN(geometry);
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);      
         let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
         let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
         let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);
@@ -6682,7 +6884,8 @@ return mat4(
 
     updateAllInfo() {
       this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-      this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
       return this;
     }
@@ -6749,6 +6952,18 @@ return mat4(
 
     get lengthCenterToCorner() {
       return this._lengthCenterToCorner;
+    }
+
+    get sizeX() {
+      return (this._AABB_max.x - this._AABB_min.x);
+    }
+
+    get sizeY() {
+      return (this._AABB_max.y - this._AABB_min.y);
+    }
+
+    get sizeZ() {
+      return (this._AABB_max.z - this._AABB_min.z);
     }
 
     static multiplyMatrix(matrix, aabb) {
@@ -7338,17 +7553,10 @@ return mat4(
       return Geometry._allVertexAttribs(this._vertices);
     } 
 
-    prepareGLSLProgram(expression, material, index, existCamera_f, lights, doSetupVertexAttribs = true, shaderClass = void 0, argShaderInstance = void 0) {
-      let gl = this._glContext.gl;
+    prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
       let vertices = this._vertices;
 
-     //let glem = GLExtensionsManager.getInstance(this._glContext);
       let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
-
-  //    if (doSetupVertexAttribs) {
-  //      glem.bindVertexArray(gl, Geometry._vaoDic[this.toString()]);
-  //    }
-
 
       let shaderInstance = null;
       if (argShaderInstance) {
@@ -7361,14 +7569,7 @@ return mat4(
         }  
       }
 
-      let glslProgram = shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
-  //    if (doSetupVertexAttribs) {
-      //  this.setUpVertexAttribs(gl, glslProgram, allVertexAttribs);
-  //    }
-
-  //    if (doSetupVertexAttribs) {
-      //  glem.bindVertexArray(gl, null);
-  //    }
+      shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
 
       return shaderInstance;
     }
@@ -7484,9 +7685,9 @@ return mat4(
         } else {
           */
           if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-            shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, void 0, materials[i].shaderInstance);
+            shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, void 0, materials[i].shaderInstance);
           } else {
-            shaderInstance = this.prepareGLSLProgram(expression, materials[i], i, existCamera_f, lights, doAfter, shaderClass);
+            shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, shaderClass);
           }  
   //      }
 
@@ -7515,7 +7716,7 @@ return mat4(
       const gl = this._glContext.gl;
       const glem = GLExtensionsManager.getInstance(this._glContext);
 
-      const materials = this._getAppropriateMaterials(data.mesh);
+      let materials = this._getAppropriateMaterials(data.mesh);
 
       const thisName = this.toString();
 
@@ -7540,7 +7741,8 @@ return mat4(
           vertexN: this._vertexN,
           viewport: data.viewport,
           isWebVRMode: data.isWebVRMode,
-          webvrFrameData: data.webvrFrameData
+          webvrFrameData: data.webvrFrameData,
+          forceThisMaterial: data.forceThisMaterial
         });
 
     }
@@ -8690,6 +8892,238 @@ return mat4(
 
   GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
 
+  class WireframeShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_WireframeShaderSource(in_, out_, f) {
+      var shaderText = '';
+      shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
+      shaderText += `${out_} vec3 barycentricCoord;\n`;
+
+      // for Unfold UV
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+        shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
+      }
+      return shaderText;
+    }
+
+    VSTransform_WireframeShaderSource(existCamera_f, f) {
+      var shaderText = '';
+
+
+      // UV Unfold
+      shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
+      shaderText +=   '  gl_Position = position_world;\n';
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
+        shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
+        shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
+        shaderText += '  uvScaled.y = - uvScaled.y;\n';
+        shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+        shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
+      }
+
+      if (existCamera_f) {
+        shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+        shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
+      }
+
+      shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
+      return shaderText;
+    }
+
+    FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `${in_} vec3 barycentricCoord;\n`;
+
+      shaderText += 'uniform bool isWireframe;\n';
+      //shaderText += 'uniform bool isWireframeOnShade;\n';
+      shaderText += 'uniform float wireframeWidth;\n';
+
+      return shaderText;
+    }
+
+    FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `
+    float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
+        vec3 d = fwidth(bary3);
+        vec3 x = bary3+vec3(1.0 - wireframeWidthInner)*d;
+        vec3 a3 = smoothstep(vec3(0.0), d, x);
+        float factor = min(min(a3.x, a3.y), a3.z);
+        
+        return clamp((1.0 - factor), 0.0, 1.0);
+    }
+    `;
+
+      return shaderText;
+    }
+
+    FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'bool isWireframeInner = false;\n';
+      shaderText += 'float wireframeWidthRelativeScale = 1.0;\n';
+      
+      return shaderText;
+    }
+
+    FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
+      shaderText += 'float threshold = 0.001;\n';
+      shaderText += 'vec4 wireframeResult = rt0;\n';
+      shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
+      shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
+      shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
+      shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
+      // if r0.a is 0.0, it is wireframe not on shaded
+      shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
+      shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+      shaderText += '}\n';
+
+      shaderText += 'if ( isWireframe ) {\n';
+      shaderText += '  rt0 = wireframeResult;\n';
+      shaderText += '}\n';
+
+      shaderText += '    if (rt0.a < 0.05) {\n';
+      shaderText += '      discard;\n';
+      shaderText += '    }\n';
+
+      /*
+      //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += '  rt0 = vec4(normalize(v_normal)*0.5+0.5, 1.0);\n';
+      }
+      */
+
+      return shaderText;
+    }
+
+    prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+      shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
+      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
+      vertexAttribsAsResult.push('barycentricCoord');
+
+      let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
+      material.setUniform(shaderProgram, 'uniform_isWireframe', uniform_isWireframe);
+      this._glContext.uniform1i( uniform_isWireframe, 0, true);
+
+      let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidth', uniform_wireframeWidth);
+      this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
+
+      let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
+      this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
+
+      if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+        material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+        material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
+      }
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class WireframeShader extends FragmentSimpleShader {
+    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+
+      super(glBoostContext);
+
+      if (basicShader === VertexWorldShaderSource) {
+        WireframeShader.mixin(VertexWorldShadowShaderSource);
+      }
+      WireframeShader.mixin(WireframeShaderSource);
+
+      this._unfoldUVRatio = void 0;
+
+      this._AABB = null;
+
+    }
+
+    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let isWifeframe = false;
+      let isWireframeOnShade = false;
+      let wireframeWidth = 0.0;
+      let wireframeWidthRelativeScale = 0.0;
+
+      if (typeof material.isWireframe !== 'undefined') {
+        isWifeframe = material.isWireframe;
+        isWireframeOnShade = material.isWireframeOnShade;
+        wireframeWidth = material.wireframeWidth;
+        wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
+      }
+
+      let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
+      if (uniformLocationIsWireframe) {
+        this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
+      }
+      if (isWifeframe && !isWireframeOnShade) {
+        material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), 0.0, true);
+      }
+      let uniformLocationWireframeWidth = material.getUniform(glslProgram, 'uniform_wireframeWidth');
+      if (uniformLocationWireframeWidth) {
+        this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
+      }
+      let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram, 'uniform_wireframeWidthRelativeScale');
+      if (uniformLocationWireframeWidthRelativeScale) {
+        this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
+      }
+
+      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
+      if (uniformLocationAABBLengthCenterToCorner) {
+        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
+      }
+      let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
+      if (uniformLocationAABBCenterPositionAndRatio) {
+        let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
+        this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
+      }
+
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
+      if (uniformLocationDepthBias) {
+        let depthBias = this.getShaderParameter(material, 'depthBias', false);
+        if (depthBias) {
+          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
+        }
+      }
+    }
+
+    set unfoldUVRatio(value) {
+      this._unfoldUVRatio = value;
+    }
+
+    get unfoldUVRatio() {
+      return this._unfoldUVRatio;
+    }
+
+    set AABB(aabb) {
+      this._AABB = aabb;
+    }
+
+    get AABB() {
+      return this._AABB;
+    }
+
+  }
+
+  GLBoost['WireframeShader'] = WireframeShader;
+
   class DecalShaderSource {
     // In the context within these member methods,
     // this is the instance of the corresponding shader class.
@@ -8823,7 +9257,7 @@ return mat4(
     }
   }
 
-  class DecalShader extends FragmentSimpleShader {
+  class DecalShader extends WireframeShader {
     constructor(glBoostContext) {
 
       super(glBoostContext);
@@ -8853,7 +9287,7 @@ return mat4(
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$2.multiply(projectionMatrix, viewMatrix).flatten());
+          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -9135,7 +9569,10 @@ return mat4(
       if (typeof states.functions === 'undefined') {
         states.functions = this._stateFunctionsToReset;
       }
-      this._states = states;
+      this._states.enable = states.enable;
+      if (typeof states.functions !== 'undefined') {
+        this._states.functions = states.functions;
+      }
       this._updateCount();
     }
 
@@ -9433,7 +9870,7 @@ return mat4(
       var s = Vector3.normalize(Vector3.cross(f, up));
       var u = Vector3.cross(s, f);
 
-      return new Matrix44$2(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+      return new Matrix44$1(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
         u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
         -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
         0, 0, 0, 1);
@@ -9557,14 +9994,14 @@ return mat4(
       var xscale = yscale / aspect;
 
       if (zFar) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
           0.0, 0.0, -1.0, 0.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, -1,0, -2*zNear,
@@ -9662,7 +10099,7 @@ return mat4(
     }
 
     static frustumRHMatrix(left, right, top, bottom, zNear, zFar) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         2*zNear/(right-left), 0.0, (right+left)/(right-left), 0.0,
         0.0, 2*zNear/(top-bottom), (top+bottom)/(top-bottom), 0.0,
         0.0, 0.0, - (zFar+zNear)/(zFar-zNear), -1*2*zFar*zNear/(zFar-zNear),
@@ -9786,14 +10223,14 @@ return mat4(
     static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
 
       if (xmag && ymag) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           1/xmag, 0.0, 0.0, 0,
           0.0, 1/ymag, 0.0, 0,
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
           0.0, 0.0, 0.0, 1.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           2/(right-left), 0.0, 0.0, -(right+left)/(right-left),
           0.0, 2/(top-bottom), 0.0, -(top+bottom)/(top-bottom),
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
@@ -10070,8 +10507,17 @@ return mat4(
 
       this._onMouseDown = (evt) => {
         let rect = evt.target.getBoundingClientRect();
-        this._clickedMouseXOnCanvas = evt.clientX - rect.left;
-        this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+        let clientX = null;
+        let clientY = null;
+        if (evt.clientX) {
+          clientX = evt.clientX;
+          clientY = evt.clientY;
+        } else {
+          clientX = evt.touches[0].clientX;
+          clientY = evt.touches[0].clientY;
+        }
+        this._clickedMouseXOnCanvas = clientX - rect.left;
+        this._clickedMouseYOnCanvas = clientY - rect.top;
         this._movedMouseYOnCanvas = -1;
         this._movedMouseXOnCanvas = -1;
         this._rot_bgn_x = this._rot_x;
@@ -10093,13 +10539,23 @@ return mat4(
       };
 
       this._onMouseMove = (evt) => {
+        evt.preventDefault();
         if (this._isKeyUp) {
           return;
         }
 
         let rect = evt.target.getBoundingClientRect();
-        this._movedMouseXOnCanvas = evt.clientX - rect.left;
-        this._movedMouseYOnCanvas = evt.clientY - rect.top;
+        let clientX = null;
+        let clientY = null;
+        if (evt.clientX) {
+          clientX = evt.clientX;
+          clientY = evt.clientY;
+        } else {
+          clientX = evt.touches[0].clientX;
+          clientY = evt.touches[0].clientY;
+        }
+        this._movedMouseXOnCanvas = clientX - rect.left;
+        this._movedMouseYOnCanvas = clientY - rect.top;
 
         if (typeof evt.buttons !== 'undefined') {
           let data = evt.buttons;
@@ -10291,6 +10747,26 @@ return mat4(
         newCenterVec.add(this._mouseTranslateVec);
       }
 
+
+      let newLeft = camera.left;
+      let newRight = camera.right;
+      let newTop = camera.top;
+      let newBottom = camera.bottom;
+      let ratio = 1;
+      if (typeof newLeft !== 'undefined') {
+        if (typeof this._lengthCenterToCorner !== 'undefined') {
+          ratio = camera.zNear / this._lengthCameraToObject;
+          if (ratio < 1.0) {
+            ratio = 1;
+          }
+        }
+        let scale = this._wheel_y / ratio;
+        newLeft *= scale;
+        newRight *= scale;
+        newTop *= scale;
+        newBottom *= scale;
+      }
+
       let newZNear = camera.zNear;
       let newZFar = camera.zFar;
       if (this._target) {
@@ -10300,7 +10776,7 @@ return mat4(
 
       this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy/2.0));
 
-      return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
+      return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar, newLeft, newRight, newTop, newBottom];
     }
 
     _getTargetAABB() {
@@ -10321,14 +10797,14 @@ return mat4(
       let targetAABB = this._getTargetAABB();
 
       this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-      let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+      this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
       let newCenterVec = targetAABB.centerPoint;
 
       let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
       let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
 
-      let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+      let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, this._lengthCameraToObject).add(newCenterVec);
 
       let newUpVec = null;
       if (camera instanceof M_AbstractCamera) {
@@ -10411,7 +10887,7 @@ return mat4(
     resetDolly() {
       this.dolly = 1;
 
-      this._updateCameras();
+      this.updateCamera();
     }
 
     set dolly(value) {
@@ -10471,15 +10947,12 @@ return mat4(
       this._virticalSpeed = options.virticalSpeed;
       this._turnSpeed = options.turnSpeed;
 
-      this._isKeyDown = false;
-      this._lastKeyCode = null;
-      this._currentPos = null;
-      this._currentCenter = null;
-      this._currentDir = null;
+      this.reset();
 
       this._onKeydown = (e)=> {
         this._isKeyDown = true;
         this._lastKeyCode = e.keyCode;
+
         this.updateCamera();
       };
 
@@ -10502,20 +10975,82 @@ return mat4(
 
     registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        eventTargetDom.addEventListener('keydown', this._onKeydown);
-        eventTargetDom.addEventListener('keyup', this._onKeyup);
+        document.addEventListener('keydown', this._onKeydown);
+        document.addEventListener('keyup', this._onKeyup);
+        eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
+        eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
+        eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
       }
     }
 
     unregisterEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        eventTargetDom.removeEventListener('keydown', this._onKeydown);
-        eventTargetDom.removeEventListener('keyup', this._onKeyup);
+        document.removeEventListener('keydown', this._onKeydown);
+        document.removeEventListener('keyup', this._onKeyup);
+        eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
+        eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
+        eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
       }
+    }
+
+    _mouseDown(evt) {
+      this._isMouseDown = true;
+
+      let rect = evt.target.getBoundingClientRect();
+      this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+      this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+
+    }
+
+    _mouseMove(evt) {
+      let rect = evt.target.getBoundingClientRect();
+      this._draggedMouseXOnCanvas = evt.clientX - rect.left;
+      this._draggedMouseYOnCanvas = evt.clientY - rect.top;
+      if (this._isMouseDown) {
+        this._isMouseDrag = true;
+      }
+
+      this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
+      this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
+
+      this.updateCamera();
+
+    }
+
+    _mouseUp(evt) {
+      this._isMouseDown = false;
+      this._isMouseDrag = false;
+
+      let rect = evt.target.getBoundingClientRect();
+      this._clickedMouseXOnCanvas = evt.clientX - rect.left;
+      this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+      
     }
 
     tryReset() {
 
+    }
+
+    reset() {
+      this._isKeyDown = false;
+      this._lastKeyCode = null;
+      this._currentPos = null;
+      this._currentCenter = null;
+      this._currentDir = null;
+      this._isMouseDown = false;
+      this._isMouseDrag = false;
+      this._draggedMouseXOnCanvas = null;
+      this._draggedMouseYOnCanvas = null;
+      this._deltaMouseXOnCanvas = null;
+      this._deltaMouseYOnCanvas = null;
+      this._mouseXAdjustScale = 0.1;
+      this._mouseYAdjustScale = 0.1;
+      this._deltaY = 0;
+      this._newDir = Vector3.zero();
+
+      this._camaras.forEach(function (camera) {
+        camera._needUpdateView(false);
+      });
     }
 
     addCamera(camera) {
@@ -10534,37 +11069,58 @@ return mat4(
       }
 
       let newEyeToCenter = null;
+
+      const t = this._deltaY / 90;
+      this._newDir.x = this._currentDir.x * (1 - t);
+      this._newDir.y = t;
+      this._newDir.z = this._currentDir.z * (1 - t);
+      this._newDir.normalize();
+
       switch(this._lastKeyCode) {
         case 87: // w key
-          this._currentPos.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(this._currentDir, this._horizontalSpeed));
+        case 38: // arrow upper key
+        {
+          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+          this._currentPos.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
+        }
         break;
         case 65: // a key
-          this._currentDir = Matrix33.rotateY(this._turnSpeed).multiplyVector(this._currentDir);
-          newEyeToCenter = Matrix33.rotateY(this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
-          this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
-        break;
+        case 37: // arrow left key
+        {
+          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+          const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
+          this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+        }
+      break;
         case 83: // s key
-          this._currentPos.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(this._currentDir, -this._horizontalSpeed));
+        case 40: // arrow down key
+        {
+          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+          this._currentPos.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
+        }
         break;
         case 68: // d key
-          this._currentDir = Matrix33.rotateY(-this._turnSpeed).multiplyVector(this._currentDir);
-          newEyeToCenter = Matrix33.rotateY(-this._turnSpeed).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
-          this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+        case 39: // arrow right key
+        {
+          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+          const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
+          this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+        }
         break;
         case 81: // q key
         {
-          const leftDir = Matrix33.rotateY(90).multiplyVector(this._currentDir);
-          this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
+          this._currentPos.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
         }
         break;
         case 69: // e key
         {
-          const rightDir = Matrix33.rotateY(-90).multiplyVector(this._currentDir);
-          this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
+          this._currentPos.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
+          this._currentCenter.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
         }
         break;
         case 82: // r key
@@ -10577,13 +11133,55 @@ return mat4(
         break;
       }
 
-  //    console.log(this._currentPos.toString(), this._currentCenter.toString());
 
-      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar];
+
+
+      if (this._isMouseDrag) {
+        const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+        this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
+        this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
+        this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
+
+        newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+        newEyeToCenter.x = newEyeToCenter.x * (1 - t);
+        newEyeToCenter.y = t;
+        newEyeToCenter.z = newEyeToCenter.z * (1 - t);
+        newEyeToCenter.normalize();
+        this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
+
+        this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
+        this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
+    
+      }
+
+      let newLeft = camera.left;
+      let newRight = camera.right;
+      let newTop = camera.top;
+      let newBottom = camera.bottom;
+
+
+
+      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
     }
 
     getDirection() {
-      return (this._currentCenter !== null) ? this._currentDir.clone() : null;
+      return (this._currentCenter !== null) ? this._newDir.clone() : null;
+    }
+
+    set horizontalSpeed(value) {
+      this._horizontalSpeed = value; 
+    }
+
+    get horizontalSpeed() {
+      return this._horizontalSpeed;
+    }
+
+    set virticalSpeed(value) {
+      this._virticalSpeed = value; 
+    }
+
+    get virticalSpeed() {
+      return this._virticalSpeed;
     }
   }
 
@@ -11909,6 +12507,7 @@ return mat4(
       this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
       this._defaultMaterial = this.createClassicMaterial();
+      this._defaultMaterial.userFlavorName = 'GLBoostSystemDefaultMaterial';
 
       // effekseer
       if (typeof effekseer !== "undefined") {
@@ -12158,11 +12757,30 @@ return mat4(
     }
 
     get currentGlobalStates() {
-      return this._currentGlobalStates.concat();
+      return this._currentGlobalStates;
     }
 
     restoreGlobalStatesToDefault() {
       this._currentGlobalStates = this._defaultGlobalStates.concat();
+    }
+
+    get glBoostMonitor() {
+      return this._glBoostMonitor;
+    }
+
+    setPropertiesFromJson(arg) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      if (!json.targetInstanceName) {
+        console.warn(`Faild! This json doesn't include targetInstanceName field!`);
+        return;
+      }
+      const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      object.setPropertiesFromJson(json);
+
+      return object;
     }
 
   }
@@ -12180,6 +12798,7 @@ return mat4(
         this.material = material;
       }
       this._transformedDepth = 0;
+      this._outlineGizmo = null;
     }
 
     prepareToRender(expression, existCamera_f, lights) {
@@ -12206,7 +12825,8 @@ return mat4(
           mesh: this,
           viewport: data.viewport,
           isWebVRMode: data.isWebVRMode,
-          webvrFrameData: data.webvrFrameData
+          webvrFrameData: data.webvrFrameData,
+          forceThisMaterial: data.forceThisMaterial,
         }
       );
     }
@@ -12251,7 +12871,7 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$2.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -12284,7 +12904,7 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$2.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -12371,7 +12991,7 @@ return mat4(
       var viewMatrix = camera.lookAtRHMatrix();
       var m_m = null;
       if (this.bindShapeMatrix) {
-        m_m = Matrix44$2.multiply(this.worldMatrix, this.bindShapeMatrix);
+        m_m = Matrix44$1.multiply(this.worldMatrix, this.bindShapeMatrix);
       } else {
         m_m = this.worldMatrix;
       }
@@ -12430,6 +13050,42 @@ return mat4(
       return [intersectPositionInWorld, result[1]];
     }
 
+    get gizmos() {
+      if (this.isOutlineVisible) {
+        return this._gizmos.concat([this._outlineGizmo]);
+      } else {
+        return this._gizmos;
+      }
+    }
+
+    set isOutlineVisible(flg) {
+      if (flg && this._outlineGizmo === null) {
+        this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+      }
+
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
+      }
+    }
+
+    get isOutlineVisible() {
+      if (this._outlineGizmo === null) {
+        return false;
+      }
+      return this._outlineGizmo.isVisible;
+    }
+
+    set isVisible(flg) {
+      super.isVisible = flg;
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
+      }
+    }
+
+    get isVisible() {
+      return super.isVisible;
+    }
+
     clone() {
       let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
       this._copy(instance);
@@ -12440,6 +13096,10 @@ return mat4(
     _copy(instance) {
       super._copy(instance);
       instance._transformedDepth = this._transformedDepth;
+    }
+
+    _needUpdate() {
+      super._needUpdate();
     }
   }
   M_Mesh._geometries = {};
@@ -12635,7 +13295,6 @@ return mat4(
   //    this._aabbGizmo = null;
   //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
   //    this._gizmos.push(this._aabbGizmo);
-
     }
 
     /**
@@ -12716,23 +13375,23 @@ return mat4(
 
     _validateByQuery(object               , query        , queryMeta           ) {
       let propertyName = '';
-      if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME) {
+      if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME) {
         propertyName = 'instanceName';
-      } else if (queryMeta.type === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
         propertyName = 'userFlavorName';
-      } else if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
         propertyName = 'instanceNameWithUserFlavor';
       }
 
-      if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
+      if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
         if (object[propertyName] === query) {
           return object;
         }
-      } else if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
           if (object[propertyName].indexOf(query) !== -1) {
             return object;
           }
-      } else if (queryMeta.format === GLBoost.QUERY_FORMAT_REGEXP) {
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_REGEXP) {
         if (object[propertyName].match(query)) {
           return object;
         }
@@ -12740,7 +13399,7 @@ return mat4(
 
     }
 
-    searchElement(query        , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -12763,7 +13422,7 @@ return mat4(
       return null;
     }
 
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
@@ -12781,7 +13440,7 @@ return mat4(
       return null;
     }
 
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
@@ -12835,7 +13494,7 @@ return mat4(
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -12868,7 +13527,7 @@ return mat4(
       }
     }
 
-    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -13028,8 +13687,8 @@ return mat4(
       instance._isRootJointGroup = this._isRootJointGroup;
     }
 
-    set isVisible(flg) {
-      let collectVisibility = function(elem) {
+    set isVisible(flg        ) {
+      let collectVisibility = function(elem        ) {
         elem._isVisible = flg;
         if (elem instanceof M_Group) {
           let children = elem.getChildren();
@@ -13058,6 +13717,20 @@ return mat4(
     }
 
     readyForDiscard() {
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Element) {
+          // Must be M_Element
+          elem.readyForDiscard();
+        } else {
+          console.error('not M_Group nor M_Element');
+        }
+      };
+      collectElements(this);
 
       this.removeAll();
     }
@@ -13066,6 +13739,7 @@ return mat4(
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
+      let selectedMesh = null;
       for (let mesh of meshes) {
         const result = mesh.rayCast(x, y, camera, viewport);
         if (result === null) {
@@ -13075,11 +13749,31 @@ return mat4(
         if (t < currentShortestT) {
           currentShortestT = t;
           currentShortestIntersectedPosVec3 = result[0];
+          selectedMesh = mesh;
         }
       }
 
-      return [currentShortestIntersectedPosVec3, currentShortestT];
+      return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
     }
+
+    _needUpdate() {
+      super._needUpdate();
+
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Mesh) {
+          if (elem._outlineGizmo) {
+            elem._outlineGizmo.updateMatrix(elem);
+          }
+        }
+      };
+      collectElements(this);
+    }
+
   }
 
   let singleton$3 = Symbol();
@@ -13237,7 +13931,8 @@ return mat4(
 
       this._scene = null;
       this._meshes = [];
-      this._gizmos = [];
+      this._preGizmos = [];
+      this._postGizmos = [];
       this._opacityMeshes = [];
       this._transparentMeshes = [];
       this._transparentMeshesAsManualOrder = null;
@@ -13321,8 +14016,12 @@ return mat4(
       return this._transparentMeshes;
     }
 
-    get gizmos() {
-      return this._gizmos;
+    get preGizmos() {
+      return this._preGizmos;
+    }
+
+    get postGizmos() {
+      return this._postGizmos;
     }
 
     specifyRenderTargetTextures(renderTargetTextures) {
@@ -13567,7 +14266,7 @@ return mat4(
               if (!this._newShaderInstance) {
   //              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
   //              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-                let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+                let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
                 this._oldShaderClass = material.shaderClass;
                 this._newShaderInstance = material.shaderInstance;
               }
@@ -13597,7 +14296,7 @@ return mat4(
           if(!shaderInstance) {
   //          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
   //          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-            material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+            material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
             
           }
 
@@ -13664,24 +14363,32 @@ return mat4(
       };
 
       this._meshes = [];
-      this._gizmos = [];
+      this._preGizmos = [];
+      this._postGizmos = [];
       if (this._scene) {
-        let elements = [];
-        Array.prototype.push.apply(this._gizmos, this._scene._gizmos);
-        this._scene.getChildren().forEach((elm)=> {
-
-          // collect gizmos from elements
-          Array.prototype.push.apply(this._gizmos, elm._gizmos);
-
-          // collect meshes
-          this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
-
-          // collect meshes
-          elements = elements.concat(collectElements(elm, M_Element));
-
-
-        });
+        // collect meshes
+        this._meshes = this._meshes.concat(collectElements(this._scene, M_Mesh));
       }
+
+      // collect gizmos
+      let collectGizmos = (elem)=> {
+        if (elem instanceof M_Group) {
+          var children = elem.getChildren();
+          children.forEach((child)=> {
+            collectGizmos(child);
+          });
+        } 
+        if (elem.gizmos) {
+          elem.gizmos.filter((gizmo)=>{
+            if (gizmo.isPreDraw) {
+              this._preGizmos.push(gizmo);
+            } else {
+              this._postGizmos.push(gizmo);
+            }
+          });
+        }
+      };
+      collectGizmos(this._scene);
 
       this._opacityMeshes = [];
       this._transparentMeshes = [];
@@ -13811,6 +14518,8 @@ return mat4(
       this.__isWebVRMode = false;
       this.__webvrFrameData = null;
       this.__webvrDisplay = null;
+      this.__canvasWidthBackup = null;
+      this.__canvasHeightBackup = null;
       this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
       this.__requestedToEnterWebVR = false;
       this.__isReadyForWebVR = false;
@@ -13919,10 +14628,12 @@ return mat4(
           if (this.__webvrDisplay.stageParameters) {
             this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
           } else {
-            this.__webvrFrameData.sittingToStandingTransform = Matrix44$2.translate(this.__defaultUserSittingPositionInVR).flatten();
+            this.__webvrFrameData.sittingToStandingTransform = Matrix44$1.translate(this.__defaultUserSittingPositionInVR).flatten();
           }
         }
 
+        // draw pre gizmos
+        this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
 
         // draw opacity meshes.
         const opacityMeshes = renderPass.opacityMeshes;
@@ -13946,7 +14657,7 @@ return mat4(
         }
         // draw transparent meshes.
         const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
-  //      console.log("START!!");
+
         transparentMeshes.forEach((mesh)=> {
           //console.log(mesh.userFlavorName);
           if (mesh.isVisible) {
@@ -13962,30 +14673,9 @@ return mat4(
             });
           }
         });
-  //      console.log("END!!");
         
-        const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-        this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE;
-        this._glBoostContext.currentGlobalStates = [
-          3042, // gl.BLEND
-        ];
-        let gizmos = renderPass.gizmos;
-        for (let gizmo of gizmos) {
-          if (gizmo.isVisible) {
-            gizmo.mesh.draw({
-              expression: expression,
-              lights: lights,
-              camera: camera,
-              renderPass: renderPass,
-              renderPassIndex: index,
-              viewport: viewport,
-              isWebVRMode: this.isWebVRMode,
-              webvrFrameData: this.__webvrFrameData
-            });
-          }
-        }
-        this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-        this._glBoostContext.restoreGlobalStatesToDefault();
+        // draw post gizmos
+        this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //      glem.drawBuffers(gl, [gl.BACK]);
@@ -13999,6 +14689,37 @@ return mat4(
         renderPass.postRender(camera ? true:false, lights);
 
       });
+    }
+
+    _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
+      const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
+      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+      this._glBoostContext.currentGlobalStates = [
+        3042, // gl.BLEND
+      ];
+      if (isDepthTest) {
+        this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+      }
+
+      for (let gizmo of gizmos) {
+        if (gizmo.isVisible) {
+          gizmo.mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData,
+            forceThisMaterial: gizmo.forceThisMaterial
+          });
+        }
+      }
+
+      this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+      this._glBoostContext.restoreGlobalStatesToDefault();
+
     }
 
     _clearBuffer(gl, renderPass) {
@@ -14072,16 +14793,16 @@ return mat4(
     /**
      * This method treats the given callback function as a render loop and call it every frame.
      */
-    doRenderLoop(renderLoopFunc, ...args) {
-
+    doRenderLoop(renderLoopFunc, time, ...args) {
+      args.splice(0, 0, time);
       renderLoopFunc.apply(renderLoopFunc, args);
 
-      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-        this.doRenderLoop(renderLoopFunc, ...args);
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
+        this.doRenderLoop(renderLoopFunc, _time, args[1]);
         if (this.__requestedToEnterWebVR) {
           this.__isWebVRMode = true;
         }
-      });
+      }, time);
     }
 
     doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
@@ -14118,18 +14839,29 @@ return mat4(
 
 
     // WebVR
-    async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist) {
+    async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
       if (initialUserSittingPositionIfStageParametersDoNotExist) {
         this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
       }
+      this.__minRenderWidthFromUser = minRenderWidth;
+      this.__minRenderHeightFromUser = minRenderHeight;
+
       return new Promise((resolve, reject)=> {
         if (!this.__webvrDisplay.isPresenting) {
+          this.__animationFrameObject = this.__webvrDisplay;
+          const leftEye = this.__webvrDisplay.getEyeParameters("left");
+          const rightEye = this.__webvrDisplay.getEyeParameters("right");
+
+          this.__canvasWidthBackup = this._glContext.canvasWidth;
+          this.__canvasHeightBackup = this._glContext.canvaHeight;
+
+          if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
+            this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+          } else {
+            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+          }
           this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
             //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-            this.__animationFrameObject = this.__webvrDisplay;
-            const leftEye = this.__webvrDisplay.getEyeParameters("left");
-            const rightEye = this.__webvrDisplay.getEyeParameters("right");
-            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
             this.__requestedToEnterWebVR = true;
             resolve();
           }).catch(() => {
@@ -14200,6 +14932,7 @@ return mat4(
       if (this.__webvrDisplay && this.__webvrDisplay.isPresenting) {
         await this.__webvrDisplay.exitPresent();
       }
+      this.resize(this.__canvasWidthBackup, this.__canvasHeightBackup);
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
     }
@@ -14404,17 +15137,20 @@ return mat4(
             callPrepareToRenderMethodOfAllElements(child);
           });
 
-          for (let gizmo of elem._gizmos) {
+          for (let gizmo of elem.gizmos) {
             gizmo.mesh.prepareToRender(expression, existCamera_f, []);
           }
         } else if (elem instanceof M_Mesh) {
           elem.prepareToRender(expression, existCamera_f, this._lights);
-          for (let gizmo of elem._gizmos) {
+          for (let gizmo of elem.gizmos) {
             gizmo.mesh.prepareToRender(expression, existCamera_f, this._lights);
+            if (gizmo.forceThisMaterial) {
+              gizmo.forceThisMaterial.shaderInstance = gizmo.mesh.geometry.prepareGLSLProgram(expression, gizmo.forceThisMaterial, existCamera_f, this._lights, null);
+            }
           }
         } else if (elem instanceof M_Element) {
           elem.prepareToRender();
-          for (let gizmo of elem._gizmos) {
+          for (let gizmo of elem.gizmos) {
             gizmo.mesh.prepareToRender(expression, existCamera_f, []);
           }
         } else {
@@ -14506,12 +15242,29 @@ return mat4(
       super(glBoostContext, null, null);
 
       this._mesh = null;
+
+      // Whether or not to draw this gizmo before normal meshes drawing.
+      // If true, draw this gizmo before normal meshes drawing.
+      // If false, draw this gizmo after normal meshes drawing.
+      this._isPreDraw = false;
+      this._forceThisMaterial = null;
     }
 
     get mesh() {
       return this._mesh;
     }
 
+    set isPreDraw(flg) {
+      this._isPreDraw = flg;
+    }
+
+    get isPreDraw() {
+      return this._isPreDraw;
+    }
+
+    get forceThisMaterial() {
+      return this._forceThisMaterial;
+    }
   }
 
   class JointPrimitive extends Geometry {
@@ -14696,7 +15449,7 @@ return mat4(
 
     // Use master element's worldMatrix.
     get worldMatrixInner() {
-      return Matrix44$2.identity();
+      return Matrix44$1.identity();
     }
 
     set worldPositionOfThisJoint(vec3) {
@@ -14758,10 +15511,10 @@ return mat4(
       this.length = new Vector3(length, length, length);
 
       this._isCalculatedJointGizmo = false;
-      this._jointPoseMatrix = Matrix44$2.identity();
+      this._jointPoseMatrix = Matrix44$1.identity();
       this._length = 1;
 
-      this._inverseBindMatrix = Matrix44$2.identity();
+      this._inverseBindMatrix = Matrix44$1.identity();
 
       this._skeletalMesh = null;
 
@@ -14872,7 +15625,7 @@ return mat4(
       this._rootJointName = rootJointName;
       this._jointsHierarchy = null;
       this._inverseBindMatrices = [];
-      this._bindShapeMatrix = Matrix44$2.identity();
+      this._bindShapeMatrix = Matrix44$1.identity();
       this._jointNames = []; // for glTF1.0
       this._gltfJointIndices = []; // for glTF2.0
       this._joints = [];
@@ -14900,9 +15653,9 @@ return mat4(
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -14916,9 +15669,9 @@ return mat4(
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -15120,7 +15873,7 @@ return mat4(
       let jointZeroWorldMatrix = null;
       let skeletalMeshWorldMatrix = null;
       let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getWorldMatrixAt(input);
-      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$2.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
+      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$1.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
 
       for (let i=joints.length-1; i>=0; i--) {
         let globalJointTransform = null;
@@ -15132,21 +15885,21 @@ return mat4(
           globalJointTransform = skeletalMeshTransformMatrixAccmulatedAncestry;
           skeletalMeshWorldMatrix = globalJointTransform;
           let bindMat = joints[i].bindMatrix;
-          globalJointTransform = Matrix44$2.multiply(skeletalMeshWorldMatrix, bindMat);
+          globalJointTransform = Matrix44$1.multiply(skeletalMeshWorldMatrix, bindMat);
         }
         if (i === 0) {
           jointZeroWorldMatrix = globalJointTransform;
         }
   //      if (true) {
-        if (this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
+        if (this._materialForSkeletals[0].shaderInstance && this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
           matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
         } else {
-          matrices[i] = Matrix44$2.identity();
+          matrices[i] = Matrix44$1.identity();
         }
-        matrices[i] = Matrix44$2.multiply(matrices[i], globalJointTransform);
-        joints[i].jointPoseMatrix = Matrix44$2.multiply(Matrix44$2.identity(), globalJointTransform);
-        matrices[i] = Matrix44$2.multiply(matrices[i], inverseBindMatrix);
-        matrices[i] = Matrix44$2.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], globalJointTransform);
+        joints[i].jointPoseMatrix = Matrix44$1.multiply(Matrix44$1.identity(), globalJointTransform);
+        matrices[i] = Matrix44$1.multiply(matrices[i], inverseBindMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
       }
 
       GLBoost$1.JointGizmoUpdater.update(joints, jointZeroWorldMatrix);
@@ -15462,6 +16215,8 @@ return mat4(
 
   }
 
+  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
+
   class M_FrustumCamera extends M_AbstractCamera {
     constructor(glBoostContext, toRegister, lookat, perspective) {
       super(glBoostContext, toRegister);
@@ -15710,7 +16465,7 @@ return mat4(
       super(glBoostContext);
 
       this._intensity = intensity;
-      this._direction = new Vector3(0.0, 0.0, 1.0);
+      this._direction = new Vector3(0.0, 1.0, 0.0);
   //    this._direction = direction;
 
       this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
@@ -15797,7 +16552,7 @@ return mat4(
       let xDir = Vector3.cross(yDir, _zDir);
       let zDir = Vector3.cross(xDir, yDir);
       
-      let result = Matrix44$2.identity();
+      let result = Matrix44$1.identity();
 
       result.m00 = xDir.x;
       result.m10 = xDir.y;
@@ -15841,7 +16596,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
       return direction;
     }
 
@@ -15891,7 +16646,7 @@ return mat4(
       this._intensity = intensity;
       
       this._isLightType = 'spot';
-      this._direction = new Vector3(0.0, 0.0, 1.0);
+      this._direction = new Vector3(0.0, 1.0, 0.0);
 
       this.rotate = rotate;
 
@@ -16001,7 +16756,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
       return direction;
     }
 
@@ -16027,6 +16782,8 @@ return mat4(
     }
 
   }
+
+  GLBoost$1['M_SpotLight'] = M_SpotLight;
 
   class M_AxisGizmo extends M_Gizmo {
     constructor(glBoostContext, length) {
@@ -16103,6 +16860,43 @@ return mat4(
       this._material = new ClassicMaterial$1(glBoostContext);
       this._material.baseColor = colorVec;
       this.addChild(new M_Mesh(glBoostContext, new Grid(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec), this._material));
+    }
+  }
+
+  class M_OutlineGizmo extends M_Gizmo {
+    constructor(glBoostContext, mesh, scale = 0.05) {
+      super(glBoostContext, null, null);
+
+      this._init(glBoostContext, mesh, scale);
+    }
+
+    _init(glBoostContext, mesh, scale) {
+
+      this._mesh = mesh.clone();
+      this.isPreDraw = true;
+      this._material = new ClassicMaterial$1(glBoostContext);
+      this._material.baseColor = new Vector4(0, 1, 0, 1);
+
+      
+      this._material.states.enable = [2884]; // gl.CULL_FACE
+      this._material.states.functions.cullFace = [1028]; // gl.front
+      this._material.states.functions.depthMask = [true]; // Write depth value
+      this._material.userFlavorName = "OutlineGizmoMaterial";
+
+      this._forceThisMaterial = this._material;
+
+      //this._mesh.material = this._material;
+      this._group = this._glBoostContext.createGroup();
+      this.updateMatrix(mesh);
+      this._group.addChild(this._mesh);
+      this.addChild(this._group);
+
+      const centerPoint = mesh.AABBInWorld.updateAllInfo().centerPoint;
+
+    }
+
+    updateMatrix(mesh) {
+      this._group.matrix = mesh.worldMatrix;
     }
   }
 
@@ -16440,6 +17234,11 @@ return mat4(
     createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
       return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
     }
+
+    createOutlineGizmo(mesh) {
+      return new M_OutlineGizmo(this, mesh);
+    }
+
 
     createHeightLineGizmo(startPos, endPos) {
       return new M_HeightLineGizmo(this, startPos, endPos);
@@ -17734,6 +18533,8 @@ return mat4(
 
       }
 
+      rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
       resolve(rootGroup);
     }
 
@@ -17748,7 +18549,7 @@ return mat4(
         element.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
       }
       if (nodeJson.matrix) {
-        element.matrix = new Matrix44$2(nodeJson.matrix, true);
+        element.matrix = new Matrix44$1(nodeJson.matrix, true);
       }
     }
 
@@ -17841,6 +18642,9 @@ return mat4(
               const color = lightJson.spot.color;
               light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
               light.rotate = new Vector3(0, 0, 0);
+              if (lightJson.spot.falloffAngle) {
+                light.spotCutoffInDegree = lightJson.spot.falloffAngle * 180 / Math.PI;
+              }
               this._setTransform(group, nodeJson);
               group.addChild(light);
             }
@@ -17867,7 +18671,7 @@ return mat4(
         mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
         let skin = json.skins[skinStr];
 
-        mesh.bindShapeMatrix = new Matrix44$2(skin.bindShapeMatrix, true);
+        mesh.bindShapeMatrix = new Matrix44$1(skin.bindShapeMatrix, true);
         mesh.jointNames = skin.jointNames;
 
         let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
@@ -17894,7 +18698,8 @@ return mat4(
       let additional = {
         'joint': [],
         'weight': [],
-        'texcoord': []
+        'texcoord': [],
+        'color': []
       };
 
       let dataViewMethodDic = {};
@@ -17935,6 +18740,16 @@ return mat4(
           vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json);
           vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json);
           dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json);
+        }
+
+        let colorsAccessorStr = primitiveJson.attributes.COLOR;
+        if (colorsAccessorStr) {
+          let colors = this._accessBinary(colorsAccessorStr, json, buffers, false, true);
+          additional['color'][i] = colors;
+          vertexData.components.color = this._checkComponentNumber(colorsAccessorStr, json);
+          vertexData.componentBytes.color = this._checkBytesPerComponent(colorsAccessorStr, json);
+          vertexData.componentType.color = this._getDataType(normalsAccessocolorsAccessorStrrStr, json);
+          dataViewMethodDic.color = this._checkDataViewMethod(colorsAccessorStr, json);
         }
 
         /// if Skeletal
@@ -18030,12 +18845,15 @@ return mat4(
       }
 
       if (meshJson.primitives.length > 1) {
-        let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+        let lengthDic = {index: 0, position: 0, normal: 0, color: 0, joint: 0, weight: 0, texcoord: 0};
         for (let i = 0; i < meshJson.primitives.length; i++) {
           //lengthDic.index += _indicesArray[i].length;
           lengthDic.position += _positions[i].length;
           if (_normals[i]) {
             lengthDic.normal += _normals[i].length;
+          }
+          if (typeof additional['color'][i] !== 'undefined') {
+            lengthDic.color += additional['color'][i].length;
           }
           if (typeof additional['joint'][i] !== 'undefined') {
             lengthDic.joint += additional['joint'][i].length;
@@ -18080,6 +18898,8 @@ return mat4(
               array = _positions[i];
             } else if (attribName === 'normal') {
               array = _normals[i];
+            } else if (attribName === 'color') {
+              array = additional['color'][i];
             } else if (attribName === 'joint') {
               array = additional['joint'][i];
             } else if (attribName === 'weight') {
@@ -18098,6 +18918,8 @@ return mat4(
             vertexData.position = newTypedArray;
           } else if (attribName === 'normal') {
             vertexData.normal = newTypedArray;
+          } else if (attribName === 'color') {
+            additional['color'] = newTypedArray;
           } else if (attribName === 'joint') {
             additional['joint'] = newTypedArray;
           } else if (attribName === 'weight') {
@@ -18111,6 +18933,7 @@ return mat4(
       } else {
         vertexData.position = _positions[0];
         vertexData.normal = _normals[0];
+        additional['color'] = additional['color'][0];
         additional['joint'] = additional['joint'][0];
         additional['weight'] = additional['weight'][0];
         additional['texcoord'] = additional['texcoord'][0];
@@ -18118,6 +18941,9 @@ return mat4(
 
       if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
         delete vertexData.normal;
+      }
+      if (typeof additional['color'] === 'undefined' || additional['color'].length === 0) {
+        delete additional['color'];
       }
       if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
         delete additional['joint'];
@@ -18795,7 +19621,7 @@ return mat4(
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -19547,8 +20373,10 @@ return mat4(
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
       }
+
+      rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
 
       return rootGroup;
     }
@@ -19568,7 +20396,7 @@ return mat4(
           group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
         }
         if (nodeJson.matrix) {
-          group.matrix = new Matrix44$2(nodeJson.matrix, true);
+          group.matrix = new Matrix44$1(nodeJson.matrix, true);
         }
       }
     }
@@ -19788,7 +20616,7 @@ return mat4(
         }
 
         if (mesh.primitives.length > 1) {
-          let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+          let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0, color: 0};
           for (let i = 0; i < mesh.primitives.length; i++) {
             //lengthDic.index += _indicesArray[i].length;
             lengthDic.position += _positions[i].length;
@@ -20249,7 +21077,7 @@ return mat4(
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+componentBytes*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -20984,4 +21812,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-36-g02e83-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-90-g5c29-mod branch: develop';

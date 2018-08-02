@@ -1,6 +1,6 @@
 /* @flow */
 
-import type GLBoost from '../../globals';
+import GLBoost from '../../globals';
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
@@ -22,7 +22,6 @@ export default class M_Group extends M_Element {
 //    this._aabbGizmo = null;
 //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
 //    this._gizmos.push(this._aabbGizmo);
-
   }
 
   /**
@@ -415,8 +414,8 @@ export default class M_Group extends M_Element {
     instance._isRootJointGroup = this._isRootJointGroup;
   }
 
-  set isVisible(flg) {
-    let collectVisibility = function(elem) {
+  set isVisible(flg:boolean) {
+    let collectVisibility = function(elem:M_Group) {
       elem._isVisible = flg;
       if (elem instanceof M_Group) {
         let children = elem.getChildren();
@@ -445,7 +444,7 @@ export default class M_Group extends M_Element {
   }
 
   readyForDiscard() {
-    let collectElements = function(elem, elementsType) {
+    let collectElements = function(elem) {
       if (elem instanceof M_Group) {
         const children = elem.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -458,6 +457,7 @@ export default class M_Group extends M_Element {
         console.error('not M_Group nor M_Element');
       }
     };
+    collectElements(this);
 
     this.removeAll();
   }
@@ -466,6 +466,7 @@ export default class M_Group extends M_Element {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
+    let selectedMesh = null;
     for (let mesh of meshes) {
       const result = mesh.rayCast(x, y, camera, viewport);
       if (result === null) {
@@ -475,9 +476,29 @@ export default class M_Group extends M_Element {
       if (t < currentShortestT) {
         currentShortestT = t;
         currentShortestIntersectedPosVec3 = result[0];
+        selectedMesh = mesh;
       }
     }
 
-    return [currentShortestIntersectedPosVec3, currentShortestT];
+    return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
   }
+
+  _needUpdate() {
+    super._needUpdate();
+
+    let collectElements = function(elem) {
+      if (elem instanceof M_Group) {
+        const children = elem.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          collectElements(children[i]);
+        }
+      } else if (elem instanceof M_Mesh) {
+        if (elem._outlineGizmo) {
+          elem._outlineGizmo.updateMatrix(elem);
+        }
+      }
+    };
+    collectElements(this);
+  }
+
 }

@@ -2,6 +2,7 @@ import GLBoost from '../../globals';
 import Vector2 from './Vector2';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
+import Matrix33 from './Matrix33';
 import Matrix44 from './Matrix44';
 import Quaternion from './Quaternion';
 
@@ -27,6 +28,34 @@ export default class MathUtil {
         return new Vector3(element[0], element[1], element[2]);
       } else {
         return new Vector2(element[0], element[1]);
+      }
+    } else {
+      return element;
+    }
+  }
+
+  static arrayToVectorOrMatrix(element) {
+    if (Array.isArray(element)) {
+      if(typeof(element[15]) !== 'undefined') {
+        return new Matrix44(element);
+      } else if(typeof(element[8]) !== 'undefined') {
+        return new Matrix33(element);
+      } else if(typeof(element[3]) !== 'undefined') {
+        return new Vector4(element[0], element[1], element[2], element[3]);
+      } else if (typeof(element[2]) !== 'undefined') {
+        return new Vector3(element[0], element[1], element[2]);
+      } else {
+        return new Vector2(element[0], element[1]);
+      }
+    } else {
+      return element;
+    }
+  }
+
+  static arrayToQuaternion(element) {
+    if (Array.isArray(element)) {
+      if(typeof(element[3]) !== 'undefined') {
+        return new Quaternion(element[0], element[1], element[2], element[3]);
       }
     } else {
       return element;

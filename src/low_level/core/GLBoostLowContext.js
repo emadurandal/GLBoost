@@ -47,6 +47,7 @@ export default class GLBoostLowContext {
     this._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
 
     this._defaultMaterial = this.createClassicMaterial();
+    this._defaultMaterial.userFlavorName = 'GLBoostSystemDefaultMaterial';
 
     // effekseer
     if (typeof effekseer !== "undefined") {
@@ -296,11 +297,30 @@ export default class GLBoostLowContext {
   }
 
   get currentGlobalStates() {
-    return this._currentGlobalStates.concat();
+    return this._currentGlobalStates;
   }
 
   restoreGlobalStatesToDefault() {
     this._currentGlobalStates = this._defaultGlobalStates.concat();
+  }
+
+  get glBoostMonitor() {
+    return this._glBoostMonitor;
+  }
+
+  setPropertiesFromJson(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    if (!json.targetInstanceName) {
+      console.warn(`Faild! This json doesn't include targetInstanceName field!`);
+      return;
+    }
+    const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+    object.setPropertiesFromJson(json);
+
+    return object;
   }
 
 }

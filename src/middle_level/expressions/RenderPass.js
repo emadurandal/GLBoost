@@ -11,7 +11,8 @@ export default class RenderPass extends GLBoostObject {
 
     this._scene = null;
     this._meshes = [];
-    this._gizmos = [];
+    this._preGizmos = [];
+    this._postGizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._transparentMeshesAsManualOrder = null;
@@ -95,8 +96,12 @@ export default class RenderPass extends GLBoostObject {
     return this._transparentMeshes;
   }
 
-  get gizmos() {
-    return this._gizmos;
+  get preGizmos() {
+    return this._preGizmos;
+  }
+
+  get postGizmos() {
+    return this._postGizmos;
   }
 
   specifyRenderTargetTextures(renderTargetTextures) {
@@ -341,7 +346,7 @@ export default class RenderPass extends GLBoostObject {
             if (!this._newShaderInstance) {
 //              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
 //              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-              let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+              let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
               this._oldShaderClass = material.shaderClass;
               this._newShaderInstance = material.shaderInstance;
             }
@@ -371,7 +376,7 @@ export default class RenderPass extends GLBoostObject {
         if(!shaderInstance) {
 //          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
 //          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-          material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, 0, existCamera_f, lights, false, dic.shaderClass);
+          material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
           
         }
 
@@ -438,24 +443,32 @@ export default class RenderPass extends GLBoostObject {
     };
 
     this._meshes = [];
-    this._gizmos = [];
+    this._preGizmos = [];
+    this._postGizmos = [];
     if (this._scene) {
-      let elements = [];
-      Array.prototype.push.apply(this._gizmos, this._scene._gizmos);
-      this._scene.getChildren().forEach((elm)=> {
-
-        // collect gizmos from elements
-        Array.prototype.push.apply(this._gizmos, elm._gizmos);
-
-        // collect meshes
-        this._meshes = this._meshes.concat(collectElements(elm, M_Mesh));
-
-        // collect meshes
-        elements = elements.concat(collectElements(elm, M_Element));
-
-
-      });
+      // collect meshes
+      this._meshes = this._meshes.concat(collectElements(this._scene, M_Mesh));
     }
+
+    // collect gizmos
+    let collectGizmos = (elem)=> {
+      if (elem instanceof M_Group) {
+        var children = elem.getChildren();
+        children.forEach((child)=> {
+          collectGizmos(child);
+        });
+      } 
+      if (elem.gizmos) {
+        elem.gizmos.filter((gizmo)=>{
+          if (gizmo.isPreDraw) {
+            this._preGizmos.push(gizmo);
+          } else {
+            this._postGizmos.push(gizmo);
+          }
+        });
+      }
+    };
+    collectGizmos(this._scene);
 
     this._opacityMeshes = [];
     this._transparentMeshes = [];

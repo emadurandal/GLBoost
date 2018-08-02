@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_AbstractLight from './M_AbstractLight';
 import MathUtil from '../../../low_level/math/MathUtil';
 import Vector3 from '../../../low_level/math/Vector3';
@@ -21,7 +22,7 @@ export default class M_SpotLight extends M_AbstractLight {
     this._intensity = intensity;
     
     this._isLightType = 'spot';
-    this._direction = new Vector3(0.0, 0.0, 1.0);
+    this._direction = new Vector3(0.0, 1.0, 0.0);
 
     this.rotate = rotate;
 
@@ -131,7 +132,7 @@ export default class M_SpotLight extends M_AbstractLight {
   }
 
   get directionInWorld() {
-    let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+    let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
     return direction;
   }
 
@@ -157,3 +158,5 @@ export default class M_SpotLight extends M_AbstractLight {
   }
 
 }
+
+GLBoost['M_SpotLight'] = M_SpotLight;

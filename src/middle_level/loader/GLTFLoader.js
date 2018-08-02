@@ -421,6 +421,8 @@ export default class GLTFLoader {
 
     }
 
+    rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
     resolve(rootGroup);
   }
 
@@ -528,6 +530,9 @@ export default class GLTFLoader {
             const color = lightJson.spot.color;
             light = glBoostContext.createSpotLight(new Vector3(color[0], color[1], color[2]));
             light.rotate = new Vector3(0, 0, 0);
+            if (lightJson.spot.falloffAngle) {
+              light.spotCutoffInDegree = lightJson.spot.falloffAngle * 180 / Math.PI;
+            }
             this._setTransform(group, nodeJson);
             group.addChild(light);
           }
@@ -581,7 +586,8 @@ export default class GLTFLoader {
     let additional = {
       'joint': [],
       'weight': [],
-      'texcoord': []
+      'texcoord': [],
+      'color': []
     };
 
     let dataViewMethodDic = {};
@@ -622,6 +628,16 @@ export default class GLTFLoader {
         vertexData.componentBytes.normal = this._checkBytesPerComponent(normalsAccessorStr, json);
         vertexData.componentType.normal = this._getDataType(normalsAccessorStr, json);
         dataViewMethodDic.normal = this._checkDataViewMethod(normalsAccessorStr, json);
+      }
+
+      let colorsAccessorStr = primitiveJson.attributes.COLOR;
+      if (colorsAccessorStr) {
+        let colors = this._accessBinary(colorsAccessorStr, json, buffers, false, true);
+        additional['color'][i] = colors;
+        vertexData.components.color = this._checkComponentNumber(colorsAccessorStr, json);
+        vertexData.componentBytes.color = this._checkBytesPerComponent(colorsAccessorStr, json);
+        vertexData.componentType.color = this._getDataType(normalsAccessocolorsAccessorStrrStr, json);
+        dataViewMethodDic.color = this._checkDataViewMethod(colorsAccessorStr, json);
       }
 
       /// if Skeletal
@@ -717,12 +733,15 @@ export default class GLTFLoader {
     }
 
     if (meshJson.primitives.length > 1) {
-      let lengthDic = {index: 0, position: 0, normal: 0, joint: 0, weight: 0, texcoord: 0};
+      let lengthDic = {index: 0, position: 0, normal: 0, color: 0, joint: 0, weight: 0, texcoord: 0};
       for (let i = 0; i < meshJson.primitives.length; i++) {
         //lengthDic.index += _indicesArray[i].length;
         lengthDic.position += _positions[i].length;
         if (_normals[i]) {
           lengthDic.normal += _normals[i].length;
+        }
+        if (typeof additional['color'][i] !== 'undefined') {
+          lengthDic.color += additional['color'][i].length;
         }
         if (typeof additional['joint'][i] !== 'undefined') {
           lengthDic.joint += additional['joint'][i].length;
@@ -767,6 +786,8 @@ export default class GLTFLoader {
             array = _positions[i];
           } else if (attribName === 'normal') {
             array = _normals[i];
+          } else if (attribName === 'color') {
+            array = additional['color'][i];
           } else if (attribName === 'joint') {
             array = additional['joint'][i];
           } else if (attribName === 'weight') {
@@ -785,6 +806,8 @@ export default class GLTFLoader {
           vertexData.position = newTypedArray;
         } else if (attribName === 'normal') {
           vertexData.normal = newTypedArray;
+        } else if (attribName === 'color') {
+          additional['color'] = newTypedArray;
         } else if (attribName === 'joint') {
           additional['joint'] = newTypedArray;
         } else if (attribName === 'weight') {
@@ -798,6 +821,7 @@ export default class GLTFLoader {
     } else {
       vertexData.position = _positions[0];
       vertexData.normal = _normals[0];
+      additional['color'] = additional['color'][0];
       additional['joint'] = additional['joint'][0];
       additional['weight'] = additional['weight'][0];
       additional['texcoord'] = additional['texcoord'][0];
@@ -805,6 +829,9 @@ export default class GLTFLoader {
 
     if (typeof vertexData.normal === 'undefined' || vertexData.normal.length === 0) {
       delete vertexData.normal;
+    }
+    if (typeof additional['color'] === 'undefined' || additional['color'].length === 0) {
+      delete additional['color'];
     }
     if (typeof additional['joint'] === 'undefined' || additional['joint'].length === 0) {
       delete additional['joint'];

@@ -55,7 +55,8 @@ export default class AABB {
 
   updateAllInfo() {
     this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-    this._lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+    const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+    this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
     return this;
   }
@@ -122,6 +123,18 @@ export default class AABB {
 
   get lengthCenterToCorner() {
     return this._lengthCenterToCorner;
+  }
+
+  get sizeX() {
+    return (this._AABB_max.x - this._AABB_min.x);
+  }
+
+  get sizeY() {
+    return (this._AABB_max.y - this._AABB_min.y);
+  }
+
+  get sizeZ() {
+    return (this._AABB_max.z - this._AABB_min.z);
   }
 
   static multiplyMatrix(matrix, aabb) {

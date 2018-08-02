@@ -21,7 +21,7 @@ export default class M_DirectionalLight extends M_AbstractLight {
     super(glBoostContext);
 
     this._intensity = intensity;
-    this._direction = new Vector3(0.0, 0.0, 1.0);
+    this._direction = new Vector3(0.0, 1.0, 0.0);
 //    this._direction = direction;
 
     this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
@@ -152,7 +152,7 @@ export default class M_DirectionalLight extends M_AbstractLight {
   }
 
   get directionInWorld() {
-    let direction = this.worldMatrixWithoutMySelf.multiplyVector(this.direction.toVector4()).toVector3();
+    let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
     return direction;
   }
 

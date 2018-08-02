@@ -61,8 +61,17 @@ export default class L_CameraController extends GLBoostObject {
 
     this._onMouseDown = (evt) => {
       let rect = evt.target.getBoundingClientRect();
-      this._clickedMouseXOnCanvas = evt.clientX - rect.left;
-      this._clickedMouseYOnCanvas = evt.clientY - rect.top;
+      let clientX = null;
+      let clientY = null;
+      if (evt.clientX) {
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      } else {
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+      }
+      this._clickedMouseXOnCanvas = clientX - rect.left;
+      this._clickedMouseYOnCanvas = clientY - rect.top;
       this._movedMouseYOnCanvas = -1;
       this._movedMouseXOnCanvas = -1;
       this._rot_bgn_x = this._rot_x;
@@ -84,13 +93,23 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseMove = (evt) => {
+      evt.preventDefault();
       if (this._isKeyUp) {
         return;
       }
 
       let rect = evt.target.getBoundingClientRect();
-      this._movedMouseXOnCanvas = evt.clientX - rect.left;
-      this._movedMouseYOnCanvas = evt.clientY - rect.top;
+      let clientX = null;
+      let clientY = null;
+      if (evt.clientX) {
+        clientX = evt.clientX;
+        clientY = evt.clientY;
+      } else {
+        clientX = evt.touches[0].clientX;
+        clientY = evt.touches[0].clientY;
+      }
+      this._movedMouseXOnCanvas = clientX - rect.left;
+      this._movedMouseYOnCanvas = clientY - rect.top;
 
       if (typeof evt.buttons !== 'undefined') {
         let data = evt.buttons;
@@ -286,6 +305,26 @@ export default class L_CameraController extends GLBoostObject {
       newCenterVec.add(this._mouseTranslateVec);
     }
 
+
+    let newLeft = camera.left;
+    let newRight = camera.right;
+    let newTop = camera.top;
+    let newBottom = camera.bottom;
+    let ratio = 1;
+    if (typeof newLeft !== 'undefined') {
+      if (typeof this._lengthCenterToCorner !== 'undefined') {
+        ratio = camera.zNear / this._lengthCameraToObject;
+        if (ratio < 1.0) {
+          ratio = 1;
+        }
+      }
+      let scale = this._wheel_y / ratio;
+      newLeft *= scale;
+      newRight *= scale;
+      newTop *= scale;
+      newBottom *= scale;
+    }
+
     let newZNear = camera.zNear;
     let newZFar = camera.zFar;
     if (this._target) {
@@ -295,7 +334,7 @@ export default class L_CameraController extends GLBoostObject {
 
     this._foyvBias = Math.tan(MathUtil.degreeToRadian(fovy/2.0));
 
-    return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar];
+    return [newEyeVec, newCenterVec, newUpVec, newZNear, newZFar, newLeft, newRight, newTop, newBottom];
   }
 
   _getTargetAABB() {
@@ -316,14 +355,14 @@ export default class L_CameraController extends GLBoostObject {
     let targetAABB = this._getTargetAABB();
 
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
-    let lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+    this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
     let newCenterVec = targetAABB.centerPoint;
 
     let centerToCameraVec = Vector3.subtract(eyeVec, centerVec);
     let centerToCameraVecNormalized = Vector3.normalize(centerToCameraVec);
 
-    let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, lengthCameraToObject).add(newCenterVec);
+    let newEyeVec = Vector3.multiply(centerToCameraVecNormalized, this._lengthCameraToObject).add(newCenterVec);
 
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
@@ -406,7 +445,7 @@ export default class L_CameraController extends GLBoostObject {
   resetDolly() {
     this.dolly = 1;
 
-    this._updateCameras();
+    this.updateCamera();
   }
 
   set dolly(value) {

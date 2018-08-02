@@ -22,25 +22,34 @@ export default class L_GLBoostMonitor {
   }
 
   registerGLBoostObject(glBoostObject) {
-    this._glBoostObjects[glBoostObject.toString()] = glBoostObject;
+    this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
   }
 
   deregisterGLBoostObject(glBoostObject) {
-    delete this._glBoostObjects[glBoostObject.toString()];
+    delete this._glBoostObjects[glBoostObject.instanceName];
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
   }
 
 
-  getGLBoostObjects(partOfGlBoostObjectClassName) {
+  getGLBoostObjects(partOfGlBoostObjectInstanceName) {
     let glBoostObjects = [];
     for (let instanceName in this._glBoostObjects) {
-      if (instanceName.indexOf(partOfGlBoostObjectClassName)>0) {
+      if (instanceName.indexOf(partOfGlBoostObjectInstanceName)>0) {
         glBoostObjects.push(this._glBoostObjects[instanceName]);
       }
     }
 
     return glBoostObjects;
+  }
+
+  getGLBoostObject(glBoostObjectInstanceName) {
+    for (let instanceName in this._glBoostObjects) {
+      if (instanceName === glBoostObjectInstanceName) {
+        return this._glBoostObjects[instanceName];
+      }
+    }
+    return null;
   }
 
   getGLBoostObjectWhichHasThisObjectId(objectId) {

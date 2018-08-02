@@ -16,6 +16,7 @@ export default class M_Mesh extends M_Element {
       this.material = material;
     }
     this._transformedDepth = 0;
+    this._outlineGizmo = null;
   }
 
   prepareToRender(expression, existCamera_f, lights) {
@@ -42,7 +43,8 @@ export default class M_Mesh extends M_Element {
         mesh: this,
         viewport: data.viewport,
         isWebVRMode: data.isWebVRMode,
-        webvrFrameData: data.webvrFrameData
+        webvrFrameData: data.webvrFrameData,
+        forceThisMaterial: data.forceThisMaterial,
       }
     );
   }
@@ -266,6 +268,42 @@ export default class M_Mesh extends M_Element {
     return [intersectPositionInWorld, result[1]];
   }
 
+  get gizmos() {
+    if (this.isOutlineVisible) {
+      return this._gizmos.concat([this._outlineGizmo]);
+    } else {
+      return this._gizmos;
+    }
+  }
+
+  set isOutlineVisible(flg) {
+    if (flg && this._outlineGizmo === null) {
+      this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+    }
+
+    if (this._outlineGizmo) {
+      this._outlineGizmo.isVisible = flg;
+    }
+  }
+
+  get isOutlineVisible() {
+    if (this._outlineGizmo === null) {
+      return false;
+    }
+    return this._outlineGizmo.isVisible;
+  }
+
+  set isVisible(flg) {
+    super.isVisible = flg;
+    if (this._outlineGizmo) {
+      this._outlineGizmo.isVisible = flg;
+    }
+  }
+
+  get isVisible() {
+    return super.isVisible;
+  }
+
   clone() {
     let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
     this._copy(instance);
@@ -276,6 +314,10 @@ export default class M_Mesh extends M_Element {
   _copy(instance) {
     super._copy(instance);
     instance._transformedDepth = this._transformedDepth;
+  }
+
+  _needUpdate() {
+    super._needUpdate();
   }
 }
 M_Mesh._geometries = {};
