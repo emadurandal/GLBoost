@@ -1,7 +1,7 @@
 import M_Gizmo from './M_Gizmo';
+import Vector3 from '../../../low_level/math/Vector3';
 import Line from '../../../low_level/primitives/Line';
 import M_Mesh from '../meshes/M_Mesh';
-import ClassicMaterial from '../../../low_level/materials/ClassicMaterial';
 
 export default class M_HeightLineGizmo extends M_Gizmo {
   constructor(glBoostContext) {
@@ -12,7 +12,7 @@ export default class M_HeightLineGizmo extends M_Gizmo {
   }
 
   _init(glBoostContext) {
-    this._primitive = new Line(glBoostContext);
+    this._primitive = new Line(glBoostContext, Vector3.zero(), Vector3.zero(), true);
 
     //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
     const material = glBoostContext.createClassicMaterial();
