@@ -15644,7 +15644,9 @@ return mat4(
     }
 
     updateGizmoDisplay() {
-      this._gizmo.update();
+      if (this._gizmo instanceof M_JointGizmo) {
+        this._gizmo.update();
+      }
     }
 
     clone() {
@@ -16943,18 +16945,18 @@ return mat4(
   }
 
   class Line extends Geometry {
-    constructor(glBoostContext, startPos = Vector3.zero(), endPos = Vector3.zero(), terminalMark=false) {
+    constructor(glBoostContext, startPos = Vector3.zero(), endPos = Vector3.zero()) {
       super(glBoostContext);
 
       this.__startPos = startPos;
       this.__endPos = endPos;
 
       this._color = new GLBoost$1.Vector4(1, 1, 1, 1);
-      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, terminalMark);
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
       this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
     }
 
-    _setupVertexData(startPos, endPos, terminalMark) {
+    _setupVertexData(startPos, endPos) {
 
       let positions = [];
 
@@ -16965,12 +16967,6 @@ return mat4(
 
       colors.push(this._color);
       colors.push(this._color);
-
-      if (terminalMark) {
-        const length = startPos.lengthTo(endPos);
-  //      positions.push(startPos);
-  //      positions.push(endPos);  
-      }
 
       this._vertexData = {
         position: positions,
@@ -21860,4 +21856,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-92-gce05-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-94-gb402-mod branch: develop';
