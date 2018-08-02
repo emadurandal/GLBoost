@@ -12846,6 +12846,7 @@ return mat4(
       }
       this._transformedDepth = 0;
       this._outlineGizmo = null;
+      this._isPickable = true;
     }
 
     prepareToRender(expression, existCamera_f, lights) {
@@ -13147,6 +13148,14 @@ return mat4(
 
     _needUpdate() {
       super._needUpdate();
+    }
+
+    set isPickable(flag) {
+      this._isPickable = flag;
+    }
+
+    get isPickable() {
+      return this._isPickable;
     }
   }
   M_Mesh._geometries = {};
@@ -13788,6 +13797,9 @@ return mat4(
       let currentShortestIntersectedPosVec3 = null;
       let selectedMesh = null;
       for (let mesh of meshes) {
+        if (!mesh.isPickable) {
+          continue;
+        }
         const result = mesh.rayCast(x, y, camera, viewport);
         if (result === null) {
           return [null, null];
@@ -16956,6 +16968,8 @@ return mat4(
       this.__startPos = startPos;
       this.__endPos = endPos;
 
+      this.__haveTerminalMark = haveTerminalMark;
+
       this._color = new GLBoost$1.Vector4(1, 1, 1, 1);
       this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, haveTerminalMark);
       this.setVerticesData(this._vertexData, null, GLBoost$1.LINES);
@@ -17008,7 +17022,7 @@ return mat4(
     }
 
     update() {
-      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+      this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, this.__haveTerminalMark);
       this.updateVerticesData(this._vertexData, true);
     }
 
@@ -17059,6 +17073,7 @@ return mat4(
       //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
       const material = glBoostContext.createClassicMaterial();
       this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
+      this._mesh.isPickable = false;
       this._mesh.masterElement = this;
       this.addChild(this._mesh);
 
@@ -21887,4 +21902,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-97-g52e48-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-98-g1c09-mod branch: develop';

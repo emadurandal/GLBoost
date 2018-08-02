@@ -9,6 +9,8 @@ export default class Line extends Geometry {
     this.__startPos = startPos;
     this.__endPos = endPos;
 
+    this.__haveTerminalMark = haveTerminalMark;
+
     this._color = new GLBoost.Vector4(1, 1, 1, 1);
     this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, haveTerminalMark);
     this.setVerticesData(this._vertexData, null, GLBoost.LINES);
@@ -61,7 +63,7 @@ export default class Line extends Geometry {
   }
 
   update() {
-    this._vertexData = this._setupVertexData(this.__startPos, this.__endPos);
+    this._vertexData = this._setupVertexData(this.__startPos, this.__endPos, this.__haveTerminalMark);
     this.updateVerticesData(this._vertexData, true);
   }
 
