@@ -4265,6 +4265,48 @@
         }
       }
     }
+
+    setRotationFromNewUpAndFront(UpVec, FrontVec) {
+      let yDir = UpVec;
+      let xDir = Vector3.cross(yDir, FrontVec);
+      let zDir = Vector3.cross(xDir, yDir);
+      
+      let rotateMatrix = Matrix44$1.identity();
+
+      rotateMatrix.m00 = xDir.x;
+      rotateMatrix.m10 = xDir.y;
+      rotateMatrix.m20 = xDir.z;
+    
+      rotateMatrix.m01 = yDir.x;
+      rotateMatrix.m11 = yDir.y;
+      rotateMatrix.m21 = yDir.z;
+    
+      rotateMatrix.m02 = zDir.x;
+      rotateMatrix.m12 = zDir.y;
+      rotateMatrix.m22 = zDir.z;
+    
+      this.rotateMatrix33 = rotateMatrix;
+    }
+
+    headToDirection(fromVec, toVec) {
+      const fromDir = Vector3.normalize(fromVec);
+      const toDir = Vector3.normalize(toVec);
+      const rotationDir = Vector3.cross(fromDir, toDir);
+      const cosTheta = Vector3.dotProduct(fromDir, toDir);
+      let theta = Math.acos(cosTheta);
+      if (GLBoost["VALUE_ANGLE_UNIT"] === GLBoost.DEGREE) {
+        theta = MathUtil.radianToDegree(theta);
+      }
+      this.quaternion = Quaternion.axisAngle(rotationDir, theta);
+    }
+
+    set rotateMatrix33(rotateMatrix) {
+      this.quaternion = Quaternion.fromMatrix(rotateMatrix);
+    }
+
+    get rotateMatrix33() {
+      return this.quaternion.rotationMatrix33();
+    }
   }
 
   /*       */
@@ -15602,7 +15644,9 @@ return mat4(
     }
 
     updateGizmoDisplay() {
-      this._gizmo.update();
+      if (this._gizmo instanceof M_JointGizmo) {
+        this._gizmo.update();
+      }
     }
 
     clone() {
@@ -21812,4 +21856,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-90-g5c29-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-94-gb402-mod branch: develop';
