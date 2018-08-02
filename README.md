@@ -14,7 +14,12 @@ Use this library to spend your time doing cool stuff instead of fighting WebGL.
 
 ## Latest released revision
 
-Currently, **r3** released!
+Currently, **r4** released!
+
+## GLBoost Viewer
+
+This is a demo viewer using GLBoost.
+https://viewer.glboost.org/
 
 ## Test Examples
 
@@ -42,8 +47,14 @@ $ npm start
 * Safari
 * iOS Safari
 * Android Chrome
+
+## Unsupported Browsers
+
 * Microsoft Edge (Xbox One included)
-* Internet Explorer 11 (note that [browser-polyfill.min.js](https://cdnjs.com/libraries/babel-core/5.8.34) is required)
+* Internet Explorer
+
+Microsoft Edge was previously supported but support temporarily suspended at this time.
+Support will resume in the near future.
 
 ## How to use
 
