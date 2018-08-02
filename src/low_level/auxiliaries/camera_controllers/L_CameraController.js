@@ -60,6 +60,9 @@ export default class L_CameraController extends GLBoostObject {
     this._shiftCameraTo = null;
 
     this._onMouseDown = (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      
       let rect = evt.target.getBoundingClientRect();
       let clientX = null;
       let clientY = null;
@@ -94,6 +97,8 @@ export default class L_CameraController extends GLBoostObject {
 
     this._onMouseMove = (evt) => {
       evt.preventDefault();
+      evt.stopPropagation();
+      
       if (this._isKeyUp) {
         return;
       }

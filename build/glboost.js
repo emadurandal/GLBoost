@@ -10548,6 +10548,9 @@ return mat4(
       this._shiftCameraTo = null;
 
       this._onMouseDown = (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        
         let rect = evt.target.getBoundingClientRect();
         let clientX = null;
         let clientY = null;
@@ -10582,6 +10585,8 @@ return mat4(
 
       this._onMouseMove = (evt) => {
         evt.preventDefault();
+        evt.stopPropagation();
+        
         if (this._isKeyUp) {
           return;
         }
@@ -21856,4 +21861,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-94-gb402-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-99-gb45c3-mod branch: master';
