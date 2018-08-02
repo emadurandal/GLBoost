@@ -468,6 +468,9 @@ export default class M_Group extends M_Element {
     let currentShortestIntersectedPosVec3 = null;
     let selectedMesh = null;
     for (let mesh of meshes) {
+      if (!mesh.isPickable) {
+        continue;
+      }
       const result = mesh.rayCast(x, y, camera, viewport);
       if (result === null) {
         return [null, null];

@@ -17,6 +17,7 @@ export default class M_HeightLineGizmo extends M_Gizmo {
     //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
     const material = glBoostContext.createClassicMaterial();
     this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
+    this._mesh.isPickable = false;
     this._mesh.masterElement = this;
     this.addChild(this._mesh);
 

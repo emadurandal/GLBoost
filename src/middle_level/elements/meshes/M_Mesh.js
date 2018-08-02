@@ -17,6 +17,7 @@ export default class M_Mesh extends M_Element {
     }
     this._transformedDepth = 0;
     this._outlineGizmo = null;
+    this._isPickable = true;
   }
 
   prepareToRender(expression, existCamera_f, lights) {
@@ -318,6 +319,14 @@ export default class M_Mesh extends M_Element {
 
   _needUpdate() {
     super._needUpdate();
+  }
+
+  set isPickable(flag) {
+    this._isPickable = flag;
+  }
+
+  get isPickable() {
+    return this._isPickable;
   }
 }
 M_Mesh._geometries = {};
