@@ -78,6 +78,13 @@ export default class FragmentSimpleShader extends Shader {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
+  
+    let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+    let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
+    if (uniformLocationAABBLengthCenterToCorner) {
+      this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
+    }
 
   }
 

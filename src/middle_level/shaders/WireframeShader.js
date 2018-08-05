@@ -16,7 +16,6 @@ export class WireframeShaderSource {
 
     // for Unfold UV
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
-      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
       shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
     }
     return shaderText;
@@ -139,7 +138,6 @@ export class WireframeShaderSource {
     this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
 
     if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
       material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
     }
 
@@ -196,10 +194,6 @@ export default class WireframeShader extends FragmentSimpleShader {
 
     let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
 
-    let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
-    if (uniformLocationAABBLengthCenterToCorner) {
-      this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
-    }
     let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
     if (uniformLocationAABBCenterPositionAndRatio) {
       let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);

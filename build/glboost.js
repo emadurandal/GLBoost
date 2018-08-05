@@ -5344,7 +5344,8 @@ return mat4(
       shaderText +=      'uniform mat4 viewMatrix;\n';
       shaderText +=      'uniform mat4 projectionMatrix;\n';
       shaderText +=      'uniform mat3 normalMatrix;\n';
-      shaderText += `     uniform highp ivec3 objectIds;\n`;
+      shaderText +=      'uniform highp ivec3 objectIds;\n';
+      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
 
       shaderText += `${out_} vec3 v_position_world;\n`;
 
@@ -5367,7 +5368,7 @@ return mat4(
       if (Shader._exist(f, GLBoost.NORMAL)) {
   //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
   //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-        shaderText += '  float borderWidth = 2.0;\n';
+        shaderText += '  float borderWidth = AABBLengthCenterToCorner * 0.01;\n';
         shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
       }
       
@@ -5480,10 +5481,15 @@ return mat4(
         material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
       }
 
+      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
 
       return vertexAttribsAsResult;
     }
+    
   }
+
+
+
 
   GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
@@ -8794,6 +8800,13 @@ return mat4(
       super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
       this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
+    
+      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
+      if (uniformLocationAABBLengthCenterToCorner) {
+        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
+      }
 
     }
 
@@ -8945,7 +8958,6 @@ return mat4(
 
       // for Unfold UV
       if (Shader._exist(f, GLBoost.TEXCOORD)) {
-        shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
         shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
       }
       return shaderText;
@@ -9068,7 +9080,6 @@ return mat4(
       this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
 
       if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-        material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
         material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
       }
 
@@ -9125,10 +9136,6 @@ return mat4(
 
       let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
 
-      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
-      if (uniformLocationAABBLengthCenterToCorner) {
-        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
-      }
       let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
       if (uniformLocationAABBCenterPositionAndRatio) {
         let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
@@ -21902,4 +21909,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-98-g1c09-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-100-gdba3-mod branch: develop';
