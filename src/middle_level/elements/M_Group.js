@@ -468,6 +468,9 @@ export default class M_Group extends M_Element {
     let currentShortestIntersectedPosVec3 = null;
     let selectedMesh = null;
     for (let mesh of meshes) {
+      if (!mesh.isVisible) {
+        continue;
+      }
       if (!mesh.isPickable) {
         continue;
       }

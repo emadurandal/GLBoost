@@ -899,7 +899,7 @@ export default class Geometry extends GLBoostObject {
     return count;
   }
 
-  rayCast(origVec3, dirVec3) {
+  rayCast(origVec3, dirVec3, isFrontFacePickable, isBackFacePickable) {
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
 
@@ -915,7 +915,7 @@ export default class Geometry extends GLBoostObject {
           let pos0IndexBase = j * positionElementNumPerVertex;
           let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
           if (result === null) {
             continue;
           }
@@ -937,7 +937,7 @@ export default class Geometry extends GLBoostObject {
             if (vertexIndices[k + 2] === void 0) {
               break;
             }
-            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
+            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
             if (result === null) {
               continue;
             }
@@ -954,10 +954,20 @@ export default class Geometry extends GLBoostObject {
     return [currentShortestIntersectedPosVec3, currentShortestT];
   }
 
-  _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
+  _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable) {
     if (!this._vertices.arenberg3rdPosition[i]) {
       return null;
     }
+
+    const faceNormal = this._vertices.faceNormal[i];
+    if (faceNormal.dotProduct(dirVec3) < 0 && !isFrontFacePickable) { // ---> <---
+      return null;
+    }
+    if (faceNormal.dotProduct(dirVec3) > 0 && !isBackFacePickable) { // ---> --->
+      return null;
+    }
+    
+
     const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
     const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
     const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
@@ -1017,9 +1027,10 @@ export default class Geometry extends GLBoostObject {
     }
     this._vertices.inverseArenbergMatrix = [];
     this._vertices.arenberg3rdPosition = [];
+    this._vertices.faceNormal = [];
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i+=incrementNum) {
+        for (let i=0; i<this._vertexN; i+=incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -1106,6 +1117,7 @@ export default class Geometry extends GLBoostObject {
 //    const triangleIdx = i/incrementNum;
     this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
     this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
+    this._vertices.faceNormal[arenberg0IndexBase] = new Vector3(nx, ny, nz);
   }
 
 }

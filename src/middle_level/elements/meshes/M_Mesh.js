@@ -261,7 +261,23 @@ export default class M_Mesh extends M_Element {
     const distVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
     const dirVecInLocal = GLBoost.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
-    const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal);
+    const gl = this._glContext.gl;
+    const isCulling = gl.isEnabled(gl.CULL_FACE);
+    const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
+
+    const isFrontFacePickable = true;
+    const isBackFacePickable = true;
+    if (isCulling) {
+      if (cullMode === gl.FRONT) {
+        isFrontFacePickable = false;
+      } else if (cullMode === gl.Back) {
+        isBackFacePickable = false;
+      } else {
+        isFrontFacePickable = false;
+        isBackFacePickable = false;
+      }
+    }
+    const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
     let intersectPositionInWorld = null;
     if (result[0]) {
       intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();

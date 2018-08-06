@@ -8063,7 +8063,7 @@ return mat4(
       return count;
     }
 
-    rayCast(origVec3, dirVec3) {
+    rayCast(origVec3, dirVec3, isFrontFacePickable, isBackFacePickable) {
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
 
@@ -8079,7 +8079,7 @@ return mat4(
             let pos0IndexBase = j * positionElementNumPerVertex;
             let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-            const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+            const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
             if (result === null) {
               continue;
             }
@@ -8101,7 +8101,7 @@ return mat4(
               if (vertexIndices[k + 2] === void 0) {
                 break;
               }
-              const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
+              const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
               if (result === null) {
                 continue;
               }
@@ -8118,10 +8118,20 @@ return mat4(
       return [currentShortestIntersectedPosVec3, currentShortestT];
     }
 
-    _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
+    _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable) {
       if (!this._vertices.arenberg3rdPosition[i]) {
         return null;
       }
+
+      const faceNormal = this._vertices.faceNormal[i];
+      if (faceNormal.dotProduct(dirVec3) < 0 && !isFrontFacePickable) { // ---> <---
+        return null;
+      }
+      if (faceNormal.dotProduct(dirVec3) > 0 && !isBackFacePickable) { // ---> --->
+        return null;
+      }
+      
+
       const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
       const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
       const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
@@ -8181,9 +8191,10 @@ return mat4(
       }
       this._vertices.inverseArenbergMatrix = [];
       this._vertices.arenberg3rdPosition = [];
+      this._vertices.faceNormal = [];
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
-          for (let i=0; i<vertexNum; i+=incrementNum) {
+          for (let i=0; i<this._vertexN; i+=incrementNum) {
             let pos0IndexBase = i * positionElementNumPerVertex;
             let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -8270,6 +8281,7 @@ return mat4(
   //    const triangleIdx = i/incrementNum;
       this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
       this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
+      this._vertices.faceNormal[arenberg0IndexBase] = new Vector3(nx, ny, nz);
     }
 
   }
@@ -13097,7 +13109,23 @@ return mat4(
       const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
       const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
-      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal);
+      const gl = this._glContext.gl;
+      const isCulling = gl.isEnabled(gl.CULL_FACE);
+      const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
+
+      const isFrontFacePickable = true;
+      const isBackFacePickable = true;
+      if (isCulling) {
+        if (cullMode === gl.FRONT) {
+          isFrontFacePickable = false;
+        } else if (cullMode === gl.Back) {
+          isBackFacePickable = false;
+        } else {
+          isFrontFacePickable = false;
+          isBackFacePickable = false;
+        }
+      }
+      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
       let intersectPositionInWorld = null;
       if (result[0]) {
         intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
@@ -13804,6 +13832,9 @@ return mat4(
       let currentShortestIntersectedPosVec3 = null;
       let selectedMesh = null;
       for (let mesh of meshes) {
+        if (!mesh.isVisible) {
+          continue;
+        }
         if (!mesh.isPickable) {
           continue;
         }
@@ -21909,4 +21940,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-100-gdba3-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-101-g5a54-mod branch: develop';
