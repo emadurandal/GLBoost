@@ -18966,9 +18966,9 @@
                                       "line": 216,
                                       "column": 71
                                     },
-                                    "identifierName": "_transparentByUser"
+                                    "identifierName": "_isTransparentForce"
                                   },
-                                  "name": "_transparentByUser"
+                                  "name": "_isTransparentForce"
                                 },
                                 "computed": false
                               },
@@ -19354,9 +19354,9 @@
                                 "line": 222,
                                 "column": 27
                               },
-                              "identifierName": "_transparentByUser"
+                              "identifierName": "_isTransparentForce"
                             },
-                            "name": "_transparentByUser"
+                            "name": "_isTransparentForce"
                           },
                           "computed": false
                         },
@@ -58003,7 +58003,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 7132,
       "end": 7150,
       "loc": {
@@ -58789,7 +58789,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 7291,
       "end": 7309,
       "loc": {

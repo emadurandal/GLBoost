@@ -228,13 +228,17 @@ export default class M_Mesh extends M_Element {
   }
 
   get isTransparent() {
-    let isTransparent = (this._opacity < 1.0 || this._transparentByUser) ? true : false;
+    let isTransparent = (this._opacity < 1.0) ? true : false;
     isTransparent |= this.geometry.isTransparent(this);
     return isTransparent;
   }
 
-  set isTransparent(flg) {
-    this._transparentByUser = flg;
+  set isTransparentForce(flg) {
+    this._isTransparentForce = flg;
+  }
+
+  get isTransparentForce() {
+    return this._isTransparentForce;
   }
 
   get AABBInWorld() {
@@ -265,8 +269,8 @@ export default class M_Mesh extends M_Element {
     const isCulling = gl.isEnabled(gl.CULL_FACE);
     const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
 
-    const isFrontFacePickable = true;
-    const isBackFacePickable = true;
+    let isFrontFacePickable = true;
+    let isBackFacePickable = true;
     if (isCulling) {
       if (cullMode === gl.FRONT) {
         isFrontFacePickable = false;

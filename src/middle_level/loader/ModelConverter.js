@@ -218,7 +218,7 @@ export default class ModelConverter {
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.isMeshTransparentAsDefault) {
-        glboostMeshes.isTransparent = true;
+        glboostMeshes.isTransparentForce = true;
       }
 
       let _indicesArray = [];

@@ -4324,7 +4324,7 @@
                                                                 
                                                         
                      
-                                
+                                  
                             
                          
                                       
@@ -4347,7 +4347,7 @@
       this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
       this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
       this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-      this._transparentByUser = false;
+      this._isTransparentForce = null;
       this._opacity = 1.0;
       this._isAffectedByWorldMatrix = true;
       this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -4511,11 +4511,11 @@
     }
 
     get isTransparent() {
-      return this._transparentByUser;
+      return this._isTransparentForce;
     }
 
-    set isTransparent(flg         ) {
-      this._transparentByUser = flg;
+    set isTransparentForce(flg         ) {
+      this._isTransparentForce = flg;
     }
 
     set dirty(flg        ) {
@@ -4561,7 +4561,7 @@
       instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
 
 
-      instance._transparentByUser = this._transparentByUser;
+      instance._isTransparentForce = this._isTransparentForce;
       instance.opacity = this.opacity;
       instance._activeAnimationLineName = this._activeAnimationLineName;
 
@@ -13076,13 +13076,17 @@ return mat4(
     }
 
     get isTransparent() {
-      let isTransparent = (this._opacity < 1.0 || this._transparentByUser) ? true : false;
+      let isTransparent = (this._opacity < 1.0) ? true : false;
       isTransparent |= this.geometry.isTransparent(this);
       return isTransparent;
     }
 
-    set isTransparent(flg) {
-      this._transparentByUser = flg;
+    set isTransparentForce(flg) {
+      this._isTransparentForce = flg;
+    }
+
+    get isTransparentForce() {
+      return this._isTransparentForce;
     }
 
     get AABBInWorld() {
@@ -13113,8 +13117,8 @@ return mat4(
       const isCulling = gl.isEnabled(gl.CULL_FACE);
       const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
 
-      const isFrontFacePickable = true;
-      const isBackFacePickable = true;
+      let isFrontFacePickable = true;
+      let isBackFacePickable = true;
       if (isCulling) {
         if (cullMode === gl.FRONT) {
           isFrontFacePickable = false;
@@ -14490,10 +14494,17 @@ return mat4(
       this._opacityMeshes = [];
       this._transparentMeshes = [];
       this._meshes.forEach((mesh)=>{
-        if (mesh.isTransparent) {
+        if (mesh.isTransparentForce === false) {
+          this._opacityMeshes.push(mesh);
+        } else if (mesh.isTransparentForce === true) {
           this._transparentMeshes.push(mesh);
         } else {
-          this._opacityMeshes.push(mesh);
+          if (!mesh.isTransparent) {
+            this._opacityMeshes.push(mesh);
+          } else {
+            this._transparentMeshes.push(mesh);
+          }
+
         }
       });
 
@@ -18353,6 +18364,21 @@ return mat4(
         isDepthTest: true,
         defaultShaderClass: null,
         isMeshTransparentAsDefault: false,
+        defaultStates: {
+          states: {
+            enable: [
+                // 3042,  // BLEND
+            ],
+            functions: {
+              //"blendFuncSeparate": [1, 0, 1, 0],
+            }
+          },
+          isTransparent: true,
+          opacity: 1.0,
+          shaderClass: DecalShader, // LambertShader // PhongShader
+          isTextureImageToLoadPreMultipliedAlpha: false,
+          globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
+        },
         statesOfElements: [
           {
             targets: [], //["name_foo", "name_boo"],
@@ -18700,9 +18726,7 @@ return mat4(
             rootJointStr = nodeJson.skeletons[0];
             skinStr = nodeJson.skin;
           }
-          let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
-          mesh.userFlavorName = meshStr;
-          group.addChild(mesh);
+          this._loadMesh(glBoostContext, meshJson, meshStr, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
         }
       } else if (nodeJson.jointName) {
         let joint = glBoostContext.createJoint(options.isExistJointGizmo);
@@ -18791,7 +18815,7 @@ return mat4(
       return group;
     }
 
-    _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
+    _loadMesh(glBoostContext, meshJson, meshStr, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
       var mesh = null;
       var geometry = null;
       if (rootJointStr) {
@@ -18808,9 +18832,11 @@ return mat4(
         geometry = glBoostContext.createGeometry();
         mesh = glBoostContext.createMesh(geometry);
       }
+      mesh.userFlavorName = meshStr;
+      group.addChild(mesh);
 
       if (options && options.isMeshTransparentAsDefault) {
-        mesh.isTransparent = true;
+        mesh.isTransparentForce = true;
       }
 
       let _indicesArray = [];
@@ -18928,25 +18954,35 @@ return mat4(
           }
           this._materials.push(material);
 
+          if (options && options.defaultStates) {
+            if (options.defaultStates.states) {
+              material.states = options.defaultStates.states;
+            }
+            material.globalStatesUsage = options.defaultStates.globalStatesUsage !== void 0 ? options.defaultStates.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+          }
           if (options && options.statesOfElements) {
+
             for (let statesInfo of options.statesOfElements) {
               if (statesInfo.targets) {
                 for (let target of statesInfo.targets) {
-                  let isMatch = false;
-                  let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
-                  switch (specifyMethod) {
-                    case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
-                      isMatch = group.userFlavorName === target; break;
-                    case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
-                      isMatch = group.instanceName === target; break;
-                    case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                      isMatch = group.instanceNameWithUserFlavor === target; break;                      
-                  }
+                  let isMatch = this.isTargetMatch(statesInfo, group, target);
                   if (isMatch) {
-                    material.states = statesInfo.states;
-                    group.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
-                    material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;
+                    if (statesInfo.states) {
+                      material.states = statesInfo.states;
+                    }
+                    material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;  
                   }
+
+                  group.getChildren().forEach((elem)=>{
+                    let isMatch = this.isTargetMatch(statesInfo, elem, target);
+                    if (isMatch) {
+                      elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                      if (statesInfo.states) {
+                        material.states = statesInfo.states;
+                      }
+                      material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost$1.GLOBAL_STATES_USAGE_IGNORE;  
+                    }
+                  });
                 }
               }
             }
@@ -19189,15 +19225,7 @@ return mat4(
                   if (statesInfo.targets) {
                     for (let target of statesInfo.targets) {
                       let isMatch = false;
-                      let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
-                      switch (specifyMethod) {
-                        case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
-                          isMatch = group.userFlavorName === target; break;
-                        case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
-                          isMatch = group.instanceName === target; break;
-                        case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                          isMatch = group.instanceNameWithUserFlavor === target; break;                      
-                      }
+                      isMatch = this.isTargetMatch(statesInfo, group, target);
 
                       if (isMatch) {
                         if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
@@ -19300,15 +19328,7 @@ return mat4(
           if (statesInfo.targets) {
             for (let target of statesInfo.targets) {
               let isMatch = false;
-              let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
-              switch (specifyMethod) {
-                case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
-                  isMatch = group.userFlavorName === target; break;
-                case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
-                  isMatch = group.instanceName === target; break;
-                case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                  isMatch = group.instanceNameWithUserFlavor === target; break;                      
-              }
+              isMatch = this.isTargetMatch(statesInfo, group, target);
 
               if (isMatch) {
                 if (statesInfo.shaderClass) {
@@ -19322,6 +19342,33 @@ return mat4(
       }
 
       return texcoords;
+    }
+
+    isTargetMatch(statesInfo, element, target) {
+      let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME;
+      if (typeof statesInfo.specifyMethod === 'string') {
+        statesInfo.specifyMethod = GLBoost$1[statesInfo.specifyMethod];
+      }
+
+      const isTargetMatchInner = function(specifyMethod, element, target) {
+        let isMatch = false;
+        switch (specifyMethod) {
+        case GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME:
+          isMatch = element.userFlavorName === target;
+          break;
+        case GLBoost$1.QUERY_TYPE_INSTANCE_NAME:
+          isMatch = element.instanceName === target;
+          break;
+        case GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+          isMatch = element.instanceNameWithUserFlavor === target;
+          break;
+        }
+        return isMatch;
+      };
+
+      let isMatch = isTargetMatchInner(specifyMethod, element, target);
+
+      return isMatch;
     }
 
     _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer) {
@@ -20618,7 +20665,7 @@ return mat4(
 
         let options = gltfModel.asset.extras.glboostOptions;
         if (options.isMeshTransparentAsDefault) {
-          glboostMeshes.isTransparent = true;
+          glboostMeshes.isTransparentForce = true;
         }
 
         let _indicesArray = [];
@@ -21940,4 +21987,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-101-g5a54-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-102-g94a05-mod branch: develop';

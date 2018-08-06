@@ -18,7 +18,7 @@ export default class M_Element extends L_Element {
   _accumulatedAncestryObjectUpdateNumberWithoutMySelf: number;
   _accumulatedAncestryObjectUpdateNumberJoint: number;
   _opacity: number;
-  _transparentByUser: boolean;
+  _isTransparentForce: ?boolean;
   _parent: M_Group | null;
   _invMatrix: Matrix44;
   _isAffectedByWorldMatrix: boolean;
@@ -41,7 +41,7 @@ export default class M_Element extends L_Element {
     this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-    this._transparentByUser = false;
+    this._isTransparentForce = null;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
     this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -205,11 +205,11 @@ export default class M_Element extends L_Element {
   }
 
   get isTransparent() {
-    return this._transparentByUser;
+    return this._isTransparentForce;
   }
 
-  set isTransparent(flg: boolean) {
-    this._transparentByUser = flg;
+  set isTransparentForce(flg: boolean) {
+    this._isTransparentForce = flg;
   }
 
   set dirty(flg: number) {
@@ -255,7 +255,7 @@ export default class M_Element extends L_Element {
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
 
 
-    instance._transparentByUser = this._transparentByUser;
+    instance._isTransparentForce = this._isTransparentForce;
     instance.opacity = this.opacity;
     instance._activeAnimationLineName = this._activeAnimationLineName;
 

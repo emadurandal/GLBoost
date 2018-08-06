@@ -136,7 +136,7 @@ export default class M_Element extends L_Element {
     this._accumulatedAncestryNameWithUpdateInfoStringNormal = &apos;&apos;;
     this._accumulatedAncestryNameWithUpdateInfoStringInv = &apos;&apos;;
     this._animationLine = {};
-    this._transparentByUser = false;
+    this._isTransparentForce = false;
     this.opacity = 1.0;
 
     this._activeAnimationLineName = null;
@@ -637,11 +637,11 @@ export default class M_Element extends L_Element {
   }
 
   set transparent(flg) {
-    this._transparentByUser = flg;
+    this._isTransparentForce = flg;
   }
 
   isTransparent() {
-    return (this._opacity &lt; 1.0 || this._transparentByUser) ? true : false;
+    return (this._opacity &lt; 1.0 || this._isTransparentForce) ? true : false;
   }
 
   set dirty(flg) {
