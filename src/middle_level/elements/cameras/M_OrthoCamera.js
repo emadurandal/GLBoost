@@ -74,4 +74,13 @@ export default class M_OrthoCamera extends M_AbstractCamera {
   get aspect() {
     return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
   }
+
+  get allInfo() {
+    return this._lowLevelCamera.allInfo;
+  }
+
+  set allInfo(info) {
+    this._lowLevelCamera.allInfo = info;
+  }
+
 }

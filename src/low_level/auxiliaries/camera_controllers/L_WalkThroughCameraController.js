@@ -1,6 +1,7 @@
 import GLBoostObject from '../../core/GLBoostObject';
 import Vector3 from '../../math/Vector3';
 import Matrix33 from '../../math/Matrix33';
+import MathUtil from '../../math/MathUtil';
 import GLBoost from '../../../globals';
 
 export default class L_WalkThroughCameraController extends GLBoostObject {
@@ -253,6 +254,46 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   get virticalSpeed() {
     return this._virticalSpeed;
+  }
+
+  get allInfo() {
+    const info = {};
+
+    info.virticalSpeed = this.virticalSpeed;
+    info.horizontalSpeed = this.horizontalSpeed;
+    info._turnSpeed = this._turnSpeed;
+    info.shiftCameraTo = this.shiftCameraTo;
+    info.zFarAdjustingFactorBasedOnAABB = this.zFarAdjustingFactorBasedOnAABB;
+    info.target = this.target;
+    if (this._currentPos) {
+      info._currentPos = this._currentPos.clone();
+    }
+    if (this._currentCenter) {
+      info._currentCenter = this._currentCenter.clone();
+    }
+    if (this._currentDir) {
+      info._currentDir = this._currentDir.clone();
+    }
+    info._deltaY = this._deltaY;
+    info._newDir = this._newDir.clone();
+
+    return info;
+  }
+
+  set allInfo(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    for(let key in json) {
+      if(json.hasOwnProperty(key) && key in this) {
+        if (key === "quaternion") {
+          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+        } else {
+          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+        }
+      }
+    }
   }
 }
 

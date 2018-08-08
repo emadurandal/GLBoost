@@ -122,4 +122,23 @@ export default class L_FrustumCamera extends L_AbstractCamera {
   get aspect() {
     return (this.right - this.left) / (this.top - this.bottom);
   }
+
+  get allInfo() {
+    const info = super.allInfo;
+
+    info.left = this.left;
+    info.right = this.right;
+    info.top = this.top;
+    info.bottom = this.bottom;
+    info.zFar = this.zFar;
+//    info.zFarInner = this.zFarInner;
+    info.zNear = this.zNear;
+//    info.zNearInner = this.zNearInner;
+
+    return info;
+  }
+
+  set allInfo(info) {
+    super.allInfo = info;
+  }
 }

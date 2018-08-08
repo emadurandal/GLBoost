@@ -3540,6 +3540,23 @@
       }
     }
 
+    static cloneOfMathObjects(element) {
+      if(element instanceof Matrix44$1) {
+        return element.clone();
+      } else if (element instanceof Matrix33) {
+        return element.clone();
+      } else if (element instanceof Vector4) {
+        return element.clone();
+      } else if (element instanceof Vector3) {
+        return element.clone();
+      } else if (element instanceof Vector2) {
+        return element.clone();
+      } else {
+        return element;
+      }
+
+    }
+
     static arrayToQuaternion(element) {
       if (Array.isArray(element)) {
         if(typeof(element[3]) !== 'undefined') {
@@ -4250,7 +4267,7 @@
       instance._updateCountAsElement = this._updateCountAsElement;
     }
 
-    setPropertiesFromJson(arg        ) {
+    set allInfo(arg) {
       let json = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
@@ -4258,9 +4275,9 @@
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.arrayToQuaternion(json[key]);
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
           } else {
-            this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
           }
         }
       }
@@ -9999,17 +10016,33 @@ return mat4(
       return this._texture;
     }
 
-    getCameraInfo() {
+    get allInfo() {
       const info = {};
 
       info.translate = this.translate;
-      info.translateInner = this.translateInner;
+      //info.translateInner = this.translateInner;
       info.center = this.center;
-      info.centerInner = this.centerInner;
+      //info.centerInner = this.centerInner;
       info.up = this.up;
-      info.upInner = this.upInner;
+      //info.upInner = this.upInner;
 
       return info;
+    }
+
+    set allInfo(arg) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      for(let key in json) {
+        if(json.hasOwnProperty(key) && key in this) {
+          if (key === "quaternion") {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          } else {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          }
+        }
+      }
     }
   }
 
@@ -10121,17 +10154,21 @@ return mat4(
       return this._zFar;
     }
 
-    getCameraInfo() {
-      const info = super.getCameraInfo();
+    get allInfo() {
+      const info = super.allInfo;
 
       info.fovy = this.fovy;
       info.aspect = this.aspect;
       info.zFar = this.zFar;
-      info.zFarInner = this.zFarInner;
+  //    info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-      info.zNearInner = this.zNearInner;
-      
+  //    info.zNearInner = this.zNearInner;
+
       return info;
+    }
+
+    set allInfo(info) {
+      super.allInfo = info;
     }
   }
 
@@ -10257,19 +10294,23 @@ return mat4(
       return (this.right - this.left) / (this.top - this.bottom);
     }
 
-    getCameraInfo() {
-      const info = super.getCameraInfo();
+    get allInfo() {
+      const info = super.allInfo;
 
       info.left = this.left;
       info.right = this.right;
       info.top = this.top;
       info.bottom = this.bottom;
       info.zFar = this.zFar;
-      info.zFarInner = this.zFarInner;
+  //    info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-      info.zNearInner = this.zNearInner;
+  //    info.zNearInner = this.zNearInner;
 
       return info;
+    }
+
+    set allInfo(info) {
+      super.allInfo = info;
     }
   }
 
@@ -10428,21 +10469,25 @@ return mat4(
       return (this.right - this.left) / (this.top - this.bottom);
     }
 
-    getCameraInfo() {
-      const info = super.getCameraInfo();
+    get allInfo() {
+      const info = super.allInfo;
 
       info.left = this.left;
       info.right = this.right;
       info.top = this.top;
       info.bottom = this.bottom;
       info.zFar = this.zFar;
-      info.zFarInner = this.zFarInner;
+  //    info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-      info.zNearInner = this.zNearInner;
+  //    info.zNearInner = this.zNearInner;
       info.xmag = this.xmag;
       info.ymag = this.ymag;
 
       return info;
+    }
+
+    set allInfo(info) {
+      super.allInfo = info;
     }
   }
 
@@ -10553,6 +10598,13 @@ return mat4(
       return this._lowLevelCamera.upInner;
     }
 
+    get allInfo() {
+      return this._lowLevelCamera.allInfo;
+    }
+
+    set allInfo(info) {
+      this._lowLevelCamera.allInfo = info;
+    }
 
   }
 
@@ -10979,6 +11031,10 @@ return mat4(
       this.updateTargeting();
     }
 
+    get target() {
+      return this._target;
+    }
+
     set zFarAdjustingFactorBasedOnAABB(value) {
       this._zFarAdjustingFactorBasedOnAABB = value;
     }
@@ -11039,6 +11095,35 @@ return mat4(
       });
     }
 
+
+    get allInfo() {
+      const info = {};
+
+      info.rotY = this.rotY;
+      info.rotX = this.rotX;
+      info.dolly = this.dolly;
+      info.shiftCameraTo = this.shiftCameraTo;
+      info.zFarAdjustingFactorBasedOnAABB = this.zFarAdjustingFactorBasedOnAABB;
+      info.target = this.target;
+
+      return info;
+    }
+
+    set allInfo(arg) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      for(let key in json) {
+        if(json.hasOwnProperty(key) && key in this) {
+          if (key === "quaternion") {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          } else {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          }
+        }
+      }
+    }
   }
 
   GLBoost$1['L_CameraController'] = L_CameraController;
@@ -11293,6 +11378,46 @@ return mat4(
 
     get virticalSpeed() {
       return this._virticalSpeed;
+    }
+
+    get allInfo() {
+      const info = {};
+
+      info.virticalSpeed = this.virticalSpeed;
+      info.horizontalSpeed = this.horizontalSpeed;
+      info._turnSpeed = this._turnSpeed;
+      info.shiftCameraTo = this.shiftCameraTo;
+      info.zFarAdjustingFactorBasedOnAABB = this.zFarAdjustingFactorBasedOnAABB;
+      info.target = this.target;
+      if (this._currentPos) {
+        info._currentPos = this._currentPos.clone();
+      }
+      if (this._currentCenter) {
+        info._currentCenter = this._currentCenter.clone();
+      }
+      if (this._currentDir) {
+        info._currentDir = this._currentDir.clone();
+      }
+      info._deltaY = this._deltaY;
+      info._newDir = this._newDir.clone();
+
+      return info;
+    }
+
+    set allInfo(arg) {
+      let json = arg;
+      if (typeof arg === "string") {
+        json = JSON.parse(arg);
+      }
+      for(let key in json) {
+        if(json.hasOwnProperty(key) && key in this) {
+          if (key === "quaternion") {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          } else {
+            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          }
+        }
+      }
     }
   }
 
@@ -16368,6 +16493,13 @@ return mat4(
       return this._lowLevelCamera.zFar;
     }
 
+    get allInfo() {
+      return this._lowLevelCamera.allInfo;
+    }
+
+    set allInfo(info) {
+      this._lowLevelCamera.allInfo = info;
+    }
   }
 
   GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
@@ -16445,6 +16577,14 @@ return mat4(
     get aspect() {
       return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
     }
+
+    get allInfo() {
+      return this._lowLevelCamera.allInfo;
+    }
+
+    set allInfo(info) {
+      this._lowLevelCamera.allInfo = info;
+    }
   }
 
   class M_OrthoCamera extends M_AbstractCamera {
@@ -16520,6 +16660,15 @@ return mat4(
     get aspect() {
       return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
     }
+
+    get allInfo() {
+      return this._lowLevelCamera.allInfo;
+    }
+
+    set allInfo(info) {
+      this._lowLevelCamera.allInfo = info;
+    }
+
   }
 
   class Arrow extends Geometry {
@@ -22032,4 +22181,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-105-g1a609-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-106-gcd58-mod branch: develop';

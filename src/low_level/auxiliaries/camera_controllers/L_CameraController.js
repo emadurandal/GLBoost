@@ -431,6 +431,10 @@ export default class L_CameraController extends GLBoostObject {
     this.updateTargeting();
   }
 
+  get target() {
+    return this._target;
+  }
+
   set zFarAdjustingFactorBasedOnAABB(value) {
     this._zFarAdjustingFactorBasedOnAABB = value;
   }
@@ -491,6 +495,35 @@ export default class L_CameraController extends GLBoostObject {
     });
   }
 
+
+  get allInfo() {
+    const info = {};
+
+    info.rotY = this.rotY;
+    info.rotX = this.rotX;
+    info.dolly = this.dolly;
+    info.shiftCameraTo = this.shiftCameraTo;
+    info.zFarAdjustingFactorBasedOnAABB = this.zFarAdjustingFactorBasedOnAABB;
+    info.target = this.target;
+
+    return info;
+  }
+
+  set allInfo(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    for(let key in json) {
+      if(json.hasOwnProperty(key) && key in this) {
+        if (key === "quaternion") {
+          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+        } else {
+          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+        }
+      }
+    }
+  }
 }
 
 GLBoost['L_CameraController'] = L_CameraController;

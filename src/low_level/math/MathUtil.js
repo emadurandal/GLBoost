@@ -52,6 +52,23 @@ export default class MathUtil {
     }
   }
 
+  static cloneOfMathObjects(element) {
+    if(element instanceof Matrix44) {
+      return element.clone();
+    } else if (element instanceof Matrix33) {
+      return element.clone();
+    } else if (element instanceof Vector4) {
+      return element.clone();
+    } else if (element instanceof Vector3) {
+      return element.clone();
+    } else if (element instanceof Vector2) {
+      return element.clone();
+    } else {
+      return element;
+    }
+
+  }
+
   static arrayToQuaternion(element) {
     if (Array.isArray(element)) {
       if(typeof(element[3]) !== 'undefined') {
