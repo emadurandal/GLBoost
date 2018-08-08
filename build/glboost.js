@@ -4309,366 +4309,596 @@
     }
   }
 
-  class AABB {
+  /*       */
+                                              
 
-    constructor() {
-      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-      this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
-      this._centerPoint = null;
-      this._lengthCenterToCorner = null;
+  class M_Element extends L_Element {
+                        
+                                                      
+                                         
+                                                                
+                            
+                                                         
+                                                      
+                                                   
+                                                                
+                                                        
+                     
+                                  
+                            
+                         
+                                      
+                                                         
+                                     
+                                           
+                                                  
+                            
+                                     
+                           
 
-    }
-
-    clone() {
-      let instance = new AABB();
-      instance._AABB_max = this._AABB_max.clone();
-      instance._AABB_min = this._AABB_min.clone();
-      instance._centerPoint = (this._centerPoint !== null) ? this._centerPoint.clone() : null;
-      instance._lengthCenterToCorner = this._lengthCenterToCorner;
-
-      return instance;
-    }
-
-    isVanilla() {
-      if (this._AABB_min.x == Number.MAX_VALUE && this._AABB_min.y == Number.MAX_VALUE && this._AABB_min.z == Number.MAX_VALUE
-        && this._AABB_max.x == -Number.MAX_VALUE && this._AABB_max.y == -Number.MAX_VALUE && this._AABB_max.z == -Number.MAX_VALUE) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    addPosition(positionVector) {
-      this._AABB_min.x = (positionVector.x < this._AABB_min.x) ? positionVector.x : this._AABB_min.x;
-      this._AABB_min.y = (positionVector.y < this._AABB_min.y) ? positionVector.y : this._AABB_min.y;
-      this._AABB_min.z = (positionVector.z < this._AABB_min.z) ? positionVector.z : this._AABB_min.z;
-      this._AABB_max.x = (this._AABB_max.x < positionVector.x) ? positionVector.x : this._AABB_max.x;
-      this._AABB_max.y = (this._AABB_max.y < positionVector.y) ? positionVector.y : this._AABB_max.y;
-      this._AABB_max.z = (this._AABB_max.z < positionVector.z) ? positionVector.z : this._AABB_max.z;
-
-      return positionVector;
-    }
-
-    addPositionWithArray(array, index) {
-      this._AABB_min.x = (array[index+0] < this._AABB_min.x) ? array[index+0] : this._AABB_min.x;
-      this._AABB_min.y = (array[index+1] < this._AABB_min.y) ? array[index+1] : this._AABB_min.y;
-      this._AABB_min.z = (array[index+2] < this._AABB_min.z) ? array[index+2] : this._AABB_min.z;
-      this._AABB_max.x = (this._AABB_max.x < array[index+0]) ? array[index+0] : this._AABB_max.x;
-      this._AABB_max.y = (this._AABB_max.y < array[index+1]) ? array[index+1] : this._AABB_max.y;
-      this._AABB_max.z = (this._AABB_max.z < array[index+2]) ? array[index+2] : this._AABB_max.z;
-
-      return array;
-    }
-
-    updateAllInfo() {
-      this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
-      const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
-      this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
-
-      return this;
-    }
-
-    mergeAABB(aabb) {
-      var isUpdated = false;
-
-      if (aabb.isVanilla()) {
-        return isUpdated;
-      }
-
-      if (this.isVanilla()) {
-        this._AABB_min.x = aabb.minPoint.x;
-        this._AABB_min.y = aabb.minPoint.y;
-        this._AABB_min.z = aabb.minPoint.z;
-        this._AABB_max.x = aabb.maxPoint.x;
-        this._AABB_max.y = aabb.maxPoint.y;
-        this._AABB_max.z = aabb.maxPoint.z;
-        isUpdated = true;
-        return isUpdated;
-      }
-
-      if (aabb.minPoint.x < this._AABB_min.x) {
-        this._AABB_min.x = aabb.minPoint.x;
-        isUpdated = true;
-      }
-      if (aabb.minPoint.y < this._AABB_min.y) {
-        this._AABB_min.y = aabb.minPoint.y;
-        isUpdated = true;
-      }
-      if (aabb.minPoint.z < this._AABB_min.z) {
-        this._AABB_min.z = aabb.minPoint.z;
-        isUpdated = true;
-      }
-      if (this._AABB_max.x < aabb.maxPoint.x) {
-        this._AABB_max.x = aabb.maxPoint.x;
-        isUpdated = true;
-      }
-      if (this._AABB_max.y < aabb.maxPoint.y) {
-        this._AABB_max.y = aabb.maxPoint.y;
-        isUpdated = true;
-      }
-      if (this._AABB_max.z < aabb.maxPoint.z) {
-        this._AABB_max.z = aabb.maxPoint.z;
-        isUpdated = true;
-      }
-      this.updateAllInfo();
-
-      return isUpdated;
-    }
-
-
-    get minPoint() {
-      return this._AABB_min;
-    }
-
-    get maxPoint() {
-      return this._AABB_max;
-    }
-
-    get centerPoint() {
-      return this._centerPoint;
-    }
-
-    get lengthCenterToCorner() {
-      return this._lengthCenterToCorner;
-    }
-
-    get sizeX() {
-      return (this._AABB_max.x - this._AABB_min.x);
-    }
-
-    get sizeY() {
-      return (this._AABB_max.y - this._AABB_min.y);
-    }
-
-    get sizeZ() {
-      return (this._AABB_max.z - this._AABB_min.z);
-    }
-
-    static multiplyMatrix(matrix, aabb) {
-       if (aabb.isVanilla()) {
-         return aabb.clone();
-       }
-      var newAabb = new AABB();
-
-      let AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-      let AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-      let AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-      let AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-      let AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-      let AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-      let AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-      let AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-      newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
-      newAabb.updateAllInfo();
-
-      return newAabb;
-    }
-
-    toString() {
-      return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n'
-        + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
-    }
-  }
-
-  GLBoost$1['AABB'] = AABB;
-
-  /**
-   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
-   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
-   */
-  class AbstractTexture extends GLBoostObject {
-
-    /**
-     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
-     *
-     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     */
-    constructor(glBoostContext) {
+    constructor(glBoostContext                      ) {
       super(glBoostContext);
 
-      if (this.constructor === AbstractTexture) {
-        throw new TypeError('Cannot construct AbstractTexture instances directly.');
+      this._parent = null;
+      this._invMatrix = Matrix44$1.identity();
+      this._accumulatedAncestryObjectUpdateNumber = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Number.MAX_VALUE;    
+      this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
+      this._isTransparentForce = null;
+      this._opacity = 1.0;
+      this._isAffectedByWorldMatrix = true;
+      this._isAffectedByWorldMatrixAccumulatedAncestry = true;
+      this._isAffectedByViewMatrix = true;
+      this._isAffectedByProjectionMatrix = true;
+
+      this._toInheritCurrentAnimationInputValue = true;
+
+      this._isVisible = true;
+
+      this._gizmos = [];
+      this._masterElement = null;
+
+      this._worldMatrix = new Matrix44$1();
+    }
+
+    _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
+      if (currentElem._parent === null) {
+        return currentElem.elementUpdateNumber;
+      } else {
+        return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
+      }
+    }
+
+    set toInheritCurrentAnimationInputValue(flg         ) {
+      this._toInheritCurrentAnimationInputValue = flg;
+    }
+
+    get toInheritCurrentAnimationInputValue() {
+      return this._toInheritCurrentAnimationInputValue;
+    }
+
+    _getCurrentAnimationInputValue(inputName        )                {
+      let value = this._currentAnimationInputValues[inputName];
+      if (typeof(value) === 'number') {
+        return value;
+      } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
+        let val = this._parent._getCurrentAnimationInputValue(inputName);
+        if (val === void 0) {
+          val = null;
+        }
+        return val;
+      } else {
+        return null;
+      }
+    }
+
+    _setDirtyToAnimatedElement(inputName        ) {
+      if (this.hasAnimation(inputName)) {
+        this._needUpdate();
+      }
+    }
+
+
+    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf         , input        ) {
+      if (input === void 0 && this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
-      this._textureUnitIndex = 0;
+      let tempNumber = 0;
+      if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
+      {
 
-      // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
-      this._uvTransform = new Vector4(1, 1, 0, 0);
+        let currentMatrix = null;
+        if (withMySelf) {
+          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+        } else {
+          currentMatrix = Matrix44$1.identity();
+        }
+    
+        if (this._parent === null) {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
+          return currentMatrix;
+        }
 
-      this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
-    }
-
-    /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
-     *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
-     */
-    get glTextureResource() {
-      return this._texture;
-    }
-
-    /**
-     * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
-     * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
-     */
-    setUp(textureUnitIndex) {
-      var gl = this._glContext.gl;
-      if (this._texture === null) {
-        return false;
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
+        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
       }
-      var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-      gl.activeTexture(gl.TEXTURE0 + index);
-      gl.bindTexture(gl.TEXTURE_2D, this._texture);
-
-      return true;
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
     }
 
-    /**
-     * [en] unbind the texture. <br />
-     * [ja] テクスチャをバインド解除します。
-     */
-    tearDown(textureUnitIndex) {
-      var gl = this._glContext.gl;
-
-      var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
-      gl.activeTexture(gl.TEXTURE0 + index);
-      gl.bindTexture(gl.TEXTURE_2D, null);
+    get worldMatrixWithoutMySelf() {
+      return this.getWorldMatrixWithoutMySelfAt(void 0);
     }
 
-    get width() {
-      return this._width;
-    }
+    getWorldMatrixWithoutMySelfAt(input         ) {
 
-    get height() {
-      return this._height;
-    }
-
-    set textureUnitIndex(index) {
-      this._textureUnitIndex = index;
-    }
-
-    get textureUnitIndex() {
-      return this._textureUnitIndex;
-    }
-
-    getTexturePixelData() {
-      let gl = this._glContext.gl;
-
-      // Create a framebuffer backed by the texture
-      let framebuffer = this._glContext.createFramebuffer(this);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
-
-      // Read the contents of the framebuffer (data stores the pixel data)
-      let data = new Uint8Array(this.width * this.height * 4);
-      gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
-
-      //this._glContext.deleteFramebuffer(this, framebuffer);
-      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-      return data;
-    }
-
-    /**
-     * Origin is left bottom
-     *
-     * @param {number} x horizontal pixel position (0 is left)
-     * @param {number} y virtical pixel position (0 is bottom)
-     * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
-     */
-    getPixelValueAt(x, y, argByteArray) {
-      let byteArray = argByteArray;
-      if (!byteArray) {
-        byteArray = this.getTexturePixelData();
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    
+      if (this._accumulatedWithoutMySelfAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedWithoutMySelfAncestry === void 0) {
+        this._matrixAccumulatedWithoutMySelfAncestry = this._multiplyMyAndParentTransformMatrices(false, input);
+        this._accumulatedWithoutMySelfAncestryObjectUpdateNumber = tempNumber;
       }
 
-      let color = new Vector4(
-        byteArray[(y*this.width + x) * 4+0],
-        byteArray[(y*this.width + x) * 4+1],
-        byteArray[(y*this.width + x) * 4+2],
-        byteArray[(y*this.width + x) * 4+3]
-        );
-      return color;
+      return this._matrixAccumulatedWithoutMySelfAncestry.clone();
     }
 
-    _getResizedCanvas(image) {
-      var canvas = document.createElement("canvas");
-      canvas.width = this._getNearestPowerOfTwo(image.width);
-      canvas.height = this._getNearestPowerOfTwo(image.height);
+    get normalMatrix() {
+      var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      //console.log(tempNumber);
+      if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
+        let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
+        this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
+        this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
+      }
 
-      var ctx = canvas.getContext("2d");
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-      return canvas;
-    }
-    /**
-     * [en] check whether or not this texture size is power of two. <br />
-     * [ja] テクスチャサイズが２の累乗かどうかを返します
-     *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
-     */
-    _isPowerOfTwo(x) {
-      return (x & (x - 1)) == 0;
+      return this._normalMatrix.clone();
     }
 
-    /**
-     * [en] get a value nearest power of two. <br />
-     * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
-     *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
-     */
-    _getNearestPowerOfTwo(x) {
-      return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
+
+    get inverseWorldMatrixWithoutMySelf() {
+      if (this._parent === null) {
+        return Matrix44$1.identity();
+      }
+
+      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
+    }
+
+    _multiplyMyAndParentRotateMatrices(currentElem           , withMySelf         ) {
+      if (currentElem._parent === null) {
+        if (withMySelf) {
+          return currentElem.transformMatrixOnlyRotate;
+        } else {
+          return Matrix44$1.identity();
+        }
+      } else {
+        let currentMatrix = Matrix44$1.identity();
+        if (withMySelf) {
+          currentMatrix = currentElem.transformMatrixOnlyRotate;
+        }
+        return Matrix44$1.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
+      }
+    }
+
+    get inverseWorldMatrix() {
+      return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
+    }
+
+    _accumulateMyAndParentOpacity(currentElem           ) {
+      if (currentElem._parent === null) {
+        return currentElem.opacity;
+      } else {
+        return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
+      }
+    }
+
+    get opacityAccumulatedAncestry() {
+      return this._accumulateMyAndParentOpacity(this);
+    }
+
+    set opacity(opacity        ) {
+      this._opacity = opacity;
+    }
+
+    get opacity() {
+      return this._opacity;
+    }
+
+    get isTransparent() {
+      return this._isTransparentForce;
+    }
+
+    set isTransparentForce(flg         ) {
+      this._isTransparentForce = flg;
+    }
+
+    set dirty(flg        ) {
+      if (flg) {
+        this._needUpdate();
+      }
+    }
+
+    get parent() {
+      return this._parent;
+    }
+
+    get elementUpdateNumber() {
+      return this.classUniqueNumber + this._updateCountAsElement;
+    }
+
+    // used by library (not Application)
+    toStringWithUpdateInfo() {
+      //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
+      return this._instanceName + this._updateCountAsElement;                // faster
+    }
+
+    prepareToRender() {
+
+    }
+
+    _copy(instance           ) {
+      super._copy(instance);
+
+      instance._parent = this._parent;
+      instance._invMatrix = this._invMatrix.clone();
+      instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
+      instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
+      instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
+      instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
+
+
+      instance._isTransparentForce = this._isTransparentForce;
+      instance.opacity = this.opacity;
+      instance._activeAnimationLineName = this._activeAnimationLineName;
+
+      instance._currentAnimationInputValues = {};
+      for (let inputName in this._currentAnimationInputValues) {
+        instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
+      }
+
+      instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
+    }
+
+    set isVisible(flg         ) {
+      this._isVisible = flg;
+    }
+
+    get isVisible() {
+      return this._isVisible;
+    }
+
+    set isAffectedByWorldMatrix(flg         ) {
+      this._isAffectedByWorldMatrix = flg;
+    }
+
+    get isAffectedByWorldMatrix() {
+      return this._isAffectedByWorldMatrix;
+    }
+
+    set isAffectedByWorldMatrixAccumulatedAncestry(flg         ) {
+      this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
+    }
+
+    get isAffectedByWorldMatrixAccumulatedAncestry() {
+      return this._isAffectedByWorldMatrixAccumulatedAncestry;
+    }
+
+    set isAffectedByViewMatrix(flg         ) {
+      this._isAffectedByViewMatrix = flg;
+    }
+
+    get isAffectedByViewMatrix() {
+      return this._isAffectedByViewMatrix;
+    }
+
+    set isAffectedByProjectionMatrix(flg         ) {
+      this._isAffectedByProjectionMatrix = flg;
+    }
+
+    get isAffectedByProjectionMatrix() {
+      return this._isAffectedByProjectionMatrix;
+    }
+
+    set gizmoScale(scale        ) {
+      for (let gizmo of this._gizmos) {
+        gizmo.scale = new Vector3(scale, scale, scale);
+      }
+    }
+
+    get gizmoScale() {
+      if (this._gizmos.length === 0) {
+        return 1.0;
+      }
+      return this._gizmos[0].scale.x;
+    }
+
+    set isGizmoVisible(flg         ) {
+      for (let gizmo of this._gizmos) {
+        gizmo.isVisible = flg;
+      }
+    }
+
+    get isGizmoVisible() {
+      return this._gizmos[0].isVisible;
+    }
+
+    set masterElement(element           ) {
+      this._masterElement = element;
+    }
+
+    get masterElement() {
+      return this._masterElement;
+    }
+
+    get worldMatrixForJoints() {
+      return this.getWorldMatrixForJointsAt(void 0);
+    }
+
+    getWorldMatrixForJointsAt(input         ) {
+
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      
+      if (this._accumulatedAncestryObjectUpdateNumberForJoints !== tempNumber || this._matrixAccumulatedAncestryForJoints === void 0) {
+        this._matrixAccumulatedAncestryForJoints = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
+        this._accumulatedAncestryObjectUpdateNumberForJoints = tempNumber;
+      }
+
+      return this._matrixAccumulatedAncestryForJoints.clone();
+      
+    }
+
+    _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
+      if (input === void 0 && this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+
+      let tempNumber = 0;
+      if (this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
+      {
+
+          let currentMatrix = null;
+          if (withMySelf) {
+            currentMatrix = this.getRotateTranslateAt(input);
+          } else {
+            currentMatrix = Matrix44$1.identity();
+          }
+      
+          if (this._parent === null) {
+            this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
+            return currentMatrix;
+          }
+
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
+          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
+          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
+    
+    }
+
+
+    get worldMatrix() {
+      return this.getWorldMatrixAt(void 0);
+    }
+
+
+    getWorldMatrixAt(input        ) {
+
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    
+      if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
+        this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(true, input);
+        this._accumulatedAncestryObjectUpdateNumber = tempNumber;
+      }
+
+      return this._matrixAccumulatedAncestry.clone();
+    }
+
+    _multiplyMyAndParentTransformMatrices(withMySelf, input) {
+      if (input === void 0 && this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+      if (this.__updateInfoString_multiplyMyAndParentTransformMatrices !== tempNumber ||
+        this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
+      {
+
+        let currentMatrix = null;
+        if (withMySelf) {
+          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+        } else {
+          currentMatrix = Matrix44$1.identity();
+        }
+        if (this._parent === null) {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
+          return currentMatrix;
+        }
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+        this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
+        this.__cache_input_multiplyMyAndParentTransformMatrices = input;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
+    
+    }
+
+    get inverseWorldMatrix() {
+      return this.getInverseWorldMatrixAt(void 0);
+    }
+
+    getInverseWorldMatrixAt(input         ) {
+      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
+    
+      if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
+        this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
+        this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
+      }
+
+      return this._inverseMatrixAccumulatedAncestry.clone();
+    }
+
+    get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
+      if (this._parent === null) {
+        return Matrix44$1.identity();
+      }
+
+      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
+    }
+
+    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
+      if (input === null && this._activeAnimationLineName !== null) {
+        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
+      }
+
+      let tempNumber = 0;
+      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
+      {
+
+        let currentMatrix = null;
+        if (withMySelf) {
+          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
+        } else {
+          currentMatrix = Matrix44$1.identity();
+        }
+    
+        if (this._parent === null) {
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
+          return currentMatrix;
+        }
+
+        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
+        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
+        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
+      }
+      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
     }
 
     readyForDiscard() {
-      if (this._texture) {
-        this._glContext.deleteTexture(this, this._texture);
-      }
-      if (this.fbo) {
-        for (let texture of this.fbo._glboostTextures) {
-          this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function(v, i) {
-            return (v !== this);
-          });
-        }
-        if (this.fbo._glboostTextures.length === 0) {
-          this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
-          this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
-          if (this.fbo.renderBuffer) {
-            this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+      if (this.className.indexOf('Mesh') !== -1) {
+        const materials = this.getAppropriateMaterials();
+        for (let material of materials) {
+          if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
+            material.readyForDiscard();
           }
         }
       }
-
-      super.readyForDiscard();
     }
 
-    get uvTransform() {
-      return this._uvTransform;
+    addGizmo(gizmo         ) {
+      this._gizmos.push(gizmo);
     }
 
-    set uvTransform(vec4) {
-      this._uvTransform = vec4;
+    get gizmos() {
+      return this._gizmos;
     }
 
-    get toMultiplyAlphaToColorPreviously() {
-      return this._toMultiplyAlphaToColorPreviously;
+    _needUpdate() {
+      super._needUpdate();
     }
 
-    set toMultiplyAlphaToColorPreviously(flag) {
-      this._toMultiplyAlphaToColorPreviously = flag;
+  }
+
+  /**
+   * This is the abstract class for all lights classes. Don't use this class directly.<br>
+   */
+  class M_AbstractLight extends M_Element {
+    constructor(glBoostContext) {
+      super(glBoostContext);
+
+      if (this.constructor === M_AbstractLight) {
+        throw new TypeError('Cannot construct AbstractLight instances directly.');
+      }
+
+      this._gl = this._glContext.gl;
+
+      this._isCastingShadow = true;
+      this._isLightType = '';
+      this._camera = null;
     }
+
+    prepareToRender() {
+      if (this._camera) {
+        if (this._camera.customFunction) {
+          this._camera.customFunction(this);
+        }
+      }
+    }
+
+    set isCastingShadow(flg) {
+      this._isCastingShadow = flg;
+    }
+
+    get isCastingShadow() {
+      return this._isCastingShadow;
+    }
+
+    get lightType() {
+      return this._isLightType;
+    }
+
+    isTypeAmbient() {
+      return this._isLightType === 'ambient';
+    }
+
+    isTypeDirectional() {
+      return this._isLightType === 'directional';
+    }
+
+    isTypePoint() {
+      return this._isLightType === 'point';
+    }
+
+    isTypeSpot() {
+      return this._isLightType === 'spot';
+    }
+
+    set camera(camera) {
+      this._camera = camera;
+    }
+
+    get camera() {
+      return this._camera;
+    }
+  }
+
+  GLBoost$1['M_AbstractLight'] = M_AbstractLight;
+
+  /**
+   * This is a Point Light class.
+   */
+  class M_PointLight extends M_AbstractLight {
+
+    /**
+     * The constructor of PointLight class.
+     * @param {Vector4} intensity intensity as Vector4 Color
+     * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
+     */
+    constructor(glBoostContext, intensity) {
+      super(glBoostContext);
+
+      this._intensity = intensity;
+      
+      this._isLightType = 'point';
+      
+    }
+
+    set intensity(vec) {
+      this._intensity = vec;
+    }
+
+    get intensity() {
+      return this._intensity;
+    }
+
   }
 
   class Hash {
@@ -6100,2757 +6330,6 @@ return mat4(
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  class FragmentSimpleShaderSource {
-    // In the context within these member methods,
-    // this is the instance of the corresponding shader class.
-
-    VSTransform_FragmentSimpleShaderSource(existCamera_f, f) {
-      var shaderText = '';
-
-      if (existCamera_f) {
-        shaderText +=   '  gl_Position = projectionMatrix * viewMatrix * position_world;\n';
-      } else {
-        shaderText +=   '  gl_Position = position_world;\n';
-      }
-
-      return shaderText;
-    }
-
-    FSDefine_FragmentSimpleShaderSource(in_, f) {
-      let shaderText =      'uniform float opacity;\n';
-      shaderText +=         'uniform bool isNeededToMultiplyAlphaToColorOfPixelOutput;\n';
-      return shaderText;
-    }
-
-    FSShade_FragmentSimpleShaderSource(f, gl) {
-      let shaderText =   "";
-      shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
-      shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
-      shaderText += '    rt0.rgb *= rt0.a;\n';
-      shaderText += '  }\n';
-
-      return shaderText;
-    }
-
-    FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
-      let shaderText = '';
-  /*
-      shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
-      shaderText += '  rt0.rgb *= rt0.a;\n';
-      shaderText += '}\n';
-  */
-      return shaderText;
-    }
-
-    prepare_FragmentSimpleShaderSource(gl, glslProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-
-      material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
-      material.setUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput', this._glContext.getUniformLocation(glslProgram, 'isNeededToMultiplyAlphaToColorOfPixelOutput'));
-
-      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
-      if (uniformLocationDepthBias) {
-        let depthBias = this.getShaderParameter(material, 'depthBias', false);
-        if (depthBias) {
-          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
-        }
-      }
-
-      return vertexAttribsAsResult;
-    }
-  }
-
-  class FragmentSimpleShader extends Shader {
-    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
-
-      super(glBoostContext, basicShader);
-
-      FragmentSimpleShader.mixin(basicShader);
-      FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
-
-      this._isNeededToMultiplyAlphaToColorOfPixelOutput = null;
-    }
-
-    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
-      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-      this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
-    
-      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
-
-      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
-      if (uniformLocationAABBLengthCenterToCorner) {
-        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
-      }
-
-    }
-
-    set isNeededToMultiplyAlphaToColorOfPixelOutput(flg) {
-      this._isNeededToMultiplyAlphaToColorOfPixelOutput = flg;
-    }
-
-    get isNeededToMultiplyAlphaToColorOfPixelOutput() {
-      return this._isNeededToMultiplyAlphaToColorOfPixelOutput;
-    }
-  }
-
-
-  GLBoost['FragmentSimpleShader'] = FragmentSimpleShader;
-
-  class VertexWorldShadowShaderSource {
-    // In the context within these member methods,
-    // this is the instance of the corresponding shader class.
-
-    VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
-      var shaderText =   '';
-      //for (let i=0; i<lights.length; i++) {
-      //if (lights[i].camera && lights[i].camera.texture) {
-
-      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
-          
-      //shaderText +=      `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
-      //shaderText +=       `${out_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-
-      return shaderText;
-    }
-
-    VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
-      var shaderText = '';
-      let gl = this._glContext.gl;
-
-      return shaderText;
-    }
-
-    FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += 'uniform float depthBias;\n';
-      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
-  //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
-      if (lightNumExceptAmbient > 0) {
-        shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
-      }
-      
-      return shaderText;
-    }
-
-    FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
-      let shaderText = '';
-      shaderText += 'float visibilityLevel = 1.0;\n';
-
-      if (lights.length > 0) {
-        shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
-      }    
-      for (let i=0; i<lights.length; i++) {
-        shaderText += `  { // ${i}\n`;
-        shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
-        shaderText += `    shadowCoord[${i}].xyz *= 0.5; // ${i}\n`;
-        shaderText += `    shadowCoord[${i}].xyz += 0.5; // ${i}\n`;
-        shaderText += `  } // ${i}\n`;
-      }
-      return shaderText;
-    }
-    FSPostEffect_VertexWorldShadowShaderSource(f, gl, lights, material, extraData) {
-      let shaderText = '';
-
-  //    shaderText += 'rt0 = vec4(visibilityLevel, 1.0, 1.0, 1.0);\n';
-
-      return shaderText;
-    }
-
-    prepare_VertexWorldShadowShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'position' || attribName === 'normal') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);  
-          }
-        }
-      });
-
-      
-      for (let i=0; i<lights.length; i++) {
-        let light = lights[i];
-        
-        material.setUniform(shaderProgram, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
-
-        if (light.camera && light.camera.texture) {// && light.isCastingShadow) {
-
-          // depthTexture
-          let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
-          material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
-
-          let index = i;
-
-          // count for Decal Texture at first
-          index++;
-
-          // count for Normal Texture if it exists
-          let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-          if (normalTexture) {
-            index++;
-          }
-
-          lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
-        }
-      }
-
-      let uniform_depthBias = this._glContext.getUniformLocation(shaderProgram, 'depthBias');
-      material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
-      this._glContext.uniform1f(uniform_depthBias, 0.005, true);
-
-      let textureUnitIndex = 0;
-      for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
-
-        // matrices
-        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
-
-        textureUnitIndex++;
-        //}
-        //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
-      }
-
-      return vertexAttribsAsResult;
-    }
-
-  }
-
-  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
-
-  class WireframeShaderSource {
-    // In the context within these member methods,
-    // this is the instance of the corresponding shader class.
-
-    VSDefine_WireframeShaderSource(in_, out_, f) {
-      var shaderText = '';
-      shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
-      shaderText += `${out_} vec3 barycentricCoord;\n`;
-
-      // for Unfold UV
-      if (Shader._exist(f, GLBoost.TEXCOORD)) {
-        shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
-      }
-      return shaderText;
-    }
-
-    VSTransform_WireframeShaderSource(existCamera_f, f) {
-      var shaderText = '';
-
-
-      // UV Unfold
-      shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
-      shaderText +=   '  gl_Position = position_world;\n';
-      if (Shader._exist(f, GLBoost.TEXCOORD)) {
-        shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
-        shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
-        shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
-        shaderText += '  uvScaled.y = - uvScaled.y;\n';
-        shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
-        shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
-      }
-
-      if (existCamera_f) {
-        shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
-        shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
-      }
-
-      shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
-
-      return shaderText;
-    }
-
-    FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += `${in_} vec3 barycentricCoord;\n`;
-
-      shaderText += 'uniform bool isWireframe;\n';
-      //shaderText += 'uniform bool isWireframeOnShade;\n';
-      shaderText += 'uniform float wireframeWidth;\n';
-
-      return shaderText;
-    }
-
-    FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += `
-    float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
-        vec3 d = fwidth(bary3);
-        vec3 x = bary3+vec3(1.0 - wireframeWidthInner)*d;
-        vec3 a3 = smoothstep(vec3(0.0), d, x);
-        float factor = min(min(a3.x, a3.y), a3.z);
-        
-        return clamp((1.0 - factor), 0.0, 1.0);
-    }
-    `;
-
-      return shaderText;
-    }
-
-    FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += 'bool isWireframeInner = false;\n';
-      shaderText += 'float wireframeWidthRelativeScale = 1.0;\n';
-      
-      return shaderText;
-    }
-
-    FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
-      shaderText += 'float threshold = 0.001;\n';
-      shaderText += 'vec4 wireframeResult = rt0;\n';
-      shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
-      shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
-      shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
-      shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
-      // if r0.a is 0.0, it is wireframe not on shaded
-      shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
-      shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
-      shaderText += '}\n';
-
-      shaderText += 'if ( isWireframe ) {\n';
-      shaderText += '  rt0 = wireframeResult;\n';
-      shaderText += '}\n';
-
-      shaderText += '    if (rt0.a < 0.05) {\n';
-      shaderText += '      discard;\n';
-      shaderText += '    }\n';
-
-      /*
-      //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += '  rt0 = vec4(normalize(v_normal)*0.5+0.5, 1.0);\n';
-      }
-      */
-
-      return shaderText;
-    }
-
-    prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-      shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
-      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
-      vertexAttribsAsResult.push('barycentricCoord');
-
-      let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
-      material.setUniform(shaderProgram, 'uniform_isWireframe', uniform_isWireframe);
-      this._glContext.uniform1i( uniform_isWireframe, 0, true);
-
-      let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
-      material.setUniform(shaderProgram, 'uniform_wireframeWidth', uniform_wireframeWidth);
-      this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
-
-      let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
-      material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
-      this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
-
-      if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
-        material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
-      }
-
-      return vertexAttribsAsResult;
-    }
-  }
-
-  class WireframeShader extends FragmentSimpleShader {
-    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
-
-      super(glBoostContext);
-
-      if (basicShader === VertexWorldShaderSource) {
-        WireframeShader.mixin(VertexWorldShadowShaderSource);
-      }
-      WireframeShader.mixin(WireframeShaderSource);
-
-      this._unfoldUVRatio = void 0;
-
-      this._AABB = null;
-
-    }
-
-    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
-      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-      let isWifeframe = false;
-      let isWireframeOnShade = false;
-      let wireframeWidth = 0.0;
-      let wireframeWidthRelativeScale = 0.0;
-
-      if (typeof material.isWireframe !== 'undefined') {
-        isWifeframe = material.isWireframe;
-        isWireframeOnShade = material.isWireframeOnShade;
-        wireframeWidth = material.wireframeWidth;
-        wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
-      }
-
-      let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
-      if (uniformLocationIsWireframe) {
-        this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
-      }
-      if (isWifeframe && !isWireframeOnShade) {
-        material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), 0.0, true);
-      }
-      let uniformLocationWireframeWidth = material.getUniform(glslProgram, 'uniform_wireframeWidth');
-      if (uniformLocationWireframeWidth) {
-        this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
-      }
-      let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram, 'uniform_wireframeWidthRelativeScale');
-      if (uniformLocationWireframeWidthRelativeScale) {
-        this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
-      }
-
-      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
-
-      let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
-      if (uniformLocationAABBCenterPositionAndRatio) {
-        let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
-        this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
-      }
-
-      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
-      if (uniformLocationDepthBias) {
-        let depthBias = this.getShaderParameter(material, 'depthBias', false);
-        if (depthBias) {
-          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
-        }
-      }
-    }
-
-    set unfoldUVRatio(value) {
-      this._unfoldUVRatio = value;
-    }
-
-    get unfoldUVRatio() {
-      return this._unfoldUVRatio;
-    }
-
-    set AABB(aabb) {
-      this._AABB = aabb;
-    }
-
-    get AABB() {
-      return this._AABB;
-    }
-
-  }
-
-  GLBoost['WireframeShader'] = WireframeShader;
-
-  class DecalShaderSource {
-    // In the context within these member methods,
-    // this is the instance of the corresponding shader class.
-
-    VSDefine_DecalShaderSource(in_, out_, f) {
-      var shaderText = '';
-      if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += `${in_} vec4 aVertex_color;\n`;
-        shaderText += `${out_} vec4 color;\n`;
-      }
-      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-        shaderText += `${in_} vec2 aVertex_texcoord;\n`;
-        shaderText += `${out_} vec2 texcoord;\n`;
-      }
-      return shaderText;
-    }
-
-    VSTransform_DecalShaderSource(existCamera_f, f) {
-      var shaderText = '';
-      if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += '  color = aVertex_color;\n';
-      }
-      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-        shaderText += '  texcoord = aVertex_texcoord;\n';
-      }
-      return shaderText;
-    }
-
-    FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
-      var shaderText = '';
-      if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += `${in_} vec4 color;\n`;
-      }
-      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-        shaderText += `${in_} vec2 texcoord;\n\n`;
-      }
-      if (material.hasAnyTextures()) {
-        shaderText += 'uniform sampler2D uTexture;\n';
-      }
-      shaderText += 'uniform vec4 materialBaseColor;\n';
-      shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
-
-      return shaderText;
-    }
-
-    FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += this._multiplyAlphaToColorOfTexel();
-
-      return shaderText;
-    }
-
-    FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
-      var shaderText = '';
-
-      shaderText += Shader._getNormalStr(gl, material, f);
-      
-      var textureFunc = Shader._texture_func(gl);
-      if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += '  rt0 *= color;\n';
-      }
-      shaderText += '    rt0 *= materialBaseColor;\n';
-      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
-        shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
-      }
-
-      //shaderText += '    float shadowRatio = 0.0;\n';
-
-      //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
-
-      return shaderText;
-    }
-
-    prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'color' || attribName === 'texcoord') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);  
-          }
-        }
-      });
-
-      material.setUniform(shaderProgram, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
-
-      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-      if (!diffuseTexture) {
-        diffuseTexture = this._glBoostContext.defaultDummyTexture;
-      }
-
-      if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
-        let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
-        material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
-      }
-
-      let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-      material.setUniform(shaderProgram, 'uTexture', uTexture);
-      // set texture unit 0 to the sampler
-      this._glContext.uniform1i( uTexture, 0, true);
-
-      material._semanticsDic['TEXTURE'] = [];
-
-      material.uniformTextureSamplerDic['uTexture'] = {};
-      if (material.hasAnyTextures() || diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        material._semanticsDic['TEXTURE'] = 'uTexture';
-      }
-
-
-      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
-      let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
-      if (uNormalTexture) {
-        material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
-        // set texture unit 1 to the normal texture sampler
-        this._glContext.uniform1i( uNormalTexture, 1, true);
-
-        material.uniformTextureSamplerDic['uNormalTexture'] = {};
-        if (material.hasAnyTextures()) {
-          material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
-          material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
-          material._semanticsDic['TEXTURE'].push('uNormalTexture');
-        }
-      }
-
-      return vertexAttribsAsResult;
-    }
-  }
-
-  class DecalShader extends WireframeShader {
-    constructor(glBoostContext) {
-
-      super(glBoostContext);
-
-      DecalShader.mixin(VertexWorldShadowShaderSource);
-      DecalShader.mixin(DecalShaderSource);
-
-      this._lut = null;
-    }
-
-    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
-      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
-
-      let baseColor = material.baseColor;
-      this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
-
-      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-      if (diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
-      }
-
-
-      // For Shadow
-      for (let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {
-          let cameraMatrix = lights[i].camera.lookAtRHMatrix();
-          let viewMatrix = cameraMatrix.clone();
-          let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
-        }
-
-        if (lights[i].camera && lights[i].camera.texture) {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 1, true);
-        } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 0, true);
-        }
-
-        if (lights[i].camera && lights[i].camera.texture) {
-          let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
-          let index = lights[i].camera.texture.textureUnitIndex;
-
-          this._glContext.uniform1i(uniformLocation, index, true);
-        } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
-        }
-      }
-    }
-
-    setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
-      super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
-      for (let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {
-          // set depthTexture unit i+1 to the sampler
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
-        }
-      }
-    }
-
-    set lut(lut) {
-      this._lut = lut;
-    }
-
-    get lut() {
-      return this._lut;
-    }
-  }
-
-  GLBoost$1['DecalShader'] = DecalShader;
-
-  class L_AbstractMaterial extends GLBoostObject {
-    constructor(glBoostContext) {
-      super(glBoostContext);
-
-      if (this.constructor === L_AbstractMaterial) {
-        throw new TypeError('Cannot construct L_AbstractMaterial instances directly.');
-      }
-
-      this._textureDic = {};
-      this._texturePurposeDic = [];
-      this._textureContributionRateDic = {};
-      this._gl = this._glContext.gl;
-      this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
-      this._ambientColor = new Vector4(0.25, 0.25, 0.25, 1.0);
-      this._name = '';
-      this._shaderClass = DecalShader;
-      this._shaderInstance = null;
-      this._vertexNofGeometries = {};
-      this._states = {
-        enable:[],
-        functions:{}
-      };
-      this._shaderUniformLocationsOfExpressions = {};
-      this._isVisibleForGeometiesAssginedByThisMaterial = true;
-      this._globalStatesUsage = null;
-      this._shaderParametersForShaderInstance = {};
-      this._semanticsDic = {};
-
-      this._stateFunctionsToReset = {
-        "blendColor": [0.0, 0.0, 0.0, 0.0],
-        "blendEquationSeparate": [
-          32774,
-          32774
-        ],
-        "blendFuncSeparate": [1, 0, 1, 0],
-        "colorMask": [true, true, true, true],
-        "cullFace": [1029],
-        "depthFunc": [513],
-        "depthMask": [true],
-        "depthRange": [0.0, 1.0],
-        "frontFace": [2305],
-        "lineWidth": [1.0],
-        "polygonOffset": [0.0, 0.0]
-      };
-
-      this._countOfUpdate = 0;
-    }
-
-    clone() {
-      var material = new ClassicMaterial(this._glBoostContext);
-      material._baseColor = this._baseColor;
-      material._diffuseColor = this._diffuseColor;
-      material._specularColor = this._specularColor;
-      material._ambientColor = this._ambientColor;
-      material._shaderClass = this._shaderClass;
-      material._shaderInstance = this._shaderInstance;
-
-      for (let geom in this._vertexNofGeometries) {
-        material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
-      }
-
-      return material;
-    }
-
-    _updateCount() {
-      this._countOfUpdate += 1;
-    }
-
-    getUpdateStateString() {
-      return this.toString() + '_updateCount_' + this._countOfUpdate;
-    }
-
-    setShaderClassWithForceUpdate(shaderClass) {
-      this._shaderClass = shaderClass;
-      if (this._shaderInstance) {
-        this._shaderInstance.readyForDiscard();
-      }
-      this._shaderInstance = null;
-    }
-
-    set shaderClass(shaderClass) {
-      if (this._shaderClass === shaderClass) {
-        return;
-      }
-      this.setShaderClassWithForceUpdate(shaderClass);
-    }
-
-    get shaderClass() {
-      return this._shaderClass;
-    }
-
-    set shaderInstance(shaderInstance) {
-      this._shaderInstance = shaderInstance;
-      this._updateCount();
-    }
-
-    get shaderInstance() {
-      return this._shaderInstance;
-    }
-
-    setTexture(texture, purpose) {
-      if (!texture) {
-        return;
-      }
-      this._textureDic[texture.userFlavorName] = texture;
-      let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
-      this._texturePurposeDic[_purpose] = texture.userFlavorName;
-      texture.purpose = _purpose;
-      this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
-      this._updateCount();
-    }
-
-    removeTexture(userFlavorName, discardTexture=true) {
-      if (discardTexture) {
-        this._textureDic[userFlavorName].readyForDiscard();
-      }
-      delete this._texturePurposeDic[this._textureDic[userFlavorName].purpose];
-      delete this._textureDic[userFlavorName];
-      delete this._textureContributionRateDic[userFlavorName];
-      this._updateCount();
-    }
-
-    setTexturePurpose(userFlavorNameOfTexture, purpose) {
-      this._texturePurposeDic[purpose] = userFlavorNameOfTexture;
-      this._updateCount();
-    }
-
-    getTexture(userFlavorName) {
-      return this._textureDic[userFlavorName];
-    }
-
-    getTextureFromPurpose(purpose) {
-      let userFlavorName = this._texturePurposeDic[purpose];
-      return this.getTexture(userFlavorName);
-    }
-
-    getOneTexture() {
-      for (let userFlavorName in this._textureDic) {
-        return this._textureDic[userFlavorName];
-      }
-      return null;
-    }
-
-    getTextureNum() {
-      let count = 0;
-      for (let userFlavorName in this._textureDic) {
-        if (this._textureDic[userFlavorName] instanceof AbstractTexture) {
-          count += 1;
-        }
-      }
-      return count;
-    }
-
-    getTextureUserFlavorNames() {
-      return Object.keys(this._textureDic);
-    }
-
-    setAllTextureContributionRate(rateVec4) {
-      for (let userFlavorName in this._textureContributionRateDic) {
-        this._textureContributionRateDic[userFlavorName] = rateVec4;
-      }
-      this._updateCount();
-    }
-
-    setTextureContributionRate(textureUserFlavorName, rateVec4) {
-      this._textureContributionRateDic[textureUserFlavorName] = rateVec4;
-      this._updateCount();
-    }
-
-    getTextureContributionRate(textureUserFlavorName) {
-      return this._textureContributionRateDic[textureUserFlavorName];
-    }
-
-
-    hasAnyTextures() {
-      let result = false;
-      for (let userFlavorName in this._textureDic) {
-        result = true;
-      }
-
-      return result;
-    }
-
-    set baseColor(vec) {
-      if (!vec) {
-        return;
-      }
-
-      this._baseColor = vec;
-      this._updateCount();
-    }
-
-    get baseColor() {
-      return this._baseColor;
-    }
-
-    set diffuseColor(vec) {
-      if (!vec) {
-        return;
-      }
-
-      this._diffuseColor = vec;
-      this._updateCount();
-    }
-
-    get diffuseColor() {
-      return this._diffuseColor;
-    }
-
-    set specularColor(vec) {
-      if (!vec) {
-        return;
-      }
-
-      this._specularColor = vec;
-      this._updateCount();
-    }
-
-    get specularColor() {
-      return this._specularColor;
-    }
-
-    set ambientColor(vec) {
-      if (!vec) {
-        return;
-      }
-
-      this._ambientColor = vec;
-      this._updateCount();
-    }
-
-    get ambientColor() {
-      return this._ambientColor;
-    }
-
-    set states(states) {
-      if (typeof states.functions === 'undefined') {
-        states.functions = this._stateFunctionsToReset;
-      }
-      this._states.enable = states.enable;
-      if (typeof states.functions !== 'undefined') {
-        this._states.functions = states.functions;
-      }
-      this._updateCount();
-    }
-
-    get states() {
-      return this._states;
-    }
-
-    isTransparent() {
-      let isTransparent = false;
-      if (this._states) {
-        if (this._states.enable) {
-          this._states.enable.forEach((state) => {
-            if (state === 3042) {
-              isTransparent = true;
-            }
-          });
-        }
-      }
-
-      return isTransparent;
-    }
-
-    set name(name) {
-      this._name = name;
-      this._updateCount();
-    }
-
-    get name() {
-      return this._name;
-    }
-
-    setVertexN(geom, num) {
-      this._vertexNofGeometries[geom] = num;
-      this._updateCount();
-    }
-
-    getVertexN(geom) {
-      return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
-    }
-
-    /**
-     * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
-     * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
-     */
-    setUpTexture(textureName, textureUnitIndex) {
-      var gl = this._gl;
-      let texture = this.getTexture(textureName);
-      let isCalledWebGLBindTexture = true;
-
-      if (texture) {
-        isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
-        return isCalledWebGLBindTexture;
-      } else {
-        this._glBoostContext.defaultDummyTexture.setUp(0);
-
-  //      gl.bindTexture(gl.TEXTURE_2D, null);
-        isCalledWebGLBindTexture = true;
-        return isCalledWebGLBindTexture;
-      }
-    }
-
-    tearDownTexture(textureName, textureUnitIndex) {
-      let texture = this.getTexture(textureName);
-      if (texture) {
-        texture.tearDown(textureUnitIndex);
-      }
-    }
-
-    _setUpMaterialStates(states) {
-      let gl = this._gl;
-
-      if (states) {
-        if (states.enable) {
-          states.enable.forEach((state)=>{
-            gl.enable(state);
-          });
-        }
-        if (states.functions) {
-          for (let functionName in states.functions) {
-            gl[functionName].apply(gl, states.functions[functionName]);
-          }
-        }
-      }
-    }
-
-    setUpStates() {
-      let globalStatesUsage = this._glBoostContext.globalStatesUsage;
-      if (this._globalStatesUsage) {
-        globalStatesUsage = this._globalStatesUsage;
-      }
-      switch (globalStatesUsage) {
-        case GLBoost$1.GLOBAL_STATES_USAGE_DO_NOTHING:
-          break;
-        case GLBoost$1.GLOBAL_STATES_USAGE_IGNORE:
-          this._setUpMaterialStates(this._states);
-          break;
-        case GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE:
-          this._glBoostContext.reflectGlobalGLState();
-          this._setUpMaterialStates(this._states);
-          break;
-        case GLBoost$1.GLOBAL_STATES_USAGE_EXCLUSIVE:
-          this._glBoostContext.reflectGlobalGLState();
-          break;
-        default:
-          break;
-      }
-    }
-
-    tearDownStates() {
-      this._glBoostContext.disableAllGLState();
-      this._setUpMaterialStates({
-        functions : this._stateFunctionsToReset
-      });
-    }
-
-    setUniform(glslProgram, uniformLocationName, uniformLocation) {
-      if (!this._shaderUniformLocationsOfExpressions[glslProgram.hashId]) {
-        this._shaderUniformLocationsOfExpressions[glslProgram.hashId] = {};
-      }
-
-      this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
-      glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
-
-      this._updateCount();
-    }
-
-    getUniform(glslProgram, uniformLocationName) {
-      if (typeof this._shaderUniformLocationsOfExpressions[glslProgram.hashId] !== 'undefined') {
-        return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
-      }
-
-  //    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');
-
-      return void 0;
-    }
-
-    set isVisible(flg) {
-      this._isVisibleForGeometiesAssginedByThisMaterial = flg;
-      this._updateCount();
-    }
-
-    get isVisible() {
-      return this._isVisibleForGeometiesAssginedByThisMaterial;
-    }
-
-    set globalStatesUsage(usage) {
-      this._globalStatesUsage = usage;
-      this._updateCount();
-    }
-
-    get globalStatesUsage() {
-      return this._globalStatesUsage;
-    }
-
-    get shaderParameters() {
-      return this._shaderParametersForShaderInstance;
-    }
-
-    set shaderParameters(shaderParameterDic) {
-      this._shaderParametersForShaderInstance = shaderParameterDic;
-    }
-
-    addSemanticsDic(uniform, uniformName) {
-      if (typeof this._semanticsDic[uniform] === 'undefined') {
-        this._semanticsDic[uniform] = uniformName;
-      } else if (typeof this._semanticsDic[uniform] === 'string') {
-        let tmpSemanticsStr = this._semanticsDic[uniform];
-        this._semanticsDic[uniform] = [];
-        this._semanticsDic[uniform].push(tmpSemanticsStr);
-        this._semanticsDic[uniform].push(uniformName);
-      } else {
-        // it must be Array
-        this._semanticsDic[uniform].push(uniformName);
-      }
-    }
-
-    removeSemanticsDic(uniform) {
-      delete this._semanticsDic[uniform];
-    }
-
-    readyForDiscard() {
-      for (let userFlavorName in this._textureDic) {
-        this.removeTexture(userFlavorName, true);
-      }
-      if (this._shaderInstance) {
-        this._shaderInstance.readyForDiscard();
-      }
-      this._shaderInstance = null;
-    }
-  }
-
-  GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
-
-  class M_Mesh extends M_Element {
-    constructor(glBoostContext, geometry, material) {
-      super(glBoostContext);
-
-      if (geometry) {
-        this.geometry = geometry;
-      }
-      if (material) {
-        this.material = material;
-      }
-      this._transformedDepth = 0;
-      this._outlineGizmo = null;
-      this._isPickable = true;
-    }
-
-    prepareToRender(expression, existCamera_f, lights) {
-      this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
-      /*
-      if (this._geometry._materials.length === 0 && this._material) {
-        let shaderInstance = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
-        this._geometry._setVertexNtoSingleMaterial(this._material, 0);
-        this._material.shaderInstance = shaderInstance;      
-        this._material.shaderInstance.vao = this._geometry._getVAO();
-        this._geometry.setUpVertexAttribs(this._glContext.gl, shaderInstance._glslProgram, this._geometry._getAllVertexAttribs());
-      }
-      */
-    }
-
-    draw(data) {
-      this._geometry.draw(
-        {
-          expression: data.expression,
-          lights: data.lights,
-          camera: data.camera,
-          scene: data.renderPass.scene,
-          renderPassIndex: data.renderPassIndex,
-          mesh: this,
-          viewport: data.viewport,
-          isWebVRMode: data.isWebVRMode,
-          webvrFrameData: data.webvrFrameData,
-          forceThisMaterial: data.forceThisMaterial,
-        }
-      );
-    }
-
-    set geometry(geometry) {
-      this._geometry = geometry;
-      geometry._parent = this;
-      M_Mesh._geometries[geometry.toString()] = geometry;
-    }
-
-    get geometry() {
-      return this._geometry;
-    }
-
-    set material(material) {
-      this._material = material;
-    }
-
-    get material() {
-      return this._material;
-    }
-
-    bakeTransformToGeometry() {
-      var positions = this._geometry._vertices.position;
-      var mat = this.worldMatrix;
-      let componentN = this._geometry._vertices.components.position;
-      let length = positions.length / componentN;
-      for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
-        let transformedPosVec = mat.multiplyVector(posVector4);
-        positions[i*componentN] = transformedPosVec.x;
-        positions[i*componentN+1] = transformedPosVec.y;
-        positions[i*componentN+2] = transformedPosVec.z;
-        if (componentN > 3) {
-          positions[i * componentN+3] = transformedPosVec.w;
-        }
-      }
-      this._geometry._vertices.position = positions;
-
-      if (this._geometry._vertices.normal) {
-        var normals = this._geometry._vertices.normal;
-        length = normals.length / 3;
-        for (let i=0; i<length; i++) {
-          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
-          normals[i*3] = transformedNormalVec.x;
-          normals[i*3+1] = transformedNormalVec.y;
-          normals[i*3+2] = transformedNormalVec.z;
-        }
-        this._geometry._vertices.normal = normals;
-      }
-
-    }
-
-    bakeInverseTransformToGeometry() {
-      var positions = this._geometry._vertices.position;
-      var invMat = this.inverseWorldMatrix;
-      let componentN = this._geometry._vertices.components.position;
-      let length = positions.length / componentN;
-      for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
-        let transformedPosVec = invMat.multiplyVector(posVector4);
-        positions[i*componentN] = transformedPosVec.x;
-        positions[i*componentN+1] = transformedPosVec.y;
-        positions[i*componentN+2] = transformedPosVec.z;
-        if (componentN > 3) {
-          positions[i * componentN+3] = transformedPosVec.w;
-        }
-      }
-      this._geometry._vertices.position = positions;
-
-      let mat = this.worldMatrix;
-      if (this._geometry._vertices.normal) {
-        var normals = this._geometry._vertices.normal;
-        length = normals.length / 3;
-        for (let i=0; i<length; i++) {
-          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
-          normals[i*3] = transformedNormalVec.x;
-          normals[i*3+1] = transformedNormalVec.y;
-          normals[i*3+2] = transformedNormalVec.z;
-        }
-        this._geometry._vertices.normal = normals;
-      }
-
-    }
-
-    _copyMaterials() {
-      if (this.geometry._indicesArray.length !== this.geometry._materials.length) {
-        for (let i=0; i<this.geometry._indicesArray.length;i++) {
-          this.geometry._materials[i] = this._material;//.clone();
-          this.geometry._materials[i].setVertexN(this.geometry, this.geometry._indicesArray[i].length);
-        }
-      }
-    }
-
-    merge(meshOrMeshes) {
-      if (Array.isArray(meshOrMeshes)) {
-        this.bakeTransformToGeometry();
-
-        let meshes = meshOrMeshes;
-        let geometries = [];
-        for (let i=0; i<meshes.length; i++) {
-          meshes[i].bakeTransformToGeometry();
-          geometries.push(meshes[i].geometry);
-        }
-
-        this.geometry.merge(geometries);
-
-        for (let i=0; i<meshes.length; i++) {
-          delete meshes[i];
-        }
-
-        this._copyMaterials();
-
-        this.bakeInverseTransformToGeometry();
-
-      } else { //
-        let mesh = meshOrMeshes;
-        mesh.bakeTransformToGeometry();
-        this.bakeTransformToGeometry();
-        this.geometry.merge(mesh.geometry);
-
-        this._copyMaterials();
-
-        this.bakeInverseTransformToGeometry();
-      }
-    }
-
-    mergeHarder(meshOrMeshes) {
-
-      if (Array.isArray(meshOrMeshes)) {
-
-        this.bakeTransformToGeometry();
-
-        let meshes = meshOrMeshes;
-        let geometries = [];
-        for (let i=0; i<meshes.length; i++) {
-          meshes[i].bakeTransformToGeometry();
-          geometries.push(meshes[i].geometry);
-        }
-
-        this.geometry.mergeHarder(geometries);
-
-        for (let i=0; i<meshes.length; i++) {
-          delete meshes[i];
-        }
-
-        this.bakeInverseTransformToGeometry();
-
-      } else { //
-        let mesh = meshOrMeshes;
-        mesh.bakeTransformToGeometry();
-        this.bakeTransformToGeometry();
-        this.geometry.mergeHarder(mesh.geometry);
-
-        this.bakeInverseTransformToGeometry();
-      }
-    }
-
-    calcTransformedDepth(camera) {
-      var viewMatrix = camera.lookAtRHMatrix();
-      var m_m = null;
-      if (this.bindShapeMatrix) {
-        m_m = Matrix44$1.multiply(this.worldMatrix, this.bindShapeMatrix);
-      } else {
-        m_m = this.worldMatrix;
-      }
-      var mv_m = viewMatrix.multiply(camera.inverseWorldMatrix).multiply(m_m);
-
-      var centerPosition = this.geometry.centerPosition.toVector4();
-      //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
-      var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
-
-      this._transformedDepth = transformedCenterPosition.z;//transformedCenterPosition.length();// //
-    }
-
-    get transformedDepth() {
-      return this._transformedDepth;
-    }
-
-    get isTransparent() {
-      let isTransparent = (this._opacity < 1.0) ? true : false;
-      isTransparent |= this.geometry.isTransparent(this);
-      return isTransparent;
-    }
-
-    set isTransparentForce(flg) {
-      this._isTransparentForce = flg;
-    }
-
-    get isTransparentForce() {
-      return this._isTransparentForce;
-    }
-
-    get AABBInWorld() {
-      var world_m = this.worldMatrix;
-      return AABB.multiplyMatrix(world_m, this._geometry.rawAABB);
-    }
-
-    get AABBInLocal() {
-      return this._geometry.rawAABB;//.clone();
-    }
-
-    get rawAABBInLocal() {
-      return this._geometry.rawAABB;
-    }
-
-    getAppropriateMaterials() {
-      return this.geometry._getAppropriateMaterials(this);
-    }
-
-    rayCast(x, y, camera, viewport) {
-
-      const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-      const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
-      const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
-      const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
-
-      const gl = this._glContext.gl;
-      const isCulling = gl.isEnabled(gl.CULL_FACE);
-      const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
-
-      let isFrontFacePickable = true;
-      let isBackFacePickable = true;
-      if (isCulling) {
-        if (cullMode === gl.FRONT) {
-          isFrontFacePickable = false;
-        } else if (cullMode === gl.Back) {
-          isBackFacePickable = false;
-        } else {
-          isFrontFacePickable = false;
-          isBackFacePickable = false;
-        }
-      }
-      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
-      let intersectPositionInWorld = null;
-      if (result[0]) {
-        intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
-      }
-      return [intersectPositionInWorld, result[1]];
-    }
-
-    get gizmos() {
-      if (this.isOutlineVisible) {
-        return this._gizmos.concat([this._outlineGizmo]);
-      } else {
-        return this._gizmos;
-      }
-    }
-
-    set isOutlineVisible(flg) {
-      if (flg && this._outlineGizmo === null) {
-        this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
-      }
-
-      if (this._outlineGizmo) {
-        this._outlineGizmo.isVisible = flg;
-      }
-    }
-
-    get isOutlineVisible() {
-      if (this._outlineGizmo === null) {
-        return false;
-      }
-      return this._outlineGizmo.isVisible;
-    }
-
-    set isVisible(flg) {
-      super.isVisible = flg;
-      if (this._outlineGizmo) {
-        this._outlineGizmo.isVisible = flg;
-      }
-    }
-
-    get isVisible() {
-      return super.isVisible;
-    }
-
-    clone() {
-      let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
-      this._copy(instance);
-
-      return instance;
-    }
-
-    _copy(instance) {
-      super._copy(instance);
-      instance._transformedDepth = this._transformedDepth;
-    }
-
-    _needUpdate() {
-      super._needUpdate();
-    }
-
-    set isPickable(flag) {
-      this._isPickable = flag;
-    }
-
-    get isPickable() {
-      return this._isPickable;
-    }
-  }
-  M_Mesh._geometries = {};
-
-  GLBoost$1['M_Mesh'] = M_Mesh;
-
-  class CubeAbsolute extends Geometry {
-    constructor(glBoostContext) {
-      super(glBoostContext);
-
-      //this._
-
-      const BIG_NUMBER = 999;
-      this._vertexData = this._setupVertexData(
-        new Vector3(-BIG_NUMBER, -BIG_NUMBER, -BIG_NUMBER),
-        new Vector3(-BIG_NUMBER+1, -BIG_NUMBER+1, -BIG_NUMBER+1));
-      this.setVerticesData(this._vertexData, [this._indices]);
-    }
-
-    _setupVertexData(minPosition, maxPosition, vertexColor) {
-      this._indices = [
-        3, 1, 0, 2, 1, 3,
-        4, 5, 7, 7, 5, 6,
-        8, 9, 11, 11, 9, 10,
-        15, 13, 12, 14, 13, 15,
-        19, 17, 16, 18, 17, 19,
-        20, 21, 23, 23, 21, 22
-      ];
-
-
-      const positions = [
-        // upper
-        new Vector3(minPosition.x, maxPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
-        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
-        // lower
-        new Vector3(minPosition.x, minPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
-        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
-        // front
-        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
-        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
-        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
-        // back
-        new Vector3(minPosition.x, minPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
-        new Vector3(minPosition.x, maxPosition.y, minPosition.z),
-        // right
-        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
-        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
-        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
-        // left
-        new Vector3(minPosition.x, minPosition.y, minPosition.z),
-        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
-        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
-        new Vector3(minPosition.x, maxPosition.y, minPosition.z)
-      ];
-      if (vertexColor) {
-        const colors = [
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
-        ];
-      }
-
-      const texcoords = [
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0),
-
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0),
-
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0),
-
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0),
-
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0),
-
-        new Vector2(0.0, 0.0),
-        new Vector2(1.0, 0.0),
-        new Vector2(1.0, 1.0),
-        new Vector2(0.0, 1.0)
-      ];
-
-      const normals = [
-        // upper
-        new Vector3(0, 1, 0),
-        new Vector3(0, 1, 0),
-        new Vector3(0, 1, 0),
-        new Vector3(0, 1, 0),
-        // lower
-        new Vector3(0, -1, 0),
-        new Vector3(0, -1, 0),
-        new Vector3(0, -1, 0),
-        new Vector3(0, -1, 0),
-        // front
-        new Vector3(0, 0, 1),
-        new Vector3(0, 0, 1),
-        new Vector3(0, 0, 1),
-        new Vector3(0, 0, 1),
-        // back
-        new Vector3(0, 0, -1),
-        new Vector3(0, 0, -1),
-        new Vector3(0, 0, -1),
-        new Vector3(0, 0, -1),
-        // right
-        new Vector3(1, 0, 0),
-        new Vector3(1, 0, 0),
-        new Vector3(1, 0, 0),
-        new Vector3(1, 0, 0),
-        // left
-        new Vector3(-1, 0, 0),
-        new Vector3(-1, 0, 0),
-        new Vector3(-1, 0, 0),
-        new Vector3(-1, 0, 0),
-      ];
-
-      this._vertexData ={
-        position: positions,
-        normal: normals,
-        texcoord: texcoords
-      };
-
-      return this._vertexData;
-    }
-
-    update(minPosition, maxPosition) {
-      this._vertexData = this._setupVertexData(minPosition, maxPosition);
-      this.updateVerticesData(this._vertexData, [this._indices]);
-    }
-
-  }
-
-  GLBoost$1["CubeAbsolute"] = CubeAbsolute;
-
-  class ClassicMaterial$1 extends L_AbstractMaterial {
-    constructor(glBoostContext) {
-      super(glBoostContext);
-
-      this._wireframeWidthRelativeScale = 1.0;
-
-    }
-
-    get wireframeWidthRelativeScale() {
-      return this._wireframeWidthRelativeScale;
-    }
-  }
-
-  GLBoost$1['ClassicMaterial'] = ClassicMaterial$1;
-
-  /*       */
-
-                                                  
-
-  class M_Group extends M_Element {
-                               
-
-    constructor(glBoostContext) {
-      super(glBoostContext);
-      this._elements = [];
-      this._AABB = new AABB();
-      this._isRootJointGroup = false;
-
-  //    this._aabbGizmo = null;
-  //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
-  //    this._gizmos.push(this._aabbGizmo);
-    }
-
-    /**
-     * [en] Add the element to this group as a child.<br>
-     * [ja] このグループにelementを子供として追加します。
-     * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
-     */
-    addChild(element, isDuplicateOk = false) {
-
-      if (isDuplicateOk){
-        // if forgive duplicated register by copy
-        let elem = null;
-        if (element._parent) {
-          elem = element.clone();
-        } else {
-          elem = element;
-        }
-        elem._parent = this;
-        this._elements.push(elem);
-      } else {
-        //// if forbit duplicated register
-        this.removeChild(element);
-        element._parent = this;
-        this._elements.push(element);
-      }
-    }
-
-    /**
-     * [en] remove the element from this group.
-     * [ja] このグループから指定した要素を削除します。
-     * @param {Element} element [en] the element to remove [ja] 削除したい要素
-     */
-    removeChild(element) {
-      this._elements = this._elements.filter(function(elem) {
-        if (elem === element) {
-          element._parent = null;
-        }
-        return elem !== element;
-      });
-    }
-
-    /**
-     * [en] remove all elements from this group.
-     * [ja] このグループから全ての要素を削除します。
-     */
-    removeAll() {
-      this._elements = this._elements.filter(function(elem) {
-        elem._parent = null;
-      });
-      this._elements.length = 0;
-    }
-
-    getChildren()                  {
-      return this._elements;
-    }
-
-    getAnyJointAsChild()           {
-      for (let element of this._elements) {
-        if (element.className === 'M_Joint') {
-          return element;
-        }
-      }
-      return null;
-    }
-
-    _setDirtyToAnimatedElement(inputName       )      {
-      if (this.hasAnimation(inputName)) {
-        this._needUpdate();
-      }
-
-      let children = this.getChildren();
-      if (children) {
-        for (let i = 0; i < children.length; i++) {
-          children[i]._setDirtyToAnimatedElement(inputName);
-        }  
-      }
-    }
-
-    _validateByQuery(object               , query        , queryMeta           ) {
-      let propertyName = '';
-      if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME) {
-        propertyName = 'instanceName';
-      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-        propertyName = 'userFlavorName';
-      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-        propertyName = 'instanceNameWithUserFlavor';
-      }
-
-      if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
-        if (object[propertyName] === query) {
-          return object;
-        }
-      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
-          if (object[propertyName].indexOf(query) !== -1) {
-            return object;
-          }
-      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_REGEXP) {
-        if (object[propertyName].match(query)) {
-          return object;
-        }
-      }
-
-    }
-
-    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
-      /*
-      if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
-        return element;
-      }*/
-
-      if (this._validateByQuery(element, query, queryMeta)) {
-        return element;
-      }
-
-
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChild = this.searchElement(query, queryMeta, children[i]);
-          if (hitChild) {
-            return hitChild;
-          }
-        }
-      }
-      return null;
-    }
-
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
-        return element;
-      }
-
-
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChild = this.searchElementByNameAndType(query, type, queryMeta, children[i]);
-          if (hitChild) {
-            return hitChild;
-          }
-        }
-      }
-      return null;
-    }
-
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
-      let resultElements = [];
-
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChildren = this.searchElementsByNameAndType(query, type, queryMeta, children[i]);
-          if (hitChildren) {
-            resultElements = resultElements.concat(hitChildren);
-          }
-        }
-      }
-      /*
-      if ((element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) && element instanceof type) {
-          resultElements.push(element);
-      }*/
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
-        resultElements.push(element);
-      }
-
-
-      return resultElements;
-    }
-
-    searchElementsByType(type               , element           = this) {
-      if (element instanceof type) {
-        return element;
-      }
-
-      if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
-        let gizmos = element._gizmos;
-        for (let gizmo of gizmos) {
-          if (gizmo instanceof type) {
-            return gizmo;
-          }
-        }
-      }
-
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        let results = [];
-        for (let i = 0; i < children.length; i++) {
-          let hitChildOrChildren = this.searchElementsByType(type, children[i]);
-          if (Array.isArray(hitChildOrChildren)) {
-            Array.prototype.push.apply(results, hitChildOrChildren); // concat
-          } else if (hitChildOrChildren != null) {
-            results.push(hitChildOrChildren);
-          }
-        }
-        return results;
-      }
-      return null;
-    }
-
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
-          if (hitChild) {
-            return hitChild;
-          }
-        }
-      }
-
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
-        let gizmos = element._gizmos;
-        for (let gizmo of gizmos) {
-          if (this._validateByQuery(gizmo, query, queryMeta)) {
-            return gizmo;
-          }
-        }
-      }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
-        let materials = element.getAppropriateMaterials();
-        for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            return material;
-          }
-        }
-        return null;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
-        return element;
-      }
-    }
-
-    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
-      let objects = [];
-      if (element instanceof M_Group) {
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
-          if (hitChildren.length > 0) {
-            objects = objects.concat(hitChildren);
-          }
-        }
-        return objects;
-      }
-
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
-        let gizmos = element._gizmos;
-        for (let gizmo of gizmos) {
-          if (this._validateByQuery(gizmo, query, queryMeta)) {
-            objects.push(gizmo);
-          }
-        }
-        return objects;
-      }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
-        let materials = element.getAppropriateMaterials();
-        for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            objects.push(material);
-          }
-        }
-        return objects;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
-        return [element];
-      }
-      return objects;
-    }
-
-    getStartAnimationInputValue(inputLineName, element = this) {
-
-      if (element instanceof M_Group) {
-        let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChildOrInputValue = this.getStartAnimationInputValue(inputLineName, children[i]);
-
-          if (hitChildOrInputValue instanceof M_Element) {
-            let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(inputLineName);
-            if (startInputValueOfThisElement < latestInputValue) {
-              latestInputValue = startInputValueOfThisElement;
-            }
-          } else {
-            let startInputValueOfThisElement = hitChildOrInputValue;
-            if (startInputValueOfThisElement < latestInputValue) {
-              latestInputValue = startInputValueOfThisElement;
-            }
-          }
-        }
-        
-        return latestInputValue;
-      }
-
-      return element.getStartInputValueOfAnimation(inputLineName);
-    }
-
-
-    getEndAnimationInputValue(inputLineName, element = this) {
-
-      if (element instanceof M_Group) {
-        let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
-        let children = element.getChildren();
-        for (let i = 0; i < children.length; i++) {
-          let hitChildOrInputValue = this.getEndAnimationInputValue(inputLineName, children[i]);
-
-          if (hitChildOrInputValue instanceof M_Element) {
-            let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(inputLineName);
-            if (endInputValueOfThisElement > latestInputValue) {
-              latestInputValue = endInputValueOfThisElement;
-            }
-          } else {
-            let endInputValueOfThisElement = hitChildOrInputValue;
-            if (endInputValueOfThisElement > latestInputValue) {
-              latestInputValue = endInputValueOfThisElement;
-            }
-          }
-        }
-        return latestInputValue;
-      }
-
-      return element.getEndInputValueOfAnimation(inputLineName);
-    }
-
-    /*
-     * Note that it's in world space
-     */
-    updateAABB() {
-      var aabb = (function mergeAABBRecursively(elem) {
-        if (elem instanceof M_Group) {
-          var children = elem.getChildren();
-          for(let i=0; i<children.length; i++) {
-            var aabb = mergeAABBRecursively(children[i]);
-            if (aabb instanceof AABB) {
-              elem.AABB.mergeAABB(aabb);
-            } else {
-              console.assert('calculation of AABB error!');
-            }
-          }
-          return elem.AABB;
-          //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
-        }
-        if (elem instanceof M_Mesh) {
-          let aabb = elem.AABBInWorld;
-          //console.log(aabb.toString());
-          return aabb;
-        }
-
-        return null;
-      })(this);
-      this.AABB.mergeAABB(aabb);
-
-      let newAABB = this.AABB;
-
-  //    this._AABB = aabbInWorld;
-
-      this._updateAABBGizmo();
-
-      return newAABB;
-    }
-
-    get AABB() {
-      return this._AABB;
-    }
-
-    clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-      let instance = new M_Group(this._glBoostContext);
-      if (clonedRootElement === null) {
-        clonedRootElement = instance;
-      }
-      this._copy(instance);
-
-      this._elements.forEach((element)=>{
-        if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
-          instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
-        } else {
-          instance._elements.push(element);
-        }
-      });
-
-      onCompleteFuncs.forEach((func)=>{
-        func();
-      });
-
-      return instance;
-    }
-
-    _copy(instance) {
-      super._copy(instance);
-      instance._AABB = this._AABB.clone();
-      instance._isRootJointGroup = this._isRootJointGroup;
-    }
-
-    set isVisible(flg        ) {
-      let collectVisibility = function(elem        ) {
-        elem._isVisible = flg;
-        if (elem instanceof M_Group) {
-          let children = elem.getChildren();
-          children.forEach(function(child) {
-            collectVisibility(child);
-          });
-        }
-      };
-      collectVisibility(this);
-    }
-
-    get isVisible() {
-      return this._isVisible;
-    }
-
-    _updateAABBGizmo() {
-      /*
-      if (this._aabbGizmo === null) {
-        this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
-      }
-      */
-      let world_m = this.worldMatrix;
-      let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
-
-  //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
-    }
-
-    readyForDiscard() {
-      let collectElements = function(elem) {
-        if (elem instanceof M_Group) {
-          const children = elem.getChildren();
-          for (let i = 0; i < children.length; i++) {
-            collectElements(children[i]);
-          }
-        } else if (elem instanceof M_Element) {
-          // Must be M_Element
-          elem.readyForDiscard();
-        } else {
-          console.error('not M_Group nor M_Element');
-        }
-      };
-      collectElements(this);
-
-      this.removeAll();
-    }
-
-    rayCast(x, y, camera, viewport) {
-      const meshes = this.searchElementsByType(M_Mesh);
-      let currentShortestT = Number.MAX_VALUE;
-      let currentShortestIntersectedPosVec3 = null;
-      let selectedMesh = null;
-      for (let mesh of meshes) {
-        if (!mesh.isVisible) {
-          continue;
-        }
-        if (!mesh.isPickable) {
-          continue;
-        }
-        const result = mesh.rayCast(x, y, camera, viewport);
-        if (result === null) {
-          return [null, null];
-        }
-        const t = result[1];
-        if (t < currentShortestT) {
-          currentShortestT = t;
-          currentShortestIntersectedPosVec3 = result[0];
-          selectedMesh = mesh;
-        }
-      }
-
-      return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
-    }
-
-    _needUpdate() {
-      super._needUpdate();
-
-      let collectElements = function(elem) {
-        if (elem instanceof M_Group) {
-          const children = elem.getChildren();
-          for (let i = 0; i < children.length; i++) {
-            collectElements(children[i]);
-          }
-        } else if (elem instanceof M_Mesh) {
-          if (elem._outlineGizmo) {
-            elem._outlineGizmo.updateMatrix(elem);
-          }
-        }
-      };
-      collectElements(this);
-    }
-
-  }
-
-  class M_Gizmo extends M_Group {
-    constructor(glBoostContext) {
-      super(glBoostContext, null, null);
-
-      this._mesh = null;
-
-      // Whether or not to draw this gizmo before normal meshes drawing.
-      // If true, draw this gizmo before normal meshes drawing.
-      // If false, draw this gizmo after normal meshes drawing.
-      this._isPreDraw = false;
-      this._forceThisMaterial = null;
-    }
-
-    get mesh() {
-      return this._mesh;
-    }
-
-    set isPreDraw(flg) {
-      this._isPreDraw = flg;
-    }
-
-    get isPreDraw() {
-      return this._isPreDraw;
-    }
-
-    get forceThisMaterial() {
-      return this._forceThisMaterial;
-    }
-  }
-
-  /*       */
-
-  class M_Element extends L_Element {
-                        
-                                                      
-                                         
-                                                                
-                            
-                                                         
-                                                      
-                                                   
-                                                                
-                                                        
-                     
-                                  
-                            
-                         
-                                      
-                                                         
-                                     
-                                           
-                                                  
-                            
-                                     
-                           
-
-    constructor(glBoostContext                      ) {
-      super(glBoostContext);
-
-      this._parent = null;
-      this._invMatrix = Matrix44$1.identity();
-      this._accumulatedAncestryObjectUpdateNumber = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Number.MAX_VALUE;    
-      this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-      this._isTransparentForce = null;
-      this._opacity = 1.0;
-      this._isAffectedByWorldMatrix = true;
-      this._isAffectedByWorldMatrixAccumulatedAncestry = true;
-      this._isAffectedByViewMatrix = true;
-      this._isAffectedByProjectionMatrix = true;
-
-      this._toInheritCurrentAnimationInputValue = true;
-
-      this._isVisible = true;
-
-      this._gizmos = [];
-      this._masterElement = null;
-
-      this._worldMatrix = new Matrix44$1();
-    }
-
-    _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
-      if (currentElem._parent === null) {
-        return currentElem.elementUpdateNumber;
-      } else {
-        return this._accumulateMyAndParentNameWithUpdateInfo(currentElem._parent) + currentElem.elementUpdateNumber;
-      }
-    }
-
-    set toInheritCurrentAnimationInputValue(flg         ) {
-      this._toInheritCurrentAnimationInputValue = flg;
-    }
-
-    get toInheritCurrentAnimationInputValue() {
-      return this._toInheritCurrentAnimationInputValue;
-    }
-
-    _getCurrentAnimationInputValue(inputName        )                {
-      let value = this._currentAnimationInputValues[inputName];
-      if (typeof(value) === 'number') {
-        return value;
-      } else if (this._toInheritCurrentAnimationInputValue && this._parent) {
-        let val = this._parent._getCurrentAnimationInputValue(inputName);
-        if (val === void 0) {
-          val = null;
-        }
-        return val;
-      } else {
-        return null;
-      }
-    }
-
-    _setDirtyToAnimatedElement(inputName        ) {
-      if (this.hasAnimation(inputName)) {
-        this._needUpdate();
-      }
-    }
-
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf         , input        ) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$1.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-    }
-
-    get worldMatrixWithoutMySelf() {
-      return this.getWorldMatrixWithoutMySelfAt(void 0);
-    }
-
-    getWorldMatrixWithoutMySelfAt(input         ) {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    
-      if (this._accumulatedWithoutMySelfAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedWithoutMySelfAncestry === void 0) {
-        this._matrixAccumulatedWithoutMySelfAncestry = this._multiplyMyAndParentTransformMatrices(false, input);
-        this._accumulatedWithoutMySelfAncestryObjectUpdateNumber = tempNumber;
-      }
-
-      return this._matrixAccumulatedWithoutMySelfAncestry.clone();
-    }
-
-    get normalMatrix() {
-      var tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      //console.log(tempNumber);
-      if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
-        let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-        this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
-        this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
-      }
-
-      return this._normalMatrix.clone();
-    }
-
-
-    get inverseWorldMatrixWithoutMySelf() {
-      if (this._parent === null) {
-        return Matrix44$1.identity();
-      }
-
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-    }
-
-    _multiplyMyAndParentRotateMatrices(currentElem           , withMySelf         ) {
-      if (currentElem._parent === null) {
-        if (withMySelf) {
-          return currentElem.transformMatrixOnlyRotate;
-        } else {
-          return Matrix44$1.identity();
-        }
-      } else {
-        let currentMatrix = Matrix44$1.identity();
-        if (withMySelf) {
-          currentMatrix = currentElem.transformMatrixOnlyRotate;
-        }
-        return Matrix44$1.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
-      }
-    }
-
-    get inverseWorldMatrix() {
-      return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
-    }
-
-    _accumulateMyAndParentOpacity(currentElem           ) {
-      if (currentElem._parent === null) {
-        return currentElem.opacity;
-      } else {
-        return this._accumulateMyAndParentOpacity(currentElem._parent) * currentElem.opacity;
-      }
-    }
-
-    get opacityAccumulatedAncestry() {
-      return this._accumulateMyAndParentOpacity(this);
-    }
-
-    set opacity(opacity        ) {
-      this._opacity = opacity;
-    }
-
-    get opacity() {
-      return this._opacity;
-    }
-
-    get isTransparent() {
-      return this._isTransparentForce;
-    }
-
-    set isTransparentForce(flg         ) {
-      this._isTransparentForce = flg;
-    }
-
-    set dirty(flg        ) {
-      if (flg) {
-        this._needUpdate();
-      }
-    }
-
-    get parent() {
-      return this._parent;
-    }
-
-    get elementUpdateNumber() {
-      return this.classUniqueNumber + this._updateCountAsElement;
-    }
-
-    // used by library (not Application)
-    toStringWithUpdateInfo() {
-      //  return '&' + this._instanceName + '#' + this._updateCountAsElement;  // human readable
-      return this._instanceName + this._updateCountAsElement;                // faster
-    }
-
-    prepareToRender() {
-
-    }
-
-    _copy(instance           ) {
-      super._copy(instance);
-
-      instance._parent = this._parent;
-      instance._invMatrix = this._invMatrix.clone();
-      instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
-      instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
-      instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
-      instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
-
-
-      instance._isTransparentForce = this._isTransparentForce;
-      instance.opacity = this.opacity;
-      instance._activeAnimationLineName = this._activeAnimationLineName;
-
-      instance._currentAnimationInputValues = {};
-      for (let inputName in this._currentAnimationInputValues) {
-        instance._currentAnimationInputValues[inputName] = this._currentAnimationInputValues[inputName];
-      }
-
-      instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
-    }
-
-    set isVisible(flg         ) {
-      this._isVisible = flg;
-    }
-
-    get isVisible() {
-      return this._isVisible;
-    }
-
-    set isAffectedByWorldMatrix(flg         ) {
-      this._isAffectedByWorldMatrix = flg;
-    }
-
-    get isAffectedByWorldMatrix() {
-      return this._isAffectedByWorldMatrix;
-    }
-
-    set isAffectedByWorldMatrixAccumulatedAncestry(flg         ) {
-      this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
-    }
-
-    get isAffectedByWorldMatrixAccumulatedAncestry() {
-      return this._isAffectedByWorldMatrixAccumulatedAncestry;
-    }
-
-    set isAffectedByViewMatrix(flg         ) {
-      this._isAffectedByViewMatrix = flg;
-    }
-
-    get isAffectedByViewMatrix() {
-      return this._isAffectedByViewMatrix;
-    }
-
-    set isAffectedByProjectionMatrix(flg         ) {
-      this._isAffectedByProjectionMatrix = flg;
-    }
-
-    get isAffectedByProjectionMatrix() {
-      return this._isAffectedByProjectionMatrix;
-    }
-
-    set gizmoScale(scale        ) {
-      for (let gizmo of this._gizmos) {
-        gizmo.scale = new Vector3(scale, scale, scale);
-      }
-    }
-
-    get gizmoScale() {
-      if (this._gizmos.length === 0) {
-        return 1.0;
-      }
-      return this._gizmos[0].scale.x;
-    }
-
-    set isGizmoVisible(flg         ) {
-      for (let gizmo of this._gizmos) {
-        gizmo.isVisible = flg;
-      }
-    }
-
-    get isGizmoVisible() {
-      return this._gizmos[0].isVisible;
-    }
-
-    set masterElement(element           ) {
-      this._masterElement = element;
-    }
-
-    get masterElement() {
-      return this._masterElement;
-    }
-
-    get worldMatrixForJoints() {
-      return this.getWorldMatrixForJointsAt(void 0);
-    }
-
-    getWorldMatrixForJointsAt(input         ) {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      
-      if (this._accumulatedAncestryObjectUpdateNumberForJoints !== tempNumber || this._matrixAccumulatedAncestryForJoints === void 0) {
-        this._matrixAccumulatedAncestryForJoints = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-        this._accumulatedAncestryObjectUpdateNumberForJoints = tempNumber;
-      }
-
-      return this._matrixAccumulatedAncestryForJoints.clone();
-      
-    }
-
-    _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
-      {
-
-          let currentMatrix = null;
-          if (withMySelf) {
-            currentMatrix = this.getRotateTranslateAt(input);
-          } else {
-            currentMatrix = Matrix44$1.identity();
-          }
-      
-          if (this._parent === null) {
-            this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
-            return currentMatrix;
-          }
-
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
-          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
-    
-    }
-
-
-    get worldMatrix() {
-      return this.getWorldMatrixAt(void 0);
-    }
-
-
-    getWorldMatrixAt(input        ) {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    
-      if (this._accumulatedAncestryObjectUpdateNumber !== tempNumber || this._matrixAccumulatedAncestry === void 0) {
-        this._matrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatrices(true, input);
-        this._accumulatedAncestryObjectUpdateNumber = tempNumber;
-      }
-
-      return this._matrixAccumulatedAncestry.clone();
-    }
-
-    _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      if (this.__updateInfoString_multiplyMyAndParentTransformMatrices !== tempNumber ||
-        this.__cache_input_multiplyMyAndParentTransformMatrices !== input ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$1.identity();
-        }
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
-          return currentMatrix;
-        }
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
-        this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatrices = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
-    
-    }
-
-    get inverseWorldMatrix() {
-      return this.getInverseWorldMatrixAt(void 0);
-    }
-
-    getInverseWorldMatrixAt(input         ) {
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    
-      if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
-        this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
-        this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
-      }
-
-      return this._inverseMatrixAccumulatedAncestry.clone();
-    }
-
-    get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
-      if (this._parent === null) {
-        return Matrix44$1.identity();
-      }
-
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-    }
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-      if (input === null && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$1.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-    }
-
-    readyForDiscard() {
-      if (this.className.indexOf('Mesh') !== -1) {
-        const materials = this.getAppropriateMaterials();
-        for (let material of materials) {
-          if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
-            material.readyForDiscard();
-          }
-        }
-      }
-    }
-
-    addGizmo(gizmo         ) {
-      this._gizmos.push(gizmo);
-    }
-
-    get gizmos() {
-      return this._gizmos;
-    }
-
-    _needUpdate() {
-      super._needUpdate();
-    }
-
-  }
-
-  /**
-   * This is the abstract class for all lights classes. Don't use this class directly.<br>
-   */
-  class M_AbstractLight extends M_Element {
-    constructor(glBoostContext) {
-      super(glBoostContext);
-
-      if (this.constructor === M_AbstractLight) {
-        throw new TypeError('Cannot construct AbstractLight instances directly.');
-      }
-
-      this._gl = this._glContext.gl;
-
-      this._isCastingShadow = true;
-      this._isLightType = '';
-      this._camera = null;
-    }
-
-    prepareToRender() {
-      if (this._camera) {
-        if (this._camera.customFunction) {
-          this._camera.customFunction(this);
-        }
-      }
-    }
-
-    set isCastingShadow(flg) {
-      this._isCastingShadow = flg;
-    }
-
-    get isCastingShadow() {
-      return this._isCastingShadow;
-    }
-
-    get lightType() {
-      return this._isLightType;
-    }
-
-    isTypeAmbient() {
-      return this._isLightType === 'ambient';
-    }
-
-    isTypeDirectional() {
-      return this._isLightType === 'directional';
-    }
-
-    isTypePoint() {
-      return this._isLightType === 'point';
-    }
-
-    isTypeSpot() {
-      return this._isLightType === 'spot';
-    }
-
-    set camera(camera) {
-      this._camera = camera;
-    }
-
-    get camera() {
-      return this._camera;
-    }
-  }
-
-  GLBoost$1['M_AbstractLight'] = M_AbstractLight;
-
-  /**
-   * This is a Point Light class.
-   */
-  class M_PointLight extends M_AbstractLight {
-
-    /**
-     * The constructor of PointLight class.
-     * @param {Vector4} intensity intensity as Vector4 Color
-     * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
-     */
-    constructor(glBoostContext, intensity) {
-      super(glBoostContext);
-
-      this._intensity = intensity;
-      
-      this._isLightType = 'point';
-      
-    }
-
-    set intensity(vec) {
-      this._intensity = vec;
-    }
-
-    get intensity() {
-      return this._intensity;
-    }
-
-  }
-
   let singleton$1 = Symbol();
   let singletonEnforcer = Symbol();
 
@@ -9387,6 +6866,176 @@ return mat4(
   }
 
   GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
+
+  class AABB {
+
+    constructor() {
+      this._AABB_min = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+      this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
+      this._centerPoint = null;
+      this._lengthCenterToCorner = null;
+
+    }
+
+    clone() {
+      let instance = new AABB();
+      instance._AABB_max = this._AABB_max.clone();
+      instance._AABB_min = this._AABB_min.clone();
+      instance._centerPoint = (this._centerPoint !== null) ? this._centerPoint.clone() : null;
+      instance._lengthCenterToCorner = this._lengthCenterToCorner;
+
+      return instance;
+    }
+
+    isVanilla() {
+      if (this._AABB_min.x == Number.MAX_VALUE && this._AABB_min.y == Number.MAX_VALUE && this._AABB_min.z == Number.MAX_VALUE
+        && this._AABB_max.x == -Number.MAX_VALUE && this._AABB_max.y == -Number.MAX_VALUE && this._AABB_max.z == -Number.MAX_VALUE) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    addPosition(positionVector) {
+      this._AABB_min.x = (positionVector.x < this._AABB_min.x) ? positionVector.x : this._AABB_min.x;
+      this._AABB_min.y = (positionVector.y < this._AABB_min.y) ? positionVector.y : this._AABB_min.y;
+      this._AABB_min.z = (positionVector.z < this._AABB_min.z) ? positionVector.z : this._AABB_min.z;
+      this._AABB_max.x = (this._AABB_max.x < positionVector.x) ? positionVector.x : this._AABB_max.x;
+      this._AABB_max.y = (this._AABB_max.y < positionVector.y) ? positionVector.y : this._AABB_max.y;
+      this._AABB_max.z = (this._AABB_max.z < positionVector.z) ? positionVector.z : this._AABB_max.z;
+
+      return positionVector;
+    }
+
+    addPositionWithArray(array, index) {
+      this._AABB_min.x = (array[index+0] < this._AABB_min.x) ? array[index+0] : this._AABB_min.x;
+      this._AABB_min.y = (array[index+1] < this._AABB_min.y) ? array[index+1] : this._AABB_min.y;
+      this._AABB_min.z = (array[index+2] < this._AABB_min.z) ? array[index+2] : this._AABB_min.z;
+      this._AABB_max.x = (this._AABB_max.x < array[index+0]) ? array[index+0] : this._AABB_max.x;
+      this._AABB_max.y = (this._AABB_max.y < array[index+1]) ? array[index+1] : this._AABB_max.y;
+      this._AABB_max.z = (this._AABB_max.z < array[index+2]) ? array[index+2] : this._AABB_max.z;
+
+      return array;
+    }
+
+    updateAllInfo() {
+      this._centerPoint = Vector3.add(this._AABB_min, this._AABB_max).divide(2);
+      const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
+      this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
+
+      return this;
+    }
+
+    mergeAABB(aabb) {
+      var isUpdated = false;
+
+      if (aabb.isVanilla()) {
+        return isUpdated;
+      }
+
+      if (this.isVanilla()) {
+        this._AABB_min.x = aabb.minPoint.x;
+        this._AABB_min.y = aabb.minPoint.y;
+        this._AABB_min.z = aabb.minPoint.z;
+        this._AABB_max.x = aabb.maxPoint.x;
+        this._AABB_max.y = aabb.maxPoint.y;
+        this._AABB_max.z = aabb.maxPoint.z;
+        isUpdated = true;
+        return isUpdated;
+      }
+
+      if (aabb.minPoint.x < this._AABB_min.x) {
+        this._AABB_min.x = aabb.minPoint.x;
+        isUpdated = true;
+      }
+      if (aabb.minPoint.y < this._AABB_min.y) {
+        this._AABB_min.y = aabb.minPoint.y;
+        isUpdated = true;
+      }
+      if (aabb.minPoint.z < this._AABB_min.z) {
+        this._AABB_min.z = aabb.minPoint.z;
+        isUpdated = true;
+      }
+      if (this._AABB_max.x < aabb.maxPoint.x) {
+        this._AABB_max.x = aabb.maxPoint.x;
+        isUpdated = true;
+      }
+      if (this._AABB_max.y < aabb.maxPoint.y) {
+        this._AABB_max.y = aabb.maxPoint.y;
+        isUpdated = true;
+      }
+      if (this._AABB_max.z < aabb.maxPoint.z) {
+        this._AABB_max.z = aabb.maxPoint.z;
+        isUpdated = true;
+      }
+      this.updateAllInfo();
+
+      return isUpdated;
+    }
+
+
+    get minPoint() {
+      return this._AABB_min;
+    }
+
+    get maxPoint() {
+      return this._AABB_max;
+    }
+
+    get centerPoint() {
+      return this._centerPoint;
+    }
+
+    get lengthCenterToCorner() {
+      return this._lengthCenterToCorner;
+    }
+
+    get sizeX() {
+      return (this._AABB_max.x - this._AABB_min.x);
+    }
+
+    get sizeY() {
+      return (this._AABB_max.y - this._AABB_min.y);
+    }
+
+    get sizeZ() {
+      return (this._AABB_max.z - this._AABB_min.z);
+    }
+
+    static multiplyMatrix(matrix, aabb) {
+       if (aabb.isVanilla()) {
+         return aabb.clone();
+       }
+      var newAabb = new AABB();
+
+      let AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+      let AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+      let AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+      let AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+      let AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+      let AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+      let AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+      let AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+      newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
+      newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
+      newAabb.updateAllInfo();
+
+      return newAabb;
+    }
+
+    toString() {
+      return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n'
+        + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
+    }
+  }
+
+  GLBoost$1['AABB'] = AABB;
 
   class FreeShader extends Shader {
     constructor(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames) {
@@ -10883,6 +8532,1304 @@ return mat4(
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
+  /**
+   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
+   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   */
+  class AbstractTexture extends GLBoostObject {
+
+    /**
+     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
+     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     *
+     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     */
+    constructor(glBoostContext) {
+      super(glBoostContext);
+
+      if (this.constructor === AbstractTexture) {
+        throw new TypeError('Cannot construct AbstractTexture instances directly.');
+      }
+
+      this._textureUnitIndex = 0;
+
+      // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
+      this._uvTransform = new Vector4(1, 1, 0, 0);
+
+      this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
+    }
+
+    /**
+     * [en] get the WebGL texture resource within this class. <br />
+     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     *
+     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     */
+    get glTextureResource() {
+      return this._texture;
+    }
+
+    /**
+     * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
+     * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
+     */
+    setUp(textureUnitIndex) {
+      var gl = this._glContext.gl;
+      if (this._texture === null) {
+        return false;
+      }
+      var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+      gl.activeTexture(gl.TEXTURE0 + index);
+      gl.bindTexture(gl.TEXTURE_2D, this._texture);
+
+      return true;
+    }
+
+    /**
+     * [en] unbind the texture. <br />
+     * [ja] テクスチャをバインド解除します。
+     */
+    tearDown(textureUnitIndex) {
+      var gl = this._glContext.gl;
+
+      var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
+      gl.activeTexture(gl.TEXTURE0 + index);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    get width() {
+      return this._width;
+    }
+
+    get height() {
+      return this._height;
+    }
+
+    set textureUnitIndex(index) {
+      this._textureUnitIndex = index;
+    }
+
+    get textureUnitIndex() {
+      return this._textureUnitIndex;
+    }
+
+    getTexturePixelData() {
+      let gl = this._glContext.gl;
+
+      // Create a framebuffer backed by the texture
+      let framebuffer = this._glContext.createFramebuffer(this);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._texture, 0);
+
+      // Read the contents of the framebuffer (data stores the pixel data)
+      let data = new Uint8Array(this.width * this.height * 4);
+      gl.readPixels(0, 0, this.width, this.height, gl.RGBA, gl.UNSIGNED_BYTE, data);
+
+      //this._glContext.deleteFramebuffer(this, framebuffer);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+      return data;
+    }
+
+    /**
+     * Origin is left bottom
+     *
+     * @param {number} x horizontal pixel position (0 is left)
+     * @param {number} y virtical pixel position (0 is bottom)
+     * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+     */
+    getPixelValueAt(x, y, argByteArray) {
+      let byteArray = argByteArray;
+      if (!byteArray) {
+        byteArray = this.getTexturePixelData();
+      }
+
+      let color = new Vector4(
+        byteArray[(y*this.width + x) * 4+0],
+        byteArray[(y*this.width + x) * 4+1],
+        byteArray[(y*this.width + x) * 4+2],
+        byteArray[(y*this.width + x) * 4+3]
+        );
+      return color;
+    }
+
+    _getResizedCanvas(image) {
+      var canvas = document.createElement("canvas");
+      canvas.width = this._getNearestPowerOfTwo(image.width);
+      canvas.height = this._getNearestPowerOfTwo(image.height);
+
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      return canvas;
+    }
+    /**
+     * [en] check whether or not this texture size is power of two. <br />
+     * [ja] テクスチャサイズが２の累乗かどうかを返します
+     *
+     * @param {number} x [en] texture size. [ja] テクスチャサイズ
+     * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+     */
+    _isPowerOfTwo(x) {
+      return (x & (x - 1)) == 0;
+    }
+
+    /**
+     * [en] get a value nearest power of two. <br />
+     * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+     *
+     * @param {number} x [en] texture size. [ja] テクスチャサイズ
+     * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+     */
+    _getNearestPowerOfTwo(x) {
+      return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
+    }
+
+    readyForDiscard() {
+      if (this._texture) {
+        this._glContext.deleteTexture(this, this._texture);
+      }
+      if (this.fbo) {
+        for (let texture of this.fbo._glboostTextures) {
+          this.fbo._glboostTextures = this.fbo._glboostTextures.filter(function(v, i) {
+            return (v !== this);
+          });
+        }
+        if (this.fbo._glboostTextures.length === 0) {
+          this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+          this._glContext.deleteFramebuffer(this._glBoostContext, this.fbo);
+          if (this.fbo.renderBuffer) {
+            this._glContext.deleteRenderbuffer(this._glBoostContext, this.fbo.renderBuffer);
+          }
+        }
+      }
+
+      super.readyForDiscard();
+    }
+
+    get uvTransform() {
+      return this._uvTransform;
+    }
+
+    set uvTransform(vec4) {
+      this._uvTransform = vec4;
+    }
+
+    get toMultiplyAlphaToColorPreviously() {
+      return this._toMultiplyAlphaToColorPreviously;
+    }
+
+    set toMultiplyAlphaToColorPreviously(flag) {
+      this._toMultiplyAlphaToColorPreviously = flag;
+    }
+  }
+
+  class FragmentSimpleShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSTransform_FragmentSimpleShaderSource(existCamera_f, f) {
+      var shaderText = '';
+
+      if (existCamera_f) {
+        shaderText +=   '  gl_Position = projectionMatrix * viewMatrix * position_world;\n';
+      } else {
+        shaderText +=   '  gl_Position = position_world;\n';
+      }
+
+      return shaderText;
+    }
+
+    FSDefine_FragmentSimpleShaderSource(in_, f) {
+      let shaderText =      'uniform float opacity;\n';
+      shaderText +=         'uniform bool isNeededToMultiplyAlphaToColorOfPixelOutput;\n';
+      return shaderText;
+    }
+
+    FSShade_FragmentSimpleShaderSource(f, gl) {
+      let shaderText =   "";
+      shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
+      shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
+      shaderText += '    rt0.rgb *= rt0.a;\n';
+      shaderText += '  }\n';
+
+      return shaderText;
+    }
+
+    FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+  /*
+      shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
+      shaderText += '  rt0.rgb *= rt0.a;\n';
+      shaderText += '}\n';
+  */
+      return shaderText;
+    }
+
+    prepare_FragmentSimpleShaderSource(gl, glslProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+
+      material.setUniform(glslProgram, 'uniform_opacity', this._glContext.getUniformLocation(glslProgram, 'opacity'));
+      material.setUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput', this._glContext.getUniformLocation(glslProgram, 'isNeededToMultiplyAlphaToColorOfPixelOutput'));
+
+      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
+      if (uniformLocationDepthBias) {
+        let depthBias = this.getShaderParameter(material, 'depthBias', false);
+        if (depthBias) {
+          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
+        }
+      }
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class FragmentSimpleShader extends Shader {
+    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+
+      super(glBoostContext, basicShader);
+
+      FragmentSimpleShader.mixin(basicShader);
+      FragmentSimpleShader.mixin(FragmentSimpleShaderSource);
+
+      this._isNeededToMultiplyAlphaToColorOfPixelOutput = null;
+    }
+
+    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isNeededToMultiplyAlphaToColorOfPixelOutput'), this._isNeededToMultiplyAlphaToColorOfPixelOutput, true);
+    
+      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+      let uniformLocationAABBLengthCenterToCorner = material.getUniform(glslProgram, 'uniform_AABBLengthCenterToCorner');
+      if (uniformLocationAABBLengthCenterToCorner) {
+        this._glContext.uniform1f(uniformLocationAABBLengthCenterToCorner, AABB.lengthCenterToCorner, true);
+      }
+
+    }
+
+    set isNeededToMultiplyAlphaToColorOfPixelOutput(flg) {
+      this._isNeededToMultiplyAlphaToColorOfPixelOutput = flg;
+    }
+
+    get isNeededToMultiplyAlphaToColorOfPixelOutput() {
+      return this._isNeededToMultiplyAlphaToColorOfPixelOutput;
+    }
+  }
+
+
+  GLBoost['FragmentSimpleShader'] = FragmentSimpleShader;
+
+  class VertexWorldShadowShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_VertexWorldShadowShaderSource(in_, out_, f, lights, material, extraData) {
+      var shaderText =   '';
+      //for (let i=0; i<lights.length; i++) {
+      //if (lights[i].camera && lights[i].camera.texture) {
+
+      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;        
+          
+      //shaderText +=      `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+      //shaderText +=       `${out_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+
+      return shaderText;
+    }
+
+    VSTransform_VertexWorldShadowShaderSource(existCamera_f, f, lights, material, extraData) {
+      var shaderText = '';
+      let gl = this._glContext.gl;
+
+      return shaderText;
+    }
+
+    FSDefine_VertexWorldShadowShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'uniform float depthBias;\n';
+      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
+  //    shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
+      if (lightNumExceptAmbient > 0) {
+        shaderText += `uniform mat4 depthPVMatrix[${lightNumExceptAmbient}];\n`;
+      }
+      
+      return shaderText;
+    }
+
+    FSShade_VertexWorldShadowShaderSource(f, gl, lights) {
+      let shaderText = '';
+      shaderText += 'float visibilityLevel = 1.0;\n';
+
+      if (lights.length > 0) {
+        shaderText += `    vec4 shadowCoord[${lights.length}];\n`;
+      }    
+      for (let i=0; i<lights.length; i++) {
+        shaderText += `  { // ${i}\n`;
+        shaderText += `    shadowCoord[${i}] = depthPVMatrix[${i}] * vec4(v_position_world, 1.0); // ${i}\n`;
+        shaderText += `    shadowCoord[${i}].xyz *= 0.5; // ${i}\n`;
+        shaderText += `    shadowCoord[${i}].xyz += 0.5; // ${i}\n`;
+        shaderText += `  } // ${i}\n`;
+      }
+      return shaderText;
+    }
+    FSPostEffect_VertexWorldShadowShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+  //    shaderText += 'rt0 = vec4(visibilityLevel, 1.0, 1.0, 1.0);\n';
+
+      return shaderText;
+    }
+
+    prepare_VertexWorldShadowShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+
+      vertexAttribs.forEach((attribName)=>{
+        if (attribName === 'position' || attribName === 'normal') {
+          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);  
+          }
+        }
+      });
+
+      
+      for (let i=0; i<lights.length; i++) {
+        let light = lights[i];
+        
+        material.setUniform(shaderProgram, 'uniform_isShadowCasting' + i, this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']'));
+
+        if (light.camera && light.camera.texture) {// && light.isCastingShadow) {
+
+          // depthTexture
+          let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
+          material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
+
+          let index = i;
+
+          // count for Decal Texture at first
+          index++;
+
+          // count for Normal Texture if it exists
+          let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+          if (normalTexture) {
+            index++;
+          }
+
+          lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+        }
+      }
+
+      let uniform_depthBias = this._glContext.getUniformLocation(shaderProgram, 'depthBias');
+      material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
+      this._glContext.uniform1f(uniform_depthBias, 0.005, true);
+
+      let textureUnitIndex = 0;
+      for (let i=0; i<lights.length; i++) {
+        //if (lights[i].camera && lights[i].camera.texture) {
+
+        // matrices
+        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
+
+        textureUnitIndex++;
+        //}
+        //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+      }
+
+      return vertexAttribsAsResult;
+    }
+
+  }
+
+  GLBoost['VertexWorldShadowShaderSource'] = VertexWorldShadowShaderSource;
+
+  class WireframeShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_WireframeShaderSource(in_, out_, f) {
+      var shaderText = '';
+      shaderText += `${in_} vec3 aVertex_barycentricCoord;\n`;
+      shaderText += `${out_} vec3 barycentricCoord;\n`;
+
+      // for Unfold UV
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText +=      'uniform vec4 AABBCenterPositionAndRatio;\n';
+      }
+      return shaderText;
+    }
+
+    VSTransform_WireframeShaderSource(existCamera_f, f) {
+      var shaderText = '';
+
+
+      // UV Unfold
+      shaderText += '  vec4 interpolatedPosition_world = position_world;\n';
+      shaderText +=   '  gl_Position = position_world;\n';
+      if (Shader._exist(f, GLBoost.TEXCOORD)) {
+        shaderText += '  vec3 AABBCenterPosition = AABBCenterPositionAndRatio.xyz;\n';      
+        shaderText += '  float unfoldUVRatio = AABBCenterPositionAndRatio.w;\n';      
+        shaderText += '  vec2 uvScaled = vec2((aVertex_texcoord-0.5)*AABBLengthCenterToCorner*2.0);\n';
+        shaderText += '  uvScaled.y = - uvScaled.y;\n';
+        shaderText += '  vec4 uvPosition = vec4(uvScaled + AABBCenterPosition.xy, AABBCenterPosition.z, 1.0);\n';
+        shaderText += '  interpolatedPosition_world = uvPosition * unfoldUVRatio + position_world * (1.0-unfoldUVRatio);\n';
+      }
+
+      if (existCamera_f) {
+        shaderText +=   '  mat4 pvMatrix = projectionMatrix * viewMatrix;\n';
+        shaderText +=   '  gl_Position = pvMatrix * interpolatedPosition_world;\n';
+      }
+
+      shaderText += '  barycentricCoord = aVertex_barycentricCoord;\n';
+
+      return shaderText;
+    }
+
+    FSDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `${in_} vec3 barycentricCoord;\n`;
+
+      shaderText += 'uniform bool isWireframe;\n';
+      //shaderText += 'uniform bool isWireframeOnShade;\n';
+      shaderText += 'uniform float wireframeWidth;\n';
+
+      return shaderText;
+    }
+
+    FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `
+    float edge_ratio(vec3 bary3, float wireframeWidthInner, float wireframeWidthRelativeScale) {     
+        vec3 d = fwidth(bary3);
+        vec3 x = bary3+vec3(1.0 - wireframeWidthInner)*d;
+        vec3 a3 = smoothstep(vec3(0.0), d, x);
+        float factor = min(min(a3.x, a3.y), a3.z);
+        
+        return clamp((1.0 - factor), 0.0, 1.0);
+    }
+    `;
+
+      return shaderText;
+    }
+
+    FSShade_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'bool isWireframeInner = false;\n';
+      shaderText += 'float wireframeWidthRelativeScale = 1.0;\n';
+      
+      return shaderText;
+    }
+
+    FSPostEffect_WireframeShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'float wireframeWidthInner = wireframeWidth;\n';
+      shaderText += 'float threshold = 0.001;\n';
+      shaderText += 'vec4 wireframeResult = rt0;\n';
+      shaderText += 'if ( isWireframeInner || isWireframe ) {\n';
+      shaderText += '  vec4 wireframeColor = vec4(0.2, 0.75, 0.0, 1.0);\n';
+      shaderText += '  float edgeRatio = edge_ratio(barycentricCoord, wireframeWidthInner, wireframeWidthRelativeScale);\n';
+      shaderText += '  float edgeRatioModified = mix(step(0.001, edgeRatio), clamp(edgeRatio*4.0, 0.0, 1.0), wireframeWidthInner / wireframeWidthRelativeScale/4.0);\n';
+      // if r0.a is 0.0, it is wireframe not on shaded
+      shaderText += '  wireframeResult.rgb = wireframeColor.rgb * edgeRatioModified + rt0.rgb * (1.0 - edgeRatioModified);\n';
+      shaderText += '  wireframeResult.a = max(rt0.a, wireframeColor.a * mix(edgeRatioModified, pow(edgeRatioModified, 100.0), wireframeWidthInner / wireframeWidthRelativeScale/1.0));\n';
+      shaderText += '}\n';
+
+      shaderText += 'if ( isWireframe ) {\n';
+      shaderText += '  rt0 = wireframeResult;\n';
+      shaderText += '}\n';
+
+      shaderText += '    if (rt0.a < 0.05) {\n';
+      shaderText += '      discard;\n';
+      shaderText += '    }\n';
+
+      /*
+      //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += '  rt0 = vec4(normalize(v_normal)*0.5+0.5, 1.0);\n';
+      }
+      */
+
+      return shaderText;
+    }
+
+    prepare_WireframeShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+      shaderProgram['vertexAttribute_barycentricCoord'] = gl.getAttribLocation(shaderProgram, 'aVertex_barycentricCoord');
+      gl.enableVertexAttribArray(shaderProgram['vertexAttribute_barycentricCoord']);
+      vertexAttribsAsResult.push('barycentricCoord');
+
+      let uniform_isWireframe = material._glContext.getUniformLocation(shaderProgram, 'isWireframe');
+      material.setUniform(shaderProgram, 'uniform_isWireframe', uniform_isWireframe);
+      this._glContext.uniform1i( uniform_isWireframe, 0, true);
+
+      let uniform_wireframeWidth = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidth');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidth', uniform_wireframeWidth);
+      this._glContext.uniform1f( uniform_wireframeWidth, 1.0, true);
+
+      let uniform_wireframeWidthRelativeScale = material._glContext.getUniformLocation(shaderProgram, 'wireframeWidthRelativeScale');
+      material.setUniform(shaderProgram, 'uniform_wireframeWidthRelativeScale', uniform_wireframeWidthRelativeScale);
+      this._glContext.uniform1f( uniform_wireframeWidthRelativeScale, 1.0, true);
+
+      if (Shader._exist(vertexAttribs, GLBoost.TEXCOORD)) {
+        material.setUniform(shaderProgram, 'uniform_AABBCenterPositionAndRatio', this._glContext.getUniformLocation(shaderProgram, 'AABBCenterPositionAndRatio'));
+      }
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class WireframeShader extends FragmentSimpleShader {
+    constructor(glBoostContext, basicShader = VertexWorldShaderSource) {
+
+      super(glBoostContext);
+
+      if (basicShader === VertexWorldShaderSource) {
+        WireframeShader.mixin(VertexWorldShadowShaderSource);
+      }
+      WireframeShader.mixin(WireframeShaderSource);
+
+      this._unfoldUVRatio = void 0;
+
+      this._AABB = null;
+
+    }
+
+    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let isWifeframe = false;
+      let isWireframeOnShade = false;
+      let wireframeWidth = 0.0;
+      let wireframeWidthRelativeScale = 0.0;
+
+      if (typeof material.isWireframe !== 'undefined') {
+        isWifeframe = material.isWireframe;
+        isWireframeOnShade = material.isWireframeOnShade;
+        wireframeWidth = material.wireframeWidth;
+        wireframeWidthRelativeScale = material.wireframeWidthRelativeScale;
+      }
+
+      let uniformLocationIsWireframe = material.getUniform(glslProgram, 'uniform_isWireframe');
+      if (uniformLocationIsWireframe) {
+        this._glContext.uniform1i(uniformLocationIsWireframe, isWifeframe, true);
+      }
+      if (isWifeframe && !isWireframeOnShade) {
+        material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), 0.0, true);
+      }
+      let uniformLocationWireframeWidth = material.getUniform(glslProgram, 'uniform_wireframeWidth');
+      if (uniformLocationWireframeWidth) {
+        this._glContext.uniform1f(uniformLocationWireframeWidth, wireframeWidth, true);
+      }
+      let uniformLocationWireframeWidthRelativeScale = material.getUniform(glslProgram, 'uniform_wireframeWidthRelativeScale');
+      if (uniformLocationWireframeWidthRelativeScale) {
+        this._glContext.uniform1f(uniformLocationWireframeWidthRelativeScale, wireframeWidthRelativeScale, true);
+      }
+
+      let AABB = (this._AABB !== null) ? this._AABB : mesh.geometry.AABB;
+
+      let uniformLocationAABBCenterPositionAndRatio = material.getUniform(glslProgram, 'uniform_AABBCenterPositionAndRatio');
+      if (uniformLocationAABBCenterPositionAndRatio) {
+        let unfoldUVRatioParameter = this.getShaderParameter(material, 'unfoldUVRatio', 0.0);
+        this._glContext.uniform4f(uniformLocationAABBCenterPositionAndRatio, AABB.centerPoint.x, AABB.centerPoint.y, AABB.centerPoint.z, unfoldUVRatioParameter, true);
+      }
+
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let uniformLocationDepthBias = material.getUniform(glslProgram, 'uniform_depthBias');
+      if (uniformLocationDepthBias) {
+        let depthBias = this.getShaderParameter(material, 'depthBias', false);
+        if (depthBias) {
+          this._glContext.uniform1f(uniformLocationDepthBias, depthBias, true);
+        }
+      }
+    }
+
+    set unfoldUVRatio(value) {
+      this._unfoldUVRatio = value;
+    }
+
+    get unfoldUVRatio() {
+      return this._unfoldUVRatio;
+    }
+
+    set AABB(aabb) {
+      this._AABB = aabb;
+    }
+
+    get AABB() {
+      return this._AABB;
+    }
+
+  }
+
+  GLBoost['WireframeShader'] = WireframeShader;
+
+  class DecalShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_DecalShaderSource(in_, out_, f) {
+      var shaderText = '';
+      if (Shader._exist(f, GLBoost$1.COLOR)) {
+        shaderText += `${in_} vec4 aVertex_color;\n`;
+        shaderText += `${out_} vec4 color;\n`;
+      }
+      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+        shaderText += `${in_} vec2 aVertex_texcoord;\n`;
+        shaderText += `${out_} vec2 texcoord;\n`;
+      }
+      return shaderText;
+    }
+
+    VSTransform_DecalShaderSource(existCamera_f, f) {
+      var shaderText = '';
+      if (Shader._exist(f, GLBoost$1.COLOR)) {
+        shaderText += '  color = aVertex_color;\n';
+      }
+      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+        shaderText += '  texcoord = aVertex_texcoord;\n';
+      }
+      return shaderText;
+    }
+
+    FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+      var shaderText = '';
+      if (Shader._exist(f, GLBoost$1.COLOR)) {
+        shaderText += `${in_} vec4 color;\n`;
+      }
+      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+        shaderText += `${in_} vec2 texcoord;\n\n`;
+      }
+      if (material.hasAnyTextures()) {
+        shaderText += 'uniform sampler2D uTexture;\n';
+      }
+      shaderText += 'uniform vec4 materialBaseColor;\n';
+      shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
+
+      return shaderText;
+    }
+
+    FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += this._multiplyAlphaToColorOfTexel();
+
+      return shaderText;
+    }
+
+    FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
+      var shaderText = '';
+
+      shaderText += Shader._getNormalStr(gl, material, f);
+      
+      var textureFunc = Shader._texture_func(gl);
+      if (Shader._exist(f, GLBoost$1.COLOR)) {
+        shaderText += '  rt0 *= color;\n';
+      }
+      shaderText += '    rt0 *= materialBaseColor;\n';
+      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
+        shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
+      }
+
+      //shaderText += '    float shadowRatio = 0.0;\n';
+
+      //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
+      return shaderText;
+    }
+
+    prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+      vertexAttribs.forEach((attribName)=>{
+        if (attribName === 'color' || attribName === 'texcoord') {
+          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);  
+          }
+        }
+      });
+
+      material.setUniform(shaderProgram, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
+
+      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      if (!diffuseTexture) {
+        diffuseTexture = this._glBoostContext.defaultDummyTexture;
+      }
+
+      if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
+        let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
+        material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
+      }
+
+      let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
+      material.setUniform(shaderProgram, 'uTexture', uTexture);
+      // set texture unit 0 to the sampler
+      this._glContext.uniform1i( uTexture, 0, true);
+
+      material._semanticsDic['TEXTURE'] = [];
+
+      material.uniformTextureSamplerDic['uTexture'] = {};
+      if (material.hasAnyTextures() || diffuseTexture) {
+        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
+        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+        material._semanticsDic['TEXTURE'] = 'uTexture';
+      }
+
+
+      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+      let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
+      if (uNormalTexture) {
+        material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
+        // set texture unit 1 to the normal texture sampler
+        this._glContext.uniform1i( uNormalTexture, 1, true);
+
+        material.uniformTextureSamplerDic['uNormalTexture'] = {};
+        if (material.hasAnyTextures()) {
+          material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
+          material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
+          material._semanticsDic['TEXTURE'].push('uNormalTexture');
+        }
+      }
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class DecalShader extends WireframeShader {
+    constructor(glBoostContext) {
+
+      super(glBoostContext);
+
+      DecalShader.mixin(VertexWorldShadowShaderSource);
+      DecalShader.mixin(DecalShaderSource);
+
+      this._lut = null;
+    }
+
+    setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+
+      let baseColor = material.baseColor;
+      this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
+
+      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      if (diffuseTexture) {
+        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+        this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
+      }
+
+
+      // For Shadow
+      for (let i=0; i<lights.length; i++) {
+        if (lights[i].camera && lights[i].camera.texture) {
+          let cameraMatrix = lights[i].camera.lookAtRHMatrix();
+          let viewMatrix = cameraMatrix.clone();
+          let projectionMatrix = lights[i].camera.projectionRHMatrix();
+          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
+        }
+
+        if (lights[i].camera && lights[i].camera.texture) {
+          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 1, true);
+        } else {
+          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 0, true);
+        }
+
+        if (lights[i].camera && lights[i].camera.texture) {
+          let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
+          let index = lights[i].camera.texture.textureUnitIndex;
+
+          this._glContext.uniform1i(uniformLocation, index, true);
+        } else {
+          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
+        }
+      }
+    }
+
+    setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
+      super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
+      for (let i=0; i<lights.length; i++) {
+        if (lights[i].camera && lights[i].camera.texture) {
+          // set depthTexture unit i+1 to the sampler
+          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
+        }
+      }
+    }
+
+    set lut(lut) {
+      this._lut = lut;
+    }
+
+    get lut() {
+      return this._lut;
+    }
+  }
+
+  GLBoost$1['DecalShader'] = DecalShader;
+
+  class L_AbstractMaterial extends GLBoostObject {
+    constructor(glBoostContext) {
+      super(glBoostContext);
+
+      if (this.constructor === L_AbstractMaterial) {
+        throw new TypeError('Cannot construct L_AbstractMaterial instances directly.');
+      }
+
+      this._textureDic = {};
+      this._texturePurposeDic = [];
+      this._textureContributionRateDic = {};
+      this._gl = this._glContext.gl;
+      this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
+      this._ambientColor = new Vector4(0.25, 0.25, 0.25, 1.0);
+      this._name = '';
+      this._shaderClass = DecalShader;
+      this._shaderInstance = null;
+      this._vertexNofGeometries = {};
+      this._states = {
+        enable:[],
+        functions:{}
+      };
+      this._shaderUniformLocationsOfExpressions = {};
+      this._isVisibleForGeometiesAssginedByThisMaterial = true;
+      this._globalStatesUsage = null;
+      this._shaderParametersForShaderInstance = {};
+      this._semanticsDic = {};
+
+      this._stateFunctionsToReset = {
+        "blendColor": [0.0, 0.0, 0.0, 0.0],
+        "blendEquationSeparate": [
+          32774,
+          32774
+        ],
+        "blendFuncSeparate": [1, 0, 1, 0],
+        "colorMask": [true, true, true, true],
+        "cullFace": [1029],
+        "depthFunc": [513],
+        "depthMask": [true],
+        "depthRange": [0.0, 1.0],
+        "frontFace": [2305],
+        "lineWidth": [1.0],
+        "polygonOffset": [0.0, 0.0]
+      };
+
+      this._countOfUpdate = 0;
+    }
+
+    clone() {
+      var material = new ClassicMaterial(this._glBoostContext);
+      material._baseColor = this._baseColor;
+      material._diffuseColor = this._diffuseColor;
+      material._specularColor = this._specularColor;
+      material._ambientColor = this._ambientColor;
+      material._shaderClass = this._shaderClass;
+      material._shaderInstance = this._shaderInstance;
+
+      for (let geom in this._vertexNofGeometries) {
+        material._vertexNofGeometries[geom] = this._vertexNofGeometries[geom];
+      }
+
+      return material;
+    }
+
+    _updateCount() {
+      this._countOfUpdate += 1;
+    }
+
+    getUpdateStateString() {
+      return this.toString() + '_updateCount_' + this._countOfUpdate;
+    }
+
+    setShaderClassWithForceUpdate(shaderClass) {
+      this._shaderClass = shaderClass;
+      if (this._shaderInstance) {
+        this._shaderInstance.readyForDiscard();
+      }
+      this._shaderInstance = null;
+    }
+
+    set shaderClass(shaderClass) {
+      if (this._shaderClass === shaderClass) {
+        return;
+      }
+      this.setShaderClassWithForceUpdate(shaderClass);
+    }
+
+    get shaderClass() {
+      return this._shaderClass;
+    }
+
+    set shaderInstance(shaderInstance) {
+      this._shaderInstance = shaderInstance;
+      this._updateCount();
+    }
+
+    get shaderInstance() {
+      return this._shaderInstance;
+    }
+
+    setTexture(texture, purpose) {
+      if (!texture) {
+        return;
+      }
+      this._textureDic[texture.userFlavorName] = texture;
+      let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      this._texturePurposeDic[_purpose] = texture.userFlavorName;
+      texture.purpose = _purpose;
+      this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._updateCount();
+    }
+
+    removeTexture(userFlavorName, discardTexture=true) {
+      if (discardTexture) {
+        this._textureDic[userFlavorName].readyForDiscard();
+      }
+      delete this._texturePurposeDic[this._textureDic[userFlavorName].purpose];
+      delete this._textureDic[userFlavorName];
+      delete this._textureContributionRateDic[userFlavorName];
+      this._updateCount();
+    }
+
+    setTexturePurpose(userFlavorNameOfTexture, purpose) {
+      this._texturePurposeDic[purpose] = userFlavorNameOfTexture;
+      this._updateCount();
+    }
+
+    getTexture(userFlavorName) {
+      return this._textureDic[userFlavorName];
+    }
+
+    getTextureFromPurpose(purpose) {
+      let userFlavorName = this._texturePurposeDic[purpose];
+      return this.getTexture(userFlavorName);
+    }
+
+    getOneTexture() {
+      for (let userFlavorName in this._textureDic) {
+        return this._textureDic[userFlavorName];
+      }
+      return null;
+    }
+
+    getTextureNum() {
+      let count = 0;
+      for (let userFlavorName in this._textureDic) {
+        if (this._textureDic[userFlavorName] instanceof AbstractTexture) {
+          count += 1;
+        }
+      }
+      return count;
+    }
+
+    getTextureUserFlavorNames() {
+      return Object.keys(this._textureDic);
+    }
+
+    setAllTextureContributionRate(rateVec4) {
+      for (let userFlavorName in this._textureContributionRateDic) {
+        this._textureContributionRateDic[userFlavorName] = rateVec4;
+      }
+      this._updateCount();
+    }
+
+    setTextureContributionRate(textureUserFlavorName, rateVec4) {
+      this._textureContributionRateDic[textureUserFlavorName] = rateVec4;
+      this._updateCount();
+    }
+
+    getTextureContributionRate(textureUserFlavorName) {
+      return this._textureContributionRateDic[textureUserFlavorName];
+    }
+
+
+    hasAnyTextures() {
+      let result = false;
+      for (let userFlavorName in this._textureDic) {
+        result = true;
+      }
+
+      return result;
+    }
+
+    set baseColor(vec) {
+      if (!vec) {
+        return;
+      }
+
+      this._baseColor = vec;
+      this._updateCount();
+    }
+
+    get baseColor() {
+      return this._baseColor;
+    }
+
+    set diffuseColor(vec) {
+      if (!vec) {
+        return;
+      }
+
+      this._diffuseColor = vec;
+      this._updateCount();
+    }
+
+    get diffuseColor() {
+      return this._diffuseColor;
+    }
+
+    set specularColor(vec) {
+      if (!vec) {
+        return;
+      }
+
+      this._specularColor = vec;
+      this._updateCount();
+    }
+
+    get specularColor() {
+      return this._specularColor;
+    }
+
+    set ambientColor(vec) {
+      if (!vec) {
+        return;
+      }
+
+      this._ambientColor = vec;
+      this._updateCount();
+    }
+
+    get ambientColor() {
+      return this._ambientColor;
+    }
+
+    set states(states) {
+      if (typeof states.functions === 'undefined') {
+        states.functions = this._stateFunctionsToReset;
+      }
+      this._states.enable = states.enable;
+      if (typeof states.functions !== 'undefined') {
+        this._states.functions = states.functions;
+      }
+      this._updateCount();
+    }
+
+    get states() {
+      return this._states;
+    }
+
+    isTransparent() {
+      let isTransparent = false;
+      if (this._states) {
+        if (this._states.enable) {
+          this._states.enable.forEach((state) => {
+            if (state === 3042) {
+              isTransparent = true;
+            }
+          });
+        }
+      }
+
+      return isTransparent;
+    }
+
+    set name(name) {
+      this._name = name;
+      this._updateCount();
+    }
+
+    get name() {
+      return this._name;
+    }
+
+    setVertexN(geom, num) {
+      this._vertexNofGeometries[geom] = num;
+      this._updateCount();
+    }
+
+    getVertexN(geom) {
+      return (typeof this._vertexNofGeometries[geom] === 'undefined') ? 0 : this._vertexNofGeometries[geom];
+    }
+
+    /**
+     * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
+     * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
+     */
+    setUpTexture(textureName, textureUnitIndex) {
+      var gl = this._gl;
+      let texture = this.getTexture(textureName);
+      let isCalledWebGLBindTexture = true;
+
+      if (texture) {
+        isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
+        return isCalledWebGLBindTexture;
+      } else {
+        this._glBoostContext.defaultDummyTexture.setUp(0);
+
+  //      gl.bindTexture(gl.TEXTURE_2D, null);
+        isCalledWebGLBindTexture = true;
+        return isCalledWebGLBindTexture;
+      }
+    }
+
+    tearDownTexture(textureName, textureUnitIndex) {
+      let texture = this.getTexture(textureName);
+      if (texture) {
+        texture.tearDown(textureUnitIndex);
+      }
+    }
+
+    _setUpMaterialStates(states) {
+      let gl = this._gl;
+
+      if (states) {
+        if (states.enable) {
+          states.enable.forEach((state)=>{
+            gl.enable(state);
+          });
+        }
+        if (states.functions) {
+          for (let functionName in states.functions) {
+            gl[functionName].apply(gl, states.functions[functionName]);
+          }
+        }
+      }
+    }
+
+    setUpStates() {
+      let globalStatesUsage = this._glBoostContext.globalStatesUsage;
+      if (this._globalStatesUsage) {
+        globalStatesUsage = this._globalStatesUsage;
+      }
+      switch (globalStatesUsage) {
+        case GLBoost$1.GLOBAL_STATES_USAGE_DO_NOTHING:
+          break;
+        case GLBoost$1.GLOBAL_STATES_USAGE_IGNORE:
+          this._setUpMaterialStates(this._states);
+          break;
+        case GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE:
+          this._glBoostContext.reflectGlobalGLState();
+          this._setUpMaterialStates(this._states);
+          break;
+        case GLBoost$1.GLOBAL_STATES_USAGE_EXCLUSIVE:
+          this._glBoostContext.reflectGlobalGLState();
+          break;
+        default:
+          break;
+      }
+    }
+
+    tearDownStates() {
+      this._glBoostContext.disableAllGLState();
+      this._setUpMaterialStates({
+        functions : this._stateFunctionsToReset
+      });
+    }
+
+    setUniform(glslProgram, uniformLocationName, uniformLocation) {
+      if (!this._shaderUniformLocationsOfExpressions[glslProgram.hashId]) {
+        this._shaderUniformLocationsOfExpressions[glslProgram.hashId] = {};
+      }
+
+      this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
+      glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+
+      this._updateCount();
+    }
+
+    getUniform(glslProgram, uniformLocationName) {
+      if (typeof this._shaderUniformLocationsOfExpressions[glslProgram.hashId] !== 'undefined') {
+        return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
+      }
+
+  //    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');
+
+      return void 0;
+    }
+
+    set isVisible(flg) {
+      this._isVisibleForGeometiesAssginedByThisMaterial = flg;
+      this._updateCount();
+    }
+
+    get isVisible() {
+      return this._isVisibleForGeometiesAssginedByThisMaterial;
+    }
+
+    set globalStatesUsage(usage) {
+      this._globalStatesUsage = usage;
+      this._updateCount();
+    }
+
+    get globalStatesUsage() {
+      return this._globalStatesUsage;
+    }
+
+    get shaderParameters() {
+      return this._shaderParametersForShaderInstance;
+    }
+
+    set shaderParameters(shaderParameterDic) {
+      this._shaderParametersForShaderInstance = shaderParameterDic;
+    }
+
+    addSemanticsDic(uniform, uniformName) {
+      if (typeof this._semanticsDic[uniform] === 'undefined') {
+        this._semanticsDic[uniform] = uniformName;
+      } else if (typeof this._semanticsDic[uniform] === 'string') {
+        let tmpSemanticsStr = this._semanticsDic[uniform];
+        this._semanticsDic[uniform] = [];
+        this._semanticsDic[uniform].push(tmpSemanticsStr);
+        this._semanticsDic[uniform].push(uniformName);
+      } else {
+        // it must be Array
+        this._semanticsDic[uniform].push(uniformName);
+      }
+    }
+
+    removeSemanticsDic(uniform) {
+      delete this._semanticsDic[uniform];
+    }
+
+    readyForDiscard() {
+      for (let userFlavorName in this._textureDic) {
+        this.removeTexture(userFlavorName, true);
+      }
+      if (this._shaderInstance) {
+        this._shaderInstance.readyForDiscard();
+      }
+      this._shaderInstance = null;
+    }
+  }
+
+  GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
+
+  class ClassicMaterial$1 extends L_AbstractMaterial {
+    constructor(glBoostContext) {
+      super(glBoostContext);
+
+      this._wireframeWidthRelativeScale = 1.0;
+
+    }
+
+    get wireframeWidthRelativeScale() {
+      return this._wireframeWidthRelativeScale;
+    }
+  }
+
+  GLBoost$1['ClassicMaterial'] = ClassicMaterial$1;
+
   class L_AbstractCamera extends L_Element {
     constructor(glBoostContext, toRegister, lookat) {
       super(glBoostContext, toRegister);
@@ -11051,6 +9998,19 @@ return mat4(
     get texture() {
       return this._texture;
     }
+
+    getCameraInfo() {
+      const info = {};
+
+      info.translate = this.translate;
+      info.translateInner = this.translateInner;
+      info.center = this.center;
+      info.centerInner = this.centerInner;
+      info.up = this.up;
+      info.upInner = this.upInner;
+
+      return info;
+    }
   }
 
   L_AbstractCamera._mainCamera = {};
@@ -11161,6 +10121,18 @@ return mat4(
       return this._zFar;
     }
 
+    getCameraInfo() {
+      const info = super.getCameraInfo();
+
+      info.fovy = this.fovy;
+      info.aspect = this.aspect;
+      info.zFar = this.zFar;
+      info.zFarInner = this.zFarInner;
+      info.zNear = this.zNear;
+      info.zNearInner = this.zNearInner;
+      
+      return info;
+    }
   }
 
   class L_FrustumCamera extends L_AbstractCamera {
@@ -11283,6 +10255,21 @@ return mat4(
 
     get aspect() {
       return (this.right - this.left) / (this.top - this.bottom);
+    }
+
+    getCameraInfo() {
+      const info = super.getCameraInfo();
+
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFar;
+      info.zFarInner = this.zFarInner;
+      info.zNear = this.zNear;
+      info.zNearInner = this.zNearInner;
+
+      return info;
     }
   }
 
@@ -11439,6 +10426,23 @@ return mat4(
 
     get aspect() {
       return (this.right - this.left) / (this.top - this.bottom);
+    }
+
+    getCameraInfo() {
+      const info = super.getCameraInfo();
+
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFar;
+      info.zFarInner = this.zFarInner;
+      info.zNear = this.zNear;
+      info.zNearInner = this.zNearInner;
+      info.xmag = this.xmag;
+      info.ymag = this.ymag;
+
+      return info;
     }
   }
 
@@ -13894,6 +12898,1030 @@ return mat4(
 
   GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
+  class M_Mesh extends M_Element {
+    constructor(glBoostContext, geometry, material) {
+      super(glBoostContext);
+
+      if (geometry) {
+        this.geometry = geometry;
+      }
+      if (material) {
+        this.material = material;
+      }
+      this._transformedDepth = 0;
+      this._outlineGizmo = null;
+      this._isPickable = true;
+    }
+
+    prepareToRender(expression, existCamera_f, lights) {
+      this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
+      /*
+      if (this._geometry._materials.length === 0 && this._material) {
+        let shaderInstance = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
+        this._geometry._setVertexNtoSingleMaterial(this._material, 0);
+        this._material.shaderInstance = shaderInstance;      
+        this._material.shaderInstance.vao = this._geometry._getVAO();
+        this._geometry.setUpVertexAttribs(this._glContext.gl, shaderInstance._glslProgram, this._geometry._getAllVertexAttribs());
+      }
+      */
+    }
+
+    draw(data) {
+      this._geometry.draw(
+        {
+          expression: data.expression,
+          lights: data.lights,
+          camera: data.camera,
+          scene: data.renderPass.scene,
+          renderPassIndex: data.renderPassIndex,
+          mesh: this,
+          viewport: data.viewport,
+          isWebVRMode: data.isWebVRMode,
+          webvrFrameData: data.webvrFrameData,
+          forceThisMaterial: data.forceThisMaterial,
+        }
+      );
+    }
+
+    set geometry(geometry) {
+      this._geometry = geometry;
+      geometry._parent = this;
+      M_Mesh._geometries[geometry.toString()] = geometry;
+    }
+
+    get geometry() {
+      return this._geometry;
+    }
+
+    set material(material) {
+      this._material = material;
+    }
+
+    get material() {
+      return this._material;
+    }
+
+    bakeTransformToGeometry() {
+      var positions = this._geometry._vertices.position;
+      var mat = this.worldMatrix;
+      let componentN = this._geometry._vertices.components.position;
+      let length = positions.length / componentN;
+      for (let i=0; i<length; i++) {
+        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+        let transformedPosVec = mat.multiplyVector(posVector4);
+        positions[i*componentN] = transformedPosVec.x;
+        positions[i*componentN+1] = transformedPosVec.y;
+        positions[i*componentN+2] = transformedPosVec.z;
+        if (componentN > 3) {
+          positions[i * componentN+3] = transformedPosVec.w;
+        }
+      }
+      this._geometry._vertices.position = positions;
+
+      if (this._geometry._vertices.normal) {
+        var normals = this._geometry._vertices.normal;
+        length = normals.length / 3;
+        for (let i=0; i<length; i++) {
+          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
+          normals[i*3] = transformedNormalVec.x;
+          normals[i*3+1] = transformedNormalVec.y;
+          normals[i*3+2] = transformedNormalVec.z;
+        }
+        this._geometry._vertices.normal = normals;
+      }
+
+    }
+
+    bakeInverseTransformToGeometry() {
+      var positions = this._geometry._vertices.position;
+      var invMat = this.inverseWorldMatrix;
+      let componentN = this._geometry._vertices.components.position;
+      let length = positions.length / componentN;
+      for (let i=0; i<length; i++) {
+        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+        let transformedPosVec = invMat.multiplyVector(posVector4);
+        positions[i*componentN] = transformedPosVec.x;
+        positions[i*componentN+1] = transformedPosVec.y;
+        positions[i*componentN+2] = transformedPosVec.z;
+        if (componentN > 3) {
+          positions[i * componentN+3] = transformedPosVec.w;
+        }
+      }
+      this._geometry._vertices.position = positions;
+
+      let mat = this.worldMatrix;
+      if (this._geometry._vertices.normal) {
+        var normals = this._geometry._vertices.normal;
+        length = normals.length / 3;
+        for (let i=0; i<length; i++) {
+          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
+          let transformedNormalVec = Matrix44$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
+          normals[i*3] = transformedNormalVec.x;
+          normals[i*3+1] = transformedNormalVec.y;
+          normals[i*3+2] = transformedNormalVec.z;
+        }
+        this._geometry._vertices.normal = normals;
+      }
+
+    }
+
+    _copyMaterials() {
+      if (this.geometry._indicesArray.length !== this.geometry._materials.length) {
+        for (let i=0; i<this.geometry._indicesArray.length;i++) {
+          this.geometry._materials[i] = this._material;//.clone();
+          this.geometry._materials[i].setVertexN(this.geometry, this.geometry._indicesArray[i].length);
+        }
+      }
+    }
+
+    merge(meshOrMeshes) {
+      if (Array.isArray(meshOrMeshes)) {
+        this.bakeTransformToGeometry();
+
+        let meshes = meshOrMeshes;
+        let geometries = [];
+        for (let i=0; i<meshes.length; i++) {
+          meshes[i].bakeTransformToGeometry();
+          geometries.push(meshes[i].geometry);
+        }
+
+        this.geometry.merge(geometries);
+
+        for (let i=0; i<meshes.length; i++) {
+          delete meshes[i];
+        }
+
+        this._copyMaterials();
+
+        this.bakeInverseTransformToGeometry();
+
+      } else { //
+        let mesh = meshOrMeshes;
+        mesh.bakeTransformToGeometry();
+        this.bakeTransformToGeometry();
+        this.geometry.merge(mesh.geometry);
+
+        this._copyMaterials();
+
+        this.bakeInverseTransformToGeometry();
+      }
+    }
+
+    mergeHarder(meshOrMeshes) {
+
+      if (Array.isArray(meshOrMeshes)) {
+
+        this.bakeTransformToGeometry();
+
+        let meshes = meshOrMeshes;
+        let geometries = [];
+        for (let i=0; i<meshes.length; i++) {
+          meshes[i].bakeTransformToGeometry();
+          geometries.push(meshes[i].geometry);
+        }
+
+        this.geometry.mergeHarder(geometries);
+
+        for (let i=0; i<meshes.length; i++) {
+          delete meshes[i];
+        }
+
+        this.bakeInverseTransformToGeometry();
+
+      } else { //
+        let mesh = meshOrMeshes;
+        mesh.bakeTransformToGeometry();
+        this.bakeTransformToGeometry();
+        this.geometry.mergeHarder(mesh.geometry);
+
+        this.bakeInverseTransformToGeometry();
+      }
+    }
+
+    calcTransformedDepth(camera) {
+      var viewMatrix = camera.lookAtRHMatrix();
+      var m_m = null;
+      if (this.bindShapeMatrix) {
+        m_m = Matrix44$1.multiply(this.worldMatrix, this.bindShapeMatrix);
+      } else {
+        m_m = this.worldMatrix;
+      }
+      var mv_m = viewMatrix.multiply(camera.inverseWorldMatrix).multiply(m_m);
+
+      var centerPosition = this.geometry.centerPosition.toVector4();
+      //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
+      var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
+
+      this._transformedDepth = transformedCenterPosition.z;//transformedCenterPosition.length();// //
+    }
+
+    get transformedDepth() {
+      return this._transformedDepth;
+    }
+
+    get isTransparent() {
+      let isTransparent = (this._opacity < 1.0) ? true : false;
+      isTransparent |= this.geometry.isTransparent(this);
+      return isTransparent;
+    }
+
+    set isTransparentForce(flg) {
+      this._isTransparentForce = flg;
+    }
+
+    get isTransparentForce() {
+      return this._isTransparentForce;
+    }
+
+    get AABBInWorld() {
+      var world_m = this.worldMatrix;
+      return AABB.multiplyMatrix(world_m, this._geometry.rawAABB);
+    }
+
+    get AABBInLocal() {
+      return this._geometry.rawAABB;//.clone();
+    }
+
+    get rawAABBInLocal() {
+      return this._geometry.rawAABB;
+    }
+
+    getAppropriateMaterials() {
+      return this.geometry._getAppropriateMaterials(this);
+    }
+
+    rayCast(x, y, camera, viewport) {
+
+      const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+      const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
+      const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
+      const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+
+      const gl = this._glContext.gl;
+      const isCulling = gl.isEnabled(gl.CULL_FACE);
+      const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
+
+      let isFrontFacePickable = true;
+      let isBackFacePickable = true;
+      if (isCulling) {
+        if (cullMode === gl.FRONT) {
+          isFrontFacePickable = false;
+        } else if (cullMode === gl.Back) {
+          isBackFacePickable = false;
+        } else {
+          isFrontFacePickable = false;
+          isBackFacePickable = false;
+        }
+      }
+      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
+      let intersectPositionInWorld = null;
+      if (result[0]) {
+        intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+      }
+      return [intersectPositionInWorld, result[1]];
+    }
+
+    get gizmos() {
+      if (this.isOutlineVisible) {
+        return this._gizmos.concat([this._outlineGizmo]);
+      } else {
+        return this._gizmos;
+      }
+    }
+
+    set isOutlineVisible(flg) {
+      if (flg && this._outlineGizmo === null) {
+        this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+      }
+
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
+      }
+    }
+
+    get isOutlineVisible() {
+      if (this._outlineGizmo === null) {
+        return false;
+      }
+      return this._outlineGizmo.isVisible;
+    }
+
+    set isVisible(flg) {
+      super.isVisible = flg;
+      if (this._outlineGizmo) {
+        this._outlineGizmo.isVisible = flg;
+      }
+    }
+
+    get isVisible() {
+      return super.isVisible;
+    }
+
+    clone() {
+      let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
+      this._copy(instance);
+
+      return instance;
+    }
+
+    _copy(instance) {
+      super._copy(instance);
+      instance._transformedDepth = this._transformedDepth;
+    }
+
+    _needUpdate() {
+      super._needUpdate();
+    }
+
+    set isPickable(flag) {
+      this._isPickable = flag;
+    }
+
+    get isPickable() {
+      return this._isPickable;
+    }
+  }
+  M_Mesh._geometries = {};
+
+  GLBoost$1['M_Mesh'] = M_Mesh;
+
+  class CubeAbsolute extends Geometry {
+    constructor(glBoostContext) {
+      super(glBoostContext);
+
+      //this._
+
+      const BIG_NUMBER = 999;
+      this._vertexData = this._setupVertexData(
+        new Vector3(-BIG_NUMBER, -BIG_NUMBER, -BIG_NUMBER),
+        new Vector3(-BIG_NUMBER+1, -BIG_NUMBER+1, -BIG_NUMBER+1));
+      this.setVerticesData(this._vertexData, [this._indices]);
+    }
+
+    _setupVertexData(minPosition, maxPosition, vertexColor) {
+      this._indices = [
+        3, 1, 0, 2, 1, 3,
+        4, 5, 7, 7, 5, 6,
+        8, 9, 11, 11, 9, 10,
+        15, 13, 12, 14, 13, 15,
+        19, 17, 16, 18, 17, 19,
+        20, 21, 23, 23, 21, 22
+      ];
+
+
+      const positions = [
+        // upper
+        new Vector3(minPosition.x, maxPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
+        // lower
+        new Vector3(minPosition.x, minPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
+        // front
+        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
+        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
+        // back
+        new Vector3(minPosition.x, minPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
+        new Vector3(minPosition.x, maxPosition.y, minPosition.z),
+        // right
+        new Vector3(maxPosition.x, minPosition.y, minPosition.z),
+        new Vector3(maxPosition.x, minPosition.y, maxPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, maxPosition.z),
+        new Vector3(maxPosition.x, maxPosition.y, minPosition.z),
+        // left
+        new Vector3(minPosition.x, minPosition.y, minPosition.z),
+        new Vector3(minPosition.x, minPosition.y, maxPosition.z),
+        new Vector3(minPosition.x, maxPosition.y, maxPosition.z),
+        new Vector3(minPosition.x, maxPosition.y, minPosition.z)
+      ];
+      if (vertexColor) {
+        const colors = [
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
+        ];
+      }
+
+      const texcoords = [
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0),
+
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0),
+
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0),
+
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0),
+
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0),
+
+        new Vector2(0.0, 0.0),
+        new Vector2(1.0, 0.0),
+        new Vector2(1.0, 1.0),
+        new Vector2(0.0, 1.0)
+      ];
+
+      const normals = [
+        // upper
+        new Vector3(0, 1, 0),
+        new Vector3(0, 1, 0),
+        new Vector3(0, 1, 0),
+        new Vector3(0, 1, 0),
+        // lower
+        new Vector3(0, -1, 0),
+        new Vector3(0, -1, 0),
+        new Vector3(0, -1, 0),
+        new Vector3(0, -1, 0),
+        // front
+        new Vector3(0, 0, 1),
+        new Vector3(0, 0, 1),
+        new Vector3(0, 0, 1),
+        new Vector3(0, 0, 1),
+        // back
+        new Vector3(0, 0, -1),
+        new Vector3(0, 0, -1),
+        new Vector3(0, 0, -1),
+        new Vector3(0, 0, -1),
+        // right
+        new Vector3(1, 0, 0),
+        new Vector3(1, 0, 0),
+        new Vector3(1, 0, 0),
+        new Vector3(1, 0, 0),
+        // left
+        new Vector3(-1, 0, 0),
+        new Vector3(-1, 0, 0),
+        new Vector3(-1, 0, 0),
+        new Vector3(-1, 0, 0),
+      ];
+
+      this._vertexData ={
+        position: positions,
+        normal: normals,
+        texcoord: texcoords
+      };
+
+      return this._vertexData;
+    }
+
+    update(minPosition, maxPosition) {
+      this._vertexData = this._setupVertexData(minPosition, maxPosition);
+      this.updateVerticesData(this._vertexData, [this._indices]);
+    }
+
+  }
+
+  GLBoost$1["CubeAbsolute"] = CubeAbsolute;
+
+  /*       */
+
+                                                  
+
+  class M_Group extends M_Element {
+                               
+
+    constructor(glBoostContext) {
+      super(glBoostContext);
+      this._elements = [];
+      this._AABB = new AABB();
+      this._isRootJointGroup = false;
+
+  //    this._aabbGizmo = null;
+  //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+  //    this._gizmos.push(this._aabbGizmo);
+    }
+
+    /**
+     * [en] Add the element to this group as a child.<br>
+     * [ja] このグループにelementを子供として追加します。
+     * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
+     */
+    addChild(element, isDuplicateOk = false) {
+
+      if (isDuplicateOk){
+        // if forgive duplicated register by copy
+        let elem = null;
+        if (element._parent) {
+          elem = element.clone();
+        } else {
+          elem = element;
+        }
+        elem._parent = this;
+        this._elements.push(elem);
+      } else {
+        //// if forbit duplicated register
+        this.removeChild(element);
+        element._parent = this;
+        this._elements.push(element);
+      }
+    }
+
+    /**
+     * [en] remove the element from this group.
+     * [ja] このグループから指定した要素を削除します。
+     * @param {Element} element [en] the element to remove [ja] 削除したい要素
+     */
+    removeChild(element) {
+      this._elements = this._elements.filter(function(elem) {
+        if (elem === element) {
+          element._parent = null;
+        }
+        return elem !== element;
+      });
+    }
+
+    /**
+     * [en] remove all elements from this group.
+     * [ja] このグループから全ての要素を削除します。
+     */
+    removeAll() {
+      this._elements = this._elements.filter(function(elem) {
+        elem._parent = null;
+      });
+      this._elements.length = 0;
+    }
+
+    getChildren()                  {
+      return this._elements;
+    }
+
+    getAnyJointAsChild()           {
+      for (let element of this._elements) {
+        if (element.className === 'M_Joint') {
+          return element;
+        }
+      }
+      return null;
+    }
+
+    _setDirtyToAnimatedElement(inputName       )      {
+      if (this.hasAnimation(inputName)) {
+        this._needUpdate();
+      }
+
+      let children = this.getChildren();
+      if (children) {
+        for (let i = 0; i < children.length; i++) {
+          children[i]._setDirtyToAnimatedElement(inputName);
+        }  
+      }
+    }
+
+    _validateByQuery(object               , query        , queryMeta           ) {
+      let propertyName = '';
+      if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME) {
+        propertyName = 'instanceName';
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+        propertyName = 'userFlavorName';
+      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+        propertyName = 'instanceNameWithUserFlavor';
+      }
+
+      if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
+        if (object[propertyName] === query) {
+          return object;
+        }
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
+          if (object[propertyName].indexOf(query) !== -1) {
+            return object;
+          }
+      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_REGEXP) {
+        if (object[propertyName].match(query)) {
+          return object;
+        }
+      }
+
+    }
+
+    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+      /*
+      if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
+        return element;
+      }*/
+
+      if (this._validateByQuery(element, query, queryMeta)) {
+        return element;
+      }
+
+
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChild = this.searchElement(query, queryMeta, children[i]);
+          if (hitChild) {
+            return hitChild;
+          }
+        }
+      }
+      return null;
+    }
+
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+        return element;
+      }
+
+
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChild = this.searchElementByNameAndType(query, type, queryMeta, children[i]);
+          if (hitChild) {
+            return hitChild;
+          }
+        }
+      }
+      return null;
+    }
+
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+      let resultElements = [];
+
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildren = this.searchElementsByNameAndType(query, type, queryMeta, children[i]);
+          if (hitChildren) {
+            resultElements = resultElements.concat(hitChildren);
+          }
+        }
+      }
+      /*
+      if ((element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) && element instanceof type) {
+          resultElements.push(element);
+      }*/
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+        resultElements.push(element);
+      }
+
+
+      return resultElements;
+    }
+
+    searchElementsByType(type               , element           = this) {
+      if (element instanceof type) {
+        return element;
+      }
+
+      if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+        let gizmos = element._gizmos;
+        for (let gizmo of gizmos) {
+          if (gizmo instanceof type) {
+            return gizmo;
+          }
+        }
+      }
+
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        let results = [];
+        for (let i = 0; i < children.length; i++) {
+          let hitChildOrChildren = this.searchElementsByType(type, children[i]);
+          if (Array.isArray(hitChildOrChildren)) {
+            Array.prototype.push.apply(results, hitChildOrChildren); // concat
+          } else if (hitChildOrChildren != null) {
+            results.push(hitChildOrChildren);
+          }
+        }
+        return results;
+      }
+      return null;
+    }
+
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
+          if (hitChild) {
+            return hitChild;
+          }
+        }
+      }
+
+      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+        let gizmos = element._gizmos;
+        for (let gizmo of gizmos) {
+          if (this._validateByQuery(gizmo, query, queryMeta)) {
+            return gizmo;
+          }
+        }
+      }
+
+      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            return material;
+          }
+        }
+        return null;
+      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+        return element;
+      }
+    }
+
+    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+      let objects = [];
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
+          if (hitChildren.length > 0) {
+            objects = objects.concat(hitChildren);
+          }
+        }
+        return objects;
+      }
+
+      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+        let gizmos = element._gizmos;
+        for (let gizmo of gizmos) {
+          if (this._validateByQuery(gizmo, query, queryMeta)) {
+            objects.push(gizmo);
+          }
+        }
+        return objects;
+      }
+
+      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            objects.push(material);
+          }
+        }
+        return objects;
+      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+        return [element];
+      }
+      return objects;
+    }
+
+    getStartAnimationInputValue(inputLineName, element = this) {
+
+      if (element instanceof M_Group) {
+        let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildOrInputValue = this.getStartAnimationInputValue(inputLineName, children[i]);
+
+          if (hitChildOrInputValue instanceof M_Element) {
+            let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(inputLineName);
+            if (startInputValueOfThisElement < latestInputValue) {
+              latestInputValue = startInputValueOfThisElement;
+            }
+          } else {
+            let startInputValueOfThisElement = hitChildOrInputValue;
+            if (startInputValueOfThisElement < latestInputValue) {
+              latestInputValue = startInputValueOfThisElement;
+            }
+          }
+        }
+        
+        return latestInputValue;
+      }
+
+      return element.getStartInputValueOfAnimation(inputLineName);
+    }
+
+
+    getEndAnimationInputValue(inputLineName, element = this) {
+
+      if (element instanceof M_Group) {
+        let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildOrInputValue = this.getEndAnimationInputValue(inputLineName, children[i]);
+
+          if (hitChildOrInputValue instanceof M_Element) {
+            let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(inputLineName);
+            if (endInputValueOfThisElement > latestInputValue) {
+              latestInputValue = endInputValueOfThisElement;
+            }
+          } else {
+            let endInputValueOfThisElement = hitChildOrInputValue;
+            if (endInputValueOfThisElement > latestInputValue) {
+              latestInputValue = endInputValueOfThisElement;
+            }
+          }
+        }
+        return latestInputValue;
+      }
+
+      return element.getEndInputValueOfAnimation(inputLineName);
+    }
+
+    /*
+     * Note that it's in world space
+     */
+    updateAABB() {
+      var aabb = (function mergeAABBRecursively(elem) {
+        if (elem instanceof M_Group) {
+          var children = elem.getChildren();
+          for(let i=0; i<children.length; i++) {
+            var aabb = mergeAABBRecursively(children[i]);
+            if (aabb instanceof AABB) {
+              elem.AABB.mergeAABB(aabb);
+            } else {
+              console.assert('calculation of AABB error!');
+            }
+          }
+          return elem.AABB;
+          //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
+        }
+        if (elem instanceof M_Mesh) {
+          let aabb = elem.AABBInWorld;
+          //console.log(aabb.toString());
+          return aabb;
+        }
+
+        return null;
+      })(this);
+      this.AABB.mergeAABB(aabb);
+
+      let newAABB = this.AABB;
+
+  //    this._AABB = aabbInWorld;
+
+      this._updateAABBGizmo();
+
+      return newAABB;
+    }
+
+    get AABB() {
+      return this._AABB;
+    }
+
+    clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+      let instance = new M_Group(this._glBoostContext);
+      if (clonedRootElement === null) {
+        clonedRootElement = instance;
+      }
+      this._copy(instance);
+
+      this._elements.forEach((element)=>{
+        if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
+          instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
+        } else {
+          instance._elements.push(element);
+        }
+      });
+
+      onCompleteFuncs.forEach((func)=>{
+        func();
+      });
+
+      return instance;
+    }
+
+    _copy(instance) {
+      super._copy(instance);
+      instance._AABB = this._AABB.clone();
+      instance._isRootJointGroup = this._isRootJointGroup;
+    }
+
+    set isVisible(flg        ) {
+      let collectVisibility = function(elem        ) {
+        elem._isVisible = flg;
+        if (elem instanceof M_Group) {
+          let children = elem.getChildren();
+          children.forEach(function(child) {
+            collectVisibility(child);
+          });
+        }
+      };
+      collectVisibility(this);
+    }
+
+    get isVisible() {
+      return this._isVisible;
+    }
+
+    _updateAABBGizmo() {
+      /*
+      if (this._aabbGizmo === null) {
+        this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+      }
+      */
+      let world_m = this.worldMatrix;
+      let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
+
+  //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
+    }
+
+    readyForDiscard() {
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Element) {
+          // Must be M_Element
+          elem.readyForDiscard();
+        } else {
+          console.error('not M_Group nor M_Element');
+        }
+      };
+      collectElements(this);
+
+      this.removeAll();
+    }
+
+    rayCast(x, y, camera, viewport) {
+      const meshes = this.searchElementsByType(M_Mesh);
+      let currentShortestT = Number.MAX_VALUE;
+      let currentShortestIntersectedPosVec3 = null;
+      let selectedMesh = null;
+      for (let mesh of meshes) {
+        if (!mesh.isVisible) {
+          continue;
+        }
+        if (!mesh.isPickable) {
+          continue;
+        }
+        const result = mesh.rayCast(x, y, camera, viewport);
+        if (result === null) {
+          return [null, null];
+        }
+        const t = result[1];
+        if (t < currentShortestT) {
+          currentShortestT = t;
+          currentShortestIntersectedPosVec3 = result[0];
+          selectedMesh = mesh;
+        }
+      }
+
+      return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
+    }
+
+    _needUpdate() {
+      super._needUpdate();
+
+      let collectElements = function(elem) {
+        if (elem instanceof M_Group) {
+          const children = elem.getChildren();
+          for (let i = 0; i < children.length; i++) {
+            collectElements(children[i]);
+          }
+        } else if (elem instanceof M_Mesh) {
+          if (elem._outlineGizmo) {
+            elem._outlineGizmo.updateMatrix(elem);
+          }
+        }
+      };
+      collectElements(this);
+    }
+
+  }
+
   let singleton$3 = Symbol();
 
   class M_GLBoostMonitor extends L_GLBoostMonitor {
@@ -15360,6 +15388,36 @@ return mat4(
       return this._cameras;
     }
 
+  }
+
+  class M_Gizmo extends M_Group {
+    constructor(glBoostContext) {
+      super(glBoostContext, null, null);
+
+      this._mesh = null;
+
+      // Whether or not to draw this gizmo before normal meshes drawing.
+      // If true, draw this gizmo before normal meshes drawing.
+      // If false, draw this gizmo after normal meshes drawing.
+      this._isPreDraw = false;
+      this._forceThisMaterial = null;
+    }
+
+    get mesh() {
+      return this._mesh;
+    }
+
+    set isPreDraw(flg) {
+      this._isPreDraw = flg;
+    }
+
+    get isPreDraw() {
+      return this._isPreDraw;
+    }
+
+    get forceThisMaterial() {
+      return this._forceThisMaterial;
+    }
   }
 
   class JointPrimitive extends Geometry {
@@ -21974,4 +22032,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-103-ga269-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-105-g1a609-mod branch: develop';

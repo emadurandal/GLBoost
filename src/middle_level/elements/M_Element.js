@@ -4,7 +4,7 @@ import type GLBoostMiddleContext from '../core/GLBoostMiddleContext';
 import Vector3 from '../../low_level/math/Vector3';
 import Matrix44 from '../../low_level/math/Matrix44';
 import L_Element from '../../low_level/elements/L_Element';
-import M_Gizmo from './gizmos/M_Gizmo';
+import type M_Gizmo from './gizmos/M_Gizmo';
 
 export default class M_Element extends L_Element {
   _isVisible: boolean;
