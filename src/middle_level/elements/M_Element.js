@@ -4,7 +4,7 @@ import type GLBoostMiddleContext from '../core/GLBoostMiddleContext';
 import Vector3 from '../../low_level/math/Vector3';
 import Matrix44 from '../../low_level/math/Matrix44';
 import L_Element from '../../low_level/elements/L_Element';
-import type M_Gizmo from './gizmos/M_Gizmo';
+import M_Gizmo from './gizmos/M_Gizmo';
 
 export default class M_Element extends L_Element {
   _isVisible: boolean;
@@ -26,7 +26,6 @@ export default class M_Element extends L_Element {
   _isAffectedByViewMatrix: boolean;
   _isAffectedByProjectionMatrix: boolean;
   _toInheritCurrentAnimationInputValue: boolean;
-  _customFunction: Function | null;
   _gizmos: Array<M_Gizmo>;
   _masterElement: M_Element | null;
   _worldMatrix: Matrix44;
@@ -50,7 +49,6 @@ export default class M_Element extends L_Element {
 
     this._toInheritCurrentAnimationInputValue = true;
 
-    this._customFunction = null;
     this._isVisible = true;
 
     this._gizmos = [];
@@ -232,14 +230,6 @@ export default class M_Element extends L_Element {
     return this._instanceName + this._updateCountAsElement;                // faster
   }
 
-  set customFunction(func: Function) {
-    this._customFunction = func;
-  }
-
-  get customFunction() {
-    return this._customFunction;
-  }
-
   prepareToRender() {
 
   }
@@ -265,8 +255,6 @@ export default class M_Element extends L_Element {
     }
 
     instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
-
-    instance._customFunction = this._customFunction;
   }
 
   set isVisible(flg: boolean) {
