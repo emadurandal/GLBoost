@@ -574,7 +574,7 @@ export default class L_Element extends GLBoostObject {
     instance._updateCountAsElement = this._updateCountAsElement;
   }
 
-  set allInfo(arg) {
+  setPropertiesFromJson(arg) {
     let json = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
@@ -582,9 +582,9 @@ export default class L_Element extends GLBoostObject {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          this[key] = MathUtil.arrayToQuaternion(json[key]);
         } else {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
         }
       }
     }
