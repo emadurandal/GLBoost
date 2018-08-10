@@ -7,7 +7,6 @@ import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShade
 import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
-import Shader from '../../low_level/shaders/Shader';
 import FreeShader from '../../middle_level/shaders/FreeShader';
 import Matrix33 from '../math/Matrix33';
 
@@ -31,10 +30,15 @@ export default class Geometry extends GLBoostObject {
 
   }
 
+  _createShaderInstance(glBoostContext, shaderClass) {
+    let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
+    return shaderInstance;
+  }
+
   /**
    * 全ての頂点属性のリストを返す
    */
-  static _allVertexAttribs(vertices) {
+  _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
       if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
@@ -271,7 +275,7 @@ export default class Geometry extends GLBoostObject {
     this._vertices = vertices;
     this._indicesArray = indicesArray;
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
     let vertexNum = 0;
@@ -290,7 +294,7 @@ export default class Geometry extends GLBoostObject {
     // for Wireframe
     this._calcBaryCentricCoord(vertexNum, positionElementNumPerVertex);
 
-    allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    allVertexAttribs = this._allVertexAttribs(this._vertices);
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
     // vector to array
@@ -425,22 +429,22 @@ export default class Geometry extends GLBoostObject {
   }
 
   _getAllVertexAttribs() {
-    return Geometry._allVertexAttribs(this._vertices);
+    return this._allVertexAttribs(this._vertices);
   } 
 
   prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
     let vertices = this._vertices;
 
-    let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
+    let _optimizedVertexAttribs = this._allVertexAttribs(vertices, material);
 
     let shaderInstance = null;
     if (argShaderInstance) {
       shaderInstance = argShaderInstance;
     } else {
       if (shaderClass) {
-        shaderInstance = Shader._createShaderInstance(this._glBoostSystem, shaderClass);
+        shaderInstance = this._createShaderInstance(this._glBoostSystem, shaderClass);
       } else {
-        shaderInstance = Shader._createShaderInstance(this._glBoostSystem, material.shaderClass);
+        shaderInstance = this._createShaderInstance(this._glBoostSystem, material.shaderClass);
       }  
     }
 
@@ -486,7 +490,7 @@ export default class Geometry extends GLBoostObject {
 
     this._vertexN = vertices.position.length / vertices.components.position;
 
-    var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+    var allVertexAttribs = this._allVertexAttribs(vertices);
 
 
     // create VAO
@@ -628,7 +632,7 @@ export default class Geometry extends GLBoostObject {
   merge(geometrys) {
     if (Array.isArray(geometrys)) {
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
 
@@ -661,7 +665,7 @@ export default class Geometry extends GLBoostObject {
     } else {
       let geometry = geometrys;
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
         let geomLength = geometry._vertices[attribName].length;
@@ -685,7 +689,7 @@ export default class Geometry extends GLBoostObject {
       console.assert('don\'t merge same geometry!');
     }
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
     allVertexAttribs.forEach((attribName)=> {
       let thisLength = this._vertices[attribName].length;
@@ -723,7 +727,7 @@ export default class Geometry extends GLBoostObject {
   mergeHarder(geometrys) {
     if (Array.isArray(geometrys)) {
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
 
@@ -756,7 +760,7 @@ export default class Geometry extends GLBoostObject {
     } else {
       let geometry = geometrys;
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
         let geomLength = geometry._vertices[attribName].length;
@@ -780,7 +784,7 @@ export default class Geometry extends GLBoostObject {
       console.assert('don\'t merge same geometry!');
     }
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
     allVertexAttribs.forEach((attribName)=> {
       let thisLength = this._vertices[attribName].length;

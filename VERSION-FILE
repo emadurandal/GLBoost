@@ -1,6 +1,6 @@
-version: 0.0.4-110-gc780-mod
+version: 0.0.4-111-ge59b-mod
 branch: develop
-50fd1aecd4c6a6b0617d22f4107481d1e0affe6ff86f88383adfe0f24b0673d0 ./build/glboost.js
-50fd1aecd4c6a6b0617d22f4107481d1e0affe6ff86f88383adfe0f24b0673d0 ./build/glboost.js
-a29984e66452267d8f4251e8a90ae5537a8fc256e39118d08fdb217896892a00 ./build/glboost.min.js
-3c01b5e631551c5237f1a578cef320796507742673033afd78ea1ec0dac1ac0d ./build/glboost.min.js.map
+35ab211f7a2309256ad05d21a137d2e435c3bae1f9c3137c1ad8d6dc5150ec3f ./build/glboost.js
+35ab211f7a2309256ad05d21a137d2e435c3bae1f9c3137c1ad8d6dc5150ec3f ./build/glboost.js
+3628d547a1a1c96a0c6d6502ce0c2b008b9d563380e61e50089b806caf94f935 ./build/glboost.min.js
+15b44b6e826ae830c46d812507647f81875e2b00eba64b1eee2409dc1e6c7bc7 ./build/glboost.min.js.map

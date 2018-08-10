@@ -472,10 +472,6 @@
         throw new TypeError("Cannot construct GLContextImpl instances directly");
       }
 
-      if (!(parent instanceof GLContext)) {
-        throw new Error("This concrete class can only be instantiated from the 'GLContext' class.");
-      }
-
       if (canvas === void 0) {
         throw new Error("Failed to create WebGL Context due to no canvas object.");
       }
@@ -4961,562 +4957,6 @@
 
   Hash._crc32table = "00000000 77073096 EE0E612C 990951BA 076DC419 706AF48F E963A535 9E6495A3 0EDB8832 79DCB8A4 E0D5E91E 97D2D988 09B64C2B 7EB17CBD E7B82D07 90BF1D91 1DB71064 6AB020F2 F3B97148 84BE41DE 1ADAD47D 6DDDE4EB F4D4B551 83D385C7 136C9856 646BA8C0 FD62F97A 8A65C9EC 14015C4F 63066CD9 FA0F3D63 8D080DF5 3B6E20C8 4C69105E D56041E4 A2677172 3C03E4D1 4B04D447 D20D85FD A50AB56B 35B5A8FA 42B2986C DBBBC9D6 ACBCF940 32D86CE3 45DF5C75 DCD60DCF ABD13D59 26D930AC 51DE003A C8D75180 BFD06116 21B4F4B5 56B3C423 CFBA9599 B8BDA50F 2802B89E 5F058808 C60CD9B2 B10BE924 2F6F7C87 58684C11 C1611DAB B6662D3D 76DC4190 01DB7106 98D220BC EFD5102A 71B18589 06B6B51F 9FBFE4A5 E8B8D433 7807C9A2 0F00F934 9609A88E E10E9818 7F6A0DBB 086D3D2D 91646C97 E6635C01 6B6B51F4 1C6C6162 856530D8 F262004E 6C0695ED 1B01A57B 8208F4C1 F50FC457 65B0D9C6 12B7E950 8BBEB8EA FCB9887C 62DD1DDF 15DA2D49 8CD37CF3 FBD44C65 4DB26158 3AB551CE A3BC0074 D4BB30E2 4ADFA541 3DD895D7 A4D1C46D D3D6F4FB 4369E96A 346ED9FC AD678846 DA60B8D0 44042D73 33031DE5 AA0A4C5F DD0D7CC9 5005713C 270241AA BE0B1010 C90C2086 5768B525 206F85B3 B966D409 CE61E49F 5EDEF90E 29D9C998 B0D09822 C7D7A8B4 59B33D17 2EB40D81 B7BD5C3B C0BA6CAD EDB88320 9ABFB3B6 03B6E20C 74B1D29A EAD54739 9DD277AF 04DB2615 73DC1683 E3630B12 94643B84 0D6D6A3E 7A6A5AA8 E40ECF0B 9309FF9D 0A00AE27 7D079EB1 F00F9344 8708A3D2 1E01F268 6906C2FE F762575D 806567CB 196C3671 6E6B06E7 FED41B76 89D32BE0 10DA7A5A 67DD4ACC F9B9DF6F 8EBEEFF9 17B7BE43 60B08ED5 D6D6A3E8 A1D1937E 38D8C2C4 4FDFF252 D1BB67F1 A6BC5767 3FB506DD 48B2364B D80D2BDA AF0A1B4C 36034AF6 41047A60 DF60EFC3 A867DF55 316E8EEF 4669BE79 CB61B38C BC66831A 256FD2A0 5268E236 CC0C7795 BB0B4703 220216B9 5505262F C5BA3BBE B2BD0B28 2BB45A92 5CB36A04 C2D7FFA7 B5D0CF31 2CD99E8B 5BDEAE1D 9B64C2B0 EC63F226 756AA39C 026D930A 9C0906A9 EB0E363F 72076785 05005713 95BF4A82 E2B87A14 7BB12BAE 0CB61B38 92D28E9B E5D5BE0D 7CDCEFB7 0BDBDF21 86D3D2D4 F1D4E242 68DDB3F8 1FDA836E 81BE16CD F6B9265B 6FB077E1 18B74777 88085AE6 FF0F6A70 66063BCA 11010B5C 8F659EFF F862AE69 616BFFD3 166CCF45 A00AE278 D70DD2EE 4E048354 3903B3C2 A7672661 D06016F7 4969474D 3E6E77DB AED16A4A D9D65ADC 40DF0B66 37D83BF0 A9BCAE53 DEBB9EC5 47B2CF7F 30B5FFE9 BDBDF21C CABAC28A 53B39330 24B4A3A6 BAD03605 CDD70693 54DE5729 23D967BF B3667A2E C4614AB8 5D681B02 2A6F2B94 B40BBE37 C30C8EA1 5A05DF1B 2D02EF8D".split(' ');
 
-  class SkeletalShaderSource {
-
-    VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
-      var shaderText = '';
-      shaderText += `${in_} vec4 aVertex_joint;\n`;
-      shaderText += `${in_} vec4 aVertex_weight;\n`;
-
-      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1){
-        shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
-        shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
-        //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
-
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-        // `OneVec4` Version [Begin]
-        shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
-        shaderText += 'uniform vec3 translationScale;\n';
-        // `OneVec4` Version [End]
-      }
-      
-      return shaderText;
-    }
-
-    VSMethodDefine_SkeletalShaderSource(f, lights, material, extraData) {
-      let shaderText = '';
-      shaderText += `
-    mat3 toNormalMatrix(mat4 m) {
-      float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2], a03 = m[0][3],
-      a10 = m[1][0], a11 = m[1][1], a12 = m[1][2], a13 = m[1][3],
-      a20 = m[2][0], a21 = m[2][1], a22 = m[2][2], a23 = m[2][3],
-      a30 = m[3][0], a31 = m[3][1], a32 = m[3][2], a33 = m[3][3];
-    
-      float b00 = a00 * a11 - a01 * a10,
-      b01 = a00 * a12 - a02 * a10,
-      b02 = a00 * a13 - a03 * a10,
-      b03 = a01 * a12 - a02 * a11,
-      b04 = a01 * a13 - a03 * a11,
-      b05 = a02 * a13 - a03 * a12,
-      b06 = a20 * a31 - a21 * a30,
-      b07 = a20 * a32 - a22 * a30,
-      b08 = a20 * a33 - a23 * a30,
-      b09 = a21 * a32 - a22 * a31,
-      b10 = a21 * a33 - a23 * a31,
-      b11 = a22 * a33 - a23 * a32;
-    
-      float determinantVal = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-    
-      return mat3(
-        a11 * b11 - a12 * b10 + a13 * b09, a12 * b08 - a10 * b11 - a13 * b07, a10 * b10 - a11 * b08 + a13 * b06,
-        a02 * b10 - a01 * b11 - a03 * b09, a00 * b11 - a02 * b08 + a03 * b07, a01 * b08 - a00 * b10 - a03 * b06,
-        a31 * b05 - a32 * b04 + a33 * b03, a32 * b02 - a30 * b05 - a33 * b01, a30 * b04 - a31 * b02 + a33 * b00) / determinantVal;
-    }
-
-    mat4 transposeMatrix(mat4 m) {
-      return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
-                  m[0][1], m[1][1], m[2][1], m[3][1],
-                  m[0][2], m[1][2], m[2][2], m[3][2],
-                  m[0][3], m[1][3], m[2][3], m[3][3]);
-    }
-
-    mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
-      vec4 q = quaternion;
-      vec3 t = translation;
-
-      float sx = q.x * q.x;
-      float sy = q.y * q.y;
-      float sz = q.z * q.z;
-      float cx = q.y * q.z;
-      float cy = q.x * q.z;
-      float cz = q.x * q.y;
-      float wx = q.w * q.x;
-      float wy = q.w * q.y;
-      float wz = q.w * q.z;
-
-      
-      return mat4(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
-        2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
-        2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
-        t.x, t.y, t.z, 1.0
-      );
-      /*
-     return mat4(
-      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
-      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
-      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
-      0.0, 0.0, 0.0, 1.0
-    );
-
-   return mat4(
-    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
-    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
-    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
-    t.x, t.y, t.z, 1.0
-  );
-
-    return mat4(
-      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
-      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
-      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
-      0.0, 0.0, 0.0, 1.0
-    );
-    */
-  }
-
-  mat4 createMatrixFromQuaternionTransformUniformScale( vec4 quaternion, vec4 translationUniformScale ) {
-    vec4 q = quaternion;
-    vec3 t = translationUniformScale.xyz;
-    float scale = translationUniformScale.w;
-
-    float sx = q.x * q.x;
-    float sy = q.y * q.y;
-    float sz = q.z * q.z;
-    float cx = q.y * q.z;
-    float cy = q.x * q.z;
-    float cz = q.x * q.y;
-    float wx = q.w * q.x;
-    float wy = q.w * q.y;
-    float wz = q.w * q.z;
-
-    
-    mat4 mat = mat4(
-      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
-      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
-      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
-      t.x, t.y, t.z, 1.0
-    );
-    /*
-    mat4 mat = mat4(
-    1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
-    2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
-    2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
-    0.0, 0.0, 0.0, 1.0
-  );
-
-  mat4 mat = mat4(
-  1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
-  2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
-  2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
-  t.x, t.y, t.z, 1.0
-);
-
-  mat4 mat = mat4(
-    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
-    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
-    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
-    0.0, 0.0, 0.0, 1.0
-  );
-  */
-
-  mat4 uniformScaleMat = mat4(
-    scale, 0.0, 0.0, 0.0,
-    0.0, scale, 0.0, 0.0,
-    0.0, 0.0, scale, 0.0,
-    0.0, 0.0, 0.0, 1.0
-  );
- 
-//  mat[0][0] *= scale;
-//  mat[0][1] *= scale;
-//  mat[0][2] *= scale;
-//  mat[1][0] *= scale;
-//  mat[1][1] *= scale;
-//  mat[1][2] *= scale;
-//  mat[2][0] *= scale;
-//  mat[2][1] *= scale;
-//  mat[2][2] *= scale;
-  
-  return mat*uniformScaleMat;
-}
-
-/*
-  mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
-    vec4 q = quaternion;
-    vec3 t = translation;
-    float x = q.x;
-    float y = q.y;
-    float z = q.z;
-    float w = q.w;
-    float x2 = x + x;
-    float y2 = y + y;
-    float z2 = z + z;
-    float xx = x * x2;
-    float yx = y * x2;
-    float yy = y * y2;
-    float zx = z * x2;
-    float zy = z * y2;
-    float zz = z * z2;
-    float wx = w * x2;
-    float wy = w * y2;
-    float wz = w * z2;
-    float m_0 = 1.0 - yy - zz;
-    float m_3 = yx - wz;
-    float m_6 = zx + wy;
-    float m_1 = yx + wz;
-    float m_4 = 1.0 - xx - zz;
-    float m_7 = zy - wx;
-    float m_2 = zx - wy;
-    float m_5 = zy + wx;
-    float m_8 = 1.0 - xx - yy;
-
-    return mat4(
-      m_0, m_3, m_6, 0.0,
-      m_1, m_4, m_7, 0.0,
-      m_2, m_5, m_8, 0.0,
-      t.x, t.y, t.z, 0.0
-    );
-
-    return mat4(
-    m_0, m_3, m_6, t.x,
-    m_1, m_4, m_7, t.y,
-    m_2, m_5, m_8, t.z,
-    0.0, 0.0, 0.0, 0.0
-  );
-
- 
-   return mat4(
-    m_0, m_1, m_2, 0.0,
-    m_3, m_4, m_5, 0.0,
-    m_6, m_7, m_8, 0.0,
-    t.x, t.y, t.z, 0.0
-  );
-
-return mat4(
-  m_0, m_1, m_2, t.x,
-  m_3, m_4, m_5, t.y,
-  m_6, m_7, m_8, t.z,
-  0.0, 0.0, 0.0, 0.0
-);
-
-  }
-  */
-
-    vec4 unpackedVec2ToNormalizedVec4(vec2 vec_xy, float criteria){
-
-      float r;
-      float g;
-      float b;
-      float a;
-      
-      float ix = floor(vec_xy.x * criteria);
-      float v1x = ix / criteria;
-      float v1y = ix - floor(v1x) * criteria;
-  
-      r = ( v1x + 1.0 ) / (criteria-1.0);
-      g = ( v1y + 1.0 ) / (criteria-1.0);
-  
-      float iy = floor( vec_xy.y * criteria);
-      float v2x = iy / criteria;
-      float v2y = iy - floor(v2x) * criteria;
-  
-      b = ( v2x + 1.0 ) / (criteria-1.0);
-      a = ( v2y + 1.0 ) / (criteria-1.0);
-  
-      r -= 1.0/criteria;
-      g -= 1.0/criteria;
-      b -= 1.0/criteria;
-      a -= 1.0/criteria;
-        
-      r = r*2.0-1.0;
-      g = g*2.0-1.0;
-      b = b*2.0-1.0;
-      a = a*2.0-1.0;
-  
-      return vec4(r, g, b, a);
-    }
-    `;
-
-      return shaderText;
-    }
-
-    /**
-     * @return {string}
-     */
-    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
-
-      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-        shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-        shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-        shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-
-        // `Quaterion (Vec4) Transform(Vec3)` Version
-        shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
-        shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
-        shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
-        shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-
-        // `OneVec4` Version
-        shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
-        shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.x)].xy, criteria.x),
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.x)].zw, criteria.y).xyz*translationScale);\n`;
-        shaderText += `skinMat += weightVec.y * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.y)].xy, criteria.x),
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.y)].zw, criteria.y).xyz*translationScale);\n`;
-        shaderText += `skinMat += weightVec.z * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.z)].xy, criteria.x),
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.z)].zw, criteria.y).xyz*translationScale);\n`;
-        shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
-        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
-      
-      }
-
-      // Calc the following...
-      // * position_world
-      // * normal_world
-      // * normalMatrix
-      // * tangent_world
-      shaderText += 'position_world = skinMat * position_local;\n';    
-      if (Shader._exist(f, GLBoost$1.NORMAL)) {
-        shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
-        shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
-        if (Shader._exist(f, GLBoost$1.TANGENT)) {
-          shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
-        }
-      }
-      // So, you should not recompute the items in the list above. Check the isSkinning flag to avoid recalculation.
-      shaderText += 'isSkinning = true;\n';
-
-
-      return shaderText;
-    }
-
-    prepare_SkeletalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-      let vertexAttribsAsResult = [];
-
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'joint' || attribName === 'weight') {
-          vertexAttribsAsResult.push(attribName);
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-        }
-      });
-
-      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-        material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
-        material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-        
-        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
-        material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
-        material._semanticsDic['JOINT_QUATERNION'] = 'quatArray';
-        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'transArray');
-        material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
-        material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
-        
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-        
-        // `OneVec4` Version [Begin]
-        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
-        material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
-        material._semanticsDic['JOINT_QUATTRANSLATION'] = 'quatTranslationArray';
-        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
-        material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
-        // `OneVec4` Version [End]
-        
-      }
-      
-      /*
-      // とりあえず単位行列で初期化
-      let identityMatrices = [];
-      for (let i=0; i<extraData.jointN; i++) {
-        Array.prototype.push.apply(identityMatrices,
-          [1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1]
-        );
-      }
-      //gl.uniformMatrix4fv(skinTransformMatricesUniformLocation, false, new Float32Array(identityMatrices));
-      */
-
-      return vertexAttribsAsResult;
-    }
-  }
-
-  class VertexWorldShaderSource {
-    // In the context within these member methods,
-    // this is the instance of the corresponding shader class.
-
-    VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `${in_} vec3 aVertex_normal;\n`;
-        shaderText += `${out_} vec3 v_normal_world;\n`;
-        
-        if (Shader._exist(f, GLBoost.TANGENT)) {
-          shaderText += `${in_} vec3 aVertex_tangent;\n`;
-          if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
-            shaderText += `${out_} vec3 v_tangent_world;\n`;
-            shaderText += `${out_} vec3 v_binormal_world;\n`;  
-          }
-        }
-      }
-      shaderText +=      'uniform mat4 worldMatrix;\n';
-      shaderText +=      'uniform mat4 viewMatrix;\n';
-      shaderText +=      'uniform mat4 projectionMatrix;\n';
-      shaderText +=      'uniform mat3 normalMatrix;\n';
-      shaderText +=      'uniform highp ivec3 objectIds;\n';
-      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
-
-      shaderText += `${out_} vec3 v_position_world;\n`;
-
-      return shaderText;
-    }
-
-    VSPreProcess_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
-      var shaderText = '';
-      shaderText += '  vec4 position_world;\n';
-      shaderText += '  vec3 normal_world;\n';
-      shaderText += '  vec3 tangent_world;\n';
-      return shaderText;
-    }
-
-    VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
-      var shaderText = '';
-
-      // calc Projection * View * World matrix
-      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-  //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
-  //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-        shaderText += '  float borderWidth = AABBLengthCenterToCorner * 0.01;\n';
-        shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
-      }
-      
-      // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
-      shaderText += '  if (!isSkinning) {\n';
-      shaderText += '    position_world = worldMatrix * position_local;\n';
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += '  normal_world = normalMatrix * normal_local;\n';
-      }
-      shaderText += '  }\n';
-
-      // calc vertex position in world space
-      shaderText += '  v_position_world = position_world.xyz;\n';
-
-      let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-
-      // Send normal, tangent, binormal vectors in world space to the rasterizer
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        // calc Normal vector in world space
-        shaderText += '  v_normal_world = normal_world;\n';
-        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
-          // calc BiNormal vector and Tangent vector in world space
-          
-          {
-            // Calculate only when No skinning. If skinning, it has already been calculated by SkeletalShader.
-            shaderText += '  if (!isSkinning) {\n';
-            shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
-            shaderText += '  }\n';
-          }
-
-          shaderText += '  v_binormal_world = cross(normal_world, tangent_world);\n';
-          shaderText += '  v_tangent_world = cross(v_binormal_world, normal_world);\n';
-
-        }
-      }
-
-      // Calc vertex positions in clip coordinate space.
-      // (These will be converted in Normalized Device Coordinates by divided gl_Posiiton.w in after stage.)
-      shaderText += '  gl_Position =  pvwMatrix * position_local;\n';
-
-      return shaderText;
-    }
-
-    FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
-
-      shaderText += `uniform highp ivec3 objectIds;\n`;
-      shaderText += `uniform vec3 viewPosition_world;\n`;
-
-      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-      if(lightNumExceptAmbient > 0) {
-        shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
-        shaderText += `uniform vec3 lightSpotInfo[${lightNumExceptAmbient}];\n`;
-        shaderText += `uniform vec3 lightPosition_world[${lightNumExceptAmbient}];\n`;
-        shaderText += `uniform vec3 lightDirection_world[${lightNumExceptAmbient}];\n`;
-      }
-
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `${in_} vec3 v_normal_world;\n`;
-        if (Shader._exist(f, GLBoost.TANGENT) && material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
-          shaderText += `${in_} vec3 v_tangent_world;\n`;
-          shaderText += `${in_} vec3 v_binormal_world;\n`;
-        }
-      }
-
-      shaderText += `${in_} vec3 v_position_world;\n`;
-
-      return shaderText;
-    }
-
-
-    FSShade_VertexWorldShaderSource(f, gl, lights) {
-      var shaderText = '';
-      return shaderText;
-    }
-
-    prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);
-          }
-        }
-      });
-
-      material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
-
-      material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
-      material._semanticsDic['WORLD'] = 'worldMatrix';
-      material.setUniform(shaderProgram, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
-      material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
-      if (existCamera_f) {
-        material.setUniform(shaderProgram, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
-        material._semanticsDic['VIEW'] = 'viewMatrix';
-        material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
-        material._semanticsDic['PROJECTION'] = 'projectionMatrix';
-      }
-
-      material.setUniform(shaderProgram, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition_world'));
-
-      for(let i=0; i<lights.length; i++) {
-        material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightDirection_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDirection_world[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
-      }
-
-      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
-
-      return vertexAttribsAsResult;
-    }
-    
-  }
-
-
-
-
-  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
-
   class Shader extends GLBoostObject {
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -6074,11 +5514,6 @@ return mat4(
       return programToReturn;
     }
 
-    static _createShaderInstance(glBoostContext, shaderClass) {
-      let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
-      return shaderInstance;
-    }
-
     getDefaultPointLightIfNotExist(lights) {
 
       if (lights.length === 0) {
@@ -6499,10 +5934,10 @@ return mat4(
         let glslProgram = this._glslProgram;
 
         if (!isVAOBound) {
-          if (DrawKickerWorld._lastGeometry !== geometryName) {
+        if (DrawKickerWorld._lastGeometry !== geometryName) {
             for (let attribName in vboDic) {
               gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
             }
           }
         }
@@ -6685,6 +6120,562 @@ return mat4(
   //DrawKickerWorld._lastMaterialUpdateStateString = null;
   //DrawKickerWorld._lastGeometry = null;
   //DrawKickerWorld._lastRenderPassIndex = -1;
+
+  class SkeletalShaderSource {
+
+    VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
+      var shaderText = '';
+      shaderText += `${in_} vec4 aVertex_joint;\n`;
+      shaderText += `${in_} vec4 aVertex_weight;\n`;
+
+      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
+        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1){
+        shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
+        shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
+        //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
+
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
+        // `OneVec4` Version [Begin]
+        shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
+        shaderText += 'uniform vec3 translationScale;\n';
+        // `OneVec4` Version [End]
+      }
+      
+      return shaderText;
+    }
+
+    VSMethodDefine_SkeletalShaderSource(f, lights, material, extraData) {
+      let shaderText = '';
+      shaderText += `
+    mat3 toNormalMatrix(mat4 m) {
+      float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2], a03 = m[0][3],
+      a10 = m[1][0], a11 = m[1][1], a12 = m[1][2], a13 = m[1][3],
+      a20 = m[2][0], a21 = m[2][1], a22 = m[2][2], a23 = m[2][3],
+      a30 = m[3][0], a31 = m[3][1], a32 = m[3][2], a33 = m[3][3];
+    
+      float b00 = a00 * a11 - a01 * a10,
+      b01 = a00 * a12 - a02 * a10,
+      b02 = a00 * a13 - a03 * a10,
+      b03 = a01 * a12 - a02 * a11,
+      b04 = a01 * a13 - a03 * a11,
+      b05 = a02 * a13 - a03 * a12,
+      b06 = a20 * a31 - a21 * a30,
+      b07 = a20 * a32 - a22 * a30,
+      b08 = a20 * a33 - a23 * a30,
+      b09 = a21 * a32 - a22 * a31,
+      b10 = a21 * a33 - a23 * a31,
+      b11 = a22 * a33 - a23 * a32;
+    
+      float determinantVal = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    
+      return mat3(
+        a11 * b11 - a12 * b10 + a13 * b09, a12 * b08 - a10 * b11 - a13 * b07, a10 * b10 - a11 * b08 + a13 * b06,
+        a02 * b10 - a01 * b11 - a03 * b09, a00 * b11 - a02 * b08 + a03 * b07, a01 * b08 - a00 * b10 - a03 * b06,
+        a31 * b05 - a32 * b04 + a33 * b03, a32 * b02 - a30 * b05 - a33 * b01, a30 * b04 - a31 * b02 + a33 * b00) / determinantVal;
+    }
+
+    mat4 transposeMatrix(mat4 m) {
+      return mat4(m[0][0], m[1][0], m[2][0], m[3][0],
+                  m[0][1], m[1][1], m[2][1], m[3][1],
+                  m[0][2], m[1][2], m[2][2], m[3][2],
+                  m[0][3], m[1][3], m[2][3], m[3][3]);
+    }
+
+    mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
+      vec4 q = quaternion;
+      vec3 t = translation;
+
+      float sx = q.x * q.x;
+      float sy = q.y * q.y;
+      float sz = q.z * q.z;
+      float cx = q.y * q.z;
+      float cy = q.x * q.z;
+      float cz = q.x * q.y;
+      float wx = q.w * q.x;
+      float wy = q.w * q.y;
+      float wz = q.w * q.z;
+
+      
+      return mat4(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
+        2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
+        2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        t.x, t.y, t.z, 1.0
+      );
+      /*
+     return mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
+      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
+      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
+      0.0, 0.0, 0.0, 1.0
+    );
+
+   return mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+    t.x, t.y, t.z, 1.0
+  );
+
+    return mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
+      2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
+      2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
+      0.0, 0.0, 0.0, 1.0
+    );
+    */
+  }
+
+  mat4 createMatrixFromQuaternionTransformUniformScale( vec4 quaternion, vec4 translationUniformScale ) {
+    vec4 q = quaternion;
+    vec3 t = translationUniformScale.xyz;
+    float scale = translationUniformScale.w;
+
+    float sx = q.x * q.x;
+    float sy = q.y * q.y;
+    float sz = q.z * q.z;
+    float cx = q.y * q.z;
+    float cy = q.x * q.z;
+    float cz = q.x * q.y;
+    float wx = q.w * q.x;
+    float wy = q.w * q.y;
+    float wz = q.w * q.z;
+
+    
+    mat4 mat = mat4(
+      1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), 0.0,
+      2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), 0.0,
+      2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), 0.0,
+      t.x, t.y, t.z, 1.0
+    );
+    /*
+    mat4 mat = mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz + wz), 2.0 * (cy - wy), t.x,
+    2.0 * (cz - wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx + wx), t.y,
+    2.0 * (cy + wy), 2.0 * (cx - wx), 1.0 - 2.0 * (sx + sy), t.z,
+    0.0, 0.0, 0.0, 1.0
+  );
+
+  mat4 mat = mat4(
+  1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+  2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+  2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+  t.x, t.y, t.z, 1.0
+);
+
+  mat4 mat = mat4(
+    1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), t.x,
+    2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), t.y,
+    2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), t.z,
+    0.0, 0.0, 0.0, 1.0
+  );
+  */
+
+  mat4 uniformScaleMat = mat4(
+    scale, 0.0, 0.0, 0.0,
+    0.0, scale, 0.0, 0.0,
+    0.0, 0.0, scale, 0.0,
+    0.0, 0.0, 0.0, 1.0
+  );
+ 
+//  mat[0][0] *= scale;
+//  mat[0][1] *= scale;
+//  mat[0][2] *= scale;
+//  mat[1][0] *= scale;
+//  mat[1][1] *= scale;
+//  mat[1][2] *= scale;
+//  mat[2][0] *= scale;
+//  mat[2][1] *= scale;
+//  mat[2][2] *= scale;
+  
+  return mat*uniformScaleMat;
+}
+
+/*
+  mat4 createMatrixFromQuaternionTransform( vec4 quaternion, vec3 translation ) {
+    vec4 q = quaternion;
+    vec3 t = translation;
+    float x = q.x;
+    float y = q.y;
+    float z = q.z;
+    float w = q.w;
+    float x2 = x + x;
+    float y2 = y + y;
+    float z2 = z + z;
+    float xx = x * x2;
+    float yx = y * x2;
+    float yy = y * y2;
+    float zx = z * x2;
+    float zy = z * y2;
+    float zz = z * z2;
+    float wx = w * x2;
+    float wy = w * y2;
+    float wz = w * z2;
+    float m_0 = 1.0 - yy - zz;
+    float m_3 = yx - wz;
+    float m_6 = zx + wy;
+    float m_1 = yx + wz;
+    float m_4 = 1.0 - xx - zz;
+    float m_7 = zy - wx;
+    float m_2 = zx - wy;
+    float m_5 = zy + wx;
+    float m_8 = 1.0 - xx - yy;
+
+    return mat4(
+      m_0, m_3, m_6, 0.0,
+      m_1, m_4, m_7, 0.0,
+      m_2, m_5, m_8, 0.0,
+      t.x, t.y, t.z, 0.0
+    );
+
+    return mat4(
+    m_0, m_3, m_6, t.x,
+    m_1, m_4, m_7, t.y,
+    m_2, m_5, m_8, t.z,
+    0.0, 0.0, 0.0, 0.0
+  );
+
+ 
+   return mat4(
+    m_0, m_1, m_2, 0.0,
+    m_3, m_4, m_5, 0.0,
+    m_6, m_7, m_8, 0.0,
+    t.x, t.y, t.z, 0.0
+  );
+
+return mat4(
+  m_0, m_1, m_2, t.x,
+  m_3, m_4, m_5, t.y,
+  m_6, m_7, m_8, t.z,
+  0.0, 0.0, 0.0, 0.0
+);
+
+  }
+  */
+
+    vec4 unpackedVec2ToNormalizedVec4(vec2 vec_xy, float criteria){
+
+      float r;
+      float g;
+      float b;
+      float a;
+      
+      float ix = floor(vec_xy.x * criteria);
+      float v1x = ix / criteria;
+      float v1y = ix - floor(v1x) * criteria;
+  
+      r = ( v1x + 1.0 ) / (criteria-1.0);
+      g = ( v1y + 1.0 ) / (criteria-1.0);
+  
+      float iy = floor( vec_xy.y * criteria);
+      float v2x = iy / criteria;
+      float v2y = iy - floor(v2x) * criteria;
+  
+      b = ( v2x + 1.0 ) / (criteria-1.0);
+      a = ( v2y + 1.0 ) / (criteria-1.0);
+  
+      r -= 1.0/criteria;
+      g -= 1.0/criteria;
+      b -= 1.0/criteria;
+      a -= 1.0/criteria;
+        
+      r = r*2.0-1.0;
+      g = g*2.0-1.0;
+      b = b*2.0-1.0;
+      a = a*2.0-1.0;
+  
+      return vec4(r, g, b, a);
+    }
+    `;
+
+      return shaderText;
+    }
+
+    /**
+     * @return {string}
+     */
+    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
+
+      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
+        shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
+        shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
+        shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
+        shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
+
+        // `Quaterion (Vec4) Transform(Vec3)` Version
+        shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
+        shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
+        shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
+        shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
+
+        // `OneVec4` Version
+        shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
+        shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.x)].xy, criteria.x),
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.x)].zw, criteria.y).xyz*translationScale);\n`;
+        shaderText += `skinMat += weightVec.y * createMatrixFromQuaternionTransform(
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.y)].xy, criteria.x),
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.y)].zw, criteria.y).xyz*translationScale);\n`;
+        shaderText += `skinMat += weightVec.z * createMatrixFromQuaternionTransform(
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.z)].xy, criteria.x),
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.z)].zw, criteria.y).xyz*translationScale);\n`;
+        shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
+        unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
+      
+      }
+
+      // Calc the following...
+      // * position_world
+      // * normal_world
+      // * normalMatrix
+      // * tangent_world
+      shaderText += 'position_world = skinMat * position_local;\n';    
+      if (Shader._exist(f, GLBoost$1.NORMAL)) {
+        shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
+        shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
+        if (Shader._exist(f, GLBoost$1.TANGENT)) {
+          shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
+        }
+      }
+      // So, you should not recompute the items in the list above. Check the isSkinning flag to avoid recalculation.
+      shaderText += 'isSkinning = true;\n';
+
+
+      return shaderText;
+    }
+
+    prepare_SkeletalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+      let vertexAttribsAsResult = [];
+
+      vertexAttribs.forEach((attribName)=>{
+        if (attribName === 'joint' || attribName === 'weight') {
+          vertexAttribsAsResult.push(attribName);
+          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        }
+      });
+
+      if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
+        let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
+        material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
+        material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
+        
+        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
+        material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
+        material._semanticsDic['JOINT_QUATERNION'] = 'quatArray';
+        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'transArray');
+        material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
+        material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
+        
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
+        
+        // `OneVec4` Version [Begin]
+        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
+        material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
+        material._semanticsDic['JOINT_QUATTRANSLATION'] = 'quatTranslationArray';
+        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
+        material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
+        // `OneVec4` Version [End]
+        
+      }
+      
+      /*
+      // とりあえず単位行列で初期化
+      let identityMatrices = [];
+      for (let i=0; i<extraData.jointN; i++) {
+        Array.prototype.push.apply(identityMatrices,
+          [1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1]
+        );
+      }
+      //gl.uniformMatrix4fv(skinTransformMatricesUniformLocation, false, new Float32Array(identityMatrices));
+      */
+
+      return vertexAttribsAsResult;
+    }
+  }
+
+  class VertexWorldShaderSource {
+    // In the context within these member methods,
+    // this is the instance of the corresponding shader class.
+
+    VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += `${in_} vec3 aVertex_normal;\n`;
+        shaderText += `${out_} vec3 v_normal_world;\n`;
+        
+        if (Shader._exist(f, GLBoost.TANGENT)) {
+          shaderText += `${in_} vec3 aVertex_tangent;\n`;
+          if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
+            shaderText += `${out_} vec3 v_tangent_world;\n`;
+            shaderText += `${out_} vec3 v_binormal_world;\n`;  
+          }
+        }
+      }
+      shaderText +=      'uniform mat4 worldMatrix;\n';
+      shaderText +=      'uniform mat4 viewMatrix;\n';
+      shaderText +=      'uniform mat4 projectionMatrix;\n';
+      shaderText +=      'uniform mat3 normalMatrix;\n';
+      shaderText +=      'uniform highp ivec3 objectIds;\n';
+      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+
+      shaderText += `${out_} vec3 v_position_world;\n`;
+
+      return shaderText;
+    }
+
+    VSPreProcess_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+      var shaderText = '';
+      shaderText += '  vec4 position_world;\n';
+      shaderText += '  vec3 normal_world;\n';
+      shaderText += '  vec3 tangent_world;\n';
+      return shaderText;
+    }
+
+    VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
+      var shaderText = '';
+
+      // calc Projection * View * World matrix
+      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+  //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
+  //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
+        shaderText += '  float borderWidth = AABBLengthCenterToCorner * 0.01;\n';
+        shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
+      }
+      
+      // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
+      shaderText += '  if (!isSkinning) {\n';
+      shaderText += '    position_world = worldMatrix * position_local;\n';
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += '  normal_world = normalMatrix * normal_local;\n';
+      }
+      shaderText += '  }\n';
+
+      // calc vertex position in world space
+      shaderText += '  v_position_world = position_world.xyz;\n';
+
+      let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+
+      // Send normal, tangent, binormal vectors in world space to the rasterizer
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        // calc Normal vector in world space
+        shaderText += '  v_normal_world = normal_world;\n';
+        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
+          // calc BiNormal vector and Tangent vector in world space
+          
+          {
+            // Calculate only when No skinning. If skinning, it has already been calculated by SkeletalShader.
+            shaderText += '  if (!isSkinning) {\n';
+            shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
+            shaderText += '  }\n';
+          }
+
+          shaderText += '  v_binormal_world = cross(normal_world, tangent_world);\n';
+          shaderText += '  v_tangent_world = cross(v_binormal_world, normal_world);\n';
+
+        }
+      }
+
+      // Calc vertex positions in clip coordinate space.
+      // (These will be converted in Normalized Device Coordinates by divided gl_Posiiton.w in after stage.)
+      shaderText += '  gl_Position =  pvwMatrix * position_local;\n';
+
+      return shaderText;
+    }
+
+    FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
+      let shaderText = '';
+
+      shaderText += `uniform highp ivec3 objectIds;\n`;
+      shaderText += `uniform vec3 viewPosition_world;\n`;
+
+      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
+      if(lightNumExceptAmbient > 0) {
+        shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
+        shaderText += `uniform vec3 lightSpotInfo[${lightNumExceptAmbient}];\n`;
+        shaderText += `uniform vec3 lightPosition_world[${lightNumExceptAmbient}];\n`;
+        shaderText += `uniform vec3 lightDirection_world[${lightNumExceptAmbient}];\n`;
+      }
+
+      if (Shader._exist(f, GLBoost.NORMAL)) {
+        shaderText += `${in_} vec3 v_normal_world;\n`;
+        if (Shader._exist(f, GLBoost.TANGENT) && material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
+          shaderText += `${in_} vec3 v_tangent_world;\n`;
+          shaderText += `${in_} vec3 v_binormal_world;\n`;
+        }
+      }
+
+      shaderText += `${in_} vec3 v_position_world;\n`;
+
+      return shaderText;
+    }
+
+
+    FSShade_VertexWorldShaderSource(f, gl, lights) {
+      var shaderText = '';
+      return shaderText;
+    }
+
+    prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+
+      var vertexAttribsAsResult = [];
+
+      vertexAttribs.forEach((attribName)=>{
+        if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
+          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
+          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
+            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+            vertexAttribsAsResult.push(attribName);
+          }
+        }
+      });
+
+      material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
+
+      material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
+      material._semanticsDic['WORLD'] = 'worldMatrix';
+      material.setUniform(shaderProgram, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
+      material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+      if (existCamera_f) {
+        material.setUniform(shaderProgram, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
+        material._semanticsDic['VIEW'] = 'viewMatrix';
+        material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
+        material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+      }
+
+      material.setUniform(shaderProgram, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition_world'));
+
+      for(let i=0; i<lights.length; i++) {
+        material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
+        material.setUniform(shaderProgram, 'uniform_lightDirection_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDirection_world[${i}]`));
+        material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
+        material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
+      }
+
+      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+
+      return vertexAttribsAsResult;
+    }
+    
+  }
+
+
+
+
+  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
 
   class AABB {
 
@@ -7011,10 +7002,15 @@ return mat4(
 
     }
 
+    _createShaderInstance(glBoostContext, shaderClass) {
+      let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
+      return shaderInstance;
+    }
+
     /**
      * 全ての頂点属性のリストを返す
      */
-    static _allVertexAttribs(vertices) {
+    _allVertexAttribs(vertices) {
       var attribNameArray = [];
       for (var attribName in vertices) {
         if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
@@ -7251,7 +7247,7 @@ return mat4(
       this._vertices = vertices;
       this._indicesArray = indicesArray;
 
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
       let vertexNum = 0;
@@ -7270,7 +7266,7 @@ return mat4(
       // for Wireframe
       this._calcBaryCentricCoord(vertexNum, positionElementNumPerVertex);
 
-      allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      allVertexAttribs = this._allVertexAttribs(this._vertices);
       this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
       // vector to array
@@ -7404,22 +7400,22 @@ return mat4(
     }
 
     _getAllVertexAttribs() {
-      return Geometry._allVertexAttribs(this._vertices);
+      return this._allVertexAttribs(this._vertices);
     } 
 
     prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
       let vertices = this._vertices;
 
-      let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
+      let _optimizedVertexAttribs = this._allVertexAttribs(vertices, material);
 
       let shaderInstance = null;
       if (argShaderInstance) {
         shaderInstance = argShaderInstance;
       } else {
         if (shaderClass) {
-          shaderInstance = Shader._createShaderInstance(this._glBoostSystem, shaderClass);
+          shaderInstance = this._createShaderInstance(this._glBoostSystem, shaderClass);
         } else {
-          shaderInstance = Shader._createShaderInstance(this._glBoostSystem, material.shaderClass);
+          shaderInstance = this._createShaderInstance(this._glBoostSystem, material.shaderClass);
         }  
       }
 
@@ -7465,7 +7461,7 @@ return mat4(
 
       this._vertexN = vertices.position.length / vertices.components.position;
 
-      var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+      var allVertexAttribs = this._allVertexAttribs(vertices);
 
 
       // create VAO
@@ -7606,7 +7602,7 @@ return mat4(
     merge(geometrys) {
       if (Array.isArray(geometrys)) {
         let typedArrayDic = {};
-        let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+        let allVertexAttribs = this._allVertexAttribs(this._vertices);
         allVertexAttribs.forEach((attribName)=> {
           let thisLength = this._vertices[attribName].length;
 
@@ -7639,7 +7635,7 @@ return mat4(
       } else {
         let geometry = geometrys;
         let typedArrayDic = {};
-        let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+        let allVertexAttribs = this._allVertexAttribs(this._vertices);
         allVertexAttribs.forEach((attribName)=> {
           let thisLength = this._vertices[attribName].length;
           let geomLength = geometry._vertices[attribName].length;
@@ -7662,7 +7658,7 @@ return mat4(
         console.assert('don\'t merge same geometry!');
       }
 
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
@@ -7700,7 +7696,7 @@ return mat4(
     mergeHarder(geometrys) {
       if (Array.isArray(geometrys)) {
         let typedArrayDic = {};
-        let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+        let allVertexAttribs = this._allVertexAttribs(this._vertices);
         allVertexAttribs.forEach((attribName)=> {
           let thisLength = this._vertices[attribName].length;
 
@@ -7733,7 +7729,7 @@ return mat4(
       } else {
         let geometry = geometrys;
         let typedArrayDic = {};
-        let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+        let allVertexAttribs = this._allVertexAttribs(this._vertices);
         allVertexAttribs.forEach((attribName)=> {
           let thisLength = this._vertices[attribName].length;
           let geomLength = geometry._vertices[attribName].length;
@@ -7757,7 +7753,7 @@ return mat4(
         console.assert('don\'t merge same geometry!');
       }
 
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
@@ -21995,4 +21991,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-110-gc780-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-111-ge59b-mod branch: develop';

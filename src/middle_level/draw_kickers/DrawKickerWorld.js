@@ -6,7 +6,6 @@ import Matrix44 from '../../low_level/math/Matrix44';
 import Matrix33 from '../../low_level/math/Matrix33';
 import Shader from '../../low_level/shaders/Shader';
 import MiscUtil from '../../low_level/misc/MiscUtil';
-import Geometry from '../../low_level/geometries/Geometry';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -141,10 +140,10 @@ export default class DrawKickerWorld {
       let glslProgram = this._glslProgram;
 
       if (!isVAOBound) {
-        if (DrawKickerWorld._lastGeometry !== geometryName) {
+      if (DrawKickerWorld._lastGeometry !== geometryName) {
           for (let attribName in vboDic) {
             gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-            geometry.setUpVertexAttribs(gl, glslProgram, Geometry._allVertexAttribs(vertices));
+            geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
           }
         }
       }
