@@ -571,7 +571,7 @@ export default class Shader extends GLBoostObject {
 
     if (lights.length === 0) {
       if (Shader._defaultLight === null) {
-        Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
+        Shader._defaultLight = this._glBoostContext._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
       }
       return [Shader._defaultLight];
     } else {

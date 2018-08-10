@@ -1220,7 +1220,7 @@ export default class GLTFLoader {
     let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
     let vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
+    material.shaderInstance = new FreeShader(glBoostContext.__system, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
   _loadAnimation(element, buffers, json, glTFVer, options) {

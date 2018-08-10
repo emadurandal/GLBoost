@@ -1,6 +1,6 @@
-version: 0.0.4-106-gcd58-mod
-branch: develop
-a546b08528f3c6632aca5989ce24a1cbb5b68e0f7dddd8c1dc9293d32a8bdc15 ./build/glboost.js
-a546b08528f3c6632aca5989ce24a1cbb5b68e0f7dddd8c1dc9293d32a8bdc15 ./build/glboost.js
-02019992534a90da5f98dd2f4d8cfb811e7fda6e5e1083ca5a1b16008248c753 ./build/glboost.min.js
-dfa44c96db5f983b0ed5b34bb55b73bb20dcf1f2a4cce1ed18d885d9dc779152 ./build/glboost.min.js.map
+version: 0.0.4-109-g39af-mod
+branch: feature/add-entity-system
+718e41174bac4b5266e679f7fcec0a2a5412ee80f857f6e9a1ab513313609710 ./build/glboost.js
+718e41174bac4b5266e679f7fcec0a2a5412ee80f857f6e9a1ab513313609710 ./build/glboost.js
+4ccef9297967362194175b372d351e096163ce9e02cf2220e17907e6265fbd73 ./build/glboost.min.js
+0210c5196e1557ae1136e4b7a1220cd4ccbb939df16866af60d174e046ac44a4 ./build/glboost.min.js.map

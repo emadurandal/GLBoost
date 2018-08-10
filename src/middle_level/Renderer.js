@@ -12,9 +12,9 @@ export default class Renderer extends GLBoostObject {
     super(glBoostContext);
     var _clearColor = parameters.clearColor;
 
-    var gl = this._glContext.gl;
-
-    this._glBoostContext.reflectGlobalGLState();
+    this._glBoostContext._glBoostContext.reflectGlobalGLState();
+    const glContext = this._glContext;
+    const gl = glContext.gl;
 
     if (_clearColor) {
       gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
@@ -198,13 +198,13 @@ export default class Renderer extends GLBoostObject {
   }
 
   _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-    const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-    this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
-    this._glBoostContext.currentGlobalStates = [
+    const globalStatesUsageBackup = this._glBoostContext._glBoostContext.globalStatesUsage;
+    this._glBoostContext._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    this._glBoostContext._glBoostContext.currentGlobalStates = [
       3042, // gl.BLEND
     ];
     if (isDepthTest) {
-      this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+      this._glBoostContext._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
     }
 
     for (let gizmo of gizmos) {
@@ -223,8 +223,8 @@ export default class Renderer extends GLBoostObject {
       }
     }
 
-    this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-    this._glBoostContext.restoreGlobalStatesToDefault();
+    this._glBoostContext._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostContext._glBoostContext.restoreGlobalStatesToDefault();
 
   }
 
@@ -262,8 +262,7 @@ export default class Renderer extends GLBoostObject {
    * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
    */
   clearCanvas( color_flg, depth_flg, stencil_flg ) {
-
-    var gl = this._glContext.gl;
+    const gl = this._glContext.gl;
 
     var bufferBits = 0;
 

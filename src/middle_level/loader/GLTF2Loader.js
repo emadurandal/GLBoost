@@ -3,7 +3,6 @@ import DataUtil from '../../low_level/misc/DataUtil';
 import DecalShader from '../shaders/DecalShader';
 import LambertShader from '../shaders/LambertShader';
 import PhongShader from '../shaders/PhongShader';
-import FreeShader from '../shaders/FreeShader';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();

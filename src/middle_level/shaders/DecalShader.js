@@ -96,7 +96,7 @@ export class DecalShaderSource {
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
-      diffuseTexture = this._glBoostContext.defaultDummyTexture;
+      diffuseTexture = this._glBoostContext._glBoostContext.defaultDummyTexture;
     }
 
     if (diffuseTexture.toMultiplyAlphaToColorPreviously) {

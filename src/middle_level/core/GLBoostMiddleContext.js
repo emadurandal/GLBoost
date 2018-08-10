@@ -32,27 +32,27 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createScene() {
-    return new M_Scene(this);
+    return new M_Scene(this.__system);
   }
 
   createGroup() {
-    return new M_Group(this);
+    return new M_Group(this.__system);
   }
 
   createMesh(geometry, material) {
-    return new M_Mesh(this, geometry, material);
+    return new M_Mesh(this.__system, geometry, material);
   }
 
   createSkeletalMesh(geometry, material, rootJointName) {
-    return new M_SkeletalMesh(this, geometry, material, rootJointName);
+    return new M_SkeletalMesh(this.__system, geometry, material, rootJointName);
   }
 
   createSkeletalGeometry() {
-    return new M_SkeletalGeometry(this);
+    return new M_SkeletalGeometry(this.__system);
   }
 
   createRenderer(parameters) {
-    return new Renderer(this, parameters);
+    return new Renderer(this.__system, parameters);
   }
 
   createExpression() {
@@ -60,7 +60,7 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   }
 
   createExpressionAndRenderPasses(number) {
-    var expression = new Expression(this);
+    var expression = new Expression(this.__system);
     var renderPasses = this.createRenderPasses(number);
     expression.addRenderPasses(renderPasses);
 
@@ -70,67 +70,67 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
   createRenderPasses(number) {
     var renderPasses = [];
     for (let i=0; i<number; i++) {
-      renderPasses.push(new RenderPass(this));
+      renderPasses.push(new RenderPass(this.__system));
     }
 
     return renderPasses;
   }
 
   createPerspectiveCamera(lookat, perspective) {
-    return new M_PerspectiveCamera(this, true, lookat, perspective);
+    return new M_PerspectiveCamera(this.__system, true, lookat, perspective);
   }
 
   createFrustumCamera(lookat, perspective) {
-    return new M_FrustumCamera(this, true, lookat, perspective);
+    return new M_FrustumCamera(this.__system, true, lookat, perspective);
   }
 
   createOrthoCamera(lookat, ortho) {
-    return new M_OrthoCamera(this, true, lookat, ortho);
+    return new M_OrthoCamera(this.__system, true, lookat, ortho);
   }
 
   createDirectionalLight(intensity, rotate, length) {
-    return new M_DirectionalLight(this, intensity, rotate, length);
+    return new M_DirectionalLight(this.__system, intensity, rotate, length);
   }
 
   createPointLight(intensity) {
-    return new M_PointLight(this, intensity);
+    return new M_PointLight(this.__system, intensity);
   }
 
   createAmbientLight(intensity) {
-    return new M_AmbientLight(this, intensity);
+    return new M_AmbientLight(this.__system, intensity);
   }
 
   createSpotLight(intensity, rotate) {
-    return new M_SpotLight(this, intensity, rotate);
+    return new M_SpotLight(this.__system, intensity, rotate);
   }
 
   createJoint(isExistJointGizmo) {
-    return new M_Joint(this, isExistJointGizmo);
+    return new M_Joint(this.__system, isExistJointGizmo);
   }
 
   createAxisGizmo(length) {
-    return new M_AxisGizmo(this, length);
+    return new M_AxisGizmo(this.__system, length);
   }
 
   createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
-    return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
+    return new M_GridGizmo(this.__system, length, division, isXZ, isXY, isYZ, colorVec);
   }
 
   createOutlineGizmo(mesh) {
-    return new M_OutlineGizmo(this, mesh);
+    return new M_OutlineGizmo(this.__system, mesh);
   }
 
 
   createHeightLineGizmo(startPos, endPos) {
-    return new M_HeightLineGizmo(this, startPos, endPos);
+    return new M_HeightLineGizmo(this.__system, startPos, endPos);
   }
 
   createEffekseerElement() {
-    return new EffekseerElement(this);
+    return new EffekseerElement(this.__system);
   }
 
   createScreenMesh(customVertexAttributes) {
-    return new M_ScreenMesh(this, customVertexAttributes);
+    return new M_ScreenMesh(this.__system, customVertexAttributes);
   }
 
 }

@@ -546,7 +546,7 @@
 
   }
 
-  class GLExtensionsManager {
+  class GLExtensionsManager$1 {
 
     constructor(glContext) {
       var gl = glContext.gl;
@@ -569,15 +569,15 @@
         this._extTFL = gl.getExtension("OES_texture_float_linear");
       }
 
-      GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+      GLExtensionsManager$1._instances[glContext.belongingCanvasId] = this;
 
       this._glContext = glContext;
     }
     static getInstance(glContext) {
-      if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
-        return GLExtensionsManager._instances[glContext.belongingCanvasId];
+      if (GLExtensionsManager$1._instances[glContext.belongingCanvasId]) {
+        return GLExtensionsManager$1._instances[glContext.belongingCanvasId];
       }
-      return new GLExtensionsManager(glContext);
+      return new GLExtensionsManager$1(glContext);
     }
 
     get extVAO() {
@@ -686,9 +686,9 @@
     }
 
   }
-  GLExtensionsManager._instances = new Object();
+  GLExtensionsManager$1._instances = new Object();
 
-  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
+  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager$1;
 
   let singleton = Symbol();
 
@@ -961,7 +961,7 @@
 
     createVertexArray(glBoostObject) {
       var gl = this.gl;
-      var glem = GLExtensionsManager.getInstance(this);
+      var glem = GLExtensionsManager$1.getInstance(this);
       var glResource = glem.createVertexArray(gl);
       if (glResource) {
         this._monitor.registerWebGLResource(glBoostObject, glResource);
@@ -1222,10 +1222,41 @@
   }
   GLContext._instances = new Object();
 
+  class GLBoostSystem {
+
+    constructor(canvas, initParameter, gl, width, height, glBoostContext) {
+      if (gl) {
+        this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
+      } else {
+        this._glContext = GLContext.getInstance(canvas, initParameter);
+      }
+
+      this._glBoostContext = glBoostContext;
+
+      this._globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+      this._defaultGlobalStates = [
+        3042, // gl.BLEND
+        2929  // gl.DEPTH_TEST
+      ];
+
+      this._currentGlobalStates = null;
+
+      this._glBoostMonitor = L_GLBoostMonitor.getInstance();
+
+      // effekseer
+      if (typeof effekseer !== "undefined") {
+        effekseer.init(this._glContext.gl);
+      }
+    }
+  }
+
+  //
+
   /*       */
 
   class GLBoostObject {
-                                       
+                                   
                           
                          
                                       
@@ -1234,19 +1265,16 @@
                               
                                
                          
-                        
-                           
-                        
-                           
+                         
                           
 
-    constructor(glBoostContext                  , toRegister         = true) {
+    constructor(glBoostContext               , toRegister         = true) {
       if (this.constructor === GLBoostObject) {
         throw new TypeError('Cannot construct GLBoostObject instances directly.');
       }
       this._setName();
       this._glBoostContext = glBoostContext;
-      this._glContext = glBoostContext.glContext;
+      this._glContext = glBoostContext._glContext;
       this._glBoostMonitor = glBoostContext._glBoostMonitor;
       this._toRegister = toRegister;
       if (this._toRegister) {
@@ -1266,10 +1294,6 @@
 
     setupExistIndexAndArray() {
       this._objectIndex = -1;
-      this._materialIndex = -1;
-      this._lightIndex = -1;
-      this._jointSetIndex = -1;
-      this._morphIndex = -1;
 
       const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
@@ -1286,13 +1310,6 @@
 
       if (this.className.indexOf('Mesh') !== -1) {
         seekSpaceOfArrayAndSetIndexThere('object');
-        if (this.className.indexOf('SkeletalMesh') !== -1) {
-          seekSpaceOfArrayAndSetIndexThere('jointSet');
-        }
-      } else if (this.className.indexOf('Light') !== -1) {
-        seekSpaceOfArrayAndSetIndexThere('light');
-      } else if (this.className.indexOf('Material') !== -1) {
-        seekSpaceOfArrayAndSetIndexThere('material');
       }
 
     }
@@ -1385,14 +1402,16 @@
     get objectIndex()        {
       return this._objectIndex;
     }
+
+    get entityUID() {
+      return this.__entity_uid;
+    }
   }
 
   GLBoostObject.classInfoDic = {};
   GLBoostObject._objectExistArray = [];
-  GLBoostObject._materialExistArray = [];
-  GLBoostObject._lightExistArray = [];
-  GLBoostObject._jointSetExistArray = [];
-  GLBoostObject._morphExistArray = [];
+  GLBoostObject.__entities = [];
+
 
   GLBoost$1['GLBoostObject'] = GLBoostObject;
 
@@ -4267,7 +4286,7 @@
       instance._updateCountAsElement = this._updateCountAsElement;
     }
 
-    set allInfo(arg) {
+    setPropertiesFromJson(arg) {
       let json = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
@@ -4275,9 +4294,9 @@
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+            this[key] = MathUtil.arrayToQuaternion(json[key]);
           } else {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
           }
         }
       }
@@ -6064,7 +6083,7 @@ return mat4(
 
       if (lights.length === 0) {
         if (Shader._defaultLight === null) {
-          Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost$1.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
+          Shader._defaultLight = this._glBoostContext._glBoostContext.createPointLight(GLBoost$1.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
         }
         return [Shader._defaultLight];
       } else {
@@ -6084,7 +6103,7 @@ return mat4(
         return gl.getParameter(gl.MAX_DRAW_BUFFERS);
       }
 
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager$1.getInstance(this._glContext);
       if (glem.extDBs) {
         return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
       } else {
@@ -6347,10 +6366,10 @@ return mat4(
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  let singleton$1 = Symbol();
+  let singleton$2 = Symbol();
   let singletonEnforcer = Symbol();
 
-  class DrawKickerLocal {
+  class DrawKickerWorld {
     constructor(enforcer) {
       if (enforcer !== singletonEnforcer) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
@@ -6359,154 +6378,8 @@ return mat4(
     }
 
     static getInstance() {
-      if (!this[singleton$1]) {
-        this[singleton$1] = new DrawKickerLocal(singletonEnforcer);
-      }
-      return this[singleton$1];
-    }
-
-    draw(gl, glem, expression, mesh, materials, camera, lights, lightsExceptAmbient, scene, vertices, vaoDic, vboDic, iboArrayDic, geometry, geometryName, primitiveType, vertexN, renderPassIndex) {
-      var isVAOBound = false;
-      if (DrawKickerLocal._lastGeometry !== geometryName) {
-        isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
-      }
-
-      for (let i=0; i<materials.length;i++) {
-        let material = materials[i];
-        if (!material.isVisible) {
-          continue;
-        }
-
-        let materialUpdateStateString = material.getUpdateStateString();
-        if (materialUpdateStateString !== DrawKickerLocal._lastMaterialUpdateStateString) {
-          this._glslProgram = material.shaderInstance.glslProgram;
-          material._glContext.useProgram(this._glslProgram);
-        }
-        let glslProgram = this._glslProgram;
-
-        if (!isVAOBound) {
-          if (DrawKickerLocal._lastGeometry !== geometryName) {
-            for (let attribName in vboDic) {
-              gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
-            }
-          }
-        }
-
-        let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-        material._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_opacity'), opacity, true);
-
-        if (camera) {
-          let world_m;
-          if (mesh.isAffectedByWorldMatrix) {
-            if (mesh.isAffectedByWorldMatrixAccumulatedAncestry) {
-              world_m = mesh.worldMatrix;
-            } else {
-              world_m = mesh.transformMatrix;
-            }
-          } else {
-            world_m = Matrix44.identity();
-          }
-          let viewMatrix;
-          if (mesh.isAffectedByViewMatrix) {
-            viewMatrix = camera.lookAtRHMatrix();
-          } else {
-            viewMatrix = Matrix44.identity();
-          }
-          let projectionMatrix;
-          if (mesh.isAffectedByProjectionMatrix) {
-            projectionMatrix = camera.projectionRHMatrix();
-          } else {
-            projectionMatrix = Matrix44.identity();
-          }
-          let pvm_m = projectionMatrix.multiply(viewMatrix).multiply(camera.inverseWorldMatrixWithoutMySelf).multiply(world_m);
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m.flatten()));
-          Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, glslProgram._semanticsDic, 'MODELVIEWPROJECTION',pvm_m.flatten());
-        }
-
-        if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
-          lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-          if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-            let cameraPosInLocalCoord = null;
-            if (camera) {
-              let cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
-              cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(cameraPos.x, cameraPos.y, cameraPos.z, 1));
-            } else {
-              cameraPosInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(new Vector4(0, 0, 1, 1));
-            }
-            material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPosInLocalCoord.x, cameraPosInLocalCoord.y, cameraPosInLocalCoord.z, true);
-          }
-
-          for (let j = 0; j < lights.length; j++) {
-            if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-              let lightVec = null;
-              let isPointLight = -9999;
-              if (lights[j] instanceof M_PointLight) {
-                lightVec = new Vector4(0, 0, 0, 1);
-                lightVec = lights[j].worldMatrix.multiplyVector(lightVec);
-                isPointLight = 1.0;
-              } else if (lights[j].className === 'M_DirectionalLight') {
-                lightVec = new Vector4(lights[j].direction.x, lights[j].direction.y, lights[j].direction.z, 1);
-                lightVec = lights[j].rotateMatrixAccumulatedAncestry.multiplyVector(lightVec);
-                lightVec.w = 0.0;
-                isPointLight = 0.0;
-              }
-
-              let lightVecInLocalCoord = mesh.inverseWorldMatrix.multiplyVector(lightVec);
-              material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightVecInLocalCoord.x, lightVecInLocalCoord.y, lightVecInLocalCoord.z, isPointLight, true);
-
-              material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lights[j].intensity.x, lights[j].intensity.y, lights[j].intensity.z, 1.0, true);
-            }
-          }
-        }
-
-        let isMaterialSetupDone = true;
-
-        {
-          var needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh);
-          material.shaderInstance.dirty = needTobeStillDirty ? true : false;
-
-          isMaterialSetupDone = material.setUpTexture();
-          return;
-        }
-
-        if (geometry.isIndexed()) {
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName][i]);
-          gl.drawElements(primitiveType, material.getVertexN(geometry), glem.elementIndexBitSize(gl), 0);
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-        } else {
-          gl.drawArrays(primitiveType, 0, vertexN);
-        }
-
-
-        DrawKickerLocal._lastMaterialUpdateStateString = isMaterialSetupDone ? materialUpdateStateString : null;
-      }
-
-      //gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-      DrawKickerLocal._lastGeometry = geometryName;
-      DrawKickerLocal._lastRenderPassIndex = renderPassIndex;
-    }
-  }
-
-  DrawKickerLocal._lastMaterialUpdateStateString = null;
-  DrawKickerLocal._lastGeometry = null;
-  DrawKickerLocal._lastRenderPassIndex = -1;
-
-  let singleton$2 = Symbol();
-  let singletonEnforcer$1 = Symbol();
-
-  class DrawKickerWorld {
-    constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$1) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
-      }
-      this._glslProgram = null;
-    }
-
-    static getInstance() {
       if (!this[singleton$2]) {
-        this[singleton$2] = new DrawKickerWorld(singletonEnforcer$1);
+        this[singleton$2] = new DrawKickerWorld(singletonEnforcer);
       }
       return this[singleton$2];
     }
@@ -6812,77 +6685,6 @@ return mat4(
   //DrawKickerWorld._lastMaterialUpdateStateString = null;
   //DrawKickerWorld._lastGeometry = null;
   //DrawKickerWorld._lastRenderPassIndex = -1;
-
-  class VertexLocalShaderSource {
-    VSDefine_VertexLocalShaderSource(in_, out_, f) {
-      let shaderText = '';
-
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `${in_} vec3 aVertex_normal;\n`;
-        shaderText += `${out_} vec3 v_normal;\n`;
-      }
-      shaderText += `${out_} vec4 position;\n`;
-      shaderText +=      'uniform mat4 modelViewProjectionMatrix;\n';
-      return shaderText;
-    }
-
-    VSTransform_VertexLocalShaderSource(existCamera_f, f) {
-      var shaderText = '';
-      if (existCamera_f) {
-        shaderText +=   '  gl_Position = modelViewProjectionMatrix * position_local;\n';
-        shaderText +=   '  mat4 pvwMatrix = modelViewProjectionMatrix;\n';
-      } else {
-        shaderText +=   '  gl_Position = position_local;\n';
-      }
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += '  v_normal = aVertex_normal;\n';
-      }
-      shaderText += '  position = vec4(aVertex_position, 1.0);\n';
-
-      return shaderText;
-    }
-
-    FSDefine_VertexLocalShaderSource(in_, f, lights, material, extraData) {
-      var shaderText = '';
-      if(lights.length > 0) {
-        shaderText += `uniform vec4 lightPosition[${lights.length}];\n`;
-        shaderText += `uniform vec4 lightDiffuse[${lights.length}];\n`;
-      }
-      if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += `${in_} vec3 v_normal;\n`;
-      }
-      shaderText += `${in_} vec4 position;\n`;
-
-      return shaderText;
-    }
-
-    prepare_VertexLocalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
-      var vertexAttribsAsResult = [];
-
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'position' || attribName === 'normal') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-          vertexAttribsAsResult.push(attribName);
-        }
-      });
-
-      if (existCamera_f) {
-        material.setUniform(shaderProgram, 'uniform_modelViewProjectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'modelViewProjectionMatrix'));
-        material._semanticsDic['MODELVIEWPROJECTION'] = 'modelViewProjectionMatrix';
-      }
-
-      for(let i=0; i<lights.length; i++) {
-        material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
-      }
-
-      return vertexAttribsAsResult;
-    }
-  }
-
-  GLBoost['VertexLocalShaderSource'] = VertexLocalShaderSource;
 
   class AABB {
 
@@ -7207,7 +7009,6 @@ return mat4(
       this._AABB = new AABB();
       this._drawKicker = DrawKickerWorld.getInstance();
 
-      if (this._drawKicker instanceof DrawKickerWorld) ; else if (this._drawKicker instanceof DrawKickerLocal) ;
     }
 
     /**
@@ -7660,7 +7461,7 @@ return mat4(
       var vertices = this._vertices;
       var gl = this._glContext.gl;
 
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager$1.getInstance(this._glContext);
 
       this._vertexN = vertices.position.length / vertices.components.position;
 
@@ -7767,7 +7568,7 @@ return mat4(
 
     draw(data) {
       const gl = this._glContext.gl;
-      const glem = GLExtensionsManager.getInstance(this._glContext);
+      const glem = GLExtensionsManager$1.getInstance(this._glContext);
 
       let materials = this._getAppropriateMaterials(data.mesh);
 
@@ -9281,7 +9082,7 @@ return mat4(
 
       let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       if (!diffuseTexture) {
-        diffuseTexture = this._glBoostContext.defaultDummyTexture;
+        diffuseTexture = this._glBoostContext._glBoostContext.defaultDummyTexture;
       }
 
       if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
@@ -9692,7 +9493,7 @@ return mat4(
         isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
         return isCalledWebGLBindTexture;
       } else {
-        this._glBoostContext.defaultDummyTexture.setUp(0);
+        this._glBoostContext._glBoostContext.defaultDummyTexture.setUp(0);
 
   //      gl.bindTexture(gl.TEXTURE_2D, null);
         isCalledWebGLBindTexture = true;
@@ -9725,7 +9526,7 @@ return mat4(
     }
 
     setUpStates() {
-      let globalStatesUsage = this._glBoostContext.globalStatesUsage;
+      let globalStatesUsage = this._glBoostContext._glBoostContext.globalStatesUsage;
       if (this._globalStatesUsage) {
         globalStatesUsage = this._globalStatesUsage;
       }
@@ -9736,11 +9537,11 @@ return mat4(
           this._setUpMaterialStates(this._states);
           break;
         case GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE:
-          this._glBoostContext.reflectGlobalGLState();
+          this._glBoostContext._glBoostContext.reflectGlobalGLState();
           this._setUpMaterialStates(this._states);
           break;
         case GLBoost$1.GLOBAL_STATES_USAGE_EXCLUSIVE:
-          this._glBoostContext.reflectGlobalGLState();
+          this._glBoostContext._glBoostContext.reflectGlobalGLState();
           break;
         default:
           break;
@@ -9748,7 +9549,7 @@ return mat4(
     }
 
     tearDownStates() {
-      this._glBoostContext.disableAllGLState();
+      this._glBoostContext._glBoostContext.disableAllGLState();
       this._setUpMaterialStates({
         functions : this._stateFunctionsToReset
       });
@@ -11767,7 +11568,7 @@ return mat4(
 
     _generateTextureFromImageData(imageData) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager$1.getInstance(this._glContext);
 
       var imgCanvas = this._getResizedCanvas(imageData);
       this._width = imgCanvas.width;
@@ -11785,7 +11586,7 @@ return mat4(
 
     _generateTextureInnerWithArrayBufferView(imgCanvas, width, height, isKeepBound) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager$1.getInstance(this._glContext);
       var texture = this._glContext.createTexture(this);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -11810,7 +11611,7 @@ return mat4(
 
     _generateTextureInner(imgCanvas, isKeepBound) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager.getInstance(this._glContext);
+      var glem = GLExtensionsManager$1.getInstance(this._glContext);
       var texture = this._glContext.createTexture(this);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -12716,19 +12517,32 @@ return mat4(
 
   GLBoost$1["Screen"] = Screen;
 
+  //import GLContext from './GLContext';
+
   class GLBoostLowContext {
     constructor(canvas, initParameter, gl, width, height) {
       this._setName();
 
+      this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
       console.log('*** GLBoost ' + GLBoost$1.VERSION + ' ***');
 
+
+      let dummyWhite1x1ImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6REY4MUVGRjk0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6REY4MUVGRkE0QzMyMTFFN0I2REJDQTc4QjEyOEY2RTgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpERjgxRUZGNzRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpERjgxRUZGODRDMzIxMUU3QjZEQkNBNzhCMTI4RjZFOCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvTp+QkAAAAPSURBVHjaYvj//z9AgAEABf4C/i3Oie4AAAAASUVORK5CYII=';
+      this.__system._defaultDummyTexture = this.createTexture(dummyWhite1x1ImageDataUrl, "GLBoost_dummyWhite1x1Texture");
+
+      this.__system._defaultMaterial = this.createClassicMaterial();
+      this.__system._defaultMaterial.userFlavorName = 'GLBoostSystemDefaultMaterial';
+
+      this.restoreGlobalStatesToDefault();
+
+  /*
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
       } else {
         this._glContext = GLContext.getInstance(canvas, initParameter);
       }
 
-      this._globalStatesUsage = GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE;
+      this._globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
 
       this._defaultGlobalStates = [
         3042, // gl.BLEND
@@ -12747,16 +12561,17 @@ return mat4(
 
       // effekseer
       if (typeof effekseer !== "undefined") {
-        effekseer.init(this._glContext.gl);
+        effekseer.init(this.__system._glContext.gl);
       }
+      */
     }
 
     get defaultDummyTexture() {
-      return this._defaultDummyTexture;
+      return this.__system._defaultDummyTexture;
     }
 
     _setName() {
-      this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
+      this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.__system.constructor._instanceCount + 1);
       this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
     }
 
@@ -12765,71 +12580,71 @@ return mat4(
     }
 
     get glContext() {
-      return this._glContext;
+      return this.__system._glContext;
     }
 
     createGeometry() {
-      return new Geometry(this);
+      return new Geometry(this.__system);
     }
 
     createBlendShapeGeometry() {
-      return new BlendShapeGeometry(this);
+      return new BlendShapeGeometry(this.__system);
     }
 
     createCube(widthVector, vertexColor) {
-      return new Cube(this, widthVector, vertexColor);
+      return new Cube(this.__system, widthVector, vertexColor);
     }
 
     createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
-      return new Plane(this, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
+      return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
     }
 
     createSphere(radius, widthSegments, heightSegments, vertexColor) {
-      return new Sphere(this, radius, widthSegments, heightSegments, vertexColor);
+      return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
     }
 
     createAxis(length) {
-      return new Axis(length);
+      return new Axis(this.__system, length);
     }
 
     createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
-      return new Particle(this, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
+      return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
     }
 
     createClassicMaterial() {
-      return new ClassicMaterial$1(this);
+      return new ClassicMaterial$1(this.__system);
     }
 
     createPerspectiveCamera(lookat, perspective) {
-      return new L_PerspectiveCamera(this, true, lookat, perspective);
+      return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
     }
 
     createFrustumCamera(lookat, perspective) {
-      return new L_FrustumCamera(this, true, lookat, perspective);
+      return new L_FrustumCamera(this.__system, true, lookat, perspective);
     }
 
     createOrthoCamera(lookat, ortho) {
-      return new L_OrthoCamera(this, true, lookat, ortho);
+      return new L_OrthoCamera(this.__system, true, lookat, ortho);
     }
 
     createCameraController(options) {
-      return new L_CameraController(this, options);
+      return new L_CameraController(this.__system, options);
     }
 
     createWalkThroughCameraController(options) {
-      return new L_WalkThroughCameraController(this, options);
+      return new L_WalkThroughCameraController(this.__system, options);
     }
 
     createTexture(src, userFlavorName, parameters = null) {
-      return new Texture(this, src, userFlavorName, parameters);
+      return new Texture(this.__system, src, userFlavorName, parameters);
     }
 
     createPhinaTexture(width, height, fillStyle, parameters = null) {
-      return new PhinaTexture(this, width, height, fillStyle, parameters);
+      return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
     }
 
     createScreen(screen, customVertexAttributes) {
-      return new Screen(this, screen, customVertexAttributes);
+      return new Screen(this.__system, screen, customVertexAttributes);
     }
 
     /**
@@ -12842,26 +12657,26 @@ return mat4(
      * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
      */
     createTexturesForRenderTarget(width, height, textureNum) {
-      var glContext = this._glContext;
+      var glContext = this.__system._glContext;
       var gl = glContext.gl;
 
       var glem = GLExtensionsManager.getInstance(glContext);
 
       // Create FBO
-      var fbo = glContext.createFramebuffer(this);
+      var fbo = glContext.createFramebuffer(this.__system);
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
       fbo.width = width;
       fbo.height = height;
       fbo._glboostTextures = [];
 
       for(let i=0; i<textureNum; i++) {
-        let texture = new MutableTexture(this, fbo.width, fbo.height);
+        let texture = new MutableTexture(this.__system, fbo.width, fbo.height);
         texture.fbo = fbo;
         fbo._glboostTextures.push(texture);
       }
 
       // Create RenderBuffer
-      var renderBuffer = glContext.createRenderbuffer(this);
+      var renderBuffer = glContext.createRenderbuffer(this.__system);
       gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
       gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
       fbo.renderBuffer = renderBuffer;
@@ -12882,14 +12697,14 @@ return mat4(
     }
 
     createDepthTexturesForRenderTarget(width, height) {
-      var glContext = this._glContext;
+      var glContext = this.__system._glContext;
 
       var gl = glContext.gl;
 
       var glem = GLExtensionsManager.getInstance(glContext);
 
       // Create FBO
-      var fbo = glContext.createFramebuffer(this);
+      var fbo = glContext.createFramebuffer(this.__system);
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
       fbo.width = width;
       fbo.height = height;
@@ -12915,7 +12730,7 @@ return mat4(
         internalFormat = gl.DEPTH_STENCIL;
       }
 
-      let depthTexture = new MutableTexture(this, fbo.width, fbo.height, 0,
+      let depthTexture = new MutableTexture(this.__system, fbo.width, fbo.height, 0,
         internalFormat, format, type,
         gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
       depthTexture.fbo = fbo;
@@ -12944,19 +12759,19 @@ return mat4(
     }
 
     get belongingCanvasId() {
-      return this._glContext.belongingCanvasId;
+      return this.__system._glContext.belongingCanvasId;
     }
 
     set globalStatesUsage(usageMode) {
-      this._globalStatesUsage = usageMode;
+      this.__system._globalStatesUsage = usageMode;
     }
 
     get globalStatesUsage() {
-      return this._globalStatesUsage;
+      return this.__system._globalStatesUsage;
     }
 
     reflectGlobalGLState() {
-      let gl = this._glContext.gl;
+      let gl = this.__system._glContext.gl;
 
       this.currentGlobalStates.forEach((state)=>{
         gl.enable(state);
@@ -12980,7 +12795,7 @@ return mat4(
         32926, // gl.SAMPLE_ALPHA_TO_COVERAGE
       ];
 
-      let glContext = this._glContext;
+      let glContext = this.__system._glContext;
       let gl = glContext.gl;
 
       states.forEach((state)=>{
@@ -12989,19 +12804,19 @@ return mat4(
     }
 
     set currentGlobalStates(states) {
-      this._currentGlobalStates = states.concat();
+      this.__system._currentGlobalStates = states.concat();
     }
 
     get currentGlobalStates() {
-      return this._currentGlobalStates;
+      return this.__system._currentGlobalStates;
     }
 
     restoreGlobalStatesToDefault() {
-      this._currentGlobalStates = this._defaultGlobalStates.concat();
+      this.__system._currentGlobalStates = this.__system._defaultGlobalStates.concat();
     }
 
     get glBoostMonitor() {
-      return this._glBoostMonitor;
+      return this.__system._glBoostMonitor;
     }
 
     setPropertiesFromJson(arg) {
@@ -13013,7 +12828,7 @@ return mat4(
         console.warn(`Faild! This json doesn't include targetInstanceName field!`);
         return;
       }
-      const object = this._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      const object = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
       object.setPropertiesFromJson(json);
 
       return object;
@@ -14784,9 +14599,9 @@ return mat4(
       super(glBoostContext);
       var _clearColor = parameters.clearColor;
 
-      var gl = this._glContext.gl;
-
-      this._glBoostContext.reflectGlobalGLState();
+      this._glBoostContext._glBoostContext.reflectGlobalGLState();
+      const glContext = this._glContext;
+      const gl = glContext.gl;
 
       if (_clearColor) {
         gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
@@ -14863,7 +14678,7 @@ return mat4(
 
         var glContext = this._glContext;
         var gl = glContext.gl;
-        var glem = GLExtensionsManager.getInstance(this._glContext);
+        var glem = GLExtensionsManager$1.getInstance(this._glContext);
 
 
         // set render target buffers for each RenderPass.
@@ -14970,13 +14785,13 @@ return mat4(
     }
 
     _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-      const globalStatesUsageBackup = this._glBoostContext.globalStatesUsage;
-      this._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
-      this._glBoostContext.currentGlobalStates = [
+      const globalStatesUsageBackup = this._glBoostContext._glBoostContext.globalStatesUsage;
+      this._glBoostContext._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+      this._glBoostContext._glBoostContext.currentGlobalStates = [
         3042, // gl.BLEND
       ];
       if (isDepthTest) {
-        this._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+        this._glBoostContext._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
       }
 
       for (let gizmo of gizmos) {
@@ -14995,8 +14810,8 @@ return mat4(
         }
       }
 
-      this._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-      this._glBoostContext.restoreGlobalStatesToDefault();
+      this._glBoostContext._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+      this._glBoostContext._glBoostContext.restoreGlobalStatesToDefault();
 
     }
 
@@ -15034,8 +14849,7 @@ return mat4(
      * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
      */
     clearCanvas( color_flg, depth_flg, stencil_flg ) {
-
-      var gl = this._glContext.gl;
+      const gl = this._glContext.gl;
 
       var bufferBits = 0;
 
@@ -17314,7 +17128,7 @@ return mat4(
       this._primitive = new Line(glBoostContext, Vector3.zero(), Vector3.zero(), true);
 
       //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
-      const material = glBoostContext.createClassicMaterial();
+      const material = glBoostContext._glBoostContext.createClassicMaterial();
       this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
       this._mesh.isPickable = false;
       this._mesh.masterElement = this;
@@ -17484,27 +17298,27 @@ return mat4(
     }
 
     createScene() {
-      return new M_Scene(this);
+      return new M_Scene(this.__system);
     }
 
     createGroup() {
-      return new M_Group(this);
+      return new M_Group(this.__system);
     }
 
     createMesh(geometry, material) {
-      return new M_Mesh(this, geometry, material);
+      return new M_Mesh(this.__system, geometry, material);
     }
 
     createSkeletalMesh(geometry, material, rootJointName) {
-      return new M_SkeletalMesh(this, geometry, material, rootJointName);
+      return new M_SkeletalMesh(this.__system, geometry, material, rootJointName);
     }
 
     createSkeletalGeometry() {
-      return new M_SkeletalGeometry(this);
+      return new M_SkeletalGeometry(this.__system);
     }
 
     createRenderer(parameters) {
-      return new Renderer(this, parameters);
+      return new Renderer(this.__system, parameters);
     }
 
     createExpression() {
@@ -17512,7 +17326,7 @@ return mat4(
     }
 
     createExpressionAndRenderPasses(number) {
-      var expression = new Expression(this);
+      var expression = new Expression(this.__system);
       var renderPasses = this.createRenderPasses(number);
       expression.addRenderPasses(renderPasses);
 
@@ -17522,67 +17336,67 @@ return mat4(
     createRenderPasses(number) {
       var renderPasses = [];
       for (let i=0; i<number; i++) {
-        renderPasses.push(new RenderPass(this));
+        renderPasses.push(new RenderPass(this.__system));
       }
 
       return renderPasses;
     }
 
     createPerspectiveCamera(lookat, perspective) {
-      return new M_PerspectiveCamera(this, true, lookat, perspective);
+      return new M_PerspectiveCamera(this.__system, true, lookat, perspective);
     }
 
     createFrustumCamera(lookat, perspective) {
-      return new M_FrustumCamera(this, true, lookat, perspective);
+      return new M_FrustumCamera(this.__system, true, lookat, perspective);
     }
 
     createOrthoCamera(lookat, ortho) {
-      return new M_OrthoCamera(this, true, lookat, ortho);
+      return new M_OrthoCamera(this.__system, true, lookat, ortho);
     }
 
     createDirectionalLight(intensity, rotate, length) {
-      return new M_DirectionalLight(this, intensity, rotate, length);
+      return new M_DirectionalLight(this.__system, intensity, rotate, length);
     }
 
     createPointLight(intensity) {
-      return new M_PointLight(this, intensity);
+      return new M_PointLight(this.__system, intensity);
     }
 
     createAmbientLight(intensity) {
-      return new M_AmbientLight(this, intensity);
+      return new M_AmbientLight(this.__system, intensity);
     }
 
     createSpotLight(intensity, rotate) {
-      return new M_SpotLight(this, intensity, rotate);
+      return new M_SpotLight(this.__system, intensity, rotate);
     }
 
     createJoint(isExistJointGizmo) {
-      return new M_Joint(this, isExistJointGizmo);
+      return new M_Joint(this.__system, isExistJointGizmo);
     }
 
     createAxisGizmo(length) {
-      return new M_AxisGizmo(this, length);
+      return new M_AxisGizmo(this.__system, length);
     }
 
     createGridGizmo(length, division, isXZ, isXY, isYZ, colorVec) {
-      return new M_GridGizmo(this, length, division, isXZ, isXY, isYZ, colorVec);
+      return new M_GridGizmo(this.__system, length, division, isXZ, isXY, isYZ, colorVec);
     }
 
     createOutlineGizmo(mesh) {
-      return new M_OutlineGizmo(this, mesh);
+      return new M_OutlineGizmo(this.__system, mesh);
     }
 
 
     createHeightLineGizmo(startPos, endPos) {
-      return new M_HeightLineGizmo(this, startPos, endPos);
+      return new M_HeightLineGizmo(this.__system, startPos, endPos);
     }
 
     createEffekseerElement() {
-      return new EffekseerElement(this);
+      return new EffekseerElement(this.__system);
     }
 
     createScreenMesh(customVertexAttributes) {
-      return new M_ScreenMesh(this, customVertexAttributes);
+      return new M_ScreenMesh(this.__system, customVertexAttributes);
     }
 
   }
@@ -17718,7 +17532,7 @@ return mat4(
   GLBoost['PhongShader'] = PhongShader;
 
   let singleton$4 = Symbol();
-  let singletonEnforcer$2 = Symbol();
+  let singletonEnforcer$1 = Symbol();
 
   /**
    * [en] This is a loader class of Obj file format.<br>
@@ -17732,7 +17546,7 @@ return mat4(
      * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
      */
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$2) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -17744,7 +17558,7 @@ return mat4(
      */
     static getInstance() {
       if (!this[singleton$4]) {
-        this[singleton$4] = new ObjLoader(singletonEnforcer$2);
+        this[singleton$4] = new ObjLoader(singletonEnforcer$1);
       }
       return this[singleton$4];
     }
@@ -18466,7 +18280,7 @@ return mat4(
   GLBoost['LambertShader'] = LambertShader;
 
   let singleton$5 = Symbol();
-  let singletonEnforcer$3 = Symbol();
+  let singletonEnforcer$2 = Symbol();
 
   /**
    * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
@@ -18480,7 +18294,7 @@ return mat4(
      * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
      */
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$3) {
+      if (enforcer !== singletonEnforcer$2) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -18492,7 +18306,7 @@ return mat4(
      */
     static getInstance() {
       if (!this[singleton$5]) {
-        this[singleton$5] = new GLTFLoader(singletonEnforcer$3);
+        this[singleton$5] = new GLTFLoader(singletonEnforcer$2);
       }
       return this[singleton$5];
     }
@@ -19653,7 +19467,7 @@ return mat4(
       let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
       let vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-      material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
+      material.shaderInstance = new FreeShader(glBoostContext.__system, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
     }
 
     _loadAnimation(element, buffers, json, glTFVer, options) {
@@ -20008,7 +19822,7 @@ return mat4(
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
   let singleton$6 = Symbol();
-  let singletonEnforcer$4 = Symbol();
+  let singletonEnforcer$3 = Symbol();
 
   /**
    * This is a loader class of glTF2 file format. You can see more detail of glTF2 format at https://github.com/KhronosGroup/glTF .
@@ -20020,7 +19834,7 @@ return mat4(
      * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$4) {
+      if (enforcer !== singletonEnforcer$3) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -20057,7 +19871,7 @@ return mat4(
      */
     static getInstance() {
       if (!this[singleton$6]) {
-        this[singleton$6] = new GLTF2Loader(singletonEnforcer$4);
+        this[singleton$6] = new GLTF2Loader(singletonEnforcer$3);
       }
       return this[singleton$6];
     }
@@ -20652,7 +20466,7 @@ return mat4(
   GLBoost$1["GLTF2Loader"] = GLTF2Loader;
 
   let singleton$7 = Symbol();
-  let singletonEnforcer$5 = Symbol();
+  let singletonEnforcer$4 = Symbol();
 
   /**
    * 
@@ -20664,7 +20478,7 @@ return mat4(
      * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$5) {
+      if (enforcer !== singletonEnforcer$4) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -20675,7 +20489,7 @@ return mat4(
      */
     static getInstance() {
       if (!this[singleton$7]) {
-        this[singleton$7] = new ModelConverter(singletonEnforcer$5);
+        this[singleton$7] = new ModelConverter(singletonEnforcer$4);
       }
       return this[singleton$7];
     }
@@ -22181,4 +21995,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-106-gcd58-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-109-g39af-mod branch: feature/add-entity-system';
