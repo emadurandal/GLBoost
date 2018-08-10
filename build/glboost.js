@@ -1256,7 +1256,7 @@
   /*       */
 
   class GLBoostObject {
-                                   
+                                  
                           
                          
                                       
@@ -1268,14 +1268,14 @@
                          
                           
 
-    constructor(glBoostContext               , toRegister         = true) {
+    constructor(glBoostSystem               , toRegister         = true) {
       if (this.constructor === GLBoostObject) {
         throw new TypeError('Cannot construct GLBoostObject instances directly.');
       }
       this._setName();
-      this._glBoostContext = glBoostContext;
-      this._glContext = glBoostContext._glContext;
-      this._glBoostMonitor = glBoostContext._glBoostMonitor;
+      this._glBoostSystem = glBoostSystem;
+      this._glContext = glBoostSystem._glContext;
+      this._glBoostMonitor = glBoostSystem._glBoostMonitor;
       this._toRegister = toRegister;
       if (this._toRegister) {
         this._glBoostMonitor.registerGLBoostObject(this);
@@ -1366,7 +1366,7 @@
     }
 
     get belongingCanvasId() {
-      return this._glBoostContext.belongingCanvasId;
+      return this._glBoostSystem.belongingCanvasId;
     }
 
     set userFlavorName(name       ) {
@@ -6083,7 +6083,7 @@ return mat4(
 
       if (lights.length === 0) {
         if (Shader._defaultLight === null) {
-          Shader._defaultLight = this._glBoostContext._glBoostContext.createPointLight(GLBoost$1.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
+          Shader._defaultLight = this._glBoostSystem._glBoostContext.createPointLight(GLBoost$1.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
         }
         return [Shader._defaultLight];
       } else {
@@ -7417,9 +7417,9 @@ return mat4(
         shaderInstance = argShaderInstance;
       } else {
         if (shaderClass) {
-          shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+          shaderInstance = Shader._createShaderInstance(this._glBoostSystem, shaderClass);
         } else {
-          shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
+          shaderInstance = Shader._createShaderInstance(this._glBoostSystem, material.shaderClass);
         }  
       }
 
@@ -7446,7 +7446,7 @@ return mat4(
       } else if (mesh.material){
         materials = [mesh.material];
       } else {
-        mesh.material = this._glBoostContext._defaultMaterial;
+        mesh.material = this._glBoostSystem._defaultMaterial;
         materials = [mesh.material];
       }
       return materials;
@@ -9082,7 +9082,7 @@ return mat4(
 
       let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       if (!diffuseTexture) {
-        diffuseTexture = this._glBoostContext._glBoostContext.defaultDummyTexture;
+        diffuseTexture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
       }
 
       if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
@@ -9493,7 +9493,7 @@ return mat4(
         isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
         return isCalledWebGLBindTexture;
       } else {
-        this._glBoostContext._glBoostContext.defaultDummyTexture.setUp(0);
+        this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
 
   //      gl.bindTexture(gl.TEXTURE_2D, null);
         isCalledWebGLBindTexture = true;
@@ -9526,7 +9526,7 @@ return mat4(
     }
 
     setUpStates() {
-      let globalStatesUsage = this._glBoostContext._glBoostContext.globalStatesUsage;
+      let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
       if (this._globalStatesUsage) {
         globalStatesUsage = this._globalStatesUsage;
       }
@@ -9537,11 +9537,11 @@ return mat4(
           this._setUpMaterialStates(this._states);
           break;
         case GLBoost$1.GLOBAL_STATES_USAGE_INCLUSIVE:
-          this._glBoostContext._glBoostContext.reflectGlobalGLState();
+          this._glBoostSystem._glBoostContext.reflectGlobalGLState();
           this._setUpMaterialStates(this._states);
           break;
         case GLBoost$1.GLOBAL_STATES_USAGE_EXCLUSIVE:
-          this._glBoostContext._glBoostContext.reflectGlobalGLState();
+          this._glBoostSystem._glBoostContext.reflectGlobalGLState();
           break;
         default:
           break;
@@ -9549,7 +9549,7 @@ return mat4(
     }
 
     tearDownStates() {
-      this._glBoostContext._glBoostContext.disableAllGLState();
+      this._glBoostSystem._glBoostContext.disableAllGLState();
       this._setUpMaterialStates({
         functions : this._stateFunctionsToReset
       });
@@ -14599,7 +14599,7 @@ return mat4(
       super(glBoostContext);
       var _clearColor = parameters.clearColor;
 
-      this._glBoostContext._glBoostContext.reflectGlobalGLState();
+      this._glBoostSystem._glBoostContext.reflectGlobalGLState();
       const glContext = this._glContext;
       const gl = glContext.gl;
 
@@ -14785,13 +14785,13 @@ return mat4(
     }
 
     _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-      const globalStatesUsageBackup = this._glBoostContext._glBoostContext.globalStatesUsage;
-      this._glBoostContext._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
-      this._glBoostContext._glBoostContext.currentGlobalStates = [
+      const globalStatesUsageBackup = this._glBoostSystem._glBoostContext.globalStatesUsage;
+      this._glBoostSystem._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+      this._glBoostSystem._glBoostContext.currentGlobalStates = [
         3042, // gl.BLEND
       ];
       if (isDepthTest) {
-        this._glBoostContext._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+        this._glBoostSystem._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
       }
 
       for (let gizmo of gizmos) {
@@ -14810,8 +14810,8 @@ return mat4(
         }
       }
 
-      this._glBoostContext._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-      this._glBoostContext._glBoostContext.restoreGlobalStatesToDefault();
+      this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+      this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
 
     }
 
@@ -21995,4 +21995,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-109-g39af-mod branch: feature/add-entity-system';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-110-gc780-mod branch: develop';

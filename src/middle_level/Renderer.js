@@ -12,7 +12,7 @@ export default class Renderer extends GLBoostObject {
     super(glBoostContext);
     var _clearColor = parameters.clearColor;
 
-    this._glBoostContext._glBoostContext.reflectGlobalGLState();
+    this._glBoostSystem._glBoostContext.reflectGlobalGLState();
     const glContext = this._glContext;
     const gl = glContext.gl;
 
@@ -198,13 +198,13 @@ export default class Renderer extends GLBoostObject {
   }
 
   _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-    const globalStatesUsageBackup = this._glBoostContext._glBoostContext.globalStatesUsage;
-    this._glBoostContext._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
-    this._glBoostContext._glBoostContext.currentGlobalStates = [
+    const globalStatesUsageBackup = this._glBoostSystem._glBoostContext.globalStatesUsage;
+    this._glBoostSystem._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    this._glBoostSystem._glBoostContext.currentGlobalStates = [
       3042, // gl.BLEND
     ];
     if (isDepthTest) {
-      this._glBoostContext._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+      this._glBoostSystem._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
     }
 
     for (let gizmo of gizmos) {
@@ -223,8 +223,8 @@ export default class Renderer extends GLBoostObject {
       }
     }
 
-    this._glBoostContext._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
-    this._glBoostContext._glBoostContext.restoreGlobalStatesToDefault();
+    this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
 
   }
 

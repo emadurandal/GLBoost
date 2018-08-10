@@ -303,7 +303,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
       isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
       return isCalledWebGLBindTexture;
     } else {
-      this._glBoostContext._glBoostContext.defaultDummyTexture.setUp(0);
+      this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
 
 //      gl.bindTexture(gl.TEXTURE_2D, null);
       isCalledWebGLBindTexture = true;
@@ -336,7 +336,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   setUpStates() {
-    let globalStatesUsage = this._glBoostContext._glBoostContext.globalStatesUsage;
+    let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
     if (this._globalStatesUsage) {
       globalStatesUsage = this._globalStatesUsage;
     }
@@ -347,11 +347,11 @@ export default class L_AbstractMaterial extends GLBoostObject {
         this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE:
-        this._glBoostContext._glBoostContext.reflectGlobalGLState();
+        this._glBoostSystem._glBoostContext.reflectGlobalGLState();
         this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE:
-        this._glBoostContext._glBoostContext.reflectGlobalGLState();
+        this._glBoostSystem._glBoostContext.reflectGlobalGLState();
         break;
       default:
         break;
@@ -359,7 +359,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   tearDownStates() {
-    this._glBoostContext._glBoostContext.disableAllGLState();
+    this._glBoostSystem._glBoostContext.disableAllGLState();
     this._setUpMaterialStates({
       functions : this._stateFunctionsToReset
     });

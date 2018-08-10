@@ -8,7 +8,7 @@ import type GLBoostSystem from './GLBoostSystem';
 import GLContext from './GLContext';
 
 export default class GLBoostObject {
-  _glBoostContext: GLBoostSystem;
+  _glBoostSystem: GLBoostSystem;
   _glContext: GLContext;
   _toRegister: boolean;
   _glBoostMonitor: L_GLBoostMonitor;
@@ -20,14 +20,14 @@ export default class GLBoostObject {
   __entity_uid: number;
   _glContext: GLContext;
 
-  constructor(glBoostContext: GLBoostSystem, toRegister:boolean = true) {
+  constructor(glBoostSystem: GLBoostSystem, toRegister:boolean = true) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
     this._setName();
-    this._glBoostContext = glBoostContext;
-    this._glContext = glBoostContext._glContext;
-    this._glBoostMonitor = glBoostContext._glBoostMonitor;
+    this._glBoostSystem = glBoostSystem;
+    this._glContext = glBoostSystem._glContext;
+    this._glBoostMonitor = glBoostSystem._glBoostMonitor;
     this._toRegister = toRegister;
     if (this._toRegister) {
       this._glBoostMonitor.registerGLBoostObject(this);
@@ -118,7 +118,7 @@ export default class GLBoostObject {
   }
 
   get belongingCanvasId() {
-    return this._glBoostContext.belongingCanvasId;
+    return this._glBoostSystem.belongingCanvasId;
   }
 
   set userFlavorName(name:string) {

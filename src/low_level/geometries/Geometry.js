@@ -438,9 +438,9 @@ export default class Geometry extends GLBoostObject {
       shaderInstance = argShaderInstance;
     } else {
       if (shaderClass) {
-        shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+        shaderInstance = Shader._createShaderInstance(this._glBoostSystem, shaderClass);
       } else {
-        shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
+        shaderInstance = Shader._createShaderInstance(this._glBoostSystem, material.shaderClass);
       }  
     }
 
@@ -467,7 +467,7 @@ export default class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      mesh.material = this._glBoostContext._defaultMaterial;
+      mesh.material = this._glBoostSystem._defaultMaterial;
       materials = [mesh.material];
     }
     return materials;
