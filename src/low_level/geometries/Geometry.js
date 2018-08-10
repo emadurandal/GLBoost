@@ -2,9 +2,7 @@ import GLBoost from '../../globals';
 import GLBoostObject from '../core/GLBoostObject';
 import GLExtensionsManager from '../core/GLExtensionsManager';
 import MathUtil from '../../low_level/math/MathUtil';
-import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
-import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
@@ -31,11 +29,6 @@ export default class Geometry extends GLBoostObject {
     this._AABB = new AABB();
     this._drawKicker = DrawKickerWorld.getInstance();
 
-    if (this._drawKicker instanceof DrawKickerWorld) {
-
-    } else if (this._drawKicker instanceof DrawKickerLocal) {
-
-    }
   }
 
   /**
