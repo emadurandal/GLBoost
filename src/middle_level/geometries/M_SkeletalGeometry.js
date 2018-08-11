@@ -82,7 +82,7 @@ export default class M_SkeletalGeometry extends Geometry {
       let q = (Quaternion.fromMatrix(matrices[i]));
       q.normalize();
       let t = matrices[i].getTranslate();
-      let matrix = q.rotationMatrix;
+      let matrix = new Matrix44(q);
       
       matrix.m00 *= s.x;
       matrix.m01 *= s.x;

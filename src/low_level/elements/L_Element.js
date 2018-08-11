@@ -256,7 +256,7 @@ export default class L_Element extends GLBoostObject {
     } else if (this._is_trs_matrix_updated) {
       this._rotate = this._matrix.toEulerAngles();
     } else if (this._is_quaternion_updated) {
-      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+      this._rotate = (new Matrix44(this._quaternion)).toEulerAngles();
     }
 
     this._is_euler_angles_updated = true;
@@ -345,8 +345,7 @@ export default class L_Element extends GLBoostObject {
       return this._matrix.clone();
     }
 
-    let rotationMatrix = Matrix44.identity();
-    rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+    const rotationMatrix = new Matrix44(this.getQuaternionNotAnimated());
 
     let scale = this.getScaleNotAnimated();
 
@@ -392,9 +391,8 @@ export default class L_Element extends GLBoostObject {
       return this.getMatrixNotAnimated();
     } else {
 
-      let rotationMatrix = Matrix44.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
-      rotationMatrix = quaternion.rotationMatrix;
+      const rotationMatrix = new Matrix44(quaternion);
 
       let scale = this.getScaleAtOrStatic(lineName, input);
       
@@ -486,7 +484,7 @@ export default class L_Element extends GLBoostObject {
       this._quaternion = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       this._is_quaternion_updated = true;
     } else if (!this._is_euler_angles_updated && this._is_quaternion_updated) {
-      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+      this._rotate = (new Matrix44(this._quaternion)).toEulerAngles();
       this._is_euler_angles_updated = true;
     } else if (!this._is_euler_angles_updated && !this._is_quaternion_updated && this._is_trs_matrix_updated) {
       const m = this._matrix;
@@ -519,8 +517,7 @@ export default class L_Element extends GLBoostObject {
 
   __updateMatrix() {
     if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
-      let rotationMatrix = Matrix44.identity();
-      rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+      const rotationMatrix = new Matrix44(this.getQuaternionNotAnimated());
   
       let scale = this.getScaleNotAnimated();
   
@@ -631,6 +628,6 @@ export default class L_Element extends GLBoostObject {
   }
 
   get rotateMatrix33() {
-    return this.quaternion.rotationMatrix33();
+    return new Matrix33(this.quaternion);
   }
 }

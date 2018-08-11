@@ -62,6 +62,25 @@ export default class Matrix44 {
           this.setComponents(m.m00, m.m01, m.m02, 0, m.m10, m.m11, m.m12, 0, m.m20, m.m21, m.m22, 0, 0, 0, 0, 1); // 'm' must be row major array if isColumnMajor is false
         }  
       }
+    } else if (!!m && typeof m.className !== 'undefined' && m.className === 'Quaternion') {
+      this.m = new Float32Array(16);
+
+      const sx = m.x * m.x;
+      const sy = m.y * m.y;
+      const sz = m.z * m.z;
+      const cx = m.y * m.z;
+      const cy = m.x * m.z;
+      const cz = m.x * m.y;
+      const wx = m.w * m.x;
+      const wy = m.w * m.y;
+      const wz = m.w * m.z;
+  
+      this.setComponents(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        0.0, 0.0, 0.0, 1.0
+      );
     } else {
       this.m = new Float32Array(16);
       this.identity();
@@ -725,7 +744,7 @@ export default class Matrix44 {
 
   getRotate() {
     const quat = Quaternion.fromMatrix(this);
-    const rotateMat = quat.rotationMatrix;
+    const rotateMat = new Matrix44(quat);
     return rotateMat;
   }
 }

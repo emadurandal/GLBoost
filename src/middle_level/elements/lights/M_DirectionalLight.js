@@ -147,7 +147,7 @@ export default class M_DirectionalLight extends M_AbstractLight {
 
   get direction() {
     //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
-    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    let result = (new Matrix33(super.quaternion)).multiplyVector(this._direction);
     return result;
   }
 
