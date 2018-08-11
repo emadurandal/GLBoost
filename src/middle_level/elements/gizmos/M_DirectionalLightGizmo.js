@@ -5,19 +5,19 @@ import M_Mesh from '../meshes/M_Mesh';
 import Vector4 from '../../../low_level/math/Vector4';
 
 export default class M_DirectionalLightGizmo extends M_Gizmo {
-  constructor(glBoostContext, length) {
-    super(glBoostContext, null, null);
-    this._init(glBoostContext, length);
+  constructor(glBoostSystem, length) {
+    super(glBoostSystem, null, null);
+    this._init(glBoostSystem, length);
 
     this.isVisible = false;
 
     this.baseColor = new Vector4(0.8, 0.8, 0, 1);
   }
 
-  _init(glBoostContext, length) {
-    this._material = new ClassicMaterial(this._glBoostContext);
-    this._mesh = new M_Mesh(glBoostContext,
-      new Arrow(this._glBoostContext, length, 3),
+  _init(glBoostSystem, length) {
+    this._material = new ClassicMaterial(glBoostSystem);
+    this._mesh = new M_Mesh(glBoostSystem,
+      new Arrow(glBoostSystem, length, 3),
       this._material);
 
     this.addChild(this._mesh);

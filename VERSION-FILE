@@ -1,6 +1,6 @@
-version: 0.0.4-115-gc29d-mod
+version: 0.0.4-116-ga2bc6-mod
 branch: develop
-fe21c982c119424972366ad3e450a48f3b562c58cfe7b061fea32d24dc073267 ./build/glboost.js
-fe21c982c119424972366ad3e450a48f3b562c58cfe7b061fea32d24dc073267 ./build/glboost.js
-57ae368dca41b3244641ac623b1c94b98fb6f5e70f96f501f947c33dd91c971c ./build/glboost.min.js
-5bfd3dd66653f631b6671603331d86be8140f491c33757ee21d8828a3e07588d ./build/glboost.min.js.map
+b7ca4d860c3a2d42ca86a6f2b40f6f31c9c9fddd7eee72a972cf556f574b9599 ./build/glboost.js
+b7ca4d860c3a2d42ca86a6f2b40f6f31c9c9fddd7eee72a972cf556f574b9599 ./build/glboost.js
+9f833aa6bfb802009d814958858c0aa4a2896b106d9e9777bbec727caa9c523b ./build/glboost.min.js
+e30df94787f7150ff3df147e083f05189be191834146bc3d9fd547ecaf9d66fa ./build/glboost.min.js.map

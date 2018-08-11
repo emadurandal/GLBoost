@@ -4,8 +4,8 @@ import Vector3 from '../../low_level/math/Vector3';
 import Vector4 from '../../low_level/math/Vector4';
 
 export default class Arrow extends Geometry {
-  constructor(glBoostContext, length, lineCount = 1) {
-    super(glBoostContext);
+  constructor(glBoostSystem, length, lineCount = 1) {
+    super(glBoostSystem);
 
     this._setupVertexData(length, lineCount);
   }
