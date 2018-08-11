@@ -3,15 +3,15 @@ import Geometry from '../../low_level/geometries/Geometry';
 import Vector4 from '../../low_level/math/Vector4';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
-import MathUtil from '../../low_level/math/MathUtil';
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 
 export default class Cube extends Geometry {
   constructor(glBoostContext, widthVector, vertexColor) {
     super(glBoostContext);
 
     // if array, convert to vector[2/3/4]
-    widthVector = MathUtil.arrayToVector(widthVector);
-    vertexColor = MathUtil.arrayToVector(vertexColor);
+    widthVector = MathClassUtil.arrayToVector(widthVector);
+    vertexColor = MathClassUtil.arrayToVector(vertexColor);
 
     this._setupVertexData(widthVector.divide(2.0), vertexColor);
   }

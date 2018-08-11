@@ -1,8 +1,9 @@
-/* @flow */
+// @flow
 
 import GLBoost from './../../globals';
-import Vector4 from './Vector4';
 import MathUtil from './MathUtil';
+import type Vector2 from './Vector2';
+import type Vector4 from './Vector4';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array |
 Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
@@ -10,7 +11,7 @@ Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 export default class Vector3 {
   v: TypedArray;
 
-  constructor(x:number|TypedArray, y?:number, z?:number) {
+  constructor(x:number|TypedArray|Vector2|Vector3|Vector4, y?:number, z?:number) {
     if (ArrayBuffer.isView(x)) {
       this.v = ((x:any):TypedArray);
       return;
@@ -18,9 +19,27 @@ export default class Vector3 {
       this.v = new Float32Array(3)
     }
 
-    this.x = ((x:any):number);
-    this.y = ((y:any):number);
-    this.z = ((z:any):number);
+    if (typeof (x:any).w !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = (x:any).z;
+    } else if (typeof (x:any).z !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = (x:any).z;
+    } else if (typeof (x:any).y !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = 0;
+    } else {
+      this.x = ((x:any):number);
+      this.y = ((y:any):number);
+      this.z = ((z:any):number);
+    }
+  }
+
+  get className() {
+    return this.constructor.name;
   }
 
   isEqual(vec:Vector3) {
@@ -258,11 +277,6 @@ export default class Vector3 {
 
   static divideVector(lvec3:Vector3, rvec3:Vector3) {
     return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
-  }
-
-
-  toVector4() {
-    return new Vector4(this.x, this.y, this.z, 1.0);
   }
 
   toString() {

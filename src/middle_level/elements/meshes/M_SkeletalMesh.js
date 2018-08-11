@@ -205,7 +205,7 @@ export default class M_SkeletalMesh extends M_Mesh {
   get rootJointsWorldPosition() {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].worldMatrix;
-      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      let rootJointPosWorld = new Vector3(rootJointMatrix.multiplyVector(Vector4.zero()));
       return rootJointPosWorld;
     }
     return Vector3.zero();
@@ -215,7 +215,7 @@ export default class M_SkeletalMesh extends M_Mesh {
   getRootJointsWorldPositionAt(inputValue) {
     if (this._joints.length > 0) {
       const rootJointMatrix = this._joints[0].getWorldMatrixAt(inputValue);
-      let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+      let rootJointPosWorld = new Vector3(rootJointMatrix.multiplyVector(Vector4.zero()));
       return rootJointPosWorld;
     }
 

@@ -6,7 +6,7 @@ import Vector2 from '../../low_level/math/Vector2';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import ParticleShaderSource from '../../middle_level/shaders/ParticleShader';
 import Shader from '../../low_level/shaders/Shader';
-import MathUtil from '../../low_level/math/MathUtil';
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 
 /**
  * This Particle class handles particles expressions.
@@ -53,7 +53,7 @@ export default class Particle extends Geometry {
 
     // if array, convert to vector[2/3/4]
     for (let i=0; i<positionArray.length; i++) {
-      positionArray[i] = MathUtil.arrayToVector(positionArray[i]);
+      positionArray[i] = MathClassUtil.arrayToVector(positionArray[i]);
     }
 
     for (let i=0; i<positionArray.length; i++) {

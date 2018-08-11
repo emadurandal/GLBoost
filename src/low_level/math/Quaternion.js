@@ -22,6 +22,10 @@ export default class Quaternion {
     }
   }
 
+  get className() {
+    return this.constructor.name;
+  }
+
   clone() {
     return new Quaternion(this.x, this.y, this.z, this.w);
   }

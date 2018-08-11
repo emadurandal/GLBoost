@@ -1,7 +1,6 @@
 import GLBoost from '../../globals';
 import Vector3 from './Vector3';
 import MathUtil from './MathUtil';
-import Matrix44 from './Matrix44';
 
 export default class Matrix33 {
 
@@ -37,6 +36,15 @@ export default class Matrix33 {
       } else {
         this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
       }
+    } else if (!!m && typeof m.m22 !== 'undefined') {
+      if (isColumnMajor === true) {
+        this.setComponents(
+          m.m00, m.m01, m.m02,
+          m.m10, m.m11, m.m12,
+          m.m20, m.m21, m.m22);
+      } else {
+        this.setComponents(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22); // 'm' must be row major array if isColumnMajor is false
+      }
     } else {
       this.identity();
     }
@@ -50,9 +58,10 @@ export default class Matrix33 {
     return this;
   }
 
-  /**
-   * 単位行列にする
-   */
+  get className() {
+    return this.constructor.name;
+  }
+
   identity() {
     this.setComponents(
       1, 0, 0,
@@ -471,24 +480,6 @@ export default class Matrix33 {
     return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + '\n' +
       this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' \n' +
       this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
-  }
-
-  toMatrix44() {
-    return new Matrix44(
-      this.m00, this.m01, this.m02, 0,
-      this.m10, this.m11, this.m12, 0,
-      this.m20, this.m21, this.m22, 0,
-      0, 0, 0, 1
-    );
-  }
-
-  static toMatrix44(mat) {
-    return new Matrix44(
-      mat.m00, mat.m01, mat.m02, 0,
-      mat.m10, mat.m11, mat.m12, 0,
-      mat.m20, mat.m21, mat.m22, 0,
-      0, 0, 0, 1
-    );
   }
 
   getScale() {

@@ -151,14 +151,14 @@ export default class AABB {
     let AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
     let AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
     let AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-    newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
-    newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_0)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_1)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_2)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_3)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_4)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_5)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_6)));
+    newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_7)));
     newAabb.updateAllInfo();
 
     return newAabb;

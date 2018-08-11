@@ -1,7 +1,7 @@
 import GLBoost from '../../globals';
 import GLBoostObject from '../core/GLBoostObject';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import MathUtil from '../../low_level/math/MathUtil';
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 import AABB from '../../low_level/math/AABB';
@@ -52,7 +52,7 @@ export default class Geometry extends GLBoostObject {
   _checkAndSetVertexComponentNumber(allVertexAttribs) {
     allVertexAttribs.forEach((attribName)=> {
       let element = this._vertices[attribName][0];
-      let componentN = MathUtil.compomentNumberOfVector(element);
+      let componentN = MathClassUtil.compomentNumberOfVector(element);
       if (componentN === 0) {
         // if 0, it must be a number. so users must set components info.
         return;
@@ -311,7 +311,7 @@ export default class Geometry extends GLBoostObject {
       let vertexAttribArray = [];
       this._vertices[attribName].forEach((elem, index) => {
         let element = this._vertices[attribName][index];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+        Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
       });
       this._vertices[attribName] = vertexAttribArray;
 
@@ -353,7 +353,7 @@ export default class Geometry extends GLBoostObject {
       let vertexAttribArray = [];
       this._vertices[attribName].forEach((elem, index) => {
         let element = vertices[attribName][index];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+        Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
 
         if (attribName === 'position' && !(skipUpdateAABB === true)) {
           let componentN = this._vertices.components[attribName];

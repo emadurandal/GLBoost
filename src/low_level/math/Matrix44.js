@@ -33,7 +33,6 @@ export default class Matrix44 {
         this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
       }
     } else if (m instanceof Float32Array) {
-      this.m = new Float32Array(16);
       if (notCopyFloat32Array) {
         this.m = m;
       } else {
@@ -46,6 +45,21 @@ export default class Matrix44 {
             m[3], m[7], m[11], m[15]);
         } else {
           this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }  
+      }
+    } else if (!!m && typeof m.m33 === 'undefined' && typeof m.m22 !== 'undefined') {
+      if (notCopyFloat32Array) {
+        this.m = m.m;
+      } else {
+        this.m = new Float32Array(16);
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m.m00, m.m01, m.m02, 0,
+            m.m10, m.m11, m.m12, 0,
+            m.m20, m.m21, m.m22, 0,
+            0, 0, 0, 1);
+        } else {
+          this.setComponents(m.m00, m.m01, m.m02, 0, m.m10, m.m11, m.m12, 0, m.m20, m.m21, m.m22, 0, 0, 0, 0, 1); // 'm' must be row major array if isColumnMajor is false
         }  
       }
     } else {
@@ -66,6 +80,10 @@ export default class Matrix44 {
   copyComponents(mat4) {
     //this.m.set(mat4.m);
     this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
+  }
+
+  get className() {
+    return this.constructor.name;
   }
 
   clone() {
@@ -280,7 +298,7 @@ export default class Matrix44 {
   }
 
   static rotateXYZ(x, y, z) {
-    return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
+    return new Matrix44(Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
   }
 
   /**
@@ -463,22 +481,6 @@ export default class Matrix44 {
         m10, m11, m12, m13,
         m20, m21, m22, m23,
         m30, m31, m32, m33
-    );
-  }
-
-  toMatrix33() {
-    return new Matrix33(
-      this.m00, this.m01, this.m02,
-      this.m10, this.m11, this.m12,
-      this.m20, this.m21, this.m22
-    );
-  }
-
-  static toMatrix33(mat) {
-    return new Matrix33(
-      mat.m00, mat.m01, mat.m02,
-      mat.m10, mat.m11, mat.m12,
-      mat.m20, mat.m21, mat.m22
     );
   }
 

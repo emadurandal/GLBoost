@@ -1,7 +1,7 @@
 import Vector3 from '../../math/Vector3';
 import L_Element from '../L_Element';
 import Matrix44 from '../../math/Matrix44';
-import MathUtil from '../../math/MathUtil';
+import MathClassUtil from '../../math/MathClassUtil';
 
 export default class L_AbstractCamera extends L_Element {
   constructor(glBoostContext, toRegister, lookat) {
@@ -193,9 +193,9 @@ export default class L_AbstractCamera extends L_Element {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
         } else {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
         }
       }
     }

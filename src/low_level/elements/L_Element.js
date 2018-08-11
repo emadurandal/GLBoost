@@ -4,7 +4,9 @@ import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
+import Matrix33 from '../math/Matrix33';
 import Matrix44 from '../math/Matrix44';
+import MathClassUtil from '../math/MathClassUtil';
 import MathUtil from '../math/MathUtil';
 import GLBoostObject from '../core/GLBoostObject';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
@@ -468,7 +470,7 @@ export default class L_Element extends GLBoostObject {
   }
 
   get normalMatrix() {
-    return Matrix44.invert(this.transformMatrix).transpose().toMatrix33();
+    return new Matrix33(Matrix44.invert(this.transformMatrix).transpose());
   }
 
   __updateTransform() {
@@ -582,9 +584,9 @@ export default class L_Element extends GLBoostObject {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.arrayToQuaternion(json[key]);
+          this[key] = MathClassUtil.arrayToQuaternion(json[key]);
         } else {
-          this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+          this[key] = MathClassUtil.arrayToVectorOrMatrix(json[key]);
         }
       }
     }

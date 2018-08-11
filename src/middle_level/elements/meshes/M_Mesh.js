@@ -4,6 +4,8 @@ import Vector3 from '../../../low_level/math/Vector3';
 import Vector4 from '../../../low_level/math/Vector4';
 import Matrix44 from '../../../low_level/math/Matrix44';
 import AABB from '../../../low_level/math/AABB';
+import Matrix33 from '../../../low_level/math/Matrix33';
+import MathClassUtil from '../../../low_level/math/MathClassUtil';
 
 export default class M_Mesh extends M_Element {
   constructor(glBoostContext, geometry, material) {
@@ -90,7 +92,7 @@ export default class M_Mesh extends M_Element {
       length = normals.length / 3;
       for (let i=0; i<length; i++) {
         let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-        let transformedNormalVec = Matrix44.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
+        let transformedNormalVec = this.normalMatrix.multiplyVector(normalVector3).normalize();
         normals[i*3] = transformedNormalVec.x;
         normals[i*3+1] = transformedNormalVec.y;
         normals[i*3+2] = transformedNormalVec.z;
@@ -123,7 +125,8 @@ export default class M_Mesh extends M_Element {
       length = normals.length / 3;
       for (let i=0; i<length; i++) {
         let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-        let transformedNormalVec = Matrix44.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
+        const invNormalMat = new Matrix33(Matrix44.invert(mat).transpose().invert());
+        let transformedNormalVec = invNormalMat.multiplyVector(normalVector3).normalize();
         normals[i*3] = transformedNormalVec.x;
         normals[i*3+1] = transformedNormalVec.y;
         normals[i*3+2] = transformedNormalVec.z;
@@ -216,7 +219,7 @@ export default class M_Mesh extends M_Element {
     }
     var mv_m = viewMatrix.multiply(camera.inverseWorldMatrix).multiply(m_m);
 
-    var centerPosition = this.geometry.centerPosition.toVector4();
+    var centerPosition = new Vector4(this.geometry.centerPosition);
     //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
     var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
@@ -261,8 +264,8 @@ export default class M_Mesh extends M_Element {
   rayCast(x, y, camera, viewport) {
 
     const invPVW = GLBoost.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-    const origVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 0), invPVW, viewport);
-    const distVecInLocal = GLBoost.MathUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
+    const origVecInLocal = GLBoost.MathClassUtil.unProject(new GLBoost.Vector3(x, y, 0), invPVW, viewport);
+    const distVecInLocal = GLBoost.MathClassUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
     const dirVecInLocal = GLBoost.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
     const gl = this._glContext.gl;
@@ -284,7 +287,7 @@ export default class M_Mesh extends M_Element {
     const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
     let intersectPositionInWorld = null;
     if (result[0]) {
-      intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+      intersectPositionInWorld = new Vector3(this.worldMatrix.multiplyVector(new Vector4(result[0])));
     }
     return [intersectPositionInWorld, result[1]];
   }

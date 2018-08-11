@@ -1,7 +1,8 @@
-/* @flow */
+// @flow
 
 import GLBoost from '../../globals';
-import Vector3 from './Vector3';
+import type Vector2 from './Vector2';
+import type Vector3 from './Vector3';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array |
 Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
@@ -9,7 +10,7 @@ Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 export default class Vector4 {
   v: TypedArray;
 
-  constructor(x:number|TypedArray, y?:number, z?:number, w?:number) {
+  constructor(x:number|TypedArray|Vector2|Vector3|Vector4, y?:number, z?:number, w?:number) {
     if (ArrayBuffer.isView(x)) {
       this.v = ((x:any):TypedArray);
       return;
@@ -17,10 +18,31 @@ export default class Vector4 {
       this.v = new Float32Array(4)
     }
 
-    this.x = ((x:any):number);
-    this.y = ((y:any):number);
-    this.z = ((z:any):number);
-    this.w = ((w:any):number);
+    if (typeof (x:any).w !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = (x:any).z;
+      this.w = (x:any).w;
+    } else if (typeof (x:any).z !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = (x:any).z;
+      this.w = 1;
+    } else if (typeof (x:any).y !== 'undefined') {
+      this.x = (x:any).x;
+      this.y = (x:any).y;
+      this.z = 0;
+      this.w = 1;
+    } else {
+      this.x = ((x:any):number);
+      this.y = ((y:any):number);
+      this.z = ((z:any):number);
+      this.w = ((w:any):number);
+    }
+  }
+
+  get className() {
+    return this.constructor.name;
   }
 
   isEqual(vec:Vector4): boolean {
@@ -61,11 +83,6 @@ export default class Vector4 {
     return newVec;
   }
   
-
-  toVector3() {
-    return new Vector3(this.x, this.y, this.z);
-  }
-
   /**
    * add value
    */
@@ -184,7 +201,7 @@ export default class Vector4 {
     return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
   }
 
-  get x() {
+  get x():number {
     return this.v[0];
   }
 
@@ -192,7 +209,7 @@ export default class Vector4 {
     this.v[0] = x;
   }
 
-  get y() {
+  get y():number {
     return this.v[1];
   }
 
@@ -200,7 +217,7 @@ export default class Vector4 {
     this.v[1] = y;
   }
 
-  get z() {
+  get z():number {
     return this.v[2];
   }
 
@@ -208,7 +225,7 @@ export default class Vector4 {
     this.v[2] = z;
   }
 
-  get w() {
+  get w():number {
     return this.v[3];
   }
 

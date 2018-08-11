@@ -1473,234 +1473,27 @@
 
   GLBoost$1["Vector2"] = Vector2;
 
-  //      
+  class MathUtil {
 
-                                                                             
-                                                                       
+    constructor() {
 
-  class Vector4 {
-                  
-
-    constructor(x                  , y        , z        , w        ) {
-      if (ArrayBuffer.isView(x)) {
-        this.v = ((x    )           );
-        return;
-      } else {
-        this.v = new Float32Array(4);
-      }
-
-      this.x = ((x    )       );
-      this.y = ((y    )       );
-      this.z = ((z    )       );
-      this.w = ((w    )       );
     }
 
-    get className() {
-      return this.constructor.name;
+    static radianToDegree(rad) {
+      return rad * 180 / Math.PI;
     }
 
-    isEqual(vec        )          {
-      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
-        return true;
-      } else {
-        return false;
-      }
+    static degreeToRadian(deg) {
+      return deg * Math.PI / 180;
     }
 
-    clone() {
-      return new Vector4(this.x, this.y, this.z, this.w);
-    }
-
-    /**
-     * Zero Vector
-     */
-    static zero() {
-      return new Vector4(0, 0, 0, 1);
-    }
-
-    length() {
-      return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
-    }
-
-    normalize() {
-      var length = this.length();
-      this.divide(length);
-
-      return this;
-    }
-
-    static normalize(vec4        ) {
-      var length = vec4.length();
-      var newVec = new Vector4(vec4.x, vec4.y, vec4.z, vec4.w);
-      newVec.divide(length);
-
-      return newVec;
-    }
-    
-
-    toVector3() {
-      return new Vector3(this.x, this.y, this.z);
-    }
-
-    /**
-     * add value
-     */
-    add(v        ) {
-      this.x += v.x;
-      this.y += v.y;
-      this.z += v.z;
-      this.w += v.w;
-      
-      return this;
-    }
-
-    /**
-     * add value（static version）
-     */
-    static add(lv        , rv        ) {
-      return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
-    }
-
-    /**
-     * add value except w component
-     */
-    addWithOutW(v                ) {
-      this.x += v.x;
-      this.y += v.y;
-      this.z += v.z;
-      
-      return this;
-    }
-
-    subtract(v        ) {
-      this.x -= v.x;
-      this.y -= v.y;
-      this.z -= v.z;
-      this.w -= v.w;
-
-      return this;
-    }
-
-    static subtract(lv        , rv        ) {
-      return new Vector4(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z, lv.w  - rv.w);
-    }
-    /**
-     * add value except w component（static version）
-     */
-    static addWithOutW(lv        , rv        ) {
-      return new Vector4(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
-    }
-
-    multiply(val       ) {
-      this.x *= val;
-      this.y *= val;
-      this.z *= val;
-      this.w *= val;
-      
-      return this;
-    }
-
-    multiplyVector(vec        ) {
-      this.x *= vec.x;
-      this.y *= vec.y;
-      this.z *= vec.z;
-      this.w *= vec.w;
-      
-      return this;
-    }
-
-    static multiply(vec4        , val       ) {
-      return new Vector4(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
-    }
-
-    static multiplyVector(vec4        , vec        ) {
-      return new Vector4(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
-    }
-
-
-    divide(val       ) {
-      if (val !== 0) {
-        this.x /= val;
-        this.y /= val;
-        this.z /= val;
-        this.w /= val;
-      } else {
-        console.warn("0 division occured!");
-        this.x = Infinity;
-        this.y = Infinity;
-        this.z = Infinity;
-        this.w = Infinity;
-      }
-      return this;
-    }
-
-    static divide(vec4        , val       ) {
-      if (val !== 0) {
-        return new Vector4(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
-      } else {
-        console.warn("0 division occured!");
-        return new Vector4(Infinity, Infinity, Infinity, Infinity);
-      }
-    }
-
-    divideVector(vec4        ) {
-      this.x /= vec4.x;
-      this.y /= vec4.y;
-      this.z /= vec4.z;
-      this.w /= vec4.w;
-
-      return this;
-    }
-
-    static divideVector(lvec4        , rvec4        ) {
-      return new Vector4(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
-    }
-
-    toString() {
-      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
-    }
-
-    get x()        {
-      return this.v[0];
-    }
-
-    set x(x       ) {
-      this.v[0] = x;
-    }
-
-    get y()        {
-      return this.v[1];
-    }
-
-    set y(y       ) {
-      this.v[1] = y;
-    }
-
-    get z()        {
-      return this.v[2];
-    }
-
-    set z(z       ) {
-      this.v[2] = z;
-    }
-
-    get w()        {
-      return this.v[3];
-    }
-
-    set w(w       ) {
-      this.v[3] = w;
-    }
-
-    get raw() {
-      return this.v;
-    }
   }
 
-  GLBoost$1["Vector4"] = Vector4;
+  GLBoost$1["MathUtil"] = MathUtil;
 
   //      
-
+                                       
+                                       
 
                                                                              
                                                                        
@@ -1708,7 +1501,7 @@
   class Vector3 {
                   
 
-    constructor(x                  , y        , z        ) {
+    constructor(x                                          , y        , z        ) {
       if (ArrayBuffer.isView(x)) {
         this.v = ((x    )           );
         return;
@@ -1716,10 +1509,18 @@
         this.v = new Float32Array(3);
       }
 
-      if (typeof (x    ).z !== 'undefined') {
+      if (typeof (x    ).w !== 'undefined') {
         this.x = (x    ).x;
         this.y = (x    ).y;
         this.z = (x    ).z;
+      } else if (typeof (x    ).z !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = (x    ).z;
+      } else if (typeof (x    ).y !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = 0;
       } else {
         this.x = ((x    )       );
         this.y = ((y    )       );
@@ -1968,11 +1769,6 @@
       return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
     }
 
-
-    toVector4() {
-      return new Vector4(this.x, this.y, this.z, 1.0);
-    }
-
     toString() {
       return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
     }
@@ -2008,16 +1804,52 @@
 
   GLBoost$1['Vector3'] = Vector3;
 
-  class Quaternion {
+  //      
+                                       
+                                       
 
-    constructor(x, y, z, w) {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-      this.w = w;
+                                                                             
+                                                                       
+
+  class Vector4$1 {
+                  
+
+    constructor(x                                          , y        , z        , w        ) {
+      if (ArrayBuffer.isView(x)) {
+        this.v = ((x    )           );
+        return;
+      } else {
+        this.v = new Float32Array(4);
+      }
+
+      if (typeof (x    ).w !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = (x    ).z;
+        this.w = (x    ).w;
+      } else if (typeof (x    ).z !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = (x    ).z;
+        this.w = 1;
+      } else if (typeof (x    ).y !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = 0;
+        this.w = 1;
+      } else {
+        this.x = ((x    )       );
+        this.y = ((y    )       );
+        this.z = ((z    )       );
+        this.w = ((w    )       );
+      }
     }
 
-    isEqual(vec) {
+    get className() {
+      return this.constructor.name;
+    }
+
+    isEqual(vec        )          {
       if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
         return true;
       } else {
@@ -2025,1009 +1857,192 @@
       }
     }
 
-    get className() {
-      return this.constructor.name;
-    }
-
     clone() {
-      return new Quaternion(this.x, this.y, this.z, this.w);
+      return new Vector4$1(this.x, this.y, this.z, this.w);
     }
 
-    static invert(quat) {
-      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    /**
+     * Zero Vector
+     */
+    static zero() {
+      return new Vector4$1(0, 0, 0, 1);
     }
 
-    static qlerp(lhq, rhq, ratio) {
-
-      var q = new Quaternion(0, 0, 0, 1);
-      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
-      var ss = 1.0 - qr * qr;
-
-      if (ss === 0.0) {
-        q.w = lhq.w;
-        q.x = lhq.x;
-        q.y = lhq.y;
-        q.z = lhq.z;
-
-        return q;
-      } else {
-
-        if (qr > 1) {
-          qr = 0.999;
-        } else if (qr < -1) {
-          qr = -0.999;
-        }
-
-        let ph = Math.acos(qr);
-        let s2;
-        if(qr < 0.0 && ph > Math.PI / 2.0){
-          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
-          ph = Math.acos(qr);
-          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
-        } else {
-          s2 = Math.sin(ph * ratio) / Math.sin(ph);
-        }
-        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
-
-        q.x = lhq.x * s1 + rhq.x * s2;
-        q.y = lhq.y * s1 + rhq.y * s2;
-        q.z = lhq.z * s1 + rhq.z * s2;
-        q.w = lhq.w * s1 + rhq.w * s2;
-
-        return q;
-      }
-    }
-
-    get rotationMatrix() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix44$1(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
-        0.0, 0.0, 0.0, 1.0
-      );
-    }
-
-    get rotationMatrix33() {
-      var sx = this.x * this.x;
-      var sy = this.y * this.y;
-      var sz = this.z * this.z;
-      var cx = this.y * this.z;
-      var cy = this.x * this.z;
-      var cz = this.x * this.y;
-      var wx = this.w * this.x;
-      var wy = this.w * this.y;
-      var wz = this.w * this.z;
-
-      return new Matrix33(
-        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
-        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
-        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
-      );
-    }
-
-    axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      this.w = Math.cos(halfAngle);
-      this.x = sin * axis.x;
-      this.y = sin * axis.y;
-      this.z = sin * axis.z;
-
-      return this;
-    }
-
-    static axisAngle(axisVec3, angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-      var halfAngle = 0.5 * radian;
-      var sin = Math.sin(halfAngle);
-
-      var axis = Vector3.normalize(axisVec3);
-      return new Quaternion(
-        sin * axis.x,
-        sin * axis.y,
-        sin * axis.z,
-        Math.cos(halfAngle));
-    }
-
-    add(q) {
-      this.x += q.x;
-      this.y += q.y;
-      this.z += q.z;
-      this.w += q.w;
-
-      return this;
-    }
-
-    multiply(q) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
-      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
-      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
-      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
-      this.x = result.x;
-      this.y = result.y;
-      this.z = result.z;
-      this.w = result.w;
-      
-      return this;
-    }
-
-    static multiply(q1, q2) {
-      let result = new Quaternion(0, 0, 0, 1);
-      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
-      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
-      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
-      return result;
-    }
-
-    static fromMatrix(m) {
-      
-      let q = new Quaternion();
-      let tr = m.m00 + m.m11 + m.m22;
-
-      if (tr > 0) { 
-        let S = 0.5 / Math.sqrt(tr+1.0);
-        q.w = 0.25 / S;
-        q.x = (m.m21 - m.m12) * S;
-        q.y = (m.m02 - m.m20) * S; 
-        q.z = (m.m10 - m.m01) * S; 
-      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
-        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
-        q.w = (m.m21 - m.m12) / S;
-        q.x = 0.25 * S;
-        q.y = (m.m01 + m.m10) / S; 
-        q.z = (m.m02 + m.m20) / S; 
-      } else if (m.m11 > m.m22) { 
-        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
-        q.w = (m.m02 - m.m20) / S;
-        q.x = (m.m01 + m.m10) / S; 
-        q.y = 0.25 * S;
-        q.z = (m.m12 + m.m21) / S; 
-      } else { 
-        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
-        q.w = (m.m10 - m.m01) / S;
-        q.x = (m.m02 + m.m20) / S;
-        q.y = (m.m12 + m.m21) / S;
-        q.z = 0.25 * S;
-      }
-
-      return q;
-    }
-  /*
-    static fromMatrix(m) {
-      let fTrace = m.m[0] + m.m[4] + m.m[8];
-      let fRoot;
-      let q = new Quaternion();
-      if ( fTrace > 0.0 ) {
-        // |w| > 1/2, may as well choose w > 1/2
-        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
-        q.w = 0.5 * fRoot;
-        fRoot = 0.5/fRoot;  // 1/(4w)
-        q.x = (m.m[5]-m.m[7])*fRoot;
-        q.y = (m.m[6]-m.m[2])*fRoot;
-        q.z = (m.m[1]-m.m[3])*fRoot;
-      } else {
-        // |w| <= 1/2
-        let i = 0;
-        if ( m.m[4] > m.m[0] )
-          i = 1;
-        if ( m.m[8] > m.m[i*3+i] )
-          i = 2;
-        let j = (i+1)%3;
-        let k = (i+2)%3;
-        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
-        
-        let setValue = function(q, i, value) {
-          switch (i) {
-            case 0: q.x = value; break;
-            case 1: q.y = value; break;
-            case 2: q.z = value; break;
-          }
-        }
-
-        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
-        fRoot = 0.5 / fRoot;
-        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
-
-        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
-        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
-      }
-
-      return q;
-    }
-  */
-
-    static fromPosition(vec3) {
-      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
-      return q;
-    }
-
-    at(i) {
-      switch (i%4) {
-      case 0: return this.x;
-      case 1: return this.y;
-      case 2: return this.z;
-      case 3: return this.w;
-      }
-    }
-
-    setAt(i, val) {
-      switch (i%4) {
-      case 0: this.x = val; break;
-      case 1: this.y = val; break;
-      case 2: this.z = val; break;
-      case 3: this.w = val; break;
-      }
+    length() {
+      return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
     }
 
     normalize() {
-      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
-      this.x /= norm;
-      this.y /= norm;
-      this.z /= norm;
-      this.w /= norm;
+      var length = this.length();
+      this.divide(length);
+
       return this;
+    }
+
+    static normalize(vec4        ) {
+      var length = vec4.length();
+      var newVec = new Vector4$1(vec4.x, vec4.y, vec4.z, vec4.w);
+      newVec.divide(length);
+
+      return newVec;
+    }
+    
+    /**
+     * add value
+     */
+    add(v        ) {
+      this.x += v.x;
+      this.y += v.y;
+      this.z += v.z;
+      this.w += v.w;
+      
+      return this;
+    }
+
+    /**
+     * add value（static version）
+     */
+    static add(lv        , rv        ) {
+      return new Vector4$1(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z + rv.z);
+    }
+
+    /**
+     * add value except w component
+     */
+    addWithOutW(v                ) {
+      this.x += v.x;
+      this.y += v.y;
+      this.z += v.z;
+      
+      return this;
+    }
+
+    subtract(v        ) {
+      this.x -= v.x;
+      this.y -= v.y;
+      this.z -= v.z;
+      this.w -= v.w;
+
+      return this;
+    }
+
+    static subtract(lv        , rv        ) {
+      return new Vector4$1(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z, lv.w  - rv.w);
+    }
+    /**
+     * add value except w component（static version）
+     */
+    static addWithOutW(lv        , rv        ) {
+      return new Vector4$1(lv.x + rv.x, lv.y + rv.y, lv.z + rv.z, lv.z);
+    }
+
+    multiply(val       ) {
+      this.x *= val;
+      this.y *= val;
+      this.z *= val;
+      this.w *= val;
+      
+      return this;
+    }
+
+    multiplyVector(vec        ) {
+      this.x *= vec.x;
+      this.y *= vec.y;
+      this.z *= vec.z;
+      this.w *= vec.w;
+      
+      return this;
+    }
+
+    static multiply(vec4        , val       ) {
+      return new Vector4$1(vec4.x * val, vec4.y * val, vec4.z * val, vec4.w * val);
+    }
+
+    static multiplyVector(vec4        , vec        ) {
+      return new Vector4$1(vec4.x * vec.x, vec4.y * vec.y, vec4.z * vec.z, vec4.w * vec.w);
+    }
+
+
+    divide(val       ) {
+      if (val !== 0) {
+        this.x /= val;
+        this.y /= val;
+        this.z /= val;
+        this.w /= val;
+      } else {
+        console.warn("0 division occured!");
+        this.x = Infinity;
+        this.y = Infinity;
+        this.z = Infinity;
+        this.w = Infinity;
+      }
+      return this;
+    }
+
+    static divide(vec4        , val       ) {
+      if (val !== 0) {
+        return new Vector4$1(vec4.x / val, vec4.y / val, vec4.z / val, vec4.w / val);
+      } else {
+        console.warn("0 division occured!");
+        return new Vector4$1(Infinity, Infinity, Infinity, Infinity);
+      }
+    }
+
+    divideVector(vec4        ) {
+      this.x /= vec4.x;
+      this.y /= vec4.y;
+      this.z /= vec4.z;
+      this.w /= vec4.w;
+
+      return this;
+    }
+
+    static divideVector(lvec4        , rvec4        ) {
+      return new Vector4$1(lvec4.x / rvec4.x, lvec4.y / rvec4.y, lvec4.z / rvec4.z, lvec4.w / rvec4.w);
     }
 
     toString() {
       return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
     }
-  }
 
-  GLBoost$1["Quaternion"] = Quaternion;
-
-  class Matrix44$1 {
-
-    constructor(m, isColumnMajor = false, notCopyFloat32Array = false
-    ) {
-      if (arguments.length >= 16) {
-        this.m = new Float32Array(16); // Data order is column major
-        if (isColumnMajor === true) {
-          let m = arguments;
-          this.setComponents(
-            m[0], m[4], m[8], m[12],
-            m[1], m[5], m[9], m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
-        }
-      } else if (Array.isArray(m)) {
-        this.m = new Float32Array(16);
-        if (isColumnMajor === true) {
-          this.setComponents(
-            m[0], m[4], m[8], m[12],
-            m[1], m[5], m[9], m[13],
-            m[2], m[6], m[10], m[14],
-            m[3], m[7], m[11], m[15]);
-        } else {
-          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-        }
-      } else if (m instanceof Float32Array) {
-        this.m = new Float32Array(16);
-        if (notCopyFloat32Array) {
-          this.m = m;
-        } else {
-          this.m = new Float32Array(16);
-          if (isColumnMajor === true) {
-            this.setComponents(
-              m[0], m[4], m[8], m[12],
-              m[1], m[5], m[9], m[13],
-              m[2], m[6], m[10], m[14],
-              m[3], m[7], m[11], m[15]);
-          } else {
-            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
-          }  
-        }
-      } else {
-        this.m = new Float32Array(16);
-        this.identity();
-      }
-    }
-
-    setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
-      this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
-      this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
-      this.m20 = m20; this.m21 = m21; this.m22 = m22; this.m23 = m23;
-      this.m30 = m30; this.m31 = m31; this.m32 = m32; this.m33 = m33;
-
-      return this;
-    }
-
-    copyComponents(mat4) {
-      //this.m.set(mat4.m);
-      this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
-    }
-
-    get className() {
-      return this.constructor.name;
-    }
-    
-    clone() {
-      return new Matrix44$1(
-        this.m[0], this.m[4], this.m[8], this.m[12],
-        this.m[1], this.m[5], this.m[9], this.m[13],
-        this.m[2], this.m[6], this.m[10], this.m[14],
-        this.m[3], this.m[7], this.m[11], this.m[15]
-      );
-    }
-
-    /**
-     * 単位行列にする
-     */
-    identity() {
-      this.setComponents(
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1
-      );
-      return this;
-    }
-
-    /**
-     * 単位行列にする（static版）
-     */
-    static identity() {
-      return new Matrix44$1(
-          1, 0, 0, 0,
-          0, 1, 0, 0,
-          0, 0, 1, 0,
-          0, 0, 0, 1
-      );
-    }
-
-    translate(vec) {
-      return this.setComponents(
-        1, 0, 0, vec.x,
-        0, 1, 0, vec.y,
-        0, 0, 1, vec.z,
-        0, 0, 0, 1
-      );
-    }
-
-    putTranslate(vec) {
-      this.m03 = vec.x;
-      this.m13 = vec.y;
-      this.m23 = vec.z;
-    }
-
-    getTranslate() {
-      return new Vector3(this.m03, this.m13, this.m23);
-    }
-
-    static translate(vec) {
-      return new Matrix44$1(
-        1, 0, 0, vec.x,
-        0, 1, 0, vec.y,
-        0, 0, 1, vec.z,
-        0, 0, 0, 1
-      );
-    }
-
-    scale(vec) {
-      return this.setComponents(
-        vec.x, 0, 0, 0,
-        0, vec.y, 0, 0,
-        0, 0, vec.z, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    static scale(vec) {
-      return new Matrix44$1(
-        vec.x, 0, 0, 0,
-        0, vec.y, 0, 0,
-        0, 0, vec.z, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    addScale(vec) {
-      this.m00 *= vec.x;
-      this.m11 *= vec.y;
-      this.m22 *= vec.z;
-
-      return this;
-    }
-
-    /**
-     * Create X oriented Rotation Matrix
-     */
-    rotateX(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        1, 0, 0, 0,
-        0, cos, -sin, 0,
-        0, sin, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create X oriented Rotation Matrix
-    */
-    static rotateX(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$1(
-        1, 0, 0, 0,
-        0, cos, -sin, 0,
-        0, sin, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    /**
-     * Create Y oriented Rotation Matrix
-     */
-    rotateY(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        cos, 0, sin, 0,
-        0, 1, 0, 0,
-        -sin, 0, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create Y oriented Rotation Matrix
-     */
-    static rotateY(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$1(
-        cos, 0, sin, 0,
-        0, 1, 0, 0,
-        -sin, 0, cos, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    /**
-     * Create Z oriented Rotation Matrix
-     */
-    rotateZ(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return this.setComponents(
-        cos, -sin, 0, 0,
-        sin, cos, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-      );
-    }
-    /**
-     * Create Z oriented Rotation Matrix
-     */
-    static rotateZ(angle) {
-      var radian = 0;
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        radian = MathUtil.degreeToRadian(angle);
-      } else {
-        radian = angle;
-      }
-
-      var cos = Math.cos(radian);
-      var sin = Math.sin(radian);
-      return new Matrix44$1(
-        cos, -sin, 0, 0,
-        sin, cos, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    static rotateXYZ(x, y, z) {
-      return (Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x)))).toMatrix44();
-    }
-
-    /**
-     * @return Euler Angles Rotation (x, y, z)
-     */
-    toEulerAngles() {
-      let rotate = null;
-      if (Math.abs(this.m20) != 1.0) {
-        let y   = -Math.asin(this.m20);
-        let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
-        let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
-        rotate = new Vector3(x, y, z);
-      } else if (this.m20 === -1.0) {
-        rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
-      } else {
-        rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
-      }
-
-      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
-        rotate.x = MathUtil.radianToDegree(rotate.x);
-        rotate.y = MathUtil.radianToDegree(rotate.y);
-        rotate.z = MathUtil.radianToDegree(rotate.z);
-      }
-
-      return rotate;
-    }
-
-    /**
-     * ゼロ行列
-     */
-    zero() {
-      this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-      return this;
-    }
-
-    static zero() {
-      return new Matrix44$1(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    }
-
-    flatten() {
-      return this.m;
-    }
-
-    flattenAsArray() {
-      return [this.m[0], this.m[1], this.m[2], this.m[3],
-        this.m[4], this.m[5], this.m[6], this.m[7],
-        this.m[8], this.m[9], this.m[10], this.m[11],
-        this.m[12], this.m[13], this.m[14], this.m[15]];
-    }
-
-    _swap(l, r) {
-      this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
-    }
-
-    /**
-     * 転置
-     */
-    transpose() {
-      this._swap(1, 4);
-      this._swap(2, 8);
-      this._swap(3, 12);
-      this._swap(6, 9);
-      this._swap(7, 13);
-      this._swap(11, 14);
-
-      return this;
-    }
-
-    /**
-     * 転置（static版）
-     */
-    static transpose(mat) {
-
-      var mat_t = new Matrix44$1(
-        mat.m00, mat.m10, mat.m20, mat.m30,
-        mat.m01, mat.m11, mat.m21, mat.m31,
-        mat.m02, mat.m12, mat.m22, mat.m32,
-        mat.m03, mat.m13, mat.m23, mat.m33
-      );
-
-      return mat_t;
-    }
-
-    multiplyVector(vec) {
-      var x = this.m00*vec.x + this.m01*vec.y + this.m02*vec.z + this.m03*vec.w;
-      var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z + this.m13*vec.w;
-      var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
-      var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
-
-      return new Vector4(x, y, z, w);
-    }
-
-    /**
-     * 行列同士の乗算
-     */
-    multiply(mat) {
-      var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
-      var m01 = this.m00*mat.m01 + this.m01*mat.m11 + this.m02*mat.m21 + this.m03*mat.m31;
-      var m02 = this.m00*mat.m02 + this.m01*mat.m12 + this.m02*mat.m22 + this.m03*mat.m32;
-      var m03 = this.m00*mat.m03 + this.m01*mat.m13 + this.m02*mat.m23 + this.m03*mat.m33;
-
-      var m10 = this.m10*mat.m00 + this.m11*mat.m10 + this.m12*mat.m20 + this.m13*mat.m30;
-      var m11 = this.m10*mat.m01 + this.m11*mat.m11 + this.m12*mat.m21 + this.m13*mat.m31;
-      var m12 = this.m10*mat.m02 + this.m11*mat.m12 + this.m12*mat.m22 + this.m13*mat.m32;
-      var m13 = this.m10*mat.m03 + this.m11*mat.m13 + this.m12*mat.m23 + this.m13*mat.m33;
-
-      var m20 = this.m20*mat.m00 + this.m21*mat.m10 + this.m22*mat.m20 + this.m23*mat.m30;
-      var m21 = this.m20*mat.m01 + this.m21*mat.m11 + this.m22*mat.m21 + this.m23*mat.m31;
-      var m22 = this.m20*mat.m02 + this.m21*mat.m12 + this.m22*mat.m22 + this.m23*mat.m32;
-      var m23 = this.m20*mat.m03 + this.m21*mat.m13 + this.m22*mat.m23 + this.m23*mat.m33;
-
-      var m30 = this.m30*mat.m00 + this.m31*mat.m10 + this.m32*mat.m20 + this.m33*mat.m30;
-      var m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
-      var m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
-      var m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
-
-      return this.setComponents(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    multiplyByLeft(mat) {
-      var m00 = mat.m00*this.m00 + mat.m01*this.m10 + mat.m02*this.m20 + mat.m03*this.m30;
-      var m01 = mat.m00*this.m01 + mat.m01*this.m11 + mat.m02*this.m21 + mat.m03*this.m31;
-      var m02 = mat.m00*this.m02 + mat.m01*this.m12 + mat.m02*this.m22 + mat.m03*this.m32;
-      var m03 = mat.m00*this.m03 + mat.m01*this.m13 + mat.m02*this.m23 + mat.m03*this.m33;
-
-      var m10 = mat.m10*this.m00 + mat.m11*this.m10 + mat.m12*this.m20 + mat.m13*this.m30;
-      var m11 = mat.m10*this.m01 + mat.m11*this.m11 + mat.m12*this.m21 + mat.m13*this.m31;
-      var m12 = mat.m10*this.m02 + mat.m11*this.m12 + mat.m12*this.m22 + mat.m13*this.m32;
-      var m13 = mat.m10*this.m03 + mat.m11*this.m13 + mat.m12*this.m23 + mat.m13*this.m33;
-
-      var m20 = mat.m20*this.m00 + mat.m21*this.m10 + mat.m22*this.m20 + mat.m23*this.m30;
-      var m21 = mat.m20*this.m01 + mat.m21*this.m11 + mat.m22*this.m21 + mat.m23*this.m31;
-      var m22 = mat.m20*this.m02 + mat.m21*this.m12 + mat.m22*this.m22 + mat.m23*this.m32;
-      var m23 = mat.m20*this.m03 + mat.m21*this.m13 + mat.m22*this.m23 + mat.m23*this.m33;
-
-      var m30 = mat.m30*this.m00 + mat.m31*this.m10 + mat.m32*this.m20 + mat.m33*this.m30;
-      var m31 = mat.m30*this.m01 + mat.m31*this.m11 + mat.m32*this.m21 + mat.m33*this.m31;
-      var m32 = mat.m30*this.m02 + mat.m31*this.m12 + mat.m32*this.m22 + mat.m33*this.m32;
-      var m33 = mat.m30*this.m03 + mat.m31*this.m13 + mat.m32*this.m23 + mat.m33*this.m33;
-
-      return this.setComponents(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    /**
-     * 行列同士の乗算（static版）
-     */
-    static multiply(l_m, r_m) {
-      var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
-      var m10 = l_m.m10*r_m.m00 + l_m.m11*r_m.m10 + l_m.m12*r_m.m20 + l_m.m13*r_m.m30;
-      var m20 = l_m.m20*r_m.m00 + l_m.m21*r_m.m10 + l_m.m22*r_m.m20 + l_m.m23*r_m.m30;
-      var m30 = l_m.m30*r_m.m00 + l_m.m31*r_m.m10 + l_m.m32*r_m.m20 + l_m.m33*r_m.m30;
-
-      var m01 = l_m.m00*r_m.m01 + l_m.m01*r_m.m11 + l_m.m02*r_m.m21 + l_m.m03*r_m.m31;
-      var m11 = l_m.m10*r_m.m01 + l_m.m11*r_m.m11 + l_m.m12*r_m.m21 + l_m.m13*r_m.m31;
-      var m21 = l_m.m20*r_m.m01 + l_m.m21*r_m.m11 + l_m.m22*r_m.m21 + l_m.m23*r_m.m31;
-      var m31 = l_m.m30*r_m.m01 + l_m.m31*r_m.m11 + l_m.m32*r_m.m21 + l_m.m33*r_m.m31;
-
-      var m02 = l_m.m00*r_m.m02 + l_m.m01*r_m.m12 + l_m.m02*r_m.m22 + l_m.m03*r_m.m32;
-      var m12 = l_m.m10*r_m.m02 + l_m.m11*r_m.m12 + l_m.m12*r_m.m22 + l_m.m13*r_m.m32;
-      var m22 = l_m.m20*r_m.m02 + l_m.m21*r_m.m12 + l_m.m22*r_m.m22 + l_m.m23*r_m.m32;
-      var m32 = l_m.m30*r_m.m02 + l_m.m31*r_m.m12 + l_m.m32*r_m.m22 + l_m.m33*r_m.m32;
-
-      var m03 = l_m.m00*r_m.m03 + l_m.m01*r_m.m13 + l_m.m02*r_m.m23 + l_m.m03*r_m.m33;
-      var m13 = l_m.m10*r_m.m03 + l_m.m11*r_m.m13 + l_m.m12*r_m.m23 + l_m.m13*r_m.m33;
-      var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
-      var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
-
-      return new Matrix44$1(
-          m00, m01, m02, m03,
-          m10, m11, m12, m13,
-          m20, m21, m22, m23,
-          m30, m31, m32, m33
-      );
-    }
-
-    toMatrix33() {
-      return new Matrix33(
-        this.m00, this.m01, this.m02,
-        this.m10, this.m11, this.m12,
-        this.m20, this.m21, this.m22
-      );
-    }
-
-    static toMatrix33(mat) {
-      return new Matrix33(
-        mat.m00, mat.m01, mat.m02,
-        mat.m10, mat.m11, mat.m12,
-        mat.m20, mat.m21, mat.m22
-      );
-    }
-
-    determinant() {
-      return this.m00*this.m11*this.m22*this.m33 + this.m00*this.m12*this.m23*this.m31 + this.m00*this.m13*this.m21*this.m32 +
-        this.m01*this.m10*this.m23*this.m32 + this.m01*this.m12*this.m20*this.m33 + this.m01*this.m13*this.m22*this.m30 +
-        this.m02*this.m10*this.m21*this.m33 + this.m02*this.m11*this.m23*this.m30 + this.m02*this.m13*this.m20*this.m31 +
-        this.m03*this.m10*this.m22*this.m31 + this.m03*this.m11*this.m20*this.m32 + this.m03*this.m12*this.m21*this.m30 -
-
-        this.m00*this.m11*this.m23*this.m32 - this.m00*this.m12*this.m21*this.m33 - this.m00*this.m13*this.m22*this.m31 -
-        this.m01*this.m10*this.m22*this.m33 - this.m01*this.m12*this.m23*this.m30 - this.m01*this.m13*this.m20*this.m32 -
-        this.m02*this.m10*this.m23*this.m31 - this.m02*this.m11*this.m20*this.m33 - this.m02*this.m13*this.m21*this.m30 -
-        this.m03*this.m10*this.m21*this.m32 - this.m03*this.m11*this.m22*this.m30 - this.m03*this.m12*this.m20*this.m31;
-    }
-
-    static determinant(mat) {
-      return mat.m00*mat.m11*mat.m22*mat.m33 + mat.m00*mat.m12*mat.m23*mat.m31 + mat.m00*mat.m13*mat.m21*mat.m32 +
-        mat.m01*mat.m10*mat.m23*mat.m32 + mat.m01*mat.m12*mat.m20*mat.m33 + mat.m01*mat.m13*mat.m22*mat.m30 +
-        mat.m02*mat.m10*mat.m21*mat.m33 + mat.m02*mat.m11*mat.m23*mat.m30 + mat.m02*mat.m13*mat.m20*mat.m31 +
-        mat.m03*mat.m10*mat.m22*mat.m31 + mat.m03*mat.m11*mat.m20*mat.m32 + mat.m03*mat.m12*mat.m21*mat.m30 -
-
-        mat.m00*mat.m11*mat.m23*mat.m32 - mat.m00*mat.m12*mat.m21*mat.m33 - mat.m00*mat.m13*mat.m22*mat.m31 -
-        mat.m01*mat.m10*mat.m22*mat.m33 - mat.m01*mat.m12*mat.m23*mat.m30 - mat.m01*mat.m13*mat.m20*mat.m32 -
-        mat.m02*mat.m10*mat.m23*mat.m31 - mat.m02*mat.m11*mat.m20*mat.m33 - mat.m02*mat.m13*mat.m21*mat.m30 -
-        mat.m03*mat.m10*mat.m21*mat.m32 - mat.m03*mat.m11*mat.m22*mat.m30 - mat.m03*mat.m12*mat.m20*mat.m31;
-    }
-
-    invert() {
-      var det = this.determinant();
-      var m00 = (this.m11*this.m22*this.m33 + this.m12*this.m23*this.m31 + this.m13*this.m21*this.m32 - this.m11*this.m23*this.m32 - this.m12*this.m21*this.m33 - this.m13*this.m22*this.m31) / det;
-      var m01 = (this.m01*this.m23*this.m32 + this.m02*this.m21*this.m33 + this.m03*this.m22*this.m31 - this.m01*this.m22*this.m33 - this.m02*this.m23*this.m31 - this.m03*this.m21*this.m32) / det;
-      var m02 = (this.m01*this.m12*this.m33 + this.m02*this.m13*this.m31 + this.m03*this.m11*this.m32 - this.m01*this.m13*this.m32 - this.m02*this.m11*this.m33 - this.m03*this.m12*this.m31) / det;
-      var m03 = (this.m01*this.m13*this.m22 + this.m02*this.m11*this.m23 + this.m03*this.m12*this.m21 - this.m01*this.m12*this.m23 - this.m02*this.m13*this.m21 - this.m03*this.m11*this.m22) / det;
-      var m10 = (this.m10*this.m23*this.m32 + this.m12*this.m20*this.m33 + this.m13*this.m22*this.m30 - this.m10*this.m22*this.m33 - this.m12*this.m23*this.m30 - this.m13*this.m20*this.m32) / det;
-      var m11 = (this.m00*this.m22*this.m33 + this.m02*this.m23*this.m30 + this.m03*this.m20*this.m32 - this.m00*this.m23*this.m32 - this.m02*this.m20*this.m33 - this.m03*this.m22*this.m30) / det;
-      var m12 = (this.m00*this.m13*this.m32 + this.m02*this.m10*this.m33 + this.m03*this.m12*this.m30 - this.m00*this.m12*this.m33 - this.m02*this.m13*this.m30 - this.m03*this.m10*this.m32) / det;
-      var m13 = (this.m00*this.m12*this.m23 + this.m02*this.m13*this.m20 + this.m03*this.m10*this.m22 - this.m00*this.m13*this.m22 - this.m02*this.m10*this.m23 - this.m03*this.m12*this.m20) / det;
-      var m20 = (this.m10*this.m21*this.m33 + this.m11*this.m23*this.m30 + this.m13*this.m20*this.m31 - this.m10*this.m23*this.m31 - this.m11*this.m20*this.m33 - this.m13*this.m21*this.m30) / det;
-      var m21 = (this.m00*this.m23*this.m31 + this.m01*this.m20*this.m33 + this.m03*this.m21*this.m30 - this.m00*this.m21*this.m33 - this.m01*this.m23*this.m30 - this.m03*this.m20*this.m31) / det;
-      var m22 = (this.m00*this.m11*this.m33 + this.m01*this.m13*this.m30 + this.m03*this.m10*this.m31 - this.m00*this.m13*this.m31 - this.m01*this.m10*this.m33 - this.m03*this.m11*this.m30) / det;
-      var m23 = (this.m00*this.m13*this.m21 + this.m01*this.m10*this.m23 + this.m03*this.m11*this.m20 - this.m00*this.m11*this.m23 - this.m01*this.m13*this.m20 - this.m03*this.m10*this.m21) / det;
-      var m30 = (this.m10*this.m22*this.m31 + this.m11*this.m20*this.m32 + this.m12*this.m21*this.m30 - this.m10*this.m21*this.m32 - this.m11*this.m22*this.m30 - this.m12*this.m20*this.m31) / det;
-      var m31 = (this.m00*this.m21*this.m32 + this.m01*this.m22*this.m30 + this.m02*this.m20*this.m31 - this.m00*this.m22*this.m31 - this.m01*this.m20*this.m32 - this.m02*this.m21*this.m30) / det;
-      var m32 = (this.m00*this.m12*this.m31 + this.m01*this.m10*this.m32 + this.m02*this.m11*this.m30 - this.m00*this.m11*this.m32 - this.m01*this.m12*this.m30 - this.m02*this.m10*this.m31) / det;
-      var m33 = (this.m00*this.m11*this.m22 + this.m01*this.m12*this.m20 + this.m02*this.m10*this.m21 - this.m00*this.m12*this.m21 - this.m01*this.m10*this.m22 - this.m02*this.m11*this.m20) / det;
-
-      return this.setComponents(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        m30, m31, m32, m33
-      );
-    }
-
-    static invert(mat) {
-      var det = mat.determinant();
-      var m00 = (mat.m11*mat.m22*mat.m33 + mat.m12*mat.m23*mat.m31 + mat.m13*mat.m21*mat.m32 - mat.m11*mat.m23*mat.m32 - mat.m12*mat.m21*mat.m33 - mat.m13*mat.m22*mat.m31) / det;
-      var m01 = (mat.m01*mat.m23*mat.m32 + mat.m02*mat.m21*mat.m33 + mat.m03*mat.m22*mat.m31 - mat.m01*mat.m22*mat.m33 - mat.m02*mat.m23*mat.m31 - mat.m03*mat.m21*mat.m32) / det;
-      var m02 = (mat.m01*mat.m12*mat.m33 + mat.m02*mat.m13*mat.m31 + mat.m03*mat.m11*mat.m32 - mat.m01*mat.m13*mat.m32 - mat.m02*mat.m11*mat.m33 - mat.m03*mat.m12*mat.m31) / det;
-      var m03 = (mat.m01*mat.m13*mat.m22 + mat.m02*mat.m11*mat.m23 + mat.m03*mat.m12*mat.m21 - mat.m01*mat.m12*mat.m23 - mat.m02*mat.m13*mat.m21 - mat.m03*mat.m11*mat.m22) / det;
-      var m10 = (mat.m10*mat.m23*mat.m32 + mat.m12*mat.m20*mat.m33 + mat.m13*mat.m22*mat.m30 - mat.m10*mat.m22*mat.m33 - mat.m12*mat.m23*mat.m30 - mat.m13*mat.m20*mat.m32) / det;
-      var m11 = (mat.m00*mat.m22*mat.m33 + mat.m02*mat.m23*mat.m30 + mat.m03*mat.m20*mat.m32 - mat.m00*mat.m23*mat.m32 - mat.m02*mat.m20*mat.m33 - mat.m03*mat.m22*mat.m30) / det;
-      var m12 = (mat.m00*mat.m13*mat.m32 + mat.m02*mat.m10*mat.m33 + mat.m03*mat.m12*mat.m30 - mat.m00*mat.m12*mat.m33 - mat.m02*mat.m13*mat.m30 - mat.m03*mat.m10*mat.m32) / det;
-      var m13 = (mat.m00*mat.m12*mat.m23 + mat.m02*mat.m13*mat.m20 + mat.m03*mat.m10*mat.m22 - mat.m00*mat.m13*mat.m22 - mat.m02*mat.m10*mat.m23 - mat.m03*mat.m12*mat.m20) / det;
-      var m20 = (mat.m10*mat.m21*mat.m33 + mat.m11*mat.m23*mat.m30 + mat.m13*mat.m20*mat.m31 - mat.m10*mat.m23*mat.m31 - mat.m11*mat.m20*mat.m33 - mat.m13*mat.m21*mat.m30) / det;
-      var m21 = (mat.m00*mat.m23*mat.m31 + mat.m01*mat.m20*mat.m33 + mat.m03*mat.m21*mat.m30 - mat.m00*mat.m21*mat.m33 - mat.m01*mat.m23*mat.m30 - mat.m03*mat.m20*mat.m31) / det;
-      var m22 = (mat.m00*mat.m11*mat.m33 + mat.m01*mat.m13*mat.m30 + mat.m03*mat.m10*mat.m31 - mat.m00*mat.m13*mat.m31 - mat.m01*mat.m10*mat.m33 - mat.m03*mat.m11*mat.m30) / det;
-      var m23 = (mat.m00*mat.m13*mat.m21 + mat.m01*mat.m10*mat.m23 + mat.m03*mat.m11*mat.m20 - mat.m00*mat.m11*mat.m23 - mat.m01*mat.m13*mat.m20 - mat.m03*mat.m10*mat.m21) / det;
-      var m30 = (mat.m10*mat.m22*mat.m31 + mat.m11*mat.m20*mat.m32 + mat.m12*mat.m21*mat.m30 - mat.m10*mat.m21*mat.m32 - mat.m11*mat.m22*mat.m30 - mat.m12*mat.m20*mat.m31) / det;
-      var m31 = (mat.m00*mat.m21*mat.m32 + mat.m01*mat.m22*mat.m30 + mat.m02*mat.m20*mat.m31 - mat.m00*mat.m22*mat.m31 - mat.m01*mat.m20*mat.m32 - mat.m02*mat.m21*mat.m30) / det;
-      var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
-      var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
-
-      return new Matrix44$1(
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23,
-        m30, m31, m32, m33
-      );
-    }
-
-    set m00(val) {
-      this.m[0] = val;
-    }
-
-    get m00() {
-      return this.m[0];
-    }
-
-    set m10(val) {
-      this.m[1] = val;
-    }
-
-    get m10() {
-      return this.m[1];
-    }
-
-    set m20(val) {
-      this.m[2] = val;
-    }
-
-    get m20() {
-      return this.m[2];
-    }
-
-    set m30(val) {
-      this.m[3] = val;
-    }
-
-    get m30() {
-      return this.m[3];
-    }
-
-    set m01(val) {
-      this.m[4] = val;
-    }
-
-    get m01() {
-      return this.m[4];
-    }
-
-    set m11(val) {
-      this.m[5] = val;
-    }
-
-    get m11() {
-      return this.m[5];
-    }
-
-    set m21(val) {
-      this.m[6] = val;
-    }
-
-    get m21() {
-      return this.m[6];
-    }
-
-    set m31(val) {
-      this.m[7] = val;
-    }
-
-    get m31() {
-      return this.m[7];
-    }
-
-    set m02(val) {
-      this.m[8] = val;
-    }
-
-    get m02() {
-      return this.m[8];
-    }
-
-    set m12(val) {
-      this.m[9] = val;
-    }
-
-    get m12() {
-      return this.m[9];
-    }
-
-    set m22(val) {
-      this.m[10] = val;
-    }
-
-    get m22() {
-      return this.m[10];
-    }
-
-    set m32(val) {
-      this.m[11] = val;
-    }
-
-    get m32() {
-      return this.m[11];
-    }
-
-    set m03(val) {
-      this.m[12] = val;
-    }
-
-    get m03() {
-      return this.m[12];
-    }
-
-    set m13(val) {
-      this.m[13] = val;
-    }
-
-    get m13() {
-      return this.m[13];
-    }
-
-    set m23(val) {
-      this.m[14] = val;
+    get x()        {
+      return this.v[0];
     }
 
-    get m23() {
-      return this.m[14];
+    set x(x       ) {
+      this.v[0] = x;
     }
 
-    set m33(val) {
-      this.m[15] = val;
+    get y()        {
+      return this.v[1];
     }
 
-    get m33() {
-      return this.m[15];
+    set y(y       ) {
+      this.v[1] = y;
     }
 
-    toString() {
-      return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' +
-        this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' +
-        this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' +
-        this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
+    get z()        {
+      return this.v[2];
     }
 
-    nearZeroToZero(value) {
-      if (Math.abs(value) < 0.00001) {
-        value = 0;
-      } else if (0.99999 < value && value < 1.00001) {
-        value = 1;
-      } else if (-1.00001 < value && value < -0.99999) {
-        value = -1;
-      }
-      return value;
+    set z(z       ) {
+      this.v[2] = z;
     }
 
-    toStringApproximately() {
-      return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' +
-        this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' +
-        this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' +
-        this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+    get w()        {
+      return this.v[3];
     }
 
-    getScale() {
-      return new Vector3(
-        Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
-        Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
-        Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
-      );
+    set w(w       ) {
+      this.v[3] = w;
     }
 
-    getRotate() {
-      const quat = Quaternion.fromMatrix(this);
-      const rotateMat = quat.rotationMatrix;
-      return rotateMat;
+    get raw() {
+      return this.v;
     }
   }
 
-  GLBoost$1["Matrix44"] = Matrix44$1;
+  GLBoost$1["Vector4"] = Vector4$1;
 
   class Matrix33 {
 
@@ -3062,6 +2077,15 @@
             m[2], m[5], m[8]);
         } else {
           this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (!!m && typeof m.m22 !== 'undefined') {
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m.m00, m.m01, m.m02,
+            m.m10, m.m11, m.m12,
+            m.m20, m.m21, m.m22);
+        } else {
+          this.setComponents(m.m00, m.m01, m.m02, m.m10, m.m11, m.m12, m.m20, m.m21, m.m22); // 'm' must be row major array if isColumnMajor is false
         }
       } else {
         this.identity();
@@ -3500,24 +2524,6 @@
         this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + '\n';
     }
 
-    toMatrix44() {
-      return new Matrix44$1(
-        this.m00, this.m01, this.m02, 0,
-        this.m10, this.m11, this.m12, 0,
-        this.m20, this.m21, this.m22, 0,
-        0, 0, 0, 1
-      );
-    }
-
-    static toMatrix44(mat) {
-      return new Matrix44$1(
-        mat.m00, mat.m01, mat.m02, 0,
-        mat.m10, mat.m11, mat.m12, 0,
-        mat.m20, mat.m21, mat.m22, 0,
-        0, 0, 0, 1
-      );
-    }
-
     getScale() {
       return new Vector3(
         Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
@@ -3537,24 +2543,1035 @@
 
   GLBoost$1['Matrix33'] = Matrix33;
 
-  class MathUtil {
+  class Matrix44$1 {
 
+    constructor(m, isColumnMajor = false, notCopyFloat32Array = false
+    ) {
+      if (arguments.length >= 16) {
+        this.m = new Float32Array(16); // Data order is column major
+        if (isColumnMajor === true) {
+          let m = arguments;
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, arguments);  // arguments[0-15] must be row major values if isColumnMajor is false
+        }
+      } else if (Array.isArray(m)) {
+        this.m = new Float32Array(16);
+        if (isColumnMajor === true) {
+          this.setComponents(
+            m[0], m[4], m[8], m[12],
+            m[1], m[5], m[9], m[13],
+            m[2], m[6], m[10], m[14],
+            m[3], m[7], m[11], m[15]);
+        } else {
+          this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+        }
+      } else if (m instanceof Float32Array) {
+        if (notCopyFloat32Array) {
+          this.m = m;
+        } else {
+          this.m = new Float32Array(16);
+          if (isColumnMajor === true) {
+            this.setComponents(
+              m[0], m[4], m[8], m[12],
+              m[1], m[5], m[9], m[13],
+              m[2], m[6], m[10], m[14],
+              m[3], m[7], m[11], m[15]);
+          } else {
+            this.setComponents.apply(this, m); // 'm' must be row major array if isColumnMajor is false
+          }  
+        }
+      } else if (!!m && typeof m.m33 === 'undefined' && typeof m.m22 !== 'undefined') {
+        if (notCopyFloat32Array) {
+          this.m = m.m;
+        } else {
+          this.m = new Float32Array(16);
+          if (isColumnMajor === true) {
+            this.setComponents(
+              m.m00, m.m01, m.m02, 0,
+              m.m10, m.m11, m.m12, 0,
+              m.m20, m.m21, m.m22, 0,
+              0, 0, 0, 1);
+          } else {
+            this.setComponents(m.m00, m.m01, m.m02, 0, m.m10, m.m11, m.m12, 0, m.m20, m.m21, m.m22, 0, 0, 0, 0, 1); // 'm' must be row major array if isColumnMajor is false
+          }  
+        }
+      } else {
+        this.m = new Float32Array(16);
+        this.identity();
+      }
+    }
+
+    setComponents(m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33) {
+      this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
+      this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
+      this.m20 = m20; this.m21 = m21; this.m22 = m22; this.m23 = m23;
+      this.m30 = m30; this.m31 = m31; this.m32 = m32; this.m33 = m33;
+
+      return this;
+    }
+
+    copyComponents(mat4) {
+      //this.m.set(mat4.m);
+      this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
+    }
+
+    get className() {
+      return this.constructor.name;
+    }
+
+    clone() {
+      return new Matrix44$1(
+        this.m[0], this.m[4], this.m[8], this.m[12],
+        this.m[1], this.m[5], this.m[9], this.m[13],
+        this.m[2], this.m[6], this.m[10], this.m[14],
+        this.m[3], this.m[7], this.m[11], this.m[15]
+      );
+    }
+
+    /**
+     * 単位行列にする
+     */
+    identity() {
+      this.setComponents(
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1
+      );
+      return this;
+    }
+
+    /**
+     * 単位行列にする（static版）
+     */
+    static identity() {
+      return new Matrix44$1(
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1
+      );
+    }
+
+    translate(vec) {
+      return this.setComponents(
+        1, 0, 0, vec.x,
+        0, 1, 0, vec.y,
+        0, 0, 1, vec.z,
+        0, 0, 0, 1
+      );
+    }
+
+    putTranslate(vec) {
+      this.m03 = vec.x;
+      this.m13 = vec.y;
+      this.m23 = vec.z;
+    }
+
+    getTranslate() {
+      return new Vector3(this.m03, this.m13, this.m23);
+    }
+
+    static translate(vec) {
+      return new Matrix44$1(
+        1, 0, 0, vec.x,
+        0, 1, 0, vec.y,
+        0, 0, 1, vec.z,
+        0, 0, 0, 1
+      );
+    }
+
+    scale(vec) {
+      return this.setComponents(
+        vec.x, 0, 0, 0,
+        0, vec.y, 0, 0,
+        0, 0, vec.z, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    static scale(vec) {
+      return new Matrix44$1(
+        vec.x, 0, 0, 0,
+        0, vec.y, 0, 0,
+        0, 0, vec.z, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    addScale(vec) {
+      this.m00 *= vec.x;
+      this.m11 *= vec.y;
+      this.m22 *= vec.z;
+
+      return this;
+    }
+
+    /**
+     * Create X oriented Rotation Matrix
+     */
+    rotateX(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        1, 0, 0, 0,
+        0, cos, -sin, 0,
+        0, sin, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create X oriented Rotation Matrix
+    */
+    static rotateX(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        1, 0, 0, 0,
+        0, cos, -sin, 0,
+        0, sin, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    /**
+     * Create Y oriented Rotation Matrix
+     */
+    rotateY(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        cos, 0, sin, 0,
+        0, 1, 0, 0,
+        -sin, 0, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create Y oriented Rotation Matrix
+     */
+    static rotateY(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        cos, 0, sin, 0,
+        0, 1, 0, 0,
+        -sin, 0, cos, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    /**
+     * Create Z oriented Rotation Matrix
+     */
+    rotateZ(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return this.setComponents(
+        cos, -sin, 0, 0,
+        sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+    }
+    /**
+     * Create Z oriented Rotation Matrix
+     */
+    static rotateZ(angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+
+      var cos = Math.cos(radian);
+      var sin = Math.sin(radian);
+      return new Matrix44$1(
+        cos, -sin, 0, 0,
+        sin, cos, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+    }
+
+    static rotateXYZ(x, y, z) {
+      return new Matrix44$1(Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
+    }
+
+    /**
+     * @return Euler Angles Rotation (x, y, z)
+     */
+    toEulerAngles() {
+      let rotate = null;
+      if (Math.abs(this.m20) != 1.0) {
+        let y   = -Math.asin(this.m20);
+        let x  = Math.atan2(this.m21 / Math.cos(y), this.m22 / Math.cos(y));
+        let z = Math.atan2(this.m10 / Math.cos(y), this.m00 / Math.cos(y));
+        rotate = new Vector3(x, y, z);
+      } else if (this.m20 === -1.0) {
+        rotate = new Vector3(Math.atan2(this.m01, this.m02), Math.PI/2.0, 0.0);
+      } else {
+        rotate = new Vector3(Math.atan2(-this.m01, -this.m02), -Math.PI/2.0, 0.0);
+      }
+
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        rotate.x = MathUtil.radianToDegree(rotate.x);
+        rotate.y = MathUtil.radianToDegree(rotate.y);
+        rotate.z = MathUtil.radianToDegree(rotate.z);
+      }
+
+      return rotate;
+    }
+
+    /**
+     * ゼロ行列
+     */
+    zero() {
+      this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      return this;
+    }
+
+    static zero() {
+      return new Matrix44$1(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    flatten() {
+      return this.m;
+    }
+
+    flattenAsArray() {
+      return [this.m[0], this.m[1], this.m[2], this.m[3],
+        this.m[4], this.m[5], this.m[6], this.m[7],
+        this.m[8], this.m[9], this.m[10], this.m[11],
+        this.m[12], this.m[13], this.m[14], this.m[15]];
+    }
+
+    _swap(l, r) {
+      this.m[r] = [this.m[l], this.m[l] = this.m[r]][0]; // Swap
+    }
+
+    /**
+     * 転置
+     */
+    transpose() {
+      this._swap(1, 4);
+      this._swap(2, 8);
+      this._swap(3, 12);
+      this._swap(6, 9);
+      this._swap(7, 13);
+      this._swap(11, 14);
+
+      return this;
+    }
+
+    /**
+     * 転置（static版）
+     */
+    static transpose(mat) {
+
+      var mat_t = new Matrix44$1(
+        mat.m00, mat.m10, mat.m20, mat.m30,
+        mat.m01, mat.m11, mat.m21, mat.m31,
+        mat.m02, mat.m12, mat.m22, mat.m32,
+        mat.m03, mat.m13, mat.m23, mat.m33
+      );
+
+      return mat_t;
+    }
+
+    multiplyVector(vec) {
+      var x = this.m00*vec.x + this.m01*vec.y + this.m02*vec.z + this.m03*vec.w;
+      var y = this.m10*vec.x + this.m11*vec.y + this.m12*vec.z + this.m13*vec.w;
+      var z = this.m20*vec.x + this.m21*vec.y + this.m22*vec.z + this.m23*vec.w;
+      var w = this.m30*vec.x + this.m31*vec.y + this.m32*vec.z + this.m33*vec.w;
+
+      return new Vector4$1(x, y, z, w);
+    }
+
+    /**
+     * 行列同士の乗算
+     */
+    multiply(mat) {
+      var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
+      var m01 = this.m00*mat.m01 + this.m01*mat.m11 + this.m02*mat.m21 + this.m03*mat.m31;
+      var m02 = this.m00*mat.m02 + this.m01*mat.m12 + this.m02*mat.m22 + this.m03*mat.m32;
+      var m03 = this.m00*mat.m03 + this.m01*mat.m13 + this.m02*mat.m23 + this.m03*mat.m33;
+
+      var m10 = this.m10*mat.m00 + this.m11*mat.m10 + this.m12*mat.m20 + this.m13*mat.m30;
+      var m11 = this.m10*mat.m01 + this.m11*mat.m11 + this.m12*mat.m21 + this.m13*mat.m31;
+      var m12 = this.m10*mat.m02 + this.m11*mat.m12 + this.m12*mat.m22 + this.m13*mat.m32;
+      var m13 = this.m10*mat.m03 + this.m11*mat.m13 + this.m12*mat.m23 + this.m13*mat.m33;
+
+      var m20 = this.m20*mat.m00 + this.m21*mat.m10 + this.m22*mat.m20 + this.m23*mat.m30;
+      var m21 = this.m20*mat.m01 + this.m21*mat.m11 + this.m22*mat.m21 + this.m23*mat.m31;
+      var m22 = this.m20*mat.m02 + this.m21*mat.m12 + this.m22*mat.m22 + this.m23*mat.m32;
+      var m23 = this.m20*mat.m03 + this.m21*mat.m13 + this.m22*mat.m23 + this.m23*mat.m33;
+
+      var m30 = this.m30*mat.m00 + this.m31*mat.m10 + this.m32*mat.m20 + this.m33*mat.m30;
+      var m31 = this.m30*mat.m01 + this.m31*mat.m11 + this.m32*mat.m21 + this.m33*mat.m31;
+      var m32 = this.m30*mat.m02 + this.m31*mat.m12 + this.m32*mat.m22 + this.m33*mat.m32;
+      var m33 = this.m30*mat.m03 + this.m31*mat.m13 + this.m32*mat.m23 + this.m33*mat.m33;
+
+      return this.setComponents(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    multiplyByLeft(mat) {
+      var m00 = mat.m00*this.m00 + mat.m01*this.m10 + mat.m02*this.m20 + mat.m03*this.m30;
+      var m01 = mat.m00*this.m01 + mat.m01*this.m11 + mat.m02*this.m21 + mat.m03*this.m31;
+      var m02 = mat.m00*this.m02 + mat.m01*this.m12 + mat.m02*this.m22 + mat.m03*this.m32;
+      var m03 = mat.m00*this.m03 + mat.m01*this.m13 + mat.m02*this.m23 + mat.m03*this.m33;
+
+      var m10 = mat.m10*this.m00 + mat.m11*this.m10 + mat.m12*this.m20 + mat.m13*this.m30;
+      var m11 = mat.m10*this.m01 + mat.m11*this.m11 + mat.m12*this.m21 + mat.m13*this.m31;
+      var m12 = mat.m10*this.m02 + mat.m11*this.m12 + mat.m12*this.m22 + mat.m13*this.m32;
+      var m13 = mat.m10*this.m03 + mat.m11*this.m13 + mat.m12*this.m23 + mat.m13*this.m33;
+
+      var m20 = mat.m20*this.m00 + mat.m21*this.m10 + mat.m22*this.m20 + mat.m23*this.m30;
+      var m21 = mat.m20*this.m01 + mat.m21*this.m11 + mat.m22*this.m21 + mat.m23*this.m31;
+      var m22 = mat.m20*this.m02 + mat.m21*this.m12 + mat.m22*this.m22 + mat.m23*this.m32;
+      var m23 = mat.m20*this.m03 + mat.m21*this.m13 + mat.m22*this.m23 + mat.m23*this.m33;
+
+      var m30 = mat.m30*this.m00 + mat.m31*this.m10 + mat.m32*this.m20 + mat.m33*this.m30;
+      var m31 = mat.m30*this.m01 + mat.m31*this.m11 + mat.m32*this.m21 + mat.m33*this.m31;
+      var m32 = mat.m30*this.m02 + mat.m31*this.m12 + mat.m32*this.m22 + mat.m33*this.m32;
+      var m33 = mat.m30*this.m03 + mat.m31*this.m13 + mat.m32*this.m23 + mat.m33*this.m33;
+
+      return this.setComponents(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    /**
+     * 行列同士の乗算（static版）
+     */
+    static multiply(l_m, r_m) {
+      var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
+      var m10 = l_m.m10*r_m.m00 + l_m.m11*r_m.m10 + l_m.m12*r_m.m20 + l_m.m13*r_m.m30;
+      var m20 = l_m.m20*r_m.m00 + l_m.m21*r_m.m10 + l_m.m22*r_m.m20 + l_m.m23*r_m.m30;
+      var m30 = l_m.m30*r_m.m00 + l_m.m31*r_m.m10 + l_m.m32*r_m.m20 + l_m.m33*r_m.m30;
+
+      var m01 = l_m.m00*r_m.m01 + l_m.m01*r_m.m11 + l_m.m02*r_m.m21 + l_m.m03*r_m.m31;
+      var m11 = l_m.m10*r_m.m01 + l_m.m11*r_m.m11 + l_m.m12*r_m.m21 + l_m.m13*r_m.m31;
+      var m21 = l_m.m20*r_m.m01 + l_m.m21*r_m.m11 + l_m.m22*r_m.m21 + l_m.m23*r_m.m31;
+      var m31 = l_m.m30*r_m.m01 + l_m.m31*r_m.m11 + l_m.m32*r_m.m21 + l_m.m33*r_m.m31;
+
+      var m02 = l_m.m00*r_m.m02 + l_m.m01*r_m.m12 + l_m.m02*r_m.m22 + l_m.m03*r_m.m32;
+      var m12 = l_m.m10*r_m.m02 + l_m.m11*r_m.m12 + l_m.m12*r_m.m22 + l_m.m13*r_m.m32;
+      var m22 = l_m.m20*r_m.m02 + l_m.m21*r_m.m12 + l_m.m22*r_m.m22 + l_m.m23*r_m.m32;
+      var m32 = l_m.m30*r_m.m02 + l_m.m31*r_m.m12 + l_m.m32*r_m.m22 + l_m.m33*r_m.m32;
+
+      var m03 = l_m.m00*r_m.m03 + l_m.m01*r_m.m13 + l_m.m02*r_m.m23 + l_m.m03*r_m.m33;
+      var m13 = l_m.m10*r_m.m03 + l_m.m11*r_m.m13 + l_m.m12*r_m.m23 + l_m.m13*r_m.m33;
+      var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
+      var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
+
+      return new Matrix44$1(
+          m00, m01, m02, m03,
+          m10, m11, m12, m13,
+          m20, m21, m22, m23,
+          m30, m31, m32, m33
+      );
+    }
+
+    determinant() {
+      return this.m00*this.m11*this.m22*this.m33 + this.m00*this.m12*this.m23*this.m31 + this.m00*this.m13*this.m21*this.m32 +
+        this.m01*this.m10*this.m23*this.m32 + this.m01*this.m12*this.m20*this.m33 + this.m01*this.m13*this.m22*this.m30 +
+        this.m02*this.m10*this.m21*this.m33 + this.m02*this.m11*this.m23*this.m30 + this.m02*this.m13*this.m20*this.m31 +
+        this.m03*this.m10*this.m22*this.m31 + this.m03*this.m11*this.m20*this.m32 + this.m03*this.m12*this.m21*this.m30 -
+
+        this.m00*this.m11*this.m23*this.m32 - this.m00*this.m12*this.m21*this.m33 - this.m00*this.m13*this.m22*this.m31 -
+        this.m01*this.m10*this.m22*this.m33 - this.m01*this.m12*this.m23*this.m30 - this.m01*this.m13*this.m20*this.m32 -
+        this.m02*this.m10*this.m23*this.m31 - this.m02*this.m11*this.m20*this.m33 - this.m02*this.m13*this.m21*this.m30 -
+        this.m03*this.m10*this.m21*this.m32 - this.m03*this.m11*this.m22*this.m30 - this.m03*this.m12*this.m20*this.m31;
+    }
+
+    static determinant(mat) {
+      return mat.m00*mat.m11*mat.m22*mat.m33 + mat.m00*mat.m12*mat.m23*mat.m31 + mat.m00*mat.m13*mat.m21*mat.m32 +
+        mat.m01*mat.m10*mat.m23*mat.m32 + mat.m01*mat.m12*mat.m20*mat.m33 + mat.m01*mat.m13*mat.m22*mat.m30 +
+        mat.m02*mat.m10*mat.m21*mat.m33 + mat.m02*mat.m11*mat.m23*mat.m30 + mat.m02*mat.m13*mat.m20*mat.m31 +
+        mat.m03*mat.m10*mat.m22*mat.m31 + mat.m03*mat.m11*mat.m20*mat.m32 + mat.m03*mat.m12*mat.m21*mat.m30 -
+
+        mat.m00*mat.m11*mat.m23*mat.m32 - mat.m00*mat.m12*mat.m21*mat.m33 - mat.m00*mat.m13*mat.m22*mat.m31 -
+        mat.m01*mat.m10*mat.m22*mat.m33 - mat.m01*mat.m12*mat.m23*mat.m30 - mat.m01*mat.m13*mat.m20*mat.m32 -
+        mat.m02*mat.m10*mat.m23*mat.m31 - mat.m02*mat.m11*mat.m20*mat.m33 - mat.m02*mat.m13*mat.m21*mat.m30 -
+        mat.m03*mat.m10*mat.m21*mat.m32 - mat.m03*mat.m11*mat.m22*mat.m30 - mat.m03*mat.m12*mat.m20*mat.m31;
+    }
+
+    invert() {
+      var det = this.determinant();
+      var m00 = (this.m11*this.m22*this.m33 + this.m12*this.m23*this.m31 + this.m13*this.m21*this.m32 - this.m11*this.m23*this.m32 - this.m12*this.m21*this.m33 - this.m13*this.m22*this.m31) / det;
+      var m01 = (this.m01*this.m23*this.m32 + this.m02*this.m21*this.m33 + this.m03*this.m22*this.m31 - this.m01*this.m22*this.m33 - this.m02*this.m23*this.m31 - this.m03*this.m21*this.m32) / det;
+      var m02 = (this.m01*this.m12*this.m33 + this.m02*this.m13*this.m31 + this.m03*this.m11*this.m32 - this.m01*this.m13*this.m32 - this.m02*this.m11*this.m33 - this.m03*this.m12*this.m31) / det;
+      var m03 = (this.m01*this.m13*this.m22 + this.m02*this.m11*this.m23 + this.m03*this.m12*this.m21 - this.m01*this.m12*this.m23 - this.m02*this.m13*this.m21 - this.m03*this.m11*this.m22) / det;
+      var m10 = (this.m10*this.m23*this.m32 + this.m12*this.m20*this.m33 + this.m13*this.m22*this.m30 - this.m10*this.m22*this.m33 - this.m12*this.m23*this.m30 - this.m13*this.m20*this.m32) / det;
+      var m11 = (this.m00*this.m22*this.m33 + this.m02*this.m23*this.m30 + this.m03*this.m20*this.m32 - this.m00*this.m23*this.m32 - this.m02*this.m20*this.m33 - this.m03*this.m22*this.m30) / det;
+      var m12 = (this.m00*this.m13*this.m32 + this.m02*this.m10*this.m33 + this.m03*this.m12*this.m30 - this.m00*this.m12*this.m33 - this.m02*this.m13*this.m30 - this.m03*this.m10*this.m32) / det;
+      var m13 = (this.m00*this.m12*this.m23 + this.m02*this.m13*this.m20 + this.m03*this.m10*this.m22 - this.m00*this.m13*this.m22 - this.m02*this.m10*this.m23 - this.m03*this.m12*this.m20) / det;
+      var m20 = (this.m10*this.m21*this.m33 + this.m11*this.m23*this.m30 + this.m13*this.m20*this.m31 - this.m10*this.m23*this.m31 - this.m11*this.m20*this.m33 - this.m13*this.m21*this.m30) / det;
+      var m21 = (this.m00*this.m23*this.m31 + this.m01*this.m20*this.m33 + this.m03*this.m21*this.m30 - this.m00*this.m21*this.m33 - this.m01*this.m23*this.m30 - this.m03*this.m20*this.m31) / det;
+      var m22 = (this.m00*this.m11*this.m33 + this.m01*this.m13*this.m30 + this.m03*this.m10*this.m31 - this.m00*this.m13*this.m31 - this.m01*this.m10*this.m33 - this.m03*this.m11*this.m30) / det;
+      var m23 = (this.m00*this.m13*this.m21 + this.m01*this.m10*this.m23 + this.m03*this.m11*this.m20 - this.m00*this.m11*this.m23 - this.m01*this.m13*this.m20 - this.m03*this.m10*this.m21) / det;
+      var m30 = (this.m10*this.m22*this.m31 + this.m11*this.m20*this.m32 + this.m12*this.m21*this.m30 - this.m10*this.m21*this.m32 - this.m11*this.m22*this.m30 - this.m12*this.m20*this.m31) / det;
+      var m31 = (this.m00*this.m21*this.m32 + this.m01*this.m22*this.m30 + this.m02*this.m20*this.m31 - this.m00*this.m22*this.m31 - this.m01*this.m20*this.m32 - this.m02*this.m21*this.m30) / det;
+      var m32 = (this.m00*this.m12*this.m31 + this.m01*this.m10*this.m32 + this.m02*this.m11*this.m30 - this.m00*this.m11*this.m32 - this.m01*this.m12*this.m30 - this.m02*this.m10*this.m31) / det;
+      var m33 = (this.m00*this.m11*this.m22 + this.m01*this.m12*this.m20 + this.m02*this.m10*this.m21 - this.m00*this.m12*this.m21 - this.m01*this.m10*this.m22 - this.m02*this.m11*this.m20) / det;
+
+      return this.setComponents(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+      );
+    }
+
+    static invert(mat) {
+      var det = mat.determinant();
+      var m00 = (mat.m11*mat.m22*mat.m33 + mat.m12*mat.m23*mat.m31 + mat.m13*mat.m21*mat.m32 - mat.m11*mat.m23*mat.m32 - mat.m12*mat.m21*mat.m33 - mat.m13*mat.m22*mat.m31) / det;
+      var m01 = (mat.m01*mat.m23*mat.m32 + mat.m02*mat.m21*mat.m33 + mat.m03*mat.m22*mat.m31 - mat.m01*mat.m22*mat.m33 - mat.m02*mat.m23*mat.m31 - mat.m03*mat.m21*mat.m32) / det;
+      var m02 = (mat.m01*mat.m12*mat.m33 + mat.m02*mat.m13*mat.m31 + mat.m03*mat.m11*mat.m32 - mat.m01*mat.m13*mat.m32 - mat.m02*mat.m11*mat.m33 - mat.m03*mat.m12*mat.m31) / det;
+      var m03 = (mat.m01*mat.m13*mat.m22 + mat.m02*mat.m11*mat.m23 + mat.m03*mat.m12*mat.m21 - mat.m01*mat.m12*mat.m23 - mat.m02*mat.m13*mat.m21 - mat.m03*mat.m11*mat.m22) / det;
+      var m10 = (mat.m10*mat.m23*mat.m32 + mat.m12*mat.m20*mat.m33 + mat.m13*mat.m22*mat.m30 - mat.m10*mat.m22*mat.m33 - mat.m12*mat.m23*mat.m30 - mat.m13*mat.m20*mat.m32) / det;
+      var m11 = (mat.m00*mat.m22*mat.m33 + mat.m02*mat.m23*mat.m30 + mat.m03*mat.m20*mat.m32 - mat.m00*mat.m23*mat.m32 - mat.m02*mat.m20*mat.m33 - mat.m03*mat.m22*mat.m30) / det;
+      var m12 = (mat.m00*mat.m13*mat.m32 + mat.m02*mat.m10*mat.m33 + mat.m03*mat.m12*mat.m30 - mat.m00*mat.m12*mat.m33 - mat.m02*mat.m13*mat.m30 - mat.m03*mat.m10*mat.m32) / det;
+      var m13 = (mat.m00*mat.m12*mat.m23 + mat.m02*mat.m13*mat.m20 + mat.m03*mat.m10*mat.m22 - mat.m00*mat.m13*mat.m22 - mat.m02*mat.m10*mat.m23 - mat.m03*mat.m12*mat.m20) / det;
+      var m20 = (mat.m10*mat.m21*mat.m33 + mat.m11*mat.m23*mat.m30 + mat.m13*mat.m20*mat.m31 - mat.m10*mat.m23*mat.m31 - mat.m11*mat.m20*mat.m33 - mat.m13*mat.m21*mat.m30) / det;
+      var m21 = (mat.m00*mat.m23*mat.m31 + mat.m01*mat.m20*mat.m33 + mat.m03*mat.m21*mat.m30 - mat.m00*mat.m21*mat.m33 - mat.m01*mat.m23*mat.m30 - mat.m03*mat.m20*mat.m31) / det;
+      var m22 = (mat.m00*mat.m11*mat.m33 + mat.m01*mat.m13*mat.m30 + mat.m03*mat.m10*mat.m31 - mat.m00*mat.m13*mat.m31 - mat.m01*mat.m10*mat.m33 - mat.m03*mat.m11*mat.m30) / det;
+      var m23 = (mat.m00*mat.m13*mat.m21 + mat.m01*mat.m10*mat.m23 + mat.m03*mat.m11*mat.m20 - mat.m00*mat.m11*mat.m23 - mat.m01*mat.m13*mat.m20 - mat.m03*mat.m10*mat.m21) / det;
+      var m30 = (mat.m10*mat.m22*mat.m31 + mat.m11*mat.m20*mat.m32 + mat.m12*mat.m21*mat.m30 - mat.m10*mat.m21*mat.m32 - mat.m11*mat.m22*mat.m30 - mat.m12*mat.m20*mat.m31) / det;
+      var m31 = (mat.m00*mat.m21*mat.m32 + mat.m01*mat.m22*mat.m30 + mat.m02*mat.m20*mat.m31 - mat.m00*mat.m22*mat.m31 - mat.m01*mat.m20*mat.m32 - mat.m02*mat.m21*mat.m30) / det;
+      var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
+      var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
+
+      return new Matrix44$1(
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+      );
+    }
+
+    set m00(val) {
+      this.m[0] = val;
+    }
+
+    get m00() {
+      return this.m[0];
+    }
+
+    set m10(val) {
+      this.m[1] = val;
+    }
+
+    get m10() {
+      return this.m[1];
+    }
+
+    set m20(val) {
+      this.m[2] = val;
+    }
+
+    get m20() {
+      return this.m[2];
+    }
+
+    set m30(val) {
+      this.m[3] = val;
+    }
+
+    get m30() {
+      return this.m[3];
+    }
+
+    set m01(val) {
+      this.m[4] = val;
+    }
+
+    get m01() {
+      return this.m[4];
+    }
+
+    set m11(val) {
+      this.m[5] = val;
+    }
+
+    get m11() {
+      return this.m[5];
+    }
+
+    set m21(val) {
+      this.m[6] = val;
+    }
+
+    get m21() {
+      return this.m[6];
+    }
+
+    set m31(val) {
+      this.m[7] = val;
+    }
+
+    get m31() {
+      return this.m[7];
+    }
+
+    set m02(val) {
+      this.m[8] = val;
+    }
+
+    get m02() {
+      return this.m[8];
+    }
+
+    set m12(val) {
+      this.m[9] = val;
+    }
+
+    get m12() {
+      return this.m[9];
+    }
+
+    set m22(val) {
+      this.m[10] = val;
+    }
+
+    get m22() {
+      return this.m[10];
+    }
+
+    set m32(val) {
+      this.m[11] = val;
+    }
+
+    get m32() {
+      return this.m[11];
+    }
+
+    set m03(val) {
+      this.m[12] = val;
+    }
+
+    get m03() {
+      return this.m[12];
+    }
+
+    set m13(val) {
+      this.m[13] = val;
+    }
+
+    get m13() {
+      return this.m[13];
+    }
+
+    set m23(val) {
+      this.m[14] = val;
+    }
+
+    get m23() {
+      return this.m[14];
+    }
+
+    set m33(val) {
+      this.m[15] = val;
+    }
+
+    get m33() {
+      return this.m[15];
+    }
+
+    toString() {
+      return this.m00 + ' ' + this.m01 + ' ' + this.m02 + ' ' + this.m03 + ' \n' +
+        this.m10 + ' ' + this.m11 + ' ' + this.m12 + ' ' + this.m13 + ' \n' +
+        this.m20 + ' ' + this.m21 + ' ' + this.m22 + ' ' + this.m23 + ' \n' +
+        this.m30 + ' ' + this.m31 + ' ' + this.m32 + ' ' + this.m33 + ' \n';
+    }
+
+    nearZeroToZero(value) {
+      if (Math.abs(value) < 0.00001) {
+        value = 0;
+      } else if (0.99999 < value && value < 1.00001) {
+        value = 1;
+      } else if (-1.00001 < value && value < -0.99999) {
+        value = -1;
+      }
+      return value;
+    }
+
+    toStringApproximately() {
+      return this.nearZeroToZero(this.m00) + ' ' + this.nearZeroToZero(this.m01) + ' ' + this.nearZeroToZero(this.m02) + ' ' + this.nearZeroToZero(this.m03) + ' \n' +
+        this.nearZeroToZero(this.m10) + ' ' + this.nearZeroToZero(this.m11) + ' ' + this.nearZeroToZero(this.m12) + ' ' + this.nearZeroToZero(this.m13) + ' \n' +
+        this.nearZeroToZero(this.m20) + ' ' + this.nearZeroToZero(this.m21) + ' ' + this.nearZeroToZero(this.m22) + ' ' + this.nearZeroToZero(this.m23) + ' \n' +
+        this.nearZeroToZero(this.m30) + ' ' + this.nearZeroToZero(this.m31) + ' ' + this.nearZeroToZero(this.m32) + ' ' + this.nearZeroToZero(this.m33) + ' \n';
+    }
+
+    getScale() {
+      return new Vector3(
+        Math.sqrt(this.m00 * this.m00 + this.m01 * this.m01 + this.m02 * this.m02),
+        Math.sqrt(this.m10 * this.m10 + this.m11 * this.m11 + this.m12 * this.m12),
+        Math.sqrt(this.m20 * this.m20 + this.m21 * this.m21 + this.m22 * this.m22)
+      );
+    }
+
+    getRotate() {
+      const quat = Quaternion.fromMatrix(this);
+      const rotateMat = quat.rotationMatrix;
+      return rotateMat;
+    }
+  }
+
+  GLBoost$1["Matrix44"] = Matrix44$1;
+
+  class Quaternion {
+
+    constructor(x, y, z, w) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.w = w;
+    }
+
+    isEqual(vec) {
+      if (this.x === vec.x && this.y === vec.y && this.z === vec.z && this.w === vec.w) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    get className() {
+      return this.constructor.name;
+    }
+
+    clone() {
+      return new Quaternion(this.x, this.y, this.z, this.w);
+    }
+
+    static invert(quat) {
+      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    }
+
+    static qlerp(lhq, rhq, ratio) {
+
+      var q = new Quaternion(0, 0, 0, 1);
+      var qr = lhq.w * rhq.w + lhq.x * rhq.x + lhq.y * rhq.y + lhq.z * rhq.z;
+      var ss = 1.0 - qr * qr;
+
+      if (ss === 0.0) {
+        q.w = lhq.w;
+        q.x = lhq.x;
+        q.y = lhq.y;
+        q.z = lhq.z;
+
+        return q;
+      } else {
+
+        if (qr > 1) {
+          qr = 0.999;
+        } else if (qr < -1) {
+          qr = -0.999;
+        }
+
+        let ph = Math.acos(qr);
+        let s2;
+        if(qr < 0.0 && ph > Math.PI / 2.0){
+          qr = - lhq.w * rhq.w - lhq.x * rhq.x - lhq.y * rhq.y - lhq.z * rhq.z;
+          ph = Math.acos(qr);
+          s2 = -1 * Math.sin(ph * ratio) / Math.sin(ph);
+        } else {
+          s2 = Math.sin(ph * ratio) / Math.sin(ph);
+        }
+        let s1 = Math.sin(ph * (1.0 - ratio)) / Math.sin(ph);
+
+        q.x = lhq.x * s1 + rhq.x * s2;
+        q.y = lhq.y * s1 + rhq.y * s2;
+        q.z = lhq.z * s1 + rhq.z * s2;
+        q.w = lhq.w * s1 + rhq.w * s2;
+
+        return q;
+      }
+    }
+
+    get rotationMatrix() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix44$1(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy), 0.0,
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx), 0.0,
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy), 0.0,
+        0.0, 0.0, 0.0, 1.0
+      );
+    }
+
+    get rotationMatrix33() {
+      var sx = this.x * this.x;
+      var sy = this.y * this.y;
+      var sz = this.z * this.z;
+      var cx = this.y * this.z;
+      var cy = this.x * this.z;
+      var cz = this.x * this.y;
+      var wx = this.w * this.x;
+      var wy = this.w * this.y;
+      var wz = this.w * this.z;
+
+      return new Matrix33(
+        1.0 - 2.0 * (sy + sz), 2.0 * (cz - wz), 2.0 * (cy + wy),
+        2.0 * (cz + wz), 1.0 - 2.0 * (sx + sz), 2.0 * (cx - wx),
+        2.0 * (cy - wy), 2.0 * (cx + wx), 1.0 - 2.0 * (sx + sy)
+      );
+    }
+
+    axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      this.w = Math.cos(halfAngle);
+      this.x = sin * axis.x;
+      this.y = sin * axis.y;
+      this.z = sin * axis.z;
+
+      return this;
+    }
+
+    static axisAngle(axisVec3, angle) {
+      var radian = 0;
+      if (GLBoost$1["VALUE_ANGLE_UNIT"] === GLBoost$1.DEGREE) {
+        radian = MathUtil.degreeToRadian(angle);
+      } else {
+        radian = angle;
+      }
+      var halfAngle = 0.5 * radian;
+      var sin = Math.sin(halfAngle);
+
+      var axis = Vector3.normalize(axisVec3);
+      return new Quaternion(
+        sin * axis.x,
+        sin * axis.y,
+        sin * axis.z,
+        Math.cos(halfAngle));
+    }
+
+    add(q) {
+      this.x += q.x;
+      this.y += q.y;
+      this.z += q.z;
+      this.w += q.w;
+
+      return this;
+    }
+
+    multiply(q) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
+      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
+      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
+      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+      this.x = result.x;
+      this.y = result.y;
+      this.z = result.z;
+      this.w = result.w;
+      
+      return this;
+    }
+
+    static multiply(q1, q2) {
+      let result = new Quaternion(0, 0, 0, 1);
+      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
+      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
+      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
+      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+      return result;
+    }
+
+    static fromMatrix(m) {
+      
+      let q = new Quaternion();
+      let tr = m.m00 + m.m11 + m.m22;
+
+      if (tr > 0) { 
+        let S = 0.5 / Math.sqrt(tr+1.0);
+        q.w = 0.25 / S;
+        q.x = (m.m21 - m.m12) * S;
+        q.y = (m.m02 - m.m20) * S; 
+        q.z = (m.m10 - m.m01) * S; 
+      } else if ((m.m00 > m.m11) && (m.m00 > m.m22)) { 
+        let S = Math.sqrt(1.0 + m.m00 - m.m11 - m.m22) * 2;
+        q.w = (m.m21 - m.m12) / S;
+        q.x = 0.25 * S;
+        q.y = (m.m01 + m.m10) / S; 
+        q.z = (m.m02 + m.m20) / S; 
+      } else if (m.m11 > m.m22) { 
+        let S = Math.sqrt(1.0 + m.m11 - m.m00 - m.m22) * 2;
+        q.w = (m.m02 - m.m20) / S;
+        q.x = (m.m01 + m.m10) / S; 
+        q.y = 0.25 * S;
+        q.z = (m.m12 + m.m21) / S; 
+      } else { 
+        let S = Math.sqrt(1.0 + m.m22 - m.m00 - m.m11) * 2;
+        q.w = (m.m10 - m.m01) / S;
+        q.x = (m.m02 + m.m20) / S;
+        q.y = (m.m12 + m.m21) / S;
+        q.z = 0.25 * S;
+      }
+
+      return q;
+    }
+  /*
+    static fromMatrix(m) {
+      let fTrace = m.m[0] + m.m[4] + m.m[8];
+      let fRoot;
+      let q = new Quaternion();
+      if ( fTrace > 0.0 ) {
+        // |w| > 1/2, may as well choose w > 1/2
+        fRoot = Math.sqrt(fTrace + 1.0);  // 2w
+        q.w = 0.5 * fRoot;
+        fRoot = 0.5/fRoot;  // 1/(4w)
+        q.x = (m.m[5]-m.m[7])*fRoot;
+        q.y = (m.m[6]-m.m[2])*fRoot;
+        q.z = (m.m[1]-m.m[3])*fRoot;
+      } else {
+        // |w| <= 1/2
+        let i = 0;
+        if ( m.m[4] > m.m[0] )
+          i = 1;
+        if ( m.m[8] > m.m[i*3+i] )
+          i = 2;
+        let j = (i+1)%3;
+        let k = (i+2)%3;
+        fRoot = Math.sqrt(m.m[i*3+i]-m.m[j*3+j]-m.m[k*3+k] + 1.0);
+        
+        let setValue = function(q, i, value) {
+          switch (i) {
+            case 0: q.x = value; break;
+            case 1: q.y = value; break;
+            case 2: q.z = value; break;
+          }
+        }
+
+        setValue(q, i, 0.5 * fRoot); //      q[i] = 0.5 * fRoot;
+        fRoot = 0.5 / fRoot;
+        q.w = (m.m[j*3+k] - m.m[k*3+j]) * fRoot;
+
+        setValue(q, j, (m.m[j*3+i] + m.m[i*3+j]) * fRoot); //      q[j] = (m.m[j*3+i] + m.m[i*3+j]) * fRoot;
+        setValue(q, k, (m.m[k*3+i] + m.m[i*3+k]) * fRoot); //      q[k] = (m.m[k*3+i] + m.m[i*3+k]) * fRoot;
+      }
+
+      return q;
+    }
+  */
+
+    static fromPosition(vec3) {
+      let q = new Quaternion(vec3.x, vec3.y, vec3.z, 0);
+      return q;
+    }
+
+    at(i) {
+      switch (i%4) {
+      case 0: return this.x;
+      case 1: return this.y;
+      case 2: return this.z;
+      case 3: return this.w;
+      }
+    }
+
+    setAt(i, val) {
+      switch (i%4) {
+      case 0: this.x = val; break;
+      case 1: this.y = val; break;
+      case 2: this.z = val; break;
+      case 3: this.w = val; break;
+      }
+    }
+
+    normalize() {
+      let norm = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+      this.x /= norm;
+      this.y /= norm;
+      this.z /= norm;
+      this.w /= norm;
+      return this;
+    }
+
+    toString() {
+      return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
+    }
+  }
+
+  GLBoost$1["Quaternion"] = Quaternion;
+
+  class MathClassUtil {
     constructor() {
 
     }
 
-    static radianToDegree(rad) {
-      return rad * 180 / Math.PI;
-    }
-
-    static degreeToRadian(deg) {
-      return deg * Math.PI / 180;
-    }
 
     static arrayToVector(element) {
       if (Array.isArray(element)) {
         if(typeof(element[3]) !== 'undefined') {
-          return new Vector4(element[0], element[1], element[2], element[3]);
+          return new Vector4$1(element[0], element[1], element[2], element[3]);
         } else if (typeof(element[2]) !== 'undefined') {
           return new Vector3(element[0], element[1], element[2]);
         } else {
@@ -3572,7 +3589,7 @@
         } else if(typeof(element[8]) !== 'undefined') {
           return new Matrix33(element);
         } else if(typeof(element[3]) !== 'undefined') {
-          return new Vector4(element[0], element[1], element[2], element[3]);
+          return new Vector4$1(element[0], element[1], element[2], element[3]);
         } else if (typeof(element[2]) !== 'undefined') {
           return new Vector3(element[0], element[1], element[2]);
         } else {
@@ -3588,7 +3605,7 @@
         return element.clone();
       } else if (element instanceof Matrix33) {
         return element.clone();
-      } else if (element instanceof Vector4) {
+      } else if (element instanceof Vector4$1) {
         return element.clone();
       } else if (element instanceof Vector3) {
         return element.clone();
@@ -3627,7 +3644,7 @@
         return [element.x, element.y];
       } else if (element instanceof Vector3) {
         return [element.x, element.y, element.z];
-      } else if (element instanceof Vector4 || element instanceof Quaternion) {
+      } else if (element instanceof Vector4$1 || element instanceof Quaternion) {
         return [element.x, element.y, element.z, element.w];
       } else {
         return element;
@@ -3639,7 +3656,7 @@
         return 2;
       } else if (element instanceof Vector3) {
         return 3;
-      } else if (element instanceof Vector4 || element instanceof Quaternion) {
+      } else if (element instanceof Vector4$1 || element instanceof Quaternion) {
         return 4;
       } else if (Array.isArray(element)) {
         return element.length;
@@ -3672,7 +3689,7 @@
     }
 
     static unProject(windowPosVec3, inversePVMat44, viewportVec4, zNear, zFar) {
-      const input = new Vector4(
+      const input = new Vector4$1(
         (windowPosVec3.x - viewportVec4.x) / viewportVec4.z * 2 - 1.0,
         (windowPosVec3.y - viewportVec4.y) / viewportVec4.w * 2 - 1.0,
   //      (windowPosVec3.z - zNear) / (zFar - zNear),
@@ -3690,13 +3707,13 @@
         console.warn("Zero division!");
       }
 
-      const output = out.multiply(1/out.w).toVector3();
+      const output = new Vector3(out.multiply(1/out.w));
 
       return output;
     }
   }
 
-  GLBoost$1["MathUtil"] = MathUtil;
+  GLBoost$1["MathClassUtil"] = MathClassUtil;
 
   class AnimationUtil {
 
@@ -3828,7 +3845,7 @@
         outputComponentN = 2;
       } else if (outputArray[0] instanceof Vector3) {
         outputComponentN = 3;
-      } else if (outputArray[0] instanceof Vector4) {
+      } else if (outputArray[0] instanceof Vector4$1) {
         outputComponentN = 4;
       } else if (outputArray[0] instanceof Quaternion) {
         outputComponentN = 4;
@@ -4204,7 +4221,7 @@
     }
 
     get normalMatrix() {
-      return Matrix44$1.invert(this.transformMatrix).transpose().toMatrix33();
+      return new Matrix33(Matrix44$1.invert(this.transformMatrix).transpose());
     }
 
     __updateTransform() {
@@ -4318,9 +4335,9 @@
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.arrayToQuaternion(json[key]);
+            this[key] = MathClassUtil.arrayToQuaternion(json[key]);
           } else {
-            this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+            this[key] = MathClassUtil.arrayToVectorOrMatrix(json[key]);
           }
         }
       }
@@ -4512,7 +4529,7 @@
       //console.log(tempNumber);
       if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
         let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-        this._normalMatrix = Matrix44$1.invert(world_m).transpose().toMatrix33();
+        this._normalMatrix = new Matrix33(Matrix44$1.invert(world_m).transpose());
         this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
       }
 
@@ -5995,9 +6012,9 @@
           lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
           
           if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-            let cameraPos = new Vector4(0, 0, 1, 1);
+            let cameraPos = new Vector4$1(0, 0, 1, 1);
             if (camera) {
-              cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+              cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4$1(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
             //  console.log(cameraPos);
             }
             material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
@@ -6006,8 +6023,8 @@
           for (let j = 0; j < lights.length; j++) {
             let light = lights[j];
             if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-              let lightPosition = new Vector4(0, 0, 0, 1);            
-              let lightDirection = new Vector4(0, 0, 0, 1);
+              let lightPosition = new Vector4$1(0, 0, 0, 1);            
+              let lightDirection = new Vector4$1(0, 0, 0, 1);
               let lightIntensity = light.intensity;
               if (!light.isVisible) {
                 lightIntensity = Vector3.zero();
@@ -6846,22 +6863,22 @@ return mat4(
        }
       var newAabb = new AABB();
 
-      let AABB_0 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-      let AABB_1 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
-      let AABB_2 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-      let AABB_3 = new Vector4(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-      let AABB_4 = new Vector4(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-      let AABB_5 = new Vector4(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
-      let AABB_6 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
-      let AABB_7 = new Vector4(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
-      newAabb.addPosition(matrix.multiplyVector(AABB_0).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_1).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_2).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_3).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_4).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_5).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_6).toVector3());
-      newAabb.addPosition(matrix.multiplyVector(AABB_7).toVector3());
+      let AABB_0 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+      let AABB_1 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_min.z, 1);
+      let AABB_2 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+      let AABB_3 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+      let AABB_4 = new Vector4$1(aabb._AABB_min.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+      let AABB_5 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_min.y, aabb._AABB_max.z, 1);
+      let AABB_6 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_min.z, 1);
+      let AABB_7 = new Vector4$1(aabb._AABB_max.x, aabb._AABB_max.y, aabb._AABB_max.z, 1);
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_0)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_1)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_2)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_3)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_4)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_5)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_6)));
+      newAabb.addPosition(new Vector3(matrix.multiplyVector(AABB_7)));
       newAabb.updateAllInfo();
 
       return newAabb;
@@ -6988,7 +7005,7 @@ return mat4(
           this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, true);
         } else if (value instanceof Vector3) {
           this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, true);
-        } else if (value instanceof Vector4) {
+        } else if (value instanceof Vector4$1) {
           this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + uniformName), value.x, value.y, value.z, value.w, true);
         }
       }
@@ -7002,7 +7019,7 @@ return mat4(
           this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, true);
         } else if (value instanceof Vector3) {
           this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, true);
-        } else if (value instanceof Vector4) {
+        } else if (value instanceof Vector4$1) {
           this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_' + parameterName), value.x, value.y, value.z, value.w, true);
         }
       }
@@ -7052,7 +7069,7 @@ return mat4(
     _checkAndSetVertexComponentNumber(allVertexAttribs) {
       allVertexAttribs.forEach((attribName)=> {
         let element = this._vertices[attribName][0];
-        let componentN = MathUtil.compomentNumberOfVector(element);
+        let componentN = MathClassUtil.compomentNumberOfVector(element);
         if (componentN === 0) {
           // if 0, it must be a number. so users must set components info.
           return;
@@ -7311,7 +7328,7 @@ return mat4(
         let vertexAttribArray = [];
         this._vertices[attribName].forEach((elem, index) => {
           let element = this._vertices[attribName][index];
-          Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
         });
         this._vertices[attribName] = vertexAttribArray;
 
@@ -7353,7 +7370,7 @@ return mat4(
         let vertexAttribArray = [];
         this._vertices[attribName].forEach((elem, index) => {
           let element = vertices[attribName][index];
-          Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+          Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
 
           if (attribName === 'position' && !(skipUpdateAABB === true)) {
             let componentN = this._vertices.components[attribName];
@@ -8024,7 +8041,7 @@ return mat4(
       this._vertices.faceNormal = [];
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
-          for (let i=0; i<this._vertexN; i+=incrementNum) {
+          for (let i=0; i<this._vertexN-2; i+=incrementNum) {
             let pos0IndexBase = i * positionElementNumPerVertex;
             let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -8035,7 +8052,7 @@ return mat4(
         } else {
           for (let i=0; i<this._indicesArray.length; i++) {
             let vertexIndices = this._indicesArray[i];
-            for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+            for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
               let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
               let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
               let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
@@ -8396,7 +8413,7 @@ return mat4(
       this._textureUnitIndex = 0;
 
       // x,y are uv scale, zw are uv transform. calculation is applied as first scale, second transform
-      this._uvTransform = new Vector4(1, 1, 0, 0);
+      this._uvTransform = new Vector4$1(1, 1, 0, 0);
 
       this._toMultiplyAlphaToColorPreviously = false; // same result when UNPACK_PREMULTIPLY_ALPHA_WEBGL is true
     }
@@ -8486,7 +8503,7 @@ return mat4(
         byteArray = this.getTexturePixelData();
       }
 
-      let color = new Vector4(
+      let color = new Vector4$1(
         byteArray[(y*this.width + x) * 4+0],
         byteArray[(y*this.width + x) * 4+1],
         byteArray[(y*this.width + x) * 4+2],
@@ -9231,10 +9248,10 @@ return mat4(
       this._texturePurposeDic = [];
       this._textureContributionRateDic = {};
       this._gl = this._glContext.gl;
-      this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-      this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
-      this._ambientColor = new Vector4(0.25, 0.25, 0.25, 1.0);
+      this._baseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+      this._diffuseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+      this._specularColor = new Vector4$1(0.5, 0.5, 0.5, 1.0);
+      this._ambientColor = new Vector4$1(0.25, 0.25, 0.25, 1.0);
       this._name = '';
       this._shaderClass = DecalShader;
       this._shaderInstance = null;
@@ -9329,7 +9346,7 @@ return mat4(
       let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       this._texturePurposeDic[_purpose] = texture.userFlavorName;
       texture.purpose = _purpose;
-      this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+      this._textureContributionRateDic[texture.userFlavorName] = new Vector4$1(1.0, 1.0, 1.0, 1.0);
       this._updateCount();
     }
 
@@ -9862,9 +9879,9 @@ return mat4(
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
           } else {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
           }
         }
       }
@@ -10797,9 +10814,9 @@ return mat4(
       let newUpVec = null;
       if (camera instanceof M_AbstractCamera) {
         let mat = camera.inverseWorldMatrixWithoutMySelf;
-        newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
-        newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
-        newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+        newEyeVec = new Vector3(mat.multiplyVector(new Vector4$1(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)));
+        newCenterVec = new Vector3(mat.multiplyVector(new Vector4$1(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)));
+        newUpVec = new Vector3(mat.multiplyVector(new Vector4$1(upVec.x, upVec.y, upVec.z, 1)));
       } else {
         newUpVec = upVec;
       }
@@ -10942,9 +10959,9 @@ return mat4(
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
           } else {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
           }
         }
       }
@@ -11237,9 +11254,9 @@ return mat4(
       for(let key in json) {
         if(json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
           } else {
-            this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
           }
         }
       }
@@ -11740,8 +11757,8 @@ return mat4(
       super(glBoostContext);
 
       // if array, convert to vector[2/3/4]
-      widthVector = MathUtil.arrayToVector(widthVector);
-      vertexColor = MathUtil.arrayToVector(vertexColor);
+      widthVector = MathClassUtil.arrayToVector(widthVector);
+      vertexColor = MathClassUtil.arrayToVector(vertexColor);
 
       this._setupVertexData(widthVector.divide(2.0), vertexColor);
     }
@@ -11790,35 +11807,35 @@ return mat4(
         new Vector3(-widthVector.x, widthVector.y, -widthVector.z)
       ];
       var colors = [
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-        new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+        new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
       ];
       var texcoords = [
         new Vector2(0.0, 0.0),
@@ -11958,7 +11975,7 @@ return mat4(
       }
 
       var colors = [];
-      var vertexColor = new Vector4(1, 1, 1, 1);
+      var vertexColor = new Vector4$1(1, 1, 1, 1);
       for(let i=0; i<=vSpan; i++) {
         for(let j=0; j<=uSpan; j++) {
           colors.push(vertexColor);
@@ -12019,7 +12036,7 @@ return mat4(
       var normals = [];
 
       if (!vertexColor) {
-        vertexColor = new Vector4(1, 1, 1, 1);
+        vertexColor = new Vector4$1(1, 1, 1, 1);
       }
 
       let shiftValue = 0.00001; // for avoid Singular point
@@ -12112,16 +12129,16 @@ return mat4(
 
       let colors = [
         // X Axis
-        new Vector4(1, 0, 0, 1),
-        new Vector4(1, 0, 0, 1),
+        new Vector4$1(1, 0, 0, 1),
+        new Vector4$1(1, 0, 0, 1),
 
         // Y Axis
-        new Vector4(0, 1, 0, 1),
-        new Vector4(0, 1, 0, 1),
+        new Vector4$1(0, 1, 0, 1),
+        new Vector4$1(0, 1, 0, 1),
 
         // Z Axis
-        new Vector4(0, 0, 1, 1),
-        new Vector4(0, 0, 1, 1),
+        new Vector4$1(0, 0, 1, 1),
+        new Vector4$1(0, 0, 1, 1),
       ];
 
       this.setVerticesData({
@@ -12218,7 +12235,7 @@ return mat4(
 
       // if array, convert to vector[2/3/4]
       for (let i=0; i<positionArray.length; i++) {
-        positionArray[i] = MathUtil.arrayToVector(positionArray[i]);
+        positionArray[i] = MathClassUtil.arrayToVector(positionArray[i]);
       }
 
       for (let i=0; i<positionArray.length; i++) {
@@ -12277,7 +12294,7 @@ return mat4(
       if (needDefaultWhiteColor) {
         this.colors = [];
         let colors = this.colors;
-        var vertexColor = new Vector4(1, 1, 1, 1);
+        var vertexColor = new Vector4$1(1, 1, 1, 1);
         for (let i=0; i<positionArray.length; i++) {
           for (let j=0; j<4; j++) {
             colors.push(vertexColor);
@@ -12517,7 +12534,7 @@ return mat4(
         indices.push(degenerate_left_index);
       }
 
-      let vertexColor = new Vector4(1, 1, 1, 1);
+      let vertexColor = new Vector4$1(1, 1, 1, 1);
       for(let i=0; i<=vSpan; i++) {
         for(let j=0; j<=uSpan; j++) {
           colors.push(vertexColor);
@@ -12931,7 +12948,7 @@ return mat4(
       let componentN = this._geometry._vertices.components.position;
       let length = positions.length / componentN;
       for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+        let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
         let transformedPosVec = mat.multiplyVector(posVector4);
         positions[i*componentN] = transformedPosVec.x;
         positions[i*componentN+1] = transformedPosVec.y;
@@ -12947,7 +12964,7 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$1.invert(mat).transpose().toMatrix33().multiplyVector(normalVector3).normalize();
+          let transformedNormalVec = this.normalMatrix.multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -12963,7 +12980,7 @@ return mat4(
       let componentN = this._geometry._vertices.components.position;
       let length = positions.length / componentN;
       for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+        let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
         let transformedPosVec = invMat.multiplyVector(posVector4);
         positions[i*componentN] = transformedPosVec.x;
         positions[i*componentN+1] = transformedPosVec.y;
@@ -12980,7 +12997,8 @@ return mat4(
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = Matrix44$1.invert(mat).transpose().invert().toMatrix33().multiplyVector(normalVector3).normalize();
+          const invNormalMat = new Matrix33(Matrix44$1.invert(mat).transpose().invert());
+          let transformedNormalVec = invNormalMat.multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
           normals[i*3+2] = transformedNormalVec.z;
@@ -13073,7 +13091,7 @@ return mat4(
       }
       var mv_m = viewMatrix.multiply(camera.inverseWorldMatrix).multiply(m_m);
 
-      var centerPosition = this.geometry.centerPosition.toVector4();
+      var centerPosition = new Vector4$1(this.geometry.centerPosition);
       //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
       var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
@@ -13118,8 +13136,8 @@ return mat4(
     rayCast(x, y, camera, viewport) {
 
       const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-      const origVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
-      const distVecInLocal = GLBoost$1.MathUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
+      const origVecInLocal = GLBoost$1.MathClassUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
+      const distVecInLocal = GLBoost$1.MathClassUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
       const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
       const gl = this._glContext.gl;
@@ -13141,7 +13159,7 @@ return mat4(
       const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
       let intersectPositionInWorld = null;
       if (result[0]) {
-        intersectPositionInWorld = this.worldMatrix.multiplyVector(result[0].toVector4()).toVector3();
+        intersectPositionInWorld = new Vector3(this.worldMatrix.multiplyVector(new Vector4$1(result[0])));
       }
       return [intersectPositionInWorld, result[1]];
     }
@@ -13268,35 +13286,35 @@ return mat4(
       ];
       if (vertexColor) {
         const colors = [
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
 
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
-          new Vector4(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w),
+          new Vector4$1(vertexColor.x, vertexColor.y, vertexColor.z, vertexColor.w)
         ];
       }
 
@@ -14213,7 +14231,7 @@ return mat4(
         height = this._renderTargetDepthTexture.height;
       }
       if (typeof width !== 'undefined' && typeof height !== 'undefined') {
-        this._viewport = new Vector4(0, 0, width, height);
+        this._viewport = new Vector4$1(0, 0, width, height);
         return true;
       } else {
         return false;
@@ -15117,7 +15135,7 @@ return mat4(
       this._lightsExceptAmbient = [];
       this._ambientLights = [];    
       this._cameras = [];
-      this._accumulatedAmbientIntensity = Vector4.zero();
+      this._accumulatedAmbientIntensity = Vector4$1.zero();
     }
 
     _getCurrentAnimationInputValue(inputName       ) {
@@ -15292,7 +15310,7 @@ return mat4(
     }
 
     updateAmountOfAmbientLightsIntensity() {
-      this._accumulatedAmbientIntensity = Vector4.zero();
+      this._accumulatedAmbientIntensity = Vector4$1.zero();
       for (let light of this._ambientLights) {
         this._accumulatedAmbientIntensity.add(light.intensity);
       }
@@ -15388,7 +15406,7 @@ return mat4(
       super(glBoostContext);
 
       this._colors = [];
-      this.color = new Vector4(1, 1, 1, 1);
+      this.color = new Vector4$1(1, 1, 1, 1);
       this._worldPositionOfThisJoint = new Vector3(0, 0, 1);
       this._worldPositionOfParentJoint = new Vector3(0, 0, 0);
       this._vertexData = this._setupVertexData();
@@ -15538,7 +15556,7 @@ return mat4(
 
       this.isVisible = false;
 
-      this.baseColor = new Vector4(0.0, 1.0, 1.0, 0.25);
+      this.baseColor = new Vector4$1(0.0, 1.0, 1.0, 0.25);
     }
 
     _init(glBoostContext, joint, length) {
@@ -15935,7 +15953,7 @@ return mat4(
     get rootJointsWorldPosition() {
       if (this._joints.length > 0) {
         const rootJointMatrix = this._joints[0].worldMatrix;
-        let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+        let rootJointPosWorld = new Vector3(rootJointMatrix.multiplyVector(Vector4$1.zero()));
         return rootJointPosWorld;
       }
       return Vector3.zero();
@@ -15945,7 +15963,7 @@ return mat4(
     getRootJointsWorldPositionAt(inputValue) {
       if (this._joints.length > 0) {
         const rootJointMatrix = this._joints[0].getWorldMatrixAt(inputValue);
-        let rootJointPosWorld = rootJointMatrix.multiplyVector(Vector4.zero()).toVector3();
+        let rootJointPosWorld = new Vector3(rootJointMatrix.multiplyVector(Vector4$1.zero()));
         return rootJointPosWorld;
       }
 
@@ -16564,7 +16582,7 @@ return mat4(
 
       this.isVisible = false;
 
-      this.baseColor = new Vector4(0.8, 0.8, 0, 1);
+      this.baseColor = new Vector4$1(0.8, 0.8, 0, 1);
     }
 
     _init(glBoostContext, length) {
@@ -16738,7 +16756,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = new Vector3(this.worldMatrixWithoutMySelf.getRotate().multiplyVector(new Vector4$1(this.direction)));
       return direction;
     }
 
@@ -16898,7 +16916,7 @@ return mat4(
     }
 
     get directionInWorld() {
-      let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
+      let direction = new Vector3(this.worldMatrixWithoutMySelf.getRotate().multiplyVector(new Vector4(this.direction)));
       return direction;
     }
 
@@ -16993,7 +17011,7 @@ return mat4(
   GLBoost$1["Grid"] = Grid;
 
   class M_GridGizmo extends M_Gizmo {
-    constructor(glBoostContext, length, division, isXZ = true, isXY = false, isYZ = false, colorVec = new Vector4(0.5, 0.5, 0.5, 1)) {
+    constructor(glBoostContext, length, division, isXZ = true, isXY = false, isYZ = false, colorVec = new Vector4$1(0.5, 0.5, 0.5, 1)) {
       super(glBoostContext, null, null);
       this._init(glBoostContext, length, division, isXZ, isXY, isYZ, colorVec);
     }
@@ -17017,7 +17035,7 @@ return mat4(
       this._mesh = mesh.clone();
       this.isPreDraw = true;
       this._material = new ClassicMaterial$1(glBoostContext);
-      this._material.baseColor = new Vector4(0, 1, 0, 1);
+      this._material.baseColor = new Vector4$1(0, 1, 0, 1);
 
       
       this._material.states.enable = [2884]; // gl.CULL_FACE
@@ -17523,7 +17541,7 @@ return mat4(
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
       this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
 
-      let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+      let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
     }
@@ -18294,7 +18312,7 @@ return mat4(
       let Ka = material.ambientColor;    
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
       
-      let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+      let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
 
     }
@@ -19033,7 +19051,7 @@ return mat4(
           if (defaultShader) {
             material.shaderClass = defaultShader;
           } else {
-            material.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+            material.baseColor = new Vector4$1(0.5, 0.5, 0.5, 1);
           }
           materials.push(material);
         }
@@ -19308,7 +19326,7 @@ return mat4(
       for (let valueName in materialJson.values) {
         let value = materialJson.values[valueName];
         if (typeof value !== 'string') {
-          material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
+          material[valueName + 'Color'] = new Vector4$1(value[0], value[1], value[2], value[3]);
         }
       }
 
@@ -19445,7 +19463,7 @@ return mat4(
               uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
               break;
             case 35666:
-              uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+              uniforms[uniformName] = new Vector4$1(value[0], value[1], value[2], value[3]);
               break;
             case 5124:
               uniforms[uniformName] = (glTFVer < 1.1) ? value : value[0];
@@ -19457,7 +19475,7 @@ return mat4(
               uniforms[uniformName] = new Vector3(value[0], value[1], value[2]);
               break;
             case 35669:
-              uniforms[uniformName] = new Vector4(value[0], value[1], value[2], value[3]);
+              uniforms[uniformName] = new Vector4$1(value[0], value[1], value[2], value[3]);
               break;
             case 35678:
               uniforms[uniformName] = 'TEXTURE';
@@ -19815,7 +19833,7 @@ return mat4(
                   dataView[dataViewMethod](pos+bytesPerComponent*3, littleEndian)
                 ));
               } else {
-                vertexAttributeArray.push(new Vector4(
+                vertexAttributeArray.push(new Vector4$1(
                   dataView[dataViewMethod](pos, littleEndian),
                   dataView[dataViewMethod](pos+bytesPerComponent, littleEndian),
                   dataView[dataViewMethod](pos+bytesPerComponent*2, littleEndian),
@@ -20816,7 +20834,7 @@ return mat4(
             if (defaultShader) {
               glboostMaterial.shaderClass = defaultShader;
             } else {
-              glboostMaterial.baseColor = new Vector4(0.5, 0.5, 0.5, 1);
+              glboostMaterial.baseColor = new Vector4$1(0.5, 0.5, 0.5, 1);
             }
             materials.push(glboostMaterial);
           }
@@ -21048,7 +21066,7 @@ return mat4(
 
       if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
         let value = materialJson.pbrMetallicRoughness.baseColorFactor;
-        gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
+        gltfMaterial.baseColor = new Vector4$1(value[0], value[1], value[2], value[3]);
       }
 
       if (indices !== null) {
@@ -21271,7 +21289,7 @@ return mat4(
                   dataView[dataViewMethod](pos+componentBytes*3, littleEndian)
                 ));
               } else {
-                vertexAttributeArray.push(new Vector4(
+                vertexAttributeArray.push(new Vector4$1(
                   dataView[dataViewMethod](pos, littleEndian),
                   dataView[dataViewMethod](pos+componentBytes, littleEndian),
                   dataView[dataViewMethod](pos+componentBytes*2, littleEndian),
@@ -21377,7 +21395,7 @@ return mat4(
 
         if (params.fillStyle instanceof Vector3) {
           this.fillStyle = `rgb(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},1)`;
-        } else if (params.fillStyle instanceof Vector4) {
+        } else if (params.fillStyle instanceof Vector4$1) {
           this.fillStyle = `rgba(${params.fillStyle.x * 255},${params.fillStyle.y * 255},${params.fillStyle.z * 255},${params.fillStyle.w})`;
         } else {
           this.fillStyle = params.fillStyle;
@@ -21502,7 +21520,7 @@ return mat4(
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Ks'), Ks.x, Ks.y, Ks.z, Ks.w, true);
       this._glContext.uniform1f(material.getUniform(glslProgram, 'uniform_power'), this._power, true);
 
-      let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+      let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
     }
@@ -21603,7 +21621,7 @@ return mat4(
       let Ka = material.ambientColor;
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
 
-      let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+      let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
     }
   }
@@ -21683,7 +21701,7 @@ return mat4(
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_Kd'), Kd.x, Kd.y, Kd.z, Kd.w, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_wrap'), this._wrap.x, this._wrap.y, this._wrap.z, true);
 
-      let ambient = Vector4.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
+      let ambient = Vector4$1.multiplyVector(Ka, scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);
     }
 
@@ -22019,4 +22037,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-112-g74644-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-114-gd60f-mod branch: develop';

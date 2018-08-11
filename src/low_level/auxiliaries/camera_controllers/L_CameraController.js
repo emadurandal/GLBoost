@@ -3,6 +3,7 @@ import Vector4 from '../../math/Vector4';
 import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
+import MathClassUtil from '../../math/MathClassUtil';
 import MathUtil from '../../math/MathUtil';
 import GLBoost from '../../../globals';
 
@@ -372,9 +373,9 @@ export default class L_CameraController extends GLBoostObject {
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
       let mat = camera.inverseWorldMatrixWithoutMySelf;
-      newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
-      newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
-      newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+      newEyeVec = new Vector3(mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)));
+      newCenterVec = new Vector3(mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)));
+      newUpVec = new Vector3(mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)));
     } else {
       newUpVec = upVec;
     }
@@ -517,9 +518,9 @@ export default class L_CameraController extends GLBoostObject {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
         } else {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
         }
       }
     }

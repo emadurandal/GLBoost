@@ -1,7 +1,7 @@
 import GLBoostObject from '../../core/GLBoostObject';
 import Vector3 from '../../math/Vector3';
 import Matrix33 from '../../math/Matrix33';
-import MathUtil from '../../math/MathUtil';
+import MathClassUtil from '../../math/MathClassUtil';
 import GLBoost from '../../../globals';
 
 export default class L_WalkThroughCameraController extends GLBoostObject {
@@ -288,9 +288,9 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToQuaternion(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
         } else {
-          this[key] = MathUtil.cloneOfMathObjects(MathUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
         }
       }
     }
