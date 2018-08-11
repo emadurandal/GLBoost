@@ -239,7 +239,7 @@ export default class Geometry extends GLBoostObject {
     }
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i+=incrementNum) {
+        for (let i=0; i<vertexNum-2; i+=incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -253,7 +253,7 @@ export default class Geometry extends GLBoostObject {
       } else {
         for (let i=0; i<this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
             let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex; /// ０つ目の頂点
             let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
             let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
@@ -1027,7 +1027,7 @@ export default class Geometry extends GLBoostObject {
     this._vertices.faceNormal = [];
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<this._vertexN; i+=incrementNum) {
+        for (let i=0; i<this._vertexN-2; i+=incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -1038,7 +1038,7 @@ export default class Geometry extends GLBoostObject {
       } else {
         for (let i=0; i<this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
             let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
             let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
             let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;

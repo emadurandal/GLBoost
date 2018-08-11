@@ -1431,6 +1431,10 @@
       this.y = ((y    )       );
     }
 
+    get className() {
+      return this.constructor.name;
+    }
+
     clone() {
       return new Vector2(this.x, this.y);
     }
@@ -1469,7 +1473,7 @@
 
   GLBoost$1["Vector2"] = Vector2;
 
-  /*       */
+  //      
 
                                                                              
                                                                        
@@ -1489,6 +1493,10 @@
       this.y = ((y    )       );
       this.z = ((z    )       );
       this.w = ((w    )       );
+    }
+
+    get className() {
+      return this.constructor.name;
     }
 
     isEqual(vec        )          {
@@ -1652,7 +1660,7 @@
       return '(' + this.x + ', ' + this.y + ', ' + this.z + ', ' + this.w + ')';
     }
 
-    get x() {
+    get x()        {
       return this.v[0];
     }
 
@@ -1660,7 +1668,7 @@
       this.v[0] = x;
     }
 
-    get y() {
+    get y()        {
       return this.v[1];
     }
 
@@ -1668,7 +1676,7 @@
       this.v[1] = y;
     }
 
-    get z() {
+    get z()        {
       return this.v[2];
     }
 
@@ -1676,7 +1684,7 @@
       this.v[2] = z;
     }
 
-    get w() {
+    get w()        {
       return this.v[3];
     }
 
@@ -1691,7 +1699,8 @@
 
   GLBoost$1["Vector4"] = Vector4;
 
-  /*       */
+  //      
+
 
                                                                              
                                                                        
@@ -1707,9 +1716,19 @@
         this.v = new Float32Array(3);
       }
 
-      this.x = ((x    )       );
-      this.y = ((y    )       );
-      this.z = ((z    )       );
+      if (typeof (x    ).z !== 'undefined') {
+        this.x = (x    ).x;
+        this.y = (x    ).y;
+        this.z = (x    ).z;
+      } else {
+        this.x = ((x    )       );
+        this.y = ((y    )       );
+        this.z = ((z    )       );
+      }
+    }
+
+    get className() {
+      return this.constructor.name;
     }
 
     isEqual(vec        ) {
@@ -2004,6 +2023,10 @@
       } else {
         return false;
       }
+    }
+
+    get className() {
+      return this.constructor.name;
     }
 
     clone() {
@@ -2340,6 +2363,10 @@
       this.setComponents.apply(this, mat4.m); // 'm' must be row major array if isColumnMajor is false    
     }
 
+    get className() {
+      return this.constructor.name;
+    }
+    
     clone() {
       return new Matrix44$1(
         this.m[0], this.m[4], this.m[8], this.m[12],
@@ -3049,9 +3076,10 @@
       return this;
     }
 
-    /**
-     * 単位行列にする
-     */
+    get className() {
+      return this.constructor.name;
+    }
+
     identity() {
       this.setComponents(
         1, 0, 0,
@@ -7211,7 +7239,7 @@ return mat4(
       }
       if ( this._vertices.texcoord ) {
         if (!this._indicesArray) {
-          for (let i=0; i<vertexNum; i+=incrementNum) {
+          for (let i=0; i<vertexNum-2; i+=incrementNum) {
             let pos0IndexBase = i * positionElementNumPerVertex;
             let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -7225,7 +7253,7 @@ return mat4(
         } else {
           for (let i=0; i<this._indicesArray.length; i++) {
             let vertexIndices = this._indicesArray[i];
-            for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+            for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
               let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex; /// ０つ目の頂点
               let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
               let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
@@ -21991,4 +22019,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-111-ge59b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-112-g74644-mod branch: develop';
