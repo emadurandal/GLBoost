@@ -16,6 +16,7 @@ import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import DataUtil from '../../low_level/misc/DataUtil';
 import M_Group from '../elements/M_Group';
 import MathUtil from "../../low_level/math/MathUtil";
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 
 
 let singleton = Symbol();
@@ -1037,7 +1038,7 @@ export default class GLTFLoader {
     for (let valueName in materialJson.values) {
       let value = materialJson.values[valueName];
       if (typeof value !== 'string') {
-        material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
+        material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
       }
     }
 
