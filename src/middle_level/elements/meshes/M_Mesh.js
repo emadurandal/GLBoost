@@ -329,7 +329,7 @@ export default class M_Mesh extends M_Element {
   }
 
   clone() {
-    let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
+    let instance = new M_Mesh(this._glBoostSystem, this.geometry, this.material);
     this._copy(instance);
 
     return instance;

@@ -13196,7 +13196,7 @@ return mat4(
     }
 
     clone() {
-      let instance = new M_Mesh(this._glBoostContext, this.geometry, this.material);
+      let instance = new M_Mesh(this._glBoostSystem, this.geometry, this.material);
       this._copy(instance);
 
       return instance;
@@ -22032,4 +22032,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-114-g040c-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-115-gc29d-mod branch: develop';
