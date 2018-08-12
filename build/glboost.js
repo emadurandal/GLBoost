@@ -1509,7 +1509,11 @@
         this.v = new Float32Array(3);
       }
 
-      if (typeof (x    ).w !== 'undefined') {
+      if (typeof x === 'undefined') {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+      } else if (typeof (x    ).w !== 'undefined') {
         this.x = (x    ).x;
         this.y = (x    ).y;
         this.z = (x    ).z;
@@ -1822,7 +1826,12 @@
         this.v = new Float32Array(4);
       }
 
-      if (typeof (x    ).w !== 'undefined') {
+      if (typeof x === 'undefined') {
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+        this.w = 1;
+      } else if (typeof (x    ).w !== 'undefined') {
         this.x = (x    ).x;
         this.y = (x    ).y;
         this.z = (x    ).z;
@@ -14060,9 +14069,9 @@ return mat4(
       this._transparentMeshes = [];
       this._transparentMeshesAsManualOrder = null;
       this._drawBuffers = [this._glContext.gl.NONE];
-      this._clearColor = null;
+      this._clearColor = null; // webgl default is [0, 0, 0, 0]
       this._clearDepth = null;  // webgl default is 1.0
-      this._colorMask = null; // webgl defalult is [true, true, true, true];
+      this._colorMask = null; // webgl defalult is [true, true, true, true]
       this._renderTargetColorTextures = [];
       this._renderTargetDepthTexture = [];
       this._expression = null;
@@ -19321,7 +19330,7 @@ return mat4(
       for (let valueName in materialJson.values) {
         let value = materialJson.values[valueName];
         if (typeof value !== 'string') {
-          material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value); //new Vector4(value[0], value[1], value[2], value[3]);
+          material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
         }
       }
 
@@ -22032,4 +22041,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-116-ga2bc6-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-121-g1642-mod branch: develop';

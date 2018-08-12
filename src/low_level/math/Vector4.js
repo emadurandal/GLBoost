@@ -18,7 +18,12 @@ export default class Vector4 {
       this.v = new Float32Array(4)
     }
 
-    if (typeof (x:any).w !== 'undefined') {
+    if (typeof x === 'undefined') {
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+      this.w = 1;
+    } else if (typeof (x:any).w !== 'undefined') {
       this.x = (x:any).x;
       this.y = (x:any).y;
       this.z = (x:any).z;

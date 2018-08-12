@@ -19,7 +19,11 @@ export default class Vector3 {
       this.v = new Float32Array(3)
     }
 
-    if (typeof (x:any).w !== 'undefined') {
+    if (typeof x === 'undefined') {
+      this.x = 0;
+      this.y = 0;
+      this.z = 0;
+    } else if (typeof (x:any).w !== 'undefined') {
       this.x = (x:any).x;
       this.y = (x:any).y;
       this.z = (x:any).z;
