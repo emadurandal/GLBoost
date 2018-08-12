@@ -17,9 +17,9 @@ export default class RenderPass extends GLBoostObject {
     this._transparentMeshes = [];
     this._transparentMeshesAsManualOrder = null;
     this._drawBuffers = [this._glContext.gl.NONE];
-    this._clearColor = null;
+    this._clearColor = null; // webgl default is [0, 0, 0, 0]
     this._clearDepth = null;  // webgl default is 1.0
-    this._colorMask = null; // webgl defalult is [true, true, true, true];
+    this._colorMask = null; // webgl defalult is [true, true, true, true]
     this._renderTargetColorTextures = [];
     this._renderTargetDepthTexture = [];
     this._expression = null;
