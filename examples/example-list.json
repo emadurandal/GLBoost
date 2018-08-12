@@ -1,6 +1,5 @@
 {
   "test_with_phinajs": [
-    "basic",
     "blendshape",
     "camera",
     "canvas_texture",
@@ -20,6 +19,7 @@
   ],
 
   "test": [
+    "basic",
     "custom_shader",
     "custom_shader_2",
     "loading_gltf",
