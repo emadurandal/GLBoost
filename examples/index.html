@@ -188,9 +188,6 @@
       <div id="webgl-version-selector" class="clearfix">
         <a href="javascript:void(0)" id="button-webgl-1">WebGL 1</a><span>&nbsp;/&nbsp;</span><a id="button-webgl-2" href="javascript:void(0)">WebGL 2</a>
       </div>
-      <div id="environment-selector" class="clearfix">
-        <a href="javascript:void(0)" id="button-env-file">File-based</a><span>&nbsp;/&nbsp;</span><a id="button-env-runstant" href="javascript:void(0)">Runstant</a>
-      </div>
       <div id="content"></div>
     </div>
     <iframe id="viewer" name="viewer" allowfullscreen onmousewheel=""></iframe>
@@ -250,29 +247,6 @@
         });
         button_webgl_2.addEventListener('click', function(){
           isWebGL2 = true;
-          redirect();
-        });
-
-        //
-        // Environment buttons
-        var button_env_file = document.getElementById('button-env-file');
-        var button_env_runstant = document.getElementById('button-env-runstant');
-
-        var borderEnv_file = function() {
-          button_env_file.style.borderColor = "rgba(0,0,0,0.5)";
-          button_env_runstant.style.borderColor = "rgba(0,0,0,0)";
-        };
-        var borderEnv_runstant = function() {
-          button_env_file.style.borderColor = "rgba(0,0,0,0)";
-          button_env_runstant.style.borderColor = "rgba(0,0,0,0.5)";
-        };
-
-        button_env_file.addEventListener('click', function(){
-          isRunstant = false;
-          redirect();
-        });
-        button_env_runstant.addEventListener('click', function(){
-          isRunstant = true;
           redirect();
         });
 
@@ -392,11 +366,6 @@
 
             document.getElementById('viewer').contentWindow.location.replace("//runstant.com/GLBoost/projects/" + splitted[splitted.length - 2] + '-' + splitted[splitted.length - 1]);
           })();
-          borderEnv_runstant();
-          isRunstant = true;
-        } else {
-          borderEnv_file();
-          isRunstant = false;
         }
 
         var loadNormal = function ( file ) {
