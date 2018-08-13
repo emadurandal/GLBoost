@@ -88,7 +88,7 @@ class MyCustomShaderSource {
 }
 
 
-class MyCustomShader extends GLBoost.HalfLambertShader {
+class MyCustomShader extends GLBoost.DecalShader {
   constructor(glBoostContext, basicShader, ParticleShaderSource) {
     super(glBoostContext, basicShader);
     if (ParticleShaderSource) {
