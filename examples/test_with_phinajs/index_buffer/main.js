@@ -64,7 +64,7 @@ phina.define('MainScene', {
       ];
 
     var geometry2 = glBoostContext.createGeometry();
-    var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/index_buffer/resources/texture.png');
+    var texture = glBoostContext.createTexture('resources/texture.png');
     var material = glBoostContext.createClassicMaterial();
     material.setTexture(texture);
     geometry2.setVerticesData({
