@@ -1247,7 +1247,45 @@
     }
   }
 
-  //
+  //      
+                                                   
+
+  let singleton$1     = Symbol();
+
+  class EntityRepository {
+                               
+                                     
+
+    constructor(enforcer        ) {
+      if (enforcer !== EntityRepository.__singletonEnforcer || !(this instanceof EntityRepository)) {
+        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      }
+
+      EntityRepository.__singletonEnforcer = Symbol();
+
+      this.__entity_uid_count = 0;
+      this.__entities = [];
+    }
+
+    assignEntityId(glBoostObject               ) {
+      if (glBoostObject.entityUID !== 0) {
+        console.warn('This GLBoostObject has been assigned entityUID already!');
+        return false;
+      }
+
+      glBoostObject._entity_uid = ++this.__entity_uid_count;
+      this.__entities.push(glBoostObject);
+
+      return true;
+    }
+
+    static getInstance() {
+      if (!this[singleton$1]) {
+        this[singleton$1] = new EntityRepository(EntityRepository.__singletonEnforcer);
+      }
+      return this[singleton$1];
+    }
+  }
 
   /*       */
 
@@ -1261,14 +1299,19 @@
                               
                                
                          
-                         
+                        
                           
 
     constructor(glBoostSystem               , toRegister         = true) {
       if (this.constructor === GLBoostObject) {
         throw new TypeError('Cannot construct GLBoostObject instances directly.');
       }
+      this._entity_uid = 0;
       this._setName();
+      
+      const entityRepository = EntityRepository.getInstance();
+      entityRepository.assignEntityId(this);
+
       this._glBoostSystem = glBoostSystem;
       this._glContext = glBoostSystem._glContext;
       this._glBoostMonitor = glBoostSystem._glBoostMonitor;
@@ -1400,13 +1443,14 @@
     }
 
     get entityUID() {
-      return this.__entity_uid;
+      return this._entity_uid;
     }
   }
 
   GLBoostObject.classInfoDic = {};
   GLBoostObject._objectExistArray = [];
   GLBoostObject.__entities = [];
+
 
 
   GLBoost$1['GLBoostObject'] = GLBoostObject;
@@ -22041,4 +22085,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-127-gd23f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-132-g68a4-mod branch: develop';

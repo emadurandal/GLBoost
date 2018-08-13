@@ -3,7 +3,8 @@
 import L_GLBoostMonitor from './L_GLBoostMonitor';
 import EntityRepositiory from './EntityRepository';
 import GLBoost from '../../globals';
-//import GLBoostLowContext from './GLBoostLowContext';
+import GLBoostLowContext from './GLBoostLowContext';
+import EntityRepository from './EntityRepository';
 import type GLBoostSystem from './GLBoostSystem';
 import GLContext from './GLContext';
 
@@ -17,14 +18,19 @@ export default class GLBoostObject {
   _readyForDiscard: boolean;
   _classUniqueNumber: number;
   _objectIndex: number;
-  __entity_uid: number;
+  _entity_uid: number;
   _glContext: GLContext;
 
   constructor(glBoostSystem: GLBoostSystem, toRegister:boolean = true) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
+    this._entity_uid = 0;
     this._setName();
+    
+    const entityRepository = EntityRepository.getInstance();
+    entityRepository.assignEntityId(this);
+
     this._glBoostSystem = glBoostSystem;
     this._glContext = glBoostSystem._glContext;
     this._glBoostMonitor = glBoostSystem._glBoostMonitor;
@@ -156,13 +162,14 @@ export default class GLBoostObject {
   }
 
   get entityUID() {
-    return this.__entity_uid;
+    return this._entity_uid;
   }
 }
 
 GLBoostObject.classInfoDic = {};
 GLBoostObject._objectExistArray = [];
 GLBoostObject.__entities = [];
+
 
 
 GLBoost['GLBoostObject'] = GLBoostObject;
