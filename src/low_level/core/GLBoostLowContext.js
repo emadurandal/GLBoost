@@ -1,6 +1,6 @@
 //import GLContext from './GLContext';
 //import L_GLBoostMonitor from './L_GLBoostMonitor';
-//import GLExtensionsManager from './GLExtensionsManager';
+import GLExtensionsManager from './GLExtensionsManager';
 import GLBoostSystem from './GLBoostSystem';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';

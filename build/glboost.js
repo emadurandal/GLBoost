@@ -432,6 +432,150 @@
 
   var GLBoost$1 = global.GLBoost;
 
+  class GLExtensionsManager {
+
+    constructor(glContext) {
+      var gl = glContext.gl;
+
+      if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
+        this._extVAO = gl.getExtension('OES_vertex_array_object');
+
+        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
+
+        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') ||
+          gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
+          gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
+
+        this._extEIUI = gl.getExtension('OES_element_index_uint');
+
+        this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
+
+        this._extStdDerivatives = gl.getExtension("OES_standard_derivatives");
+
+        this._extTFL = gl.getExtension("OES_texture_float_linear");
+      }
+
+      GLExtensionsManager._instances[glContext.belongingCanvasId] = this;
+
+      this._glContext = glContext;
+    }
+    static getInstance(glContext) {
+      if (GLExtensionsManager._instances[glContext.belongingCanvasId]) {
+        return GLExtensionsManager._instances[glContext.belongingCanvasId];
+      }
+      return new GLExtensionsManager(glContext);
+    }
+
+    get extVAO() {
+      return this._extVAO;
+    }
+
+    get extDBs() {
+      return this._extDBs;
+    }
+
+    get extTFA() {
+      return this._extTFA;
+    }
+
+    get extDepthTex() {
+      return this._extDepthTex;
+    }
+
+    createVertexArray(gl) {
+      if (GLBoost$1.isThisGLVersion_2(gl)) {
+        return gl.createVertexArray();
+      } else if (this._extVAO) {
+        return this._extVAO.createVertexArrayOES();
+      } else {
+        return null;
+      }
+
+      this._glContext.checkGLError();
+    }
+
+    bindVertexArray(gl, vao) {
+      if (GLBoost$1.isThisGLVersion_2(gl)) {
+        gl.bindVertexArray(vao);
+        return true;
+      } else if (this._extVAO) {
+        this._extVAO.bindVertexArrayOES(vao);
+        return true;
+      } else {
+        return false;
+      }
+
+      this._glContext.checkGLError();
+    }
+
+    drawBuffers(gl, buffers) {
+      let buffer = buffers;
+      if (GLBoost$1.isThisGLVersion_2(gl)) {
+        gl.drawBuffers(buffers);
+        buffer = buffer[0];
+      } else if (this._extDBs) {
+        this.extDBs.drawBuffersWEBGL(buffers);
+        buffer = buffer[0];
+      }
+
+      if (buffer === gl.NONE) {
+        gl.colorMask(false, false, false, false);
+      } else {
+        gl.colorMask(true, true, true, true);
+      }
+
+      this._glContext.checkGLError();
+    }
+
+    readBuffer(gl, buffers) {
+      let buffer = buffers;
+      if (GLBoost$1.isThisGLVersion_2(gl)) {
+        buffer = buffer[0];
+      } else if (this._extDBs) {
+        buffer = buffer[0];
+      }
+
+      gl.readBuffer(buffer);
+
+      this._glContext.checkGLError();
+    }
+
+
+    colorAttachiment(gl, index) {
+      return this._extDBs ?
+        this._extDBs[`COLOR_ATTACHMENT${index}_WEBGL`] :
+        gl[`COLOR_ATTACHMENT${index}`];
+    }
+
+    elementIndexBitSizeGLConstant(gl) {
+      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+        return gl.UNSIGNED_INT;
+      } else {
+        return gl.UNSIGNED_SHORT;
+      }
+    }
+
+    elementIndexByteSizeNumber(gl) {
+      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+        return 4;
+      } else {
+        return 2;
+      }
+    }
+
+    createUintArrayForElementIndex(gl, array) {
+      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
+        return new Uint32Array(array);
+      } else {
+        return new Uint16Array(array);
+      }
+    }
+
+  }
+  GLExtensionsManager._instances = new Object();
+
+  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager;
+
   class MiscUtil {
 
     constructor() {
@@ -541,150 +685,6 @@
     }
 
   }
-
-  class GLExtensionsManager$1 {
-
-    constructor(glContext) {
-      var gl = glContext.gl;
-
-      if (GLBoost$1.VALUE_WEBGL_ONE_USE_EXTENSIONS) {
-        this._extVAO = gl.getExtension('OES_vertex_array_object');
-
-        this._extDBs = gl.getExtension('WEBGL_draw_buffers');
-
-        this._extTFA = gl.getExtension('EXT_texture_filter_anisotropic') ||
-          gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic') ||
-          gl.getExtension('MOZ_EXT_texture_filter_anisotropic');
-
-        this._extEIUI = gl.getExtension('OES_element_index_uint');
-
-        this._extDepthTex = gl.getExtension('WEBGL_depth_texture');
-
-        this._extStdDerivatives = gl.getExtension("OES_standard_derivatives");
-
-        this._extTFL = gl.getExtension("OES_texture_float_linear");
-      }
-
-      GLExtensionsManager$1._instances[glContext.belongingCanvasId] = this;
-
-      this._glContext = glContext;
-    }
-    static getInstance(glContext) {
-      if (GLExtensionsManager$1._instances[glContext.belongingCanvasId]) {
-        return GLExtensionsManager$1._instances[glContext.belongingCanvasId];
-      }
-      return new GLExtensionsManager$1(glContext);
-    }
-
-    get extVAO() {
-      return this._extVAO;
-    }
-
-    get extDBs() {
-      return this._extDBs;
-    }
-
-    get extTFA() {
-      return this._extTFA;
-    }
-
-    get extDepthTex() {
-      return this._extDepthTex;
-    }
-
-    createVertexArray(gl) {
-      if (GLBoost$1.isThisGLVersion_2(gl)) {
-        return gl.createVertexArray();
-      } else if (this._extVAO) {
-        return this._extVAO.createVertexArrayOES();
-      } else {
-        return null;
-      }
-
-      this._glContext.checkGLError();
-    }
-
-    bindVertexArray(gl, vao) {
-      if (GLBoost$1.isThisGLVersion_2(gl)) {
-        gl.bindVertexArray(vao);
-        return true;
-      } else if (this._extVAO) {
-        this._extVAO.bindVertexArrayOES(vao);
-        return true;
-      } else {
-        return false;
-      }
-
-      this._glContext.checkGLError();
-    }
-
-    drawBuffers(gl, buffers) {
-      let buffer = buffers;
-      if (GLBoost$1.isThisGLVersion_2(gl)) {
-        gl.drawBuffers(buffers);
-        buffer = buffer[0];
-      } else if (this._extDBs) {
-        this.extDBs.drawBuffersWEBGL(buffers);
-        buffer = buffer[0];
-      }
-
-      if (buffer === gl.NONE) {
-        gl.colorMask(false, false, false, false);
-      } else {
-        gl.colorMask(true, true, true, true);
-      }
-
-      this._glContext.checkGLError();
-    }
-
-    readBuffer(gl, buffers) {
-      let buffer = buffers;
-      if (GLBoost$1.isThisGLVersion_2(gl)) {
-        buffer = buffer[0];
-      } else if (this._extDBs) {
-        buffer = buffer[0];
-      }
-
-      gl.readBuffer(buffer);
-
-      this._glContext.checkGLError();
-    }
-
-
-    colorAttachiment(gl, index) {
-      return this._extDBs ?
-        this._extDBs[`COLOR_ATTACHMENT${index}_WEBGL`] :
-        gl[`COLOR_ATTACHMENT${index}`];
-    }
-
-    elementIndexBitSizeGLConstant(gl) {
-      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-        return gl.UNSIGNED_INT;
-      } else {
-        return gl.UNSIGNED_SHORT;
-      }
-    }
-
-    elementIndexByteSizeNumber(gl) {
-      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-        return 4;
-      } else {
-        return 2;
-      }
-    }
-
-    createUintArrayForElementIndex(gl, array) {
-      if (GLBoost$1.isThisGLVersion_2(gl) || this._extEIUI) {
-        return new Uint32Array(array);
-      } else {
-        return new Uint16Array(array);
-      }
-    }
-
-  }
-  GLExtensionsManager$1._instances = new Object();
-
-  GLBoost$1['GLExtensionsManager'] = GLExtensionsManager$1;
 
   let singleton = Symbol();
 
@@ -957,7 +957,7 @@
 
     createVertexArray(glBoostObject) {
       var gl = this.gl;
-      var glem = GLExtensionsManager$1.getInstance(this);
+      var glem = GLExtensionsManager.getInstance(this);
       var glResource = glem.createVertexArray(gl);
       if (glResource) {
         this._monitor.registerWebGLResource(glBoostObject, glResource);
@@ -5587,7 +5587,7 @@
         return gl.getParameter(gl.MAX_DRAW_BUFFERS);
       }
 
-      var glem = GLExtensionsManager$1.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
       if (glem.extDBs) {
         return gl.getParameter(glem.extDBs.MAX_DRAW_BUFFERS_WEBGL);
       } else {
@@ -7506,7 +7506,7 @@ return mat4(
       var vertices = this._vertices;
       var gl = this._glContext.gl;
 
-      var glem = GLExtensionsManager$1.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
 
       this._vertexN = vertices.position.length / vertices.components.position;
 
@@ -7613,7 +7613,7 @@ return mat4(
 
     draw(data) {
       const gl = this._glContext.gl;
-      const glem = GLExtensionsManager$1.getInstance(this._glContext);
+      const glem = GLExtensionsManager.getInstance(this._glContext);
 
       let materials = this._getAppropriateMaterials(data.mesh);
 
@@ -11613,7 +11613,7 @@ return mat4(
 
     _generateTextureFromImageData(imageData) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager$1.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
 
       var imgCanvas = this._getResizedCanvas(imageData);
       this._width = imgCanvas.width;
@@ -11631,7 +11631,7 @@ return mat4(
 
     _generateTextureInnerWithArrayBufferView(imgCanvas, width, height, isKeepBound) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager$1.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
       var texture = this._glContext.createTexture(this);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -11656,7 +11656,7 @@ return mat4(
 
     _generateTextureInner(imgCanvas, isKeepBound) {
       var gl = this._glContext.gl;
-      var glem = GLExtensionsManager$1.getInstance(this._glContext);
+      var glem = GLExtensionsManager.getInstance(this._glContext);
       var texture = this._glContext.createTexture(this);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -14724,7 +14724,7 @@ return mat4(
 
         var glContext = this._glContext;
         var gl = glContext.gl;
-        var glem = GLExtensionsManager$1.getInstance(this._glContext);
+        var glem = GLExtensionsManager.getInstance(this._glContext);
 
 
         // set render target buffers for each RenderPass.
@@ -22041,4 +22041,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-124-g8b7b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-126-gc8e3-mod branch: develop';
