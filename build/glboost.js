@@ -12616,7 +12616,7 @@ return mat4(
     }
 
     _setName() {
-      this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.__system.constructor._instanceCount + 1);
+      this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
       this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
     }
 
@@ -22041,4 +22041,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-122-g8bc9-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-124-g8b7b-mod branch: develop';

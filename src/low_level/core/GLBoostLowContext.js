@@ -73,7 +73,7 @@ export default class GLBoostLowContext {
   }
 
   _setName() {
-    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.__system.constructor._instanceCount + 1);
+    this.constructor._instanceCount = (typeof this.constructor._instanceCount === 'undefined') ? 0 : (this.constructor._instanceCount + 1);
     this._instanceName = this.constructor.name + '_' + this.constructor._instanceCount;
   }
 
