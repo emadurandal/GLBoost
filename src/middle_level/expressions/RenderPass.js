@@ -507,7 +507,7 @@ export default class RenderPass extends GLBoostObject {
       for (let obj of dic.instances) {
         let renderSpecificMaterials = [];
         obj.getAppropriateMaterials().forEach((material, index) => {
-          let newMaterial = this._glBoostContext.createClassicMaterial();
+          let newMaterial = this._glBoostSystem._glBoostContext.createClassicMaterial();
           //newMaterial._originalMaterial = material;
           renderSpecificMaterials.push(newMaterial);
         });

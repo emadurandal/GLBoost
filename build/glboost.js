@@ -14559,7 +14559,7 @@ return mat4(
         for (let obj of dic.instances) {
           let renderSpecificMaterials = [];
           obj.getAppropriateMaterials().forEach((material, index) => {
-            let newMaterial = this._glBoostContext.createClassicMaterial();
+            let newMaterial = this._glBoostSystem._glBoostContext.createClassicMaterial();
             //newMaterial._originalMaterial = material;
             renderSpecificMaterials.push(newMaterial);
           });
@@ -22041,4 +22041,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-126-gc8e3-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-127-gd23f-mod branch: develop';
