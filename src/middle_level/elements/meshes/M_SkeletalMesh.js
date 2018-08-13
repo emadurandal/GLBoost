@@ -167,7 +167,7 @@ export default class M_SkeletalMesh extends M_Mesh {
   }
 
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-    let instance = new M_SkeletalMesh(this._glBoostContext, this.geometry, this.material, this._rootJointName);
+    let instance = new M_SkeletalMesh(this._glBoostSystem, this.geometry, this.material, this._rootJointName);
     this._copy(instance, clonedOriginalRootElement, clonedRootElement, onCompleteFuncs);
 
     return instance;

@@ -121,7 +121,7 @@ export default class M_Joint extends M_Element {
   }
 
   clone() {
-    let instance = new M_Joint(this._glBoostContext);
+    let instance = new M_Joint(this._glBoostSystem);
     this._copy(instance);
     return instance;
   }

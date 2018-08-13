@@ -387,7 +387,7 @@ export default class M_Group extends M_Element {
   }
 
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-    let instance = new M_Group(this._glBoostContext);
+    let instance = new M_Group(this._glBoostSystem);
     if (clonedRootElement === null) {
       clonedRootElement = instance;
     }

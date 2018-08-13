@@ -3,14 +3,14 @@ import M_Gizmo from './M_Gizmo';
 import M_Mesh from '../meshes/M_Mesh';
 
 export default class M_AxisGizmo extends M_Gizmo {
-  constructor(glBoostContext, length) {
-    super(glBoostContext);
+  constructor(glBoostSystem, length) {
+    super(glBoostSystem);
 
-    this._init(glBoostContext, length);
+    this._init(glBoostSystem, length);
   }
 
-  _init(glBoostContext, length) {
-    let mesh = new M_Mesh(glBoostContext, new Axis(this._glBoostContext, length));
+  _init(glBoostSystem, length) {
+    let mesh = new M_Mesh(glBoostSystem, new Axis(glBoostSystem, length));
     this.addChild(mesh);
   }
 }

@@ -13786,7 +13786,7 @@ return mat4(
     }
 
     clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-      let instance = new M_Group(this._glBoostContext);
+      let instance = new M_Group(this._glBoostSystem);
       if (clonedRootElement === null) {
         clonedRootElement = instance;
       }
@@ -15746,7 +15746,7 @@ return mat4(
     }
 
     clone() {
-      let instance = new M_Joint(this._glBoostContext);
+      let instance = new M_Joint(this._glBoostSystem);
       this._copy(instance);
       return instance;
     }
@@ -15919,7 +15919,7 @@ return mat4(
     }
 
     clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-      let instance = new M_SkeletalMesh(this._glBoostContext, this.geometry, this.material, this._rootJointName);
+      let instance = new M_SkeletalMesh(this._glBoostSystem, this.geometry, this.material, this._rootJointName);
       this._copy(instance, clonedOriginalRootElement, clonedRootElement, onCompleteFuncs);
 
       return instance;
@@ -16950,14 +16950,14 @@ return mat4(
   GLBoost$1['M_SpotLight'] = M_SpotLight;
 
   class M_AxisGizmo extends M_Gizmo {
-    constructor(glBoostContext, length) {
-      super(glBoostContext);
+    constructor(glBoostSystem, length) {
+      super(glBoostSystem);
 
-      this._init(glBoostContext, length);
+      this._init(glBoostSystem, length);
     }
 
-    _init(glBoostContext, length) {
-      let mesh = new M_Mesh(glBoostContext, new Axis(this._glBoostContext, length));
+    _init(glBoostSystem, length) {
+      let mesh = new M_Mesh(glBoostSystem, new Axis(glBoostSystem, length));
       this.addChild(mesh);
     }
   }
@@ -22041,4 +22041,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-121-g1642-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-122-g8bc9-mod branch: develop';
