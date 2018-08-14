@@ -9,7 +9,7 @@ import MathUtil from '../math/MathUtil';
 
 import Component from '../core/Component';
 
-export default class TransformComponent {
+export default class TransformComponent extends Component {
 
   _translate: Vector3;
   _rotate: Vector3;
