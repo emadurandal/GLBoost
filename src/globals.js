@@ -398,6 +398,22 @@ var global = ('global',eval)('this');
     c.define('GLOBAL_STATES_USAGE_INCLUSIVE');
     c.define('GLOBAL_STATES_USAGE_EXCLUSIVE');
 
+    c.define('LIFECYCLE_FHASE_CREATE');
+    c.define('LIFECYCLE_FHASE_LOAD');
+    c.define('LIFECYCLE_FHASE_MOUNT');
+    c.define('LIFECYCLE_FHASE_UPDATE_LOGIC');
+    c.define('LIFECYCLE_FHASE_UPDATE_FOR_RENDERING');
+    c.define('LIFECYCLE_FHASE_RENDER');
+    c.define('LIFECYCLE_FHASE_DISCARD');
+
+    c.define('LIFECYCLE_EVENT_CREATED');
+    c.define('LIFECYCLE_EVENT_LOADED');
+    c.define('LIFECYCLE_EVENT_MOUNTED');
+    c.define('LIFECYCLE_EVENT_UPDATED_LOGIC');
+    c.define('LIFECYCLE_EVENT_UPDATED_FOR_RENDERING');
+    c.define('LIFECYCLE_EVENT_RENDERED');
+    c.define('LIFECYCLE_EVENT_DISCARDED');
+
     c.define('LOG_GENERAL');
     c.define('LOG_SHADER_CODE');
     c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
