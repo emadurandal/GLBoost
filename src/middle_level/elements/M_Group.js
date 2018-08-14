@@ -394,7 +394,7 @@ export default class M_Group extends M_Element {
     this._copy(instance);
 
     this._elements.forEach((element)=>{
-      if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
+      if (typeof element.clone !== 'undefined') {
         instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
       } else {
         instance._elements.push(element);

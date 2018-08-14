@@ -3,7 +3,6 @@ import AbstractTexture from '../textures/AbstractTexture';
 import Vector4 from '../math/Vector4';
 import DecalShader from '../../middle_level/shaders/DecalShader';
 import GLBoostObject from '../core/GLBoostObject';
-import MiscUtil from '../misc/MiscUtil'
 
 export default class L_AbstractMaterial extends GLBoostObject {
   constructor(glBoostContext) {
@@ -380,8 +379,6 @@ export default class L_AbstractMaterial extends GLBoostObject {
     if (typeof this._shaderUniformLocationsOfExpressions[glslProgram.hashId] !== 'undefined') {
       return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
     }
-
-//    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');
 
     return void 0;
   }

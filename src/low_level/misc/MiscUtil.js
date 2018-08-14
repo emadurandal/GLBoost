@@ -1,13 +1,8 @@
 import GLBoost from '../../globals';
-
 export default class MiscUtil {
 
   constructor() {
 
-  }
-
-  static isDefinedAndTrue(value) {
-    return !!(typeof value !== 'undefined' && value);
   }
 
   static getTheValueOrAlternative(value, alternativeIfTheValueIsNullOrUndefined) {

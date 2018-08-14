@@ -582,10 +582,6 @@
 
     }
 
-    static isDefinedAndTrue(value) {
-      return !!(typeof value !== 'undefined' && value);
-    }
-
     static getTheValueOrAlternative(value, alternativeIfTheValueIsNullOrUndefined) {
       if (typeof value !== 'undefined' && value != null) {
         return value;
@@ -9665,8 +9661,6 @@ return mat4(
         return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
       }
 
-  //    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');
-
       return void 0;
     }
 
@@ -13842,7 +13836,7 @@ return mat4(
       this._copy(instance);
 
       this._elements.forEach((element)=>{
-        if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
+        if (typeof element.clone !== 'undefined') {
           instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
         } else {
           instance._elements.push(element);
@@ -22090,4 +22084,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-139-gf419-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-141-g38e9-mod branch: develop';

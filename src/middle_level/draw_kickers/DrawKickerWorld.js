@@ -5,7 +5,6 @@ import Vector4 from '../../low_level/math/Vector4';
 import Matrix44 from '../../low_level/math/Matrix44';
 import Matrix33 from '../../low_level/math/Matrix33';
 import Shader from '../../low_level/shaders/Shader';
-import MiscUtil from '../../low_level/misc/MiscUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();

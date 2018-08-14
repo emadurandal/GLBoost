@@ -1,7 +1,6 @@
 import GLBoost from '../../globals';
 import Texture from './Texture';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import MiscUtil from '../misc/MiscUtil';
 
 export default class PhinaTexture extends Texture {
   constructor(glBoostContext, width, height, fillStyle, parameters = null) {
