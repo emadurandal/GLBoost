@@ -446,7 +446,7 @@ export default class L_Element extends GLBoostObject {
       } else if (this._is_euler_angles_updated) {
         value = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       } else {
-        console.log('jojjeoe');
+        console.log('Not Quaternion Updated in error!');
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
