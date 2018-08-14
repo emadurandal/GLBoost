@@ -1,10 +1,15 @@
 
+
 export default class Component {
   constructor() {
 
   }
 
-  registerDependency(component) {
+  static get componentUID() {
+    return 0;
+  }
+
+  registerDependency(component, isMust) {
 
   }
 

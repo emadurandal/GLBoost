@@ -8,6 +8,7 @@ import Matrix44 from '../math/Matrix44';
 import MathUtil from '../math/MathUtil';
 
 import Component from '../core/Component';
+import AnimationComponent from './AnimationComponent';
 
 export default class TransformComponent extends Component {
 
@@ -49,6 +50,18 @@ export default class TransformComponent extends Component {
 
     this._updateCountAsElement = 0;
   }
+
+  static get componentUID() {
+    return 1;
+  }
+
+  $create() {
+    // Define process dependencies with other components.
+    // If circular depenencies are detected, the error will be repoated.
+
+    this.registerDependency(AnimationComponent.componentUID, false);
+  }
+
 
   get updateCount() {
     return this._updateCountAsElement;
