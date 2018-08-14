@@ -11,12 +11,6 @@ import MathUtil from '../math/MathUtil';
 import GLBoostObject from '../core/GLBoostObject';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
 
-const LatestRotationDriverType = {
-  TrsMatrix: Symbol(),
-  Quaternion: Symbol(),
-  EulerAngles: Symbol()
-};
-
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
   _currentAnimationInputValues: Object;
