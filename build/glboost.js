@@ -3828,6 +3828,7 @@
                     
                             
                       
+                         
                                   
                                     
                                    
@@ -4115,6 +4116,8 @@
       this._is_euler_angles_updated = false;
       this._is_quaternion_updated = false;
       this._is_scale_updated = false;
+      this._is_inverse_trs_matrix_updated = false;
+      
       this.__updateTransform();
 
     }
@@ -4204,12 +4207,13 @@
         this._matrix.m13 = translateVec.y;
         this._matrix.m23 = translateVec.z;
 
+        this._is_trs_matrix_updated = true;
+   
         return this._matrix.clone();
 
       }
 
-      this._is_trs_matrix_updated = true;
-    }
+   }
 
 
     set quaternion(quat            ) {
@@ -4245,20 +4249,20 @@
     getQuaternionNotAnimated() {
       let value = null;
       if (this._is_quaternion_updated) {
-        return this._quaternion;
+        return this._quaternion.clone();
       } else if (!this._is_quaternion_updated) {
         if (this._is_trs_matrix_updated) {
           value = Quaternion.fromMatrix(this._matrix);
         } else if (this._is_euler_angles_updated) {
           value = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
         } else {
-          console.log('jojjeoe');
+          console.log('Not Quaternion Updated in error!');
         }
         this._quaternion = value;
         this._is_quaternion_updated = true;
       }
 
-      return this._quaternion;
+      return this._quaternion.clone();
     }
 
     get inverseTransformMatrix() {
@@ -22085,4 +22089,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-133-gb3f40-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-137-g5cdd-mod branch: develop';
