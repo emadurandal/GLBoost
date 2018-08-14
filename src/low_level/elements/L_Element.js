@@ -308,6 +308,8 @@ export default class L_Element extends GLBoostObject {
     this._is_euler_angles_updated = false;
     this._is_quaternion_updated = false;
     this._is_scale_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
+    
     this.__updateTransform();
 
   }
@@ -439,7 +441,7 @@ export default class L_Element extends GLBoostObject {
   getQuaternionNotAnimated() {
     let value = null;
     if (this._is_quaternion_updated) {
-      return this._quaternion;
+      return this._quaternion.clone();
     } else if (!this._is_quaternion_updated) {
       if (this._is_trs_matrix_updated) {
         value = Quaternion.fromMatrix(this._matrix);
@@ -452,7 +454,7 @@ export default class L_Element extends GLBoostObject {
       this._is_quaternion_updated = true;
     }
 
-    return this._quaternion;
+    return this._quaternion.clone();
   }
 
   get inverseTransformMatrix() {
