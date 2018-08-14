@@ -10,6 +10,7 @@ import MathClassUtil from '../math/MathClassUtil';
 import MathUtil from '../math/MathUtil';
 import GLBoostObject from '../core/GLBoostObject';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
+import type GLBoostSystem from '../core/GLBoostSystem';
 
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
@@ -30,8 +31,8 @@ export default class L_Element extends GLBoostObject {
   _is_inverse_trs_matrix_updated: boolean;
 
 
-  constructor(glBoostContext, toRegister: boolean = true) {
-    super(glBoostContext, toRegister);
+  constructor(glBoostSystem: GLBoostSystem, toRegister: boolean = true) {
+    super(glBoostSystem, toRegister);
 
     // Live (Static or Animation)
     this._translate = Vector3.zero();
@@ -309,7 +310,7 @@ export default class L_Element extends GLBoostObject {
     this._is_quaternion_updated = false;
     this._is_scale_updated = false;
     this._is_inverse_trs_matrix_updated = false;
-    
+
     this.__updateTransform();
 
   }

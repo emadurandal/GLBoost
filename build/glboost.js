@@ -3818,6 +3818,7 @@
   }
 
   /*       */
+                                                         
 
   class L_Element extends GLBoostObject {
                            
@@ -3838,8 +3839,8 @@
                                             
 
 
-    constructor(glBoostContext, toRegister          = true) {
-      super(glBoostContext, toRegister);
+    constructor(glBoostSystem               , toRegister          = true) {
+      super(glBoostSystem, toRegister);
 
       // Live (Static or Animation)
       this._translate = Vector3.zero();
@@ -4117,7 +4118,7 @@
       this._is_quaternion_updated = false;
       this._is_scale_updated = false;
       this._is_inverse_trs_matrix_updated = false;
-      
+
       this.__updateTransform();
 
     }
@@ -22089,4 +22090,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-137-g5cdd-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-139-gf419-mod branch: develop';

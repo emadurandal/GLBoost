@@ -3,7 +3,6 @@
 import L_GLBoostMonitor from './L_GLBoostMonitor';
 import EntityRepositiory from './EntityRepository';
 import GLBoost from '../../globals';
-import GLBoostLowContext from './GLBoostLowContext';
 import EntityRepository from './EntityRepository';
 import type GLBoostSystem from './GLBoostSystem';
 import GLContext from './GLContext';
