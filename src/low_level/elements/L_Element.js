@@ -20,6 +20,7 @@ export default class L_Element extends GLBoostObject {
   _scale: Vector3;
   _quaternion: Quaternion;
   _matrix: Matrix44;
+  _invMatrix: Matrix44;
   _updateCountAsElement: number;
   _is_trs_matrix_updated: boolean;
   _is_translate_updated: boolean;
@@ -396,12 +397,13 @@ export default class L_Element extends GLBoostObject {
       this._matrix.m13 = translateVec.y;
       this._matrix.m23 = translateVec.z;
 
+      this._is_trs_matrix_updated = true;
+ 
       return this._matrix.clone();
 
     }
 
-    this._is_trs_matrix_updated = true;
-  }
+ }
 
 
   set quaternion(quat: Quaternion) {
