@@ -302,7 +302,7 @@ export default class M_Mesh extends M_Element {
 
   set isOutlineVisible(flg) {
     if (flg && this._outlineGizmo === null) {
-      this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+      this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
     }
 
     if (this._outlineGizmo) {

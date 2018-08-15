@@ -7,17 +7,17 @@ import Vector3 from '../../../low_level/math/Vector3';
 import Matrix44 from '../../../low_level/math/Matrix44';
 
 export default class M_OutlineGizmo extends M_Gizmo {
-  constructor(glBoostContext, mesh, scale = 0.05) {
-    super(glBoostContext, null, null);
+  constructor(glBoostSystem, mesh, scale = 0.05) {
+    super(glBoostSystem, null, null);
 
-    this._init(glBoostContext, mesh, scale);
+    this._init(glBoostSystem, mesh, scale);
   }
 
-  _init(glBoostContext, mesh, scale) {
+  _init(glBoostSystem, mesh, scale) {
 
     this._mesh = mesh.clone();
     this.isPreDraw = true;
-    this._material = new ClassicMaterial(glBoostContext);
+    this._material = new ClassicMaterial(glBoostSystem);
     this._material.baseColor = new Vector4(0, 1, 0, 1);
 
     
@@ -29,7 +29,7 @@ export default class M_OutlineGizmo extends M_Gizmo {
     this._forceThisMaterial = this._material;
 
     //this._mesh.material = this._material;
-    this._group = this._glBoostContext.createGroup();
+    this._group = glBoostSystem._glBoostContext.createGroup();
     this.updateMatrix(mesh);
     this._group.addChild(this._mesh);
     this.addChild(this._group);
