@@ -404,6 +404,22 @@
       c.define('GLOBAL_STATES_USAGE_INCLUSIVE');
       c.define('GLOBAL_STATES_USAGE_EXCLUSIVE');
 
+      c.define('LIFECYCLE_FHASE_CREATE');
+      c.define('LIFECYCLE_FHASE_LOAD');
+      c.define('LIFECYCLE_FHASE_MOUNT');
+      c.define('LIFECYCLE_FHASE_UPDATE_LOGIC');
+      c.define('LIFECYCLE_FHASE_UPDATE_FOR_RENDERING');
+      c.define('LIFECYCLE_FHASE_RENDER');
+      c.define('LIFECYCLE_FHASE_DISCARD');
+
+      c.define('LIFECYCLE_EVENT_CREATED');
+      c.define('LIFECYCLE_EVENT_LOADED');
+      c.define('LIFECYCLE_EVENT_MOUNTED');
+      c.define('LIFECYCLE_EVENT_UPDATED_LOGIC');
+      c.define('LIFECYCLE_EVENT_UPDATED_FOR_RENDERING');
+      c.define('LIFECYCLE_EVENT_RENDERED');
+      c.define('LIFECYCLE_EVENT_DISCARDED');
+
       c.define('LOG_GENERAL');
       c.define('LOG_SHADER_CODE');
       c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
@@ -1263,6 +1279,13 @@
       this.__entities = [];
     }
 
+    static getInstance() {
+      if (!this[singleton$1]) {
+        this[singleton$1] = new EntityRepository(EntityRepository.__singletonEnforcer);
+      }
+      return this[singleton$1];
+    }
+
     assignEntityId(glBoostObject               ) {
       if (glBoostObject.entityUID !== 0) {
         console.warn('This GLBoostObject has been assigned entityUID already!');
@@ -1275,12 +1298,7 @@
       return true;
     }
 
-    static getInstance() {
-      if (!this[singleton$1]) {
-        this[singleton$1] = new EntityRepository(EntityRepository.__singletonEnforcer);
-      }
-      return this[singleton$1];
-    }
+
   }
 
   /*       */
@@ -22084,4 +22102,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-141-g38e9-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-145-gf30e4-mod branch: develop';
