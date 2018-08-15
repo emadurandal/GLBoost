@@ -18,6 +18,13 @@ export default class EntityRepository {
     this.__entities = [];
   }
 
+  static getInstance() {
+    if (!this[singleton]) {
+      this[singleton] = new EntityRepository(EntityRepository.__singletonEnforcer);
+    }
+    return this[singleton];
+  }
+
   assignEntityId(glBoostObject: GLBoostObject) {
     if (glBoostObject.entityUID !== 0) {
       console.warn('This GLBoostObject has been assigned entityUID already!');
@@ -30,11 +37,6 @@ export default class EntityRepository {
     return true;
   }
 
-  static getInstance() {
-    if (!this[singleton]) {
-      this[singleton] = new EntityRepository(EntityRepository.__singletonEnforcer);
-    }
-    return this[singleton];
-  }
+
 }
 
