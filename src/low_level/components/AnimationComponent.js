@@ -6,12 +6,14 @@ export default class AnimationComponent extends Component {
   _activeAnimationLineName: string;
 
   constructor() {
+    super();
+
     this._animationLine = {};
     this._activeAnimationLineName = 'time';
   }
 
-  static get componentUID() {
-    return 2;
+  static get componentTID() {
+    return 3;
   }
 
   _getAnimatedTransformValue(value, animation, type) {

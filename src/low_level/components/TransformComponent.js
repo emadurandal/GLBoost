@@ -30,8 +30,12 @@ export default class TransformComponent extends Component {
 
   _updateCountAsElement: number;
   
+  // dependencies
+  _dependentAnimationComponentId: number;
 
   constructor() {
+    super();
+    
     this._translate = Vector3.zero();
     this._rotate = Vector3.zero();
     this._scale = new Vector3(1, 1, 1);
@@ -51,17 +55,28 @@ export default class TransformComponent extends Component {
     this._updateCountAsElement = 0;
   }
 
-  static get componentUID() {
-    return 1;
+  static get renderedPropertyCount() {
+
+  }
+
+  static get maxCount() {
+    return 1000000;
+  }
+
+  static get componentTID() {
+    return 2;
   }
 
   $create() {
     // Define process dependencies with other components.
     // If circular depenencies are detected, the error will be repoated.
 
-    this.registerDependency(AnimationComponent.componentUID, false);
+    this.registerDependency(AnimationComponent.componentTID, false);
   }
 
+  $updateLogic() {
+
+  }
 
   get updateCount() {
     return this._updateCountAsElement;
@@ -353,7 +368,7 @@ export default class TransformComponent extends Component {
     this.rotateMatrix33 = rotateMatrix;
   }
 
-  headToDirection(fromVec: Vector3, toVec: :Vector3) {
+  headToDirection(fromVec: Vector3, toVec: Vector3) {
     const fromDir = Vector3.normalize(fromVec);
     const toDir = Vector3.normalize(toVec);
     const rotationDir = Vector3.cross(fromDir, toDir);
@@ -373,3 +388,4 @@ export default class TransformComponent extends Component {
     return new Matrix33(this.quaternion);
   }
 }
+
