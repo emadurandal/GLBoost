@@ -1,12 +1,18 @@
-
+// @flow
 
 export default class Component {
-  constructor() {
+  _component_sid: number;
 
+  constructor() {
+    this._component_sid = 0;
   }
 
-  static get componentUID() {
+  static get componentTID() {
     return 0;
+  }
+
+  get componentSID() {
+    return this._component_sid;
   }
 
   registerDependency(component, isMust) {
