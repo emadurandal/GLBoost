@@ -1,11 +1,16 @@
 // @flow
-import type GLBoostObject from './GLBoostObject';
+//import type GLBoostObject from './GLBoostObject';
+import Entity from './Entity';
 
+type EntityUID = number;
 let singleton:any = Symbol();
 
 export default class EntityRepository {
-  __entity_uid_count: number;
-  __entities: Array<GLBoostObject>;
+  static __singletonEnforcer: Symbol;
+  __entity_uid_count: EntityUID;
+  //__entities: Array<GLBoostObject>;
+  __entities: Map<EntityUID, Entity>;
+  __lifeStatusOfEntities: Map<EntityUID, Boolean>;
 
   constructor(enforcer: Symbol) {
     if (enforcer !== EntityRepository.__singletonEnforcer || !(this instanceof EntityRepository)) {
@@ -15,7 +20,8 @@ export default class EntityRepository {
     EntityRepository.__singletonEnforcer = Symbol();
 
     this.__entity_uid_count = 0;
-    this.__entities = [];
+    this.__entities = new Map();
+    this.__lifeStatusOfEntities = new Maps();
   }
 
   static getInstance() {
@@ -25,18 +31,31 @@ export default class EntityRepository {
     return this[singleton];
   }
 
-  assignEntityId(glBoostObject: GLBoostObject) {
-    if (glBoostObject.entityUID !== 0) {
-      console.warn('This GLBoostObject has been assigned entityUID already!');
-      return false;
-    }
+  
+  // assignEntityId(glBoostObject: GLBoostObject) {
+  //   if (glBoostObject.entityUID !== 0) {
+  //     console.warn('This GLBoostObject has been assigned entityUID already!');
+  //     return false;
+  //   }
 
-    glBoostObject._entity_uid = ++this.__entity_uid_count;
-    this.__entities.push(glBoostObject);
+  //   glBoostObject._entity_uid = ++this.__entity_uid_count;
+  //   this.__entities.push(glBoostObject);
 
-    return true;
+  //   return true;
+  // }
+
+
+  createEntity() {
+    this.__entity_uid_count++;
+
+    const alive = new Boolean(true);
+    const entity = new Entity(this.__entity_uid_count, alive);
+
+    this.__entities.set(this.__entity_uid_count, entity);
+    this.__lifeStatusOfEntities.set(this.__entity_uid_count, alive);
+    
+    return entity;
   }
-
 
 }
 
