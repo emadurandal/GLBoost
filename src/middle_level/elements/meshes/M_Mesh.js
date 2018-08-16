@@ -6,6 +6,7 @@ import Matrix44 from '../../../low_level/math/Matrix44';
 import AABB from '../../../low_level/math/AABB';
 import Matrix33 from '../../../low_level/math/Matrix33';
 import MathClassUtil from '../../../low_level/math/MathClassUtil';
+import is from '../../../low_level/misc/IsUtil';
 
 export default class M_Mesh extends M_Element {
   constructor(glBoostContext, geometry, material) {
@@ -268,16 +269,18 @@ export default class M_Mesh extends M_Element {
     const distVecInLocal = GLBoost.MathClassUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
     const dirVecInLocal = GLBoost.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
+    const material = this.getAppropriateMaterials()[0];
+
     const gl = this._glContext.gl;
-    const isCulling = gl.isEnabled(gl.CULL_FACE);
-    const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
+    const isCulling = material.states.enable.includes(gl.CULL_FACE);
+    const cullMode = is.exist(material.states.functions.cullFace) ? material.states.functions.cullFace: gl.BACK;
 
     let isFrontFacePickable = true;
     let isBackFacePickable = true;
     if (isCulling) {
       if (cullMode === gl.FRONT) {
         isFrontFacePickable = false;
-      } else if (cullMode === gl.Back) {
+      } else if (cullMode === gl.BACK) {
         isBackFacePickable = false;
       } else {
         isFrontFacePickable = false;

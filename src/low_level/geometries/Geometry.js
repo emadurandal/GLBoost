@@ -905,14 +905,35 @@ export default class Geometry extends GLBoostObject {
     if (this._primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
       incrementNum = 1;
     }
-    if ( this._vertices.texcoord ) {
-      if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i++) {
-          const j = i * incrementNum;
-          let pos0IndexBase = j * positionElementNumPerVertex;
-          let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
-          let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+    if (!this._indicesArray) {
+      for (let i=0; i<vertexNum; i++) {
+        const j = i * incrementNum;
+        let pos0IndexBase = j * positionElementNumPerVertex;
+        let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
+        let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
+        const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+        if (result === null) {
+          continue;
+        }
+        const t = result[0];
+        if (result[0] < currentShortestT) {
+          currentShortestT = t;
+          currentShortestIntersectedPosVec3 = result[1];
+        }
+      }
+    } else {
+      for (let i=0; i<this._indicesArray.length; i++) {
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length; j++) {
+          const k = j * incrementNum;
+          let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
+          let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
+          let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+
+          if (vertexIndices[k + 2] === void 0) {
+            break;
+          }
+          const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
           if (result === null) {
             continue;
           }
@@ -922,32 +943,9 @@ export default class Geometry extends GLBoostObject {
             currentShortestIntersectedPosVec3 = result[1];
           }
         }
-      } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
-          let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j++) {
-            const k = j * incrementNum;
-            let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
-
-            if (vertexIndices[k + 2] === void 0) {
-              break;
-            }
-            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
-            if (result === null) {
-              continue;
-            }
-            const t = result[0];
-            if (result[0] < currentShortestT) {
-              currentShortestT = t;
-              currentShortestIntersectedPosVec3 = result[1];
-            }
-          }
-        }
       }
     }
-    
+  
     return [currentShortestIntersectedPosVec3, currentShortestT];
   }
 
@@ -1025,30 +1023,28 @@ export default class Geometry extends GLBoostObject {
     this._vertices.inverseArenbergMatrix = [];
     this._vertices.arenberg3rdPosition = [];
     this._vertices.faceNormal = [];
-    if ( this._vertices.texcoord ) {
-      if (!this._indicesArray) {
-        for (let i=0; i<this._vertexN-2; i+=incrementNum) {
-          let pos0IndexBase = i * positionElementNumPerVertex;
-          let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
-          let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
+    if (!this._indicesArray) {
+      for (let i=0; i<this._vertexN-2; i+=incrementNum) {
+        let pos0IndexBase = i * positionElementNumPerVertex;
+        let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
+        let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
 
-          this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+        this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
 
-        }
-      } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
-          let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
-            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+      }
+    } else {
+      for (let i=0; i<this._indicesArray.length; i++) {
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
+          let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
+          let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
+          let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
-            if (vertexIndices[j + 2] === void 0) {
-              break;
-            }
-            this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
-
+          if (vertexIndices[j + 2] === void 0) {
+            break;
           }
+          this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+
         }
       }
     }
