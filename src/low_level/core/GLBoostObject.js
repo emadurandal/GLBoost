@@ -28,7 +28,7 @@ export default class GLBoostObject {
     this._setName();
     
     const entityRepository = EntityRepository.getInstance();
-    entityRepository.assignEntityId(this);
+    //entityRepository.assignEntityId(this);
 
     this._glBoostSystem = glBoostSystem;
     this._glContext = glBoostSystem._glContext;

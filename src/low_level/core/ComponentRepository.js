@@ -2,11 +2,15 @@
 import type Component from './Component';
 import is from '../misc/IsUtil';
 
+type ComponentTID = number;
+type ComponentSID = number;
+
 let singleton:any = Symbol();
 
 export default class ComponentRepository {
-  __component_uid_count_array: Array<number>;
-  __componentsArray: Array<Array<Component>>;
+  static __singletonEnforcer: Symbol;
+  __component_sid_count_map: Map<ComponentTID, number>;
+  __components: Map<ComponentTID, Map<ComponentSID, Component>>;
 
   constructor(enforcer: Symbol) {
     if (enforcer !== ComponentRepository.__singletonEnforcer || !(this instanceof ComponentRepository)) {
@@ -15,8 +19,8 @@ export default class ComponentRepository {
 
     ComponentRepository.__singletonEnforcer = Symbol();
 
-    this.__component_uid_count_array = [];
-    this.__componentsArray = [];
+    this.__component_sid_count_map = new Map();
+    this.__components = new Map;
   }
 
   static getInstance() {
@@ -28,16 +32,20 @@ export default class ComponentRepository {
 
   createComponent(componentClass: Component.constructor) {
     const component = new componentClass();
-    const component_uid_count = this.__component_uid_count_array[component.componentTID];
-    if (!is.exist(component_uid_count)) {
-      this.__component_uid_count_array[component.componentTID] = 0;
+    let component_sid_count = this.__component_sid_count_map.get(component.componentTID);
+    if (!is.exist(component_sid_count)) {
+      this.__component_sid_count_map.set(component.componentTID, 0);
+      component_sid_count = 0;
     }
-    component._component_uid = ++this.__component_uid_count_array[component.componentTID];
+    component._component_uid = this.__component_sid_count_map.set(
+      component.componentTID,
+      component_sid_count !== undefined ? ++component_sid_count : 1
+    );
 
-    if (!is.exist(this.__componentsArray[component.componentTID])) {
-      this.__componentsArray[component.componentTID] = [];
+    if (!this.__components.has(component.componentTID)) {
+      this.__components.set(component.componentTID, new Map());
     }
-    this.__componentsArray[component.componentTID].push(component);
+    this.__components.set(component.componentTID, new Map(component);
 
     return component;
   }

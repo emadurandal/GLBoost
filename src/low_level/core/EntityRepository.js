@@ -21,7 +21,11 @@ export default class EntityRepository {
 
     this.__entity_uid_count = 0;
     this.__entities = new Map();
+<<<<<<< Updated upstream
     this.__lifeStatusOfEntities = new Maps();
+=======
+    this.__lifeStatusOfEntities = new Map();
+>>>>>>> Stashed changes
   }
 
   static getInstance() {

@@ -2,6 +2,7 @@
 
 export default class Component {
   _component_sid: number;
+  __isAlive: Boolean;
 
   constructor() {
     this._component_sid = 0;
