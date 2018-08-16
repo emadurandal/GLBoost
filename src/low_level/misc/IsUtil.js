@@ -12,12 +12,18 @@ const IsUtil = {
 
   _all(fn) {
     return function() {
+      if (Array.isArray(arguments[0])) {
+        return arguments[0].every(fn);
+      }
       return [...arguments].every(fn);
     };
   },
 
   _any(fn) {
     return function() {
+      if (Array.isArray(arguments[0])) {
+        return arguments[0].some(fn);
+      }
       return [...arguments].some(fn);
     };
   },

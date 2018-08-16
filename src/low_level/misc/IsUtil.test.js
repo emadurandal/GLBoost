@@ -82,20 +82,37 @@ test('is.not.null(null) return true', () => {
 
 // is.all
 
-test('is.all.null([null, null, null]) return true', () => {
+test('is.all.null(null, null, null) return true', () => {
   expect(is.all.null(null, null, null)).toBe(true);
 });
 
-test('is.all.null([null, null, null]) return false', () => {
+test('is.all.null(null, null, undefined) return false', () => {
   expect(is.all.null(null, null, undefined)).toBe(false);
+});
+
+test('is.all.null([null, null, null]) return true', () => {
+  expect(is.all.null([null, null, null])).toBe(true);
+});
+
+test('is.all.null([null, null, undefined]) return false', () => {
+  expect(is.all.null([null, null, undefined])).toBe(false);
 });
 
 // is.any
 
-test('is.any.null([null, null, null]) return true', () => {
+test('is.any.null(null, null, null) return true', () => {
   expect(is.any.null(null, null, undefined)).toBe(true);
 });
 
-test('is.any.null([null, null, null]) return false', () => {
+test('is.any.null(undefined, undefined, undefined) return false', () => {
   expect(is.any.null(undefined, undefined, undefined)).toBe(false);
+});
+
+
+test('is.any.null([null, null, undefined]) return true', () => {
+  expect(is.any.null([null, null, undefined])).toBe(true);
+});
+
+test('is.any.null([undefined, undefined, undefined]) return false', () => {
+  expect(is.any.null([undefined, undefined, undefined])).toBe(false);
 });
