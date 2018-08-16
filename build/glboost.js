@@ -1260,13 +1260,33 @@
   }
 
   //      
-                                                   
 
+                             
+                             
+
+  class Entity {
+                                                     
+                         
+                       
+
+    constructor(entityUID        , isAlive         ) {
+      this.__entity_uid = entityUID;
+      this.__isAlive = isAlive;
+    }
+
+  }
+
+  //      
+
+                          
   let singleton$1     = Symbol();
 
   class EntityRepository {
-                               
-                                     
+                                       
+                                  
+    //__entities: Array<GLBoostObject>;
+                                       
+                                                    
 
     constructor(enforcer        ) {
       if (enforcer !== EntityRepository.__singletonEnforcer || !(this instanceof EntityRepository)) {
@@ -1276,7 +1296,8 @@
       EntityRepository.__singletonEnforcer = Symbol();
 
       this.__entity_uid_count = 0;
-      this.__entities = [];
+      this.__entities = new Map();
+      this.__lifeStatusOfEntities = new Maps();
     }
 
     static getInstance() {
@@ -1286,18 +1307,31 @@
       return this[singleton$1];
     }
 
-    assignEntityId(glBoostObject               ) {
-      if (glBoostObject.entityUID !== 0) {
-        console.warn('This GLBoostObject has been assigned entityUID already!');
-        return false;
-      }
+    
+    // assignEntityId(glBoostObject: GLBoostObject) {
+    //   if (glBoostObject.entityUID !== 0) {
+    //     console.warn('This GLBoostObject has been assigned entityUID already!');
+    //     return false;
+    //   }
 
-      glBoostObject._entity_uid = ++this.__entity_uid_count;
-      this.__entities.push(glBoostObject);
+    //   glBoostObject._entity_uid = ++this.__entity_uid_count;
+    //   this.__entities.push(glBoostObject);
 
-      return true;
+    //   return true;
+    // }
+
+
+    createEntity() {
+      this.__entity_uid_count++;
+
+      const alive = new Boolean(true);
+      const entity = new Entity(this.__entity_uid_count, alive);
+
+      this.__entities.set(this.__entity_uid_count, entity);
+      this.__lifeStatusOfEntities.set(this.__entity_uid_count, alive);
+      
+      return entity;
     }
-
 
   }
 
@@ -10689,14 +10723,14 @@ return mat4(
       this._onMouseDblClick = (evt) => {
         if (evt.shiftKey) {
           this._mouseTranslateVec = new Vector3(0, 0, 0);
-        } else {
+        } else if (evt.ctrlKey) {
           this._rot_y = 0;
           this._rot_x = 0;
           this._rot_bgn_y = 0;
           this._rot_bgn_x = 0;
         }
-        this.updateCamera();
 
+        this.updateCamera();
       };
 
       this.registerEventListeners(eventTargetDom);
@@ -13239,7 +13273,7 @@ return mat4(
 
     set isOutlineVisible(flg) {
       if (flg && this._outlineGizmo === null) {
-        this._outlineGizmo = this._glBoostContext.createOutlineGizmo(this);
+        this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
       }
 
       if (this._outlineGizmo) {
@@ -17089,17 +17123,17 @@ return mat4(
   }
 
   class M_OutlineGizmo extends M_Gizmo {
-    constructor(glBoostContext, mesh, scale = 0.05) {
-      super(glBoostContext, null, null);
+    constructor(glBoostSystem, mesh, scale = 0.05) {
+      super(glBoostSystem, null, null);
 
-      this._init(glBoostContext, mesh, scale);
+      this._init(glBoostSystem, mesh, scale);
     }
 
-    _init(glBoostContext, mesh, scale) {
+    _init(glBoostSystem, mesh, scale) {
 
       this._mesh = mesh.clone();
       this.isPreDraw = true;
-      this._material = new ClassicMaterial$1(glBoostContext);
+      this._material = new ClassicMaterial$1(glBoostSystem);
       this._material.baseColor = new Vector4$1(0, 1, 0, 1);
 
       
@@ -17111,7 +17145,7 @@ return mat4(
       this._forceThisMaterial = this._material;
 
       //this._mesh.material = this._material;
-      this._group = this._glBoostContext.createGroup();
+      this._group = glBoostSystem._glBoostContext.createGroup();
       this.updateMatrix(mesh);
       this._group.addChild(this._mesh);
       this.addChild(this._group);
@@ -22102,4 +22136,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-146-g2d78-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-154-gc497-mod branch: develop';

@@ -183,14 +183,14 @@ export default class L_CameraController extends GLBoostObject {
     this._onMouseDblClick = (evt) => {
       if (evt.shiftKey) {
         this._mouseTranslateVec = new Vector3(0, 0, 0);
-      } else {
+      } else if (evt.ctrlKey) {
         this._rot_y = 0;
         this._rot_x = 0;
         this._rot_bgn_y = 0;
         this._rot_bgn_x = 0;
       }
-      this.updateCamera();
 
+      this.updateCamera();
     };
 
     this.registerEventListeners(eventTargetDom);
