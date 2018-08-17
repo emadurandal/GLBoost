@@ -22,9 +22,86 @@ export class PBRPrincipledShaderSource {
 
   VSMethodDefine_PBRPrincipledShaderSource(f, lights, material, extraData) {
     let shaderText = '';
+
     shaderText += `
-    float foo(float val) {
-      return val;
+      const float M_PI = 3.141592653589793;
+    `;
+
+    shaderText += `
+    float angular_n_h(float NH) {
+      return acos(NH);
+    }
+    `;
+
+    shaderText += `
+    float sqr(float x) {
+      return x*x;
+    }
+    `;
+
+
+    shaderText += `
+    float d_phong(float NH, float c1) {
+      return pow(
+        cos(acos(NH))
+        , c1
+      );
+    }
+    `;
+
+    shaderText += `
+    // GGX NDF
+    float d_ggx(float NH, float alphaRoughness) {
+      float roughnessSqr = alphaRoughness * alphaRoughness;
+      float f = (roughnessSqr - 1) * NH * NH + 1.0;
+      return roughnessSq / (M_PI * f * f);
+    }
+    `;
+
+    shaderText += `
+    float d_torrance_reiz(float NH, float c3) {
+      float CosSquared = NH*NH;
+      float TanSquared = (1.0 - CosSquared)/CosSquared;
+      //return (1.0/PI) * sqr(c3/(CosSquared * (c3*c3 + TanSquared)));  // gamma = 2, aka GGX
+      return (1.0/sqrt(PI)) * (sqr(c3)/(CosSquared * (c3*c3 + TanSquared))); // gamma = 1, D_Berry
+    }
+    `;
+
+    shaderText += `
+    float d_beckmann(float NH, float m) {
+      float co = 1.0 / (4.0 * m * m * NH * NH * NH * NH);
+      float expx = exp((NH * NH - 1.0) / (m * m * NH * NH));
+      return co * expx; 
+    }
+    `;
+
+    shaderText += `
+    float g_shielding(float NH, float NV, float NL, float VH) {
+      float g1 = 2.0 * NH * NV / VH;
+      float g2 = 2.0 * NH * NL / VH;
+      return max(0.0, min(1.0, min(g1, g2)));
+    }
+    `;
+
+    shaderText += `
+    float fresnel(float n, float VH) {
+      float c = VH;
+      float g = sqrt(n * n + c * c - 1.0);
+      float f = ((g - c)*(g - c))/((g + c)*(g + c)) * (1.0 + 
+      ((c * (g + c) - 1.0)*(c * (g + c) - 1.0))
+      /
+      ((c * (g - c) - 1.0)*(c * (g - c) - 1.0))
+      );
+      return f;
+    }
+    `;
+
+    shaderText += `
+    float cook_torrance_specular_brdf(float n, float NH, float NV, float NL, float VH, float power) {    
+      float D = d_torrance_reiz(NH, power);
+      float G = g_shielding(NH, NV, NL, VH);
+      float F = fresnel(n, VH);
+      return D*G*F/(4*NL*NV);
     }
     `;
 
