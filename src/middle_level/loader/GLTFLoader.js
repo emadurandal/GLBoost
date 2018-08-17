@@ -956,6 +956,8 @@ export default class GLTFLoader {
             let texturePurpose;
             if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
+            } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_NORMAL;
             }
 
             let texture = textures[textureStr];
