@@ -22,6 +22,7 @@
     "basic",
     "custom_shader",
     "custom_shader_2",
+    "free_shader",
     "loading_gltf",
     "loading_gltf_head",
     "loading_gltf_anim",
