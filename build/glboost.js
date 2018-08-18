@@ -1297,7 +1297,7 @@
 
       this.__entity_uid_count = 0;
       this.__entities = new Map();
-      this.__lifeStatusOfEntities = new Maps();
+      this.__lifeStatusOfEntities = new Map();
     }
 
     static getInstance() {
@@ -1358,7 +1358,7 @@
       this._setName();
       
       const entityRepository = EntityRepository.getInstance();
-      entityRepository.assignEntityId(this);
+      //entityRepository.assignEntityId(this);
 
       this._glBoostSystem = glBoostSystem;
       this._glContext = glBoostSystem._glContext;
@@ -8020,14 +8020,35 @@ return mat4(
       if (this._primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
         incrementNum = 1;
       }
-      if ( this._vertices.texcoord ) {
-        if (!this._indicesArray) {
-          for (let i=0; i<vertexNum; i++) {
-            const j = i * incrementNum;
-            let pos0IndexBase = j * positionElementNumPerVertex;
-            let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
-            let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-            const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+      if (!this._indicesArray) {
+        for (let i=0; i<vertexNum; i++) {
+          const j = i * incrementNum;
+          let pos0IndexBase = j * positionElementNumPerVertex;
+          let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
+          let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
+          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+          if (result === null) {
+            continue;
+          }
+          const t = result[0];
+          if (result[0] < currentShortestT) {
+            currentShortestT = t;
+            currentShortestIntersectedPosVec3 = result[1];
+          }
+        }
+      } else {
+        for (let i=0; i<this._indicesArray.length; i++) {
+          let vertexIndices = this._indicesArray[i];
+          for (let j=0; j<vertexIndices.length; j++) {
+            const k = j * incrementNum;
+            let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
+            let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
+            let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+
+            if (vertexIndices[k + 2] === void 0) {
+              break;
+            }
+            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
             if (result === null) {
               continue;
             }
@@ -8037,32 +8058,9 @@ return mat4(
               currentShortestIntersectedPosVec3 = result[1];
             }
           }
-        } else {
-          for (let i=0; i<this._indicesArray.length; i++) {
-            let vertexIndices = this._indicesArray[i];
-            for (let j=0; j<vertexIndices.length; j++) {
-              const k = j * incrementNum;
-              let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
-              let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
-              let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
-
-              if (vertexIndices[k + 2] === void 0) {
-                break;
-              }
-              const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
-              if (result === null) {
-                continue;
-              }
-              const t = result[0];
-              if (result[0] < currentShortestT) {
-                currentShortestT = t;
-                currentShortestIntersectedPosVec3 = result[1];
-              }
-            }
-          }
         }
       }
-      
+    
       return [currentShortestIntersectedPosVec3, currentShortestT];
     }
 
@@ -8140,30 +8138,28 @@ return mat4(
       this._vertices.inverseArenbergMatrix = [];
       this._vertices.arenberg3rdPosition = [];
       this._vertices.faceNormal = [];
-      if ( this._vertices.texcoord ) {
-        if (!this._indicesArray) {
-          for (let i=0; i<this._vertexN-2; i+=incrementNum) {
-            let pos0IndexBase = i * positionElementNumPerVertex;
-            let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
-            let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
+      if (!this._indicesArray) {
+        for (let i=0; i<this._vertexN-2; i+=incrementNum) {
+          let pos0IndexBase = i * positionElementNumPerVertex;
+          let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
+          let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
 
-            this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+          this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
 
-          }
-        } else {
-          for (let i=0; i<this._indicesArray.length; i++) {
-            let vertexIndices = this._indicesArray[i];
-            for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
-              let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
-              let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
-              let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+        }
+      } else {
+        for (let i=0; i<this._indicesArray.length; i++) {
+          let vertexIndices = this._indicesArray[i];
+          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
+            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
+            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
+            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
-              if (vertexIndices[j + 2] === void 0) {
-                break;
-              }
-              this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
-
+            if (vertexIndices[j + 2] === void 0) {
+              break;
             }
+            this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+
           }
         }
       }
@@ -12978,6 +12974,70 @@ return mat4(
 
   GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
+  const IsUtil = {
+    not: {},
+    all: {},
+    any: {},
+
+    _not(fn) {
+      return function() {
+        return !fn.apply(null, [...arguments]);
+      };
+    },
+
+    _all(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].every(fn);
+        }
+        return [...arguments].every(fn);
+      };
+    },
+
+    _any(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].some(fn);
+        }
+        return [...arguments].some(fn);
+      };
+    },
+
+    defined(val) {
+      return val !== void 0;
+    },
+
+    undefined(val) {
+      return val === void 0;
+    },
+
+    null(val) {
+      return val === null;
+    },
+
+    // is NOT null or undefined
+    exist(val) {
+      return val != null;
+    },
+
+    function(val) {
+      return typeof val === 'function';
+    }
+
+  };
+
+  for (let fn in IsUtil) {
+    if (IsUtil.hasOwnProperty(fn)) {
+      const interfaces = ['not', 'all', 'any'];
+      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
+        interfaces.forEach((itf)=>{
+          const op = '_' + itf;
+          IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
+        });
+      }
+    }
+  }
+
   class M_Mesh extends M_Element {
     constructor(glBoostContext, geometry, material) {
       super(glBoostContext);
@@ -13239,16 +13299,18 @@ return mat4(
       const distVecInLocal = GLBoost$1.MathClassUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
       const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
 
+      const material = this.getAppropriateMaterials()[0];
+
       const gl = this._glContext.gl;
-      const isCulling = gl.isEnabled(gl.CULL_FACE);
-      const cullMode = gl.getParameter(gl.CULL_FACE_MODE);
+      const isCulling = material.states.enable.includes(gl.CULL_FACE);
+      const cullMode = IsUtil.exist(material.states.functions.cullFace) ? material.states.functions.cullFace: gl.BACK;
 
       let isFrontFacePickable = true;
       let isBackFacePickable = true;
       if (isCulling) {
         if (cullMode === gl.FRONT) {
           isFrontFacePickable = false;
-        } else if (cullMode === gl.Back) {
+        } else if (cullMode === gl.BACK) {
           isBackFacePickable = false;
         } else {
           isFrontFacePickable = false;
@@ -17540,6 +17602,9 @@ return mat4(
       return new M_ScreenMesh(this.__system, customVertexAttributes);
     }
 
+    createFreeShader(vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames) {
+      return new FreeShader(this.__system, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames); 
+    }
   }
 
   GLBoost['GLBoostMiddleContext'] = GLBoostMiddleContext;
@@ -19355,6 +19420,8 @@ return mat4(
               let texturePurpose;
               if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
                 texturePurpose = GLBoost$1.TEXTURE_PURPOSE_DIFFUSE;
+              } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
+                texturePurpose = GLBoost$1.TEXTURE_PURPOSE_NORMAL;
               }
 
               let texture = textures[textureStr];
@@ -22136,4 +22203,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-154-gc497-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-162-gaad3-mod branch: develop';

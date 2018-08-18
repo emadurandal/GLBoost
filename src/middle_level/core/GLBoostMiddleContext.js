@@ -22,6 +22,7 @@ import M_OutlineGizmo from '../elements/gizmos/M_OutlineGizmo';
 import M_HeightLineGizmo from '../elements/gizmos/M_HeightLineGizmo';
 import EffekseerElement from '../plugins/EffekseerElement';
 import M_ScreenMesh from '../elements/meshes/M_ScreenMesh';
+import FreeShader from '../shaders/FreeShader';
 
 
 export default class GLBoostMiddleContext extends GLBoostLowContext {
@@ -133,6 +134,9 @@ export default class GLBoostMiddleContext extends GLBoostLowContext {
     return new M_ScreenMesh(this.__system, customVertexAttributes);
   }
 
+  createFreeShader(vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames) {
+    return new FreeShader(this.__system, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames); 
+  }
 }
 
 GLBoost['GLBoostMiddleContext'] = GLBoostMiddleContext;
