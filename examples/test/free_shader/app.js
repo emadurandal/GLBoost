@@ -80,7 +80,7 @@ promise.then(function(mesh) {
       `,
       {
         'aVertex_position': 'POSITION',
-        'aVertex_texcoord': 'TEXCOORD'
+        'aVertex_texcoord': 'TEXCOORD_0'
       },
       {
         'worldMatrix': 'WORLD',
