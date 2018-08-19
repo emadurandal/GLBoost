@@ -76,23 +76,28 @@ export class PBRPrincipledShaderSource {
     `;
 
     shaderText += `
-    float g_shielding(float NH, float NV, float NL, float VH) {
-      float g1 = 2.0 * NH * NV / VH;
-      float g2 = 2.0 * NH * NL / VH;
-      return max(0.0, min(1.0, min(g1, g2)));
+    // the same as glTF WebGL sample
+    // https://github.com/KhronosGroup/glTF-WebGL-PBR/blob/88eda8c5358efe03128b72b6c5f5f6e5b6d023e1/shaders/pbr-frag.glsl#L188
+    // That is, Unreal Engine based approach, but modified to use alphaRoughness (squared artist's roughness parameter),
+    // and based on 'Separable Masking and Shadowing' approximation (propesed by Christophe Schlick)
+    // https://www.cs.virginia.edu/~jdl/bib/appearance/analytic%20models/schlick94b.pdf
+    float g_shielding(float NH, float NV, float NL, float VH, float alphaRoughness) {
+      float r = alphaRoughness;
+
+      // Local Shadowing using Smith Masking Function
+      float localShadowing = 2.0 * NL / (NL + sqrt(r * r + (1.0 - r * r) * (NL * NL)));
+      
+      // Local Masking using Smith Masking Function
+      float localMasking = 2.0 * NV / (NV + sqrt(r * r + (1.0 - r * r) * (NV * NV)));
+      
+      return localShadowing * localMasking;
     }
     `;
 
     shaderText += `
-    float fresnel(float n, float VH) {
-      float c = VH;
-      float g = sqrt(n * n + c * c - 1.0);
-      float f = ((g - c)*(g - c))/((g + c)*(g + c)) * (1.0 + 
-      ((c * (g + c) - 1.0)*(c * (g + c) - 1.0))
-      /
-      ((c * (g - c) - 1.0)*(c * (g - c) - 1.0))
-      );
-      return f;
+    // The Schlick Approximation to Fresnel
+    float fresnel(float f0, float LH) {
+      return f0 + (1.0 - f0) * pow(1.0 - LH, 5);
     }
     `;
 
