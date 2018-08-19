@@ -84,10 +84,10 @@ export class PBRPrincipledShaderSource {
     float g_shielding(float NH, float NV, float NL, float VH, float alphaRoughness) {
       float r = alphaRoughness;
 
-      // Local Shadowing using Smith Masking Function
+      // Local Shadowing using Smith Masking Function (Schlick's approximation version)
       float localShadowing = 2.0 * NL / (NL + sqrt(r * r + (1.0 - r * r) * (NL * NL)));
       
-      // Local Masking using Smith Masking Function
+      // Local Masking using Smith Masking Function (Schlick's approximation version)
       float localMasking = 2.0 * NV / (NV + sqrt(r * r + (1.0 - r * r) * (NV * NV)));
       
       return localShadowing * localMasking;
