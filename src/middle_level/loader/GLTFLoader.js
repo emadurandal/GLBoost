@@ -517,7 +517,7 @@ export default class GLTFLoader {
           }
         );
       }
-      camera.userFlavorName = cameraStr;
+      camera.userFlavorName = cameraStr + 'Shape';
       group.addChild(camera);
     } else if (nodeJson.extensions) {
       if (nodeJson.extensions.KHR_materials_common) {
