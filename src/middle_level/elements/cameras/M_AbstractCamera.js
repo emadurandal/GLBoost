@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_Element from '../M_Element';
 
 export default class M_AbstractCamera extends M_Element {

@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_AbstractCamera from './M_AbstractCamera';
 import L_OrthoCamera from '../../../low_level/elements/cameras/L_OrthoCamera';
 
@@ -71,6 +72,22 @@ export default class M_OrthoCamera extends M_AbstractCamera {
     return this._lowLevelCamera.zFar;
   }
 
+  set xmag(value) {
+    this._lowLevelCamera.xmag = value;
+  }
+
+  get xmag() {
+    return this._lowLevelCamera.xmag;
+  }
+
+  set ymag(value) {
+    this._lowLevelCamera.ymag = value;
+  }
+
+  get ymag() {
+    return this._lowLevelCamera.ymag;
+  }
+
   get aspect() {
     return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
   }
@@ -84,3 +101,5 @@ export default class M_OrthoCamera extends M_AbstractCamera {
   }
 
 }
+
+GLBoost['M_OrthoCamera'] = M_OrthoCamera;

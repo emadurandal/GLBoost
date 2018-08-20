@@ -1,3 +1,4 @@
+import GLBoost from '../../../globals';
 import M_AbstractCamera from './M_AbstractCamera';
 import L_FrustumCamera from '../../../low_level/elements/cameras/L_FrustumCamera';
 
@@ -83,3 +84,5 @@ export default class M_FrustumCamera extends M_AbstractCamera {
     this._lowLevelCamera.allInfo = info;
   }
 }
+
+GLBoost['M_FrustumCamera'] = M_FrustumCamera;
