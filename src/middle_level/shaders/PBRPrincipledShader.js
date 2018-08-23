@@ -9,6 +9,9 @@ export class PBRPrincipledShaderSource {
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
     shaderText += 'uniform vec4 Kd;\n';
+    shaderText += 'uniform vec2 uMetallicRoughness;\n';
+    shaderText += 'uniform vec4 uBaseColorFactor;\n';
+
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;
@@ -25,6 +28,7 @@ export class PBRPrincipledShaderSource {
 
     shaderText += `
       const float M_PI = 3.141592653589793;
+      const float c_MinRoughness = 0.04;
     `;
 
     shaderText += `
@@ -102,13 +106,20 @@ export class PBRPrincipledShaderSource {
     `;
 
     shaderText += `
-    float cook_torrance_specular_brdf(float f0, float NH, float NL, float NV, float alphaRoughness) {    
+    float cook_torrance_specular_brdf(float NH, float NL, float NV, float F, float alphaRoughness) {    
       float D = d_ggx(NH, alphaRoughness);
       float G = g_shielding(NL, NV, alphaRoughness);
-      float F = fresnel(f0, LH);
       return D*G*F/(4.0*NL*NV);
     }
     `;
+
+    shaderText += `
+    vec3 diffuse_brdf(vec3 Kd)
+    {
+      return Kd / M_PI;
+    }
+    `;
+
 
     return shaderText;
   }
@@ -116,25 +127,45 @@ export class PBRPrincipledShaderSource {
   FSShade_PBRPrincipledShaderSource(f, gl, lights) {
     var shaderText = '';
 
-    shaderText += '  vec4 surfaceColor = rt0;\n';
-    shaderText += '  rt0 = vec4(0.0, 0.0, 0.0, 0.0);\n';
-    
+    shaderText += `
+vec4 surfaceColor = rt0;
+rt0 = vec4(0.0, 0.0, 0.0, 0.0);
+float userRoughness = uMetallicRoughness.y;
+float metallic = uMetallicRoughness.x;
+userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
+metallic = clamp(metallic, 0.0, 1.0);
+float alphaRoughness = userRoughness * userRoughness;
+`;
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
       shaderText += `  {\n`;
       shaderText +=      Shader._generateLightStr(i);
-      shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
-      shaderText += `    float diffuse = max(dot(lightDirection, normal), 0.0);\n`;
-      shaderText += `    rt0 += spotEffect * vec4(visibility, visibility, visibility, 1.0) * Kd * lightDiffuse[${i}] * vec4(diffuse, diffuse, diffuse, 1.0) * surfaceColor;\n`;
+      // Light
+      shaderText += `    vec4 incidentLight = spotEffect * lightDiffuse[${i}];\n`;
+
+      // Diffuse
+      shaderText += `    vec3 diffuseContrib = (1.0 - F) * diffuse_brdf(Kd.xyz);\n`;
+       
+      // Specular
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
       shaderText += '    vec3 halfVector = normalize(lightDirection + viewDirection);\n';
-      shaderText += '    float NH = dot(normal, halfVector);\n';
-      shaderText += '    float NV = dot(normal, viewDirection);\n';
-      shaderText += '    float NL = dot(normal, lightDirection);\n';
-      shaderText += '    float VH = dot(viewDirection, halfVector);\n';
+      shaderText += '    float NL = clamp(dot(normal, lightDirection), 0.001, 1.0);\n';
+      shaderText += '    float NV = clamp(dot(normal, viewDirection), 0.001, 1.0);\n';
+      shaderText += '    float NH = clamp(dot(normal, halfVector), 0.0, 1.0);\n';
+      shaderText += '    float LH = clamp(dot(lightDirection, halfVector, 0.0, 1.0);\n';
+      shaderText += '    float VH = clamp(dot(viewDirection, halfVector, 0.0, 1.0);\n';
+      shaderText += '    float F = fresnel(f0, LH);\n';
+      shaderText += `    vec3 specularContrib = cook_torrance_specular_brdf(NH, NL, NV, F, alphaRoughness);\n`;
 
-      shaderText += `    float specular = cook_torrance_specular_brdf(f0, NH, NL, NV, alphaRoughness);\n`;
+      shaderText += `    vec3 reflect = (diffuseLight + specularContrib) * NL * incidentLight;\n`;
+
+      // Light Visibility (Shadow Effect)
+      shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
+
+      // Add this light contribute to the amount of light
+      shaderText += `    rt0.xyz += reflect * visibility;\n`;
+
       shaderText += `  }\n`;
     }
     shaderText += '  rt0.xyz += ambient.xyz;\n';

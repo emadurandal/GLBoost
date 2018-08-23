@@ -1,6 +1,6 @@
-version: 0.0.4-170-g4f45c-mod
+version: 0.0.4-171-gee08-mod
 branch: develop
-e6becea8ac6b2313665bd3d19ff3842cc5c1cc69d90565b623efe60de716594b ./build/glboost.js
-e6becea8ac6b2313665bd3d19ff3842cc5c1cc69d90565b623efe60de716594b ./build/glboost.js
-cc432bb8ae18755ecd0341b928ff68f6268e67b7fb82f745f966061b9a4a4868 ./build/glboost.min.js
+c6d193a10fd3ff6cc17cc718dba7b83951b6a792aea4a9eabd406d34e8b1b4d4 ./build/glboost.js
+c6d193a10fd3ff6cc17cc718dba7b83951b6a792aea4a9eabd406d34e8b1b4d4 ./build/glboost.js
+1d32636cff4d356df86d2d34289a28e4f3e282f085e6e129654b65183ad4ecf2 ./build/glboost.min.js
 f1e69a792f3f7e86db2627b3c53f87f646ab6561b33ee1cb1aad2ac103695456 ./build/glboost.min.js.map
