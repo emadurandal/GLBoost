@@ -6,6 +6,7 @@ import Quaternion from '../math/Quaternion';
 import Matrix33 from '../math/Matrix33';
 import Matrix44 from '../math/Matrix44';
 import MathUtil from '../math/MathUtil';
+import is from '../misc/IsUtil';
 
 import Component from '../core/Component';
 import AnimationComponent from './AnimationComponent';
@@ -268,6 +269,69 @@ export default class TransformComponent extends Component {
       this._is_normal_trs_matrix_updated = true;
     }
     return this._normalMatrix; 
+  }
+
+  /**
+   * Set multiple transform information at once. By using this method,
+   * we reduce the cost of automatically updating other transform components inside this class.
+   * This method may be useful for animation processing and so on.
+   * 
+   * The transform components of these arguments must not be mutually discrepant.
+   * for example. The transform components of matrix argument (translate, rotate/quaternion, scale)
+   * must be equal to translate, rotate, scale, quaternion arguments.
+   * And both rotate and quaternion arguments must be same rotation.
+   * If there is an argument passed with null or undefined, it is interpreted as unchanged.
+   * 
+   * @param {*} translate 
+   * @param {*} rotate 
+   * @param {*} scale 
+   * @param {*} quaternion 
+   * @param {*} matrix 
+   */
+  setTransform(translate: Vector3, rotate: Vector3, scale: Vector3, quaternion: Quaternion, matrix: Matrix44) {
+    this._is_trs_matrix_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
+    this._is_normal_trs_matrix_updated = false;
+
+    // Matrix
+    if (matrix != null) {
+      this._matrix = matrix.clone();
+      this._is_trs_matrix_updated = true;
+      this._is_translate_updated = false;
+      this._is_euler_angles_updated = false;
+      this._is_quaternion_updated = false;
+      this._is_scale_updated = false;
+    }
+
+    // Translate
+    if (translate != null) {
+      this._translate = translate.clone();
+      this._is_translate_updated = true;
+    }
+
+    // Roatation
+    if (rotate != null && quaternion != null) {
+      this._rotate = rotate.clone();
+      this._quaternion = quaternion.clone();
+      this._is_euler_angles_updated = true;
+      this._is_quaternion_updated = true;
+    } else if (rotate != null) {
+      this._rotate = rotate.clone();
+      this._is_euler_angles_updated = true;
+      this._is_quaternion_updated = false;
+     } else if (quaternion != null) {
+      this._quaternion = quaternion.clone();
+      this._is_euler_angles_updated = false;
+      this._is_quaternion_updated = true;
+    }
+    
+    // Scale
+    if (scale != null) {
+      this._scale = scale.clone();
+      this._is_scale_updated = true;
+    }
+
+    this.__updateTransform();
   }
 
   __updateTransform() {
