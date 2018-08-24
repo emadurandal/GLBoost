@@ -141,8 +141,11 @@ userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
 float alphaRoughness = userRoughness * userRoughness;
 
+// F0
 vec3 diffuseMatAverageF0 = vec3(0.04);
 vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
+
+// Albedo
 // vec3 albedo = baseColor.rgb * (vec3(1.0) - F0);
 vec3 albedo = baseColor.rgb * (1.0 - metallic);
 
@@ -155,6 +158,9 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       // Light
       shaderText += `    vec4 incidentLight = spotEffect * lightDiffuse[${i}];\n`;
 
+      // Fresnel
+      shaderText += '    float F = fresnel(f0, LH);\n';
+
       // Diffuse
       shaderText += `    vec3 diffuseContrib = (1.0 - F) * diffuse_brdf(albedo);\n`;
        
@@ -166,7 +172,6 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       shaderText += '    float NH = clamp(dot(normal, halfVector), 0.0, 1.0);\n';
       shaderText += '    float LH = clamp(dot(lightDirection, halfVector, 0.0, 1.0);\n';
       shaderText += '    float VH = clamp(dot(viewDirection, halfVector, 0.0, 1.0);\n';
-      shaderText += '    float F = fresnel(f0, LH);\n';
       shaderText += `    vec3 specularContrib = cook_torrance_specular_brdf(NH, NL, NV, F, alphaRoughness);\n`;
 
       shaderText += `    vec3 reflect = (diffuseLight + specularContrib) * NL * incidentLight;\n`;
