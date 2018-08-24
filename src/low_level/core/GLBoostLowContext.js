@@ -5,6 +5,7 @@ import GLBoostSystem from './GLBoostSystem';
 import Geometry from '../geometries/Geometry';
 import BlendShapeGeometry from '../geometries/BlendShapeGeometry';
 import ClassicMaterial from '../materials/ClassicMaterial';
+import PBRMetallicRoughnessMaterial from '../materials/PBRMetallicRoughnessMaterial';
 import L_PerspectiveCamera from '../elements/cameras/L_PerspectiveCamera';
 import L_FrustumCamera from '../elements/cameras/L_FrustumCamera';
 import L_OrthoCamera from '../elements/cameras/L_OrthoCamera';
@@ -115,6 +116,10 @@ export default class GLBoostLowContext {
 
   createClassicMaterial() {
     return new ClassicMaterial(this.__system);
+  }
+
+  createPBRMetallicRoughnessMaterial() {
+    return new PBRMetallicRoughnessMaterial(this.__system);
   }
 
   createPerspectiveCamera(lookat, perspective) {

@@ -5,11 +5,13 @@ import glBoostSystem from '../core/GLBoostSystem';
 import L_AbstractMaterial from './L_AbstractMaterial';
 import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
+import PBRPrincipledShader from '../../middle_level/shaders/PBRPrincipledShader';
 
 export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   _wireframeWidthRelativeScale: number;
   _baseColor: Vector3;
   _metallicRoughnessFactors: Vector2;
+  _shaderClass: PBRPrincipledShader;
 
   constructor(glBoostSystem: glBoostSystem) {
     super(glBoostSystem);
@@ -18,6 +20,8 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
     this._baseColor = new Vector3(1.0, 1.0, 1.0);
     this._metallicRoughnessFactors = new Vector2(0.0, 0.5);
+
+    this._shaderClass = PBRPrincipledShader;
   }
 
   get wireframeWidthRelativeScale() {
