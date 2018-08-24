@@ -317,7 +317,7 @@ export default class GLTFLoader {
             fulfilled();
           })
         );
-      } else if (bufferInfo.uri === 'data:,') {
+      } else if (bufferInfo.uri === '' || bufferInfo.uri === 'data:,') {
         buffers[bufferName] = arrayBufferBinary;
       } else if (options.files && options.files[filename]) {
         const arrayBuffer = options.files[filename];

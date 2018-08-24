@@ -18801,7 +18801,7 @@ return mat4(
               fulfilled();
             })
           );
-        } else if (bufferInfo.uri === 'data:,') {
+        } else if (bufferInfo.uri === '' || bufferInfo.uri === 'data:,') {
           buffers[bufferName] = arrayBufferBinary;
         } else if (options.files && options.files[filename]) {
           const arrayBuffer = options.files[filename];
@@ -22223,4 +22223,4 @@ return mat4(
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-171-gee08-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-173-g92e1-mod branch: develop';
