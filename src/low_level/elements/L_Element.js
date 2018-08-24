@@ -193,7 +193,7 @@ export default class L_Element extends GLBoostObject {
     return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getTranslateAt(lineName: string, inputValue: Vector3): Vector3 {
+  getTranslateAt(lineName: string, inputValue: number): Vector3 {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
     if (value !== null) {
       this._translate = value;
@@ -202,7 +202,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getTranslateAtOrStatic(lineName: string, inputValue: Vector3) {
+  getTranslateAtOrStatic(lineName: string, inputValue: number) {
     let value = this.getTranslateAt(lineName, inputValue);
     if (value === null) {
       return this.getTranslateNotAnimated();
@@ -271,7 +271,7 @@ export default class L_Element extends GLBoostObject {
     return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getScaleAt(lineName: string, inputValue: Vector3) {
+  getScaleAt(lineName: string, inputValue: number) {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
     if (value !== null) {
       this._scale = value.clone();
@@ -280,7 +280,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getScaleAtOrStatic(lineName: string, inputValue: Vector3) {
+  getScaleAtOrStatic(lineName: string, inputValue: number) {
     let value = this.getScaleAt(lineName, inputValue);
     if (value === null) {
       return this.getScaleNotAnimated();
