@@ -8,8 +8,7 @@ export class PBRPrincipledShaderSource {
     
     var sampler2D = this._sampler2DShadow_func();
     var shaderText = '';
-    shaderText += 'uniform vec4 Kd;\n';
-    shaderText += 'uniform vec2 uMetallicRoughness;\n';
+    shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
     shaderText += 'uniform vec4 uBaseColorFactor;\n';
 
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
@@ -130,11 +129,23 @@ export class PBRPrincipledShaderSource {
     shaderText += `
 vec4 surfaceColor = rt0;
 rt0 = vec4(0.0, 0.0, 0.0, 0.0);
-float userRoughness = uMetallicRoughness.y;
-float metallic = uMetallicRoughness.x;
+
+// BaseColor
+vec3 baseColor = uBaseColorFactor.rgb;
+
+// Metallic & Roughness
+float userRoughness = uMetallicRoughnessFactors.y;
+float metallic = uMetallicRoughnessFactors.x;
+
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
 float alphaRoughness = userRoughness * userRoughness;
+
+vec3 diffuseMatAverageF0 = vec3(0.04);
+vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
+// vec3 albedo = baseColor.rgb * (vec3(1.0) - F0);
+vec3 albedo = baseColor.rgb * (1.0 - metallic);
+
 `;
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
@@ -145,7 +156,7 @@ float alphaRoughness = userRoughness * userRoughness;
       shaderText += `    vec4 incidentLight = spotEffect * lightDiffuse[${i}];\n`;
 
       // Diffuse
-      shaderText += `    vec3 diffuseContrib = (1.0 - F) * diffuse_brdf(Kd.xyz);\n`;
+      shaderText += `    vec3 diffuseContrib = (1.0 - F) * diffuse_brdf(albedo);\n`;
        
       // Specular
       shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
