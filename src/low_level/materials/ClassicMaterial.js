@@ -1,5 +1,6 @@
 import GLBoost from '../../globals';
 import L_AbstractMaterial from './L_AbstractMaterial';
+import Vector4 from '../math/Vector4';
 
 export default class ClassicMaterial extends L_AbstractMaterial {
   constructor(glBoostContext) {
