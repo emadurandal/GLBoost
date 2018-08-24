@@ -34,6 +34,7 @@
     "obj_mesh_changing_shader",
     "opacity",
     "particles",
+    "pbr_punctual_lights",
     "quaternion",
     "scene_graph",
     "shadowmap",
