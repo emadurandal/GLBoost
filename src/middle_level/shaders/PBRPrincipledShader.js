@@ -159,7 +159,7 @@ vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 
 // Albedo
 vec3 albedo = baseColor.rgb * (vec3(1.0) - diffuseMatAverageF0);
-//vec3 albedo = baseColor.rgb * (1.0 - metallic);
+albedo *= (1.0 - metallic);
 
 `;
     for (let i=0; i<lights.length; i++) {
