@@ -10,7 +10,9 @@ export default class M_OutlineGizmo extends M_Gizmo {
   constructor(glBoostSystem, mesh, scale = 0.05) {
     super(glBoostSystem, null, null);
 
-    this._init(glBoostSystem, mesh, scale);
+    if (mesh.className === 'M_Mesh') {
+      this._init(glBoostSystem, mesh, scale);
+    }
   }
 
   _init(glBoostSystem, mesh, scale) {
@@ -39,6 +41,8 @@ export default class M_OutlineGizmo extends M_Gizmo {
   }
 
   updateMatrix(mesh) {
-    this._group.matrix = mesh.worldMatrix;
+    if (mesh.className === 'M_Mesh') {
+      this._group.matrix = mesh.worldMatrix;
+    }
   }
 }

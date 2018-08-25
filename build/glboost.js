@@ -13629,7 +13629,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
     }
 
     get gizmos() {
-      if (this.isOutlineVisible) {
+      if (this.isOutlineVisible && this.className === 'M_Mesh') {
         return this._gizmos.concat([this._outlineGizmo]);
       } else {
         return this._gizmos;
@@ -13637,7 +13637,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
     }
 
     set isOutlineVisible(flg) {
-      if (flg && this._outlineGizmo === null) {
+      if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
         this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
       }
 
@@ -17511,7 +17511,9 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
     constructor(glBoostSystem, mesh, scale = 0.05) {
       super(glBoostSystem, null, null);
 
-      this._init(glBoostSystem, mesh, scale);
+      if (mesh.className === 'M_Mesh') {
+        this._init(glBoostSystem, mesh, scale);
+      }
     }
 
     _init(glBoostSystem, mesh, scale) {
@@ -17540,7 +17542,9 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
     }
 
     updateMatrix(mesh) {
-      this._group.matrix = mesh.worldMatrix;
+      if (mesh.className === 'M_Mesh') {
+        this._group.matrix = mesh.worldMatrix;
+      }
     }
   }
 
@@ -18877,6 +18881,24 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
         }
       }
 
+      if (options && typeof options.defaultMaterial !== "undefined") {
+        if (typeof options.defaultMaterial === "string") {
+          defaultOptions.defaultMaterial = GLBoost$1[options.defaultMaterial];
+        } else {
+          defaultOptions.defaultMaterial = options.defaultMaterial;
+        }
+      }
+
+      if (defaultOptions.defaultMaterial != null && defaultOptions.defaultMaterial.name.indexOf('PBR') !== -1) {
+        defaultOptions.defaultShaderClass = defaultOptions.defaultMaterial.shaderClass;
+      } else if (options && typeof options.defaultShaderClass !== "undefined") {
+        if (typeof options.defaultShaderClass === "string") {
+          defaultOptions.defaultShaderClass = GLBoost$1[options.defaultShaderClass];
+        } else {
+          defaultOptions.defaultShaderClass = options.defaultShaderClass;
+        }
+      }
+
       return defaultOptions;
     }
 
@@ -18899,6 +18921,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
         isExistJointGizmo: false,
         isBlend: false,
         isDepthTest: true,
+        defaultMaterial: ClassicMaterial$1,
         defaultShaderClass: null,
         isMeshTransparentAsDefault: false,
         defaultStates: {
@@ -18999,7 +19022,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
       let glTFVer = this._checkGLTFVersion(json);
       options = this.getOptions(defaultOptions, json, options);
-      const defaultShader = this.getDefaultShader(options);
+      const defaultShader = options.defaultShaderClass;
       this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
       return { options, defaultShader };
     }
@@ -19020,7 +19043,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       let json = JSON.parse(gotText);
       let glTFVer = this._checkGLTFVersion(json);
       options = this.getOptions(defaultOptions, json, options);
-      const defaultShader = this.getDefaultShader(options);
+      const defaultShader = options.defaultShaderClass;
       this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
       return { options, defaultShader };
     }
@@ -19481,7 +19504,9 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
           }
   */
           let material = null;
-          if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+          if (options.defaultMaterial != null) {
+            material = new options.defaultMaterial(glBoostContext.__system);
+          } else if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
             material = options.loaderExtension.createClassicMaterial(glBoostContext);
           } else {
             material = glBoostContext.createClassicMaterial();
@@ -19826,7 +19851,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       let techniqueStr = materialJson.technique;
       if (defaultShader) {
         material.shaderClass = defaultShader;
-      } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
+      } else if (this._isKHRMaterialsCommon(originalMaterialJson) && material.className.indexOf('PBR') === -1) {
         switch (techniqueStr) {
           case 'CONSTANT':
             if (options.loaderExtension && options.loaderExtension.getDecalShader) {
@@ -19853,7 +19878,7 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       } else {
         if (typeof json.techniques !== 'undefined') {
           this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
-        } else {
+        } else if (material.className.indexOf('PBR') === -1) {
           if (options.loaderExtension && options.loaderExtension.getDecalShader) {
             material.shaderClass = options.loaderExtension.getDecalShader();
           } else {
@@ -22526,4 +22551,4 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-181-ga3c3-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-182-gce125-mod branch: develop';

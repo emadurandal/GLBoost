@@ -296,7 +296,7 @@ export default class M_Mesh extends M_Element {
   }
 
   get gizmos() {
-    if (this.isOutlineVisible) {
+    if (this.isOutlineVisible && this.className === 'M_Mesh') {
       return this._gizmos.concat([this._outlineGizmo]);
     } else {
       return this._gizmos;
@@ -304,7 +304,7 @@ export default class M_Mesh extends M_Element {
   }
 
   set isOutlineVisible(flg) {
-    if (flg && this._outlineGizmo === null) {
+    if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
       this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
     }
 
