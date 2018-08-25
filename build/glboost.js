@@ -9276,7 +9276,12 @@ return mat4(
     setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
       super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-      let baseColor = material.baseColor;
+      let baseColor = null;
+      if (material.className.indexOf('ClassicMaterial') !== -1) {
+        baseColor = material.baseColor;
+      } else {
+        baseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+      }
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
 
       let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
@@ -9910,6 +9915,11 @@ return mat4(
     }
     `;
 
+      shaderText += `
+      vec3 srgbToLinear(vec3 srgbColor) {
+        return pow(srgbColor, vec3(2.2));
+      }
+    `;
 
       return shaderText;
     }
@@ -9918,11 +9928,11 @@ return mat4(
       var shaderText = '';
 
       shaderText += `
-vec4 surfaceColor = rt0;
+vec3 surfaceColor = rt0.rgb;
 rt0 = vec4(0.0, 0.0, 0.0, 0.0);
 
 // BaseColor
-vec3 baseColor = uBaseColorFactor.rgb;
+vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
@@ -9937,7 +9947,7 @@ vec3 diffuseMatAverageF0 = vec3(0.04);
 vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 
 // Albedo
-// vec3 albedo = baseColor.rgb * (vec3(1.0) - F0);
+//vec3 albedo = baseColor.rgb * (vec3(1.0) - F0);
 vec3 albedo = baseColor.rgb * (1.0 - metallic);
 
 `;
@@ -9972,8 +9982,6 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
         shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
 
         // Add this light contribute to the amount of light
-  //      shaderText += `    rt0.xyz += baseColor * vec3(NL) * incidentLight.rgb;\n`;
-  //      shaderText += `    rt0.xyz += reflect;\n`;
         shaderText += `    rt0.xyz += reflect * visibility;\n`;
 
         shaderText += `  }\n`;
@@ -9981,8 +9989,6 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
       shaderText += '  rt0.xyz += ambient.xyz;\n';
       
       shaderText += '  rt0.a = 1.0;\n';
-      // shaderText += '  rt0 = surfaceColor;\n';
-  //    shaderText += '  rt0 = vec4(v_shadowCoord[0].xy, 0.0, 1.0);\n';
 
 
 
@@ -22520,4 +22526,4 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-177-ge14e8b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-181-ga3c3-mod branch: develop';
