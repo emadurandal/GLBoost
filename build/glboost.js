@@ -22558,4 +22558,4 @@ vec3 albedo = baseColor.rgb * (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-184-gd457-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-185-g79f17-mod branch: develop';
