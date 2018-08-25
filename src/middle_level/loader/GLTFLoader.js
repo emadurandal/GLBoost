@@ -17,6 +17,7 @@ import DataUtil from '../../low_level/misc/DataUtil';
 import M_Group from '../elements/M_Group';
 import MathUtil from "../../low_level/math/MathUtil";
 import MathClassUtil from '../../low_level/math/MathClassUtil';
+import ClassicMaterial from '../../low_level/materials/ClassicMaterial';
 
 
 let singleton = Symbol();
@@ -88,6 +89,24 @@ export default class GLTFLoader {
       }
     }
 
+    if (options && typeof options.defaultMaterial !== "undefined") {
+      if (typeof options.defaultMaterial === "string") {
+        defaultOptions.defaultMaterial = GLBoost[options.defaultMaterial];
+      } else {
+        defaultOptions.defaultMaterial = options.defaultMaterial;
+      }
+    }
+
+    if (defaultOptions.defaultMaterial != null && defaultOptions.defaultMaterial.name.indexOf('PBR') !== -1) {
+      defaultOptions.defaultShaderClass = defaultOptions.defaultMaterial.shaderClass;
+    } else if (options && typeof options.defaultShaderClass !== "undefined") {
+      if (typeof options.defaultShaderClass === "string") {
+        defaultOptions.defaultShaderClass = GLBoost[options.defaultShaderClass];
+      } else {
+        defaultOptions.defaultShaderClass = options.defaultShaderClass;
+      }
+    }
+
     return defaultOptions;
   }
 
@@ -110,6 +129,7 @@ export default class GLTFLoader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      defaultMaterial: ClassicMaterial,
       defaultShaderClass: null,
       isMeshTransparentAsDefault: false,
       defaultStates: {
@@ -212,7 +232,7 @@ export default class GLTFLoader {
     let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    const defaultShader = this.getDefaultShader(options);
+    const defaultShader = options.defaultShaderClass;
     this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
@@ -233,7 +253,7 @@ export default class GLTFLoader {
     let json = JSON.parse(gotText);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    const defaultShader = this.getDefaultShader(options);
+    const defaultShader = options.defaultShaderClass;
     this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
@@ -694,7 +714,9 @@ export default class GLTFLoader {
         }
 */
         let material = null;
-        if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+        if (options.defaultMaterial != null) {
+          material = new options.defaultMaterial(glBoostContext.__system);
+        } else if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
           material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
@@ -1051,7 +1073,7 @@ export default class GLTFLoader {
     let techniqueStr = materialJson.technique;
     if (defaultShader) {
       material.shaderClass = defaultShader;
-    } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
+    } else if (this._isKHRMaterialsCommon(originalMaterialJson) && material.className.indexOf('PBR') === -1) {
       switch (techniqueStr) {
         case 'CONSTANT':
           if (options.loaderExtension && options.loaderExtension.getDecalShader) {
@@ -1078,7 +1100,7 @@ export default class GLTFLoader {
     } else {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
-      } else {
+      } else if (material.className.indexOf('PBR') === -1) {
         if (options.loaderExtension && options.loaderExtension.getDecalShader) {
           material.shaderClass = options.loaderExtension.getDecalShader();
         } else {
