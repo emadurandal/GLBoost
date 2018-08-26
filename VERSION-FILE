@@ -1,6 +1,6 @@
-version: 0.0.4-189-gabe1-mod
+version: 0.0.4-190-g012c-mod
 branch: develop
-7d9fee06e2dc2c60f620069bde7d313f64b23201ea7d637eb7124facf59b2a4d ./build/glboost.js
-7d9fee06e2dc2c60f620069bde7d313f64b23201ea7d637eb7124facf59b2a4d ./build/glboost.js
-4ee1015c820016c682c8cb372101c280021ab26467da0975d5bd66d48fdc3598 ./build/glboost.min.js
+408ea7744adcffda28cc11ea5cc22dbc1b1d3ec3eaaa4a5ea504ede7bb4ab117 ./build/glboost.js
+408ea7744adcffda28cc11ea5cc22dbc1b1d3ec3eaaa4a5ea504ede7bb4ab117 ./build/glboost.js
+ebebc81b0a788d954e92581b7666ee26e71021cc451cf57b7f198593064bd652 ./build/glboost.min.js
 a4f6b683f730b6dff3aac14dd0d0d5003b1868856773a7ebf16a299a9cb8fecc ./build/glboost.min.js.map
