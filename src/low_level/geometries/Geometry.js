@@ -1,15 +1,12 @@
 import GLBoost from '../../globals';
 import GLBoostObject from '../core/GLBoostObject';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import MathUtil from '../../low_level/math/MathUtil';
-import DrawKickerLocal from '../../middle_level/draw_kickers/DrawKickerLocal';
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 import DrawKickerWorld from '../../middle_level/draw_kickers/DrawKickerWorld';
-import VertexLocalShaderSource from '../../middle_level/shaders/VertexLocalShader';
 import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 import AABB from '../../low_level/math/AABB';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector2 from '../../low_level/math/Vector2';
-import Shader from '../../low_level/shaders/Shader';
 import FreeShader from '../../middle_level/shaders/FreeShader';
 import Matrix33 from '../math/Matrix33';
 
@@ -31,17 +28,17 @@ export default class Geometry extends GLBoostObject {
     this._AABB = new AABB();
     this._drawKicker = DrawKickerWorld.getInstance();
 
-    if (this._drawKicker instanceof DrawKickerWorld) {
+  }
 
-    } else if (this._drawKicker instanceof DrawKickerLocal) {
-
-    }
+  _createShaderInstance(glBoostContext, shaderClass) {
+    let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
+    return shaderInstance;
   }
 
   /**
    * 全ての頂点属性のリストを返す
    */
-  static _allVertexAttribs(vertices) {
+  _allVertexAttribs(vertices) {
     var attribNameArray = [];
     for (var attribName in vertices) {
       if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
@@ -55,7 +52,7 @@ export default class Geometry extends GLBoostObject {
   _checkAndSetVertexComponentNumber(allVertexAttribs) {
     allVertexAttribs.forEach((attribName)=> {
       let element = this._vertices[attribName][0];
-      let componentN = MathUtil.compomentNumberOfVector(element);
+      let componentN = MathClassUtil.compomentNumberOfVector(element);
       if (componentN === 0) {
         // if 0, it must be a number. so users must set components info.
         return;
@@ -242,7 +239,7 @@ export default class Geometry extends GLBoostObject {
     }
     if ( this._vertices.texcoord ) {
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i+=incrementNum) {
+        for (let i=0; i<vertexNum-2; i+=incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -256,7 +253,7 @@ export default class Geometry extends GLBoostObject {
       } else {
         for (let i=0; i<this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j+=incrementNum) {
+          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
             let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex; /// ０つ目の頂点
             let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
             let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
@@ -278,7 +275,7 @@ export default class Geometry extends GLBoostObject {
     this._vertices = vertices;
     this._indicesArray = indicesArray;
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
     let vertexNum = 0;
@@ -297,7 +294,7 @@ export default class Geometry extends GLBoostObject {
     // for Wireframe
     this._calcBaryCentricCoord(vertexNum, positionElementNumPerVertex);
 
-    allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    allVertexAttribs = this._allVertexAttribs(this._vertices);
     this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
     // vector to array
@@ -314,7 +311,7 @@ export default class Geometry extends GLBoostObject {
       let vertexAttribArray = [];
       this._vertices[attribName].forEach((elem, index) => {
         let element = this._vertices[attribName][index];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+        Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
       });
       this._vertices[attribName] = vertexAttribArray;
 
@@ -356,7 +353,7 @@ export default class Geometry extends GLBoostObject {
       let vertexAttribArray = [];
       this._vertices[attribName].forEach((elem, index) => {
         let element = vertices[attribName][index];
-        Array.prototype.push.apply(vertexAttribArray, MathUtil.vectorToArray(element));
+        Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
 
         if (attribName === 'position' && !(skipUpdateAABB === true)) {
           let componentN = this._vertices.components[attribName];
@@ -432,22 +429,22 @@ export default class Geometry extends GLBoostObject {
   }
 
   _getAllVertexAttribs() {
-    return Geometry._allVertexAttribs(this._vertices);
+    return this._allVertexAttribs(this._vertices);
   } 
 
   prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
     let vertices = this._vertices;
 
-    let _optimizedVertexAttribs = Geometry._allVertexAttribs(vertices, material);
+    let _optimizedVertexAttribs = this._allVertexAttribs(vertices, material);
 
     let shaderInstance = null;
     if (argShaderInstance) {
       shaderInstance = argShaderInstance;
     } else {
       if (shaderClass) {
-        shaderInstance = Shader._createShaderInstance(this._glBoostContext, shaderClass);
+        shaderInstance = this._createShaderInstance(this._glBoostSystem, shaderClass);
       } else {
-        shaderInstance = Shader._createShaderInstance(this._glBoostContext, material.shaderClass);
+        shaderInstance = this._createShaderInstance(this._glBoostSystem, material.shaderClass);
       }  
     }
 
@@ -474,7 +471,7 @@ export default class Geometry extends GLBoostObject {
     } else if (mesh.material){
       materials = [mesh.material];
     } else {
-      mesh.material = this._glBoostContext._defaultMaterial;
+      mesh.material = this._glBoostSystem._defaultMaterial;
       materials = [mesh.material];
     }
     return materials;
@@ -493,7 +490,7 @@ export default class Geometry extends GLBoostObject {
 
     this._vertexN = vertices.position.length / vertices.components.position;
 
-    var allVertexAttribs = Geometry._allVertexAttribs(vertices);
+    var allVertexAttribs = this._allVertexAttribs(vertices);
 
 
     // create VAO
@@ -635,7 +632,7 @@ export default class Geometry extends GLBoostObject {
   merge(geometrys) {
     if (Array.isArray(geometrys)) {
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
 
@@ -668,7 +665,7 @@ export default class Geometry extends GLBoostObject {
     } else {
       let geometry = geometrys;
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
         let geomLength = geometry._vertices[attribName].length;
@@ -692,7 +689,7 @@ export default class Geometry extends GLBoostObject {
       console.assert('don\'t merge same geometry!');
     }
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
     allVertexAttribs.forEach((attribName)=> {
       let thisLength = this._vertices[attribName].length;
@@ -730,7 +727,7 @@ export default class Geometry extends GLBoostObject {
   mergeHarder(geometrys) {
     if (Array.isArray(geometrys)) {
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
 
@@ -763,7 +760,7 @@ export default class Geometry extends GLBoostObject {
     } else {
       let geometry = geometrys;
       let typedArrayDic = {};
-      let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+      let allVertexAttribs = this._allVertexAttribs(this._vertices);
       allVertexAttribs.forEach((attribName)=> {
         let thisLength = this._vertices[attribName].length;
         let geomLength = geometry._vertices[attribName].length;
@@ -787,7 +784,7 @@ export default class Geometry extends GLBoostObject {
       console.assert('don\'t merge same geometry!');
     }
 
-    let allVertexAttribs = Geometry._allVertexAttribs(this._vertices);
+    let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
     allVertexAttribs.forEach((attribName)=> {
       let thisLength = this._vertices[attribName].length;
@@ -899,7 +896,7 @@ export default class Geometry extends GLBoostObject {
     return count;
   }
 
-  rayCast(origVec3, dirVec3) {
+  rayCast(origVec3, dirVec3, isFrontFacePickable, isBackFacePickable) {
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
 
@@ -908,14 +905,35 @@ export default class Geometry extends GLBoostObject {
     if (this._primitiveType === GLBoost.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
       incrementNum = 1;
     }
-    if ( this._vertices.texcoord ) {
-      if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i++) {
-          const j = i * incrementNum;
-          let pos0IndexBase = j * positionElementNumPerVertex;
-          let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
-          let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase);
+    if (!this._indicesArray) {
+      for (let i=0; i<vertexNum; i++) {
+        const j = i * incrementNum;
+        let pos0IndexBase = j * positionElementNumPerVertex;
+        let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
+        let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
+        const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+        if (result === null) {
+          continue;
+        }
+        const t = result[0];
+        if (result[0] < currentShortestT) {
+          currentShortestT = t;
+          currentShortestIntersectedPosVec3 = result[1];
+        }
+      }
+    } else {
+      for (let i=0; i<this._indicesArray.length; i++) {
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length; j++) {
+          const k = j * incrementNum;
+          let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
+          let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
+          let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+
+          if (vertexIndices[k + 2] === void 0) {
+            break;
+          }
+          const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
           if (result === null) {
             continue;
           }
@@ -925,39 +943,26 @@ export default class Geometry extends GLBoostObject {
             currentShortestIntersectedPosVec3 = result[1];
           }
         }
-      } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
-          let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j++) {
-            const k = j * incrementNum;
-            let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
-
-            if (vertexIndices[k + 2] === void 0) {
-              break;
-            }
-            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase);
-            if (result === null) {
-              continue;
-            }
-            const t = result[0];
-            if (result[0] < currentShortestT) {
-              currentShortestT = t;
-              currentShortestIntersectedPosVec3 = result[1];
-            }
-          }
-        }
       }
     }
-    
+  
     return [currentShortestIntersectedPosVec3, currentShortestT];
   }
 
-  _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase) {
+  _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable) {
     if (!this._vertices.arenberg3rdPosition[i]) {
       return null;
     }
+
+    const faceNormal = this._vertices.faceNormal[i];
+    if (faceNormal.dotProduct(dirVec3) < 0 && !isFrontFacePickable) { // ---> <---
+      return null;
+    }
+    if (faceNormal.dotProduct(dirVec3) > 0 && !isBackFacePickable) { // ---> --->
+      return null;
+    }
+    
+
     const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
     const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
     const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
@@ -1017,30 +1022,29 @@ export default class Geometry extends GLBoostObject {
     }
     this._vertices.inverseArenbergMatrix = [];
     this._vertices.arenberg3rdPosition = [];
-    if ( this._vertices.texcoord ) {
-      if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i+=incrementNum) {
-          let pos0IndexBase = i * positionElementNumPerVertex;
-          let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
-          let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
+    this._vertices.faceNormal = [];
+    if (!this._indicesArray) {
+      for (let i=0; i<this._vertexN-2; i+=incrementNum) {
+        let pos0IndexBase = i * positionElementNumPerVertex;
+        let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
+        let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
 
-          this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+        this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
 
-        }
-      } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
-          let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j+=incrementNum) {
-            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+      }
+    } else {
+      for (let i=0; i<this._indicesArray.length; i++) {
+        let vertexIndices = this._indicesArray[i];
+        for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
+          let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
+          let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
+          let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
 
-            if (vertexIndices[j + 2] === void 0) {
-              break;
-            }
-            this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
-
+          if (vertexIndices[j + 2] === void 0) {
+            break;
           }
+          this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
+
         }
       }
     }
@@ -1106,6 +1110,7 @@ export default class Geometry extends GLBoostObject {
 //    const triangleIdx = i/incrementNum;
     this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
     this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
+    this._vertices.faceNormal[arenberg0IndexBase] = new Vector3(nx, ny, nz);
   }
 
 }

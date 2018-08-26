@@ -387,14 +387,14 @@ export default class M_Group extends M_Element {
   }
 
   clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
-    let instance = new M_Group(this._glBoostContext);
+    let instance = new M_Group(this._glBoostSystem);
     if (clonedRootElement === null) {
       clonedRootElement = instance;
     }
     this._copy(instance);
 
     this._elements.forEach((element)=>{
-      if (typeof element.clone !== 'undefined') {// && !MiscUtil.isDefinedAndTrue(element._isRootJointGroup)) {
+      if (typeof element.clone !== 'undefined') {
         instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
       } else {
         instance._elements.push(element);
@@ -468,6 +468,12 @@ export default class M_Group extends M_Element {
     let currentShortestIntersectedPosVec3 = null;
     let selectedMesh = null;
     for (let mesh of meshes) {
+      if (!mesh.isVisible) {
+        continue;
+      }
+      if (!mesh.isPickable) {
+        continue;
+      }
       const result = mesh.rayCast(x, y, camera, viewport);
       if (result === null) {
         return [null, null];

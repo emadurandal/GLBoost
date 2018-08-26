@@ -127,12 +127,12 @@ export default class M_SpotLight extends M_AbstractLight {
   }
 
   get direction() {
-    let result = this.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    let result = (new Matrix33(this.quaternion)).multiplyVector(this._direction);
     return result;
   }
 
   get directionInWorld() {
-    let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
+    let direction = new Vector3(this.worldMatrixWithoutMySelf.getRotate().multiplyVector(new Vector4(this.direction)));
     return direction;
   }
 

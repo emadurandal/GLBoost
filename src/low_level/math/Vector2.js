@@ -20,6 +20,10 @@ export default class Vector2 {
     this.y = ((y:any):number);
   }
 
+  get className() {
+    return this.constructor.name;
+  }
+
   clone() {
     return new Vector2(this.x, this.y);
   }

@@ -56,6 +56,13 @@ export default class M_PerspectiveCamera extends M_AbstractCamera {
     return this._lowLevelCamera.zFar;
   }
 
+  get allInfo() {
+    return this._lowLevelCamera.allInfo;
+  }
+
+  set allInfo(info) {
+    this._lowLevelCamera.allInfo = info;
+  }
 }
 
 GLBoost['M_PerspectiveCamera'] = M_PerspectiveCamera;

@@ -3,7 +3,6 @@ import AbstractTexture from '../textures/AbstractTexture';
 import Vector4 from '../math/Vector4';
 import DecalShader from '../../middle_level/shaders/DecalShader';
 import GLBoostObject from '../core/GLBoostObject';
-import MiscUtil from '../misc/MiscUtil'
 
 export default class L_AbstractMaterial extends GLBoostObject {
   constructor(glBoostContext) {
@@ -17,10 +16,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._texturePurposeDic = [];
     this._textureContributionRateDic = {};
     this._gl = this._glContext.gl;
-    this._baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-    this._diffuseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-    this._specularColor = new Vector4(0.5, 0.5, 0.5, 1.0);
-    this._ambientColor = new Vector4(0.25, 0.25, 0.25, 1.0);
+
     this._name = '';
     this._shaderClass = DecalShader;
     this._shaderInstance = null;
@@ -57,10 +53,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   clone() {
     var material = new ClassicMaterial(this._glBoostContext);
-    material._baseColor = this._baseColor;
-    material._diffuseColor = this._diffuseColor;
-    material._specularColor = this._specularColor;
-    material._ambientColor = this._ambientColor;
+
     material._shaderClass = this._shaderClass;
     material._shaderInstance = this._shaderInstance;
 
@@ -190,57 +183,6 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return result;
   }
 
-  set baseColor(vec) {
-    if (!vec) {
-      return;
-    }
-
-    this._baseColor = vec;
-    this._updateCount();
-  }
-
-  get baseColor() {
-    return this._baseColor;
-  }
-
-  set diffuseColor(vec) {
-    if (!vec) {
-      return;
-    }
-
-    this._diffuseColor = vec;
-    this._updateCount();
-  }
-
-  get diffuseColor() {
-    return this._diffuseColor;
-  }
-
-  set specularColor(vec) {
-    if (!vec) {
-      return;
-    }
-
-    this._specularColor = vec;
-    this._updateCount();
-  }
-
-  get specularColor() {
-    return this._specularColor;
-  }
-
-  set ambientColor(vec) {
-    if (!vec) {
-      return;
-    }
-
-    this._ambientColor = vec;
-    this._updateCount();
-  }
-
-  get ambientColor() {
-    return this._ambientColor;
-  }
 
   set states(states) {
     if (typeof states.functions === 'undefined') {
@@ -262,7 +204,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     if (this._states) {
       if (this._states.enable) {
         this._states.enable.forEach((state) => {
-          if (state === 3042) {
+          if (state === 3042) { // gl.BLEND
             isTransparent = true;
           }
         });
@@ -303,7 +245,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
       isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
       return isCalledWebGLBindTexture;
     } else {
-      this._glBoostContext.defaultDummyTexture.setUp(0);
+      this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
 
 //      gl.bindTexture(gl.TEXTURE_2D, null);
       isCalledWebGLBindTexture = true;
@@ -336,7 +278,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   setUpStates() {
-    let globalStatesUsage = this._glBoostContext.globalStatesUsage;
+    let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
     if (this._globalStatesUsage) {
       globalStatesUsage = this._globalStatesUsage;
     }
@@ -347,11 +289,11 @@ export default class L_AbstractMaterial extends GLBoostObject {
         this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE:
-        this._glBoostContext.reflectGlobalGLState();
+        this._glBoostSystem._glBoostContext.reflectGlobalGLState();
         this._setUpMaterialStates(this._states);
         break;
       case GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE:
-        this._glBoostContext.reflectGlobalGLState();
+        this._glBoostSystem._glBoostContext.reflectGlobalGLState();
         break;
       default:
         break;
@@ -359,7 +301,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   tearDownStates() {
-    this._glBoostContext.disableAllGLState();
+    this._glBoostSystem._glBoostContext.disableAllGLState();
     this._setUpMaterialStates({
       functions : this._stateFunctionsToReset
     });
@@ -380,8 +322,6 @@ export default class L_AbstractMaterial extends GLBoostObject {
     if (typeof this._shaderUniformLocationsOfExpressions[glslProgram.hashId] !== 'undefined') {
       return this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName];
     }
-
-//    MiscUtil.consoleLog(GLBoost.LOG_GENERAL, 'this._shaderUniformLocationsOfExpressions[hashIdOfGLSLProgram] became undefined. Are you sure of it?');
 
     return void 0;
   }

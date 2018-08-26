@@ -3,6 +3,7 @@ import Vector4 from '../../math/Vector4';
 import GLBoostObject from '../../core/GLBoostObject';
 import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
+import MathClassUtil from '../../math/MathClassUtil';
 import MathUtil from '../../math/MathUtil';
 import GLBoost from '../../../globals';
 
@@ -60,6 +61,9 @@ export default class L_CameraController extends GLBoostObject {
     this._shiftCameraTo = null;
 
     this._onMouseDown = (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      
       let rect = evt.target.getBoundingClientRect();
       let clientX = null;
       let clientY = null;
@@ -94,6 +98,8 @@ export default class L_CameraController extends GLBoostObject {
 
     this._onMouseMove = (evt) => {
       evt.preventDefault();
+      evt.stopPropagation();
+      
       if (this._isKeyUp) {
         return;
       }
@@ -177,14 +183,14 @@ export default class L_CameraController extends GLBoostObject {
     this._onMouseDblClick = (evt) => {
       if (evt.shiftKey) {
         this._mouseTranslateVec = new Vector3(0, 0, 0);
-      } else {
+      } else if (evt.ctrlKey) {
         this._rot_y = 0;
         this._rot_x = 0;
         this._rot_bgn_y = 0;
         this._rot_bgn_x = 0;
       }
-      this.updateCamera();
 
+      this.updateCamera();
     };
 
     this.registerEventListeners(eventTargetDom);
@@ -367,9 +373,9 @@ export default class L_CameraController extends GLBoostObject {
     let newUpVec = null;
     if (camera instanceof M_AbstractCamera) {
       let mat = camera.inverseWorldMatrixWithoutMySelf;
-      newEyeVec = mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)).toVector3();
-      newCenterVec = mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)).toVector3();
-      newUpVec = mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)).toVector3();
+      newEyeVec = new Vector3(mat.multiplyVector(new Vector4(newEyeVec.x, newEyeVec.y, newEyeVec.z, 1)));
+      newCenterVec = new Vector3(mat.multiplyVector(new Vector4(newCenterVec.x, newCenterVec.y, newCenterVec.z, 1)));
+      newUpVec = new Vector3(mat.multiplyVector(new Vector4(upVec.x, upVec.y, upVec.z, 1)));
     } else {
       newUpVec = upVec;
     }
@@ -424,6 +430,10 @@ export default class L_CameraController extends GLBoostObject {
   set target(object) {
     this._target = object;
     this.updateTargeting();
+  }
+
+  get target() {
+    return this._target;
   }
 
   set zFarAdjustingFactorBasedOnAABB(value) {
@@ -486,6 +496,35 @@ export default class L_CameraController extends GLBoostObject {
     });
   }
 
+
+  get allInfo() {
+    const info = {};
+
+    info.rotY = this.rotY;
+    info.rotX = this.rotX;
+    info.dolly = this.dolly;
+    info.shiftCameraTo = this.shiftCameraTo;
+    info.zFarAdjustingFactorBasedOnAABB = this.zFarAdjustingFactorBasedOnAABB;
+    info.target = this.target;
+
+    return info;
+  }
+
+  set allInfo(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    for(let key in json) {
+      if(json.hasOwnProperty(key) && key in this) {
+        if (key === "quaternion") {
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+        } else {
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+        }
+      }
+    }
+  }
 }
 
 GLBoost['L_CameraController'] = L_CameraController;

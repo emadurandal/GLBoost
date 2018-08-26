@@ -1,6 +1,7 @@
 import Vector3 from '../../math/Vector3';
 import L_Element from '../L_Element';
 import Matrix44 from '../../math/Matrix44';
+import MathClassUtil from '../../math/MathClassUtil';
 
 export default class L_AbstractCamera extends L_Element {
   constructor(glBoostContext, toRegister, lookat) {
@@ -169,6 +170,35 @@ export default class L_AbstractCamera extends L_Element {
 
   get texture() {
     return this._texture;
+  }
+
+  get allInfo() {
+    const info = {};
+
+    info.translate = this.translate;
+    //info.translateInner = this.translateInner;
+    info.center = this.center;
+    //info.centerInner = this.centerInner;
+    info.up = this.up;
+    //info.upInner = this.upInner;
+
+    return info;
+  }
+
+  set allInfo(arg) {
+    let json = arg;
+    if (typeof arg === "string") {
+      json = JSON.parse(arg);
+    }
+    for(let key in json) {
+      if(json.hasOwnProperty(key) && key in this) {
+        if (key === "quaternion") {
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+        } else {
+          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+        }
+      }
+    }
   }
 }
 

@@ -1,12 +1,14 @@
 /* @flow */
 
 import L_GLBoostMonitor from './L_GLBoostMonitor';
+import EntityRepositiory from './EntityRepository';
 import GLBoost from '../../globals';
-import GLBoostLowContext from './GLBoostLowContext';
+import EntityRepository from './EntityRepository';
+import type GLBoostSystem from './GLBoostSystem';
 import GLContext from './GLContext';
 
 export default class GLBoostObject {
-  _glBoostContext: GLBoostLowContext;
+  _glBoostSystem: GLBoostSystem;
   _glContext: GLContext;
   _toRegister: boolean;
   _glBoostMonitor: L_GLBoostMonitor;
@@ -15,20 +17,22 @@ export default class GLBoostObject {
   _readyForDiscard: boolean;
   _classUniqueNumber: number;
   _objectIndex: number;
-  _lightIndex: number;
-  _jointSetIndex: number;
-  _morphIndex: number;
-  _materialIndex: number;
+  _entity_uid: number;
   _glContext: GLContext;
 
-  constructor(glBoostContext:GLBoostLowContext, toRegister:boolean = true) {
+  constructor(glBoostSystem: GLBoostSystem, toRegister:boolean = true) {
     if (this.constructor === GLBoostObject) {
       throw new TypeError('Cannot construct GLBoostObject instances directly.');
     }
+    this._entity_uid = 0;
     this._setName();
-    this._glBoostContext = glBoostContext;
-    this._glContext = glBoostContext.glContext;
-    this._glBoostMonitor = glBoostContext._glBoostMonitor;
+    
+    const entityRepository = EntityRepository.getInstance();
+    //entityRepository.assignEntityId(this);
+
+    this._glBoostSystem = glBoostSystem;
+    this._glContext = glBoostSystem._glContext;
+    this._glBoostMonitor = glBoostSystem._glBoostMonitor;
     this._toRegister = toRegister;
     if (this._toRegister) {
       this._glBoostMonitor.registerGLBoostObject(this);
@@ -47,10 +51,6 @@ export default class GLBoostObject {
 
   setupExistIndexAndArray() {
     this._objectIndex = -1;
-    this._materialIndex = -1;
-    this._lightIndex = -1;
-    this._jointSetIndex = -1;
-    this._morphIndex = -1;
 
     const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
       let array = GLBoostObject['_' + typeName + 'ExistArray'];
@@ -67,13 +67,6 @@ export default class GLBoostObject {
 
     if (this.className.indexOf('Mesh') !== -1) {
       seekSpaceOfArrayAndSetIndexThere('object');
-      if (this.className.indexOf('SkeletalMesh') !== -1) {
-        seekSpaceOfArrayAndSetIndexThere('jointSet');
-      }
-    } else if (this.className.indexOf('Light') !== -1) {
-      seekSpaceOfArrayAndSetIndexThere('light');
-    } else if (this.className.indexOf('Material') !== -1) {
-      seekSpaceOfArrayAndSetIndexThere('material');
     }
 
   }
@@ -130,7 +123,7 @@ export default class GLBoostObject {
   }
 
   get belongingCanvasId() {
-    return this._glBoostContext.belongingCanvasId;
+    return this._glBoostSystem.belongingCanvasId;
   }
 
   set userFlavorName(name:string) {
@@ -166,13 +159,16 @@ export default class GLBoostObject {
   get objectIndex():number {
     return this._objectIndex;
   }
+
+  get entityUID() {
+    return this._entity_uid;
+  }
 }
 
 GLBoostObject.classInfoDic = {};
 GLBoostObject._objectExistArray = [];
-GLBoostObject._materialExistArray = [];
-GLBoostObject._lightExistArray = [];
-GLBoostObject._jointSetExistArray = [];
-GLBoostObject._morphExistArray = [];
+GLBoostObject.__entities = [];
+
+
 
 GLBoost['GLBoostObject'] = GLBoostObject;

@@ -1,6 +1,5 @@
 {
   "test_with_phinajs": [
-    "basic",
     "blendshape",
     "camera",
     "canvas_texture",
@@ -20,20 +19,23 @@
   ],
 
   "test": [
+    "basic",
     "custom_shader",
     "custom_shader_2",
+    "free_shader",
     "loading_gltf",
     "loading_gltf_head",
     "loading_gltf_anim",
     "loading_gltf_hierarchical_anim",
     "loading_gltf_skinning_anim",
     "loading_gltf_skinning_anim_current_value_control",
-    "loading_gltf_1_1",
     "multiple_contexts",
     "obj_mesh_changing_scene_graph",
     "obj_mesh_changing_shader",
     "opacity",
     "particles",
+    "pbr_balls",
+    "pbr_punctual_lights",
     "quaternion",
     "scene_graph",
     "shadowmap",

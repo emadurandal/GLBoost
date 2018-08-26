@@ -65,7 +65,7 @@ phina.define('MainScene', {
     ];
 
     var geometry = glBoostContext.createBlendShapeGeometry();
-    var texture = glBoostContext.createTexture('//cdn.rawgit.com/emadurandal/GLBoost/master/examples/for_phina/multiple_render_passes/resources/texture.png');
+    var texture = glBoostContext.createTexture('resources/texture.png');
     var material = glBoostContext.createClassicMaterial();
     material.setTexture(texture);
     var mesh = glBoostContext.createMesh(geometry, material);

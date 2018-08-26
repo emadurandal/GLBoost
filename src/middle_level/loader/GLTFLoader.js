@@ -16,6 +16,8 @@ import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import DataUtil from '../../low_level/misc/DataUtil';
 import M_Group from '../elements/M_Group';
 import MathUtil from "../../low_level/math/MathUtil";
+import MathClassUtil from '../../low_level/math/MathClassUtil';
+import ClassicMaterial from '../../low_level/materials/ClassicMaterial';
 
 
 let singleton = Symbol();
@@ -87,6 +89,24 @@ export default class GLTFLoader {
       }
     }
 
+    if (options && typeof options.defaultMaterial !== "undefined") {
+      if (typeof options.defaultMaterial === "string") {
+        defaultOptions.defaultMaterial = GLBoost[options.defaultMaterial];
+      } else {
+        defaultOptions.defaultMaterial = options.defaultMaterial;
+      }
+    }
+
+    if (defaultOptions.defaultMaterial != null && defaultOptions.defaultMaterial.name.indexOf('PBR') !== -1) {
+      defaultOptions.defaultShaderClass = defaultOptions.defaultMaterial.shaderClass;
+    } else if (options && typeof options.defaultShaderClass !== "undefined") {
+      if (typeof options.defaultShaderClass === "string") {
+        defaultOptions.defaultShaderClass = GLBoost[options.defaultShaderClass];
+      } else {
+        defaultOptions.defaultShaderClass = options.defaultShaderClass;
+      }
+    }
+
     return defaultOptions;
   }
 
@@ -109,15 +129,31 @@ export default class GLTFLoader {
       isExistJointGizmo: false,
       isBlend: false,
       isDepthTest: true,
+      defaultMaterial: ClassicMaterial,
       defaultShaderClass: null,
       isMeshTransparentAsDefault: false,
+      defaultStates: {
+        states: {
+          enable: [
+            // 3042,  // BLEND
+          ],
+          functions: {
+            //"blendFuncSeparate": [1, 0, 1, 0],
+          }
+        },
+        isTransparent: true,
+        opacity: 1.0,
+        shaderClass: DecalShader, // LambertShader // PhongShader
+        isTextureImageToLoadPreMultipliedAlpha: false,
+        globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
+      },
       statesOfElements: [
         {
           targets: [], //["name_foo", "name_boo"],
           specifyMethod: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
           states: {
             enable: [
-                // 3042,  // BLEND
+              // 3042,  // BLEND
             ],
             functions: {
               //"blendFuncSeparate": [1, 0, 1, 0],
@@ -196,7 +232,7 @@ export default class GLTFLoader {
     let arrayBufferBinary = arrayBuffer.slice(20 + lengthOfContent);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    const defaultShader = this.getDefaultShader(options);
+    const defaultShader = options.defaultShaderClass;
     this._loadResourcesAndScene(glBoostContext, arrayBufferBinary, null, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
@@ -217,7 +253,7 @@ export default class GLTFLoader {
     let json = JSON.parse(gotText);
     let glTFVer = this._checkGLTFVersion(json);
     options = this.getOptions(defaultOptions, json, options);
-    const defaultShader = this.getDefaultShader(options);
+    const defaultShader = options.defaultShaderClass;
     this._loadResourcesAndScene(glBoostContext, null, basePath, json, defaultShader, glTFVer, resolve, options);
     return { options, defaultShader };
   }
@@ -301,7 +337,7 @@ export default class GLTFLoader {
             fulfilled();
           })
         );
-      } else if (bufferInfo.uri === 'data:,') {
+      } else if (bufferInfo.uri === '' || bufferInfo.uri === 'data:,') {
         buffers[bufferName] = arrayBufferBinary;
       } else if (options.files && options.files[filename]) {
         const arrayBuffer = options.files[filename];
@@ -460,9 +496,7 @@ export default class GLTFLoader {
           rootJointStr = nodeJson.skeletons[0];
           skinStr = nodeJson.skin;
         }
-        let mesh = this._loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
-        mesh.userFlavorName = meshStr;
-        group.addChild(mesh);
+        this._loadMesh(glBoostContext, meshJson, meshStr, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options);
       }
     } else if (nodeJson.jointName) {
       let joint = glBoostContext.createJoint(options.isExistJointGizmo);
@@ -503,7 +537,7 @@ export default class GLTFLoader {
           }
         );
       }
-      camera.userFlavorName = cameraStr;
+      camera.userFlavorName = cameraStr + 'Shape';
       group.addChild(camera);
     } else if (nodeJson.extensions) {
       if (nodeJson.extensions.KHR_materials_common) {
@@ -551,7 +585,7 @@ export default class GLTFLoader {
     return group;
   }
 
-  _loadMesh(glBoostContext, meshJson, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
+  _loadMesh(glBoostContext, meshJson, meshStr, buffers, json, defaultShader, rootJointStr, skinStr, shaders, textures, glTFVer, group, options) {
     var mesh = null;
     var geometry = null;
     if (rootJointStr) {
@@ -568,9 +602,11 @@ export default class GLTFLoader {
       geometry = glBoostContext.createGeometry();
       mesh = glBoostContext.createMesh(geometry);
     }
+    mesh.userFlavorName = meshStr;
+    group.addChild(mesh);
 
     if (options && options.isMeshTransparentAsDefault) {
-      mesh.isTransparent = true;
+      mesh.isTransparentForce = true;
     }
 
     let _indicesArray = [];
@@ -678,7 +714,9 @@ export default class GLTFLoader {
         }
 */
         let material = null;
-        if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
+        if (options.defaultMaterial != null) {
+          material = new options.defaultMaterial(glBoostContext.__system);
+        } else if (options && options.loaderExtension && options.loaderExtension.createClassicMaterial) {
           material = options.loaderExtension.createClassicMaterial(glBoostContext);
         } else {
           material = glBoostContext.createClassicMaterial();
@@ -688,25 +726,35 @@ export default class GLTFLoader {
         }
         this._materials.push(material);
 
+        if (options && options.defaultStates) {
+          if (options.defaultStates.states) {
+            material.states = options.defaultStates.states;
+          }
+          material.globalStatesUsage = options.defaultStates.globalStatesUsage !== void 0 ? options.defaultStates.globalStatesUsage : GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+        }
         if (options && options.statesOfElements) {
+
           for (let statesInfo of options.statesOfElements) {
             if (statesInfo.targets) {
               for (let target of statesInfo.targets) {
-                let isMatch = false;
-                let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
-                switch (specifyMethod) {
-                  case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
-                    isMatch = group.userFlavorName === target; break;
-                  case GLBoost.QUERY_TYPE_INSTANCE_NAME:
-                    isMatch = group.instanceName === target; break;
-                  case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                    isMatch = group.instanceNameWithUserFlavor === target; break;                      
-                }
+                let isMatch = this.isTargetMatch(statesInfo, group, target);
                 if (isMatch) {
-                  material.states = statesInfo.states;
-                  group.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
-                  material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost.GLOBAL_STATES_USAGE_IGNORE;
+                  if (statesInfo.states) {
+                    material.states = statesInfo.states;
+                  }
+                  material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost.GLOBAL_STATES_USAGE_IGNORE;  
                 }
+
+                group.getChildren().forEach((elem)=>{
+                  let isMatch = this.isTargetMatch(statesInfo, elem, target);
+                  if (isMatch) {
+                    elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                    if (statesInfo.states) {
+                      material.states = statesInfo.states;
+                    }
+                    material.globalStatesUsage = statesInfo.globalStatesUsage !== void 0 ? statesInfo.globalStatesUsage : GLBoost.GLOBAL_STATES_USAGE_IGNORE;  
+                  }
+                });
               }
             }
           }
@@ -930,6 +978,8 @@ export default class GLTFLoader {
             let texturePurpose;
             if (valueName === 'diffuse' || (materialJson.technique === "CONSTANT" && valueName === 'ambient')) {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
+            } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_NORMAL;
             }
 
             let texture = textures[textureStr];
@@ -955,15 +1005,7 @@ export default class GLTFLoader {
                 if (statesInfo.targets) {
                   for (let target of statesInfo.targets) {
                     let isMatch = false;
-                    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
-                    switch (specifyMethod) {
-                      case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
-                        isMatch = group.userFlavorName === target; break;
-                      case GLBoost.QUERY_TYPE_INSTANCE_NAME:
-                        isMatch = group.instanceName === target; break;
-                      case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                        isMatch = group.instanceNameWithUserFlavor === target; break;                      
-                    }
+                    isMatch = this.isTargetMatch(statesInfo, group, target);
 
                     if (isMatch) {
                       if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
@@ -1020,7 +1062,7 @@ export default class GLTFLoader {
     for (let valueName in materialJson.values) {
       let value = materialJson.values[valueName];
       if (typeof value !== 'string') {
-        material[valueName + 'Color'] = new Vector4(value[0], value[1], value[2], value[3]);
+        material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
       }
     }
 
@@ -1031,7 +1073,7 @@ export default class GLTFLoader {
     let techniqueStr = materialJson.technique;
     if (defaultShader) {
       material.shaderClass = defaultShader;
-    } else if (this._isKHRMaterialsCommon(originalMaterialJson)) {
+    } else if (this._isKHRMaterialsCommon(originalMaterialJson) && material.className.indexOf('PBR') === -1) {
       switch (techniqueStr) {
         case 'CONSTANT':
           if (options.loaderExtension && options.loaderExtension.getDecalShader) {
@@ -1058,7 +1100,7 @@ export default class GLTFLoader {
     } else {
       if (typeof json.techniques !== 'undefined') {
         this._loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer);
-      } else {
+      } else if (material.className.indexOf('PBR') === -1) {
         if (options.loaderExtension && options.loaderExtension.getDecalShader) {
           material.shaderClass = options.loaderExtension.getDecalShader();
         } else {
@@ -1072,19 +1114,11 @@ export default class GLTFLoader {
         if (statesInfo.targets) {
           for (let target of statesInfo.targets) {
             let isMatch = false;
-            let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
-            switch (specifyMethod) {
-              case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
-                isMatch = group.userFlavorName === target; break;
-              case GLBoost.QUERY_TYPE_INSTANCE_NAME:
-                isMatch = group.instanceName === target; break;
-              case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
-                isMatch = group.instanceNameWithUserFlavor === target; break;                      
-            }
+            isMatch = this.isTargetMatch(statesInfo, group, target);
 
             if (isMatch) {
               if (statesInfo.shaderClass) {
-                material.shaderClass = statesInfo.shaderClass
+                material.shaderClass = statesInfo.shaderClass;
               }
             }
 
@@ -1094,6 +1128,33 @@ export default class GLTFLoader {
     }
 
     return texcoords;
+  }
+
+  isTargetMatch(statesInfo, element, target) {
+    let specifyMethod = statesInfo.specifyMethod !== void 0 ? statesInfo.specifyMethod : GLBoost.QUERY_TYPE_USER_FLAVOR_NAME;
+    if (typeof statesInfo.specifyMethod === 'string') {
+      statesInfo.specifyMethod = GLBoost[statesInfo.specifyMethod];
+    }
+
+    const isTargetMatchInner = function(specifyMethod, element, target) {
+      let isMatch = false;
+      switch (specifyMethod) {
+      case GLBoost.QUERY_TYPE_USER_FLAVOR_NAME:
+        isMatch = element.userFlavorName === target;
+        break;
+      case GLBoost.QUERY_TYPE_INSTANCE_NAME:
+        isMatch = element.instanceName === target;
+        break;
+      case GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR:
+        isMatch = element.instanceNameWithUserFlavor === target;
+        break;
+      }
+      return isMatch;
+    };
+
+    let isMatch = isTargetMatchInner(specifyMethod, element, target);
+
+    return isMatch;
   }
 
   _loadTechnique(glBoostContext, json, techniqueStr, material, materialJson, shaders, glTFVer) {
@@ -1184,7 +1245,7 @@ export default class GLTFLoader {
     let fragmentShaderText = shaders[fragmentShaderStr].shaderText;
     let vertexShaderText = shaders[vertexShaderStr].shaderText;
 
-    material.shaderInstance = new FreeShader(glBoostContext, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
+    material.shaderInstance = new FreeShader(glBoostContext.__system, vertexShaderText, fragmentShaderText, attributes, uniforms, textureNames);
   }
 
   _loadAnimation(element, buffers, json, glTFVer, options) {
@@ -1537,3 +1598,4 @@ export default class GLTFLoader {
 
 
 GLBoost["GLTFLoader"] = GLTFLoader;
+

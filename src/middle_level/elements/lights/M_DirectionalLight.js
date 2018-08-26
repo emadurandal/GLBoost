@@ -17,14 +17,14 @@ export default class M_DirectionalLight extends M_AbstractLight {
    * The constructor of DirectionalLight class. 
    * @param {Vector4} intensity intensity as Vector4 Color
    */
-  constructor(glBoostContext, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
-    super(glBoostContext);
+  constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
+    super(glBoostSystem);
 
     this._intensity = intensity;
     this._direction = new Vector3(0.0, 1.0, 0.0);
 //    this._direction = direction;
 
-    this._gizmo = new M_DirectionalLightGizmo(glBoostContext, length);
+    this._gizmo = new M_DirectionalLightGizmo(glBoostSystem, length);
     this._gizmos.push(this._gizmo);
 
     //this.direction = direction;
@@ -147,12 +147,12 @@ export default class M_DirectionalLight extends M_AbstractLight {
 
   get direction() {
     //return Matrix33.rotate(super.rotate).multiplyVector(this._direction);
-    let result = super.quaternion.rotationMatrix33.multiplyVector(this._direction);
+    let result = (new Matrix33(super.quaternion)).multiplyVector(this._direction);
     return result;
   }
 
   get directionInWorld() {
-    let direction = this.worldMatrixWithoutMySelf.getRotate().multiplyVector(this.direction.toVector4()).toVector3();
+    let direction = new Vector3(this.worldMatrixWithoutMySelf.getRotate().multiplyVector(new Vector4(this.direction)));
     return direction;
   }
 

@@ -2,6 +2,7 @@
 import type M_Group from './M_Group';
 import type GLBoostMiddleContext from '../core/GLBoostMiddleContext';
 import Vector3 from '../../low_level/math/Vector3';
+import Matrix33 from '../../low_level/math/Matrix33';
 import Matrix44 from '../../low_level/math/Matrix44';
 import L_Element from '../../low_level/elements/L_Element';
 import type M_Gizmo from './gizmos/M_Gizmo';
@@ -11,14 +12,14 @@ export default class M_Element extends L_Element {
   _matrixAccumulatedWithoutMySelfAncestry: Matrix44;
   _matrixAccumulatedAncestry: Matrix44;
   _accumulatedWithoutMySelfAncestryObjectUpdateNumber: number;
-  _normalMatrix: Matrix44;
+  _normalMatrix: Matrix33;
   _accumulatedAncestryObjectUpdateNumberNormal: number;
   _accumulatedAncestryObjectUpdateNumberInv: number;
   _accumulatedAncestryObjectUpdateNumber: number;
   _accumulatedAncestryObjectUpdateNumberWithoutMySelf: number;
   _accumulatedAncestryObjectUpdateNumberJoint: number;
   _opacity: number;
-  _transparentByUser: boolean;
+  _isTransparentForce: ?boolean;
   _parent: M_Group | null;
   _invMatrix: Matrix44;
   _isAffectedByWorldMatrix: boolean;
@@ -26,7 +27,6 @@ export default class M_Element extends L_Element {
   _isAffectedByViewMatrix: boolean;
   _isAffectedByProjectionMatrix: boolean;
   _toInheritCurrentAnimationInputValue: boolean;
-  _customFunction: Function | null;
   _gizmos: Array<M_Gizmo>;
   _masterElement: M_Element | null;
   _worldMatrix: Matrix44;
@@ -41,7 +41,7 @@ export default class M_Element extends L_Element {
     this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-    this._transparentByUser = false;
+    this._isTransparentForce = null;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
     this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -50,7 +50,6 @@ export default class M_Element extends L_Element {
 
     this._toInheritCurrentAnimationInputValue = true;
 
-    this._customFunction = null;
     this._isVisible = true;
 
     this._gizmos = [];
@@ -148,7 +147,7 @@ export default class M_Element extends L_Element {
     //console.log(tempNumber);
     if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
       let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-      this._normalMatrix = Matrix44.invert(world_m).transpose().toMatrix33();
+      this._normalMatrix = new Matrix33(Matrix44.invert(world_m).transpose());
       this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
     }
 
@@ -205,11 +204,11 @@ export default class M_Element extends L_Element {
   }
 
   get isTransparent() {
-    return this._transparentByUser;
+    return this._isTransparentForce;
   }
 
-  set isTransparent(flg: boolean) {
-    this._transparentByUser = flg;
+  set isTransparentForce(flg: boolean) {
+    this._isTransparentForce = flg;
   }
 
   set dirty(flg: number) {
@@ -232,14 +231,6 @@ export default class M_Element extends L_Element {
     return this._instanceName + this._updateCountAsElement;                // faster
   }
 
-  set customFunction(func: Function) {
-    this._customFunction = func;
-  }
-
-  get customFunction() {
-    return this._customFunction;
-  }
-
   prepareToRender() {
 
   }
@@ -255,7 +246,7 @@ export default class M_Element extends L_Element {
     instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
 
 
-    instance._transparentByUser = this._transparentByUser;
+    instance._isTransparentForce = this._isTransparentForce;
     instance.opacity = this.opacity;
     instance._activeAnimationLineName = this._activeAnimationLineName;
 
@@ -265,8 +256,6 @@ export default class M_Element extends L_Element {
     }
 
     instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
-
-    instance._customFunction = this._customFunction;
   }
 
   set isVisible(flg: boolean) {

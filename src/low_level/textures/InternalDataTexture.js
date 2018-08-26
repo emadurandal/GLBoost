@@ -1,7 +1,6 @@
 import GLBoost from '../../globals';
 import AbstractTexture from './AbstractTexture';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import MiscUtil from '../misc/MiscUtil';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();

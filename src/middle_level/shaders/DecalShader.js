@@ -3,7 +3,7 @@ import Shader from '../../low_level/shaders/Shader';
 import WireframeShader from './WireframeShader';
 import VertexWorldShadowShaderSource from './VertexWorldShadowShader';
 import Matrix44 from '../../low_level/math/Matrix44';
-
+import Vector4 from '../../low_level/math/Vector4';
 
 export class DecalShaderSource {
   // In the context within these member methods,
@@ -96,7 +96,7 @@ export class DecalShaderSource {
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (!diffuseTexture) {
-      diffuseTexture = this._glBoostContext.defaultDummyTexture;
+      diffuseTexture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
     }
 
     if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
@@ -152,7 +152,12 @@ export default class DecalShader extends WireframeShader {
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-    let baseColor = material.baseColor;
+    let baseColor = null;
+    if (material.className.indexOf('ClassicMaterial') !== -1) {
+      baseColor = material.baseColor;
+    } else {
+      baseColor = new Vector4(1.0, 1.0, 1.0, 1.0);
+    }
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);

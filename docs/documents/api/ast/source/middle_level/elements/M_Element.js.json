@@ -1784,9 +1784,9 @@
                                 "line": 19,
                                 "column": 27
                               },
-                              "identifierName": "_transparentByUser"
+                              "identifierName": "_isTransparentForce"
                             },
-                            "name": "_transparentByUser"
+                            "name": "_isTransparentForce"
                           },
                           "computed": false
                         },
@@ -11750,9 +11750,9 @@
                               "line": 179,
                               "column": 34
                             },
-                            "identifierName": "_transparentByUser"
+                            "identifierName": "_isTransparentForce"
                           },
-                          "name": "_transparentByUser"
+                          "name": "_isTransparentForce"
                         },
                         "computed": false
                       }
@@ -11904,9 +11904,9 @@
                                 "line": 183,
                                 "column": 27
                               },
-                              "identifierName": "_transparentByUser"
+                              "identifierName": "_isTransparentForce"
                             },
-                            "name": "_transparentByUser"
+                            "name": "_isTransparentForce"
                           },
                           "computed": false
                         },
@@ -14574,9 +14574,9 @@
                                 "line": 238,
                                 "column": 31
                               },
-                              "identifierName": "_transparentByUser"
+                              "identifierName": "_isTransparentForce"
                             },
-                            "name": "_transparentByUser"
+                            "name": "_isTransparentForce"
                           },
                           "computed": false
                         },
@@ -14622,9 +14622,9 @@
                                 "line": 238,
                                 "column": 57
                               },
-                              "identifierName": "_transparentByUser"
+                              "identifierName": "_isTransparentForce"
                             },
-                            "name": "_transparentByUser"
+                            "name": "_isTransparentForce"
                           },
                           "computed": false
                         }
@@ -30948,7 +30948,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 903,
       "end": 921,
       "loc": {
@@ -51371,7 +51371,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 6289,
       "end": 6307,
       "loc": {
@@ -51655,7 +51655,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 6350,
       "end": 6368,
       "loc": {
@@ -56679,7 +56679,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 7711,
       "end": 7729,
       "loc": {
@@ -56786,7 +56786,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "_transparentByUser",
+      "value": "_isTransparentForce",
       "start": 7737,
       "end": 7755,
       "loc": {

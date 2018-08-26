@@ -3,7 +3,6 @@ import Hash from '../misc/Hash';
 import GLBoostObject from '../core/GLBoostObject';
 import MiscUtil from '../misc/MiscUtil';
 import GLExtensionsManager from '../core/GLExtensionsManager';
-import VertexWorldShaderSource from '../../middle_level/shaders/VertexWorldShader';
 
 export default class Shader extends GLBoostObject {
   constructor(glBoostContext) {
@@ -562,16 +561,11 @@ export default class Shader extends GLBoostObject {
     return programToReturn;
   }
 
-  static _createShaderInstance(glBoostContext, shaderClass) {
-    let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
-    return shaderInstance;
-  }
-
   getDefaultPointLightIfNotExist(lights) {
 
     if (lights.length === 0) {
       if (Shader._defaultLight === null) {
-        Shader._defaultLight = this._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
+        Shader._defaultLight = this._glBoostSystem._glBoostContext.createPointLight(GLBoost.VALUE_DEFAULT_POINTLIGHT_INTENSITY);
       }
       return [Shader._defaultLight];
     } else {

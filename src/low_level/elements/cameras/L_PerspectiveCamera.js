@@ -107,4 +107,20 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return this._zFar;
   }
 
+  get allInfo() {
+    const info = super.allInfo;
+
+    info.fovy = this.fovy;
+    info.aspect = this.aspect;
+    info.zFar = this.zFar;
+//    info.zFarInner = this.zFarInner;
+    info.zNear = this.zNear;
+//    info.zNearInner = this.zNearInner;
+
+    return info;
+  }
+
+  set allInfo(info) {
+    super.allInfo = info;
+  }
 }

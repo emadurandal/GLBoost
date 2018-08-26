@@ -4,16 +4,13 @@ import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import Vector4 from '../math/Vector4';
 import Quaternion from '../math/Quaternion';
+import Matrix33 from '../math/Matrix33';
 import Matrix44 from '../math/Matrix44';
+import MathClassUtil from '../math/MathClassUtil';
 import MathUtil from '../math/MathUtil';
 import GLBoostObject from '../core/GLBoostObject';
 import AnimationUtil from '../../low_level/misc/AnimationUtil';
-
-const LatestRotationDriverType = {
-  TrsMatrix: Symbol(),
-  Quaternion: Symbol(),
-  EulerAngles: Symbol()
-};
+import type GLBoostSystem from '../core/GLBoostSystem';
 
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
@@ -24,6 +21,7 @@ export default class L_Element extends GLBoostObject {
   _scale: Vector3;
   _quaternion: Quaternion;
   _matrix: Matrix44;
+  _invMatrix: Matrix44;
   _updateCountAsElement: number;
   _is_trs_matrix_updated: boolean;
   _is_translate_updated: boolean;
@@ -33,8 +31,8 @@ export default class L_Element extends GLBoostObject {
   _is_inverse_trs_matrix_updated: boolean;
 
 
-  constructor(glBoostContext, toRegister: boolean = true) {
-    super(glBoostContext, toRegister);
+  constructor(glBoostSystem: GLBoostSystem, toRegister: boolean = true) {
+    super(glBoostSystem, toRegister);
 
     // Live (Static or Animation)
     this._translate = Vector3.zero();
@@ -195,7 +193,7 @@ export default class L_Element extends GLBoostObject {
     return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getTranslateAt(lineName: string, inputValue: Vector3): Vector3 {
+  getTranslateAt(lineName: string, inputValue: number): Vector3 {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
     if (value !== null) {
       this._translate = value;
@@ -204,7 +202,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getTranslateAtOrStatic(lineName: string, inputValue: Vector3) {
+  getTranslateAtOrStatic(lineName: string, inputValue: number) {
     let value = this.getTranslateAt(lineName, inputValue);
     if (value === null) {
       return this.getTranslateNotAnimated();
@@ -254,7 +252,7 @@ export default class L_Element extends GLBoostObject {
     } else if (this._is_trs_matrix_updated) {
       this._rotate = this._matrix.toEulerAngles();
     } else if (this._is_quaternion_updated) {
-      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+      this._rotate = (new Matrix44(this._quaternion)).toEulerAngles();
     }
 
     this._is_euler_angles_updated = true;
@@ -273,7 +271,7 @@ export default class L_Element extends GLBoostObject {
     return this.getScaleAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getScaleAt(lineName: string, inputValue: Vector3) {
+  getScaleAt(lineName: string, inputValue: number) {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'scale');
     if (value !== null) {
       this._scale = value.clone();
@@ -282,7 +280,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getScaleAtOrStatic(lineName: string, inputValue: Vector3) {
+  getScaleAtOrStatic(lineName: string, inputValue: number) {
     let value = this.getScaleAt(lineName, inputValue);
     if (value === null) {
       return this.getScaleNotAnimated();
@@ -311,6 +309,8 @@ export default class L_Element extends GLBoostObject {
     this._is_euler_angles_updated = false;
     this._is_quaternion_updated = false;
     this._is_scale_updated = false;
+    this._is_inverse_trs_matrix_updated = false;
+
     this.__updateTransform();
 
   }
@@ -343,8 +343,7 @@ export default class L_Element extends GLBoostObject {
       return this._matrix.clone();
     }
 
-    let rotationMatrix = Matrix44.identity();
-    rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+    const rotationMatrix = new Matrix44(this.getQuaternionNotAnimated());
 
     let scale = this.getScaleNotAnimated();
 
@@ -390,9 +389,8 @@ export default class L_Element extends GLBoostObject {
       return this.getMatrixNotAnimated();
     } else {
 
-      let rotationMatrix = Matrix44.identity();
       let quaternion = this.getQuaternionAtOrStatic(lineName, input);
-      rotationMatrix = quaternion.rotationMatrix;
+      const rotationMatrix = new Matrix44(quaternion);
 
       let scale = this.getScaleAtOrStatic(lineName, input);
       
@@ -402,12 +400,13 @@ export default class L_Element extends GLBoostObject {
       this._matrix.m13 = translateVec.y;
       this._matrix.m23 = translateVec.z;
 
+      this._is_trs_matrix_updated = true;
+ 
       return this._matrix.clone();
 
     }
 
-    this._is_trs_matrix_updated = true;
-  }
+ }
 
 
   set quaternion(quat: Quaternion) {
@@ -443,20 +442,20 @@ export default class L_Element extends GLBoostObject {
   getQuaternionNotAnimated() {
     let value = null;
     if (this._is_quaternion_updated) {
-      return this._quaternion;
+      return this._quaternion.clone();
     } else if (!this._is_quaternion_updated) {
       if (this._is_trs_matrix_updated) {
         value = Quaternion.fromMatrix(this._matrix);
       } else if (this._is_euler_angles_updated) {
         value = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       } else {
-        console.log('jojjeoe');
+        console.log('Not Quaternion Updated in error!');
       }
       this._quaternion = value;
       this._is_quaternion_updated = true;
     }
 
-    return this._quaternion;
+    return this._quaternion.clone();
   }
 
   get inverseTransformMatrix() {
@@ -468,7 +467,7 @@ export default class L_Element extends GLBoostObject {
   }
 
   get normalMatrix() {
-    return Matrix44.invert(this.transformMatrix).transpose().toMatrix33();
+    return new Matrix33(Matrix44.invert(this.transformMatrix).transpose());
   }
 
   __updateTransform() {
@@ -484,7 +483,7 @@ export default class L_Element extends GLBoostObject {
       this._quaternion = Quaternion.fromMatrix(Matrix44.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
       this._is_quaternion_updated = true;
     } else if (!this._is_euler_angles_updated && this._is_quaternion_updated) {
-      this._rotate = this._quaternion.rotationMatrix.toEulerAngles();
+      this._rotate = (new Matrix44(this._quaternion)).toEulerAngles();
       this._is_euler_angles_updated = true;
     } else if (!this._is_euler_angles_updated && !this._is_quaternion_updated && this._is_trs_matrix_updated) {
       const m = this._matrix;
@@ -517,8 +516,7 @@ export default class L_Element extends GLBoostObject {
 
   __updateMatrix() {
     if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
-      let rotationMatrix = Matrix44.identity();
-      rotationMatrix = this.getQuaternionNotAnimated().rotationMatrix;
+      const rotationMatrix = new Matrix44(this.getQuaternionNotAnimated());
   
       let scale = this.getScaleNotAnimated();
   
@@ -574,7 +572,7 @@ export default class L_Element extends GLBoostObject {
     instance._updateCountAsElement = this._updateCountAsElement;
   }
 
-  setPropertiesFromJson(arg: Object) {
+  setPropertiesFromJson(arg) {
     let json = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
@@ -582,9 +580,9 @@ export default class L_Element extends GLBoostObject {
     for(let key in json) {
       if(json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathUtil.arrayToQuaternion(json[key]);
+          this[key] = MathClassUtil.arrayToQuaternion(json[key]);
         } else {
-          this[key] = MathUtil.arrayToVectorOrMatrix(json[key]);
+          this[key] = MathClassUtil.arrayToVectorOrMatrix(json[key]);
         }
       }
     }
@@ -629,6 +627,6 @@ export default class L_Element extends GLBoostObject {
   }
 
   get rotateMatrix33() {
-    return this.quaternion.rotationMatrix33();
+    return new Matrix33(this.quaternion);
   }
 }

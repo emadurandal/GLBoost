@@ -24,7 +24,8 @@ export default class VertexWorldShaderSource {
     shaderText +=      'uniform mat4 viewMatrix;\n';
     shaderText +=      'uniform mat4 projectionMatrix;\n';
     shaderText +=      'uniform mat3 normalMatrix;\n';
-    shaderText += `     uniform highp ivec3 objectIds;\n`;
+    shaderText +=      'uniform highp ivec3 objectIds;\n';
+    shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
 
     shaderText += `${out_} vec3 v_position_world;\n`;
 
@@ -47,7 +48,7 @@ export default class VertexWorldShaderSource {
     if (Shader._exist(f, GLBoost.NORMAL)) {
 //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
 //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-      shaderText += '  float borderWidth = 2.0;\n';
+      shaderText += '  float borderWidth = AABBLengthCenterToCorner * 0.01;\n';
       shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
     }
     
@@ -160,9 +161,14 @@ export default class VertexWorldShaderSource {
       material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
     }
 
+    material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
 
     return vertexAttribsAsResult;
   }
+  
 }
+
+
+
 
 GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;

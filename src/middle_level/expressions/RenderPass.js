@@ -17,9 +17,9 @@ export default class RenderPass extends GLBoostObject {
     this._transparentMeshes = [];
     this._transparentMeshesAsManualOrder = null;
     this._drawBuffers = [this._glContext.gl.NONE];
-    this._clearColor = null;
+    this._clearColor = null; // webgl default is [0, 0, 0, 0]
     this._clearDepth = null;  // webgl default is 1.0
-    this._colorMask = null; // webgl defalult is [true, true, true, true];
+    this._colorMask = null; // webgl defalult is [true, true, true, true]
     this._renderTargetColorTextures = [];
     this._renderTargetDepthTexture = [];
     this._expression = null;
@@ -473,10 +473,17 @@ export default class RenderPass extends GLBoostObject {
     this._opacityMeshes = [];
     this._transparentMeshes = [];
     this._meshes.forEach((mesh)=>{
-      if (mesh.isTransparent) {
+      if (mesh.isTransparentForce === false) {
+        this._opacityMeshes.push(mesh);
+      } else if (mesh.isTransparentForce === true) {
         this._transparentMeshes.push(mesh);
       } else {
-        this._opacityMeshes.push(mesh);
+        if (!mesh.isTransparent) {
+          this._opacityMeshes.push(mesh);
+        } else {
+          this._transparentMeshes.push(mesh);
+        }
+
       }
     });
 
@@ -500,7 +507,7 @@ export default class RenderPass extends GLBoostObject {
       for (let obj of dic.instances) {
         let renderSpecificMaterials = [];
         obj.getAppropriateMaterials().forEach((material, index) => {
-          let newMaterial = this._glBoostContext.createClassicMaterial();
+          let newMaterial = this._glBoostSystem._glBoostContext.createClassicMaterial();
           //newMaterial._originalMaterial = material;
           renderSpecificMaterials.push(newMaterial);
         });
