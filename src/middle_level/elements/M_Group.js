@@ -3,6 +3,7 @@
 import GLBoost from '../../globals';
 import M_Element from './M_Element';
 import AABB from '../../low_level/math/AABB';
+import Vector3 from '../../low_level/math/Vector3';
 import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
 import M_Mesh from './meshes/M_Mesh';
 import M_AABBGizmo from '../elements/gizmos/M_AABBGizmo';
@@ -462,7 +463,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(x, y, camera, viewport) {
+  rayCast(arg, y, camera, viewport) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
@@ -474,7 +475,12 @@ export default class M_Group extends M_Element {
       if (!mesh.isPickable) {
         continue;
       }
-      const result = mesh.rayCast(x, y, camera, viewport);
+      let result = null;
+      if (arg instanceof Vector3 && y != null) {
+        mesh.rayCast(arg);
+      } else {
+        mesh.rayCast(arg, y, camera, viewport);
+      }
       if (result === null) {
         return [null, null];
       }
