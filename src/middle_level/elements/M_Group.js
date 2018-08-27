@@ -463,7 +463,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(arg, y, camera, viewport) {
+  rayCast(arg1, arg2, camera, viewport) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
@@ -476,10 +476,10 @@ export default class M_Group extends M_Element {
         continue;
       }
       let result = null;
-      if (arg instanceof Vector3 && y != null) {
-        mesh.rayCast(arg);
+      if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
+        result = mesh.rayCast(arg1, arg2, camera);
       } else {
-        mesh.rayCast(arg, y, camera, viewport);
+        result = mesh.rayCast(arg1, arg2, camera, viewport);
       }
       if (result === null) {
         return [null, null];
