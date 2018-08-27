@@ -49,9 +49,17 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     if (eventTargetDom) {
       document.addEventListener('keydown', this._onKeydown);
       document.addEventListener('keyup', this._onKeyup);
-      eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-      eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
-      eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+
+      if ('ontouchend' in document) {
+        eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
+        eventTargetDom.addEventListener('touchend', this._mouseUp.bind(this));
+        eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
+      }
+      if ('onmouseup' in document) {
+        eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
+        eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+        eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
+      }
     }
   }
 
@@ -59,32 +67,48 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     if (eventTargetDom) {
       document.removeEventListener('keydown', this._onKeydown);
       document.removeEventListener('keyup', this._onKeyup);
-      eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-      eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
-      eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+      
+      if ('ontouchend' in document) {
+        eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
+        eventTargetDom.removeEventListener('touchend', this._mouseUp.bind(this));
+        eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
+      }
+      if ('onmouseup' in document) {
+        eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
+        eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+        eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
+      }
     }
   }
 
   _mouseDown(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
     this._isMouseDown = true;
 
     let rect = evt.target.getBoundingClientRect();
     this._clickedMouseXOnCanvas = evt.clientX - rect.left;
     this._clickedMouseYOnCanvas = evt.clientY - rect.top;
 
+    return false;
   }
 
   _mouseMove(evt) {
+    evt.preventDefault();
+    evt.stopPropagation();
+    if (!this._isMouseDown) {
+      return;
+    }
+
     let rect = evt.target.getBoundingClientRect();
     this._draggedMouseXOnCanvas = evt.clientX - rect.left;
     this._draggedMouseYOnCanvas = evt.clientY - rect.top;
-    if (this._isMouseDown) {
-      this._isMouseDrag = true;
-    }
 
     this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
     this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
 
+    
+    this._isMouseDrag = true;
     this.updateCamera();
 
   }
@@ -118,6 +142,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._mouseXAdjustScale = 0.1;
     this._mouseYAdjustScale = 0.1;
     this._deltaY = 0;
+    this._deltaX = 0;
     this._newDir = Vector3.zero();
 
     this._camaras.forEach(function (camera) {
@@ -209,21 +234,26 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
 
     if (this._isMouseDrag) {
-      const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+
+      this._deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
       this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
       this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
-      this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
 
-      newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+
+      this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(this._currentDir);
+
+      newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
       newEyeToCenter.x = newEyeToCenter.x * (1 - t);
       newEyeToCenter.y = t;
       newEyeToCenter.z = newEyeToCenter.z * (1 - t);
       newEyeToCenter.normalize();
       this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
 
+
       this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
       this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
-  
+      this._deltaMouseXOnCanvas = 0;
+      this._deltaMouseYOnCanvas = 0; 
     }
 
     let newLeft = camera.left;
