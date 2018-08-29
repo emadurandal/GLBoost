@@ -19,7 +19,7 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
     this._wireframeWidthRelativeScale = 1.0;
 
     this._baseColor = new Vector3(1.0, 1.0, 1.0);
-    this._metallicRoughnessFactors = new Vector2(0.0, 0.5);
+    this._metallicRoughnessFactors = new Vector2(1.0, 1.0);
 
     this._shaderClass = PBRPrincipledShader;
   }
