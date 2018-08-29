@@ -8,6 +8,7 @@ import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_Mesh from '../elements/meshes/M_Mesh';
+import PBRMetallicRoughnessMaterial from '../../low_level/materials/PBRMetallicRoughnessMaterial';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -313,7 +314,7 @@ export default class ModelConverter {
           if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
             glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
           } else {
-            glboostMaterial = glBoostContext.createClassicMaterial();
+            glboostMaterial = glBoostContext.createPBRMatallicRoughnessMaterial();
           }
           if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
             glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
@@ -543,7 +544,7 @@ export default class ModelConverter {
               'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT,
               'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
             });
-            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
           }
 
           let enables = [];
@@ -562,6 +563,8 @@ export default class ModelConverter {
       };
       setTextures(materialJson);
 
+
+
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
         // If texture coordinates existed even once in the previous loop
@@ -579,10 +582,19 @@ export default class ModelConverter {
       }
     }
 
-    if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
-      let value = materialJson.pbrMetallicRoughness.baseColorFactor;
-      gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
+    const pmr = materialJson.pbrMetallicRoughness;
+    if (pmr != null) {
+      if (pmr.baseColorFactor) {
+        gltfMaterial.baseColor = new Vector4(pmr.baseColorFactor);
+      }
+      if (pmr.metallicFactor) {
+        gltfMaterial.metallic = new Vector4(pmr.metallicFactor);
+      }
+      if (pmr.roughnessFactor) {
+        gltfMaterial.roughness = new Vector4(pmr.roughnessFactor);
+      }
     }
+
 
     if (indices !== null) {
       gltfMaterial.setVertexN(geometry, indices.length);
