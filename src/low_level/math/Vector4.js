@@ -18,7 +18,7 @@ export default class Vector4 {
       this.v = new Float32Array(4);
     }
 
-    if (x != null) { 
+    if (typeof x == null) {
       this.x = 0;
       this.y = 0;
       this.z = 0;

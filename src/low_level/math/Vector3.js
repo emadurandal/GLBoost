@@ -19,7 +19,7 @@ export default class Vector3 {
       this.v = new Float32Array(3);
     }
 
-    if (x != null) {
+    if (typeof x == null) {
       this.x = 0;
       this.y = 0;
       this.z = 0;
