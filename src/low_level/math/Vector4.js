@@ -15,14 +15,19 @@ export default class Vector4 {
       this.v = ((x:any):TypedArray);
       return;
     } else {
-      this.v = new Float32Array(4)
+      this.v = new Float32Array(4);
     }
 
-    if (typeof x === 'undefined') {
+    if (x != null) { 
       this.x = 0;
       this.y = 0;
       this.z = 0;
       this.w = 1;
+    } else if (Array.isArray(x)) {
+      this.x = x[0];
+      this.y = x[1];
+      this.z = x[2];
+      this.w = x[3];
     } else if (typeof (x:any).w !== 'undefined') {
       this.x = (x:any).x;
       this.y = (x:any).y;

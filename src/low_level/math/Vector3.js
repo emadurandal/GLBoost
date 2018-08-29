@@ -16,13 +16,17 @@ export default class Vector3 {
       this.v = ((x:any):TypedArray);
       return;
     } else {
-      this.v = new Float32Array(3)
+      this.v = new Float32Array(3);
     }
 
-    if (typeof x === 'undefined') {
+    if (x != null) {
       this.x = 0;
       this.y = 0;
       this.z = 0;
+    } else if (Array.isArray(x)) {
+      this.x = x[0];
+      this.y = x[1];
+      this.z = x[2];
     } else if (typeof (x:any).w !== 'undefined') {
       this.x = (x:any).x;
       this.y = (x:any).y;
