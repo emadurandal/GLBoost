@@ -1602,7 +1602,7 @@
         this.v = new Float32Array(3);
       }
 
-      if (x != null) {
+      if (typeof x == null) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -1923,7 +1923,7 @@
         this.v = new Float32Array(4);
       }
 
-      if (typeof x === 'undefined') {
+      if (typeof x == null) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -15046,7 +15046,9 @@ albedo.rgb *= (1.0 - metallic);
           });
         }
       };
-      collectGizmos(this._scene);
+      if (this._scene != null) {
+        collectGizmos(this._scene);
+      }
 
       this._opacityMeshes = [];
       this._transparentMeshes = [];
@@ -22637,4 +22639,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-196-g9724-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-202-g91f4-mod branch: develop';
