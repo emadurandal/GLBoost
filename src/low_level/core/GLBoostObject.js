@@ -130,6 +130,15 @@ export default class GLBoostObject {
     this._userFlavorName = name;
   }
 
+  tryToSetUserFlavorNameUniquely(name:string) {
+    if (this._glBoostMonitor.getGLBoostObjectByUserFlavorName(name) != null) {
+      return false;
+    } else {
+      this._userFlavorName = name;
+      return true;
+    }
+  }
+
   get userFlavorName():string {
     return this._userFlavorName;
   }

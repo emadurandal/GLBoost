@@ -750,6 +750,26 @@
       return null;
     }
 
+    getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+      for (let instanceName in this._glBoostObjects) {
+        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+          return this._glBoostObjects[instanceName];
+        }
+      }
+      return null;
+    }
+
+
+    getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+      const results = [];
+      for (let instanceName in this._glBoostObjects) {
+        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+          results.push(this._glBoostObjects[instanceName]);
+        }
+      }
+      return results;
+    }
+
     getGLBoostObjectWhichHasThisObjectId(objectId) {
       for (let instanceName in this._glBoostObjects) {
         if (this._glBoostObjects[instanceName].objectIndex === objectId) {
@@ -1459,6 +1479,15 @@
 
     set userFlavorName(name       ) {
       this._userFlavorName = name;
+    }
+
+    tryToSetUserFlavorNameUniquely(name       ) {
+      if (this._glBoostMonitor.getGLBoostObjectByUserFlavorName(name) != null) {
+        return false;
+      } else {
+        this._userFlavorName = name;
+        return true;
+      }
     }
 
     get userFlavorName()        {
@@ -13305,19 +13334,33 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glBoostMonitor;
     }
 
-    setPropertiesFromJson(arg) {
+    setPropertiesFromJson(arg, queryType = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
       let json = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
-      if (!json.targetInstanceName) {
+      if (!json.targetUserFlavorName) {
         console.warn(`Faild! This json doesn't include targetInstanceName field!`);
         return;
       }
-      const object = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
-      object.setPropertiesFromJson(json);
+      let objects = null;
+      if (queryType === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+      } else if (queryType === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        if (found != null && found.userFlavorName === json.targetUserFlavorName) {
+          objects = [found];
+        } else {
+          objects = [];
+        }
+      } else {
+        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        objects = [found];
+      }
 
-      return object;
+      objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+     
+      return objects;
     }
 
   }
@@ -22639,4 +22682,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-203-g4445-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-204-g3e9e-mod branch: develop';
