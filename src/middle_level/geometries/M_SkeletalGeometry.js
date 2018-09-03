@@ -10,6 +10,7 @@ import Vector3 from '../../low_level/math/Vector3';
 import Vector4 from '../../low_level/math/Vector4';
 import Quaternion from '../../low_level/math/Quaternion';
 import MathUtil from '../../low_level/math/MathUtil';
+import MathClassUtil from '../../low_level/math/MathClassUtil';
 
 export default class M_SkeletalGeometry extends Geometry {
   constructor(glBoostContext) {
@@ -169,7 +170,7 @@ export default class M_SkeletalGeometry extends Geometry {
         for (let i=0; i<matrices.length; i++) {
           let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
-          let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+          let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
           skeletalMesh._qArray[i*2+1] = vec2QPacked[1];
           let t = matrices[i].getTranslate();
@@ -209,11 +210,11 @@ export default class M_SkeletalGeometry extends Geometry {
 
           let q = (Quaternion.fromMatrix(matrices[i]));
           q.normalize();
-          let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+          let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
           let t = matrices[i].getTranslate();
           skeletalMesh._qtArray[i*4+0] = vec2QPacked[0];
           skeletalMesh._qtArray[i*4+1] = vec2QPacked[1];
-          let vec2TPacked = MathUtil.packNormalizedVec4ToVec2(
+          let vec2TPacked = MathClassUtil.packNormalizedVec4ToVec2(
             t.x/skeletalMesh._translationScale.x, t.y/skeletalMesh._translationScale.y,
             t.z/skeletalMesh._translationScale.z, 0.0, 4096);
             skeletalMesh._qtArray[i*4+2] = vec2TPacked[0];
