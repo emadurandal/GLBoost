@@ -1613,9 +1613,71 @@
 
   GLBoost$1["MathUtil"] = MathUtil;
 
+  const IsUtil = {
+    not: {},
+    all: {},
+    any: {},
+
+    _not(fn) {
+      return function() {
+        return !fn.apply(null, [...arguments]);
+      };
+    },
+
+    _all(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].every(fn);
+        }
+        return [...arguments].every(fn);
+      };
+    },
+
+    _any(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].some(fn);
+        }
+        return [...arguments].some(fn);
+      };
+    },
+
+    defined(val) {
+      return val !== void 0;
+    },
+
+    undefined(val) {
+      return val === void 0;
+    },
+
+    null(val) {
+      return val === null;
+    },
+
+    // is NOT null or undefined
+    exist(val) {
+      return val != null;
+    },
+
+    function(val) {
+      return typeof val === 'function';
+    }
+
+  };
+
+  for (let fn in IsUtil) {
+    if (IsUtil.hasOwnProperty(fn)) {
+      const interfaces = ['not', 'all', 'any'];
+      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
+        interfaces.forEach((itf)=>{
+          const op = '_' + itf;
+          IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
+        });
+      }
+    }
+  }
+
   //      
-                                       
-                                       
 
                                                                              
                                                                        
@@ -1631,7 +1693,7 @@
         this.v = new Float32Array(3);
       }
 
-      if (typeof x == null) {
+      if (IsUtil.not.exist(x)) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -1935,8 +1997,6 @@
   GLBoost$1['Vector3'] = Vector3;
 
   //      
-                                       
-                                       
 
                                                                              
                                                                        
@@ -1952,7 +2012,7 @@
         this.v = new Float32Array(4);
       }
 
-      if (typeof x == null) {
+      if (IsUtil.not.exist(x)) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
@@ -13367,70 +13427,6 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
-  const IsUtil = {
-    not: {},
-    all: {},
-    any: {},
-
-    _not(fn) {
-      return function() {
-        return !fn.apply(null, [...arguments]);
-      };
-    },
-
-    _all(fn) {
-      return function() {
-        if (Array.isArray(arguments[0])) {
-          return arguments[0].every(fn);
-        }
-        return [...arguments].every(fn);
-      };
-    },
-
-    _any(fn) {
-      return function() {
-        if (Array.isArray(arguments[0])) {
-          return arguments[0].some(fn);
-        }
-        return [...arguments].some(fn);
-      };
-    },
-
-    defined(val) {
-      return val !== void 0;
-    },
-
-    undefined(val) {
-      return val === void 0;
-    },
-
-    null(val) {
-      return val === null;
-    },
-
-    // is NOT null or undefined
-    exist(val) {
-      return val != null;
-    },
-
-    function(val) {
-      return typeof val === 'function';
-    }
-
-  };
-
-  for (let fn in IsUtil) {
-    if (IsUtil.hasOwnProperty(fn)) {
-      const interfaces = ['not', 'all', 'any'];
-      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
-        interfaces.forEach((itf)=>{
-          const op = '_' + itf;
-          IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
-        });
-      }
-    }
-  }
-
   class M_Mesh extends M_Element {
     constructor(glBoostContext, geometry, material) {
       super(glBoostContext);
@@ -16718,7 +16714,7 @@ albedo.rgb *= (1.0 - metallic);
           for (let i=0; i<matrices.length; i++) {
             let q = (Quaternion.fromMatrix(matrices[i]));
             q.normalize();
-            let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+            let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
             skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
             skeletalMesh._qArray[i*2+1] = vec2QPacked[1];
             let t = matrices[i].getTranslate();
@@ -16758,11 +16754,11 @@ albedo.rgb *= (1.0 - metallic);
 
             let q = (Quaternion.fromMatrix(matrices[i]));
             q.normalize();
-            let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+            let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
             let t = matrices[i].getTranslate();
             skeletalMesh._qtArray[i*4+0] = vec2QPacked[0];
             skeletalMesh._qtArray[i*4+1] = vec2QPacked[1];
-            let vec2TPacked = MathUtil.packNormalizedVec4ToVec2(
+            let vec2TPacked = MathClassUtil.packNormalizedVec4ToVec2(
               t.x/skeletalMesh._translationScale.x, t.y/skeletalMesh._translationScale.y,
               t.z/skeletalMesh._translationScale.z, 0.0, 4096);
               skeletalMesh._qtArray[i*4+2] = vec2TPacked[0];
@@ -22682,4 +22678,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-204-g3e9e-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-205-g9679-mod branch: develop';
