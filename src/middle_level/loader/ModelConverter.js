@@ -544,7 +544,7 @@ export default class ModelConverter {
               'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT,
               'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
             });
-            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
           }
 
           let enables = [];

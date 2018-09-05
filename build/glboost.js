@@ -21658,7 +21658,7 @@ albedo.rgb *= (1.0 - metallic);
                 'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT,
                 'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
               });
-              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
             }
 
             let enables = [];
@@ -22678,4 +22678,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-205-g9679-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-207-g325e-mod branch: develop';
