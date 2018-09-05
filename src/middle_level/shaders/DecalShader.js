@@ -115,7 +115,8 @@ export class DecalShaderSource {
     if (material.hasAnyTextures() || diffuseTexture) {
       material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
       material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-      material._semanticsDic['TEXTURE'] = 'uTexture';
+      //material._semanticsDic['TEXTURE'] = 'uTexture';
+      material._semanticsDic['TEXTURE'].push('uTexture');
     }
 
 

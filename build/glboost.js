@@ -6327,12 +6327,15 @@
       }
 
       let isTextureProcessDone = true;
-      if (typeof material._semanticsDic['TEXTURE'] === 'undefined') ; else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
+      if (typeof material._semanticsDic['TEXTURE'] === 'undefined') ;
+      /*
+      else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
         let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
         let textureName = textureSamplerDic.textureName;
         let textureUnitIndex = textureSamplerDic.textureUnitIndex;
         isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-      } else {
+      }*/
+      else {
         // it must be an Array...
         material._semanticsDic['TEXTURE'].forEach((uniformName) => {
           let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
@@ -9338,7 +9341,8 @@ return mat4(
       if (material.hasAnyTextures() || diffuseTexture) {
         material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
         material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        material._semanticsDic['TEXTURE'] = 'uTexture';
+        //material._semanticsDic['TEXTURE'] = 'uTexture';
+        material._semanticsDic['TEXTURE'].push('uTexture');
       }
 
 
@@ -21658,7 +21662,22 @@ albedo.rgb *= (1.0 - metallic);
                 'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT,
                 'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
               });
+              texture.userFlavorName = `Texture_Diffuse_index_${baseColorTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
               gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+            }
+
+           
+            let metallicRoughnessTexture = materialJson.pbrMetallicRoughness.metallicRoughnessTexture;
+            if (metallicRoughnessTexture) {
+              let sampler = metallicRoughnessTexture.texture.sampler;
+              let texture = glBoostContext.createTexture(metallicRoughnessTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_MetallicRoughness_index_${metallicRoughnessTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
             }
 
             let enables = [];
@@ -22678,4 +22697,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-207-g325e-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-208-g1ed1-mod branch: develop';
