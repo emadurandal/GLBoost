@@ -9,6 +9,7 @@ export class PBRPrincipledShaderSource {
     var shaderText = '';
     shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
     shaderText += 'uniform vec3 uBaseColorFactor;\n';
+    shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
 
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -148,6 +149,9 @@ vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
+vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
+userRoughness = ormTexel.g * userRoughness;
+metallic = ormTexel.b * metallic;
 
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
@@ -214,6 +218,8 @@ albedo.rgb *= (1.0 - metallic);
     material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
     material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
+
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
     
     return vertexAttribsAsResult;
   }

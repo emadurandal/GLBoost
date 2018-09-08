@@ -1,6 +1,6 @@
-version: 0.0.4-208-g1ed1-mod
-branch: develop
-4db7895e0b37cb10a2e9ddac19ef946647b415c63938005a4d702d1af02f5749 ./build/glboost.js
-4db7895e0b37cb10a2e9ddac19ef946647b415c63938005a4d702d1af02f5749 ./build/glboost.js
-2c4015f880be42d51e15ee0f257b7ae9306475f7cfe379da1b0a2f7e60d36e87 ./build/glboost.min.js
-757ad2719a9da36b38ad5ac9e6be2144c501fb17546d523b8ab7ad2899334b43 ./build/glboost.min.js.map
+version: 0.0.4-209-gb4f80-mod
+branch: feature/support-pbr-texture
+e87e9e49c269f2b4a8f1775abff9f168fba890f1d5d159737065c62ffd7628fd ./build/glboost.js
+e87e9e49c269f2b4a8f1775abff9f168fba890f1d5d159737065c62ffd7628fd ./build/glboost.js
+0d814b8984d1a7ad0ff6d2e99d0fa47359f878caae54d1968e77983713ba44c2 ./build/glboost.min.js
+c3b5b15198c03a6185566247ffbcee11f854d68a0b8de8c82feb8132a9af6f47 ./build/glboost.min.js.map

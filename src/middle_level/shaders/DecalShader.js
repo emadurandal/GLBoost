@@ -41,9 +41,7 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    if (material.hasAnyTextures()) {
-      shaderText += 'uniform sampler2D uTexture;\n';
-    }
+    shaderText += 'uniform sampler2D uTexture;\n';
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
@@ -68,7 +66,7 @@ export class DecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD) && material.hasAnyTextures()) {
+    if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
@@ -104,36 +102,9 @@ export class DecalShaderSource {
       material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
 
-    let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-    material.setUniform(shaderProgram, 'uTexture', uTexture);
-    // set texture unit 0 to the sampler
-    this._glContext.uniform1i( uTexture, 0, true);
-
-    material._semanticsDic['TEXTURE'] = [];
-
-    material.uniformTextureSamplerDic['uTexture'] = {};
-    if (material.hasAnyTextures() || diffuseTexture) {
-      material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-      //material._semanticsDic['TEXTURE'] = 'uTexture';
-      material._semanticsDic['TEXTURE'].push('uTexture');
-    }
-
-
-    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-    let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
-    if (uNormalTexture) {
-      material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
-      // set texture unit 1 to the normal texture sampler
-      this._glContext.uniform1i( uNormalTexture, 1, true);
-
-      material.uniformTextureSamplerDic['uNormalTexture'] = {};
-      if (material.hasAnyTextures()) {
-        material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
-        material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
-        material._semanticsDic['TEXTURE'].push('uNormalTexture');
-      }
-    }
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
+    
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
 
     return vertexAttribsAsResult;
   }

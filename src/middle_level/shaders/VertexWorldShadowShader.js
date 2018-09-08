@@ -87,18 +87,8 @@ export default class VertexWorldShadowShaderSource {
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
 
-        let index = i;
-
-        // count for Decal Texture at first
-        index++;
-
-        // count for Normal Texture if it exists
-        let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-        if (normalTexture) {
-          index++;
-        }
-
-        lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+        const index = i + material.getTextureNumAttachedShader();
+        lights[i].camera.texture.textureUnitIndex = index;
       }
     }
 
