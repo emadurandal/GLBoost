@@ -96,16 +96,9 @@ export default class VertexWorldShadowShaderSource {
     material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
     this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
-    let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
-      //if (lights[i].camera && lights[i].camera.texture) {
       const light_i = i;
-      // matrices
-      material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
-
-    //  textureUnitIndex++;
-      //}
-      //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+      material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + light_i, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
     }
 
     return vertexAttribsAsResult;

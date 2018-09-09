@@ -1142,13 +1142,14 @@
       }
   */
       if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-  //       console.error('missmatch!')
+         console.error('missmatch!');
         return;
       }
 
       if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
         // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
         this.gl[uniformFuncStr].apply(this.gl, args);
+        args[0].setValue = args;
         this.checkGLError();
 
         return;
@@ -8966,16 +8967,9 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
       this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
-      let textureUnitIndex = 0;
       for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
         const light_i = i;
-        // matrices
-        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
-
-      //  textureUnitIndex++;
-        //}
-        //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + light_i, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
       }
 
       return vertexAttribsAsResult;
@@ -22688,4 +22682,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-212-g0f2a-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-215-g7dca-mod branch: feature/support-pbr-texture';
