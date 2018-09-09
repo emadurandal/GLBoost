@@ -144,6 +144,9 @@ export default class DecalShader extends WireframeShader {
     // For Shadow
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
+        const index = i + material.getTextureNumAttachedShader();
+        lights[i].camera.texture.textureUnitIndex = index;
+
         let cameraMatrix = lights[i].camera.lookAtRHMatrix();
         let viewMatrix = cameraMatrix.clone();
         let projectionMatrix = lights[i].camera.projectionRHMatrix();
@@ -158,13 +161,13 @@ export default class DecalShader extends WireframeShader {
 
       if (lights[i].camera && lights[i].camera.texture) {
         let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
-        //let index = lights[i].camera.texture.textureUnitIndex;
-        const index = i + material.getTextureNumAttachedShader();
+        let index = lights[i].camera.texture.textureUnitIndex;
+        //const index = i + material.getTextureNumAttachedShader();
 
 
         this._glContext.uniform1i(uniformLocation, index, true);
       } else {
-        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
+        //this._glContext.uniform1i(uniformLocation, 0, true);
       }
     }
   }
@@ -174,7 +177,7 @@ export default class DecalShader extends WireframeShader {
     for (let i=0; i<lights.length; i++) {
       if (lights[i].camera && lights[i].camera.texture) {
         // set depthTexture unit i+1 to the sampler
-        this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
+        //this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
       }
     }
   }
