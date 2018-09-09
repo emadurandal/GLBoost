@@ -323,6 +323,9 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
     this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
     glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+    if (uniformLocation != null) {
+      uniformLocation.uniformLocationName = uniformLocationName;
+    }
 
     this._updateCount();
   }
@@ -393,7 +396,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     const texture = this.getTextureFromPurpose(texturePurpose);
     if (texture != null) {
       let uTexture = this._glContext.getUniformLocation(shaderProgram, uniformName);
-      let index = Object.keys(this._textureSemanticsDic).indexOf(texturePurpose);
+      let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
       index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
       this._glContext.uniform1i( uTexture, index, true);
       this.setUniform(shaderProgram, uniformName, uTexture);

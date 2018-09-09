@@ -8969,11 +8969,11 @@ return mat4(
       let textureUnitIndex = 0;
       for (let i=0; i<lights.length; i++) {
         //if (lights[i].camera && lights[i].camera.texture) {
-
+        const light_i = i;
         // matrices
-        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
+        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
 
-        textureUnitIndex++;
+      //  textureUnitIndex++;
         //}
         //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
       }
@@ -9350,6 +9350,9 @@ return mat4(
       // For Shadow
       for (let i=0; i<lights.length; i++) {
         if (lights[i].camera && lights[i].camera.texture) {
+          const index = i + material.getTextureNumAttachedShader();
+          lights[i].camera.texture.textureUnitIndex = index;
+
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
@@ -9364,13 +9367,11 @@ return mat4(
 
         if (lights[i].camera && lights[i].camera.texture) {
           let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
-          //let index = lights[i].camera.texture.textureUnitIndex;
-          const index = i + material.getTextureNumAttachedShader();
+          let index = lights[i].camera.texture.textureUnitIndex;
+          //const index = i + material.getTextureNumAttachedShader();
 
 
           this._glContext.uniform1i(uniformLocation, index, true);
-        } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
         }
       }
     }
@@ -9378,10 +9379,7 @@ return mat4(
     setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
       super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
       for (let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {
-          // set depthTexture unit i+1 to the sampler
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
-        }
+        if (lights[i].camera && lights[i].camera.texture) ;
       }
     }
 
@@ -9714,6 +9712,9 @@ return mat4(
 
       this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
       glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+      if (uniformLocation != null) {
+        uniformLocation.uniformLocationName = uniformLocationName;
+      }
 
       this._updateCount();
     }
@@ -9784,7 +9785,7 @@ return mat4(
       const texture = this.getTextureFromPurpose(texturePurpose);
       if (texture != null) {
         let uTexture = this._glContext.getUniformLocation(shaderProgram, uniformName);
-        let index = Object.keys(this._textureSemanticsDic).indexOf(texturePurpose);
+        let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
         index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
         this._glContext.uniform1i( uTexture, index, true);
         this.setUniform(shaderProgram, uniformName, uTexture);
@@ -13302,6 +13303,7 @@ albedo.rgb *= (1.0 - metallic);
         internalFormat, format, type,
         gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
       depthTexture.fbo = fbo;
+      depthTexture.userFlavorName = `DepthTexture_${fbo.width}x${fbo.height}`;
 
       /// Attach Buffers
       // color
@@ -22686,4 +22688,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-211-ga19c-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-212-g0f2a-mod branch: feature/support-pbr-texture';
