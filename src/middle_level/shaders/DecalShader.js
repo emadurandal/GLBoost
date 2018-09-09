@@ -41,7 +41,9 @@ export class DecalShaderSource {
     if (Shader._exist(f, GLBoost.TEXCOORD)) {
       shaderText += `${in_} vec2 texcoord;\n\n`;
     }
-    shaderText += 'uniform sampler2D uTexture;\n';
+    if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE)) {
+      shaderText += 'uniform sampler2D uTexture;\n';
+    }
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
@@ -66,7 +68,7 @@ export class DecalShaderSource {
       shaderText += '  rt0 *= color;\n';
     }
     shaderText += '    rt0 *= materialBaseColor;\n';
-    if (Shader._exist(f, GLBoost.TEXCOORD)) {
+    if (Shader._exist(f, GLBoost.TEXCOORD) && material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE)) {
       shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 

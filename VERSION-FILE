@@ -1,6 +1,6 @@
-version: 0.0.4-210-g8d778-mod
+version: 0.0.4-211-ga19c-mod
 branch: feature/support-pbr-texture
-755442724258f760cbe8d71b1e40e2421dfbfc7a05190dee97b837e56c3fbf99 ./build/glboost.js
-755442724258f760cbe8d71b1e40e2421dfbfc7a05190dee97b837e56c3fbf99 ./build/glboost.js
-d7b11ae460c54d28072257587515fd1ab82891e93f263bf42c798006a103f6b3 ./build/glboost.min.js
-e0fc8f6f1f6bab0ce92b79a64974e1f260cf0b192bc5edf16368e0c6d48ceed1 ./build/glboost.min.js.map
+6dfcff98da17faa388107ee42b893dd9ba3b5fba680a6a4e4d06f9c791d0cce8 ./build/glboost.js
+6dfcff98da17faa388107ee42b893dd9ba3b5fba680a6a4e4d06f9c791d0cce8 ./build/glboost.js
+0952e0a9fec92926309ea699daabf8c15a2da79ace1391410dbd6422beb0943f ./build/glboost.min.js
+31cf9ccc87e6d9397ac95b9efe72902924dd35edb2b34853079258429ec73484 ./build/glboost.min.js.map

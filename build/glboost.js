@@ -9247,7 +9247,9 @@ return mat4(
       if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
         shaderText += `${in_} vec2 texcoord;\n\n`;
       }
-      shaderText += 'uniform sampler2D uTexture;\n';
+      if (material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
+        shaderText += 'uniform sampler2D uTexture;\n';
+      }
       shaderText += 'uniform vec4 materialBaseColor;\n';
       shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
@@ -9272,7 +9274,7 @@ return mat4(
         shaderText += '  rt0 *= color;\n';
       }
       shaderText += '    rt0 *= materialBaseColor;\n';
-      if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
+      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
 
@@ -22684,4 +22686,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-210-g8d778-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-211-ga19c-mod branch: feature/support-pbr-texture';
