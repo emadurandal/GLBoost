@@ -241,6 +241,7 @@ export default class GLBoostLowContext {
       internalFormat, format, type,
       gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
+    depthTexture.userFlavorName = `DepthTexture_${fbo.width}x${fbo.height}`;
 
     /// Attach Buffers
     // color

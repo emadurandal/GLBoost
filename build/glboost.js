@@ -1142,13 +1142,14 @@
       }
   */
       if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-  //       console.error('missmatch!')
+         console.error('missmatch!');
         return;
       }
 
       if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
         // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
         this.gl[uniformFuncStr].apply(this.gl, args);
+        args[0].setValue = args;
         this.checkGLError();
 
         return;
@@ -1161,6 +1162,11 @@
         MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
           'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
       }
+    }
+
+    // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+    uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
+      this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
@@ -6327,22 +6333,12 @@
       }
 
       let isTextureProcessDone = true;
-      if (typeof material._semanticsDic['TEXTURE'] === 'undefined') ;
-      /*
-      else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-        let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+      for (let key in material._textureSemanticsDic) {
+        const uniformName = material._textureSemanticsDic[key];
+        let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
         let textureName = textureSamplerDic.textureName;
         let textureUnitIndex = textureSamplerDic.textureUnitIndex;
         isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-      }*/
-      else {
-        // it must be an Array...
-        material._semanticsDic['TEXTURE'].forEach((uniformName) => {
-          let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-          let textureName = textureSamplerDic.textureName;
-          let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-          isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-        });
       }
 
       return isTextureProcessDone;
@@ -8967,18 +8963,8 @@ return mat4(
           let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
           material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
 
-          let index = i;
-
-          // count for Decal Texture at first
-          index++;
-
-          // count for Normal Texture if it exists
-          let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-          if (normalTexture) {
-            index++;
-          }
-
-          lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+          const index = i + material.getTextureNumAttachedShader();
+          lights[i].camera.texture.textureUnitIndex = index;
         }
       }
 
@@ -8986,16 +8972,9 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
       this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
-      let textureUnitIndex = 0;
       for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
-
-        // matrices
-        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
-
-        textureUnitIndex++;
-        //}
-        //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        const light_i = i;
+        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + light_i, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
       }
 
       return vertexAttribsAsResult;
@@ -9267,7 +9246,7 @@ return mat4(
       if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
         shaderText += `${in_} vec2 texcoord;\n\n`;
       }
-      if (material.hasAnyTextures()) {
+      if (material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += 'uniform sampler2D uTexture;\n';
       }
       shaderText += 'uniform vec4 materialBaseColor;\n';
@@ -9294,7 +9273,7 @@ return mat4(
         shaderText += '  rt0 *= color;\n';
       }
       shaderText += '    rt0 *= materialBaseColor;\n';
-      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
+      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
 
@@ -9330,36 +9309,9 @@ return mat4(
         material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
       }
 
-      let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-      material.setUniform(shaderProgram, 'uTexture', uTexture);
-      // set texture unit 0 to the sampler
-      this._glContext.uniform1i( uTexture, 0, true);
-
-      material._semanticsDic['TEXTURE'] = [];
-
-      material.uniformTextureSamplerDic['uTexture'] = {};
-      if (material.hasAnyTextures() || diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        //material._semanticsDic['TEXTURE'] = 'uTexture';
-        material._semanticsDic['TEXTURE'].push('uTexture');
-      }
-
-
-      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
-      let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
-      if (uNormalTexture) {
-        material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
-        // set texture unit 1 to the normal texture sampler
-        this._glContext.uniform1i( uNormalTexture, 1, true);
-
-        material.uniformTextureSamplerDic['uNormalTexture'] = {};
-        if (material.hasAnyTextures()) {
-          material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
-          material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
-          material._semanticsDic['TEXTURE'].push('uNormalTexture');
-        }
-      }
+      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
+      
+      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
 
       return vertexAttribsAsResult;
     }
@@ -9397,10 +9349,13 @@ return mat4(
       // For Shadow
       for (let i=0; i<lights.length; i++) {
         if (lights[i].camera && lights[i].camera.texture) {
+          const index = i + material.getTextureNumAttachedShader();
+          lights[i].camera.texture.textureUnitIndex = index;
+
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
+          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(), true);
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -9412,10 +9367,10 @@ return mat4(
         if (lights[i].camera && lights[i].camera.texture) {
           let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
           let index = lights[i].camera.texture.textureUnitIndex;
+          //const index = i + material.getTextureNumAttachedShader();
+
 
           this._glContext.uniform1i(uniformLocation, index, true);
-        } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
         }
       }
     }
@@ -9423,10 +9378,7 @@ return mat4(
     setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
       super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
       for (let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {
-          // set depthTexture unit i+1 to the sampler
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
-        }
+        if (lights[i].camera && lights[i].camera.texture) ;
       }
     }
 
@@ -9467,6 +9419,7 @@ return mat4(
       this._globalStatesUsage = null;
       this._shaderParametersForShaderInstance = {};
       this._semanticsDic = {};
+      this._textureSemanticsDic = {};
 
       this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -9541,11 +9494,13 @@ return mat4(
       if (!texture) {
         return;
       }
+
       this._textureDic[texture.userFlavorName] = texture;
       let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       this._texturePurposeDic[_purpose] = texture.userFlavorName;
       texture.purpose = _purpose;
       this._textureContributionRateDic[texture.userFlavorName] = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+
       this._updateCount();
     }
 
@@ -9570,7 +9525,12 @@ return mat4(
 
     getTextureFromPurpose(purpose) {
       let userFlavorName = this._texturePurposeDic[purpose];
-      return this.getTexture(userFlavorName);
+      let texture = this.getTexture(userFlavorName);
+      //if (purpose === GLBoost.TEXTURE_PURPOSE_DIFFUSE && !texture) {
+      //  texture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
+      //}
+
+      return texture;
     }
 
     getOneTexture() {
@@ -9682,7 +9642,7 @@ return mat4(
         isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
         return isCalledWebGLBindTexture;
       } else {
-        this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
+        this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(textureUnitIndex);
 
   //      gl.bindTexture(gl.TEXTURE_2D, null);
         isCalledWebGLBindTexture = true;
@@ -9751,6 +9711,9 @@ return mat4(
 
       this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
       glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+      if (uniformLocation != null) {
+        uniformLocation.uniformLocationName = uniformLocationName;
+      }
 
       this._updateCount();
     }
@@ -9816,6 +9779,26 @@ return mat4(
       }
       this._shaderInstance = null;
     }
+
+    registerTextureUnitToUniform(texturePurpose, shaderProgram, uniformName) {
+      const texture = this.getTextureFromPurpose(texturePurpose);
+      if (texture != null) {
+        let uTexture = this._glContext.getUniformLocation(shaderProgram, uniformName);
+        let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
+        index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
+        this._glContext.uniform1i( uTexture, index, true);
+        this.setUniform(shaderProgram, uniformName, uTexture);
+        this.uniformTextureSamplerDic[uniformName] = {};
+        this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
+        this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
+        this._textureSemanticsDic[texturePurpose] = uniformName;
+      }
+    }
+
+    getTextureNumAttachedShader() {
+      return Object.keys(this._textureSemanticsDic).length;
+    }
+
   }
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
@@ -9907,6 +9890,7 @@ return mat4(
       var shaderText = '';
       shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
       shaderText += 'uniform vec3 uBaseColorFactor;\n';
+      shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
 
       shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -10046,6 +10030,9 @@ vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
+vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
+userRoughness = ormTexel.g * userRoughness;
+metallic = ormTexel.b * metallic;
 
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
@@ -10112,6 +10099,8 @@ albedo.rgb *= (1.0 - metallic);
       material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
       material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
       material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
+
+      material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
       
       return vertexAttribsAsResult;
     }
@@ -13313,6 +13302,7 @@ albedo.rgb *= (1.0 - metallic);
         internalFormat, format, type,
         gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
       depthTexture.fbo = fbo;
+      depthTexture.userFlavorName = `DepthTexture_${fbo.width}x${fbo.height}`;
 
       /// Attach Buffers
       // color
@@ -22697,4 +22687,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-208-g1ed1-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-217-g7ba5-mod branch: feature/support-pbr-texture';

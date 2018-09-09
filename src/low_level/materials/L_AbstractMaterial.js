@@ -3,6 +3,7 @@ import AbstractTexture from '../textures/AbstractTexture';
 import Vector4 from '../math/Vector4';
 import DecalShader from '../../middle_level/shaders/DecalShader';
 import GLBoostObject from '../core/GLBoostObject';
+import is from '../misc/IsUtil';
 
 export default class L_AbstractMaterial extends GLBoostObject {
   constructor(glBoostContext) {
@@ -30,6 +31,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._globalStatesUsage = null;
     this._shaderParametersForShaderInstance = {};
     this._semanticsDic = {};
+    this._textureSemanticsDic = {};
 
     this._stateFunctionsToReset = {
       "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -104,11 +106,13 @@ export default class L_AbstractMaterial extends GLBoostObject {
     if (!texture) {
       return;
     }
+
     this._textureDic[texture.userFlavorName] = texture;
     let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     this._texturePurposeDic[_purpose] = texture.userFlavorName;
     texture.purpose = _purpose;
     this._textureContributionRateDic[texture.userFlavorName] = new Vector4(1.0, 1.0, 1.0, 1.0);
+
     this._updateCount();
   }
 
@@ -133,7 +137,12 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   getTextureFromPurpose(purpose) {
     let userFlavorName = this._texturePurposeDic[purpose];
-    return this.getTexture(userFlavorName);
+    let texture = this.getTexture(userFlavorName);
+    //if (purpose === GLBoost.TEXTURE_PURPOSE_DIFFUSE && !texture) {
+    //  texture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
+    //}
+
+    return texture;
   }
 
   getOneTexture() {
@@ -245,7 +254,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
       isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
       return isCalledWebGLBindTexture;
     } else {
-      this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
+      this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(textureUnitIndex);
 
 //      gl.bindTexture(gl.TEXTURE_2D, null);
       isCalledWebGLBindTexture = true;
@@ -314,6 +323,9 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
     this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
     glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+    if (uniformLocation != null) {
+      uniformLocation.uniformLocationName = uniformLocationName;
+    }
 
     this._updateCount();
   }
@@ -379,6 +391,26 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
     this._shaderInstance = null;
   }
+
+  registerTextureUnitToUniform(texturePurpose, shaderProgram, uniformName) {
+    const texture = this.getTextureFromPurpose(texturePurpose);
+    if (texture != null) {
+      let uTexture = this._glContext.getUniformLocation(shaderProgram, uniformName);
+      let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
+      index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
+      this._glContext.uniform1i( uTexture, index, true);
+      this.setUniform(shaderProgram, uniformName, uTexture);
+      this.uniformTextureSamplerDic[uniformName] = {};
+      this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
+      this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
+      this._textureSemanticsDic[texturePurpose] = uniformName;
+    }
+  }
+
+  getTextureNumAttachedShader() {
+    return Object.keys(this._textureSemanticsDic).length;
+  }
+
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;
