@@ -22687,4 +22687,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-217-g7ba5-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-219-g2d31-mod branch: develop';
