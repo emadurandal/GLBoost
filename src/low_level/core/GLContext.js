@@ -245,13 +245,14 @@ export default class GLContext {
     }
 */
     if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-//       console.error('missmatch!')
+       console.error('missmatch!')
       return;
     }
 
     if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
       // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
       this.gl[uniformFuncStr].apply(this.gl, args);
+      args[0].setValue = args;
       this.checkGLError();
 
       return;
