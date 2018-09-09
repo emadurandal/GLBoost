@@ -9249,6 +9249,10 @@ return mat4(
       if (material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += 'uniform sampler2D uTexture;\n';
       }
+      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+      if (normalTexture) {
+        shaderText += `uniform highp sampler2D uNormalTexture;\n`;
+      }
       shaderText += 'uniform vec4 materialBaseColor;\n';
       shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
@@ -21670,6 +21674,19 @@ albedo.rgb *= (1.0 - metallic);
               gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
             }
 
+            const normalTexture = materialJson.normalTexture;
+            if (normalTexture) {
+              const sampler = normalTexture.texture.sampler;
+              const texture = glBoostContext.createTexture(normalTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_MetallicRoughness_index_${normalTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+            }
+
             let enables = [];
             if (options.isBlend) {
               enables.push(3042);
@@ -22687,4 +22704,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-219-g2d31-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-220-gb89c-mod branch: develop';

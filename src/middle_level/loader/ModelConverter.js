@@ -562,6 +562,19 @@ export default class ModelConverter {
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
           }
 
+          const normalTexture = materialJson.normalTexture;
+          if (normalTexture) {
+            const sampler = normalTexture.texture.sampler;
+            const texture = glBoostContext.createTexture(normalTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_MetallicRoughness_index_${normalTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_NORMAL);
+          }
+
           let enables = [];
           if (options.isBlend) {
             enables.push(3042);

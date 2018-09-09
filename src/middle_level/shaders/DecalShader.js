@@ -44,6 +44,10 @@ export class DecalShaderSource {
     if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE)) {
       shaderText += 'uniform sampler2D uTexture;\n';
     }
+    let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+    if (normalTexture) {
+      shaderText += `uniform highp sampler2D uNormalTexture;\n`;
+    }
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
 
