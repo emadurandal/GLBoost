@@ -1,6 +1,6 @@
-version: 0.0.4-215-g7dca-mod
+version: 0.0.4-217-g7ba5-mod
 branch: feature/support-pbr-texture
-05dcff13fb709348e7300c076bb6cb235df7167306e0e320e06aa66d7e4478b2 ./build/glboost.js
-05dcff13fb709348e7300c076bb6cb235df7167306e0e320e06aa66d7e4478b2 ./build/glboost.js
-ef7f3b480cd87de136c293c7b543e2de6482941570c42ee801810dd30ddf4cca ./build/glboost.min.js
-20f4574006028660318df3e184120a7cd578e43205b4e28e87751a18aac8bf0b ./build/glboost.min.js.map
+ec2d46054adc14f5637737d3248a3c9aafd2a5d5d6c2151ee54a0106a2e69f9d ./build/glboost.js
+ec2d46054adc14f5637737d3248a3c9aafd2a5d5d6c2151ee54a0106a2e69f9d ./build/glboost.js
+c5da8bf26cd5b235c3f52ea3a3bea0c0737985d4b719a0c0562be873be345653 ./build/glboost.min.js
+92324b53b06dd94bade7115312bece1d561c4fd1c0d6f39eaa2d92480330d545 ./build/glboost.min.js.map

@@ -268,6 +268,11 @@ export default class GLContext {
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+  uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
+    this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
+  }
+
+  // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
   uniform4f(uniformLocation, x, y, z, w, forceUpdate) {
     this._setUniformValues('uniform4f', [uniformLocation, x, y, z, w], forceUpdate);
   }

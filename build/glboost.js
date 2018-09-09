@@ -1165,6 +1165,11 @@
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+    uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
+      this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
+    }
+
+    // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
     uniform4f(uniformLocation, x, y, z, w, forceUpdate) {
       this._setUniformValues('uniform4f', [uniformLocation, x, y, z, w], forceUpdate);
     }
@@ -9350,7 +9355,7 @@ return mat4(
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
+          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(), true);
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -22682,4 +22687,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-215-g7dca-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-217-g7ba5-mod branch: feature/support-pbr-texture';
