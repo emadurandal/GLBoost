@@ -156,7 +156,9 @@ export default class DecalShader extends WireframeShader {
 
       if (lights[i].camera && lights[i].camera.texture) {
         let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
-        let index = lights[i].camera.texture.textureUnitIndex;
+        //let index = lights[i].camera.texture.textureUnitIndex;
+        const index = i + material.getTextureNumAttachedShader();
+
 
         this._glContext.uniform1i(uniformLocation, index, true);
       } else {

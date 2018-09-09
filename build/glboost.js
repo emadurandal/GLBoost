@@ -9362,7 +9362,9 @@ return mat4(
 
         if (lights[i].camera && lights[i].camera.texture) {
           let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
-          let index = lights[i].camera.texture.textureUnitIndex;
+          //let index = lights[i].camera.texture.textureUnitIndex;
+          const index = i + material.getTextureNumAttachedShader();
+
 
           this._glContext.uniform1i(uniformLocation, index, true);
         } else {
@@ -22682,4 +22684,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-209-gb4f80-mod branch: feature/support-pbr-texture';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-210-g8d778-mod branch: feature/support-pbr-texture';
