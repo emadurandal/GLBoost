@@ -4,12 +4,19 @@ import Vector4 from '../../low_level/math/Vector4';
 
 export class PBRPrincipledShaderSource {
 
-  FSDefine_PBRPrincipledShaderSource(in_, f, lights) {
+  FSDefine_PBRPrincipledShaderSource(in_, f, lights, material, extraData) {
     
     var shaderText = '';
     shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
     shaderText += 'uniform vec3 uBaseColorFactor;\n';
+    shaderText += 'uniform vec3 uEmissiveFactor;'
     shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
+
+    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    if (emissiveTexture) {
+      shaderText += 'uniform sampler2D uEmissiveTexture;\n';
+    }
+    
 
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -136,7 +143,7 @@ export class PBRPrincipledShaderSource {
     return shaderText;
   }
 
-  FSShade_PBRPrincipledShaderSource(f, gl, lights) {
+  FSShade_PBRPrincipledShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
 
     shaderText += `
@@ -201,6 +208,15 @@ albedo.rgb *= (1.0 - metallic);
 
       shaderText += `  }\n`;
     }
+
+    // Emissive
+    shaderText += '  vec3 emissive = uEmissiveFactor;\n';
+    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    if (emissiveTexture) {
+      shaderText += 'emissive *= srgbToLinear(texture2D(uEmissiveTexture, texcoord).xyz);';
+    }
+    shaderText += '  rt0.xyz += emissive;\n';
+
     shaderText += '  rt0.xyz += ambient.xyz;\n';
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
      
@@ -215,12 +231,15 @@ albedo.rgb *= (1.0 - metallic);
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
     material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
+    material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
+    material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
 
+
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
-    
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
+
     return vertexAttribsAsResult;
   }
 }
@@ -239,8 +258,10 @@ export default class PBRPrincipledShader extends DecalShader {
     var baseColor = material.baseColor;
     var metallic = material.metallic;
     let roughness = material.roughness;
+    const emissive = material.emissive;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
+    this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
 
     let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

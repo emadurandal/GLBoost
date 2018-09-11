@@ -574,6 +574,20 @@ export default class ModelConverter {
             texture.userFlavorName = `Texture_MetallicRoughness_index_${normalTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_NORMAL);
           }
+          
+          const emissiveTexture = materialJson.emissiveTexture;
+          if (emissiveTexture) {
+            const sampler = normalTexture.texture.sampler;
+            const texture = glBoostContext.createTexture(emissiveTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_Emissive_index_${emissiveTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+          }
+
 
           let enables = [];
           if (options.isBlend) {
@@ -616,10 +630,13 @@ export default class ModelConverter {
         gltfMaterial.baseColor = new Vector4(pmr.baseColorFactor);
       }
       if (pmr.metallicFactor) {
-        gltfMaterial.metallic = new Vector4(pmr.metallicFactor);
+        gltfMaterial.metallic = pmr.metallicFactor;
       }
       if (pmr.roughnessFactor) {
-        gltfMaterial.roughness = new Vector4(pmr.roughnessFactor);
+        gltfMaterial.roughness = pmr.roughnessFactor;
+      }
+      if (materialJson.emissiveFactor) {
+        gltfMaterial.emissive = new Vector3(materialJson.emissiveFactor);
       }
     }
 

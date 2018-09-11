@@ -345,6 +345,11 @@ export default class GLTF2Loader {
         if (normalTexture !== void 0) {
           normalTexture.texture = gltfJson.textures[normalTexture.index];
         }
+
+        const emissiveTexture = material.emissiveTexture;
+        if (emissiveTexture !== void 0) {
+          emissiveTexture.texture = gltfJson.textures[emissiveTexture.index];
+        }
       }
     }
   }

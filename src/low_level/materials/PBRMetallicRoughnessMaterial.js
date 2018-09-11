@@ -9,8 +9,9 @@ import PBRPrincipledShader from '../../middle_level/shaders/PBRPrincipledShader'
 
 export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   _wireframeWidthRelativeScale: number;
-  _baseColor: Vector3;
+  _baseColorFactor: Vector3;
   _metallicRoughnessFactors: Vector2;
+  _emissiveFactor: Vector3;
   _shaderClass: PBRPrincipledShader;
 
   constructor(glBoostSystem: glBoostSystem) {
@@ -18,8 +19,9 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
     this._wireframeWidthRelativeScale = 1.0;
 
-    this._baseColor = new Vector3(1.0, 1.0, 1.0);
+    this._baseColorFactor = new Vector3(1.0, 1.0, 1.0);
     this._metallicRoughnessFactors = new Vector2(1.0, 1.0);
+    this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
 
     this._shaderClass = PBRPrincipledShader;
   }
@@ -29,11 +31,11 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   }
 
   set baseColor(val: Vector3) {
-    this._baseColor = val.clone();
+    this._baseColorFactor = val.clone();
   }
 
   get baseColor() {
-    return this._baseColor.clone();
+    return this._baseColorFactor.clone();
   }
 
   set metallic(val: number) {
@@ -50,6 +52,14 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
   get roughness() {
     return this._metallicRoughnessFactors.y;
+  }
+
+  set emissive(val: Vector3) {
+    this._emissiveFactor = val;
+  }
+
+  get emissive() {
+    return this._emissiveFactor;
   }
 }
 
