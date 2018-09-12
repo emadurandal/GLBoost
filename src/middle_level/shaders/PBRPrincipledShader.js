@@ -9,14 +9,19 @@ export class PBRPrincipledShaderSource {
     var shaderText = '';
     shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
     shaderText += 'uniform vec3 uBaseColorFactor;\n';
+    shaderText += 'uniform vec2 uOcclusionFactors;'
     shaderText += 'uniform vec3 uEmissiveFactor;'
     shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
 
+    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    if (occlusionTexture) {
+      shaderText += 'uniform sampler2D uOcclusionTexture;\n';
+    }
+    
     let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
     if (emissiveTexture) {
       shaderText += 'uniform sampler2D uEmissiveTexture;\n';
     }
-    
 
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -209,6 +214,18 @@ albedo.rgb *= (1.0 - metallic);
       shaderText += `  }\n`;
     }
 
+    // Ambient
+    shaderText += 'float occlusion = 1.0;\n';
+    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    if (occlusionTexture) {
+      shaderText += 'occlusion = mix(1.0, texture2D(uOcclusionTexture, texcoord).r, uOcclusionFactors.x);\n';
+    }
+    shaderText += '  float occlusionRateForDirectionalLight = uOcclusionFactors.y;\n';
+    shaderText += '  rt0.xyz = mix(rt0.xyz, rt0.xyz * occlusion, occlusionRateForDirectionalLight);\n';
+    shaderText += '  rt0.xyz += ambient.xyz * occlusion;\n';
+
+
+
     // Emissive
     shaderText += '  vec3 emissive = uEmissiveFactor;\n';
     let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
@@ -217,10 +234,10 @@ albedo.rgb *= (1.0 - metallic);
     }
     shaderText += '  rt0.xyz += emissive;\n';
 
-    shaderText += '  rt0.xyz += ambient.xyz;\n';
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
      
     shaderText += '  rt0.a = 1.0;\n';
+//    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
 
@@ -233,11 +250,13 @@ albedo.rgb *= (1.0 - metallic);
 
     material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
     material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
+    material.setUniform(shaderProgram, 'uniform_OcclusionFactors', this._glContext.getUniformLocation(shaderProgram, 'uOcclusionFactors'));
     material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
 
 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, 'uOcclusionTexture');
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
 
     return vertexAttribsAsResult;
@@ -258,9 +277,12 @@ export default class PBRPrincipledShader extends DecalShader {
     var baseColor = material.baseColor;
     var metallic = material.metallic;
     let roughness = material.roughness;
+    const occlusion = material.occlusion;
+    const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
     const emissive = material.emissive;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
+    this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
 
     let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());

@@ -11,7 +11,9 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   _wireframeWidthRelativeScale: number;
   _baseColorFactor: Vector3;
   _metallicRoughnessFactors: Vector2;
+  _occlusionFactor: number;
   _emissiveFactor: Vector3;
+  _occlusionRateForDirectionalLight: number;
   _shaderClass: PBRPrincipledShader;
 
   constructor(glBoostSystem: glBoostSystem) {
@@ -21,7 +23,9 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
     this._baseColorFactor = new Vector3(1.0, 1.0, 1.0);
     this._metallicRoughnessFactors = new Vector2(1.0, 1.0);
+    this._occlusionFactor = 1.0;
     this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
+    this._occlusionRateForDirectionalLight = 0.2;
 
     this._shaderClass = PBRPrincipledShader;
   }
@@ -60,6 +64,22 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
   get emissive() {
     return this._emissiveFactor;
+  }
+  
+  set occlusion(val: number) {
+    this._occlusionFactor = val;
+  }
+
+  get occlusion() {
+    return this._occlusionFactor;
+  }
+
+  set occlusionRateForDirectionalLight(val: number) {
+    this._occlusionRateForDirectionalLight = val;
+  }
+
+  get occlusionRateForDirectionalLight() {
+    return this._occlusionRateForDirectionalLight;
   }
 }
 

@@ -346,6 +346,11 @@ export default class GLTF2Loader {
           normalTexture.texture = gltfJson.textures[normalTexture.index];
         }
 
+        const occlusionTexture = material.occlusionTexture;
+        if (occlusionTexture !== void 0) {
+          occlusionTexture.texture = gltfJson.textures[occlusionTexture.index];
+        }
+
         const emissiveTexture = material.emissiveTexture;
         if (emissiveTexture !== void 0) {
           emissiveTexture.texture = gltfJson.textures[emissiveTexture.index];
