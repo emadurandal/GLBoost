@@ -161,10 +161,18 @@ vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
+`;
+
+    let metallicRoughnessTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+    if (metallicRoughnessTexture) {
+    shaderText += `
 vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
 userRoughness = ormTexel.g * userRoughness;
 metallic = ormTexel.b * metallic;
+`;
+    }
 
+    shaderText += `
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
 float alphaRoughness = userRoughness * userRoughness;
@@ -176,8 +184,8 @@ vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 // Albedo
 vec3 albedo = baseColor.rgb * (vec3(1.0) - diffuseMatAverageF0);
 albedo.rgb *= (1.0 - metallic);
-
 `;
+
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
