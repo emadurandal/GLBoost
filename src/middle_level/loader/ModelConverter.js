@@ -310,12 +310,7 @@ export default class ModelConverter {
   
           let material = primitive.material;
   
-          let glboostMaterial = null;
-          if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
-            glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
-          } else {
-            glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
-          }
+          let glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
           if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
             glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
           }
