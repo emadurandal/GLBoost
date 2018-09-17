@@ -8,6 +8,7 @@ import Quaternion from '../../low_level/math/Quaternion';
 import ArrayUtil from '../../low_level/misc/ArrayUtil';
 import M_SkeletalMesh from '../elements/meshes/M_SkeletalMesh';
 import M_Mesh from '../elements/meshes/M_Mesh';
+import PBRMetallicRoughnessMaterial from '../../low_level/materials/PBRMetallicRoughnessMaterial';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -309,12 +310,7 @@ export default class ModelConverter {
   
           let material = primitive.material;
   
-          let glboostMaterial = null;
-          if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
-            glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
-          } else {
-            glboostMaterial = glBoostContext.createClassicMaterial();
-          }
+          let glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
           if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
             glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
           }
@@ -543,8 +539,63 @@ export default class ModelConverter {
               'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT,
               'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
             });
+            texture.userFlavorName = `Texture_Diffuse_index_${baseColorTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_DIFFUSE);
           }
+
+         
+          let metallicRoughnessTexture = materialJson.pbrMetallicRoughness.metallicRoughnessTexture;
+          if (metallicRoughnessTexture) {
+            let sampler = metallicRoughnessTexture.texture.sampler;
+            let texture = glBoostContext.createTexture(metallicRoughnessTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_MetallicRoughness_index_${metallicRoughnessTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+          }
+
+          const normalTexture = materialJson.normalTexture;
+          if (normalTexture) {
+            const sampler = normalTexture.texture.sampler;
+            const texture = glBoostContext.createTexture(normalTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_MetallicRoughness_index_${normalTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_NORMAL);
+          }
+          
+          const occlusionTexture = materialJson.occlusionTexture;
+          if (occlusionTexture) {
+            const sampler = occlusionTexture.texture.sampler;
+            const texture = glBoostContext.createTexture(occlusionTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_Occlusion_index_${occlusionTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+          }
+          
+          const emissiveTexture = materialJson.emissiveTexture;
+          if (emissiveTexture) {
+            const sampler = normalTexture.texture.sampler;
+            const texture = glBoostContext.createTexture(emissiveTexture.texture.image.image, '', {
+              'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost.LINEAR : sampler.magFilter,
+              'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+              'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapS,
+              'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost.REPEAT : sampler.wrapT
+            });
+            texture.userFlavorName = `Texture_Emissive_index_${emissiveTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+            gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+          }
+
 
           let enables = [];
           if (options.isBlend) {
@@ -561,6 +612,8 @@ export default class ModelConverter {
         }
       };
       setTextures(materialJson);
+
+
 
     } else {
       if (typeof vertexData.components.texcoord !== 'undefined') {
@@ -579,10 +632,22 @@ export default class ModelConverter {
       }
     }
 
-    if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
-      let value = materialJson.pbrMetallicRoughness.baseColorFactor;
-      gltfMaterial.baseColor = new Vector4(value[0], value[1], value[2], value[3]);
+    const pmr = materialJson.pbrMetallicRoughness;
+    if (pmr != null) {
+      if (pmr.baseColorFactor) {
+        gltfMaterial.baseColor = new Vector4(pmr.baseColorFactor);
+      }
+      if (pmr.metallicFactor) {
+        gltfMaterial.metallic = pmr.metallicFactor;
+      }
+      if (pmr.roughnessFactor) {
+        gltfMaterial.roughness = pmr.roughnessFactor;
+      }
+      if (materialJson.emissiveFactor) {
+        gltfMaterial.emissive = new Vector3(materialJson.emissiveFactor);
+      }
     }
+
 
     if (indices !== null) {
       gltfMaterial.setVertexN(geometry, indices.length);

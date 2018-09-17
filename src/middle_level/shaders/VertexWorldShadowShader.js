@@ -87,18 +87,8 @@ export default class VertexWorldShadowShaderSource {
         let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
         material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
 
-        let index = i;
-
-        // count for Decal Texture at first
-        index++;
-
-        // count for Normal Texture if it exists
-        let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-        if (normalTexture) {
-          index++;
-        }
-
-        lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+        const index = i + material.getTextureNumAttachedShader();
+        lights[i].camera.texture.textureUnitIndex = index;
       }
     }
 
@@ -106,16 +96,9 @@ export default class VertexWorldShadowShaderSource {
     material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
     this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
-    let textureUnitIndex = 0;
     for (let i=0; i<lights.length; i++) {
-      //if (lights[i].camera && lights[i].camera.texture) {
-
-      // matrices
-      material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
-
-      textureUnitIndex++;
-      //}
-      //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+      const light_i = i;
+      material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + light_i, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
     }
 
     return vertexAttribsAsResult;

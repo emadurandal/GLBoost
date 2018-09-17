@@ -4,11 +4,24 @@ import Vector4 from '../../low_level/math/Vector4';
 
 export class PBRPrincipledShaderSource {
 
-  FSDefine_PBRPrincipledShaderSource(in_, f, lights) {
+  FSDefine_PBRPrincipledShaderSource(in_, f, lights, material, extraData) {
     
     var shaderText = '';
     shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
     shaderText += 'uniform vec3 uBaseColorFactor;\n';
+    shaderText += 'uniform vec2 uOcclusionFactors;'
+    shaderText += 'uniform vec3 uEmissiveFactor;'
+    shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
+
+    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    if (occlusionTexture) {
+      shaderText += 'uniform sampler2D uOcclusionTexture;\n';
+    }
+    
+    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    if (emissiveTexture) {
+      shaderText += 'uniform sampler2D uEmissiveTexture;\n';
+    }
 
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -135,7 +148,7 @@ export class PBRPrincipledShaderSource {
     return shaderText;
   }
 
-  FSShade_PBRPrincipledShaderSource(f, gl, lights) {
+  FSShade_PBRPrincipledShaderSource(f, gl, lights, material, extraData) {
     var shaderText = '';
 
     shaderText += `
@@ -148,7 +161,18 @@ vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
+`;
 
+    let metallicRoughnessTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+    if (metallicRoughnessTexture) {
+    shaderText += `
+vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
+userRoughness = ormTexel.g * userRoughness;
+metallic = ormTexel.b * metallic;
+`;
+    }
+
+    shaderText += `
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
 float alphaRoughness = userRoughness * userRoughness;
@@ -160,8 +184,8 @@ vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 // Albedo
 vec3 albedo = baseColor.rgb * (vec3(1.0) - diffuseMatAverageF0);
 albedo.rgb *= (1.0 - metallic);
-
 `;
+
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
       let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
@@ -197,10 +221,31 @@ albedo.rgb *= (1.0 - metallic);
 
       shaderText += `  }\n`;
     }
-    shaderText += '  rt0.xyz += ambient.xyz;\n';
+
+    // Ambient
+    shaderText += 'float occlusion = 1.0;\n';
+    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    if (occlusionTexture) {
+      shaderText += 'occlusion = mix(1.0, texture2D(uOcclusionTexture, texcoord).r, uOcclusionFactors.x);\n';
+    }
+    shaderText += '  float occlusionRateForDirectionalLight = uOcclusionFactors.y;\n';
+    shaderText += '  rt0.xyz = mix(rt0.xyz, rt0.xyz * occlusion, occlusionRateForDirectionalLight);\n';
+    shaderText += '  rt0.xyz += ambient.xyz * occlusion;\n';
+
+
+
+    // Emissive
+    shaderText += '  vec3 emissive = uEmissiveFactor;\n';
+    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    if (emissiveTexture) {
+      shaderText += 'emissive *= srgbToLinear(texture2D(uEmissiveTexture, texcoord).xyz);';
+    }
+    shaderText += '  rt0.xyz += emissive;\n';
+
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
      
     shaderText += '  rt0.a = 1.0;\n';
+//    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
 
@@ -211,10 +256,17 @@ albedo.rgb *= (1.0 - metallic);
 
     var vertexAttribsAsResult = [];
 
-    material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
     material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
+    material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
+    material.setUniform(shaderProgram, 'uniform_OcclusionFactors', this._glContext.getUniformLocation(shaderProgram, 'uOcclusionFactors'));
+    material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
-    
+
+
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, 'uOcclusionTexture');
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
+
     return vertexAttribsAsResult;
   }
 }
@@ -233,8 +285,13 @@ export default class PBRPrincipledShader extends DecalShader {
     var baseColor = material.baseColor;
     var metallic = material.metallic;
     let roughness = material.roughness;
+    const occlusion = material.occlusion;
+    const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
+    const emissive = material.emissive;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
+    this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
+    this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
 
     let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

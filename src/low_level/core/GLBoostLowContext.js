@@ -241,6 +241,7 @@ export default class GLBoostLowContext {
       internalFormat, format, type,
       gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
     depthTexture.fbo = fbo;
+    depthTexture.userFlavorName = `DepthTexture_${fbo.width}x${fbo.height}`;
 
     /// Attach Buffers
     // color
@@ -326,19 +327,33 @@ export default class GLBoostLowContext {
     return this.__system._glBoostMonitor;
   }
 
-  setPropertiesFromJson(arg) {
+  setPropertiesFromJson(arg, queryType = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
     let json = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
     }
-    if (!json.targetInstanceName) {
+    if (!json.targetUserFlavorName) {
       console.warn(`Faild! This json doesn't include targetInstanceName field!`);
       return;
     }
-    const object = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
-    object.setPropertiesFromJson(json);
+    let objects = null;
+    if (queryType === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+    } else if (queryType === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+      const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      if (found != null && found.userFlavorName === json.targetUserFlavorName) {
+        objects = [found];
+      } else {
+        objects = [];
+      }
+    } else {
+      const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      objects = [found];
+    }
 
-    return object;
+    objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+   
+    return objects;
   }
 
 }

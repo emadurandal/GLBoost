@@ -289,20 +289,12 @@ export default class DrawKickerWorld {
     }
 
     let isTextureProcessDone = true;
-    if (typeof material._semanticsDic['TEXTURE'] === 'undefined') {
-    } else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-      let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+    for (let key in material._textureSemanticsDic) {
+      const uniformName = material._textureSemanticsDic[key];
+      let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
       let textureName = textureSamplerDic.textureName;
       let textureUnitIndex = textureSamplerDic.textureUnitIndex;
       isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-    } else {
-      // it must be an Array...
-      material._semanticsDic['TEXTURE'].forEach((uniformName) => {
-        let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-        let textureName = textureSamplerDic.textureName;
-        let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-        isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-      });
     }
 
     return isTextureProcessDone;

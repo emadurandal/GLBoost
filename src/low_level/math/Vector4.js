@@ -3,6 +3,7 @@
 import GLBoost from '../../globals';
 import type Vector2 from './Vector2';
 import type Vector3 from './Vector3';
+import is from '../misc/IsUtil';
 
 type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array |
 Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
@@ -15,14 +16,19 @@ export default class Vector4 {
       this.v = ((x:any):TypedArray);
       return;
     } else {
-      this.v = new Float32Array(4)
+      this.v = new Float32Array(4);
     }
 
-    if (typeof x === 'undefined') {
+    if (is.not.exist(x)) {
       this.x = 0;
       this.y = 0;
       this.z = 0;
       this.w = 1;
+    } else if (Array.isArray(x)) {
+      this.x = x[0];
+      this.y = x[1];
+      this.z = x[2];
+      this.w = x[3];
     } else if (typeof (x:any).w !== 'undefined') {
       this.x = (x:any).x;
       this.y = (x:any).y;

@@ -468,7 +468,9 @@ export default class RenderPass extends GLBoostObject {
         });
       }
     };
-    collectGizmos(this._scene);
+    if (this._scene != null) {
+      collectGizmos(this._scene);
+    }
 
     this._opacityMeshes = [];
     this._transparentMeshes = [];

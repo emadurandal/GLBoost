@@ -52,6 +52,26 @@ export default class L_GLBoostMonitor {
     return null;
   }
 
+  getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+    for (let instanceName in this._glBoostObjects) {
+      if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+        return this._glBoostObjects[instanceName];
+      }
+    }
+    return null;
+  }
+
+
+  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+    const results = [];
+    for (let instanceName in this._glBoostObjects) {
+      if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+        results.push(this._glBoostObjects[instanceName]);
+      }
+    }
+    return results;
+  }
+
   getGLBoostObjectWhichHasThisObjectId(objectId) {
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].objectIndex === objectId) {

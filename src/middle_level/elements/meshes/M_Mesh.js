@@ -262,12 +262,26 @@ export default class M_Mesh extends M_Element {
     return this.geometry._getAppropriateMaterials(this);
   }
 
-  rayCast(x, y, camera, viewport) {
 
-    const invPVW = GLBoost.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-    const origVecInLocal = GLBoost.MathClassUtil.unProject(new GLBoost.Vector3(x, y, 0), invPVW, viewport);
-    const distVecInLocal = GLBoost.MathClassUtil.unProject(new GLBoost.Vector3(x, y, 1), invPVW, viewport);
-    const dirVecInLocal = GLBoost.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+  rayCast(arg1, arg2, camera, viewport) {
+    let origVecInLocal = null;
+    let dirVecInLocal = null;
+    if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
+      const origVecInWorld = arg1;
+      const dirVec = arg2;
+      const invWorldMatrix = Matrix44.invert(this.worldMatrix);
+      origVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4(origVecInWorld)));
+      const distVecInWorld = Vector3.add(origVecInWorld, dirVec);
+      const distVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4(distVecInWorld)));
+      dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+    } else {
+      const x = arg1;
+      const y = arg2;
+      const invPVW = Matrix44.multiply(camera.projectionRHMatrix(), Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+      origVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 0), invPVW, viewport);
+      const distVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 1), invPVW, viewport);
+      dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+    }
 
     const material = this.getAppropriateMaterials()[0];
 

@@ -385,6 +385,9 @@
 
       c.define('TEXTURE_PURPOSE_DIFFUSE', void 0, 'diffuse');
       c.define('TEXTURE_PURPOSE_NORMAL', void 0, 'normal');
+      c.define('TEXTURE_PURPOSE_METALLIC_ROUGHNESS', void 0, 'metallic_roughness');
+      c.define('TEXTURE_PURPOSE_OCCLUSION', void 0, 'occlusion');
+      c.define('TEXTURE_PURPOSE_EMISSIVE', void 0, 'emissive');
       c.define('QUERY_TYPE_INSTANCE_NAME');
       c.define('QUERY_TYPE_USER_FLAVOR_NAME');
       c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
@@ -747,6 +750,26 @@
         }
       }
       return null;
+    }
+
+    getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+      for (let instanceName in this._glBoostObjects) {
+        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+          return this._glBoostObjects[instanceName];
+        }
+      }
+      return null;
+    }
+
+
+    getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+      const results = [];
+      for (let instanceName in this._glBoostObjects) {
+        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+          results.push(this._glBoostObjects[instanceName]);
+        }
+      }
+      return results;
     }
 
     getGLBoostObjectWhichHasThisObjectId(objectId) {
@@ -1121,13 +1144,14 @@
       }
   */
       if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-  //       console.error('missmatch!')
+         console.error('missmatch!');
         return;
       }
 
       if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
         // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
         this.gl[uniformFuncStr].apply(this.gl, args);
+        args[0].setValue = args;
         this.checkGLError();
 
         return;
@@ -1140,6 +1164,11 @@
         MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
           'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
       }
+    }
+
+    // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
+    uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
+      this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
@@ -1460,6 +1489,15 @@
       this._userFlavorName = name;
     }
 
+    tryToSetUserFlavorNameUniquely(name       ) {
+      if (this._glBoostMonitor.getGLBoostObjectByUserFlavorName(name) != null) {
+        return false;
+      } else {
+        this._userFlavorName = name;
+        return true;
+      }
+    }
+
     get userFlavorName()        {
       return this._userFlavorName;
     }
@@ -1583,9 +1621,71 @@
 
   GLBoost$1["MathUtil"] = MathUtil;
 
+  const IsUtil = {
+    not: {},
+    all: {},
+    any: {},
+
+    _not(fn) {
+      return function() {
+        return !fn.apply(null, [...arguments]);
+      };
+    },
+
+    _all(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].every(fn);
+        }
+        return [...arguments].every(fn);
+      };
+    },
+
+    _any(fn) {
+      return function() {
+        if (Array.isArray(arguments[0])) {
+          return arguments[0].some(fn);
+        }
+        return [...arguments].some(fn);
+      };
+    },
+
+    defined(val) {
+      return val !== void 0;
+    },
+
+    undefined(val) {
+      return val === void 0;
+    },
+
+    null(val) {
+      return val === null;
+    },
+
+    // is NOT null or undefined
+    exist(val) {
+      return val != null;
+    },
+
+    function(val) {
+      return typeof val === 'function';
+    }
+
+  };
+
+  for (let fn in IsUtil) {
+    if (IsUtil.hasOwnProperty(fn)) {
+      const interfaces = ['not', 'all', 'any'];
+      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
+        interfaces.forEach((itf)=>{
+          const op = '_' + itf;
+          IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
+        });
+      }
+    }
+  }
+
   //      
-                                       
-                                       
 
                                                                              
                                                                        
@@ -1601,10 +1701,14 @@
         this.v = new Float32Array(3);
       }
 
-      if (typeof x === 'undefined') {
+      if (IsUtil.not.exist(x)) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
+      } else if (Array.isArray(x)) {
+        this.x = x[0];
+        this.y = x[1];
+        this.z = x[2];
       } else if (typeof (x    ).w !== 'undefined') {
         this.x = (x    ).x;
         this.y = (x    ).y;
@@ -1901,8 +2005,6 @@
   GLBoost$1['Vector3'] = Vector3;
 
   //      
-                                       
-                                       
 
                                                                              
                                                                        
@@ -1918,11 +2020,16 @@
         this.v = new Float32Array(4);
       }
 
-      if (typeof x === 'undefined') {
+      if (IsUtil.not.exist(x)) {
         this.x = 0;
         this.y = 0;
         this.z = 0;
         this.w = 1;
+      } else if (Array.isArray(x)) {
+        this.x = x[0];
+        this.y = x[1];
+        this.z = x[2];
+        this.w = x[3];
       } else if (typeof (x    ).w !== 'undefined') {
         this.x = (x    ).x;
         this.y = (x    ).y;
@@ -6228,19 +6335,12 @@
       }
 
       let isTextureProcessDone = true;
-      if (typeof material._semanticsDic['TEXTURE'] === 'undefined') ; else if (typeof material._semanticsDic['TEXTURE'] === 'string') {
-        let textureSamplerDic = material.uniformTextureSamplerDic[material._semanticsDic['TEXTURE']];
+      for (let key in material._textureSemanticsDic) {
+        const uniformName = material._textureSemanticsDic[key];
+        let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
         let textureName = textureSamplerDic.textureName;
         let textureUnitIndex = textureSamplerDic.textureUnitIndex;
         isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-      } else {
-        // it must be an Array...
-        material._semanticsDic['TEXTURE'].forEach((uniformName) => {
-          let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
-          let textureName = textureSamplerDic.textureName;
-          let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-          isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
-        });
       }
 
       return isTextureProcessDone;
@@ -8865,18 +8965,8 @@ return mat4(
           let depthTextureUniformLocation = this._glContext.getUniformLocation(shaderProgram, `uDepthTexture[${i}]`);
           material.setUniform(shaderProgram, 'uniform_DepthTextureSampler_' + i, depthTextureUniformLocation);
 
-          let index = i;
-
-          // count for Decal Texture at first
-          index++;
-
-          // count for Normal Texture if it exists
-          let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
-          if (normalTexture) {
-            index++;
-          }
-
-          lights[i].camera.texture.textureUnitIndex = index;  // +1 because 0 is used for diffuse texture
+          const index = i + material.getTextureNumAttachedShader();
+          lights[i].camera.texture.textureUnitIndex = index;
         }
       }
 
@@ -8884,16 +8974,9 @@ return mat4(
       material.setUniform(shaderProgram, 'uniform_depthBias', uniform_depthBias);
       this._glContext.uniform1f(uniform_depthBias, 0.005, true);
 
-      let textureUnitIndex = 0;
       for (let i=0; i<lights.length; i++) {
-        //if (lights[i].camera && lights[i].camera.texture) {
-
-        // matrices
-        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + textureUnitIndex, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + textureUnitIndex + ']'));
-
-        textureUnitIndex++;
-        //}
-        //shaderProgram['isShadowCasting' + i] = this._glContext.getUniformLocation(shaderProgram, 'isShadowCasting[' + i + ']');
+        const light_i = i;
+        material.setUniform(shaderProgram, 'uniform_depthPVMatrix_' + light_i, this._glContext.getUniformLocation(shaderProgram, 'depthPVMatrix[' + light_i + ']'));
       }
 
       return vertexAttribsAsResult;
@@ -9165,8 +9248,12 @@ return mat4(
       if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
         shaderText += `${in_} vec2 texcoord;\n\n`;
       }
-      if (material.hasAnyTextures()) {
+      if (material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += 'uniform sampler2D uTexture;\n';
+      }
+      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+      if (normalTexture) {
+        shaderText += `uniform highp sampler2D uNormalTexture;\n`;
       }
       shaderText += 'uniform vec4 materialBaseColor;\n';
       shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
@@ -9192,7 +9279,7 @@ return mat4(
         shaderText += '  rt0 *= color;\n';
       }
       shaderText += '    rt0 *= materialBaseColor;\n';
-      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.hasAnyTextures()) {
+      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
 
@@ -9228,35 +9315,9 @@ return mat4(
         material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
       }
 
-      let uTexture = this._glContext.getUniformLocation(shaderProgram, 'uTexture');
-      material.setUniform(shaderProgram, 'uTexture', uTexture);
-      // set texture unit 0 to the sampler
-      this._glContext.uniform1i( uTexture, 0, true);
-
-      material._semanticsDic['TEXTURE'] = [];
-
-      material.uniformTextureSamplerDic['uTexture'] = {};
-      if (material.hasAnyTextures() || diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'].textureUnitIndex = 0;
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        material._semanticsDic['TEXTURE'] = 'uTexture';
-      }
-
-
-      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
-      let uNormalTexture = this._glContext.getUniformLocation(shaderProgram, 'uNormalTexture');
-      if (uNormalTexture) {
-        material.setUniform(shaderProgram, 'uNormalTexture', normalTexture);
-        // set texture unit 1 to the normal texture sampler
-        this._glContext.uniform1i( uNormalTexture, 1, true);
-
-        material.uniformTextureSamplerDic['uNormalTexture'] = {};
-        if (material.hasAnyTextures()) {
-          material.uniformTextureSamplerDic['uNormalTexture'].textureUnitIndex = 1;
-          material.uniformTextureSamplerDic['uNormalTexture'].textureName = normalTexture.userFlavorName;
-          material._semanticsDic['TEXTURE'].push('uNormalTexture');
-        }
-      }
+      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
+      
+      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
 
       return vertexAttribsAsResult;
     }
@@ -9294,10 +9355,13 @@ return mat4(
       // For Shadow
       for (let i=0; i<lights.length; i++) {
         if (lights[i].camera && lights[i].camera.texture) {
+          const index = i + material.getTextureNumAttachedShader();
+          lights[i].camera.texture.textureUnitIndex = index;
+
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          gl.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten());
+          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(), true);
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -9309,10 +9373,10 @@ return mat4(
         if (lights[i].camera && lights[i].camera.texture) {
           let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
           let index = lights[i].camera.texture.textureUnitIndex;
+          //const index = i + material.getTextureNumAttachedShader();
+
 
           this._glContext.uniform1i(uniformLocation, index, true);
-        } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);
         }
       }
     }
@@ -9320,10 +9384,7 @@ return mat4(
     setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
       super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
       for (let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {
-          // set depthTexture unit i+1 to the sampler
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i), 0, true);  // +1 because 0 is used for diffuse texture
-        }
+        if (lights[i].camera && lights[i].camera.texture) ;
       }
     }
 
@@ -9364,6 +9425,7 @@ return mat4(
       this._globalStatesUsage = null;
       this._shaderParametersForShaderInstance = {};
       this._semanticsDic = {};
+      this._textureSemanticsDic = {};
 
       this._stateFunctionsToReset = {
         "blendColor": [0.0, 0.0, 0.0, 0.0],
@@ -9438,11 +9500,13 @@ return mat4(
       if (!texture) {
         return;
       }
+
       this._textureDic[texture.userFlavorName] = texture;
       let _purpose = (typeof purpose !== 'undefined' ? purpose:GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       this._texturePurposeDic[_purpose] = texture.userFlavorName;
       texture.purpose = _purpose;
       this._textureContributionRateDic[texture.userFlavorName] = new Vector4$1(1.0, 1.0, 1.0, 1.0);
+
       this._updateCount();
     }
 
@@ -9467,7 +9531,12 @@ return mat4(
 
     getTextureFromPurpose(purpose) {
       let userFlavorName = this._texturePurposeDic[purpose];
-      return this.getTexture(userFlavorName);
+      let texture = this.getTexture(userFlavorName);
+      //if (purpose === GLBoost.TEXTURE_PURPOSE_DIFFUSE && !texture) {
+      //  texture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
+      //}
+
+      return texture;
     }
 
     getOneTexture() {
@@ -9579,7 +9648,7 @@ return mat4(
         isCalledWebGLBindTexture = texture.setUp(textureUnitIndex);
         return isCalledWebGLBindTexture;
       } else {
-        this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(0);
+        this._glBoostSystem._glBoostContext.defaultDummyTexture.setUp(textureUnitIndex);
 
   //      gl.bindTexture(gl.TEXTURE_2D, null);
         isCalledWebGLBindTexture = true;
@@ -9648,6 +9717,9 @@ return mat4(
 
       this._shaderUniformLocationsOfExpressions[glslProgram.hashId][uniformLocationName] = uniformLocation;
       glslProgram['uniform_' + uniformLocationName] = uniformLocationName;
+      if (uniformLocation != null) {
+        uniformLocation.uniformLocationName = uniformLocationName;
+      }
 
       this._updateCount();
     }
@@ -9713,6 +9785,26 @@ return mat4(
       }
       this._shaderInstance = null;
     }
+
+    registerTextureUnitToUniform(texturePurpose, shaderProgram, uniformName) {
+      const texture = this.getTextureFromPurpose(texturePurpose);
+      if (texture != null) {
+        let uTexture = this._glContext.getUniformLocation(shaderProgram, uniformName);
+        let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
+        index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
+        this._glContext.uniform1i( uTexture, index, true);
+        this.setUniform(shaderProgram, uniformName, uTexture);
+        this.uniformTextureSamplerDic[uniformName] = {};
+        this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
+        this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
+        this._textureSemanticsDic[texturePurpose] = uniformName;
+      }
+    }
+
+    getTextureNumAttachedShader() {
+      return Object.keys(this._textureSemanticsDic).length;
+    }
+
   }
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
@@ -9799,11 +9891,24 @@ return mat4(
 
   class PBRPrincipledShaderSource {
 
-    FSDefine_PBRPrincipledShaderSource(in_, f, lights) {
+    FSDefine_PBRPrincipledShaderSource(in_, f, lights, material, extraData) {
       
       var shaderText = '';
       shaderText += 'uniform vec2 uMetallicRoughnessFactors;\n';
       shaderText += 'uniform vec3 uBaseColorFactor;\n';
+      shaderText += 'uniform vec2 uOcclusionFactors;';
+      shaderText += 'uniform vec3 uEmissiveFactor;';
+      shaderText += 'uniform sampler2D uMetallicRoughnessTexture;\n';
+
+      let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+      if (occlusionTexture) {
+        shaderText += 'uniform sampler2D uOcclusionTexture;\n';
+      }
+      
+      let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+      if (emissiveTexture) {
+        shaderText += 'uniform sampler2D uEmissiveTexture;\n';
+      }
 
       shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
@@ -9930,7 +10035,7 @@ return mat4(
       return shaderText;
     }
 
-    FSShade_PBRPrincipledShaderSource(f, gl, lights) {
+    FSShade_PBRPrincipledShaderSource(f, gl, lights, material, extraData) {
       var shaderText = '';
 
       shaderText += `
@@ -9943,7 +10048,18 @@ vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
 // Metallic & Roughness
 float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
+`;
 
+      let metallicRoughnessTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+      if (metallicRoughnessTexture) {
+      shaderText += `
+vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
+userRoughness = ormTexel.g * userRoughness;
+metallic = ormTexel.b * metallic;
+`;
+      }
+
+      shaderText += `
 userRoughness = clamp(userRoughness, c_MinRoughness, 1.0);
 metallic = clamp(metallic, 0.0, 1.0);
 float alphaRoughness = userRoughness * userRoughness;
@@ -9955,8 +10071,8 @@ vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 // Albedo
 vec3 albedo = baseColor.rgb * (vec3(1.0) - diffuseMatAverageF0);
 albedo.rgb *= (1.0 - metallic);
-
 `;
+
       for (let i=0; i<lights.length; i++) {
         let light = lights[i];
         let isShadowEnabledAsTexture = (light.camera && light.camera.texture) ? true:false;
@@ -9992,10 +10108,31 @@ albedo.rgb *= (1.0 - metallic);
 
         shaderText += `  }\n`;
       }
-      shaderText += '  rt0.xyz += ambient.xyz;\n';
+
+      // Ambient
+      shaderText += 'float occlusion = 1.0;\n';
+      let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+      if (occlusionTexture) {
+        shaderText += 'occlusion = mix(1.0, texture2D(uOcclusionTexture, texcoord).r, uOcclusionFactors.x);\n';
+      }
+      shaderText += '  float occlusionRateForDirectionalLight = uOcclusionFactors.y;\n';
+      shaderText += '  rt0.xyz = mix(rt0.xyz, rt0.xyz * occlusion, occlusionRateForDirectionalLight);\n';
+      shaderText += '  rt0.xyz += ambient.xyz * occlusion;\n';
+
+
+
+      // Emissive
+      shaderText += '  vec3 emissive = uEmissiveFactor;\n';
+      let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+      if (emissiveTexture) {
+        shaderText += 'emissive *= srgbToLinear(texture2D(uEmissiveTexture, texcoord).xyz);';
+      }
+      shaderText += '  rt0.xyz += emissive;\n';
+
       shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
        
       shaderText += '  rt0.a = 1.0;\n';
+  //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
 
@@ -10006,10 +10143,17 @@ albedo.rgb *= (1.0 - metallic);
 
       var vertexAttribsAsResult = [];
 
-      material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
       material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
+      material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
+      material.setUniform(shaderProgram, 'uniform_OcclusionFactors', this._glContext.getUniformLocation(shaderProgram, 'uOcclusionFactors'));
+      material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
       material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
-      
+
+
+      material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
+      material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, 'uOcclusionTexture');
+      material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
+
       return vertexAttribsAsResult;
     }
   }
@@ -10028,8 +10172,13 @@ albedo.rgb *= (1.0 - metallic);
       var baseColor = material.baseColor;
       var metallic = material.metallic;
       let roughness = material.roughness;
+      const occlusion = material.occlusion;
+      const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
+      const emissive = material.emissive;
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
+      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
+      this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
 
       let ambient = Vector4$1.multiplyVector(new Vector4$1(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
@@ -10044,8 +10193,11 @@ albedo.rgb *= (1.0 - metallic);
 
   class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
                                          
-                        
+                              
                                        
+                             
+                             
+                                              
                                       
 
     constructor(glBoostSystem               ) {
@@ -10053,8 +10205,11 @@ albedo.rgb *= (1.0 - metallic);
 
       this._wireframeWidthRelativeScale = 1.0;
 
-      this._baseColor = new Vector3(1.0, 1.0, 1.0);
-      this._metallicRoughnessFactors = new Vector2(0.0, 0.5);
+      this._baseColorFactor = new Vector3(1.0, 1.0, 1.0);
+      this._metallicRoughnessFactors = new Vector2(1.0, 1.0);
+      this._occlusionFactor = 1.0;
+      this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
+      this._occlusionRateForDirectionalLight = 0.2;
 
       this._shaderClass = PBRPrincipledShader;
     }
@@ -10064,11 +10219,11 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     set baseColor(val         ) {
-      this._baseColor = val.clone();
+      this._baseColorFactor = val.clone();
     }
 
     get baseColor() {
-      return this._baseColor.clone();
+      return this._baseColorFactor.clone();
     }
 
     set metallic(val        ) {
@@ -10085,6 +10240,30 @@ albedo.rgb *= (1.0 - metallic);
 
     get roughness() {
       return this._metallicRoughnessFactors.y;
+    }
+
+    set emissive(val         ) {
+      this._emissiveFactor = val;
+    }
+
+    get emissive() {
+      return this._emissiveFactor;
+    }
+    
+    set occlusion(val        ) {
+      this._occlusionFactor = val;
+    }
+
+    get occlusion() {
+      return this._occlusionFactor;
+    }
+
+    set occlusionRateForDirectionalLight(val        ) {
+      this._occlusionRateForDirectionalLight = val;
+    }
+
+    get occlusionRateForDirectionalLight() {
+      return this._occlusionRateForDirectionalLight;
     }
   }
 
@@ -11416,9 +11595,17 @@ albedo.rgb *= (1.0 - metallic);
       if (eventTargetDom) {
         document.addEventListener('keydown', this._onKeydown);
         document.addEventListener('keyup', this._onKeyup);
-        eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-        eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));
-        eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+
+        if ('ontouchend' in document) {
+          eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
+          eventTargetDom.addEventListener('touchend', this._mouseUp.bind(this));
+          eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
+        }
+        if ('onmouseup' in document) {
+          eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
+          eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+          eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
+        }
       }
     }
 
@@ -11426,32 +11613,48 @@ albedo.rgb *= (1.0 - metallic);
       if (eventTargetDom) {
         document.removeEventListener('keydown', this._onKeydown);
         document.removeEventListener('keyup', this._onKeyup);
-        eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-        eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));
-        eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+        
+        if ('ontouchend' in document) {
+          eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
+          eventTargetDom.removeEventListener('touchend', this._mouseUp.bind(this));
+          eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
+        }
+        if ('onmouseup' in document) {
+          eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
+          eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+          eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
+        }
       }
     }
 
     _mouseDown(evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
       this._isMouseDown = true;
 
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
       this._clickedMouseYOnCanvas = evt.clientY - rect.top;
 
+      return false;
     }
 
     _mouseMove(evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+      if (!this._isMouseDown) {
+        return;
+      }
+
       let rect = evt.target.getBoundingClientRect();
       this._draggedMouseXOnCanvas = evt.clientX - rect.left;
       this._draggedMouseYOnCanvas = evt.clientY - rect.top;
-      if (this._isMouseDown) {
-        this._isMouseDrag = true;
-      }
 
       this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
       this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
 
+      
+      this._isMouseDrag = true;
       this.updateCamera();
 
     }
@@ -11485,6 +11688,7 @@ albedo.rgb *= (1.0 - metallic);
       this._mouseXAdjustScale = 0.1;
       this._mouseYAdjustScale = 0.1;
       this._deltaY = 0;
+      this._deltaX = 0;
       this._newDir = Vector3.zero();
 
       this._camaras.forEach(function (camera) {
@@ -11576,21 +11780,26 @@ albedo.rgb *= (1.0 - metallic);
 
 
       if (this._isMouseDrag) {
-        const deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+
+        this._deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
         this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
         this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
-        this._currentDir = Matrix33.rotateY(deltaX).multiplyVector(this._currentDir);
 
-        newEyeToCenter = Matrix33.rotateY(deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+
+        this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(this._currentDir);
+
+        newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
         newEyeToCenter.x = newEyeToCenter.x * (1 - t);
         newEyeToCenter.y = t;
         newEyeToCenter.z = newEyeToCenter.z * (1 - t);
         newEyeToCenter.normalize();
         this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
 
+
         this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
         this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
-    
+        this._deltaMouseXOnCanvas = 0;
+        this._deltaMouseYOnCanvas = 0; 
       }
 
       let newLeft = camera.left;
@@ -13180,6 +13389,7 @@ albedo.rgb *= (1.0 - metallic);
         internalFormat, format, type,
         gl.LINEAR, gl.LINEAR, gl.CLAMP_TO_EDGE, gl.CLAMP_TO_EDGE);
       depthTexture.fbo = fbo;
+      depthTexture.userFlavorName = `DepthTexture_${fbo.width}x${fbo.height}`;
 
       /// Attach Buffers
       // color
@@ -13265,88 +13475,38 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glBoostMonitor;
     }
 
-    setPropertiesFromJson(arg) {
+    setPropertiesFromJson(arg, queryType = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
       let json = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
-      if (!json.targetInstanceName) {
+      if (!json.targetUserFlavorName) {
         console.warn(`Faild! This json doesn't include targetInstanceName field!`);
         return;
       }
-      const object = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
-      object.setPropertiesFromJson(json);
+      let objects = null;
+      if (queryType === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+      } else if (queryType === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        if (found != null && found.userFlavorName === json.targetUserFlavorName) {
+          objects = [found];
+        } else {
+          objects = [];
+        }
+      } else {
+        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        objects = [found];
+      }
 
-      return object;
+      objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+     
+      return objects;
     }
 
   }
 
   GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
-
-  const IsUtil = {
-    not: {},
-    all: {},
-    any: {},
-
-    _not(fn) {
-      return function() {
-        return !fn.apply(null, [...arguments]);
-      };
-    },
-
-    _all(fn) {
-      return function() {
-        if (Array.isArray(arguments[0])) {
-          return arguments[0].every(fn);
-        }
-        return [...arguments].every(fn);
-      };
-    },
-
-    _any(fn) {
-      return function() {
-        if (Array.isArray(arguments[0])) {
-          return arguments[0].some(fn);
-        }
-        return [...arguments].some(fn);
-      };
-    },
-
-    defined(val) {
-      return val !== void 0;
-    },
-
-    undefined(val) {
-      return val === void 0;
-    },
-
-    null(val) {
-      return val === null;
-    },
-
-    // is NOT null or undefined
-    exist(val) {
-      return val != null;
-    },
-
-    function(val) {
-      return typeof val === 'function';
-    }
-
-  };
-
-  for (let fn in IsUtil) {
-    if (IsUtil.hasOwnProperty(fn)) {
-      const interfaces = ['not', 'all', 'any'];
-      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
-        interfaces.forEach((itf)=>{
-          const op = '_' + itf;
-          IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
-        });
-      }
-    }
-  }
 
   class M_Mesh extends M_Element {
     constructor(glBoostContext, geometry, material) {
@@ -13602,12 +13762,26 @@ albedo.rgb *= (1.0 - metallic);
       return this.geometry._getAppropriateMaterials(this);
     }
 
-    rayCast(x, y, camera, viewport) {
 
-      const invPVW = GLBoost$1.Matrix44.multiply(camera.projectionRHMatrix(), GLBoost$1.Matrix44.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-      const origVecInLocal = GLBoost$1.MathClassUtil.unProject(new GLBoost$1.Vector3(x, y, 0), invPVW, viewport);
-      const distVecInLocal = GLBoost$1.MathClassUtil.unProject(new GLBoost$1.Vector3(x, y, 1), invPVW, viewport);
-      const dirVecInLocal = GLBoost$1.Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+    rayCast(arg1, arg2, camera, viewport) {
+      let origVecInLocal = null;
+      let dirVecInLocal = null;
+      if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
+        const origVecInWorld = arg1;
+        const dirVec = arg2;
+        const invWorldMatrix = Matrix44$1.invert(this.worldMatrix);
+        origVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(origVecInWorld)));
+        const distVecInWorld = Vector3.add(origVecInWorld, dirVec);
+        const distVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(distVecInWorld)));
+        dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+      } else {
+        const x = arg1;
+        const y = arg2;
+        const invPVW = Matrix44$1.multiply(camera.projectionRHMatrix(), Matrix44$1.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+        origVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 0), invPVW, viewport);
+        const distVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 1), invPVW, viewport);
+        dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+      }
 
       const material = this.getAppropriateMaterials()[0];
 
@@ -14328,7 +14502,7 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(x, y, camera, viewport) {
+    rayCast(arg1, arg2, camera, viewport) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -14340,7 +14514,12 @@ albedo.rgb *= (1.0 - metallic);
         if (!mesh.isPickable) {
           continue;
         }
-        const result = mesh.rayCast(x, y, camera, viewport);
+        let result = null;
+        if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
+          result = mesh.rayCast(arg1, arg2, camera);
+        } else {
+          result = mesh.rayCast(arg1, arg2, camera, viewport);
+        }
         if (result === null) {
           return [null, null];
         }
@@ -14987,7 +15166,9 @@ albedo.rgb *= (1.0 - metallic);
           });
         }
       };
-      collectGizmos(this._scene);
+      if (this._scene != null) {
+        collectGizmos(this._scene);
+      }
 
       this._opacityMeshes = [];
       this._transparentMeshes = [];
@@ -16614,7 +16795,7 @@ albedo.rgb *= (1.0 - metallic);
           for (let i=0; i<matrices.length; i++) {
             let q = (Quaternion.fromMatrix(matrices[i]));
             q.normalize();
-            let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+            let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
             skeletalMesh._qArray[i*2+0] = vec2QPacked[0];
             skeletalMesh._qArray[i*2+1] = vec2QPacked[1];
             let t = matrices[i].getTranslate();
@@ -16654,11 +16835,11 @@ albedo.rgb *= (1.0 - metallic);
 
             let q = (Quaternion.fromMatrix(matrices[i]));
             q.normalize();
-            let vec2QPacked = MathUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
+            let vec2QPacked = MathClassUtil.packNormalizedVec4ToVec2(q.x, q.y, q.z, q.w, 4096);
             let t = matrices[i].getTranslate();
             skeletalMesh._qtArray[i*4+0] = vec2QPacked[0];
             skeletalMesh._qtArray[i*4+1] = vec2QPacked[1];
-            let vec2TPacked = MathUtil.packNormalizedVec4ToVec2(
+            let vec2TPacked = MathClassUtil.packNormalizedVec4ToVec2(
               t.x/skeletalMesh._translationScale.x, t.y/skeletalMesh._translationScale.y,
               t.z/skeletalMesh._translationScale.z, 0.0, 4096);
               skeletalMesh._qtArray[i*4+2] = vec2TPacked[0];
@@ -17666,11 +17847,20 @@ albedo.rgb *= (1.0 - metallic);
 
       //    this._mesh.rotate = new Vector3(-Math.PI/2, 0, 0);
       const material = glBoostContext._glBoostContext.createClassicMaterial();
+      this._material = material;
       this._mesh = new M_Mesh(glBoostContext, this._primitive, material);
       this._mesh.isPickable = false;
       this._mesh.masterElement = this;
       this.addChild(this._mesh);
 
+    }
+
+    set color(val) {
+      this._material.baseColor = val;
+    }
+
+    get color() {
+      return this._material.baseColor;
     }
 
     set startPosition(startPos) {
@@ -17789,12 +17979,12 @@ albedo.rgb *= (1.0 - metallic);
 
     _init(customVertexAttributes) {
       let gl = this._glContext.gl;
-      this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
+      this.geometry = new Screen(this._glBoostSystem, void 0, customVertexAttributes);
       this.isAffectedByWorldMatrix = false;
       this.isAffectedByViewMatrix = false;
       this.isAffectedByProjectionMatrix = false;
 
-      let material = new ClassicMaterial$1(this._glBoostContext);
+      let material = new ClassicMaterial$1(this._glBoostSystem);
       material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
       material.states = {
         "enable": [
@@ -20725,6 +20915,16 @@ albedo.rgb *= (1.0 - metallic);
           if (normalTexture !== void 0) {
             normalTexture.texture = gltfJson.textures[normalTexture.index];
           }
+
+          const occlusionTexture = material.occlusionTexture;
+          if (occlusionTexture !== void 0) {
+            occlusionTexture.texture = gltfJson.textures[occlusionTexture.index];
+          }
+
+          const emissiveTexture = material.emissiveTexture;
+          if (emissiveTexture !== void 0) {
+            emissiveTexture.texture = gltfJson.textures[emissiveTexture.index];
+          }
         }
       }
     }
@@ -21331,7 +21531,7 @@ albedo.rgb *= (1.0 - metallic);
             if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
               glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
             } else {
-              glboostMaterial = glBoostContext.createClassicMaterial();
+              glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
             }
             if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
               glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
@@ -21549,8 +21749,63 @@ albedo.rgb *= (1.0 - metallic);
                 'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT,
                 'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
               });
+              texture.userFlavorName = `Texture_Diffuse_index_${baseColorTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
               gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
             }
+
+           
+            let metallicRoughnessTexture = materialJson.pbrMetallicRoughness.metallicRoughnessTexture;
+            if (metallicRoughnessTexture) {
+              let sampler = metallicRoughnessTexture.texture.sampler;
+              let texture = glBoostContext.createTexture(metallicRoughnessTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_MetallicRoughness_index_${metallicRoughnessTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+            }
+
+            const normalTexture = materialJson.normalTexture;
+            if (normalTexture) {
+              const sampler = normalTexture.texture.sampler;
+              const texture = glBoostContext.createTexture(normalTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_MetallicRoughness_index_${normalTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+            }
+            
+            const occlusionTexture = materialJson.occlusionTexture;
+            if (occlusionTexture) {
+              const sampler = occlusionTexture.texture.sampler;
+              const texture = glBoostContext.createTexture(occlusionTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_Occlusion_index_${occlusionTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_OCCLUSION);
+            }
+            
+            const emissiveTexture = materialJson.emissiveTexture;
+            if (emissiveTexture) {
+              const sampler = normalTexture.texture.sampler;
+              const texture = glBoostContext.createTexture(emissiveTexture.texture.image.image, '', {
+                'TEXTURE_MAG_FILTER': sampler === void 0 ? GLBoost$1.LINEAR : sampler.magFilter,
+                'TEXTURE_MIN_FILTER': sampler === void 0 ? GLBoost$1.LINEAR_MIPMAP_LINEAR : sampler.minFilter,
+                'TEXTURE_WRAP_S': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapS,
+                'TEXTURE_WRAP_T': sampler === void 0 ? GLBoost$1.REPEAT : sampler.wrapT
+              });
+              texture.userFlavorName = `Texture_Emissive_index_${emissiveTexture.index}_of_${gltfMaterial.instanceNameWithUserFlavor}`;
+              gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_EMISSIVE);
+            }
+
 
             let enables = [];
             if (options.isBlend) {
@@ -21567,6 +21822,8 @@ albedo.rgb *= (1.0 - metallic);
           }
         };
         setTextures(materialJson);
+
+
 
       } else {
         if (typeof vertexData.components.texcoord !== 'undefined') {
@@ -21585,10 +21842,22 @@ albedo.rgb *= (1.0 - metallic);
         }
       }
 
-      if (materialJson.pbrMetallicRoughness && materialJson.pbrMetallicRoughness.baseColorFactor) {
-        let value = materialJson.pbrMetallicRoughness.baseColorFactor;
-        gltfMaterial.baseColor = new Vector4$1(value[0], value[1], value[2], value[3]);
+      const pmr = materialJson.pbrMetallicRoughness;
+      if (pmr != null) {
+        if (pmr.baseColorFactor) {
+          gltfMaterial.baseColor = new Vector4$1(pmr.baseColorFactor);
+        }
+        if (pmr.metallicFactor) {
+          gltfMaterial.metallic = pmr.metallicFactor;
+        }
+        if (pmr.roughnessFactor) {
+          gltfMaterial.roughness = pmr.roughnessFactor;
+        }
+        if (materialJson.emissiveFactor) {
+          gltfMaterial.emissive = new Vector3(materialJson.emissiveFactor);
+        }
       }
+
 
       if (indices !== null) {
         gltfMaterial.setVertexN(geometry, indices.length);
@@ -22558,4 +22827,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-190-g012c-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-223-g462f4-mod branch: develop';

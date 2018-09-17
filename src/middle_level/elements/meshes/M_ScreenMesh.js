@@ -10,12 +10,12 @@ export default class M_ScreenMesh extends M_Mesh {
 
   _init(customVertexAttributes) {
     let gl = this._glContext.gl;
-    this.geometry = new Screen(this._glBoostContext, void 0, customVertexAttributes);
+    this.geometry = new Screen(this._glBoostSystem, void 0, customVertexAttributes);
     this.isAffectedByWorldMatrix = false;
     this.isAffectedByViewMatrix = false;
     this.isAffectedByProjectionMatrix = false;
 
-    let material = new ClassicMaterial(this._glBoostContext);
+    let material = new ClassicMaterial(this._glBoostSystem);
     material.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_IGNORE;
     material.states = {
       "enable": [
