@@ -388,6 +388,7 @@
       c.define('TEXTURE_PURPOSE_METALLIC_ROUGHNESS', void 0, 'metallic_roughness');
       c.define('TEXTURE_PURPOSE_OCCLUSION', void 0, 'occlusion');
       c.define('TEXTURE_PURPOSE_EMISSIVE', void 0, 'emissive');
+      c.define('TEXTURE_PURPOSE_OTHERS', void 0, 'others');
       c.define('QUERY_TYPE_INSTANCE_NAME');
       c.define('QUERY_TYPE_USER_FLAVOR_NAME');
       c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
@@ -7157,6 +7158,8 @@ return mat4(
 
       for (let uniformName in this._uniforms) {
         if (this._uniforms[uniformName] === 'TEXTURE') {
+          //material.registerTextureUnitToUniform(material.getTexture(this._textureNames[uniformName]), shaderProgram, uniformName); 
+          /*
           material.uniformTextureSamplerDic[uniformName] = {};
           let textureUniformLocation = this._glContext.getUniformLocation(shaderProgram, uniformName);
           if (textureUniformLocation < 0) {
@@ -7166,8 +7169,19 @@ return mat4(
           material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
 
           this._glContext.uniform1i(textureUniformLocation, textureCount, true);
+  */
 
+          let uTexture = material._glContext.getUniformLocation(shaderProgram, uniformName);
+          material._glContext.uniform1i( uTexture, textureCount, true);
+          material.setUniform(shaderProgram, uniformName, uTexture);
+          material.uniformTextureSamplerDic[uniformName] = {};
+          material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
+          material.uniformTextureSamplerDic[uniformName].textureName = this._textureNames[uniformName];
+          const texturePurpose = material.getTexturePurpose(this._textureNames[uniformName]);
+          material._textureSemanticsDic[texturePurpose] = uniformName;
           textureCount++;
+          
+
         }
 
         switch (this._uniforms[uniformName]) {
@@ -9347,7 +9361,8 @@ return mat4(
 
       let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
       if (diffuseTexture) {
-        material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+  //      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+        material.updateTextureInfo(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
         this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
       }
 
@@ -9523,6 +9538,16 @@ return mat4(
     setTexturePurpose(userFlavorNameOfTexture, purpose) {
       this._texturePurposeDic[purpose] = userFlavorNameOfTexture;
       this._updateCount();
+    }
+
+    getTexturePurpose(userFlavorNameOfTexture) {
+      let hitPurpose = null;
+      for (let purpose in this._texturePurposeDic) {
+        if (this._texturePurposeDic[purpose] === userFlavorNameOfTexture) {
+          hitPurpose = purpose;
+        }
+      }
+      return hitPurpose;
     }
 
     getTexture(userFlavorName) {
@@ -9794,6 +9819,18 @@ return mat4(
         index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
         this._glContext.uniform1i( uTexture, index, true);
         this.setUniform(shaderProgram, uniformName, uTexture);
+        this.uniformTextureSamplerDic[uniformName] = {};
+        this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
+        this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
+        this._textureSemanticsDic[texturePurpose] = uniformName;
+      }
+    }
+
+    updateTextureInfo(texturePurpose, uniformName) {
+      let texture = this.getTextureFromPurpose(texturePurpose);
+      if (texture != null) {
+        let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
+        index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
         this.uniformTextureSamplerDic[uniformName] = {};
         this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
         this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
@@ -19967,6 +20004,8 @@ albedo.rgb *= (1.0 - metallic);
                 texturePurpose = GLBoost$1.TEXTURE_PURPOSE_DIFFUSE;
               } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
                 texturePurpose = GLBoost$1.TEXTURE_PURPOSE_NORMAL;
+              } else {
+                texturePurpose = GLBoost$1.TEXTURE_PURPOSE_OTHERS;
               }
 
               let texture = textures[textureStr];
@@ -22822,4 +22861,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-226-gd7ec-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-227-g773c-mod branch: develop';

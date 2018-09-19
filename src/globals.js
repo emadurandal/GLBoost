@@ -382,6 +382,7 @@ var global = ('global',eval)('this');
     c.define('TEXTURE_PURPOSE_METALLIC_ROUGHNESS', void 0, 'metallic_roughness');
     c.define('TEXTURE_PURPOSE_OCCLUSION', void 0, 'occlusion');
     c.define('TEXTURE_PURPOSE_EMISSIVE', void 0, 'emissive');
+    c.define('TEXTURE_PURPOSE_OTHERS', void 0, 'others');
     c.define('QUERY_TYPE_INSTANCE_NAME');
     c.define('QUERY_TYPE_USER_FLAVOR_NAME');
     c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');

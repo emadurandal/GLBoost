@@ -980,6 +980,8 @@ export default class GLTFLoader {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_DIFFUSE;
             } else if (valueName === 'emission' && textureStr.match(/_normal$/)) {
               texturePurpose = GLBoost.TEXTURE_PURPOSE_NORMAL;
+            } else {
+              texturePurpose = GLBoost.TEXTURE_PURPOSE_OTHERS;
             }
 
             let texture = textures[textureStr];
