@@ -131,6 +131,16 @@ export default class L_AbstractMaterial extends GLBoostObject {
     this._updateCount();
   }
 
+  getTexturePurpose(userFlavorNameOfTexture) {
+    let hitPurpose = null;
+    for (let purpose in this._texturePurposeDic) {
+      if (this._texturePurposeDic[purpose] === userFlavorNameOfTexture) {
+        hitPurpose = purpose;
+      }
+    }
+    return hitPurpose;
+  }
+
   getTexture(userFlavorName) {
     return this._textureDic[userFlavorName];
   }
@@ -400,6 +410,18 @@ export default class L_AbstractMaterial extends GLBoostObject {
       index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
       this._glContext.uniform1i( uTexture, index, true);
       this.setUniform(shaderProgram, uniformName, uTexture);
+      this.uniformTextureSamplerDic[uniformName] = {};
+      this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
+      this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;
+      this._textureSemanticsDic[texturePurpose] = uniformName;
+    }
+  }
+
+  updateTextureInfo(texturePurpose, uniformName) {
+    let texture = this.getTextureFromPurpose(texturePurpose);
+    if (texture != null) {
+      let index = Object.keys(this._textureSemanticsDic).indexOf(''+texturePurpose);
+      index = (index !== -1) ? index : Object.keys(this._textureSemanticsDic).length;
       this.uniformTextureSamplerDic[uniformName] = {};
       this.uniformTextureSamplerDic[uniformName].textureUnitIndex = index;
       this.uniformTextureSamplerDic[uniformName].textureName = texture.userFlavorName;

@@ -67,6 +67,8 @@ export default class FreeShader extends Shader {
 
     for (let uniformName in this._uniforms) {
       if (this._uniforms[uniformName] === 'TEXTURE') {
+        //material.registerTextureUnitToUniform(material.getTexture(this._textureNames[uniformName]), shaderProgram, uniformName); 
+        /*
         material.uniformTextureSamplerDic[uniformName] = {};
         let textureUniformLocation = this._glContext.getUniformLocation(shaderProgram, uniformName);
         if (textureUniformLocation < 0) {
@@ -76,8 +78,19 @@ export default class FreeShader extends Shader {
         material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
 
         this._glContext.uniform1i(textureUniformLocation, textureCount, true);
+*/
 
+        let uTexture = material._glContext.getUniformLocation(shaderProgram, uniformName);
+        material._glContext.uniform1i( uTexture, textureCount, true);
+        material.setUniform(shaderProgram, uniformName, uTexture);
+        material.uniformTextureSamplerDic[uniformName] = {};
+        material.uniformTextureSamplerDic[uniformName].textureUnitIndex = textureCount;
+        material.uniformTextureSamplerDic[uniformName].textureName = this._textureNames[uniformName];
+        const texturePurpose = material.getTexturePurpose(this._textureNames[uniformName]);
+        material._textureSemanticsDic[texturePurpose] = uniformName;
         textureCount++;
+        
+
       }
 
       switch (this._uniforms[uniformName]) {

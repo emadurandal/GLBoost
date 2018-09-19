@@ -140,7 +140,8 @@ export default class DecalShader extends WireframeShader {
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
-      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+//      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      material.updateTextureInfo(GLBoost.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
       this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 
