@@ -1,6 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 import DecalShader from './DecalShader';
 import Vector4 from '../../low_level/math/Vector4';
+import Vector3 from '../../low_level/math/Vector3';
 
 export class PBRPrincipledShaderSource {
 
@@ -283,11 +284,11 @@ export default class PBRPrincipledShader extends DecalShader {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     var baseColor = material.baseColor;
-    var metallic = material.metallic;
-    let roughness = material.roughness;
-    const occlusion = material.occlusion;
-    const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
-    const emissive = material.emissive;
+    var metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
+    let roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
+    const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
+    const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
+    const emissive = (material.emissive !== void 0) ? material.emissive : Vector3.zero();
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);

@@ -10170,11 +10170,11 @@ albedo.rgb *= (1.0 - metallic);
       super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
       var baseColor = material.baseColor;
-      var metallic = material.metallic;
-      let roughness = material.roughness;
-      const occlusion = material.occlusion;
-      const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
-      const emissive = material.emissive;
+      var metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
+      let roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
+      const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
+      const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
+      const emissive = (material.emissive !== void 0) ? material.emissive : Vector3.zero();
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
@@ -21527,12 +21527,7 @@ albedo.rgb *= (1.0 - metallic);
     
             let material = primitive.material;
     
-            let glboostMaterial = null;
-            if (options.loaderExtension && options.loaderExtension.createClassicMaterial) {
-              glboostMaterial = options.loaderExtension.createClassicMaterial(glBoostContext);
-            } else {
-              glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
-            }
+            let glboostMaterial = glBoostContext.createPBRMetallicRoughnessMaterial();
             if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
               glboostMaterial.shaderParameters.isNeededToMultiplyAlphaToColorOfPixelOutput = options.isNeededToMultiplyAlphaToColorOfPixelOutput;
             }
@@ -22827,4 +22822,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-223-g462f4-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-226-gd7ec-mod branch: develop';
