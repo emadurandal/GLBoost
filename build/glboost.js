@@ -12225,7 +12225,6 @@ albedo.rgb *= (1.0 - metallic);
           if (!imageUri.match(/^data:/)) {
             this._img.crossOrigin = 'Anonymous';
           }
-          this._img.crossOrigin = 'Anonymous';
           this._img.onload = () => {
             let imgCanvas = this._getResizedCanvas(this._img);
             this._width = imgCanvas.width;
@@ -12245,25 +12244,17 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     generateTextureFromImage(img) {
-      img.crossOrigin = 'Anonymous';
       let imgCanvas = this._getResizedCanvas(img);
       this._width = imgCanvas.width;
       this._height = imgCanvas.height;
 
-      let texture = null;
-      var userAgent = window.navigator.userAgent.toLowerCase();
-      if (userAgent.indexOf('safari') != -1) {
-        texture = this._generateTextureInner(img, false);
-      } else {
-        texture = this._generateTextureInner(imgCanvas, false);
-      }
+      let texture = this._generateTextureInner(imgCanvas, false);
 
       this._texture = texture;
       this._isTextureReady = true;
     }
 
     _generateTextureFromImageData(imageData) {
-      imageData.crossOrigin = 'Anonymous';
       var gl = this._glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
 
@@ -20719,7 +20710,7 @@ albedo.rgb *= (1.0 - metallic);
       };
 
       (function() {
-        var cors_api_host = 'cors-anywhere.herokuapp.com';
+        var cors_api_host = 'cors-anywhere.glboost.org';
         var cors_api_url = 'https://' + cors_api_host + '/';
         var slice = [].slice;
         var origin = window.location.protocol + '//' + window.location.host;
@@ -21245,20 +21236,46 @@ albedo.rgb *= (1.0 - metallic);
            */
 
             const load = (img, response)=> {
+              
               var bytes = new Uint8Array(response);
               var binaryData = "";
               for (var i = 0, len = bytes.byteLength; i < len; i++) {
                 binaryData += String.fromCharCode(bytes[i]);
               }
               const split = imageUri.split('.');
-              const ext = split[split.length-1];
+              let ext = split[split.length-1];
               img.src = this._getImageType(ext) + window.btoa(binaryData);
-              console.log('eeereeeeeeeeeeeeeeee');
-              resolve(gltfJson);
+              img.onload = ()=>{
+                resolve(gltfJson);
+              };
+              /*
+              var img = new Image();
+              img.crossOrigin = 'Anonymous';
+              var url = window.URL || window.webkitURL;
+              img.src = url.createObjectURL(response);
+  */
+  /*
+              const split = imageUri.split('.');
+              let ext = split[split.length-1];
+              if (ext === 'jpg') {
+                ext = 'jpeg';
+              }
+              const blob = new Blob([ response ], { type: "image/"+ext });
+  *//*
+              var reader = new FileReader();
+              reader.onloadend = ()=> {
+                img.src = reader.result;
+                resolve(gltfJson);
+              }
+              // DataURLとして読み込む
+              reader.readAsDataURL(response);
+              */
+  //            resolve(gltfJson);
             };
 
             const loadBinaryImage = ()=> {
               var xhr = new XMLHttpRequest();
+              //xhr.setRequestHeader('origin', 'x-requested-with');
               xhr.onreadystatechange = (function(_img) {
                 return function(){
 
@@ -22932,4 +22949,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-227-g773c-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-230-g30074-mod branch: fix/safari2';

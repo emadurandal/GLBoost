@@ -101,7 +101,7 @@ export default class GLTF2Loader {
     };
 
     (function() {
-      var cors_api_host = 'cors-anywhere.herokuapp.com';
+      var cors_api_host = 'cors-anywhere.glboost.org';
       var cors_api_url = 'https://' + cors_api_host + '/';
       var slice = [].slice;
       var origin = window.location.protocol + '//' + window.location.host;
@@ -637,20 +637,46 @@ export default class GLTF2Loader {
          */
 
           const load = (img, response)=> {
+            
             var bytes = new Uint8Array(response);
             var binaryData = "";
             for (var i = 0, len = bytes.byteLength; i < len; i++) {
               binaryData += String.fromCharCode(bytes[i]);
             }
             const split = imageUri.split('.');
-            const ext = split[split.length-1];
+            let ext = split[split.length-1];
             img.src = this._getImageType(ext) + window.btoa(binaryData);
-            console.log('eeereeeeeeeeeeeeeeee');
-            resolve(gltfJson);
+            img.onload = ()=>{
+              resolve(gltfJson);
+            }
+            /*
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            var url = window.URL || window.webkitURL;
+            img.src = url.createObjectURL(response);
+*/
+/*
+            const split = imageUri.split('.');
+            let ext = split[split.length-1];
+            if (ext === 'jpg') {
+              ext = 'jpeg';
+            }
+            const blob = new Blob([ response ], { type: "image/"+ext });
+*//*
+            var reader = new FileReader();
+            reader.onloadend = ()=> {
+              img.src = reader.result;
+              resolve(gltfJson);
+            }
+            // DataURLとして読み込む
+            reader.readAsDataURL(response);
+            */
+//            resolve(gltfJson);
           }
 
           const loadBinaryImage = ()=> {
             var xhr = new XMLHttpRequest();
+            //xhr.setRequestHeader('origin', 'x-requested-with');
             xhr.onreadystatechange = (function(_img) {
               return function(){
 

@@ -1,6 +1,6 @@
-version: 0.0.4-227-g773c-mod
-branch: develop
-717766c75727984c345b421e5d2ce541d2b16e8b1ceea167b2634ce70baffb3b ./build/glboost.js
-717766c75727984c345b421e5d2ce541d2b16e8b1ceea167b2634ce70baffb3b ./build/glboost.js
-f1c65fe394bcc85835f230cd923bd35a45dc2453d62a186f7b9dda22d7e4bd8d ./build/glboost.min.js
-963d98e85575673c8611615d7a1385fa1832ca9488ceeb0f105b993a9ea2f022 ./build/glboost.min.js.map
+version: 0.0.4-230-g30074-mod
+branch: fix/safari2
+6118eeac867d830f3f3a682b34e2c3ecebd9368314e5356c7bcf092c278d0074 ./build/glboost.js
+6118eeac867d830f3f3a682b34e2c3ecebd9368314e5356c7bcf092c278d0074 ./build/glboost.js
+e96a176484be1b91873e6704630bcf6ef66ba47404530fefa7590df64271837a ./build/glboost.min.js
+11a0eb5fde96e35f43a6a73f1743bd1053da9bacbf2bf70eaa4f685c913336b8 ./build/glboost.min.js.map
