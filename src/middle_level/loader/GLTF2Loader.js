@@ -100,6 +100,23 @@ export default class GLTF2Loader {
       ]
     };
 
+    (function() {
+      var cors_api_host = 'cors-anywhere.glboost.org';
+      var cors_api_url = 'https://' + cors_api_host + '/';
+      var slice = [].slice;
+      var origin = window.location.protocol + '//' + window.location.host;
+      var open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function() {
+          var args = slice.call(arguments);
+          var targetOrigin = /^https?:\/\/([^\/]+)/i.exec(args[1]);
+          if (targetOrigin && targetOrigin[0].toLowerCase() !== origin &&
+              targetOrigin[1] !== cors_api_host) {
+              args[1] = cors_api_url + args[1];
+          }
+          return open.apply(this, args);
+      };
+    })();
+
     if (options && options.files) {
       for (let fileName in options.files) {
         const splitted = fileName.split('.');
@@ -608,13 +625,79 @@ export default class GLTF2Loader {
         let img = new Image();
         img.src = imageUri;
         imageJson.image = img;
+        img.crossOrigin = 'Anonymous';
         if (imageUri.match(/^data:/)) {
           resolve(gltfJson);
         } else {
+          /*
           img.crossOrigin = 'Anonymous';
           img.onload = () => {
             resolve(gltfJson);
           };
+         */
+
+          const load = (img, response)=> {
+            
+            var bytes = new Uint8Array(response);
+            var binaryData = "";
+            for (var i = 0, len = bytes.byteLength; i < len; i++) {
+              binaryData += String.fromCharCode(bytes[i]);
+            }
+            const split = imageUri.split('.');
+            let ext = split[split.length-1];
+            img.src = this._getImageType(ext) + window.btoa(binaryData);
+            img.onload = ()=>{
+              resolve(gltfJson);
+            }
+            /*
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            var url = window.URL || window.webkitURL;
+            img.src = url.createObjectURL(response);
+*/
+/*
+            const split = imageUri.split('.');
+            let ext = split[split.length-1];
+            if (ext === 'jpg') {
+              ext = 'jpeg';
+            }
+            const blob = new Blob([ response ], { type: "image/"+ext });
+*//*
+            var reader = new FileReader();
+            reader.onloadend = ()=> {
+              img.src = reader.result;
+              resolve(gltfJson);
+            }
+            // DataURLとして読み込む
+            reader.readAsDataURL(response);
+            */
+//            resolve(gltfJson);
+          }
+
+          const loadBinaryImage = ()=> {
+            var xhr = new XMLHttpRequest();
+            //xhr.setRequestHeader('origin', 'x-requested-with');
+            xhr.onreadystatechange = (function(_img) {
+              return function(){
+
+              //console.log('e2222222', this.readyState, this.status);
+              
+              if (this.readyState == 4 && this.status == 200) {
+                /*
+                var img = new Image();
+                var url = window.URL || window.webkitURL;
+                img.src = url.createObjectURL(this.response);
+                */
+               load(_img, this.response);
+              }
+            }
+            })(img);
+            xhr.open('GET', imageUri);
+            xhr.responseType = 'arraybuffer';
+            xhr.send();
+          }
+          loadBinaryImage();
+
         }
 
         resources.images[i] = img;
@@ -637,13 +720,8 @@ export default class GLTF2Loader {
     return this._accessArrayBufferAsImage(arrayBufferSliced, mimeType);
   }
 
-  _accessArrayBufferAsImage(arrayBuffer, imageType) {
-    let bytes = new Uint8Array(arrayBuffer);
-    let binaryData = '';
-    for (let i = 0, len = bytes.byteLength; i < len; i++) {
-      binaryData += String.fromCharCode(bytes[i]);
-    }
-    let imgSrc = '';
+  _getImageType(imageType) {
+    let imgSrc = null;
     if (imageType === 'image/jpeg' || imageType.toLowerCase() === 'jpg' || imageType.toLowerCase() === 'jpeg') {
       imgSrc = "data:image/jpeg;base64,";
     }
@@ -659,6 +737,16 @@ export default class GLTF2Loader {
     else {
       imgSrc = "data:image/unknown;base64,";
     }
+    return imgSrc;
+  }
+
+  _accessArrayBufferAsImage(arrayBuffer, imageType) {
+    let bytes = new Uint8Array(arrayBuffer);
+    let binaryData = '';
+    for (let i = 0, len = bytes.byteLength; i < len; i++) {
+      binaryData += String.fromCharCode(bytes[i]);
+    }
+    let imgSrc = this._getImageType(imageType);
     let dataUrl = imgSrc + DataUtil.btoa(binaryData);
     return dataUrl;
   }
