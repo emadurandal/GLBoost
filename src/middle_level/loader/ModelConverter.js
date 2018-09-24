@@ -243,8 +243,14 @@ export default class ModelConverter {
       let materials = [];
       let indicesAccumulatedLength = 0;
 
+      let primitiveMode = 4;
+
       for (let i in mesh.primitives) {
         let primitive = mesh.primitives[i];
+        if (primitive.mode != null) {
+          primitiveMode = primitive.mode;
+        }
+
         {
           let accessor = primitive.attributes.POSITION;
           _positions[i] = accessor.extras.vertexAttributeArray;
@@ -455,7 +461,7 @@ export default class ModelConverter {
         _indicesArray = null;
       }
   
-      geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
+      geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray, primitiveMode);
       geometry.materials = materials;
     }
 
