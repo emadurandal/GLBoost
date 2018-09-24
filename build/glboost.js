@@ -10563,6 +10563,8 @@ albedo.rgb *= (1.0 - metallic);
         );
       }
 
+      this._yscale = yscale;
+      this._xscale = xscale;
     }
 
     set fovy(value) {
@@ -10611,6 +10613,28 @@ albedo.rgb *= (1.0 - metallic);
 
     get zFar() {
       return this._zFar;
+    }
+
+    get left() {
+      if (this._xscale != null) {
+        L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+      }
+      return -this._zNear/this._xscale;
+    }
+
+    get right() {
+      return -this.left;
+    }
+
+    get top() {
+      return -this.bottom;
+    }
+
+    get bottom() {
+      if (this._xscale != null) {
+        L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+      }
+      return this._zNear/this._yscale;
     }
 
     get allInfo() {
@@ -11114,9 +11138,9 @@ albedo.rgb *= (1.0 - metallic);
       this._lengthCenterToCorner = 10;
       this._lengthOfCenterToEye = 10;
       this._scaleOfTraslation = 5.0;
-      this._scaleOfLengthCameraToCenter = 0.5;
+      this._scaleOfLengthCameraToCenter = 1.0;
       this._foyvBias = 1.0;
-      this._zFarAdjustingFactorBasedOnAABB = 1.0;
+      this._zFarAdjustingFactorBasedOnAABB = 2.0;
 
       this._doResetWhenCameraSettingChanged = options.doResetWhenCameraSettingChanged !== void 0 ? options.doResetWhenCameraSettingChanged : false;
 
@@ -11368,29 +11392,35 @@ albedo.rgb *= (1.0 - metallic);
         newEyeVec.add(this._mouseTranslateVec);
         newCenterVec.add(this._mouseTranslateVec);
       }
-
+      const newCenterToEyeLength = Vector3.lengthBtw(newEyeVec, newCenterVec);
 
       let newLeft = camera.left;
       let newRight = camera.right;
       let newTop = camera.top;
       let newBottom = camera.bottom;
+      let newZNear = camera.zNear;
+      let newZFar = camera.zFar;
       let ratio = 1;
       if (typeof newLeft !== 'undefined') {
         if (typeof this._lengthCenterToCorner !== 'undefined') {
-          ratio = camera.zNear / this._lengthCameraToObject;
-          if (ratio < 1.0) {
-            ratio = 1;
+          let aabb = this._getTargetAABB();
+          ratio = camera.zNear / Math.abs(newCenterToEyeLength - aabb.lengthCenterToCorner);
+          
+          const minRatio = 0.001;
+          if (ratio < minRatio) {
+            ratio = minRatio;
           }
+
+          let scale = 1 / ratio;
+          newLeft *= scale;
+          newRight *= scale;
+          newTop *= scale;
+          newBottom *= scale;
+          newZFar *= scale;
+          newZNear *= scale;
         }
-        let scale = this._wheel_y / ratio;
-        newLeft *= scale;
-        newRight *= scale;
-        newTop *= scale;
-        newBottom *= scale;
       }
 
-      let newZNear = camera.zNear;
-      let newZFar = camera.zFar;
       if (this._target) {
         newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
         newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
@@ -11418,8 +11448,10 @@ albedo.rgb *= (1.0 - metallic);
 
       let targetAABB = this._getTargetAABB();
 
+      const cameraZNearPlaneHeight = camera.top - camera.bottom;
       this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
       this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+      //this._lengthCameraToObject = targetAABB.lengthCenterToCorner * (targetAABB.sizeY/cameraZNearPlaneHeight) / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
       let newCenterVec = targetAABB.centerPoint;
 
@@ -11438,7 +11470,7 @@ albedo.rgb *= (1.0 - metallic);
         newUpVec = upVec;
       }
 
-      return [newEyeVec, newCenterVec, newUpVec];
+      return [newEyeVec, newCenterVec, newUpVec]
     }
 
     tryReset() {
@@ -21587,8 +21619,14 @@ albedo.rgb *= (1.0 - metallic);
         let materials = [];
         let indicesAccumulatedLength = 0;
 
+        let primitiveMode = 4;
+
         for (let i in mesh.primitives) {
           let primitive = mesh.primitives[i];
+          if (primitive.mode != null) {
+            primitiveMode = primitive.mode;
+          }
+
           {
             let accessor = primitive.attributes.POSITION;
             _positions[i] = accessor.extras.vertexAttributeArray;
@@ -21799,7 +21837,7 @@ albedo.rgb *= (1.0 - metallic);
           _indicesArray = null;
         }
     
-        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray);
+        geometry.setVerticesData(ArrayUtil.merge(vertexData, additional), _indicesArray, primitiveMode);
         geometry.materials = materials;
       }
 
@@ -22949,4 +22987,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-230-g30074-mod branch: fix/safari2';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-232-g6e10-mod branch: develop';
