@@ -21,6 +21,8 @@ export default class GLExtensionsManager {
       this._extStdDerivatives = gl.getExtension("OES_standard_derivatives");
 
       this._extTFL = gl.getExtension("OES_texture_float_linear");
+
+      this._extTexLod = gl.getExtension("EXT_shader_texture_lod");
     }
 
     GLExtensionsManager._instances[glContext.belongingCanvasId] = this;

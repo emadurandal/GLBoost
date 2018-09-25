@@ -223,7 +223,13 @@ export default class Shader extends GLBoostObject {
     shaderText =   Shader._glslVer(gl);
     shaderText +=   'precision highp float;\n';
     shaderText +=   `${in_} vec3 aVertex_position;\n`;
-
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += `attribute vec3 aVertex_normal;\n`;
+    
+      if (Shader._exist(f, GLBoost.TANGENT)) {
+        shaderText += `attribute vec3 aVertex_tangent;\n`;
+      }
+    }
 
 
     /// define variables
@@ -302,6 +308,7 @@ export default class Shader extends GLBoostObject {
       shaderText += Shader._glsl1DrawBufferExt(gl);
     }
     shaderText += Shader._glsl1StdDerivativeExt(gl);
+    shaderText += Shader._glsl1ShaderTextureLodExt(gl);
     shaderText +=   'precision highp float;\n';
 
     for (let i=0; i<maxDrawBuffers; i++) {
@@ -609,6 +616,9 @@ export default class Shader extends GLBoostObject {
   }
   static _glsl1StdDerivativeExt(gl) {
     return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_OES_standard_derivatives : require\n' : '';
+  }
+  static _glsl1ShaderTextureLodExt(gl) {
+    return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_shader_texture_lod : require\n' : '';
   }
 
   static _in_onVert(gl) {
