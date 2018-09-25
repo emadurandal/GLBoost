@@ -52,7 +52,7 @@ export default class L_CameraController extends GLBoostObject {
     this._lengthCenterToCorner = 10;
     this._lengthOfCenterToEye = 10;
     this._scaleOfTraslation = 5.0;
-    this._scaleOfLengthCameraToCenter = 1.0
+    this._scaleOfLengthCameraToCenter = 1.0;
     this._foyvBias = 1.0;
     this._zFarAdjustingFactorBasedOnAABB = 2.0;
 
@@ -321,8 +321,9 @@ export default class L_CameraController extends GLBoostObject {
     let ratio = 1;
     if (typeof newLeft !== 'undefined') {
       if (typeof this._lengthCenterToCorner !== 'undefined') {
-        let aabb = this._getTargetAABB();
-        ratio = camera.zNear / Math.abs(newCenterToEyeLength - aabb.lengthCenterToCorner);
+
+        //let aabb = this._getTargetAABB();
+        ratio = camera.zNear / Math.abs(newCenterToEyeLength - this._lengthCenterToCorner);
         
         const minRatio = 0.001;
         if (ratio < minRatio) {
