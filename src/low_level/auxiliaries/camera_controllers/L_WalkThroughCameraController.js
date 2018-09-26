@@ -8,7 +8,9 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   constructor(glBoostContext, options = {
     eventTargetDom: document,
     horizontalSpeed: 1,
-    turnSpeed: 5
+    turnSpeed: 5,
+    inverseVirticalRotating: false,
+    inverseHorizontalRotating: false
   })
   {
     super(glBoostContext);
@@ -18,6 +20,8 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._horizontalSpeed = options.horizontalSpeed;
     this._virticalSpeed = options.virticalSpeed;
     this._turnSpeed = options.turnSpeed;
+    this._inverseVirticalRotating = options.inverseVirticalRotating;
+    this._inverseHorizontalRotating = options.inverseHorizontalRotating; 
 
     this.reset();
 
@@ -235,8 +239,16 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
     if (this._isMouseDrag) {
 
-      this._deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
-      this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
+      if (this._inverseHorizontalRotating) {
+        this._deltaX = this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+      } else {
+        this._deltaX = -this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
+      }
+      if (this._inverseVirticalRotating) {
+        this._deltaY += this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
+      } else {
+        this._deltaY += -this._deltaMouseYOnCanvas * this._mouseYAdjustScale;
+      }
       this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
 
 
