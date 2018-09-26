@@ -44,6 +44,8 @@ $ npm start
 * Phisically Based Rendering Support (Metallic-Roughness) (with/without Image based Lighting)
 * Experienced use in multiple commercial products/services
 
+<img src="assets/pbr_ibl_sample.jpg" alt="GLBoostViewer" title="GLBoostViewer" width="512">
+
 ## Supported Browsers
 
 * Google Chrome (even WebGL 2.0 mode)
