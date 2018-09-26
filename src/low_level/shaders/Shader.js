@@ -336,7 +336,7 @@ export default class Shader extends GLBoostObject {
       var method = this['FSMethodDefine_' + className];
       if (method) {
         shaderText += '//                                                            FSMethodDefine_' + className + ' //\n';
-        shaderText += method.bind(this, in_, f, lights, material, extraData)();
+        shaderText += method.bind(this, f, lights, material, extraData)();
       }
     });
 

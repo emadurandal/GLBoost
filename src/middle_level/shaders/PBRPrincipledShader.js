@@ -155,27 +155,30 @@ export class PBRPrincipledShaderSource {
     }
   `;
 
-    shaderText += `
-    vec3 IBLContribution(vec3 n, float NV, vec3 reflection, vec3 albedo, vec3 F0, float userRoughness)
-    {
-      float mipCount = uIBLParameters.x;
-      float lod = (userRoughness * mipCount);
+    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    if (diffuseEnvCubeTexture) {
+      shaderText += `
+      vec3 IBLContribution(vec3 n, float NV, vec3 reflection, vec3 albedo, vec3 F0, float userRoughness)
+      {
+        float mipCount = uIBLParameters.x;
+        float lod = (userRoughness * mipCount);
 
-      vec3 brdf = srgbToLinear(texture2D(uBrdfLUTTexture, vec2(NV, 1.0 - userRoughness)).rgb);
-      vec3 diffuseLight = srgbToLinear(textureCube(uDiffuseEnvTexture, n).rgb);
-      vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);
+        vec3 brdf = srgbToLinear(texture2D(uBrdfLUTTexture, vec2(NV, 1.0 - userRoughness)).rgb);
+        vec3 diffuseLight = srgbToLinear(textureCube(uDiffuseEnvTexture, n).rgb);
+        vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);
 
-      vec3 diffuse = diffuseLight * albedo;
-      vec3 specular = specularLight * (F0 * brdf.x + brdf.y);
+        vec3 diffuse = diffuseLight * albedo;
+        vec3 specular = specularLight * (F0 * brdf.x + brdf.y);
 
-      float IBLDiffuseContribution = uIBLParameters.y;
-      float IBLSpecularContribution = uIBLParameters.z;
-      diffuse *= IBLDiffuseContribution;
-      specular *= IBLSpecularContribution;
+        float IBLDiffuseContribution = uIBLParameters.y;
+        float IBLSpecularContribution = uIBLParameters.z;
+        diffuse *= IBLDiffuseContribution;
+        specular *= IBLSpecularContribution;
 
-      return diffuse + specular;
+        return diffuse + specular;
+      }
+      `;
     }
-    `;
 
     return shaderText;
   }

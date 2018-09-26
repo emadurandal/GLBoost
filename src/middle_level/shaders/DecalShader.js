@@ -54,7 +54,7 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+  FSMethodDefine_DecalShaderSource(f, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += this._multiplyAlphaToColorOfTexel();
