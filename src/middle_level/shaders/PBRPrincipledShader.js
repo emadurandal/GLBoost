@@ -1,6 +1,7 @@
 import Shader from '../../low_level/shaders/Shader';
 import DecalShader from './DecalShader';
 import Vector4 from '../../low_level/math/Vector4';
+import Vector3 from '../../low_level/math/Vector3';
 
 export class PBRPrincipledShaderSource {
 
@@ -23,7 +24,16 @@ export class PBRPrincipledShaderSource {
       shaderText += 'uniform sampler2D uEmissiveTexture;\n';
     }
 
+    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    if (diffuseEnvCubeTexture) {
+      shaderText += 'uniform sampler2D uBrdfLUTTexture;\n';
+      shaderText += 'uniform samplerCube uDiffuseEnvTexture;\n';
+      shaderText += 'uniform samplerCube uSpecularEnvTexture;\n';
+      shaderText += 'uniform vec3 uIBLParameters;\n'; // Ka * amount of ambient lights
+    }
+    
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
+    
 
     var sampler2D = this._sampler2DShadow_func();
     let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
@@ -145,6 +155,31 @@ export class PBRPrincipledShaderSource {
     }
   `;
 
+    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    if (diffuseEnvCubeTexture) {
+      shaderText += `
+      vec3 IBLContribution(vec3 n, float NV, vec3 reflection, vec3 albedo, vec3 F0, float userRoughness)
+      {
+        float mipCount = uIBLParameters.x;
+        float lod = (userRoughness * mipCount);
+
+        vec3 brdf = srgbToLinear(texture2D(uBrdfLUTTexture, vec2(NV, 1.0 - userRoughness)).rgb);
+        vec3 diffuseLight = srgbToLinear(textureCube(uDiffuseEnvTexture, n).rgb);
+        vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);
+
+        vec3 diffuse = diffuseLight * albedo;
+        vec3 specular = specularLight * (F0 * brdf.x + brdf.y);
+
+        float IBLDiffuseContribution = uIBLParameters.y;
+        float IBLSpecularContribution = uIBLParameters.z;
+        diffuse *= IBLDiffuseContribution;
+        specular *= IBLSpecularContribution;
+
+        return diffuse + specular;
+      }
+      `;
+    }
+
     return shaderText;
   }
 
@@ -185,6 +220,8 @@ vec3 F0 = mix(diffuseMatAverageF0, baseColor.rgb, metallic);
 vec3 albedo = baseColor.rgb * (vec3(1.0) - diffuseMatAverageF0);
 albedo.rgb *= (1.0 - metallic);
 `;
+    shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
+    shaderText += '    float NV = clamp(dot(normal, viewDirection), 0.001, 1.0);\n';
 
     for (let i=0; i<lights.length; i++) {
       let light = lights[i];
@@ -196,7 +233,6 @@ albedo.rgb *= (1.0 - metallic);
       shaderText += `    incidentLight.rgb *= M_PI;\n`; // This light is assumed as punctual light
 
       // Fresnel
-      shaderText += `    vec3 viewDirection = normalize(viewPosition_world - v_position_world);\n`;
       shaderText += '    vec3 halfVector = normalize(lightDirection + viewDirection);\n';
       shaderText += '    float LH = clamp(dot(lightDirection, halfVector), 0.0, 1.0);\n';
       shaderText += '    vec3 F = fresnel(F0, LH);\n';
@@ -206,33 +242,46 @@ albedo.rgb *= (1.0 - metallic);
        
       // Specular
       shaderText += '    float NL = clamp(dot(normal, lightDirection), 0.001, 1.0);\n';
-      shaderText += '    float NV = clamp(dot(normal, viewDirection), 0.001, 1.0);\n';
       shaderText += '    float NH = clamp(dot(normal, halfVector), 0.0, 1.0);\n';
       shaderText += '    float VH = clamp(dot(viewDirection, halfVector), 0.0, 1.0);\n';
       shaderText += `    vec3 specularContrib = cook_torrance_specular_brdf(NH, NL, NV, F, alphaRoughness);\n`;
-
-      shaderText += `    vec3 reflect = (diffuseContrib + specularContrib) * vec3(NL) * incidentLight.rgb;\n`;
+      shaderText += `    vec3 diffuseAndSpecular = (diffuseContrib + specularContrib) * vec3(NL) * incidentLight.rgb;\n`;
 
       // Light Visibility (Shadow Effect)
       shaderText +=      Shader._generateShadowingStr(gl, i, isShadowEnabledAsTexture);
 
       // Add this light contribute to the amount of light
-      shaderText += `    rt0.xyz += reflect * visibility;\n`;
+      shaderText += `    rt0.xyz += diffuseAndSpecular * visibility;\n`;
 
       shaderText += `  }\n`;
     }
 
-    // Ambient
+
+    // Indirect
+    /// IBL
+    
+    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    if (diffuseEnvCubeTexture) {
+      shaderText += `vec3 reflection = reflect(-viewDirection, normal);\n`;
+      shaderText += 'vec3 ibl = IBLContribution(normal, NV, reflection, albedo, F0, userRoughness);\n';
+    } else {
+      shaderText += 'vec3 ibl = vec3(0.0, 0.0, 0.0);\n';
+    }
+    
+//shaderText += 'ibl = vec3(0.0, 0.0, 0.0);\n';
+    // calc occlusion
     shaderText += 'float occlusion = 1.0;\n';
     let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
     if (occlusionTexture) {
       shaderText += 'occlusion = mix(1.0, texture2D(uOcclusionTexture, texcoord).r, uOcclusionFactors.x);\n';
     }
+
+    /// Enforce Occlution to Directional Lights by occlusionRateForDirectionalLight (Fake effect)
     shaderText += '  float occlusionRateForDirectionalLight = uOcclusionFactors.y;\n';
     shaderText += '  rt0.xyz = mix(rt0.xyz, rt0.xyz * occlusion, occlusionRateForDirectionalLight);\n';
-    shaderText += '  rt0.xyz += ambient.xyz * occlusion;\n';
-
-
+    
+    // Occlution to Indirect Lights
+    shaderText += '  rt0.xyz += (ambient.xyz + ibl) * occlusion;\n';
 
     // Emissive
     shaderText += '  vec3 emissive = uEmissiveFactor;\n';
@@ -248,7 +297,6 @@ albedo.rgb *= (1.0 - metallic);
 //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
-
     return shaderText;
   }
 
@@ -260,12 +308,16 @@ albedo.rgb *= (1.0 - metallic);
     material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
     material.setUniform(shaderProgram, 'uniform_OcclusionFactors', this._glContext.getUniformLocation(shaderProgram, 'uOcclusionFactors'));
     material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
+    material.setUniform(shaderProgram, 'uniform_IBLParameters', this._glContext.getUniformLocation(shaderProgram, 'uIBLParameters'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
 
-
+    material.setTexture(this._glBoostSystem._glBoostContext.brdfLutTexture, GLBoost.TEXTURE_PURPOSE_BRDF_LUT);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, 'uOcclusionTexture');
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_BRDF_LUT, shaderProgram, 'uBrdfLutTexture');
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE, shaderProgram, 'uDiffuseEnvTexture');
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_SPECULAR_ENV_CUBE, shaderProgram, 'uSpecularEnvTexture');
 
     return vertexAttribsAsResult;
   }
@@ -283,15 +335,16 @@ export default class PBRPrincipledShader extends DecalShader {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
     var baseColor = material.baseColor;
-    var metallic = material.metallic;
-    let roughness = material.roughness;
-    const occlusion = material.occlusion;
-    const occlusionRateForDirectionalLight = material.occlusionRateForDirectionalLight;
-    const emissive = material.emissive;
+    var metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
+    let roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
+    const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
+    const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
+    const emissive = (material.emissive !== void 0) ? material.emissive : Vector3.zero();
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
+    this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), 9, 0.20, 0.20, true);
 
     let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

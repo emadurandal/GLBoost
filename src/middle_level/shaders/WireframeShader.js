@@ -59,7 +59,7 @@ export class WireframeShaderSource {
     return shaderText;
   }
 
-  FSMethodDefine_WireframeShaderSource(in_, f, lights, material, extraData) {
+  FSMethodDefine_WireframeShaderSource(f, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += `

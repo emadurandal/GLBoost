@@ -9,11 +9,9 @@ export default class VertexWorldShaderSource {
     let shaderText = '';
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += `${in_} vec3 aVertex_normal;\n`;
       shaderText += `${out_} vec3 v_normal_world;\n`;
       
       if (Shader._exist(f, GLBoost.TANGENT)) {
-        shaderText += `${in_} vec3 aVertex_tangent;\n`;
         if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
           shaderText += `${out_} vec3 v_tangent_world;\n`;
           shaderText += `${out_} vec3 v_binormal_world;\n`;  

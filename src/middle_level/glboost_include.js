@@ -28,6 +28,7 @@ import HalfLambertShader from './shaders/HalfLambertShader';
 import HalfLambertAndWrapLightingShader from './shaders/HalfLambertAndWrapLightingShader';
 import DepthDisplayShader from './shaders/DepthDisplayShader';
 import PassThroughShader from './shaders/PassThroughShader';
+import EnvironmentMapShader from './shaders/EnvironmentMapShader';
 import JointGizmoUpdater from './elements/skeletons/JointGizmoUpdater';
 import M_ScreenMesh from './elements/meshes/M_ScreenMesh';
 

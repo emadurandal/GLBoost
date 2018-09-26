@@ -57,6 +57,8 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
       );
     }
 
+    this._yscale = yscale;
+    this._xscale = xscale;
   }
 
   set fovy(value) {
@@ -105,6 +107,28 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
 
   get zFar() {
     return this._zFar;
+  }
+
+  get left() {
+    if (this._xscale != null) {
+      L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+    }
+    return -this._zNear/this._xscale;
+  }
+
+  get right() {
+    return -this.left;
+  }
+
+  get top() {
+    return -this.bottom;
+  }
+
+  get bottom() {
+    if (this._xscale != null) {
+      L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+    }
+    return this._zNear/this._yscale;
   }
 
   get allInfo() {

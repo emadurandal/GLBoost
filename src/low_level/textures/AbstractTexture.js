@@ -51,7 +51,12 @@ export default class AbstractTexture extends GLBoostObject {
     }
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
     gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, this._texture);
+
+    if (this.className.indexOf('Cube') !== -1) {
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, this._texture);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, this._texture);
+    }
 
     return true;
   }
@@ -65,7 +70,11 @@ export default class AbstractTexture extends GLBoostObject {
 
     var index = !(typeof textureUnitIndex === 'undefined') ? textureUnitIndex : this._textureUnitIndex;
     gl.activeTexture(gl.TEXTURE0 + index);
-    gl.bindTexture(gl.TEXTURE_2D, null);
+    if (this.className.indexOf('Cube') !== -1) {
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
   }
 
   get width() {

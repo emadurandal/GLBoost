@@ -54,7 +54,7 @@ export class DecalShaderSource {
     return shaderText;
   }
 
-  FSMethodDefine_DecalShaderSource(in_, f, lights, material, extraData) {
+  FSMethodDefine_DecalShaderSource(f, lights, material, extraData) {
     let shaderText = '';
 
     shaderText += this._multiplyAlphaToColorOfTexel();
@@ -140,7 +140,8 @@ export default class DecalShader extends WireframeShader {
 
     let diffuseTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_DIFFUSE);
     if (diffuseTexture) {
-      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+//      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+      material.updateTextureInfo(GLBoost.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
       this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
 

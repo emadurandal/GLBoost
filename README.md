@@ -37,10 +37,12 @@ $ npm start
 ## Key features
 
 * ECMAScript 2015 based library
-* Shader classes Mixin mechanism (You can customize your shader like LEGO bricks!)
+* Shader classes Mixin layered mechanism
 * WebGL2.0 Ready (Currently, Firefox and Chrome)
 * User's Custom Shader Support
-* Obj and glTF1.0 loader
+* Obj and glTF 1.0/2.0 loader
+* Phisically Based Rendering Support (Metallic-Roughness) (with/without Image based Lighting)
+* Experienced use in multiple commercial products/services
 
 ## Supported Browsers
 

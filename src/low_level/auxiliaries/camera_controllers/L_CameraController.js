@@ -52,9 +52,9 @@ export default class L_CameraController extends GLBoostObject {
     this._lengthCenterToCorner = 10;
     this._lengthOfCenterToEye = 10;
     this._scaleOfTraslation = 5.0;
-    this._scaleOfLengthCameraToCenter = 0.5;
+    this._scaleOfLengthCameraToCenter = 1.0;
     this._foyvBias = 1.0;
-    this._zFarAdjustingFactorBasedOnAABB = 1.0;
+    this._zFarAdjustingFactorBasedOnAABB = 2.0;
 
     this._doResetWhenCameraSettingChanged = options.doResetWhenCameraSettingChanged !== void 0 ? options.doResetWhenCameraSettingChanged : false;
 
@@ -310,29 +310,36 @@ export default class L_CameraController extends GLBoostObject {
       newEyeVec.add(this._mouseTranslateVec);
       newCenterVec.add(this._mouseTranslateVec);
     }
-
+    const newCenterToEyeLength = Vector3.lengthBtw(newEyeVec, newCenterVec);
 
     let newLeft = camera.left;
     let newRight = camera.right;
     let newTop = camera.top;
     let newBottom = camera.bottom;
+    let newZNear = camera.zNear;
+    let newZFar = camera.zFar;
     let ratio = 1;
     if (typeof newLeft !== 'undefined') {
       if (typeof this._lengthCenterToCorner !== 'undefined') {
-        ratio = camera.zNear / this._lengthCameraToObject;
-        if (ratio < 1.0) {
-          ratio = 1;
+
+        //let aabb = this._getTargetAABB();
+        ratio = camera.zNear / Math.abs(newCenterToEyeLength - this._lengthCenterToCorner);
+        
+        const minRatio = 0.001;
+        if (ratio < minRatio) {
+          ratio = minRatio;
         }
+
+        let scale = 1 / ratio;
+        newLeft *= scale;
+        newRight *= scale;
+        newTop *= scale;
+        newBottom *= scale;
+        newZFar *= scale;
+        newZNear *= scale;
       }
-      let scale = this._wheel_y / ratio;
-      newLeft *= scale;
-      newRight *= scale;
-      newTop *= scale;
-      newBottom *= scale;
     }
 
-    let newZNear = camera.zNear;
-    let newZFar = camera.zFar;
     if (this._target) {
       newZFar = camera.zNear + Vector3.subtract(newCenterVec, newEyeVec).length();
       newZFar += this._getTargetAABB().lengthCenterToCorner * this._zFarAdjustingFactorBasedOnAABB;
@@ -360,8 +367,10 @@ export default class L_CameraController extends GLBoostObject {
 
     let targetAABB = this._getTargetAABB();
 
+    const cameraZNearPlaneHeight = camera.top - camera.bottom;
     this._lengthCenterToCorner = targetAABB.lengthCenterToCorner;
     this._lengthCameraToObject = targetAABB.lengthCenterToCorner / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
+    //this._lengthCameraToObject = targetAABB.lengthCenterToCorner * (targetAABB.sizeY/cameraZNearPlaneHeight) / Math.sin((fovy*Math.PI/180)/2) * this._scaleOfLengthCameraToCenter;
 
     let newCenterVec = targetAABB.centerPoint;
 
@@ -380,7 +389,7 @@ export default class L_CameraController extends GLBoostObject {
       newUpVec = upVec;
     }
 
-    return [newEyeVec, newCenterVec, newUpVec];
+    return [newEyeVec, newCenterVec, newUpVec]
   }
 
   tryReset() {
