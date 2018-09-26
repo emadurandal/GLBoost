@@ -192,12 +192,14 @@ $ npm run test
 
 ### Coming Soon
 
-* Allow access to WebGL Context and Resources
+* Improvement of Realtime shadow
 
 ### Near Future
 
-* Physically Based Rendering
-* Both Forward Rendering and Deferred Rendering Support
+* Both Clustered Forward Rendering and Deferred Rendering Support
+* Global Illumination (Light Propergation Volume or etc...)
+* Unity like Entity-Component-System
+* Original Giga DataTexture Architecture
 * High-level API for beginners
 
 ## License
