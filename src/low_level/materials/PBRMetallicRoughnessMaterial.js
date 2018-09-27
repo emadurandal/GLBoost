@@ -14,6 +14,9 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   _occlusionFactor: number;
   _emissiveFactor: Vector3;
   _occlusionRateForDirectionalLight: number;
+  _IBLSpecularTextureMipmapCount: number;
+  _IBLDiffuseContribution: number;
+  _IBLSpecularContribution: number;
   _shaderClass: PBRPrincipledShader;
 
   constructor(glBoostSystem: glBoostSystem) {
@@ -26,6 +29,9 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
     this._occlusionFactor = 1.0;
     this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
     this._occlusionRateForDirectionalLight = 0.2;
+    this._IBLSpecularTextureMipmapCount = 9;
+    this._IBLDiffuseContribution = 0.2;
+    this._IBLSpecularContribution = 0.2;
 
     this._shaderClass = PBRPrincipledShader;
   }
@@ -80,6 +86,30 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
 
   get occlusionRateForDirectionalLight() {
     return this._occlusionRateForDirectionalLight;
+  }
+
+  set IBLSpecularTextureMipmapCount(val: number) {
+    this._IBLSpecularTextureMipmapCount = val;
+  }
+
+  get IBLSpecularTextureMipmapCount() {
+    return this._IBLSpecularTextureMipmapCount;
+  }
+
+  set IBLDiffuseContribution(val: number) {
+    this._IBLDiffuseContribution = val;
+  }
+
+  get IBLDiffuseContribution() {
+    return this._IBLDiffuseContribution;
+  }
+
+  set IBLSpecularContribution(val: number) {
+    this._IBLSpecularContribution = val;
+  }
+
+  get IBLSpecularContribution() {
+    return this._IBLSpecularContribution;
   }
 }
 
