@@ -9,6 +9,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     eventTargetDom: document,
     horizontalSpeed: 1,
     turnSpeed: 5,
+    mouseWheelSpeedScale: 0.3,
     inverseVirticalRotating: false,
     inverseHorizontalRotating: false
   })
@@ -20,6 +21,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._horizontalSpeed = options.horizontalSpeed;
     this._virticalSpeed = options.virticalSpeed;
     this._turnSpeed = options.turnSpeed;
+    this._mouseWheelSpeedScale = options.mouseWheelSpeedScale;
     this._inverseVirticalRotating = options.inverseVirticalRotating;
     this._inverseHorizontalRotating = options.inverseHorizontalRotating; 
 
@@ -64,6 +66,9 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
         eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
       }
+      if ('onmousewheel' in document) {
+        document.addEventListener('mousewheel', this._mouseWheel.bind(this));
+      }
     }
   }
 
@@ -82,7 +87,17 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
         eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
       }
+      if ('onmousewheel' in document) {
+        document.removeEventListener('mousewheel', this._mouseWheel.bind(this));
+      }
     }
+  }
+
+  _mouseWheel(e) {
+    const delta = e.wheelDelta * this._mouseWheelSpeedScale;
+    const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+    this._currentPos.add(Vector3.multiply(horizontalDir, delta));
+    this._currentCenter.add(Vector3.multiply(horizontalDir, delta));
   }
 
   _mouseDown(evt) {
