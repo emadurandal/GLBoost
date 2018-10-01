@@ -10115,9 +10115,9 @@ return mat4(
         const gl = this._glBoostSystem._glContext.gl;
         const lodExt = gl.getExtension("EXT_shader_texture_lod");
         if (lodExt) {
-          shaderText += `vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);`;
+          shaderText += `vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, reflection, lod).rgb);`;
         } else {
-          shaderText += `vec3 specularLight = srgbToLinear(textureCube(uSpecularEnvTexture, F0).rgb);`;
+          shaderText += `vec3 specularLight = srgbToLinear(textureCube(uSpecularEnvTexture, reflection).rgb);`;
         }
         shaderText += `
         vec3 diffuse = diffuseLight * albedo;
@@ -10127,7 +10127,6 @@ return mat4(
         float IBLSpecularContribution = uIBLParameters.z;
         diffuse *= IBLDiffuseContribution;
         specular *= IBLSpecularContribution;
-
         return diffuse + specular;
       }
       `;
@@ -10337,7 +10336,7 @@ albedo.rgb *= (1.0 - metallic);
       this._occlusionRateForDirectionalLight = 0.2;
       this._IBLSpecularTextureMipmapCount = 9;
       this._IBLDiffuseContribution = 0.2;
-      this._IBLSpecularContribution = 0.2;
+      this._IBLSpecularContribution = 0.55;
 
       this._shaderClass = PBRPrincipledShader;
     }
@@ -23393,15 +23392,24 @@ albedo.rgb *= (1.0 - metallic);
         const fileExtension = splitted[splitted.length - 1];
 
         if (fileExtension === 'gltf' || fileExtension === 'glb') {
-          return new Promise((resolve, response)=>{
+          return new Promise((resolve, reject)=>{
             checkArrayBufferOfGltf(files[fileName], resolve);
-          }, (reject, error)=>{
-    
           });
         }
-      }      
+      } 
     }
 
+    const splitted = uri.split('.');
+    const fileExtension = splitted[splitted.length - 1];
+
+    // Effekseer
+    if (fileExtension === 'efk') {
+      return new Promise((resolve, reject)=>{
+        resolve('Effekseer');
+      });
+    }
+
+    // glTF
     return DataUtil.loadResourceAsync(uri, true,
       (resolve, response)=>
       {
@@ -23449,4 +23457,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-250-g918f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-251-g61b0-mod branch: develop';

@@ -169,9 +169,9 @@ export class PBRPrincipledShaderSource {
       const gl = this._glBoostSystem._glContext.gl;
       const lodExt = gl.getExtension("EXT_shader_texture_lod");
       if (lodExt) {
-        shaderText += `vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);`;
+        shaderText += `vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, reflection, lod).rgb);`;
       } else {
-        shaderText += `vec3 specularLight = srgbToLinear(textureCube(uSpecularEnvTexture, F0).rgb);`;
+        shaderText += `vec3 specularLight = srgbToLinear(textureCube(uSpecularEnvTexture, reflection).rgb);`;
       }
       shaderText += `
         vec3 diffuse = diffuseLight * albedo;
@@ -181,7 +181,6 @@ export class PBRPrincipledShaderSource {
         float IBLSpecularContribution = uIBLParameters.z;
         diffuse *= IBLDiffuseContribution;
         specular *= IBLSpecularContribution;
-
         return diffuse + specular;
       }
       `;

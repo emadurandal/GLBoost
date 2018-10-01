@@ -30,8 +30,8 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
     this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
     this._occlusionRateForDirectionalLight = 0.2;
     this._IBLSpecularTextureMipmapCount = 9;
-    this._IBLDiffuseContribution = 0.2;
-    this._IBLSpecularContribution = 0.2;
+    this._IBLDiffuseContribution = 0.2
+    this._IBLSpecularContribution = 0.55;
 
     this._shaderClass = PBRPrincipledShader;
   }
