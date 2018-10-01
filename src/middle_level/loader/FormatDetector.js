@@ -9,15 +9,24 @@ export default async function formatDetector(uri, files) {
       const fileExtension = splitted[splitted.length - 1];
 
       if (fileExtension === 'gltf' || fileExtension === 'glb') {
-        return new Promise((resolve, response)=>{
+        return new Promise((resolve, reject)=>{
           checkArrayBufferOfGltf(files[fileName], resolve);
-        }, (reject, error)=>{
-  
         });
       }
-    }      
+    } 
   }
 
+  const splitted = uri.split('.');
+  const fileExtension = splitted[splitted.length - 1];
+
+  // Effekseer
+  if (fileExtension === 'efk') {
+    return new Promise((resolve, reject)=>{
+      resolve('Effekseer');
+    });
+  }
+
+  // glTF
   return DataUtil.loadResourceAsync(uri, true,
     (resolve, response)=>
     {
