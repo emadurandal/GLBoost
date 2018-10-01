@@ -112,6 +112,14 @@ export default class M_AbstractCamera extends M_Element {
     return this._lowLevelCamera.allInfo;
   }
 
+  get allInfoExceptInnerData() {
+    return this._lowLevelCamera.allInfoExceptInnerData;
+  }
+
+  get allInfoAsInnerData() {
+    return this._lowLevelCamera.allInfoAsInnerData;
+  }
+
   set allInfo(info) {
     this._lowLevelCamera.allInfo = info;
   }

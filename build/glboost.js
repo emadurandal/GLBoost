@@ -10590,15 +10590,35 @@ albedo.rgb *= (1.0 - metallic);
       return this._texture;
     }
 
+    get allInfoExceptInnerData() {
+      const info = {};
+      
+      info.translate = this.translate;
+      info.center = this.center;
+      info.up = this.up;
+      
+      return info;
+    }
+
+    get allInfoAsInnerData() {
+      const info = {};
+      
+      info.translate = this.translateInner;
+      info.center = this.centerInner;
+      info.up = this.upInner;
+      
+      return info;
+    }
+
     get allInfo() {
       const info = {};
 
       info.translate = this.translate;
-      //info.translateInner = this.translateInner;
+      info.translateInner = this.translateInner;
       info.center = this.center;
-      //info.centerInner = this.centerInner;
+      info.centerInner = this.centerInner;
       info.up = this.up;
-      //info.upInner = this.upInner;
+      info.upInner = this.upInner;
 
       return info;
     }
@@ -10758,9 +10778,31 @@ albedo.rgb *= (1.0 - metallic);
       info.fovy = this.fovy;
       info.aspect = this.aspect;
       info.zFar = this.zFar;
-  //    info.zFarInner = this.zFarInner;
+      info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-  //    info.zNearInner = this.zNearInner;
+      info.zNearInner = this.zNearInner;
+
+      return info;
+    }
+
+    get allInfoExceptInnerData() {
+      const info = super.allInfoExceptInnerData;
+
+      info.fovy = this.fovy;
+      info.aspect = this.aspect;
+      info.zFar = this.zFar;
+      info.zNear = this.zNear;
+
+      return info;
+    }
+    
+    get allInfoAsInnerData() {
+      const info = super.allInfoAsInnerData;
+
+      info.fovy = this.fovy;
+      info.aspect = this.aspect;
+      info.zFar = this.zFarInner;
+      info.zNear = this.zNearInner;
 
       return info;
     }
@@ -10900,9 +10942,35 @@ albedo.rgb *= (1.0 - metallic);
       info.top = this.top;
       info.bottom = this.bottom;
       info.zFar = this.zFar;
-  //    info.zFarInner = this.zFarInner;
+      info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-  //    info.zNearInner = this.zNearInner;
+      info.zNearInner = this.zNearInner;
+
+      return info;
+    }
+
+    get allInfoExceptInnerData() {
+      const info = super.allInfoExceptInnerData;
+
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFar;
+      info.zNear = this.zNear;
+
+      return info;
+    }
+
+    get allInfoAsInnerData() {
+      const info = super.allInfoAsInnerData;
+      
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFarInner;
+      info.zNear = this.zNearInner;
 
       return info;
     }
@@ -11075,15 +11143,46 @@ albedo.rgb *= (1.0 - metallic);
       info.top = this.top;
       info.bottom = this.bottom;
       info.zFar = this.zFar;
-  //    info.zFarInner = this.zFarInner;
+      info.zFarInner = this.zFarInner;
       info.zNear = this.zNear;
-  //    info.zNearInner = this.zNearInner;
+      info.zNearInner = this.zNearInner;
       info.xmag = this.xmag;
       info.ymag = this.ymag;
 
       return info;
     }
 
+    get allInfoExceptInnerData() {
+      const info = super.allInfoExceptInnerData;
+
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFar;
+      info.zNear = this.zNear;
+      info.xmag = this.xmag;
+      info.ymag = this.ymag;
+
+      return info;
+    }
+
+    get allInfoAsInnerData() {
+      const info = super.allInfoAsInnerData;
+
+      info.left = this.left;
+      info.right = this.right;
+      info.top = this.top;
+      info.bottom = this.bottom;
+      info.zFar = this.zFarInner;
+      info.zNear = this.zNearInner;
+      info.xmag = this.xmag;
+      info.ymag = this.ymag;
+
+      return info;
+    }
+
+    
     set allInfo(info) {
       super.allInfo = info;
     }
@@ -11198,6 +11297,14 @@ albedo.rgb *= (1.0 - metallic);
 
     get allInfo() {
       return this._lowLevelCamera.allInfo;
+    }
+
+    get allInfoExceptInnerData() {
+      return this._lowLevelCamera.allInfoExceptInnerData;
+    }
+
+    get allInfoAsInnerData() {
+      return this._lowLevelCamera.allInfoAsInnerData;
     }
 
     set allInfo(info) {
@@ -17353,13 +17460,6 @@ albedo.rgb *= (1.0 - metallic);
       return this._lowLevelCamera.zFar;
     }
 
-    get allInfo() {
-      return this._lowLevelCamera.allInfo;
-    }
-
-    set allInfo(info) {
-      this._lowLevelCamera.allInfo = info;
-    }
   }
 
   GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
@@ -17438,13 +17538,6 @@ albedo.rgb *= (1.0 - metallic);
       return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
     }
 
-    get allInfo() {
-      return this._lowLevelCamera.allInfo;
-    }
-
-    set allInfo(info) {
-      this._lowLevelCamera.allInfo = info;
-    }
   }
 
   GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
@@ -17537,14 +17630,6 @@ albedo.rgb *= (1.0 - metallic);
 
     get aspect() {
       return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
-    }
-
-    get allInfo() {
-      return this._lowLevelCamera.allInfo;
-    }
-
-    set allInfo(info) {
-      this._lowLevelCamera.allInfo = info;
     }
 
   }
@@ -23364,4 +23449,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-249-g8d48-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-250-g918f-mod branch: develop';
