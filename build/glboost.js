@@ -23498,4 +23498,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-253-gb3ea-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-254-gf871-mod branch: develop';
