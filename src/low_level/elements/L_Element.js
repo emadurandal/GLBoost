@@ -293,9 +293,7 @@ export default class L_Element extends GLBoostObject {
       return this._scale.clone();
     } else if (this._is_trs_matrix_updated) {
       let m = this._matrix;
-      this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
-      this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
-      this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._scale = m.getScale();
       this._is_scale_updated = true;
     }
     

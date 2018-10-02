@@ -40,9 +40,11 @@ export default class Renderer extends GLBoostObject {
   update(expression) {
     
     let skeletalMeshes = [];
+    let effekseerElements = [];
     // gather scenes as unique
     for (let renderPass of expression.renderPasses) {
       skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
+      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
       renderPass.scene.updateAmountOfAmbientLightsIntensity();
     }
 
@@ -58,6 +60,10 @@ export default class Renderer extends GLBoostObject {
     
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
+    }
+
+    for (let effekseerElement of effekseerElements) {
+      effekseerElement.update();
     }
 
     if (typeof effekseer !== "undefined") {
@@ -187,8 +193,10 @@ export default class Renderer extends GLBoostObject {
 //      glem.drawBuffers(gl, [gl.BACK]);
 
       if (typeof effekseer !== "undefined") {
-        effekseer.setProjectionMatrix(camera.projectionRHMatrix().m);
-        effekseer.setCameraMatrix(camera.inverseWorldMatrix.m);
+        const projection = (camera === null) ? Matrix44.identity().m : camera.projectionRHMatrix().m;
+        const inverseWorld = (camera === null) ? Matrix44.identity().m : camera.inverseWorldMatrix.m; 
+        effekseer.setProjectionMatrix(projection);
+        effekseer.setCameraMatrix(inverseWorld);
         effekseer.draw();
       }
 

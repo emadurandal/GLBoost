@@ -96,7 +96,9 @@ export default class M_Group extends M_Element {
     let children = this.getChildren();
     if (children) {
       for (let i = 0; i < children.length; i++) {
-        children[i]._setDirtyToAnimatedElement(inputName);
+        if (children[i]._setDirtyToAnimatedElement != null) {
+          children[i]._setDirtyToAnimatedElement(inputName);
+        }
       }  
     }
   }
@@ -341,6 +343,8 @@ export default class M_Group extends M_Element {
         }
       }
       return latestInputValue;
+    } else if (!(element.getEndInputValueOfAnimation != null)) {
+      return 0;
     }
 
     return element.getEndInputValueOfAnimation(inputLineName);
@@ -455,6 +459,9 @@ export default class M_Group extends M_Element {
         // Must be M_Element
         elem.readyForDiscard();
       } else {
+        if (typeof EffekseerElement !== undefined && elem instanceof EffekseerElement) {
+          console.log('Nothing to do for discarding at this time.');
+        }
         console.error('not M_Group nor M_Element');
       }
     };
