@@ -15,7 +15,7 @@ import type GLBoostSystem from '../core/GLBoostSystem';
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
   _currentAnimationInputValues: Object;
-  _activeAnimationLineName: string | null;
+  _activeAnimationLineName: string;
   _translate: Vector3;
   _rotate: Vector3;
   _scale: Vector3;
@@ -29,6 +29,7 @@ export default class L_Element extends GLBoostObject {
   _is_quaternion_updated: boolean;
   _is_euler_angles_updated: boolean;
   _is_inverse_trs_matrix_updated: boolean;
+  rotateMatrix: Matrix33;
 
 
   constructor(glBoostSystem: GLBoostSystem, toRegister: boolean = true) {
@@ -622,7 +623,7 @@ export default class L_Element extends GLBoostObject {
     this.quaternion = Quaternion.axisAngle(rotationDir, theta);
   }
 
-  set rotateMatrix33(rotateMatrix) {
+  set rotateMatrix33(rotateMatrix: Matrix33) {
     this.quaternion = Quaternion.fromMatrix(rotateMatrix);
   }
 

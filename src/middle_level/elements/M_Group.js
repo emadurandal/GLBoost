@@ -13,6 +13,7 @@ type QueryMeta = {type: number, format: number};
 
 export default class M_Group extends M_Element {
   _elements:Array<M_Element>;
+  _getCurrentAnimationInputValue: number;
 
   constructor(glBoostContext) {
     super(glBoostContext);
