@@ -30,6 +30,8 @@ export default class M_Element extends L_Element {
   _gizmos: Array<M_Gizmo>;
   _masterElement: M_Element | null;
   _worldMatrix: Matrix44;
+  _currentAnimationInputValues: Array<number>;
+  _getCurrentAnimationInputValue: number;
 
   constructor(glBoostContext: GLBoostMiddleContext) {
     super(glBoostContext);
