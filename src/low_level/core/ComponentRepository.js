@@ -45,7 +45,7 @@ export default class ComponentRepository {
     if (!this.__components.has(component.componentTID)) {
       this.__components.set(component.componentTID, new Map());
     }
-    this.__components.set(component.componentTID, new Map(component);
+    this.__components.set(component.componentTID, new Map(component));
 
     return component;
   }

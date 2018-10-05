@@ -26,6 +26,7 @@ export default class M_Scene extends M_Group {
   _ambientLights: M_AmbientLight;
   _cameras: Array<M_AbstractCamera>;
   _currentAnimationInputValues: Object;
+  _glContext: GLContext;
   
   /**
    * [en] constructor
