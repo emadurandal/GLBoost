@@ -8,7 +8,7 @@
   },
   "scripts": {
     "setup": "cp ./pre-commit ./.git/hooks",
-    "build": "npm run setup && npm run build-middle && npx uglifyjs --source-map \"base='./build/',url='glboost.min.js.map'\" -o ./build/glboost.min.js -- ./build/glboost.js && bash versioning.sh",
+    "build": "npm run setup && npm run build-middle && npx uglify --source-map \"base='./build/',url='glboost.min.js.map'\" -o ./build/glboost.min.js -- ./build/glboost.js && bash versioning.sh",
     "build-middle": "rollup -c src/middle_level/rollup.config.js",
     "test": "jest",
     "esdoc": "esdoc -c esdoc.json",
@@ -46,7 +46,9 @@
     "jest": "^23.4.2",
     "rollup": "^0.59.4",
     "rollup-plugin-flow": "^1.1.1",
-    "uglify-es": "^3.3.9"
+    "grunt": "^1.0.3",
+    "uglify": "^0.1.5"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
