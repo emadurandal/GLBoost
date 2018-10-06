@@ -18,6 +18,8 @@ export default class M_Element extends L_Element {
   _accumulatedAncestryObjectUpdateNumber: number;
   _accumulatedAncestryObjectUpdateNumberWithoutMySelf: number;
   _accumulatedAncestryObjectUpdateNumberJoint: number;
+  _accumulatedAncestryObjectUpdateNumberInverse: number;
+  _accumulatedAncestryObjectUpdateNumberForJoints: string;
   _opacity: number;
   _isTransparentForce: ?boolean;
   _parent: M_Group | null;
@@ -26,12 +28,26 @@ export default class M_Element extends L_Element {
   _isAffectedByWorldMatrixAccumulatedAncestry: boolean;
   _isAffectedByViewMatrix: boolean;
   _isAffectedByProjectionMatrix: boolean;
+  _is_inverse_trs_matrix_updated: boolean;
+  _inverseMatrixAccumulatedAncestry: Matrix44;
   _toInheritCurrentAnimationInputValue: boolean;
   _gizmos: Array<M_Gizmo>;
   _masterElement: M_Element | null;
+  _currentAnimationInputValues: Object;
+  _updateCountAsElement: string;
+  _activeAnimationLineName: string;
+  _instanceName: string;
   _worldMatrix: Matrix44;
-  _currentAnimationInputValues: Array<number>;
-  _getCurrentAnimationInputValue: number;
+  _matrixAccumulatedAncestryForJoints: Matrix44;
+  __cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder: Matrix44;
+  __cache_returnValue_multiplyMyAndParentTransformMatricesForJoints: Matrix44;
+  __cache_returnValue_multiplyMyAndParentTransformMatrices: Matrix44;
+  __cache_input_multiplyMyAndParentTransformMatricesForJoints: Matrix44;
+  __cache_input_multiplyMyAndParentTransformMatrices: Matrix44;
+  __updateInfoString_multiplyMyAndParentTransformMatrices: Matrix44;
+  __updateInfoString_multiplyMyAndParentTransformMatricesForJoints: number;
+  _worldMatrix: Matrix44;
+  transformMatrixOnlyRotate: Matrix44;
 
   constructor(glBoostContext: GLBoostMiddleContext) {
     super(glBoostContext);
@@ -76,7 +92,7 @@ export default class M_Element extends L_Element {
     return this._toInheritCurrentAnimationInputValue;
   }
 
-  _getCurrentAnimationInputValue(inputName: number): number | null {
+  _getCurrentAnimationInputValue(inputName: string): number | null {
     let value = this._currentAnimationInputValues[inputName];
     if (typeof(value) === 'number') {
       return value;
@@ -165,7 +181,7 @@ export default class M_Element extends L_Element {
     return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
   }
 
-  _multiplyMyAndParentRotateMatrices(currentElem: M_Element, withMySelf: boolean) {
+  _multiplyMyAndParentRotateMatrices(currentElem: M_Element | null, withMySelf: boolean) {
     if (currentElem._parent === null) {
       if (withMySelf) {
         return currentElem.transformMatrixOnlyRotate;
