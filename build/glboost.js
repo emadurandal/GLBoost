@@ -3985,7 +3985,7 @@
   class L_Element extends GLBoostObject {
                            
                                          
-                                            
+                                     
                         
                      
                     
@@ -3999,6 +3999,8 @@
                                     
                                       
                                             
+                           
+                            
 
 
     constructor(glBoostSystem               , toRegister          = true) {
@@ -4163,7 +4165,7 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName        , inputValue        )          {
+    getTranslateAt(lineName        , inputValue        )                {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
@@ -4399,7 +4401,7 @@
       return value;
     }
 
-    getQuaternionAtOrStatic(lineName        , inputValue        ) {
+    getQuaternionAtOrStatic(lineName        , inputValue               ) {
       let value = this.getQuaternionAt(lineName, inputValue);
       if (value === null) {
         return this.getQuaternionNotAnimated();
@@ -4540,7 +4542,7 @@
       instance._updateCountAsElement = this._updateCountAsElement;
     }
 
-    setPropertiesFromJson(arg) {
+    setPropertiesFromJson(arg        ) {
       let json = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
@@ -4556,7 +4558,7 @@
       }
     }
 
-    setRotationFromNewUpAndFront(UpVec, FrontVec) {
+    setRotationFromNewUpAndFront(UpVec         , FrontVec         ) {
       let yDir = UpVec;
       let xDir = Vector3.cross(yDir, FrontVec);
       let zDir = Vector3.cross(xDir, yDir);
@@ -4578,7 +4580,7 @@
       this.rotateMatrix33 = rotateMatrix;
     }
 
-    headToDirection(fromVec, toVec) {
+    headToDirection(fromVec         , toVec         ) {
       const fromDir = Vector3.normalize(fromVec);
       const toDir = Vector3.normalize(toVec);
       const rotationDir = Vector3.cross(fromDir, toDir);
@@ -4590,7 +4592,7 @@
       this.quaternion = Quaternion.axisAngle(rotationDir, theta);
     }
 
-    set rotateMatrix33(rotateMatrix) {
+    set rotateMatrix33(rotateMatrix          ) {
       this.quaternion = Quaternion.fromMatrix(rotateMatrix);
     }
 
@@ -4613,6 +4615,8 @@
                                                    
                                                                 
                                                         
+                                                          
+                                                            
                      
                                   
                             
@@ -4621,10 +4625,26 @@
                                                          
                                      
                                            
+                                            
+                                                
                                                   
                             
                                      
+                                         
+                                  
+                                     
+                          
                            
+                                                  
+                                                                                     
+                                                                                
+                                                                       
+                                                                          
+                                                                 
+                                                                      
+                                                                             
+                           
+                                        
 
     constructor(glBoostContext                      ) {
       super(glBoostContext);
@@ -4758,7 +4778,7 @@
       return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
     }
 
-    _multiplyMyAndParentRotateMatrices(currentElem           , withMySelf         ) {
+    _multiplyMyAndParentRotateMatrices(currentElem                  , withMySelf         ) {
       if (currentElem._parent === null) {
         if (withMySelf) {
           return currentElem.transformMatrixOnlyRotate;
@@ -13964,6 +13984,8 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['GLBoostLowContext'] = GLBoostLowContext;
 
+  //      
+
   class M_Mesh extends M_Element {
     constructor(glBoostContext, geometry, material) {
       super(glBoostContext);
@@ -14219,7 +14241,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    rayCast(arg1, arg2, camera, viewport) {
+    rayCast(arg1         , arg2         , camera, viewport) {
       let origVecInLocal = null;
       let dirVecInLocal = null;
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -14507,6 +14529,9 @@ albedo.rgb *= (1.0 - metallic);
                                                   
 
   class M_Group extends M_Element {
+                               
+                        
+                  
                                
 
     constructor(glBoostContext) {
@@ -14817,7 +14842,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    getEndAnimationInputValue(inputLineName, element = this) {
+    getEndAnimationInputValue(inputLineName, element          = this) {
 
       if (element instanceof M_Group) {
         let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
@@ -14965,7 +14990,7 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(arg1, arg2, camera, viewport) {
+    rayCast(arg1         , arg2         , camera, viewport) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -16345,6 +16370,7 @@ albedo.rgb *= (1.0 - metallic);
                                    
                                       
                                          
+                          
     
     /**
      * [en] constructor
@@ -23498,4 +23524,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-254-gf871-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-261-g91f5-mod branch: develop';
