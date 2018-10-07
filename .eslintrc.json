@@ -5,7 +5,7 @@
     },
     "extends": [
         "airbnb-base",
-        "plugin:jest/recommended"
+        "plugin:jest/recommended",
         "plugin:flowtype/recommended",
         "prettier",
         "prettier/flowtype"
