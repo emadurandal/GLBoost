@@ -394,7 +394,7 @@ export default class TransformComponent extends Component {
     }
   }
 
-  setPropertiesFromJson(arg) {
+  setPropertiesFromJson(arg: JSON) {
     let json = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
@@ -410,7 +410,7 @@ export default class TransformComponent extends Component {
     }
   }
 
-  setRotationFromNewUpAndFront(UpVec, FrontVec) {
+  setRotationFromNewUpAndFront(UpVec: Vector3, FrontVec: Vector3) {
     let yDir = UpVec;
     let xDir = Vector3.cross(yDir, FrontVec);
     let zDir = Vector3.cross(xDir, yDir);

@@ -172,15 +172,35 @@ export default class L_AbstractCamera extends L_Element {
     return this._texture;
   }
 
+  get allInfoExceptInnerData() {
+    const info = {};
+    
+    info.translate = this.translate;
+    info.center = this.center;
+    info.up = this.up;
+    
+    return info;
+  }
+
+  get allInfoAsInnerData() {
+    const info = {};
+    
+    info.translate = this.translateInner;
+    info.center = this.centerInner;
+    info.up = this.upInner;
+    
+    return info;
+  }
+
   get allInfo() {
     const info = {};
 
     info.translate = this.translate;
-    //info.translateInner = this.translateInner;
+    info.translateInner = this.translateInner;
     info.center = this.center;
-    //info.centerInner = this.centerInner;
+    info.centerInner = this.centerInner;
     info.up = this.up;
-    //info.upInner = this.upInner;
+    info.upInner = this.upInner;
 
     return info;
   }

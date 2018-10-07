@@ -164,15 +164,46 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     info.top = this.top;
     info.bottom = this.bottom;
     info.zFar = this.zFar;
-//    info.zFarInner = this.zFarInner;
+    info.zFarInner = this.zFarInner;
     info.zNear = this.zNear;
-//    info.zNearInner = this.zNearInner;
+    info.zNearInner = this.zNearInner;
     info.xmag = this.xmag;
     info.ymag = this.ymag;
 
     return info;
   }
 
+  get allInfoExceptInnerData() {
+    const info = super.allInfoExceptInnerData;
+
+    info.left = this.left;
+    info.right = this.right;
+    info.top = this.top;
+    info.bottom = this.bottom;
+    info.zFar = this.zFar;
+    info.zNear = this.zNear;
+    info.xmag = this.xmag;
+    info.ymag = this.ymag;
+
+    return info;
+  }
+
+  get allInfoAsInnerData() {
+    const info = super.allInfoAsInnerData;
+
+    info.left = this.left;
+    info.right = this.right;
+    info.top = this.top;
+    info.bottom = this.bottom;
+    info.zFar = this.zFarInner;
+    info.zNear = this.zNearInner;
+    info.xmag = this.xmag;
+    info.ymag = this.ymag;
+
+    return info;
+  }
+
+  
   set allInfo(info) {
     super.allInfo = info;
   }

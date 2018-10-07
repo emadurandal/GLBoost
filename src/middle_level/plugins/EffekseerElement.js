@@ -9,29 +9,52 @@ export default class EffekseerElement extends M_Element {
     this.__effect = null;
     this.__handle = null;
     this.__speed = 1;
+    this.__timer = null;
   }
 
-  load(uri, playJustAfterLoaded = false) {
+  load(uri, playJustAfterLoaded = false, isLoop = false) {
     return new Promise((resolve, reject)=>{
       this.__effect = effekseer.loadEffect(uri, ()=>{
         if (playJustAfterLoaded) {
-          this.play();
+          if (isLoop) {
+            this.__timer = setInterval(()=>{ this.play(); }, 500);
+          } else {
+            this.play();
+          }
         }
-        resolve(this.__effect);
+        resolve(this);
       });
     })
   }
 
-  play() {
-    // Play the loaded effect
-    this.__handle = effekseer.play(this.__effect);
-//            handle.setScale(1, 1, 1);
-    this.__handle.setLocation(this.translate.x, this.translate.y, this.translate.z);
-    this.__handle.setRotation(this.rotate.x, this.rotate.y, this.rotate.z);
-    this.__handle.setScale(this.scale.x, this.scale.y, this.scale.z);
-    this.__handle.setSpeed(this.__speed);
-    //handle.setMatrix((new GLBoost.Matrix44()).scale(0.01, 0.01, 0.01));
-//    this.__handle.setSpeed(0.2);
+  cancelLoop() {
+    clearInterval(this.__timer);
+  }
+
+  play(isLoop = false) {
+    const __play = ()=>{
+      // Play the loaded effect
+      this.__handle = effekseer.play(this.__effect);
+    };
+
+    if (isLoop) {
+      this.__timer = setInterval(__play, 200);
+    } else {
+      __play();
+    }
+    
+  }
+
+  update() {
+    if (this.__handle != null) {
+      const m = this.worldMatrix;
+      this.__handle.setLocation(m.m03, m.m13, m.m23);
+      const eular = m.toEulerAngles();
+      this.__handle.setRotation(eular.x, eular.y, eular.z);
+      const scale = m.getScale();
+      this.__handle.setScale(scale.x, scale.y, scale.z);
+      this.__handle.setSpeed(this.__speed);
+    }
   }
 
   set playSpeed(val) {

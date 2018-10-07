@@ -618,7 +618,7 @@ export default class Shader extends GLBoostObject {
     return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_OES_standard_derivatives : require\n' : '';
   }
   static _glsl1ShaderTextureLodExt(gl) {
-    return !GLBoost.isThisGLVersion_2(gl) ? '#extension GL_EXT_shader_texture_lod : require\n' : '';
+    return (!GLBoost.isThisGLVersion_2(gl) && gl.getExtension("EXT_shader_texture_lod"))? '#extension GL_EXT_shader_texture_lod : require\n' : '';
   }
 
   static _in_onVert(gl) {

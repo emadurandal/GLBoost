@@ -3,6 +3,7 @@ import M_Element from '../elements/M_Element';
 import M_Group from '../elements/M_Group';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
 import Vector4 from '../../low_level/math/Vector4';
+import EffekseerElement from '../plugins/EffekseerElement';
 
 export default class RenderPass extends GLBoostObject {
 
@@ -15,6 +16,7 @@ export default class RenderPass extends GLBoostObject {
     this._postGizmos = [];
     this._opacityMeshes = [];
     this._transparentMeshes = [];
+    this._effekseerElements = [];
     this._transparentMeshesAsManualOrder = null;
     this._drawBuffers = [this._glContext.gl.NONE];
     this._clearColor = null; // webgl default is [0, 0, 0, 0]
@@ -445,9 +447,10 @@ export default class RenderPass extends GLBoostObject {
     this._meshes = [];
     this._preGizmos = [];
     this._postGizmos = [];
+    this._effekseerElements = [];
     if (this._scene) {
       // collect meshes
-      this._meshes = this._meshes.concat(collectElements(this._scene, M_Mesh));
+      this._meshes = collectElements(this._scene, M_Mesh);
     }
 
     // collect gizmos
@@ -495,7 +498,10 @@ export default class RenderPass extends GLBoostObject {
         this._skeletalMeshes.push(mesh);
       }
     });
-      
+
+    if (this._scene) {
+      this._effekseerElements = collectElements(this._scene, EffekseerElement);
+    } 
 
     if (this._scene) {
       this._scene.prepareToRender(expression);

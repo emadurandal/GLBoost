@@ -165,8 +165,15 @@ export class PBRPrincipledShaderSource {
 
         vec3 brdf = srgbToLinear(texture2D(uBrdfLUTTexture, vec2(NV, 1.0 - userRoughness)).rgb);
         vec3 diffuseLight = srgbToLinear(textureCube(uDiffuseEnvTexture, n).rgb);
-        vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, F0, lod).rgb);
-
+        `;
+      const gl = this._glBoostSystem._glContext.gl;
+      const lodExt = gl.getExtension("EXT_shader_texture_lod");
+      if (lodExt) {
+        shaderText += `vec3 specularLight = srgbToLinear(textureCubeLodEXT(uSpecularEnvTexture, reflection, lod).rgb);`;
+      } else {
+        shaderText += `vec3 specularLight = srgbToLinear(textureCube(uSpecularEnvTexture, reflection).rgb);`;
+      }
+      shaderText += `
         vec3 diffuse = diffuseLight * albedo;
         vec3 specular = specularLight * (F0 * brdf.x + brdf.y);
 
@@ -174,7 +181,6 @@ export class PBRPrincipledShaderSource {
         float IBLSpecularContribution = uIBLParameters.z;
         diffuse *= IBLDiffuseContribution;
         specular *= IBLSpecularContribution;
-
         return diffuse + specular;
       }
       `;
@@ -340,11 +346,14 @@ export default class PBRPrincipledShader extends DecalShader {
     const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
     const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
     const emissive = (material.emissive !== void 0) ? material.emissive : Vector3.zero();
+    const IBLSpecularTextureMipmapCount = (material.IBLSpecularTextureMipmapCount !== void 0) ? material.IBLSpecularTextureMipmapCount : 9;
+    const IBLDiffuseContribution = (material.IBLDiffuseContribution !== void 0) ? material.IBLDiffuseContribution : 0.2;
+    const IBLSpecularContribution = (material.IBLSpecularContribution !== void 0) ? material.IBLSpecularContribution : 0.2;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
-    this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), 9, 0.20, 0.20, true);
+    this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
 
     let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

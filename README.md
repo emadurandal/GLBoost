@@ -117,7 +117,7 @@ var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3
 scene.addChild( directionalLight );
 
 // setup camera
-var camera = glBoostContext.createCamera({
+var camera = glBoostContext.createPerspectiveCamera({
   eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
   center: new GLBoost.Vector3(0.0, 0.0, 0.0),
   up: new GLBoost.Vector3(0.0, 1.0, 0.0)

@@ -16,7 +16,7 @@ export default class Component {
     return this._component_sid;
   }
 
-  registerDependency(component, isMust) {
+  registerDependency(component: Component, isMust: boolean) {
 
   }
 

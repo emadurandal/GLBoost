@@ -13,6 +13,9 @@ type QueryMeta = {type: number, format: number};
 
 export default class M_Group extends M_Element {
   _elements:Array<M_Element>;
+  _isVisible: boolean;
+  _AABB: Object;
+  _isRootJointGroup: boolean;
 
   constructor(glBoostContext) {
     super(glBoostContext);
@@ -96,7 +99,9 @@ export default class M_Group extends M_Element {
     let children = this.getChildren();
     if (children) {
       for (let i = 0; i < children.length; i++) {
-        children[i]._setDirtyToAnimatedElement(inputName);
+        if (children[i]._setDirtyToAnimatedElement != null) {
+          children[i]._setDirtyToAnimatedElement(inputName);
+        }
       }  
     }
   }
@@ -320,7 +325,7 @@ export default class M_Group extends M_Element {
   }
 
 
-  getEndAnimationInputValue(inputLineName, element = this) {
+  getEndAnimationInputValue(inputLineName, element: M_Group = this) {
 
     if (element instanceof M_Group) {
       let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
@@ -341,6 +346,8 @@ export default class M_Group extends M_Element {
         }
       }
       return latestInputValue;
+    } else if (!(element.getEndInputValueOfAnimation != null)) {
+      return 0;
     }
 
     return element.getEndInputValueOfAnimation(inputLineName);
@@ -455,6 +462,9 @@ export default class M_Group extends M_Element {
         // Must be M_Element
         elem.readyForDiscard();
       } else {
+        if (typeof EffekseerElement !== undefined && elem instanceof EffekseerElement) {
+          console.log('Nothing to do for discarding at this time.');
+        }
         console.error('not M_Group nor M_Element');
       }
     };
@@ -463,7 +473,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(arg1, arg2, camera, viewport) {
+  rayCast(arg1: Vector3, arg2: Vector3, camera, viewport) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;

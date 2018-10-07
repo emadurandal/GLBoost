@@ -15,7 +15,7 @@ import type GLBoostSystem from '../core/GLBoostSystem';
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
   _currentAnimationInputValues: Object;
-  _activeAnimationLineName: string | null;
+  _activeAnimationLineName: string;
   _translate: Vector3;
   _rotate: Vector3;
   _scale: Vector3;
@@ -29,6 +29,8 @@ export default class L_Element extends GLBoostObject {
   _is_quaternion_updated: boolean;
   _is_euler_angles_updated: boolean;
   _is_inverse_trs_matrix_updated: boolean;
+  rotateMatrix: Matrix33;
+  _userFlavorName: string;
 
 
   constructor(glBoostSystem: GLBoostSystem, toRegister: boolean = true) {
@@ -75,7 +77,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  _getCurrentAnimationInputValue(inputName: string): number | null {
+  _getCurrentAnimationInputValue(inputName: string): Vector3 | null{
     let value = this._currentAnimationInputValues[inputName];
     if (typeof(value) === 'number') {
       return value;
@@ -193,7 +195,7 @@ export default class L_Element extends GLBoostObject {
     return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getTranslateAt(lineName: string, inputValue: number): Vector3 {
+  getTranslateAt(lineName: string, inputValue: number): Vector3 | null{
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
     if (value !== null) {
       this._translate = value;
@@ -293,9 +295,7 @@ export default class L_Element extends GLBoostObject {
       return this._scale.clone();
     } else if (this._is_trs_matrix_updated) {
       let m = this._matrix;
-      this._scale.x = Math.sqrt(m.m00*m.m00 + m.m01*m.m01 + m.m02*m.m02);
-      this._scale.y = Math.sqrt(m.m10*m.m10 + m.m11*m.m11 + m.m12*m.m12);
-      this._scale.z = Math.sqrt(m.m20*m.m20 + m.m21*m.m21 + m.m22*m.m22);
+      this._scale = m.getScale();
       this._is_scale_updated = true;
     }
     
@@ -431,7 +431,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getQuaternionAtOrStatic(lineName: string, inputValue: number) {
+  getQuaternionAtOrStatic(lineName: string, inputValue: number | null) {
     let value = this.getQuaternionAt(lineName, inputValue);
     if (value === null) {
       return this.getQuaternionNotAnimated();
@@ -572,7 +572,7 @@ export default class L_Element extends GLBoostObject {
     instance._updateCountAsElement = this._updateCountAsElement;
   }
 
-  setPropertiesFromJson(arg) {
+  setPropertiesFromJson(arg: Object) {
     let json = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
@@ -588,7 +588,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  setRotationFromNewUpAndFront(UpVec, FrontVec) {
+  setRotationFromNewUpAndFront(UpVec: Vector3, FrontVec: Vector3) {
     let yDir = UpVec;
     let xDir = Vector3.cross(yDir, FrontVec);
     let zDir = Vector3.cross(xDir, yDir);
@@ -610,7 +610,7 @@ export default class L_Element extends GLBoostObject {
     this.rotateMatrix33 = rotateMatrix;
   }
 
-  headToDirection(fromVec, toVec) {
+  headToDirection(fromVec: Vector3, toVec: Vector3) {
     const fromDir = Vector3.normalize(fromVec);
     const toDir = Vector3.normalize(toVec);
     const rotationDir = Vector3.cross(fromDir, toDir);
@@ -622,7 +622,7 @@ export default class L_Element extends GLBoostObject {
     this.quaternion = Quaternion.axisAngle(rotationDir, theta);
   }
 
-  set rotateMatrix33(rotateMatrix) {
+  set rotateMatrix33(rotateMatrix: Matrix33) {
     this.quaternion = Quaternion.fromMatrix(rotateMatrix);
   }
 

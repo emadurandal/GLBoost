@@ -50,6 +50,49 @@ export default class CubeTexture extends AbstractTexture {
     return MiscUtil.getTheValueOrAlternative(this._getParameter(paramNumber), alternative);
   }
 
+  generateTextureFromSixSideImages(posXimages, negXimages, posYimages, negYimages, posZimages, negZimages) {
+      var texture = this._glContext.createTexture(this);
+      this._texture = texture;
+      const gl = this._glContext.gl;
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
+      for (let i=0; i<posXimages.length; i++) {
+        const image = new Image();
+        image.src = posXimages[i];
+        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+      for (let i=0; i<negXimages.length; i++) {
+        const image = new Image();
+        image.src = negXimages[i];
+        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+      for (let i=0; i<posYimages.length; i++) {
+        const image = new Image();
+        image.src = posYimages[i];
+        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+      for (let i=0; i<negYimages.length; i++) {
+        const image = new Image();
+        image.src = negYimages[i];
+        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+      for (let i=0; i<posZimages.length; i++) {
+        const image = new Image();
+        image.src = posZimages[i];
+        image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+      for (let i=0; i<negZimages.length; i++) {
+        const image = new Image();
+        image.src = negZimages[i];
+        image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      }
+  }
+
   async generateTextureFromBaseUri(baseUri, mipLevelNum) {
     return new Promise((resolve, reject)=> {
       var texture = this._glContext.createTexture(this);
