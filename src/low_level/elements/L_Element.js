@@ -154,10 +154,10 @@ export default class L_Element extends GLBoostObject {
   /**
    * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
    * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-   * @param {string} inputName [en] inputName name of input value. [ja] 入力値の名前
-   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] アニメーションの入力値
+   * @param inputName [en] inputName name of input value. [ja] 入力値の名前
+   * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
    */
-  setCurrentAnimationValue(inputName: string, inputValue: any) {
+  setCurrentAnimationValue(inputName: string, inputValue: number|Vector2|Vector3|Vector4|Quaternion) {
     this._setDirtyToAnimatedElement(inputName);
     this._currentAnimationInputValues[inputName] = inputValue;
   }
