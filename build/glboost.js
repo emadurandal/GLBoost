@@ -24671,4 +24671,4 @@
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-266-g87dc-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-269-g2a4b-mod branch: develop';
