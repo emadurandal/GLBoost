@@ -2,6 +2,8 @@
   "source": "./src",
   "destination": "./docs/documents/api",
   "plugins": [
+    {"name": "esdoc-standard-plugin"},
+    {"name": "esdoc-ecmascript-proposal-plugin", "option": {"all": true}},
     {"name": "esdoc-flow-type-plugin", "option": {"enable": true}}
   ]
 }

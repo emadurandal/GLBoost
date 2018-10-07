@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/middle_level/Renderer.js | glboost</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A New WebGL Rendering Library for 3D Graphics Geeks"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="glboost"><meta property="twitter:description" content="A New WebGL Rendering Library for 3D Graphics Geeks"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/emadurandal/GLBoost"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#auxiliaries">auxiliaries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/auxiliaries/AnimationPlayer.js~AnimationPlayer.html">AnimationPlayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-auxiliaries-camera-controllers">low_level/auxiliaries/camera_controllers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html">L_CameraController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html">L_WalkThroughCameraController</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-components">low_level/components</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/AnimationComponent.js~AnimationComponent.html">AnimationComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/SceneGraphComponent.js~SceneGraphComponent.html">SceneGraphComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/TransformComponent.js~TransformComponent.html">TransformComponent</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-core">low_level/core</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/Component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/ComponentRepository.js~ComponentRepository.html">ComponentRepository</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/Entity.js~Entity.html">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/EntityRepository.js~EntityRepository.html">EntityRepository</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html">GLBoostLowContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html">GLBoostSystem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html">L_GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/MemoryManager.js~MemoryManager.html">MemoryManager</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-elements">low_level/elements</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html">L_Element</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-elements-cameras">low_level/elements/cameras</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html">L_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html">L_FrustumCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html">L_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html">L_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-geometries">low_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-impl">low_level/impl</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-materials">low_level/materials</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html">L_AbstractMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html">PBRMetallicRoughnessMaterial</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-math">low_level/math</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/AABB.js~AABB.html">AABB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/MathClassUtil.js~MathClassUtil.html">MathClassUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-misc">low_level/misc</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/DataUtil.js~DataUtil.html">DataUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/InputUtil.js~InputUtil.html">InputUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/MiscUtil.js~MiscUtil.html">MiscUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/TypedArrayWrapper.js~TypedArrayWrapper.html">TypedArrayWrapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-IsUtil">IsUtil</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-primitives">low_level/primitives</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Arrow.js~Arrow.html">Arrow</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Axis.js~Axis.html">Axis</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/CubeAbsolute.js~CubeAbsolute.html">CubeAbsolute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Grid.js~Grid.html">Grid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html">JointPrimitive</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Line.js~Line.html">Line</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Screen.js~Screen.html">Screen</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-shaders">low_level/shaders</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-textures">low_level/textures</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/CubeTexture.js~CubeTexture.html">CubeTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/InternalDataTexture.js~InternalDataTexture.html">InternalDataTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/PhinaTexture.js~PhinaTexture.html">PhinaTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level">middle_level</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-core">middle_level/core</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/core/GLBoostMiddleContext.js~GLBoostMiddleContext.html">GLBoostMiddleContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/core/M_GLBoostMonitor.js~M_GLBoostMonitor.html">M_GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-draw-kickers">middle_level/draw_kickers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/draw_kickers/DrawKickerWorld.js~DrawKickerWorld.html">DrawKickerWorld</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements">middle_level/elements</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Scene.js~M_Scene.html">M_Scene</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-cameras">middle_level/elements/cameras</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html">M_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html">M_FrustumCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html">M_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html">M_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-gizmos">middle_level/elements/gizmos</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_AABBGizmo.js~M_AABBGizmo.html">M_AABBGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_AxisGizmo.js~M_AxisGizmo.html">M_AxisGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html">M_DirectionalLightGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html">M_Gizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_GridGizmo.js~M_GridGizmo.html">M_GridGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html">M_HeightLineGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html">M_JointGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_OutlineGizmo.js~M_OutlineGizmo.html">M_OutlineGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_PointLightGizmo.js~M_PointLightGizmo.html">M_PointLightGizmo</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-lights">middle_level/elements/lights</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html">M_AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html">M_AmbientLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html">M_DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html">M_PointLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html">M_SpotLight</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-meshes">middle_level/elements/meshes</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html">M_ScreenMesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html">M_SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-skeletons">middle_level/elements/skeletons</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/skeletons/JointGizmoUpdater.js~JointGizmoUpdater.html">JointGizmoUpdater</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDetector">formatDetector</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-plugins">middle_level/plugins</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html">EffekseerElement</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-shaders">middle_level/shaders</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html">BlinnPhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShaderSource.html">BlinnPhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DecalShader.js~DecalShader.html">DecalShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DecalShader.js~DecalShaderSource.html">DecalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShader.html">DepthDisplayShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShaderSource.html">DepthDisplayShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/EnvironmentMapShader.js~EnvironmentMapShader.html">EnvironmentMapShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/EnvironmentMapShader.js~EnvironmentMapShaderSource.html">EnvironmentMapShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html">FragmentSimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShaderSource.html">FragmentSimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FreeShader.js~FreeShader.html">FreeShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertAndWrapLightingShader.js~HalfLambertAndWrapLightingShader.html">HalfLambertAndWrapLightingShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertAndWrapLightingShader.js~HalfLambertAndWrapLightingShaderSource.html">HalfLambertAndWrapLightingShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PBRPrincipledShader.js~PBRPrincipledShader.html">PBRPrincipledShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PBRPrincipledShader.js~PBRPrincipledShaderSource.html">PBRPrincipledShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PassThroughShader.js~PassThroughShader.html">PassThroughShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PassThroughShader.js~PassThroughShaderSource.html">PassThroughShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/VertexWorldShader.js~VertexWorldShaderSource.html">VertexWorldShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/VertexWorldShadowShader.js~VertexWorldShadowShaderSource.html">VertexWorldShadowShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html">WireframeShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/WireframeShader.js~WireframeShaderSource.html">WireframeShaderSource</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/middle_level/Renderer.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLExtensionsManager from &apos;../low_level/core/GLExtensionsManager&apos;;
+import GLBoostObject from &apos;../low_level/core/GLBoostObject&apos;;
+import Matrix44 from &apos;../low_level/math/Matrix44&apos;;
+import Vector3 from &apos;../low_level/math/Vector3&apos;;
+
+/**
+ * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements&apos; data, decides a plan of drawing process, and then just execute it.&lt;br&gt;
+ * ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x5236;&#x5FA1;&#x3092;&#x53F8;&#x308A;&#x307E;&#x3059;&#x3002;Canvas&#x306B;&#x30A4;&#x30E1;&#x30FC;&#x30B8;&#x3092;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x3059;&#x308B;&#x305F;&#x3081;&#x306B;&#x3001;&#x3053;&#x306E;Renderer&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x4ED6;&#x306E;&#x8981;&#x7D20;&#x306E;&#x30C7;&#x30FC;&#x30BF;&#x3092;&#x96C6;&#x3081;&#x3001;&#x63CF;&#x753B;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x8A08;&#x753B;&#x3092;&#x6C7A;&#x5B9A;&#x3057;&#x3001;&#x5B9F;&#x884C;&#x3057;&#x307E;&#x3059;&#x3002;
+ */
+export default class Renderer extends GLBoostObject {
+  constructor(glBoostContext, parameters) {
+    super(glBoostContext);
+    var _clearColor = parameters.clearColor;
+
+    this._glBoostSystem._glBoostContext.reflectGlobalGLState();
+    const glContext = this._glContext;
+    const gl = glContext.gl;
+
+    if (_clearColor) {
+      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+    }
+
+    this.__animationFrameId = -1;
+    this.__isWebVRMode = false;
+    this.__webvrFrameData = null;
+    this.__webvrDisplay = null;
+    this.__canvasWidthBackup = null;
+    this.__canvasHeightBackup = null;
+    this.__defaultUserSittingPositionInVR = new Vector3(0.0, 1.1, 1.5);
+    this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
+    this.__animationFrameObject = window;
+  }
+
+
+  /**
+   * en: update things of elements of the expression.&lt;br&gt;
+   * @param {Expression} expression a instance of Expression class
+   */
+  update(expression) {
+    
+    let skeletalMeshes = [];
+    let effekseerElements = [];
+    // gather scenes as unique
+    for (let renderPass of expression.renderPasses) {
+      skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
+      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+      renderPass.scene.updateAmountOfAmbientLightsIntensity();
+    }
+
+    let unique = function(array) {
+      return array.reduce(function(a, b) {
+        if (a.instanceName !== b.instanceName) {
+          a.push(b);
+        }
+        return a;
+      }, []);
+    };
+    skeletalMeshes = unique(skeletalMeshes);
+    
+    for (let mesh of skeletalMeshes) {
+      mesh.geometry.update(mesh);
+    }
+
+    for (let effekseerElement of effekseerElements) {
+      effekseerElement.update();
+    }
+
+    if (typeof effekseer !== &quot;undefined&quot;) {
+      effekseer.update();
+    }
+
+  }
+
+  /**
+   * en: draw elements of the expression.&lt;br&gt;
+   * ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3092;&#x63CF;&#x753B;&#x3057;&#x307E;&#x3059;
+   * @param {Expression} expression a instance of Expression class
+   */
+  draw(expression) {
+    let renderPassTag = &apos;&apos;;
+    expression.renderPasses.forEach((renderPass, index)=&gt;{
+      if (!renderPass.isEnableToDraw || !renderPass.scene) {
+        return;
+      }
+
+      if (renderPassTag !== renderPass.tag) {
+        renderPass.clearAssignShaders();
+      }
+      renderPassTag = renderPass.tag;
+
+      var camera = renderPass.scene.getMainCamera();
+
+      let lights = renderPass.scene.lightsExceptAmbient;
+
+      renderPass.preRender(camera ? true:false, lights);
+
+      var glContext = this._glContext;
+      var gl = glContext.gl;
+      var glem = GLExtensionsManager.getInstance(this._glContext);
+
+
+      // set render target buffers for each RenderPass.
+      /*
+      if (renderPass.fbo &amp;&amp; renderPass.isRenderTargetAttachedTextures) {
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+      } else {
+        glem.drawBuffers(gl, [gl.BACK]);
+      }
+      */
+      if (renderPass.fbo &amp;&amp; renderPass.isRenderTargetAttachedTextures) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderPass.fbo);
+      }
+
+      glem.drawBuffers(gl, renderPass.buffersToDraw);
+      //glem.readBuffer(gl, renderPass.buffersToDraw);
+
+      let viewport = null;
+      if (renderPass.viewport) {
+        viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
+      } else {
+        if (this.isWebVRMode) {
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
+        } else if (camera) {
+          let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
+          viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
+        } else {
+          viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
+        }
+      }
+      if (!this.isWebVRMode) {
+        gl.viewport.apply(gl, viewport);
+      }
+
+      this._clearBuffer(gl, renderPass);
+
+      if (this.__animationFrameObject === this.__webvrDisplay) {
+        this.__webvrDisplay.getFrameData(this.__webvrFrameData);
+        if (this.__webvrDisplay.stageParameters) {
+          this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
+        } else {
+          this.__webvrFrameData.sittingToStandingTransform = Matrix44.translate(this.__defaultUserSittingPositionInVR).flatten();
+        }
+      }
+
+      // draw pre gizmos
+      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
+
+      // draw opacity meshes.
+      const opacityMeshes = renderPass.opacityMeshes;
+      opacityMeshes.forEach((mesh)=&gt; {
+        if (mesh.isVisible) {
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
+          });
+        }
+      });
+
+      if (camera) {
+        renderPass.sortTransparentMeshes(camera);
+      }
+      // draw transparent meshes.
+      const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+
+      transparentMeshes.forEach((mesh)=&gt; {
+        //console.log(mesh.userFlavorName);
+        if (mesh.isVisible) {
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData
+          });
+        }
+      });
+      
+      // draw post gizmos
+      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+//      glem.drawBuffers(gl, [gl.BACK]);
+
+      if (typeof effekseer !== &quot;undefined&quot;) {
+        const projection = (camera === null) ? Matrix44.identity().m : camera.projectionRHMatrix().m;
+        const inverseWorld = (camera === null) ? Matrix44.identity().m : camera.inverseWorldMatrix.m; 
+        effekseer.setProjectionMatrix(projection);
+        effekseer.setCameraMatrix(inverseWorld);
+        effekseer.draw();
+      }
+
+      renderPass.postRender(camera ? true:false, lights);
+
+    });
+  }
+
+  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
+    const globalStatesUsageBackup = this._glBoostSystem._glBoostContext.globalStatesUsage;
+    this._glBoostSystem._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    this._glBoostSystem._glBoostContext.currentGlobalStates = [
+      3042, // gl.BLEND
+    ];
+    if (isDepthTest) {
+      this._glBoostSystem._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
+    }
+
+    for (let gizmo of gizmos) {
+      if (gizmo.isVisible) {
+        gizmo.mesh.draw({
+          expression: expression,
+          lights: lights,
+          camera: camera,
+          renderPass: renderPass,
+          renderPassIndex: index,
+          viewport: viewport,
+          isWebVRMode: this.isWebVRMode,
+          webvrFrameData: this.__webvrFrameData,
+          forceThisMaterial: gizmo.forceThisMaterial
+        });
+      }
+    }
+
+    this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
+
+  }
+
+  _clearBuffer(gl, renderPass) {
+    const clearColor = renderPass.clearColor;
+    const clearDepth = renderPass.clearDepth;
+    const colorMask = renderPass.colorMask;
+
+    if (clearColor) {
+      gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+    }
+    if (clearDepth) {
+      gl.clearDepth(clearDepth);
+    }
+    if (colorMask) {
+      gl.colorMask.apply(null, [colorMask]);
+    }
+
+    if (renderPass.buffersToDraw[0] === gl.NONE) {
+      {
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+      }
+    } else if (clearColor || clearDepth) {
+      gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    } else if (clearColor) {
+      gl.clear( gl.COLOR_BUFFER_BIT );
+    }
+  }
+
+  /**
+   * en: clear color/depth/stencil of canvas.&lt;br&gt;
+   * ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x3001;&#x30B9;&#x30C6;&#x30F3;&#x30B7;&#x30EB;&#x306E;&#x3044;&#x305A;&#x308C;&#x304B;&#x53C8;&#x306F;&#x5168;&#x3066;&#x3092;&#x30AF;&#x30EA;&#x30A2;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @param {boolean} color_flg true: clear color, false: don&apos;t clear color
+   * @param {boolean} depth_flg true: clear depth, false: don&apos;t clear depth
+   * @param {boolean} stencil_flg  true: clear stencil, false: don&apos;t clear stencil
+   */
+  clearCanvas( color_flg, depth_flg, stencil_flg ) {
+    const gl = this._glContext.gl;
+
+    var bufferBits = 0;
+
+    if ( color_flg === void 0 || color_flg ) bufferBits |= gl.COLOR_BUFFER_BIT;
+    if ( depth_flg === void 0 || depth_flg ) bufferBits |= gl.DEPTH_BUFFER_BIT;
+    if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= gl.STENCIL_BUFFER_BIT;
+
+    gl.clear( bufferBits );
+
+  }
+
+  /**
+   * en: Get WebGL context.&lt;br&gt;
+   * ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @returns {webglcontext} a context of WebGL
+   */
+  get glContext() {
+    return this._glContext.gl;
+  }
+
+
+  /**
+   * en: resize canvas and viewport.&lt;br&gt;
+   * ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @param {number} width en: width to resize, ja: &#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x5E45;
+   * @param {number} height en: height to resize, ja:&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x9AD8;&#x3055;
+   */
+  resize(width, height) {
+    this._glContext.canvasWidth = width;
+    this._glContext.canvasHeight = height;
+  }
+
+  /**
+   * This method treats the given callback function as a render loop and call it every frame.
+   */
+  doRenderLoop(renderLoopFunc, time, ...args) {
+    args.splice(0, 0, time);
+    renderLoopFunc.apply(renderLoopFunc, args);
+
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=&gt;{
+      this.doRenderLoop(renderLoopFunc, _time, args[1]);
+      if (this.__requestedToEnterWebVR) {
+        this.__isWebVRMode = true;
+      }
+    }, time);
+  }
+
+  doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
+
+    if (beforeCallback) {
+      beforeCallback.apply(beforeCallback, args);
+    }
+
+    this.clearCanvas();
+    this.update(expression);
+    this.draw(expression);
+
+    if (afterCallback) {
+      afterCallback.apply(afterCallback, args);
+    }
+
+    if (this.__webvrDisplay &amp;&amp; this.__webvrDisplay.isPresenting) {
+      this.__webvrDisplay.submitFrame();
+    }
+
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=&gt;{
+      this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
+      if (this.__requestedToEnterWebVR) {
+        this.__isWebVRMode = true;
+      }
+    });
+  }
+
+  stopRenderLoop() {
+    this.__cancelAnimationFrame(this.__animationFrameId);
+    this.__animationFrameId = -1;
+  }
+
+
+
+  // WebVR
+  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
+    if (initialUserSittingPositionIfStageParametersDoNotExist) {
+      this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
+    }
+    this.__minRenderWidthFromUser = minRenderWidth;
+    this.__minRenderHeightFromUser = minRenderHeight;
+
+    return new Promise((resolve, reject)=&gt; {
+      if (!this.__webvrDisplay.isPresenting) {
+        this.__animationFrameObject = this.__webvrDisplay;
+        const leftEye = this.__webvrDisplay.getEyeParameters(&quot;left&quot;);
+        const rightEye = this.__webvrDisplay.getEyeParameters(&quot;right&quot;);
+
+        this.__canvasWidthBackup = this._glContext.canvasWidth;
+        this.__canvasHeightBackup = this._glContext.canvaHeight;
+
+        if (this.__minRenderWidthFromUser &gt; leftEye.renderWidth &amp;&amp; this.__minRenderHeightFromUser &gt; rightEye.renderWidth) {
+          this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+        } else {
+          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+        }
+        this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() =&gt; {
+          //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+          this.__requestedToEnterWebVR = true;
+          resolve();
+        }).catch(() =&gt; {
+          console.error(&apos;Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?&apos;);
+          reject();
+        });
+      }
+    });
+  }
+
+  async readyForWebVR(requestButtonDom) {
+    if ( window.VRFrameData ) {
+      this.__webvrFrameData = new window.VRFrameData();
+    }
+
+    return new Promise((resolve, reject)=&gt; {
+      if ( navigator.getVRDisplays ) {
+        navigator.getVRDisplays()
+          .then((vrDisplays)=&gt;{
+            if (vrDisplays.length &gt; 0) {
+              const webvrDisplay = vrDisplays[vrDisplays.length - 1];
+              webvrDisplay.depthNear = 0.01;
+              webvrDisplay.depthFar = 10000;
+
+              if (webvrDisplay.capabilities.canPresent) {
+                this.__webvrDisplay = webvrDisplay;
+
+                if (requestButtonDom) {
+                  requestButtonDom.style.display = &apos;block&apos;;
+                } else {
+                  const paragrach = document.createElement(&quot;p&quot;);
+                  const anchor = document.createElement(&quot;a&quot;);
+                  anchor.setAttribute(&quot;id&quot;, &apos;enter-vr&apos;);
+                  const enterVr = document.createTextNode(&quot;Enter VR&quot;);
+
+                  anchor.appendChild(enterVr);
+                  paragrach.appendChild(anchor);
+
+                  const canvas = this.glContext.canvas;
+                  canvas.parent.insertBefore(paragrach, canvas);
+                  window.addEventListener(&apos;click&apos;, this.enterWebVR.bind(this));
+                }
+
+                this.__isReadyForWebVR = true;
+                resolve();
+              } else {
+                console.error(&quot;Can&apos;t requestPresent now. try again.&quot;);
+                reject();
+              }
+            } else {
+              console.error(&apos;Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?&apos;);
+              reject();
+            }
+          })
+          .catch(()=&gt;{
+            console.error(&apos;Failed to get VR Displays. Please check your VR Setting.&apos;);
+            reject();
+          });
+      } else {
+        console.error(&apos;Your browser does not support WebVR. Or it is disabled. Check again.&apos;);
+        reject();
+      }
+    });
+  }
+
+  async exitWebVR() {
+    this.__isWebVRMode = false;
+    if (this.__webvrDisplay &amp;&amp; this.__webvrDisplay.isPresenting) {
+      await this.__webvrDisplay.exitPresent();
+    }
+    this.resize(this.__canvasWidthBackup, this.__canvasHeightBackup);
+    this.__isReadyForWebVR = false;
+    this.__animationFrameObject = window;
+  }
+
+
+  async disableWebVR() {
+    this.__isWebVRMode = false;
+    this.__requestedToEnterWebVR = false;
+    this.__isReadyForWebVR = false;
+    if (this.__webvrDisplay &amp;&amp; this.__webvrDisplay.isPresenting) {
+      await this.__webvrDisplay.exitPresent();
+    }
+    this.__animationFrameObject = window;
+    this.__webvrDisplay = null;
+  }
+
+  get isWebVRMode() {
+    return this.__isWebVRMode;
+  }
+
+  get isReadyForWebVR() {
+    return this.__isReadyForWebVR;
+  }
+
+  webVrSubmitFrame() {
+    if (this.__webvrDisplay &amp;&amp; this.__webvrDisplay.isPresenting) {
+      this.__webvrDisplay.submitFrame();
+    }
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

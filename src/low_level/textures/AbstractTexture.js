@@ -116,7 +116,8 @@ export default class AbstractTexture extends GLBoostObject {
    *
    * @param {number} x horizontal pixel position (0 is left)
    * @param {number} y virtical pixel position (0 is bottom)
-   * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+   * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
+   * @returns {Vector4} Pixel Value in Vector4
    */
   getPixelValueAt(x, y, argByteArray) {
     let byteArray = argByteArray;

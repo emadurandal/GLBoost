@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">src/middle_level/elements/M_Group.js | glboost</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A New WebGL Rendering Library for 3D Graphics Geeks"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="glboost"><meta property="twitter:description" content="A New WebGL Rendering Library for 3D Graphics Geeks"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/emadurandal/GLBoost"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#auxiliaries">auxiliaries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/auxiliaries/AnimationPlayer.js~AnimationPlayer.html">AnimationPlayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-auxiliaries-camera-controllers">low_level/auxiliaries/camera_controllers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html">L_CameraController</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html">L_WalkThroughCameraController</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-components">low_level/components</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/AnimationComponent.js~AnimationComponent.html">AnimationComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/SceneGraphComponent.js~SceneGraphComponent.html">SceneGraphComponent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/components/TransformComponent.js~TransformComponent.html">TransformComponent</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-core">low_level/core</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/Component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/ComponentRepository.js~ComponentRepository.html">ComponentRepository</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/Entity.js~Entity.html">Entity</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/EntityRepository.js~EntityRepository.html">EntityRepository</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html">GLBoostLowContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html">GLBoostSystem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLContext.js~GLContext.html">GLContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html">GLExtensionsManager</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html">L_GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/core/MemoryManager.js~MemoryManager.html">MemoryManager</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-elements">low_level/elements</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html">L_Element</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-elements-cameras">low_level/elements/cameras</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html">L_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html">L_FrustumCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html">L_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html">L_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-geometries">low_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html">BlendShapeGeometry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/geometries/Geometry.js~Geometry.html">Geometry</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-impl">low_level/impl</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextImpl.js~GLContextImpl.html">GLContextImpl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextWebGL1Impl.js~GLContextWebGL1Impl.html">GLContextWebGL1Impl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/impl/GLContextWebGL2Impl.js~GLContextWebGL2Impl.html">GLContextWebGL2Impl</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-materials">low_level/materials</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html">ClassicMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html">L_AbstractMaterial</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html">PBRMetallicRoughnessMaterial</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-math">low_level/math</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/AABB.js~AABB.html">AABB</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/MathClassUtil.js~MathClassUtil.html">MathClassUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/MathUtil.js~MathUtil.html">MathUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Matrix33.js~Matrix33.html">Matrix33</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector2.js~Vector2.html">Vector2</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-misc">low_level/misc</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/AnimationUtil.js~AnimationUtil.html">AnimationUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/ArrayUtil.js~ArrayUtil.html">ArrayUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/DataUtil.js~DataUtil.html">DataUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/Hash.js~Hash.html">Hash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/InputUtil.js~InputUtil.html">InputUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/MiscUtil.js~MiscUtil.html">MiscUtil</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/misc/TypedArrayWrapper.js~TypedArrayWrapper.html">TypedArrayWrapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-IsUtil">IsUtil</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-primitives">low_level/primitives</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Arrow.js~Arrow.html">Arrow</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Axis.js~Axis.html">Axis</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Cube.js~Cube.html">Cube</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/CubeAbsolute.js~CubeAbsolute.html">CubeAbsolute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Grid.js~Grid.html">Grid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html">JointPrimitive</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Line.js~Line.html">Line</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Particle.js~Particle.html">Particle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Plane.js~Plane.html">Plane</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Screen.js~Screen.html">Screen</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/primitives/Sphere.js~Sphere.html">Sphere</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-shaders">low_level/shaders</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/shaders/Shader.js~Shader.html">Shader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#low-level-textures">low_level/textures</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html">AbstractTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/CubeTexture.js~CubeTexture.html">CubeTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/InternalDataTexture.js~InternalDataTexture.html">InternalDataTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/MutableTexture.js~MutableTexture.html">MutableTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/PhinaTexture.js~PhinaTexture.html">PhinaTexture</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/low_level/textures/Texture.js~Texture.html">Texture</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level">middle_level</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/Renderer.js~Renderer.html">Renderer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-core">middle_level/core</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/core/GLBoostMiddleContext.js~GLBoostMiddleContext.html">GLBoostMiddleContext</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/core/M_GLBoostMonitor.js~M_GLBoostMonitor.html">M_GLBoostMonitor</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-draw-kickers">middle_level/draw_kickers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/draw_kickers/DrawKickerWorld.js~DrawKickerWorld.html">DrawKickerWorld</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements">middle_level/elements</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/M_Scene.js~M_Scene.html">M_Scene</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-cameras">middle_level/elements/cameras</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html">M_AbstractCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html">M_FrustumCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html">M_OrthoCamera</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html">M_PerspectiveCamera</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-gizmos">middle_level/elements/gizmos</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_AABBGizmo.js~M_AABBGizmo.html">M_AABBGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_AxisGizmo.js~M_AxisGizmo.html">M_AxisGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html">M_DirectionalLightGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html">M_Gizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_GridGizmo.js~M_GridGizmo.html">M_GridGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html">M_HeightLineGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html">M_JointGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_OutlineGizmo.js~M_OutlineGizmo.html">M_OutlineGizmo</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/gizmos/M_PointLightGizmo.js~M_PointLightGizmo.html">M_PointLightGizmo</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-lights">middle_level/elements/lights</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html">M_AbstractLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html">M_AmbientLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html">M_DirectionalLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html">M_PointLight</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html">M_SpotLight</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-meshes">middle_level/elements/meshes</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html">M_ScreenMesh</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html">M_SkeletalMesh</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-elements-skeletons">middle_level/elements/skeletons</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/skeletons/JointGizmoUpdater.js~JointGizmoUpdater.html">JointGizmoUpdater</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-formatDetector">formatDetector</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-plugins">middle_level/plugins</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html">EffekseerElement</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-shaders">middle_level/shaders</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlendShapeShader.js~BlendShapeShaderSource.html">BlendShapeShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html">BlinnPhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShaderSource.html">BlinnPhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DecalShader.js~DecalShader.html">DecalShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DecalShader.js~DecalShaderSource.html">DecalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShader.html">DepthDisplayShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/DepthDisplayShader.js~DepthDisplayShaderSource.html">DepthDisplayShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/EnvironmentMapShader.js~EnvironmentMapShader.html">EnvironmentMapShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/EnvironmentMapShader.js~EnvironmentMapShaderSource.html">EnvironmentMapShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html">FragmentSimpleShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShaderSource.html">FragmentSimpleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/FreeShader.js~FreeShader.html">FreeShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertAndWrapLightingShader.js~HalfLambertAndWrapLightingShader.html">HalfLambertAndWrapLightingShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertAndWrapLightingShader.js~HalfLambertAndWrapLightingShaderSource.html">HalfLambertAndWrapLightingShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertShader.js~HalfLambertShader.html">HalfLambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/HalfLambertShader.js~HalfLambertShaderSource.html">HalfLambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/LambertShader.js~LambertShader.html">LambertShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/LambertShader.js~LambertShaderSource.html">LambertShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PBRPrincipledShader.js~PBRPrincipledShader.html">PBRPrincipledShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PBRPrincipledShader.js~PBRPrincipledShaderSource.html">PBRPrincipledShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/ParticleShader.js~ParticleShaderSource.html">ParticleShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PassThroughShader.js~PassThroughShader.html">PassThroughShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PassThroughShader.js~PassThroughShaderSource.html">PassThroughShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PhongShader.js~PhongShader.html">PhongShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/PhongShader.js~PhongShaderSource.html">PhongShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/SkeletalShader.js~SkeletalShaderSource.html">SkeletalShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/VertexWorldShader.js~VertexWorldShaderSource.html">VertexWorldShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/VertexWorldShadowShader.js~VertexWorldShadowShaderSource.html">VertexWorldShadowShaderSource</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html">WireframeShader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/shaders/WireframeShader.js~WireframeShaderSource.html">WireframeShaderSource</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/middle_level/elements/M_Group.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLBoost from &apos;../../globals&apos;;
+import M_Element from &apos;./M_Element&apos;;
+import AABB from &apos;../../low_level/math/AABB&apos;;
+import Vector3 from &apos;../../low_level/math/Vector3&apos;;
+import L_AbstractMaterial from &apos;../../low_level/materials/L_AbstractMaterial&apos;;
+import M_Mesh from &apos;./meshes/M_Mesh&apos;;
+import M_AABBGizmo from &apos;../elements/gizmos/M_AABBGizmo&apos;;
+import GLBoostObject from &apos;../../low_level/core/GLBoostObject&apos;;
+
+type QueryMeta = {type: number, format: number};
+
+export default class M_Group extends M_Element {
+  _elements:Array&lt;M_Element&gt;;
+  _isVisible: boolean;
+  _AABB: Object;
+  _isRootJointGroup: boolean;
+
+  constructor(glBoostContext) {
+    super(glBoostContext);
+    this._elements = [];
+    this._AABB = new AABB();
+    this._isRootJointGroup = false;
+
+//    this._aabbGizmo = null;
+//    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+//    this._gizmos.push(this._aabbGizmo);
+  }
+
+  /**
+   * Add the element to this group as a child.
+   * @param {Element} element - a instance of Element class
+   * @param {boolean} isDuplicateOk - allow duplicating if need
+   */
+  addChild(element, isDuplicateOk = false) {
+
+    if (isDuplicateOk){
+      // if forgive duplicated register by copy
+      let elem = null;
+      if (element._parent) {
+        elem = element.clone();
+      } else {
+        elem = element;
+      }
+      elem._parent = this;
+      this._elements.push(elem);
+    } else {
+      //// if forbit duplicated register
+      this.removeChild(element);
+      element._parent = this;
+      this._elements.push(element);
+    }
+  }
+
+  /**
+   * [en] remove the element from this group.
+   * [ja] &#x3053;&#x306E;&#x30B0;&#x30EB;&#x30FC;&#x30D7;&#x304B;&#x3089;&#x6307;&#x5B9A;&#x3057;&#x305F;&#x8981;&#x7D20;&#x3092;&#x524A;&#x9664;&#x3057;&#x307E;&#x3059;&#x3002;
+   * @param {Element} element [en] the element to remove [ja] &#x524A;&#x9664;&#x3057;&#x305F;&#x3044;&#x8981;&#x7D20;
+   */
+  removeChild(element) {
+    this._elements = this._elements.filter(function(elem) {
+      if (elem === element) {
+        element._parent = null;
+      }
+      return elem !== element;
+    });
+  }
+
+  /**
+   * [en] remove all elements from this group.
+   * [ja] &#x3053;&#x306E;&#x30B0;&#x30EB;&#x30FC;&#x30D7;&#x304B;&#x3089;&#x5168;&#x3066;&#x306E;&#x8981;&#x7D20;&#x3092;&#x524A;&#x9664;&#x3057;&#x307E;&#x3059;&#x3002;
+   */
+  removeAll() {
+    this._elements = this._elements.filter(function(elem) {
+      elem._parent = null;
+    });
+    this._elements.length = 0;
+  }
+
+  getChildren():Array&lt;M_Element&gt; {
+    return this._elements;
+  }
+
+  getAnyJointAsChild():M_Element {
+    for (let element of this._elements) {
+      if (element.className === &apos;M_Joint&apos;) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  _setDirtyToAnimatedElement(inputName:string):void {
+    if (this.hasAnimation(inputName)) {
+      this._needUpdate();
+    }
+
+    let children = this.getChildren();
+    if (children) {
+      for (let i = 0; i &lt; children.length; i++) {
+        if (children[i]._setDirtyToAnimatedElement != null) {
+          children[i]._setDirtyToAnimatedElement(inputName);
+        }
+      }  
+    }
+  }
+
+  _validateByQuery(object: GLBoostObject, query: string, queryMeta: QueryMeta) {
+    let propertyName = &apos;&apos;;
+    if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME) {
+      propertyName = &apos;instanceName&apos;;
+    } else if (queryMeta.type === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+      propertyName = &apos;userFlavorName&apos;;
+    } else if (queryMeta.type === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
+      propertyName = &apos;instanceNameWithUserFlavor&apos;;
+    }
+
+    if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
+      if (object[propertyName] === query) {
+        return object;
+      }
+    } else if (queryMeta.format === GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
+        if (object[propertyName].indexOf(query) !== -1) {
+          return object;
+        }
+    } else if (queryMeta.format === GLBoost.QUERY_FORMAT_REGEXP) {
+      if (object[propertyName].match(query)) {
+        return object;
+      }
+    }
+
+  }
+
+  searchElement(query: string, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    /*
+    if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
+      return element;
+    }*/
+
+    if (this._validateByQuery(element, query, queryMeta)) {
+      return element;
+    }
+
+
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChild = this.searchElement(query, queryMeta, children[i]);
+        if (hitChild) {
+          return hitChild;
+        }
+      }
+    }
+    return null;
+  }
+
+  searchElementByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    if (this._validateByQuery(element, query, queryMeta) &amp;&amp; element instanceof type) {
+      return element;
+    }
+
+
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChild = this.searchElementByNameAndType(query, type, queryMeta, children[i]);
+        if (hitChild) {
+          return hitChild;
+        }
+      }
+    }
+    return null;
+  }
+
+  searchElementsByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    let resultElements = [];
+
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChildren = this.searchElementsByNameAndType(query, type, queryMeta, children[i]);
+        if (hitChildren) {
+          resultElements = resultElements.concat(hitChildren);
+        }
+      }
+    }
+    /*
+    if ((element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) &amp;&amp; element instanceof type) {
+        resultElements.push(element);
+    }*/
+    if (this._validateByQuery(element, query, queryMeta) &amp;&amp; element instanceof type) {
+      resultElements.push(element);
+    }
+
+
+    return resultElements;
+  }
+
+  searchElementsByType(type: GLBoostObject, element:M_Element = this) {
+    if (element instanceof type) {
+      return element;
+    }
+
+    if (type[&apos;name&apos;].indexOf(&apos;Gizmo&apos;) !== -1 &amp;&amp; element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (gizmo instanceof type) {
+          return gizmo;
+        }
+      }
+    }
+
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      let results = [];
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChildOrChildren = this.searchElementsByType(type, children[i]);
+        if (Array.isArray(hitChildOrChildren)) {
+          Array.prototype.push.apply(results, hitChildOrChildren); // concat
+        } else if (hitChildOrChildren != null) {
+          results.push(hitChildOrChildren);
+        }
+      }
+      return results;
+    }
+    return null;
+  }
+
+  searchGLBoostObjectByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
+        if (hitChild) {
+          return hitChild;
+        }
+      }
+    }
+
+    if (type.name.indexOf(&apos;Gizmo&apos;) !== -1 &amp;&amp; element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (this._validateByQuery(gizmo, query, queryMeta)) {
+          return gizmo;
+        }
+      }
+    }
+
+    if (type === L_AbstractMaterial &amp;&amp; element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        if (this._validateByQuery(material, query, queryMeta)) {
+          return material;
+        }
+      }
+      return null;
+    } else if (this._validateByQuery(element, query, queryMeta) &amp;&amp; element instanceof type) {
+      return element;
+    }
+  }
+
+  searchGLBoostObjectsByNameAndType(query, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    let objects = [];
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
+        if (hitChildren.length &gt; 0) {
+          objects = objects.concat(hitChildren);
+        }
+      }
+      return objects;
+    }
+
+    if (type.name.indexOf(&apos;Gizmo&apos;) !== -1 &amp;&amp; element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        if (this._validateByQuery(gizmo, query, queryMeta)) {
+          objects.push(gizmo);
+        }
+      }
+      return objects;
+    }
+
+    if (type === L_AbstractMaterial &amp;&amp; element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        if (this._validateByQuery(material, query, queryMeta)) {
+          objects.push(material);
+        }
+      }
+      return objects;
+    } else if (this._validateByQuery(element, query, queryMeta) &amp;&amp; element instanceof type) {
+      return [element];
+    }
+    return objects;
+  }
+
+  getStartAnimationInputValue(inputLineName, element = this) {
+
+    if (element instanceof M_Group) {
+      let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChildOrInputValue = this.getStartAnimationInputValue(inputLineName, children[i]);
+
+        if (hitChildOrInputValue instanceof M_Element) {
+          let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(inputLineName);
+          if (startInputValueOfThisElement &lt; latestInputValue) {
+            latestInputValue = startInputValueOfThisElement;
+          }
+        } else {
+          let startInputValueOfThisElement = hitChildOrInputValue;
+          if (startInputValueOfThisElement &lt; latestInputValue) {
+            latestInputValue = startInputValueOfThisElement;
+          }
+        }
+      }
+      
+      return latestInputValue;
+    }
+
+    return element.getStartInputValueOfAnimation(inputLineName);
+  }
+
+
+  getEndAnimationInputValue(inputLineName, element: M_Group = this) {
+
+    if (element instanceof M_Group) {
+      let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
+      let children = element.getChildren();
+      for (let i = 0; i &lt; children.length; i++) {
+        let hitChildOrInputValue = this.getEndAnimationInputValue(inputLineName, children[i]);
+
+        if (hitChildOrInputValue instanceof M_Element) {
+          let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(inputLineName);
+          if (endInputValueOfThisElement &gt; latestInputValue) {
+            latestInputValue = endInputValueOfThisElement;
+          }
+        } else {
+          let endInputValueOfThisElement = hitChildOrInputValue;
+          if (endInputValueOfThisElement &gt; latestInputValue) {
+            latestInputValue = endInputValueOfThisElement;
+          }
+        }
+      }
+      return latestInputValue;
+    } else if (!(element.getEndInputValueOfAnimation != null)) {
+      return 0;
+    }
+
+    return element.getEndInputValueOfAnimation(inputLineName);
+  }
+
+  /*
+   * Note that it&apos;s in world space
+   */
+  updateAABB() {
+    var aabb = (function mergeAABBRecursively(elem) {
+      if (elem instanceof M_Group) {
+        var children = elem.getChildren();
+        for(let i=0; i&lt;children.length; i++) {
+          var aabb = mergeAABBRecursively(children[i]);
+          if (aabb instanceof AABB) {
+            elem.AABB.mergeAABB(aabb);
+          } else {
+            console.assert(&apos;calculation of AABB error!&apos;);
+          }
+        }
+        return elem.AABB;
+        //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
+      }
+      if (elem instanceof M_Mesh) {
+        let aabb = elem.AABBInWorld;
+        //console.log(aabb.toString());
+        return aabb;
+      }
+
+      return null;
+    })(this);
+    this.AABB.mergeAABB(aabb);
+
+    let newAABB = this.AABB;
+
+//    this._AABB = aabbInWorld;
+
+    this._updateAABBGizmo();
+
+    return newAABB;
+  }
+
+  get AABB() {
+    return this._AABB;
+  }
+
+  clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+    let instance = new M_Group(this._glBoostSystem);
+    if (clonedRootElement === null) {
+      clonedRootElement = instance;
+    }
+    this._copy(instance);
+
+    this._elements.forEach((element)=&gt;{
+      if (typeof element.clone !== &apos;undefined&apos;) {
+        instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
+      } else {
+        instance._elements.push(element);
+      }
+    });
+
+    onCompleteFuncs.forEach((func)=&gt;{
+      func();
+    });
+
+    return instance;
+  }
+
+  _copy(instance) {
+    super._copy(instance);
+    instance._AABB = this._AABB.clone();
+    instance._isRootJointGroup = this._isRootJointGroup;
+  }
+
+  set isVisible(flg:boolean) {
+    let collectVisibility = function(elem:M_Group) {
+      elem._isVisible = flg;
+      if (elem instanceof M_Group) {
+        let children = elem.getChildren();
+        children.forEach(function(child) {
+          collectVisibility(child);
+        });
+      }
+    };
+    collectVisibility(this);
+  }
+
+  get isVisible() {
+    return this._isVisible;
+  }
+
+  _updateAABBGizmo() {
+    /*
+    if (this._aabbGizmo === null) {
+      this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+    }
+    */
+    let world_m = this.worldMatrix;
+    let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
+
+//    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
+  }
+
+  readyForDiscard() {
+    let collectElements = function(elem) {
+      if (elem instanceof M_Group) {
+        const children = elem.getChildren();
+        for (let i = 0; i &lt; children.length; i++) {
+          collectElements(children[i]);
+        }
+      } else if (elem instanceof M_Element) {
+        // Must be M_Element
+        elem.readyForDiscard();
+      } else {
+        if (typeof EffekseerElement !== undefined &amp;&amp; elem instanceof EffekseerElement) {
+          console.log(&apos;Nothing to do for discarding at this time.&apos;);
+        }
+        console.error(&apos;not M_Group nor M_Element&apos;);
+      }
+    };
+    collectElements(this);
+
+    this.removeAll();
+  }
+
+  rayCast(arg1: Vector3, arg2: Vector3, camera, viewport) {
+    const meshes = this.searchElementsByType(M_Mesh);
+    let currentShortestT = Number.MAX_VALUE;
+    let currentShortestIntersectedPosVec3 = null;
+    let selectedMesh = null;
+    for (let mesh of meshes) {
+      if (!mesh.isVisible) {
+        continue;
+      }
+      if (!mesh.isPickable) {
+        continue;
+      }
+      let result = null;
+      if (arg1 instanceof Vector3 &amp;&amp; arg2 instanceof Vector3) {
+        result = mesh.rayCast(arg1, arg2, camera);
+      } else {
+        result = mesh.rayCast(arg1, arg2, camera, viewport);
+      }
+      if (result === null) {
+        return [null, null];
+      }
+      const t = result[1];
+      if (t &lt; currentShortestT) {
+        currentShortestT = t;
+        currentShortestIntersectedPosVec3 = result[0];
+        selectedMesh = mesh;
+      }
+    }
+
+    return [currentShortestIntersectedPosVec3, currentShortestT, selectedMesh];
+  }
+
+  _needUpdate() {
+    super._needUpdate();
+
+    let collectElements = function(elem) {
+      if (elem instanceof M_Group) {
+        const children = elem.getChildren();
+        for (let i = 0; i &lt; children.length; i++) {
+          collectElements(children[i]);
+        }
+      } else if (elem instanceof M_Mesh) {
+        if (elem._outlineGizmo) {
+          elem._outlineGizmo.updateMatrix(elem);
+        }
+      }
+    };
+    collectElements(this);
+  }
+
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

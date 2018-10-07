@@ -7941,7 +7941,6 @@ return mat4(
 
     /**
      *
-     * @param geometry
      */
     mergeInner(geometry, typedArrayDic, isFirst = false) {
       let gl = this._glContext.gl;
@@ -8036,7 +8035,6 @@ return mat4(
     /**
      * take no thought geometry's materials
      *
-     * @param geometry
      */
     mergeHarderInner(geometry, typedArrayDic, isFirst = false) {
       let gl = this._glContext.gl;
@@ -8747,7 +8745,8 @@ return mat4(
      *
      * @param {number} x horizontal pixel position (0 is left)
      * @param {number} y virtical pixel position (0 is bottom)
-     * @returns {Vector4} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+     * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
+     * @returns {Vector4} Pixel Value in Vector4
      */
     getPixelValueAt(x, y, argByteArray) {
       let byteArray = argByteArray;
@@ -13291,11 +13290,6 @@ albedo.rgb *= (1.0 - metallic);
     /**
      * This is Particle class's constructor
      *
-     * @param {Object} centerPointData [en] a JSON object consisted of position (by the particle) array and the other data (by the particle) array.
-     * @param {Number} particleWidth Width of each particle
-     * @param {Number} particleHeight Height of each particle
-     * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
-     * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
      */
     constructor(glBoostContext, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
       super(glBoostContext);
@@ -13779,13 +13773,11 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
-     * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
-     * @param {number} width en: width of texture. ja: テクスチャの幅
-     * @param {number} height en: height of texture. ja: テクスチャの高さ
-     * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-     * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+     * create textures as render target. (and attach it to framebuffer object internally.)<br>
+     * @param {number} width - width of texture
+     * @param {number} height - height of texture
+     * @param {number} textureNum - the number of creation.
+     * @returns {Array} an array of created textures.
      */
     createTexturesForRenderTarget(width, height, textureNum) {
       var glContext = this.__system._glContext;
@@ -14546,9 +14538,9 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] Add the element to this group as a child.<br>
-     * [ja] このグループにelementを子供として追加します。
-     * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
+     * Add the element to this group as a child.
+     * @param {Element} element - a instance of Element class
+     * @param {boolean} isDuplicateOk - allow duplicating if need
      */
     addChild(element, isDuplicateOk = false) {
 
@@ -17871,7 +17863,11 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of DirectionalLight class. 
+     * 
+     * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
      * @param {Vector4} intensity intensity as Vector4 Color
+     * @param {Vector3} rotate - initial rotation vector
+     * @param {number} length - length for DirectionalLightGizmo
      */
     constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
       super(glBoostSystem);
@@ -19603,10 +19599,11 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] the method to load glTF file.<br>
-     * [ja] glTF fileをロードするためのメソッド。
-     * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-     * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+     * the method to load glTF file.
+     * @param {glBoostContext} glBoostContext - glBoostContext instance
+     * @param {string} url - url of glTF file
+     * @param {Object} options - option data for loading
+     * @return {Promise} a promise object
      */
     loadGLTF(glBoostContext, url, options) {
       let defaultOptions = {
@@ -21137,7 +21134,8 @@ albedo.rgb *= (1.0 - metallic);
     /**
      * the method to load glTF2 file.
      * @param {string} uri uri of glTF file
-     * @return {Promise} a promise object
+     * @param {Object} options - opition data for loading
+     * @return {Promise}
      */
     loadGLTF(uri, options) {
       let defaultOptions = {
@@ -23524,4 +23522,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-261-g91f5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-263-g79a3-mod branch: develop';

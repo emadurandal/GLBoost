@@ -29,9 +29,9 @@ export default class M_Group extends M_Element {
   }
 
   /**
-   * [en] Add the element to this group as a child.<br>
-   * [ja] このグループにelementを子供として追加します。
-   * @param {Element} element  [en] a instance of Element class [ja] Elementクラスのインスタンス
+   * Add the element to this group as a child.
+   * @param {Element} element - a instance of Element class
+   * @param {boolean} isDuplicateOk - allow duplicating if need
    */
   addChild(element, isDuplicateOk = false) {
 
