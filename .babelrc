@@ -1,3 +1,12 @@
 {
-  "presets": ["es2015", "flow"]
+  "presets": [
+    "env"
+  ],
+  "plugins": [
+    "transform-flow-strip-types",
+    "babel-plugin-rewire",
+    "babel-plugin-transform-object-rest-spread"
+  ],
+  "retainLines": true,
+  "comments": false
 }

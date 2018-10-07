@@ -3,26 +3,38 @@
         "browser": true,
         "es6": true
     },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "sourceType": "module"
+    "extends": [
+        "airbnb-base",
+        "plugin:jest/recommended"
+        "plugin:flowtype/recommended",
+        "prettier",
+        "prettier/flowtype"
+    ],
+    "plugins": [
+        "import",
+        "jest",
+        "flowtype"
+    ],
+    "settings": {
+        "flowtype": {
+            "onlyFilesWithFlowAnnotation": true
+        }
     },
     "rules": {
-        "indent": [
+        "prettier/prettier": [
             "error",
-            2
+            {
+                "singleQuote": true,
+                "trailingComma": "es5"
+            }
         ],
-        "linebreak-style": [
+        "no-underscore-dangle": [
             "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "always"
+            {
+                "allow": [
+                    "__get__"
+                ]
+            }
         ]
     }
 }
