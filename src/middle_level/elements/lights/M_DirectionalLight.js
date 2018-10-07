@@ -15,7 +15,11 @@ export default class M_DirectionalLight extends M_AbstractLight {
 
   /**
    * The constructor of DirectionalLight class. 
+   * 
+   * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
    * @param {Vector4} intensity intensity as Vector4 Color
+   * @param {Vector3} rotate - initial rotation vector
+   * @param {number} length - length for DirectionalLightGizmo
    */
   constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
     super(glBoostSystem);

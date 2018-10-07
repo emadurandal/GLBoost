@@ -111,10 +111,11 @@ export default class GLTFLoader {
   }
 
   /**
-   * [en] the method to load glTF file.<br>
-   * [ja] glTF fileをロードするためのメソッド。
-   * @param {string} url [en] url of glTF file [ja] glTFファイルのurl
-   * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+   * the method to load glTF file.
+   * @param {glBoostContext} glBoostContext - glBoostContext instance
+   * @param {string} url - url of glTF file
+   * @param {Object} options - option data for loading
+   * @return {Promise} a promise object
    */
   loadGLTF(glBoostContext, url, options) {
     let defaultOptions = {

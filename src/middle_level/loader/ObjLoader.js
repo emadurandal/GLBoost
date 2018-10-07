@@ -38,13 +38,12 @@ export default class ObjLoader {
   }
 
   /**
-   * [en] the method to load Obj file.<br>
-   * [ja] Obj fileをロードするためのメソッド。
-   * @param {string} url [en] url of glTF file [ja] Objファイルのurl
-   * @param {Shader} defaultShader [en] a shader to assign to loaded geometries [ja] 読み込んだジオメトリに適用するシェーダー
-   * @param {string} mtlString [en] string of mtl file (optional) [ja] mtlファイルの内容の文字列情報（オプショナル。mtlファイルの読み込みが何らかの事情でできない場合に使います）
-   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-   * @return {Promise} [en] a promise object [ja] Promiseオブジェクト
+   * the method to load Obj file.
+   * @param {glBoostContext} glBoostContext - glBoostContext instance
+   * @param {string} url - url of glTF file
+   * @param {Shader} defaultShader - a shader to assign to loaded geometries
+   * @param {string} mtlString - string of mtl file (optional)
+   * @return {Promise} a promise object
    */
   loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
     return DataUtil.loadResourceAsync(url, false, (resolve, responseText)=>{

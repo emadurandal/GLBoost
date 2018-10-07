@@ -679,7 +679,6 @@ export default class Geometry extends GLBoostObject {
 
   /**
    *
-   * @param geometry
    */
   mergeInner(geometry, typedArrayDic, isFirst = false) {
     let gl = this._glContext.gl;
@@ -775,7 +774,6 @@ export default class Geometry extends GLBoostObject {
   /**
    * take no thought geometry's materials
    *
-   * @param geometry
    */
   mergeHarderInner(geometry, typedArrayDic, isFirst = false) {
     let gl = this._glContext.gl;

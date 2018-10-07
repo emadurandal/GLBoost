@@ -151,13 +151,11 @@ export default class GLBoostLowContext {
   }
 
   /**
-   * en: create textures as render target. (and attach it to framebuffer object internally.)<br>
-   * ja:レンダーターゲットとしてテクスチャを作成します（内部的にframebuffer objectにアタッチされます）。
-   * @param {number} width en: width of texture. ja: テクスチャの幅
-   * @param {number} height en: height of texture. ja: テクスチャの高さ
-   * @param {number} textureNum en: the number of creation. ja:テクスチャを作る個数
-   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
-   * @returns {Array} en: an array of created textures. ja:作成されたテクスチャの配列
+   * create textures as render target. (and attach it to framebuffer object internally.)<br>
+   * @param {number} width - width of texture
+   * @param {number} height - height of texture
+   * @param {number} textureNum - the number of creation.
+   * @returns {Array} an array of created textures.
    */
   createTexturesForRenderTarget(width, height, textureNum) {
     var glContext = this.__system._glContext;

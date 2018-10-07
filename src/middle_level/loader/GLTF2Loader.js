@@ -62,7 +62,8 @@ export default class GLTF2Loader {
   /**
    * the method to load glTF2 file.
    * @param {string} uri uri of glTF file
-   * @return {Promise} a promise object
+   * @param {Object} options - opition data for loading
+   * @return {Promise}
    */
   loadGLTF(uri, options) {
     let defaultOptions = {

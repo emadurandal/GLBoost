@@ -18,11 +18,6 @@ export default class Particle extends Geometry {
   /**
    * This is Particle class's constructor
    *
-   * @param {Object} centerPointData [en] a JSON object consisted of position (by the particle) array and the other data (by the particle) array.
-   * @param {Number} particleWidth Width of each particle
-   * @param {Number} particleHeight Height of each particle
-   * @param {Object} [en] a JSON which has other vertex attribute arrays you want (by the vertex of quad particle).
-   * @param {CanvasElement or String} Canvas Element which is generation source of WebGL context in current use or String which indicates the Canvas Element in jQuery like query string
    */
   constructor(glBoostContext, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
     super(glBoostContext);
