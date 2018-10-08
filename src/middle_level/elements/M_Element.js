@@ -11,14 +11,14 @@ export default class M_Element extends L_Element {
   _isVisible: boolean;
   _matrixAccumulatedWithoutMySelfAncestry: Matrix44;
   _matrixAccumulatedAncestry: Matrix44;
-  _accumulatedWithoutMySelfAncestryObjectUpdateNumber: number;
   _normalMatrix: Matrix33;
-  _accumulatedAncestryObjectUpdateNumberNormal: number;
+  _accumulatedWithoutMySelfAncestryObjectUpdateNumber: string | number;
+  _accumulatedAncestryObjectUpdateNumberNormal: string | number;
   _accumulatedAncestryObjectUpdateNumberInv: number;
-  _accumulatedAncestryObjectUpdateNumber: number;
+  _accumulatedAncestryObjectUpdateNumber: string | number;
   _accumulatedAncestryObjectUpdateNumberWithoutMySelf: number;
   _accumulatedAncestryObjectUpdateNumberJoint: number;
-  _accumulatedAncestryObjectUpdateNumberInverse: number;
+  _accumulatedAncestryObjectUpdateNumberInverse: string;
   _accumulatedAncestryObjectUpdateNumberForJoints: string;
   _opacity: number;
   _isTransparentForce: ?boolean;
@@ -34,7 +34,6 @@ export default class M_Element extends L_Element {
   _gizmos: Array<M_Gizmo>;
   _masterElement: M_Element | null;
   _currentAnimationInputValues: Object;
-  _updateCountAsElement: string;
   _activeAnimationLineName: string;
   _instanceName: string;
   _worldMatrix: Matrix44;
@@ -44,8 +43,11 @@ export default class M_Element extends L_Element {
   __cache_returnValue_multiplyMyAndParentTransformMatrices: Matrix44;
   __cache_input_multiplyMyAndParentTransformMatricesForJoints: Matrix44;
   __cache_input_multiplyMyAndParentTransformMatrices: Matrix44;
+  __cache_input_multiplyMyAndParentTransformMatricesInInverseOrder: Matrix44;
+  _updateCountAsElement: string;
+  __updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder: Matrix44;
   __updateInfoString_multiplyMyAndParentTransformMatrices: Matrix44;
-  __updateInfoString_multiplyMyAndParentTransformMatricesForJoints: number;
+  __updateInfoString_multiplyMyAndParentTransformMatricesForJoints: string | number;
   _worldMatrix: Matrix44;
   transformMatrixOnlyRotate: Matrix44;
 

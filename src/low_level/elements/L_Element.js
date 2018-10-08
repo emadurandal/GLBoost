@@ -77,7 +77,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  _getCurrentAnimationInputValue(inputName: string): Vector3 | null{
+  _getCurrentAnimationInputValue(inputName: string): number | null{
     let value = this._currentAnimationInputValues[inputName];
     if (typeof(value) === 'number') {
       return value;

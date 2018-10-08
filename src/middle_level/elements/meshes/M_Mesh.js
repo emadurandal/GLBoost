@@ -11,7 +11,18 @@ import MathClassUtil from '../../../low_level/math/MathClassUtil';
 import is from '../../../low_level/misc/IsUtil';
 
 export default class M_Mesh extends M_Element {
-  constructor(glBoostContext, geometry, material) {
+  _isTransparentForce: boolean;
+  _isPickable: boolean;
+  _transformedDepth: number;
+  _opacity: number;
+  _gizmos: Array<M_Mesh>;
+  _geometry: any;
+  _outlineGizmo: any;
+  _material: M_Mesh;
+  _glBoostSystem: GLBoostSystem;
+  bindShapeMatrix: Matrix44;
+
+  constructor(glBoostContext: glBoostContext, geometry: any, material: any) {
     super(glBoostContext);
 
     if (geometry) {
@@ -25,7 +36,7 @@ export default class M_Mesh extends M_Element {
     this._isPickable = true;
   }
 
-  prepareToRender(expression, existCamera_f, lights) {
+  prepareToRender(expression: any, existCamera_f: any, lights: any) {
     this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
     /*
     if (this._geometry._materials.length === 0 && this._material) {
@@ -38,7 +49,7 @@ export default class M_Mesh extends M_Element {
     */
   }
 
-  draw(data) {
+  draw(data: any) {
     this._geometry.draw(
       {
         expression: data.expression,
@@ -55,7 +66,7 @@ export default class M_Mesh extends M_Element {
     );
   }
 
-  set geometry(geometry) {
+  set geometry(geometry: any) {
     this._geometry = geometry;
     geometry._parent = this;
     M_Mesh._geometries[geometry.toString()] = geometry;
@@ -65,7 +76,7 @@ export default class M_Mesh extends M_Element {
     return this._geometry;
   }
 
-  set material(material) {
+  set material(material: any) {
     this._material = material;
   }
 
@@ -148,7 +159,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  merge(meshOrMeshes) {
+  merge(meshOrMeshes: M_Mesh | Array<M_Mesh>) {
     if (Array.isArray(meshOrMeshes)) {
       this.bakeTransformToGeometry();
 
@@ -181,7 +192,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  mergeHarder(meshOrMeshes) {
+  mergeHarder(meshOrMeshes: M_Mesh | Array<M_Mesh>) {
 
     if (Array.isArray(meshOrMeshes)) {
 
@@ -212,7 +223,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  calcTransformedDepth(camera) {
+  calcTransformedDepth(camera: any) {
     var viewMatrix = camera.lookAtRHMatrix();
     var m_m = null;
     if (this.bindShapeMatrix) {
@@ -239,7 +250,7 @@ export default class M_Mesh extends M_Element {
     return isTransparent;
   }
 
-  set isTransparentForce(flg) {
+  set isTransparentForce(flg: boolean) {
     this._isTransparentForce = flg;
   }
 
@@ -265,7 +276,7 @@ export default class M_Mesh extends M_Element {
   }
 
 
-  rayCast(arg1: Vector3, arg2: Vector3, camera, viewport) {
+  rayCast(arg1: Vector3, arg2: number, camera: any, viewport: any) {
     let origVecInLocal = null;
     let dirVecInLocal = null;
     if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -319,7 +330,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  set isOutlineVisible(flg) {
+  set isOutlineVisible(flg: boolean) {
     if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
       this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
     }
@@ -336,7 +347,7 @@ export default class M_Mesh extends M_Element {
     return this._outlineGizmo.isVisible;
   }
 
-  set isVisible(flg) {
+  set isVisible(flg: boolean) {
     super.isVisible = flg;
     if (this._outlineGizmo) {
       this._outlineGizmo.isVisible = flg;
@@ -363,7 +374,7 @@ export default class M_Mesh extends M_Element {
     super._needUpdate();
   }
 
-  set isPickable(flag) {
+  set isPickable(flag: boolean) {
     this._isPickable = flag;
   }
 

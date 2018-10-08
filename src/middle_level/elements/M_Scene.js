@@ -19,7 +19,7 @@ import Vector4 from '../../low_level/math/Vector4';
 export default class M_Scene extends M_Group {
   _gl: WebGLRenderingContext;
   _meshes: Array<M_Mesh>;
-  _elements: Array<M_Element>;
+  _elements: Array<M_Group>;
   _accumulatedAmbientIntensity: Vector4;
   _lights: M_AbstractLight;
   _lightsExceptAmbient: M_AbstractLight;
