@@ -12,12 +12,14 @@ import GLBoostObject from '../../low_level/core/GLBoostObject';
 type QueryMeta = {type: number, format: number};
 
 export default class M_Group extends M_Element {
-  _elements:Array<M_Element>;
+  _elements:Array<any>;
   _isVisible: boolean;
   _AABB: Object;
   _isRootJointGroup: boolean;
+  _glBoostSystem: glBoostSystem;
+  _gizmos: Object;
 
-  constructor(glBoostContext) {
+  constructor(glBoostContext: glBoostContext) {
     super(glBoostContext);
     this._elements = [];
     this._AABB = new AABB();
@@ -33,7 +35,7 @@ export default class M_Group extends M_Element {
    * @param {Element} element - a instance of Element class
    * @param {boolean} isDuplicateOk - allow duplicating if need
    */
-  addChild(element, isDuplicateOk = false) {
+  addChild(element: any, isDuplicateOk: boolean = false) {
 
     if (isDuplicateOk){
       // if forgive duplicated register by copy
@@ -58,7 +60,7 @@ export default class M_Group extends M_Element {
    * [ja] このグループから指定した要素を削除します。
    * @param {Element} element [en] the element to remove [ja] 削除したい要素
    */
-  removeChild(element) {
+  removeChild(element: M_Element) {
     this._elements = this._elements.filter(function(elem) {
       if (elem === element) {
         element._parent = null;
@@ -78,11 +80,11 @@ export default class M_Group extends M_Element {
     this._elements.length = 0;
   }
 
-  getChildren():Array<M_Element> {
+  getChildren():Array<M_Group> {
     return this._elements;
   }
 
-  getAnyJointAsChild():M_Element {
+  getAnyJointAsChild():M_Joint | null{
     for (let element of this._elements) {
       if (element.className === 'M_Joint') {
         return element;
@@ -132,7 +134,7 @@ export default class M_Group extends M_Element {
 
   }
 
-  searchElement(query: string, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElement(query: string, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
     /*
     if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
       return element;
@@ -155,7 +157,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElementByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
     if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
@@ -173,7 +175,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchElementsByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchElementsByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
     let resultElements = [];
 
     if (element instanceof M_Group) {
@@ -197,7 +199,7 @@ export default class M_Group extends M_Element {
     return resultElements;
   }
 
-  searchElementsByType(type: GLBoostObject, element:M_Element = this) {
+  searchElementsByType(type: any, element:M_Element = this) {
     if (element instanceof type) {
       return element;
     }
@@ -227,7 +229,7 @@ export default class M_Group extends M_Element {
     return null;
   }
 
-  searchGLBoostObjectByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
+  searchGLBoostObjectByNameAndType(query: string, type: GLBoostObject, queryMeta: QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group | M_Element |  M_Mesh= this) {
     if (element instanceof M_Group) {
       let children = element.getChildren();
       for (let i = 0; i < children.length; i++) {
@@ -260,7 +262,7 @@ export default class M_Group extends M_Element {
     }
   }
 
-  searchGLBoostObjectsByNameAndType(query, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+  searchGLBoostObjectsByNameAndType(query: any, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
     let objects = [];
     if (element instanceof M_Group) {
       let children = element.getChildren();
@@ -297,7 +299,7 @@ export default class M_Group extends M_Element {
     return objects;
   }
 
-  getStartAnimationInputValue(inputLineName, element = this) {
+  getStartAnimationInputValue(inputLineName: string, element: M_Group = this) {
 
     if (element instanceof M_Group) {
       let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
@@ -325,7 +327,7 @@ export default class M_Group extends M_Element {
   }
 
 
-  getEndAnimationInputValue(inputLineName, element: M_Group = this) {
+  getEndAnimationInputValue(inputLineName: string, element: M_Group = this) {
 
     if (element instanceof M_Group) {
       let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
@@ -394,7 +396,7 @@ export default class M_Group extends M_Element {
     return this._AABB;
   }
 
-  clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+  clone(clonedOriginalRootElement: any = this, clonedRootElement: any = null, onCompleteFuncs: any = []) {
     let instance = new M_Group(this._glBoostSystem);
     if (clonedRootElement === null) {
       clonedRootElement = instance;
@@ -422,8 +424,8 @@ export default class M_Group extends M_Element {
     instance._isRootJointGroup = this._isRootJointGroup;
   }
 
-  set isVisible(flg:boolean) {
-    let collectVisibility = function(elem:M_Group) {
+  set isVisible(flg: boolean) {
+    let collectVisibility = function(elem: M_Group) {
       elem._isVisible = flg;
       if (elem instanceof M_Group) {
         let children = elem.getChildren();
@@ -473,7 +475,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(arg1: Vector3, arg2: Vector3, camera, viewport) {
+  rayCast(arg1: number, arg2: number, camera: any, viewport: any) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
