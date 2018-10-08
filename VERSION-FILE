@@ -1,6 +1,6 @@
-version: 0.0.4-270-g0389-mod
+version: 0.0.4-272-g1d588-mod
 branch: develop
-e0ae220ec2af53423815dc6029b2e203c184a0d37e041e7b2786dea4a7092cf9 ./build/glboost.js
-e0ae220ec2af53423815dc6029b2e203c184a0d37e041e7b2786dea4a7092cf9 ./build/glboost.js
-74ddaa8d3897ca60011c5be784e031562fc29f266e8d8103a74a4bddd57ceccc ./build/glboost.min.js
+fc848bbf01eb73fbb05afeb67bb825194dfd645f7f20607f43d43ad6fa18c9ca ./build/glboost.js
+fc848bbf01eb73fbb05afeb67bb825194dfd645f7f20607f43d43ad6fa18c9ca ./build/glboost.js
+1099f2c074e56285e3f0013ad9d980f2e125dd6983b9355029fa8d564568953d ./build/glboost.min.js
 7bf12109d8a418d29a30c9b5060412dbef549f1f937b6fc469fc4181018e234d ./build/glboost.min.js.map

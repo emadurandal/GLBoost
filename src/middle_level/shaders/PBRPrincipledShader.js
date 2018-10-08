@@ -35,7 +35,7 @@ export class PBRPrincipledShaderSource {
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
     
 
-    let sampler2D = this._sampler2DShadow_func();
+    const sampler2D = this._sampler2DShadow_func();
     const lightNumExceptAmbient = lights.filter((light)=>!light.isTypeAmbient()).length;    
     if (lightNumExceptAmbient > 0) {
       shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
@@ -308,7 +308,7 @@ albedo.rgb *= (1.0 - metallic);
 
   prepare_PBRPrincipledShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
-    let vertexAttribsAsResult = [];
+    const vertexAttribsAsResult = [];
 
     material.setUniform(shaderProgram, 'uniform_BaseColorFactor', this._glContext.getUniformLocation(shaderProgram, 'uBaseColorFactor'));
     material.setUniform(shaderProgram, 'uniform_MetallicRoughnessFactors', this._glContext.getUniformLocation(shaderProgram, 'uMetallicRoughnessFactors'));
@@ -321,7 +321,7 @@ albedo.rgb *= (1.0 - metallic);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, 'uOcclusionTexture');
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, 'uEmissiveTexture');
-    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_BRDF_LUT, shaderProgram, 'uBrdfLutTexture');
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_BRDF_LUT, shaderProgram, 'uBrdfLUTTexture');
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE, shaderProgram, 'uDiffuseEnvTexture');
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_SPECULAR_ENV_CUBE, shaderProgram, 'uSpecularEnvTexture');
 
@@ -340,8 +340,8 @@ export default class PBRPrincipledShader extends DecalShader {
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-    let baseColor = material.baseColor;
-    let metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
+    const baseColor = material.baseColor;
+    const metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
     const roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
     const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
     const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
