@@ -425,7 +425,7 @@ export default class M_Group extends M_Element {
   }
 
   set isVisible(flg: boolean) {
-    let collectVisibility = function(elem: M_Group) {
+    let collectVisibility = function(elem: M_Element) {
       elem._isVisible = flg;
       if (elem instanceof M_Group) {
         let children = elem.getChildren();
@@ -439,6 +439,35 @@ export default class M_Group extends M_Element {
 
   get isVisible() {
     return this._isVisible;
+  }
+
+  setSpecifiedPropertyRecursively(propertyName: string , value: any) {
+    let setValueRecursively = function(elem: M_Element) {
+      elem[propertyName] = value;
+      if (elem instanceof M_Group) {
+        let children = elem.getChildren();
+        children.forEach(function(child) {
+          setValueRecursively(child);
+        });
+      }
+    };
+    setValueRecursively(this);
+  }
+
+  executeSpecifiedFunctionRecursively(func: Function, thisObj: any, args: Array<any>, childIndexToInsertToArgs = null) {
+    let execRecursively = function(elem: M_Element) {
+      if (childIndexToInsertToArgs != null) {
+        args[childIndexToInsertToArgs] = elem;
+      }
+      func.apply(thisObj, args);
+      if (elem instanceof M_Group) {
+        let children = elem.getChildren();
+        children.forEach(function(child) {
+          execRecursively(child);
+        });
+      }
+    };
+    execRecursively(this);
   }
 
   _updateAABBGizmo() {
