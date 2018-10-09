@@ -12523,7 +12523,7 @@ albedo.rgb *= (1.0 - metallic);
         } else {
           this._img = new Image();
           if (!imageUri.match(/^data:/)) {
-            this._img.crossorigin = 'anonymous';
+            this._img.crossOrigin = 'Anonymous';
           }
           this._img.onload = () => {
             let imgCanvas = this._getResizedCanvas(this._img);
@@ -12758,7 +12758,7 @@ albedo.rgb *= (1.0 - metallic);
         const loadImageToGPU = (images, cubemapSide) => {
           for (let i=0; i<images.length; i++) {
             const image = new Image();
-            image.crossorigin = "anonymous";
+            image.crossOrigin = "Anonymous";
             image.src = images[i];
             image.onload = ()=>{ gl.texImage2D(cubemapSide, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
           }
@@ -12817,7 +12817,7 @@ albedo.rgb *= (1.0 - metallic);
           for (var j = 0; j < faces.length; j++) {
             const face = faces[j][1];
             const image = new Image();
-            image.crossorigin = "anonymous";
+            image.crossOrigin = "Anonymous";
             image.onload = onLoadEachCubeImage(texture, face, image, i);
             image.src = faces[j][0];
           }
@@ -21692,7 +21692,7 @@ albedo.rgb *= (1.0 - metallic);
           let img = new Image();
           img.src = imageUri;
           imageJson.image = img;
-          img.crossorigin = 'anonymous';
+          img.crossOrigin = 'Anonymous';
           if (imageUri.match(/^data:/)) {
             resolve(gltfJson);
           } else {
@@ -23523,4 +23523,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-275-g260e-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-276-g6229-mod branch: develop';

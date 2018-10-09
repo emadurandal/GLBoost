@@ -64,7 +64,7 @@ export default class CubeTexture extends AbstractTexture {
       const loadImageToGPU = (images, cubemapSide) => {
         for (let i=0; i<images.length; i++) {
           const image = new Image();
-          image.crossorigin = "anonymous";
+          image.crossOrigin = "Anonymous";
           image.src = images[i];
           image.onload = ()=>{ gl.texImage2D(cubemapSide, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
         }
@@ -123,7 +123,7 @@ export default class CubeTexture extends AbstractTexture {
         for (var j = 0; j < faces.length; j++) {
           const face = faces[j][1];
           const image = new Image();
-          image.crossorigin = "anonymous";
+          image.crossOrigin = "Anonymous";
           image.onload = onLoadEachCubeImage(texture, face, image, i);
           image.src = faces[j][0];
         }

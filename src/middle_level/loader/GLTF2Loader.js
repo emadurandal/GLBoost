@@ -629,7 +629,7 @@ export default class GLTF2Loader {
         let img = new Image();
         img.src = imageUri;
         imageJson.image = img;
-        img.crossorigin = 'anonymous';
+        img.crossOrigin = 'Anonymous';
         if (imageUri.match(/^data:/)) {
           resolve(gltfJson);
         } else {
