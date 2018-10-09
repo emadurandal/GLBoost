@@ -86,7 +86,7 @@ export default class Texture extends AbstractTexture {
       } else {
         this._img = new Image();
         if (!imageUri.match(/^data:/)) {
-          this._img.crossOrigin = 'Anonymous';
+          this._img.crossorigin = 'anonymous';
         }
         this._img.onload = () => {
           let imgCanvas = this._getResizedCanvas(this._img);
