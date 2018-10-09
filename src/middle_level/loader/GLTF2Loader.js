@@ -627,9 +627,9 @@ export default class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
+        img.crossOrigin = 'Anonymous';
         img.src = imageUri;
         imageJson.image = img;
-        img.crossOrigin = 'Anonymous';
         if (imageUri.match(/^data:/)) {
           resolve(gltfJson);
         } else {

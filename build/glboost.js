@@ -21690,9 +21690,9 @@ albedo.rgb *= (1.0 - metallic);
         
         promisesToLoadResources.push(new Promise((resolve, reject)=> {
           let img = new Image();
+          img.crossOrigin = 'Anonymous';
           img.src = imageUri;
           imageJson.image = img;
-          img.crossOrigin = 'Anonymous';
           if (imageUri.match(/^data:/)) {
             resolve(gltfJson);
           } else {
@@ -23523,4 +23523,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-276-g6229-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-277-g92b23-mod branch: develop';
