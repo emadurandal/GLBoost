@@ -1,8 +1,24 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import BlendShapeShaderSource from '../../middle_level/shaders/BlendShapeShader';
 import Geometry from './Geometry';
 
 export default class BlendShapeGeometry extends Geometry {
+  _blendWeight_1: number;
+  _blendWeight_2: number;
+  _blendWeight_3: number;
+  _blendWeight_4: number;
+  _blendWeight_5: number;
+  _blendWeight_6: number;
+  _blendWeight_7: number;
+  _blendWeight_8: number;
+  _blendWeight_9: number;
+  _blendWeight_10: number;
+  _currentRenderPassIndex: number;
+  _materialForBlend: Object | null;
+  _glContext: Object;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -22,7 +38,7 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
 
-  draw(data) {
+  draw(data: Object) {
     this._currentRenderPassIndex = data.renderPass_index;
     super.draw({
       expression: data.expression,
@@ -58,7 +74,7 @@ export default class BlendShapeGeometry extends Geometry {
     super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
-  _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+  _setBlendWeightToGlslProgram(blendTargetNumber: number, weight: number) {
     let blendTarget = GLBoost.getValueOfGLBoostConstant(blendTargetNumber);
     let materials = [this._materialForBlend];
     for (let i=0; i<materials.length;i++) {
@@ -67,7 +83,7 @@ export default class BlendShapeGeometry extends Geometry {
     }
   }
 
-  set blendWeight_1(weight) {
+  set blendWeight_1(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -79,7 +95,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_1;
   }
 
-  set blendWeight_2(weight) {
+  set blendWeight_2(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -91,7 +107,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_2;
   }
 
-  set blendWeight_3(weight) {
+  set blendWeight_3(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -103,7 +119,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_3;
   }
 
-  set blendWeight_4(weight) {
+  set blendWeight_4(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -115,7 +131,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_4;
   }
 
-  set blendWeight_5(weight) {
+  set blendWeight_5(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -127,7 +143,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_5;
   }
 
-  set blendWeight_6(weight) {
+  set blendWeight_6(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -139,7 +155,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_6;
   }
 
-  set blendWeight_7(weight) {
+  set blendWeight_7(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -151,7 +167,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_7;
   }
 
-  set blendWeight_8(weight) {
+  set blendWeight_8(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -163,7 +179,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_8;
   }
 
-  set blendWeight_9(weight) {
+  set blendWeight_9(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -175,7 +191,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_9;
   }
 
-  set blendWeight_10(weight) {
+  set blendWeight_10(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 

@@ -1,8 +1,16 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import L_AbstractMaterial from './L_AbstractMaterial';
 import Vector4 from '../math/Vector4';
 
 export default class ClassicMaterial extends L_AbstractMaterial {
+  _wireframeWidthRelativeScale: number;
+  _baseColor: Vector4;
+  _diffuseColor: Vector4;
+  _specularColor: Vector4;
+  _ambientColor: Vector4;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -27,7 +35,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
   }
 
 
-  set baseColor(vec) {
+  set baseColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -40,7 +48,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._baseColor;
   }
 
-  set diffuseColor(vec) {
+  set diffuseColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -53,7 +61,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._diffuseColor;
   }
 
-  set specularColor(vec) {
+  set specularColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -66,7 +74,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._specularColor;
   }
 
-  set ambientColor(vec) {
+  set ambientColor(vec: Vector4) {
     if (!vec) {
       return;
     }
