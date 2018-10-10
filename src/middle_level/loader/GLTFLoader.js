@@ -1067,6 +1067,17 @@ export default class GLTFLoader {
       if (typeof value !== 'string') {
         material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
       }
+      if (valueName === 'transparent') {
+        material.isTransparent = value;
+        let enables = [3042];
+        material.states.enable = material.states.enable.concat(enables);
+      }
+      if (valueName === 'transparency') {
+        material.baseColor.w = 1.0 - value;
+        material.diffuseColor.w = 1.0 - value;
+        material.specularColor.w = 1.0 - value;
+        material.ambientColor.w = 1.0 - value;
+      }
     }
 
     if (indices !== null) {
