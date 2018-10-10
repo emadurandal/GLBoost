@@ -33,6 +33,9 @@ export class PBRPrincipledShaderSource {
     }
     
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
+
+    shaderText += 'uniform vec2 uAlphaTestParameters;\n';
+
     
 
     const sampler2D = this._sampler2DShadow_func();
@@ -194,7 +197,7 @@ export class PBRPrincipledShaderSource {
 
     shaderText += `
 vec3 surfaceColor = rt0.rgb;
-rt0 = vec4(0.0, 0.0, 0.0, 0.0);
+rt0 = vec4(0.0, 0.0, 0.0, rt0.a);
 
 // BaseColor
 vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
@@ -298,8 +301,14 @@ albedo.rgb *= (1.0 - metallic);
     shaderText += '  rt0.xyz += emissive;\n';
 
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
-     
-    shaderText += '  rt0.a = 1.0;\n';
+    
+    uAlphaTestParameters
+
+    shaderText += `
+                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
+                       discard;
+                     }
+    `;
 //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
@@ -316,6 +325,7 @@ albedo.rgb *= (1.0 - metallic);
     material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
     material.setUniform(shaderProgram, 'uniform_IBLParameters', this._glContext.getUniformLocation(shaderProgram, 'uIBLParameters'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
+    material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
     material.setTexture(this._glBoostSystem._glBoostContext.brdfLutTexture, GLBoost.TEXTURE_PURPOSE_BRDF_LUT);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
@@ -349,11 +359,15 @@ export default class PBRPrincipledShader extends DecalShader {
     const IBLSpecularTextureMipmapCount = (material.IBLSpecularTextureMipmapCount !== void 0) ? material.IBLSpecularTextureMipmapCount : 9;
     const IBLDiffuseContribution = (material.IBLDiffuseContribution !== void 0) ? material.IBLDiffuseContribution : 0.2;
     const IBLSpecularContribution = (material.IBLSpecularContribution !== void 0) ? material.IBLSpecularContribution : 0.2;
+    const isAlphaTestEnable = material.isAlphaTest;
+    const alphaCutoff = material.alphaCutoff;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
+    this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable, alphaCutoff, true);
+    
 
     const ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

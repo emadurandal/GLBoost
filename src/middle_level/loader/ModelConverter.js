@@ -602,9 +602,15 @@ export default class ModelConverter {
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_EMISSIVE);
           }
 
+          const alphaMode = materialJson.alphaMode;
+          if (alphaMode === 'MASK') {
+            // doalpha test in fragment shader
+            gltfMaterial.isAlphaTest = true;
+            gltfMaterial.alphaCutoff = materialJson.alphaCutoff;
+          }
 
           let enables = [];
-          if (options.isBlend) {
+          if (options.isBlend || alphaMode === 'BLEND') {
             enables.push(3042);
           }
           if (options.isDepthTest) {
