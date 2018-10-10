@@ -1,7 +1,21 @@
+/* @flow */
+
 import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
 export default class L_FrustumCamera extends L_AbstractCamera {
+  _left: number;
+  _right: number;
+  _top: number;
+  _bottom: number;
+  _zNear: number;
+  _zFar: number;
+  _zNearInner: number;
+  _zFarInner: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+  _projectionMatrix: Matrix44;
+  
   constructor(glBoostContext, toRegister, lookat, frustum) {
     super(glBoostContext, toRegister, lookat);
 
@@ -38,7 +52,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     }
   }
 
-  static frustumRHMatrix(left, right, top, bottom, zNear, zFar) {
+  static frustumRHMatrix(left: number, right: number, top: number, bottom: number, zNear: number, zFar: number) {
     return new Matrix44(
       2*zNear/(right-left), 0.0, (right+left)/(right-left), 0.0,
       0.0, 2*zNear/(top-bottom), (top+bottom)/(top-bottom), 0.0,
@@ -47,7 +61,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     );
   }
 
-  set left(value) {
+  set left(value: number) {
     if (this._left === value) {
       return;
     }
@@ -59,7 +73,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return this._left;
   }
 
-  set right(value) {
+  set right(value: number) {
     if (this._right === value) {
       return;
     }
@@ -71,7 +85,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return this._right;
   }
 
-  set top(value) {
+  set top(value: number) {
     if (this._top === value) {
       return;
     }
@@ -83,7 +97,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return this._top;
   }
 
-  set bottom(value) {
+  set bottom(value: number) {
     if (this._bottom === value) {
       return;
     }
@@ -95,7 +109,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return this._bottom;
   }
 
-  set zNear(value) {
+  set zNear(value: number) {
     if (this._zNear === value) {
       return;
     }
@@ -107,7 +121,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return this._zNear;
   }
 
-  set zFar(value) {
+  set zFar(value: number) {
     if (this._zFar === value) {
       return;
     }
@@ -164,7 +178,7 @@ export default class L_FrustumCamera extends L_AbstractCamera {
     return info;
   }
 
-  set allInfo(info) {
+  set allInfo(info: Object) {
     super.allInfo = info;
   }
 }

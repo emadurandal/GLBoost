@@ -1,3 +1,5 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import Geometry from '../../low_level/geometries/Geometry';
 import Vector4 from '../../low_level/math/Vector4';
@@ -6,7 +8,7 @@ import Vector2 from '../../low_level/math/Vector2';
 import MathClassUtil from '../../low_level/math/MathClassUtil';
 
 export default class Cube extends Geometry {
-  constructor(glBoostContext, widthVector, vertexColor) {
+  constructor(glBoostContext: Object, widthVector: Vector3, vertexColor: Vector4) {
     super(glBoostContext);
 
     // if array, convert to vector[2/3/4]

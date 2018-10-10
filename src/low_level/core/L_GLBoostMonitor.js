@@ -1,9 +1,14 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import MiscUtil from '../misc/MiscUtil';
 
 let singleton = Symbol();
 
 export default class L_GLBoostMonitor {
+  _glBoostObjects: Object;
+  _glResources: Array<Object>;
+
   constructor(enforcer) {
     if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
       throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
@@ -21,18 +26,18 @@ export default class L_GLBoostMonitor {
     return this[singleton];
   }
 
-  registerGLBoostObject(glBoostObject) {
+  registerGLBoostObject(glBoostObject: Object) {
     this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
   }
 
-  deregisterGLBoostObject(glBoostObject) {
+  deregisterGLBoostObject(glBoostObject: Object) {
     delete this._glBoostObjects[glBoostObject.instanceName];
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
   }
 
 
-  getGLBoostObjects(partOfGlBoostObjectInstanceName) {
+  getGLBoostObjects(partOfGlBoostObjectInstanceName: string) {
     let glBoostObjects = [];
     for (let instanceName in this._glBoostObjects) {
       if (instanceName.indexOf(partOfGlBoostObjectInstanceName)>0) {
@@ -43,7 +48,7 @@ export default class L_GLBoostMonitor {
     return glBoostObjects;
   }
 
-  getGLBoostObject(glBoostObjectInstanceName) {
+  getGLBoostObject(glBoostObjectInstanceName: string) {
     for (let instanceName in this._glBoostObjects) {
       if (instanceName === glBoostObjectInstanceName) {
         return this._glBoostObjects[instanceName];
@@ -52,7 +57,7 @@ export default class L_GLBoostMonitor {
     return null;
   }
 
-  getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+  getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName: string) {
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
         return this._glBoostObjects[instanceName];
@@ -62,7 +67,7 @@ export default class L_GLBoostMonitor {
   }
 
 
-  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName: string) {
     const results = [];
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
@@ -72,7 +77,7 @@ export default class L_GLBoostMonitor {
     return results;
   }
 
-  getGLBoostObjectWhichHasThisObjectId(objectId) {
+  getGLBoostObjectWhichHasThisObjectId(objectId: number) {
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].objectIndex === objectId) {
         return this._glBoostObjects[instanceName];
@@ -115,13 +120,13 @@ export default class L_GLBoostMonitor {
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
   }
 
-  registerWebGLResource(glBoostObject, glResource) {
+  registerWebGLResource(glBoostObject: Object, glResource: Object) {
     var glResourceName = glResource.constructor.name;
     this._glResources.push([glBoostObject, glResource]);
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
-  deregisterWebGLResource(glBoostObject, glResource) {
+  deregisterWebGLResource(glBoostObject: Object, glResource: Object) {
     var glResourceName = glResource.constructor.name;
     this._glResources.forEach((glResource, i)=>{
       if (glResource[0] === glBoostObject && glResource[1].constructor.name === glResourceName) {
@@ -131,7 +136,7 @@ export default class L_GLBoostMonitor {
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
   }
 
-  getWebGLResources(webglResourceName) {
+  getWebGLResources(webglResourceName: string) {
     let webglResources = this._glResources.filter((glResourceArray)=>{
       if (glResourceArray[1].constructor.name === webglResourceName) {
         return true;

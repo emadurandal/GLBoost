@@ -1,11 +1,18 @@
+/* @flow */
+
 import GLContext from './GLContext';
 import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLExtensionsManager from './GLExtensionsManager';
 import GLBoost from '../../globals';
 
 export default class GLBoostSystem {
+  _currentGlobalStates: Array<number> | null;
+  _defaultGlobalStates: Array<number>;
+  _glContext: GLContext;
+  _glBoostMonitor: L_GLBoostMonitor;
+  _globalStatesUsage: string;
 
-  constructor(canvas, initParameter, gl, width, height, glBoostContext) {
+  constructor(canvas: Object, initParameter, gl, width: number, height: number, glBoostContext) {
     if (gl) {
       this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {
