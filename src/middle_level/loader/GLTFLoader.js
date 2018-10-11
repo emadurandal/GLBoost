@@ -1332,7 +1332,7 @@ export default class GLTFLoader {
 
   _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
-    let byteOffset = bufferViewJson.byteOffset;
+    let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
     let byteLength = bufferViewJson.byteLength;
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
     return arrayBufferSliced;
