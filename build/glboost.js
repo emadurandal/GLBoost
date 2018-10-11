@@ -22034,8 +22034,9 @@ albedo.rgb *= (1.0 - metallic);
       let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
 
       let groups = [];
-      for (let node_i in gltfModel.nodes) {
+      for (let node of gltfModel.nodes) {
         let group = glBoostContext.createGroup();
+        group.userFlavorName = node.name;
         groups.push(group);
       }
 
@@ -22162,7 +22163,6 @@ albedo.rgb *= (1.0 - metallic);
             let options = gltfModel.asset.extras.glboostOptions;
             let glboostJoint = glBoostContext.createJoint(options.isExistJointGizmo);
             glboostJoint._glTFJointIndex = joint_i;
-  //          glboostJoint.userFlavorName = nodeJson.jointName;
             let group = groups[joint_i];
             group.addChild(glboostJoint, true);
           }
@@ -23686,4 +23686,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-283-g1a22-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-284-g0edb-mod branch: develop';
