@@ -35,6 +35,7 @@ export default class EffekseerElement extends M_Element {
     const __play = ()=>{
       // Play the loaded effect
       this.__handle = effekseer.play(this.__effect);
+      this.update();
     };
 
     if (isLoop) {

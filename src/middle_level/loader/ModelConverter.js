@@ -102,7 +102,7 @@ export default class ModelConverter {
 
     let options = gltfModel.asset.extras.glboostOptions;
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset, glBoostContext);
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);

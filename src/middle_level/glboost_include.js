@@ -31,7 +31,7 @@ import PassThroughShader from './shaders/PassThroughShader';
 import EnvironmentMapShader from './shaders/EnvironmentMapShader';
 import JointGizmoUpdater from './elements/skeletons/JointGizmoUpdater';
 import M_ScreenMesh from './elements/meshes/M_ScreenMesh';
-
+import GLBoostGLTFLoaderExtension from '../middle_level/loader/GLBoostGLTFLoaderExtension';
 
 import EffekseerElement from './plugins/EffekseerElement';
 import AnimationPlayer from '../auxiliaries/AnimationPlayer';

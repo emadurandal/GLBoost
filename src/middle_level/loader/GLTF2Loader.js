@@ -98,7 +98,8 @@ export default class GLTF2Loader {
           isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
-      ]
+      ],
+      extendedJson: null //   URI string / JSON Object / ArrayBuffer
     };
 
     (function() {
@@ -139,7 +140,21 @@ export default class GLTF2Loader {
     return DataUtil.loadResourceAsync(uri, true,
       (resolve, response)=>{
         var arrayBuffer = response;
-        this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+
+        if (options.extendedJson) {
+          fetch(options.extendedJson).then((_response)=> {
+            _response.json().then((json)=>{
+              options.extendedJson = json;
+              this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            });
+          }).then((json)=> {
+            //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            console.log("Result of ladding extended JSON");
+          });
+        } else {
+          this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+        }
+      
       }, (reject, error)=>{}
     );
   }
@@ -185,6 +200,12 @@ export default class GLTF2Loader {
       basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
 
+    if (gltfJson.asset.extras === undefined) {
+      gltfJson.asset.extras = {};
+    }
+    this._mergeExtendedJson(gltfJson, options.extendedJson);
+    gltfJson.asset.extras.basePath = basePath;
+
     let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
     promise.then((gltfJson) => {
       console.log('Resoureces loading done!');
@@ -200,12 +221,36 @@ export default class GLTF2Loader {
       basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
     let gltfJson = JSON.parse(gotText);
+    if (gltfJson.asset.extras === undefined) {
+      gltfJson.asset.extras = {};
+    } 
+
     options = this._getOptions(defaultOptions, gltfJson, options);
+    
+    this._mergeExtendedJson(gltfJson, options.extendedJson);
+    gltfJson.asset.extras.basePath = basePath;
+
     let promise = this._loadInner(null, basePath, gltfJson, options);
     promise.then((gltfJson) => {
       console.log('Resoureces loading done!');
       resolve(gltfJson[0][0]);
     });
+  }
+
+  _mergeExtendedJson(gltfJson, extendedData) {
+    let extendedJson = null;
+    if (extendedData instanceof ArrayBuffer) {
+      const extendedJsonStr = DataUtil.arrayBufferToString(extendedData);
+      extendedJson = JSON.parse(extendedJsonStr);
+    } else if (typeof extendedData === 'string') {
+      extendedJson = JSON.parse(extendedData);
+      extendedJson = extendedJson;
+    } else if (typeof extendedData === 'object') {
+      extendedJson = extendedData;
+    } else {
+    }
+
+    Object.assign(gltfJson, extendedJson);
   }
 
   _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
