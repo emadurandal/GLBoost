@@ -155,6 +155,10 @@ export default class AbstractTexture extends GLBoostObject {
     return (x & (x - 1)) == 0;
   }
 
+  _isPowerOfTwoTexture() {
+    return this._isPowerOfTwo(this.width) && this._isPowerOfTwo(this.height);
+  }
+
   /**
    * [en] get a value nearest power of two. <br />
    * [ja] 与えられた数から見て２の累乗に最も近い値を返します。

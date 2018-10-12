@@ -8814,6 +8814,10 @@ return mat4(
       return (x & (x - 1)) == 0;
     }
 
+    _isPowerOfTwoTexture() {
+      return this._isPowerOfTwo(this.width) && this._isPowerOfTwo(this.height);
+    }
+
     /**
      * [en] get a value nearest power of two. <br />
      * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
@@ -12688,11 +12692,13 @@ albedo.rgb *= (1.0 - metallic);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-      if (glem.extTFA) {
-        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      if (this._isPowerOfTwoTexture()) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+        if (glem.extTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        }
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MAG_FILTER, gl.LINEAR));
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_S, gl.REPEAT));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_T, gl.REPEAT));
       gl.generateMipmap(gl.TEXTURE_2D);
@@ -12713,11 +12719,13 @@ albedo.rgb *= (1.0 - metallic);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-      if (glem.extTFA) {
-        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      if (this._isPowerOfTwoTexture()) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+        if (glem.extTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        }
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MAG_FILTER, gl.LINEAR));
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_S, gl.REPEAT));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_T, gl.REPEAT));
       gl.generateMipmap(gl.TEXTURE_2D);
@@ -15360,6 +15368,7 @@ albedo.rgb *= (1.0 - metallic);
       const __play = ()=>{
         // Play the loaded effect
         this.__handle = effekseer.play(this.__effect);
+        this.update();
       };
 
       if (isLoop) {
@@ -21328,7 +21337,8 @@ albedo.rgb *= (1.0 - metallic);
             isTextureImageToLoadPreMultipliedAlpha: false,
             globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
           }
-        ]
+        ],
+        extendedJson: null //   URI string / JSON Object / ArrayBuffer
       };
 
       (function() {
@@ -21369,7 +21379,21 @@ albedo.rgb *= (1.0 - metallic);
       return DataUtil.loadResourceAsync(uri, true,
         (resolve, response)=>{
           var arrayBuffer = response;
-          this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+
+          if (options.extendedJson) {
+            fetch(options.extendedJson).then((_response)=> {
+              _response.json().then((json)=>{
+                options.extendedJson = json;
+                this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+              });
+            }).then((json)=> {
+              //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+              console.log("Result of ladding extended JSON");
+            });
+          } else {
+            this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+          }
+        
         }, (reject, error)=>{}
       );
     }
@@ -21415,6 +21439,12 @@ albedo.rgb *= (1.0 - metallic);
         basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
       }
 
+      if (gltfJson.asset.extras === undefined) {
+        gltfJson.asset.extras = {};
+      }
+      this._mergeExtendedJson(gltfJson, options.extendedJson);
+      gltfJson.asset.extras.basePath = basePath;
+
       let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
       promise.then((gltfJson) => {
         console.log('Resoureces loading done!');
@@ -21430,12 +21460,35 @@ albedo.rgb *= (1.0 - metallic);
         basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
       }
       let gltfJson = JSON.parse(gotText);
+      if (gltfJson.asset.extras === undefined) {
+        gltfJson.asset.extras = {};
+      } 
+
       options = this._getOptions(defaultOptions, gltfJson, options);
+      
+      this._mergeExtendedJson(gltfJson, options.extendedJson);
+      gltfJson.asset.extras.basePath = basePath;
+
       let promise = this._loadInner(null, basePath, gltfJson, options);
       promise.then((gltfJson) => {
         console.log('Resoureces loading done!');
         resolve(gltfJson[0][0]);
       });
+    }
+
+    _mergeExtendedJson(gltfJson, extendedData) {
+      let extendedJson = null;
+      if (extendedData instanceof ArrayBuffer) {
+        const extendedJsonStr = DataUtil.arrayBufferToString(extendedData);
+        extendedJson = JSON.parse(extendedJsonStr);
+      } else if (typeof extendedData === 'string') {
+        extendedJson = JSON.parse(extendedData);
+        extendedJson = extendedJson;
+      } else if (typeof extendedData === 'object') {
+        extendedJson = extendedData;
+      }
+
+      Object.assign(gltfJson, extendedJson);
     }
 
     _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
@@ -22072,7 +22125,7 @@ albedo.rgb *= (1.0 - metallic);
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset, glBoostContext);
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -23491,6 +23544,107 @@ albedo.rgb *= (1.0 - metallic);
     GLBoost['JointGizmoUpdater'] = JointGizmoUpdater;
   }
 
+  let singleton$8 = Symbol();
+  let singletonEnforcer$5 = Symbol();
+
+  /**
+   * This is a loader class of glTF VRize extension Data.
+   */
+  class GLBoostGLTFLoaderExtension {
+
+    /**
+     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer) {
+      if (enforcer !== singletonEnforcer$5) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return {ObjLoader} the singleton instance of ObjLoader class
+     */
+    static getInstance() {
+      if (!this[singleton$8]) {
+        this[singleton$8] = new GLBoostGLTFLoaderExtension(singletonEnforcer$5);
+      }
+      return this[singleton$8];
+    }
+
+    setAssetPropertiesToRootGroup(rootGroup, asset, glBoostContext) {
+      // Animation FPS
+      if (asset && asset.animationFps) {
+        rootGroup.animationFps = asset.animationFps;
+      }
+
+      // other information
+      if (asset && asset.version) {
+        rootGroup.spv_version = asset.version;
+      }
+      if (asset && asset.LastSaved_ApplicationVendor) {
+        rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
+      }
+      if (asset && asset.LastSaved_ApplicationName) {
+        rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
+      }
+      if (asset && asset.LastSaved_ApplicationVersion) {
+        rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+      }
+
+      // Animation Tracks
+      if (asset && asset.extras && asset.extras.animation_tracks) {
+        rootGroup.animationTracks = asset.extras.animation_tracks;
+      }
+
+      // Transparent Meshes Draw Order
+      if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+        rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
+        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        rootGroup.transparentMeshes = [];
+        for (let name of rootGroup.transparentMeshesDrawOrder) {
+          for (let mesh of meshes) {
+            if (mesh.userFlavorName === name) {
+              rootGroup.transparentMeshes.push(mesh);
+              break;
+            }
+          }
+        }
+      }
+
+      if (asset && asset.extras && asset.extras.effekseerEffects) {
+        for (let effect of asset.extras.effekseerEffects) {
+          const group = rootGroup.searchElement(effect.nodeName, {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING});
+          const effekseerElm = glBoostContext.createEffekseerElement();
+          const promise = effekseerElm.load(asset.extras.basePath + effect.efkName + '.efk', true, true);
+          promise.then((effect)=>{
+            group.addChild(effect);
+          });
+        }
+      }
+    }
+
+    setUVTransformToTexture(texture, samplerJson) {
+      let uvTransform = new Vector4$1(1, 1, 0, 0);
+      if (samplerJson.extras && samplerJson.extras.scale) {
+        let scale = samplerJson.extras.scale;
+        uvTransform.x = scale[0];
+        uvTransform.y = scale[1];
+      }
+      if (samplerJson.extras && samplerJson.extras.translation) {
+        let translation = samplerJson.extras.translation;
+        uvTransform.z = translation[0];
+        uvTransform.w = translation[1];
+      }
+      texture.uvTransform = uvTransform;
+    }
+
+  }
+
+
+  GLBoost$1["GLBoostGLTFLoaderExtension"] = GLBoostGLTFLoaderExtension;
+
   /*       */
 
   class AnimationPlayer {
@@ -23686,4 +23840,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-284-g0edb-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-285-g6fca-mod branch: develop';
