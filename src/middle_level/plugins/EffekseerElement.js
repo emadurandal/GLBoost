@@ -2,6 +2,9 @@ import GLBoost from '../../globals';
 import M_Element from '../elements/M_Element';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector4 from '../../low_level/math/Vector4';
+import Matrix44 from '../../low_level/math/Matrix44';
+import M_FrustumCamera from '../elements/cameras/M_FrustumCamera';
+import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
 
 export default class EffekseerElement extends M_Element {
   constructor(glBoostContext) {
@@ -46,7 +49,7 @@ export default class EffekseerElement extends M_Element {
     
   }
 
-  update() {
+  update(camera) {
     if (this.__handle != null) {
       const m = this.worldMatrix;
       this.__handle.setLocation(m.m03, m.m13, m.m23);
@@ -54,6 +57,33 @@ export default class EffekseerElement extends M_Element {
       this.__handle.setRotation(eular.x, eular.y, eular.z);
       const scale = m.getScale();
       this.__handle.setScale(scale.x, scale.y, scale.z);
+
+ //     this.__handle.setMatrix(this.worldMatrix.transpose().m);
+//      this.__handle.setMatrix(this.worldMatrix.m);
+      let lookAtMatrix = Matrix44.identity().m;
+      let projectionMatrix = Matrix44.identity().m;
+      if (camera) {
+//        lookAtMatrix = camera.lookAtRHMatrix().transpose().m;
+//        projectionMatrix = camera.projectionRHMatrix().transpose().m;
+//        lookAtMatrix = camera.lookAtRHMatrix().m;
+        projectionMatrix = camera.projectionRHMatrix().transpose().m;
+//        effekseer.setCameraMatrix(lookAtMatrix);
+        effekseer.setProjectionMatrix(projectionMatrix);
+
+          effekseer.setCameraLookAt(camera.translateInner.x, camera.translateInner.y, camera.translateInner.z,
+            camera.centerInner.x, camera.centerInner.y, camera.centerInner.z,
+            camera.upInner.x, camera.upInner.y, camera.upInner.z);
+/*
+            if (camera instanceof M_FrustumCamera) {
+            effekseer.setProjectionMatrix();
+          } else if (camera instanceof M_PerspectiveCamera) {
+
+          } else {
+
+          }
+          */
+        }
+      
       this.__handle.setSpeed(this.__speed);
     }
   }

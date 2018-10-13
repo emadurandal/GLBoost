@@ -2,6 +2,7 @@ import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import GLBoostObject from '../low_level/core/GLBoostObject';
 import Matrix44 from '../low_level/math/Matrix44';
 import Vector3 from '../low_level/math/Vector3';
+import EffekseerElement from './plugins/EffekseerElement';
 
 /**
  * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
@@ -44,8 +45,13 @@ export default class Renderer extends GLBoostObject {
     // gather scenes as unique
     for (let renderPass of expression.renderPasses) {
       skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+//      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+      effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement));
       renderPass.scene.updateAmountOfAmbientLightsIntensity();
+      let camera = renderPass.scene.getMainCamera();
+      for (let effekseerElement of effekseerElements) {
+        effekseerElement.update(camera);
+      }
     }
 
     let unique = function(array) {
@@ -60,10 +66,6 @@ export default class Renderer extends GLBoostObject {
     
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
-    }
-
-    for (let effekseerElement of effekseerElements) {
-      effekseerElement.update();
     }
 
     if (typeof effekseer !== "undefined") {
