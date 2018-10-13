@@ -2,6 +2,7 @@
 
 import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
+import MathUtil from '../../math/MathUtil';
 
 export default class L_FrustumCamera extends L_AbstractCamera {
   _left: number;
@@ -135,6 +136,10 @@ export default class L_FrustumCamera extends L_AbstractCamera {
 
   get aspect() {
     return (this.right - this.left) / (this.top - this.bottom);
+  }
+
+  get fovy() {
+    return MathUtil.radianToDegree(2 * Math.atan(Math.abs(this.top - this.bottom) / (2 * this.zNear)));
   }
 
   get allInfo() {
