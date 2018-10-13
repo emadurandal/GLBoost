@@ -1,3 +1,7 @@
+import draco3dgltf from 'draco3dgltf';
+console.log(draco3dgltf)
+const decoderModule = draco3dgltf.createDecoderModule({});
+
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
 import DecalShader from '../shaders/DecalShader';
@@ -66,6 +70,43 @@ export default class GLTF2Loader {
    * @return {Promise}
    */
   loadGLTF(uri, options) {
+    return this._loadGLTF(uri, options).then((gltf) => {
+      console.log(gltf);
+      if (gltf.extensionsUsed && gltf.extensionsUsed == 'KHR_draco_mesh_compression') {
+        console.log('draco')
+        const decoder = new decoderModule.Decoder();
+        for (let i=0; i<gltf.buffers.length; i++) {
+          const buffer = gltf.buffers[i].buffer;
+          const decodedGeometry = this.decodeDracoData(buffer, decoder);
+          gltf.buffers[i].buffer = decodedGeometry;
+        }
+        decoderModule.destroy(decoder);
+        decoderModule.destroy(decodedGeometry);
+      }
+      return gltf;
+    });
+  }
+
+  decodeDracoData(rawBuffer, decoder) {
+    const buffer = new decoderModule.DecoderBuffer();
+    buffer.Init(new Int8Array(rawBuffer), rawBuffer.byteLength);
+    const geometryType = decoder.GetEncodedGeometryType(buffer);
+  
+    let dracoGeometry;
+    let status;
+    if (geometryType === decoderModule.TRIANGULAR_MESH) {
+      dracoGeometry = new decoderModule.Mesh();
+      status = decoder.DecodeBufferToMesh(buffer, dracoGeometry);
+    } else {
+      const errorMsg = 'Error: Unknown geometry type.';
+      console.error(errorMsg);
+    }
+    decoderModule.destroy(buffer);
+  
+    return dracoGeometry;
+  }
+
+  _loadGLTF(uri, options) {
     let defaultOptions = {
       files: { 
         //        "foo.gltf": content of file as ArrayBuffer, 

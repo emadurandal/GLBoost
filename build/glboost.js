@@ -1,8 +1,10 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('draco3dgltf')) :
+  typeof define === 'function' && define.amd ? define(['draco3dgltf'], factory) :
+  (factory(global.draco3dgltf));
+}(this, (function (draco3dgltf) { 'use strict';
+
+  draco3dgltf = draco3dgltf && draco3dgltf.hasOwnProperty('default') ? draco3dgltf['default'] : draco3dgltf;
 
   var global = (0, eval)('this');
 
@@ -4047,7 +4049,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName        )                {
+    _getCurrentAnimationInputValue(inputName        )               {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4608,11 +4610,11 @@
                         
                                                       
                                          
-                                                                
                             
-                                                         
+                                                                         
+                                                                  
                                                       
-                                                   
+                                                            
                                                                 
                                                         
                                                           
@@ -4631,7 +4633,6 @@
                             
                                      
                                          
-                                  
                                      
                           
                            
@@ -4641,8 +4642,11 @@
                                                                        
                                                                           
                                                                  
+                                                                               
+                                  
+                                                                                    
                                                                       
-                                                                             
+                                                                                      
                            
                                         
 
@@ -13979,7 +13983,18 @@ albedo.rgb *= (1.0 - metallic);
   //      
 
   class M_Mesh extends M_Element {
-    constructor(glBoostContext, geometry, material) {
+                                 
+                         
+                              
+                     
+                           
+                   
+                       
+                      
+                                  
+                              
+
+    constructor(glBoostContext                , geometry     , material     ) {
       super(glBoostContext);
 
       if (geometry) {
@@ -13993,7 +14008,7 @@ albedo.rgb *= (1.0 - metallic);
       this._isPickable = true;
     }
 
-    prepareToRender(expression, existCamera_f, lights) {
+    prepareToRender(expression     , existCamera_f     , lights     ) {
       this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
       /*
       if (this._geometry._materials.length === 0 && this._material) {
@@ -14006,7 +14021,7 @@ albedo.rgb *= (1.0 - metallic);
       */
     }
 
-    draw(data) {
+    draw(data     ) {
       this._geometry.draw(
         {
           expression: data.expression,
@@ -14023,7 +14038,7 @@ albedo.rgb *= (1.0 - metallic);
       );
     }
 
-    set geometry(geometry) {
+    set geometry(geometry     ) {
       this._geometry = geometry;
       geometry._parent = this;
       M_Mesh._geometries[geometry.toString()] = geometry;
@@ -14033,7 +14048,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._geometry;
     }
 
-    set material(material) {
+    set material(material     ) {
       this._material = material;
     }
 
@@ -14116,7 +14131,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    merge(meshOrMeshes) {
+    merge(meshOrMeshes                        ) {
       if (Array.isArray(meshOrMeshes)) {
         this.bakeTransformToGeometry();
 
@@ -14149,7 +14164,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    mergeHarder(meshOrMeshes) {
+    mergeHarder(meshOrMeshes                        ) {
 
       if (Array.isArray(meshOrMeshes)) {
 
@@ -14180,7 +14195,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    calcTransformedDepth(camera) {
+    calcTransformedDepth(camera     ) {
       var viewMatrix = camera.lookAtRHMatrix();
       var m_m = null;
       if (this.bindShapeMatrix) {
@@ -14207,7 +14222,7 @@ albedo.rgb *= (1.0 - metallic);
       return isTransparent;
     }
 
-    set isTransparentForce(flg) {
+    set isTransparentForce(flg         ) {
       this._isTransparentForce = flg;
     }
 
@@ -14233,7 +14248,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    rayCast(arg1         , arg2         , camera, viewport) {
+    rayCast(arg1         , arg2        , camera     , viewport     ) {
       let origVecInLocal = null;
       let dirVecInLocal = null;
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -14287,7 +14302,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    set isOutlineVisible(flg) {
+    set isOutlineVisible(flg         ) {
       if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
         this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
       }
@@ -14304,7 +14319,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._outlineGizmo.isVisible;
     }
 
-    set isVisible(flg) {
+    set isVisible(flg         ) {
       super.isVisible = flg;
       if (this._outlineGizmo) {
         this._outlineGizmo.isVisible = flg;
@@ -14331,7 +14346,7 @@ albedo.rgb *= (1.0 - metallic);
       super._needUpdate();
     }
 
-    set isPickable(flag) {
+    set isPickable(flag         ) {
       this._isPickable = flag;
     }
 
@@ -14521,12 +14536,14 @@ albedo.rgb *= (1.0 - metallic);
                                                   
 
   class M_Group extends M_Element {
-                               
+                         
                         
                   
                                
+                                  
+                    
 
-    constructor(glBoostContext) {
+    constructor(glBoostContext                ) {
       super(glBoostContext);
       this._elements = [];
       this._AABB = new AABB();
@@ -14542,7 +14559,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param {Element} element - a instance of Element class
      * @param {boolean} isDuplicateOk - allow duplicating if need
      */
-    addChild(element, isDuplicateOk = false) {
+    addChild(element     , isDuplicateOk          = false) {
 
       if (isDuplicateOk){
         // if forgive duplicated register by copy
@@ -14567,7 +14584,7 @@ albedo.rgb *= (1.0 - metallic);
      * [ja] このグループから指定した要素を削除します。
      * @param {Element} element [en] the element to remove [ja] 削除したい要素
      */
-    removeChild(element) {
+    removeChild(element           ) {
       this._elements = this._elements.filter(function(elem) {
         if (elem === element) {
           element._parent = null;
@@ -14587,11 +14604,11 @@ albedo.rgb *= (1.0 - metallic);
       this._elements.length = 0;
     }
 
-    getChildren()                  {
+    getChildren()                {
       return this._elements;
     }
 
-    getAnyJointAsChild()           {
+    getAnyJointAsChild()               {
       for (let element of this._elements) {
         if (element.className === 'M_Joint') {
           return element;
@@ -14641,7 +14658,7 @@ albedo.rgb *= (1.0 - metallic);
 
     }
 
-    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -14664,7 +14681,7 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
@@ -14682,7 +14699,7 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
@@ -14706,7 +14723,7 @@ albedo.rgb *= (1.0 - metallic);
       return resultElements;
     }
 
-    searchElementsByType(type               , element           = this) {
+    searchElementsByType(type     , element           = this) {
       if (element instanceof type) {
         return element;
       }
@@ -14736,7 +14753,7 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element                               = this) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -14769,7 +14786,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectsByNameAndType(query     , type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -14806,7 +14823,7 @@ albedo.rgb *= (1.0 - metallic);
       return objects;
     }
 
-    getStartAnimationInputValue(inputLineName, element = this) {
+    getStartAnimationInputValue(inputLineName        , element          = this) {
 
       if (element instanceof M_Group) {
         let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
@@ -14834,7 +14851,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    getEndAnimationInputValue(inputLineName, element          = this) {
+    getEndAnimationInputValue(inputLineName        , element          = this) {
 
       if (element instanceof M_Group) {
         let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
@@ -14903,7 +14920,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._AABB;
     }
 
-    clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+    clone(clonedOriginalRootElement      = this, clonedRootElement      = null, onCompleteFuncs      = []) {
       let instance = new M_Group(this._glBoostSystem);
       if (clonedRootElement === null) {
         clonedRootElement = instance;
@@ -14931,8 +14948,8 @@ albedo.rgb *= (1.0 - metallic);
       instance._isRootJointGroup = this._isRootJointGroup;
     }
 
-    set isVisible(flg        ) {
-      let collectVisibility = function(elem        ) {
+    set isVisible(flg         ) {
+      let collectVisibility = function(elem         ) {
         elem._isVisible = flg;
         if (elem instanceof M_Group) {
           let children = elem.getChildren();
@@ -14982,7 +14999,7 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(arg1         , arg2         , camera, viewport) {
+    rayCast(arg1        , arg2        , camera     , viewport     ) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -16355,7 +16372,7 @@ albedo.rgb *= (1.0 - metallic);
   class M_Scene extends M_Group {
                                
                            
-                                
+                              
                                           
                              
                                           
@@ -21075,6 +21092,9 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
+  console.log(draco3dgltf);
+  const decoderModule = draco3dgltf.createDecoderModule({});
+
   let singleton$6 = Symbol();
   let singletonEnforcer$3 = Symbol();
 
@@ -21137,6 +21157,43 @@ albedo.rgb *= (1.0 - metallic);
      * @return {Promise}
      */
     loadGLTF(uri, options) {
+      return this._loadGLTF(uri, options).then((gltf) => {
+        console.log(gltf);
+        if (gltf.extensionsUsed && gltf.extensionsUsed == 'KHR_draco_mesh_compression') {
+          console.log('draco');
+          const decoder = new decoderModule.Decoder();
+          for (let i=0; i<gltf.buffers.length; i++) {
+            const buffer = gltf.buffers[i].buffer;
+            const decodedGeometry = this.decodeDracoData(buffer, decoder);
+            gltf.buffers[i].buffer = decodedGeometry;
+          }
+          decoderModule.destroy(decoder);
+          decoderModule.destroy(decodedGeometry);
+        }
+        return gltf;
+      });
+    }
+
+    decodeDracoData(rawBuffer, decoder) {
+      const buffer = new decoderModule.DecoderBuffer();
+      buffer.Init(new Int8Array(rawBuffer), rawBuffer.byteLength);
+      const geometryType = decoder.GetEncodedGeometryType(buffer);
+    
+      let dracoGeometry;
+      let status;
+      if (geometryType === decoderModule.TRIANGULAR_MESH) {
+        dracoGeometry = new decoderModule.Mesh();
+        status = decoder.DecodeBufferToMesh(buffer, dracoGeometry);
+      } else {
+        const errorMsg = 'Error: Unknown geometry type.';
+        console.error(errorMsg);
+      }
+      decoderModule.destroy(buffer);
+    
+      return dracoGeometry;
+    }
+
+    _loadGLTF(uri, options) {
       let defaultOptions = {
         files: { 
           //        "foo.gltf": content of file as ArrayBuffer, 
@@ -23521,4 +23578,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-272-g1d588-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-275-g260e-mod branch: master';
