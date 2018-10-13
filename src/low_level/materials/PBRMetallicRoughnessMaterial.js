@@ -127,7 +127,7 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   }
 
   get alphaCutoff() {
-    return this.alphaCutoff;
+    return this._alphaCutoff;
   }
 }
 

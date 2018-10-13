@@ -10403,8 +10403,8 @@ albedo.rgb *= (1.0 - metallic);
       this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
       this._occlusionRateForDirectionalLight = 0.2;
       this._IBLSpecularTextureMipmapCount = 9;
-      this._IBLDiffuseContribution = 0.5;
-      this._IBLSpecularContribution = 1.4;
+      this._IBLDiffuseContribution = 1.0;
+      this._IBLSpecularContribution = 1.0;
       this._isAlphaTestEnable = false;
       this._alphaCutoff = 0.5;
 
@@ -10500,7 +10500,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     get alphaCutoff() {
-      return this.alphaCutoff;
+      return this._alphaCutoff;
     }
   }
 
@@ -23868,4 +23868,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-287-g7b97-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-289-gc8fa3-mod branch: develop';
