@@ -10403,8 +10403,8 @@ albedo.rgb *= (1.0 - metallic);
       this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
       this._occlusionRateForDirectionalLight = 0.2;
       this._IBLSpecularTextureMipmapCount = 9;
-      this._IBLDiffuseContribution = 1.0;
-      this._IBLSpecularContribution = 1.0;
+      this._IBLDiffuseContribution = 0.5;
+      this._IBLSpecularContribution = 1.4;
       this._isAlphaTestEnable = false;
       this._alphaCutoff = 0.5;
 
@@ -10495,12 +10495,12 @@ albedo.rgb *= (1.0 - metallic);
       return this._isAlphaTestEnable;
     }
 
-    set alphaCuttoff(value) {
+    set alphaCutoff(value) {
       this._alphaCutoff = value;
     }
 
-    get alphaCuttoff() {
-      return this.alphaCuttoff;
+    get alphaCutoff() {
+      return this.alphaCutoff;
     }
   }
 
@@ -15336,6 +15336,142 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['Expression'] = Expression;
 
+  class M_FrustumCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set left(value) {
+      this._lowLevelCamera.left = value;
+    }
+
+    get left() {
+      return this._lowLevelCamera.left;
+    }
+
+    set right(value) {
+      this._lowLevelCamera.right = value;
+    }
+
+    get right() {
+      return this._lowLevelCamera.right;
+    }
+
+    set top(value) {
+      this._lowLevelCamera.top = value;
+    }
+
+    get top() {
+      return this._lowLevelCamera.top;
+    }
+
+    set bottom(value) {
+      this._lowLevelCamera.bottom = value;
+    }
+
+    get bottom() {
+      return this._lowLevelCamera.bottom;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+    get aspect() {
+      return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
+    }
+
+  }
+
+  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
+
+  class M_PerspectiveCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set fovy(value) {
+      this._lowLevelCamera.fovy = value;
+    }
+
+    get fovy() {
+      return this._lowLevelCamera.fovy;
+    }
+
+    set aspect(value) {
+      this._lowLevelCamera.aspect = value;
+    }
+
+    get aspect() {
+      return this._lowLevelCamera.aspect;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+  }
+
+  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
+
   class EffekseerElement$1 extends M_Element {
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -15379,7 +15515,7 @@ albedo.rgb *= (1.0 - metallic);
       
     }
 
-    update() {
+    update(camera) {
       if (this.__handle != null) {
         const m = this.worldMatrix;
         this.__handle.setLocation(m.m03, m.m13, m.m23);
@@ -15387,6 +15523,33 @@ albedo.rgb *= (1.0 - metallic);
         this.__handle.setRotation(eular.x, eular.y, eular.z);
         const scale = m.getScale();
         this.__handle.setScale(scale.x, scale.y, scale.z);
+
+   //     this.__handle.setMatrix(this.worldMatrix.transpose().m);
+  //      this.__handle.setMatrix(this.worldMatrix.m);
+        let lookAtMatrix = Matrix44$1.identity().m;
+        let projectionMatrix = Matrix44$1.identity().m;
+        if (camera) {
+  //        lookAtMatrix = camera.lookAtRHMatrix().transpose().m;
+  //        projectionMatrix = camera.projectionRHMatrix().transpose().m;
+  //        lookAtMatrix = camera.lookAtRHMatrix().m;
+          projectionMatrix = camera.projectionRHMatrix().transpose().m;
+  //        effekseer.setCameraMatrix(lookAtMatrix);
+          effekseer.setProjectionMatrix(projectionMatrix);
+
+            effekseer.setCameraLookAt(camera.translateInner.x, camera.translateInner.y, camera.translateInner.z,
+              camera.centerInner.x, camera.centerInner.y, camera.centerInner.z,
+              camera.upInner.x, camera.upInner.y, camera.upInner.z);
+  /*
+              if (camera instanceof M_FrustumCamera) {
+              effekseer.setProjectionMatrix();
+            } else if (camera instanceof M_PerspectiveCamera) {
+
+            } else {
+
+            }
+            */
+          }
+        
         this.__handle.setSpeed(this.__speed);
       }
     }
@@ -16065,8 +16228,13 @@ albedo.rgb *= (1.0 - metallic);
       // gather scenes as unique
       for (let renderPass of expression.renderPasses) {
         skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-        effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+  //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+        effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement$1));
         renderPass.scene.updateAmountOfAmbientLightsIntensity();
+        let camera = renderPass.scene.getMainCamera();
+        for (let effekseerElement of effekseerElements) {
+          effekseerElement.update(camera);
+        }
       }
 
       let unique = function(array) {
@@ -16081,10 +16249,6 @@ albedo.rgb *= (1.0 - metallic);
       
       for (let mesh of skeletalMeshes) {
         mesh.geometry.update(mesh);
-      }
-
-      for (let effekseerElement of effekseerElements) {
-        effekseerElement.update();
       }
 
       if (typeof effekseer !== "undefined") {
@@ -17695,142 +17859,6 @@ albedo.rgb *= (1.0 - metallic);
         return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, derrivedClass, argMaterials);
       }
   }
-
-  class M_PerspectiveCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set fovy(value) {
-      this._lowLevelCamera.fovy = value;
-    }
-
-    get fovy() {
-      return this._lowLevelCamera.fovy;
-    }
-
-    set aspect(value) {
-      this._lowLevelCamera.aspect = value;
-    }
-
-    get aspect() {
-      return this._lowLevelCamera.aspect;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-  }
-
-  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
-
-  class M_FrustumCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set left(value) {
-      this._lowLevelCamera.left = value;
-    }
-
-    get left() {
-      return this._lowLevelCamera.left;
-    }
-
-    set right(value) {
-      this._lowLevelCamera.right = value;
-    }
-
-    get right() {
-      return this._lowLevelCamera.right;
-    }
-
-    set top(value) {
-      this._lowLevelCamera.top = value;
-    }
-
-    get top() {
-      return this._lowLevelCamera.top;
-    }
-
-    set bottom(value) {
-      this._lowLevelCamera.bottom = value;
-    }
-
-    get bottom() {
-      return this._lowLevelCamera.bottom;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-    get aspect() {
-      return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
-    }
-
-  }
-
-  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
 
   class M_OrthoCamera extends M_AbstractCamera {
     constructor(glBoostContext, toRegister, lookat, ortho) {
@@ -23840,4 +23868,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-285-g6fca-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-287-g7b97-mod branch: develop';
