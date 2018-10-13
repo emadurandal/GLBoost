@@ -51,29 +51,43 @@ export default class EffekseerElement extends M_Element {
 
   update(camera) {
     if (this.__handle != null) {
+
+      // Set Model Matrix
+      const scale = 0.1;
       const m = this.worldMatrix;
-      this.__handle.setLocation(m.m03, m.m13, m.m23);
+      this.__handle.setLocation(m.m03*scale, m.m13*scale, m.m23*scale);
       const eular = m.toEulerAngles();
       this.__handle.setRotation(eular.x, eular.y, eular.z);
-      const scale = m.getScale();
-      this.__handle.setScale(scale.x, scale.y, scale.z);
+      const _scale = m.getScale();
+      this.__handle.setScale(_scale.x*scale, _scale.y*scale, _scale.z*scale);
 
  //     this.__handle.setMatrix(this.worldMatrix.transpose().m);
 //      this.__handle.setMatrix(this.worldMatrix.m);
+
+
       let lookAtMatrix = Matrix44.identity().m;
       let projectionMatrix = Matrix44.identity().m;
       if (camera) {
-//        lookAtMatrix = camera.lookAtRHMatrix().transpose().m;
-//        projectionMatrix = camera.projectionRHMatrix().transpose().m;
-//        lookAtMatrix = camera.lookAtRHMatrix().m;
-        projectionMatrix = camera.projectionRHMatrix().transpose().m;
-//        effekseer.setCameraMatrix(lookAtMatrix);
-        effekseer.setProjectionMatrix(projectionMatrix);
 
-          effekseer.setCameraLookAt(camera.translateInner.x, camera.translateInner.y, camera.translateInner.z,
-            camera.centerInner.x, camera.centerInner.y, camera.centerInner.z,
-            camera.upInner.x, camera.upInner.y, camera.upInner.z);
-/*
+
+        // Set Viewing Matrix
+//        lookAtMatrix = camera.lookAtRHMatrix();
+//        let viewMatrix = lookAtMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
+//        console.log(lookAtMatrix.toStringApproximately())
+
+        effekseer.setCameraLookAt(camera.translateInner.x, camera.translateInner.y, camera.translateInner.z,
+          camera.centerInner.x, camera.centerInner.y, camera.centerInner.z,
+          camera.upInner.x, camera.upInner.y, camera.upInner.z);
+
+
+        // Set Projection Matrix
+//        projectionMatrix = camera.projectionRHMatrix().transpose().m;
+//        effekseer.setProjectionMatrix(projectionMatrix);
+        //effekseer.setCameraMatrix(viewMatrix.transpose().m);
+          
+          effekseer.setProjectionPerspective(camera.fovy, camera.aspect, camera.zNear, camera.zFar);
+
+            /*
             if (camera instanceof M_FrustumCamera) {
             effekseer.setProjectionMatrix();
           } else if (camera instanceof M_PerspectiveCamera) {
