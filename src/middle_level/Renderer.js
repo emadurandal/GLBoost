@@ -194,11 +194,11 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (typeof effekseer !== "undefined") {
-        const projection = (camera === null) ? Matrix44.identity().m : camera.projectionRHMatrix().m;
-        const inverseWorld = (camera === null) ? Matrix44.identity().m : camera.inverseWorldMatrix.m; 
+      if (typeof effekseer !== "undefined" && camera != null) {
+        const projection = camera.projectionRHMatrix().m;
+        const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
         effekseer.setProjectionMatrix(projection);
-        effekseer.setCameraMatrix(inverseWorld);
+        effekseer.setCameraMatrix(viewing);
         effekseer.draw();
       }
 
