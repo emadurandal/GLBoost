@@ -1272,15 +1272,23 @@
   GLContext._instances = new Object();
 
   /*       */
+                                                                 
+                                                 
+                                                                  
 
   class GLBoostSystem {
                                                
                                         
                           
+                                       
                                       
                                
+                                  
+                                      
+                             
+                                      
 
-    constructor(canvas        , initParameter, gl, width        , height        , glBoostContext) {
+    constructor(canvas        , initParameter       , gl                      , width        , height        , glBoostContext                   ) {
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
       } else {
@@ -1386,6 +1394,9 @@
   /*       */
 
   class GLBoostObject {
+                                
+                                         
+                                  
                                   
                           
                          
@@ -1431,15 +1442,16 @@
       this._objectIndex = -1;
 
       const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
+        const that     = this;
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
         for (let i=0; i<array.length; i++) {
           if (array[i] === void 0) {
-            this['_' + typeName + 'Index'] = i;
+            that['_' + typeName + 'Index'] = i;
             array[i] = true;
             return;
           }
         }
-        this['_' + typeName + 'Index'] = array.length;
+        that['_' + typeName + 'Index'] = array.length;
         array[array.length] = true;
       };
 
@@ -1452,8 +1464,9 @@
     tearDownExistIndexAndArray() {
       const deleteIndex = (typeName)=>{
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
-        delete array[this['_' + typeName + 'Index']];
-        this['_' + typeName + 'Index'] = -1;
+        const that      = this;
+        delete array[that['_' + typeName + 'Index']];
+        that['_' + typeName + 'Index'] = -1;
       };
 
       if (this.className.indexOf('Mesh') !== -1) {
@@ -1501,7 +1514,7 @@
     }
 
     get belongingCanvasId() {
-      return this._glBoostSystem.belongingCanvasId;
+      return this._glContext.belongingCanvasId;
     }
 
     set userFlavorName(name       ) {
@@ -11113,8 +11126,8 @@ albedo.rgb *= (1.0 - metallic);
                                            
                                 
 
-    constructor(glBoostContext, toRegister, lookat, ortho) {
-      super(glBoostContext, toRegister, lookat);
+    constructor(glBoostSystem              , toRegister        , lookat       , ortho       ) {
+      super(glBoostSystem, toRegister, lookat);
 
       this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
       this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
@@ -13754,10 +13767,16 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["Screen"] = Screen;
 
-  //import GLContext from './GLContext';
+  //      
+                                             
+                                             
 
   class GLBoostLowContext {
-    constructor(canvas, initParameter, gl, width, height) {
+                            
+                                  
+                          
+
+    constructor(canvas                   , initParameter        , gl                      , width       , height       ) {
       this._setName();
 
       this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
@@ -13819,23 +13838,23 @@ albedo.rgb *= (1.0 - metallic);
       return new BlendShapeGeometry(this.__system);
     }
 
-    createCube(widthVector, vertexColor) {
+    createCube(widthVector         , vertexColor         ) {
       return new Cube(this.__system, widthVector, vertexColor);
     }
 
-    createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+    createPlane(width        , height        , uSpan        , vSpan        , customVertexAttributes       , isUVRepeat         ) {
       return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
     }
 
-    createSphere(radius, widthSegments, heightSegments, vertexColor) {
+    createSphere(radius        , widthSegments        , heightSegments        , vertexColor        ) {
       return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
     }
 
-    createAxis(length) {
+    createAxis(length        ) {
       return new Axis(this.__system, length);
     }
 
-    createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+    createParticle(centerPointData        , particleWidth        , particleHeight        , customVertexAttributes        , performanceHint        ) {
       return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
     }
 
@@ -13847,39 +13866,39 @@ albedo.rgb *= (1.0 - metallic);
       return new PBRMetallicRoughnessMaterial(this.__system);
     }
 
-    createPerspectiveCamera(lookat, perspective) {
+    createPerspectiveCamera(lookat       , perspective       ) {
       return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
     }
 
-    createFrustumCamera(lookat, perspective) {
+    createFrustumCamera(lookat       , perspective       ) {
       return new L_FrustumCamera(this.__system, true, lookat, perspective);
     }
 
-    createOrthoCamera(lookat, ortho) {
+    createOrthoCamera(lookat       , ortho       ) {
       return new L_OrthoCamera(this.__system, true, lookat, ortho);
     }
 
-    createCameraController(options) {
+    createCameraController(options       ) {
       return new L_CameraController(this.__system, options);
     }
 
-    createWalkThroughCameraController(options) {
+    createWalkThroughCameraController(options       ) {
       return new L_WalkThroughCameraController(this.__system, options);
     }
 
-    createTexture(src, userFlavorName, parameters = null) {
+    createTexture(src       , userFlavorName       , parameters         = null) {
       return new Texture(this.__system, src, userFlavorName, parameters);
     }
 
-    createPhinaTexture(width, height, fillStyle, parameters = null) {
+    createPhinaTexture(width       , height       , fillStyle        , parameters         = null) {
       return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
     }
 
-    createCubeTexture(userFlavorName, parameters) {
+    createCubeTexture(userFlavorName        , parameters        ) {
       return new CubeTexture(this.__system, userFlavorName, parameters);
     }
 
-    createScreen(screen, customVertexAttributes) {
+    createScreen(screen       , customVertexAttributes       ) {
       return new Screen(this.__system, screen, customVertexAttributes);
     }
 
@@ -13890,7 +13909,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param {number} textureNum - the number of creation.
      * @returns {Array} an array of created textures.
      */
-    createTexturesForRenderTarget(width, height, textureNum) {
+    createTexturesForRenderTarget(width        , height       , textureNum       ) {
       var glContext = this.__system._glContext;
       var gl = glContext.gl;
 
@@ -13930,7 +13949,7 @@ albedo.rgb *= (1.0 - metallic);
       return fbo._glboostTextures.concat();
     }
 
-    createDepthTexturesForRenderTarget(width, height) {
+    createDepthTexturesForRenderTarget(width       , height       ) {
       var glContext = this.__system._glContext;
 
       var gl = glContext.gl;
@@ -13997,7 +14016,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glContext.belongingCanvasId;
     }
 
-    set globalStatesUsage(usageMode) {
+    set globalStatesUsage(usageMode        ) {
       this.__system._globalStatesUsage = usageMode;
     }
 
@@ -14008,9 +14027,11 @@ albedo.rgb *= (1.0 - metallic);
     reflectGlobalGLState() {
       let gl = this.__system._glContext.gl;
 
-      this.currentGlobalStates.forEach((state)=>{
-        gl.enable(state);
-      });
+      if (this.currentGlobalStates != null) {
+        this.currentGlobalStates.forEach((state)=>{
+          gl.enable(state);
+        });
+      }
 
       gl.depthFunc( gl.LEQUAL );
 
@@ -14038,7 +14059,7 @@ albedo.rgb *= (1.0 - metallic);
       });
     }
 
-    set currentGlobalStates(states) {
+    set currentGlobalStates(states               ) {
       this.__system._currentGlobalStates = states.concat();
     }
 
@@ -23662,8 +23683,7 @@ albedo.rgb *= (1.0 - metallic);
                                         
                          
                             
-
-                           
+                                   
 
     constructor() {
     }
@@ -23763,7 +23783,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__animationMotions;
     }
 
-    set animationMotions(motions    ) {
+    set animationMotions(motions            ) {
       this.__animationMotions = motions;
     }
   }
@@ -23843,4 +23863,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-294-g162c4-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-295-g78e5-mod branch: develop';

@@ -18,8 +18,8 @@ export default class L_OrthoCamera extends L_AbstractCamera {
   _updateCountAsCameraProjection: number;
   _projectionMatrix: Matrix44;
 
-  constructor(glBoostContext, toRegister, lookat, ortho) {
-    super(glBoostContext, toRegister, lookat);
+  constructor(glBoostSystem:GLBoostSystem, toRegister:boolean, lookat:Object, ortho:Object) {
+    super(glBoostSystem, toRegister, lookat);
 
     this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
     this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
