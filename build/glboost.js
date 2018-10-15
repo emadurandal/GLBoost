@@ -714,9 +714,10 @@
 
   class L_GLBoostMonitor {
                             
-                                
+                                    
+                                      
 
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
@@ -727,10 +728,11 @@
     }
 
     static getInstance() {
-      if (!this[singleton]) {
-        this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+      const that      = this;
+      if (!(that    )[singleton]) {
+        that[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
       }
-      return this[singleton];
+      return that[singleton];
     }
 
     registerGLBoostObject(glBoostObject        ) {
@@ -844,7 +846,7 @@
     }
 
     getWebGLResources(webglResourceName        ) {
-      let webglResources = this._glResources.filter((glResourceArray)=>{
+      let webglResources = this._glResources.filter((glResourceArray           )=>{
         if (glResourceArray[1].constructor.name === webglResourceName) {
           return true;
         } else {
@@ -1272,9 +1274,11 @@
   GLContext._instances = new Object();
 
   /*       */
-                                                                 
+                                                           
                                                  
                                                                   
+
+                             
 
   class GLBoostSystem {
                                                
@@ -4010,7 +4014,7 @@
   class L_Element extends GLBoostObject {
                            
                                          
-                                     
+                                      
                         
                      
                     
@@ -4153,7 +4157,9 @@
      * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
      */
     setCurrentAnimationValue(inputName        , inputValue                                           ) {
-      this._setDirtyToAnimatedElement(inputName);
+      if ((this     )._setDirtyToAnimatedElement != null) {
+        (this     )._setDirtyToAnimatedElement(inputName);
+      }
       this._currentAnimationInputValues[inputName] = inputValue;
     }
 
@@ -14075,8 +14081,8 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glBoostMonitor;
     }
 
-    setPropertiesFromJson(arg, queryType = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-      let json = arg;
+    setPropertiesFromJson(arg              , queryType        = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+      let json     = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
@@ -14086,9 +14092,10 @@ albedo.rgb *= (1.0 - metallic);
       }
       let objects = null;
       if (queryType === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName     ));
       } else if (queryType === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        const targetInstanceName      = (json        ).targetInstanceName;
+        const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
         if (found != null && found.userFlavorName === json.targetUserFlavorName) {
           objects = [found];
         } else {
@@ -14099,7 +14106,7 @@ albedo.rgb *= (1.0 - metallic);
         objects = [found];
       }
 
-      objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+      objects.forEach((obj    )=>{obj.setPropertiesFromJson(json);});
      
       return objects;
     }
@@ -23863,4 +23870,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-295-g78e5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-296-gb126-mod branch: develop';

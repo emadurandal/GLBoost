@@ -15,7 +15,7 @@ import type GLBoostSystem from '../core/GLBoostSystem';
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
   _currentAnimationInputValues: Object;
-  _activeAnimationLineName: string;
+  _activeAnimationLineName: ?string;
   _translate: Vector3;
   _rotate: Vector3;
   _scale: Vector3;
@@ -158,7 +158,9 @@ export default class L_Element extends GLBoostObject {
    * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
    */
   setCurrentAnimationValue(inputName: string, inputValue: number|Vector2|Vector3|Vector4|Quaternion) {
-    this._setDirtyToAnimatedElement(inputName);
+    if ((this: any)._setDirtyToAnimatedElement != null) {
+      (this: any)._setDirtyToAnimatedElement(inputName);
+    }
     this._currentAnimationInputValues[inputName] = inputValue;
   }
 

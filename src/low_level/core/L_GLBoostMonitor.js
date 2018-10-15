@@ -7,9 +7,10 @@ let singleton = Symbol();
 
 export default class L_GLBoostMonitor {
   _glBoostObjects: Object;
-  _glResources: Array<Object>;
+  _glResources: Array<Array<any>>;
+  static _singletonEnforcer: Symbol;
 
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
       throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
     }
@@ -20,10 +21,11 @@ export default class L_GLBoostMonitor {
   }
 
   static getInstance() {
-    if (!this[singleton]) {
-      this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+    const that: any = this;
+    if (!(that:any)[singleton]) {
+      that[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
     }
-    return this[singleton];
+    return that[singleton];
   }
 
   registerGLBoostObject(glBoostObject: Object) {
@@ -137,7 +139,7 @@ export default class L_GLBoostMonitor {
   }
 
   getWebGLResources(webglResourceName: string) {
-    let webglResources = this._glResources.filter((glResourceArray)=>{
+    let webglResources = this._glResources.filter((glResourceArray:Array<any>)=>{
       if (glResourceArray[1].constructor.name === webglResourceName) {
         return true;
       } else {

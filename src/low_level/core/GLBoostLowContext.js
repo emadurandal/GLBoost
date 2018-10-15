@@ -331,8 +331,8 @@ export default class GLBoostLowContext {
     return this.__system._glBoostMonitor;
   }
 
-  setPropertiesFromJson(arg, queryType = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-    let json = arg;
+  setPropertiesFromJson(arg:Object|string, queryType:number = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+    let json:any = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
     }
@@ -342,9 +342,10 @@ export default class GLBoostLowContext {
     }
     let objects = null;
     if (queryType === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName: any));
     } else if (queryType === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-      const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      const targetInstanceName: any = (json: Object).targetInstanceName;
+      const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
       if (found != null && found.userFlavorName === json.targetUserFlavorName) {
         objects = [found];
       } else {
@@ -355,7 +356,7 @@ export default class GLBoostLowContext {
       objects = [found];
     }
 
-    objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+    objects.forEach((obj:any)=>{obj.setPropertiesFromJson(json);});
    
     return objects;
   }

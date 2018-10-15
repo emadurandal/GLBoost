@@ -4,9 +4,11 @@ import GLContext from './GLContext';
 import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLExtensionsManager from './GLExtensionsManager';
 import GLBoost from '../../globals';
-import type GLBoostLowContextimport from './GLBoostLowContext';
+import type GLBoostLowContext from './GLBoostLowContext';
 import type Texture from '../textures/Texture';
 import type ClassicMaterial from '../materials/ClassicMaterial';
+
+declare var effekseer: any;
 
 export default class GLBoostSystem {
   _currentGlobalStates: Array<number> | null;
@@ -20,7 +22,7 @@ export default class GLBoostSystem {
   _brdfLutTexture: Texture;
   _defaultMaterial: ClassicMaterial;
 
-  constructor(canvas: Object, initParameter:Object, gl:WebGLRenderingContext, width: number, height: number, glBoostContext: glBoostLowContext) {
+  constructor(canvas: Object, initParameter:Object, gl:WebGLRenderingContext, width: number, height: number, glBoostContext: GLBoostLowContext) {
     if (gl) {
       this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {
