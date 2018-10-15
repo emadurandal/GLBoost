@@ -4014,7 +4014,7 @@
   class L_Element extends GLBoostObject {
                            
                                          
-                                      
+                                     
                         
                      
                     
@@ -4048,7 +4048,7 @@
       this._updateCountAsElement = 0;
       this._animationLine = {};
       this._currentAnimationInputValues = {};
-      this._activeAnimationLineName = null;
+      this._activeAnimationLineName = "time";
 
       this._is_trs_matrix_updated = true;
       this._is_translate_updated = true;
@@ -4076,7 +4076,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName        )               {
+    _getCurrentAnimationInputValue(inputName         )          {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4196,7 +4196,7 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName        , inputValue        )                {
+    getTranslateAt(lineName        , inputValue         )           {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
@@ -4205,7 +4205,7 @@
       return value;
     }
 
-    getTranslateAtOrStatic(lineName        , inputValue        ) {
+    getTranslateAtOrStatic(lineName        , inputValue         ) {
       let value = this.getTranslateAt(lineName, inputValue);
       if (value === null) {
         return this.getTranslateNotAnimated();
@@ -4229,7 +4229,7 @@
       return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getRotateAt(lineName        , inputValue         ) {
+    getRotateAt(lineName        , inputValue        ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
       if (value !== null) {
         this._rotate = value;
@@ -4240,8 +4240,8 @@
 
     getRotateAtOrStatic(lineName        , inputValue         ) {
       let value = null;
-      if (this._activeAnimationLineName) {
-        value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+      if (lineName != null && inputValue != null) {
+        value = this.getRotateAt(lineName, inputValue);
       }
       if (value === null) {
         return this.getRotateNotAnimated();
@@ -4283,8 +4283,11 @@
       return value;
     }
 
-    getScaleAtOrStatic(lineName        , inputValue        ) {
-      let value = this.getScaleAt(lineName, inputValue);
+    getScaleAtOrStatic(lineName        , inputValue         ) {
+      let value = null;
+      if (lineName != null && inputValue != null) {
+        value = this.getScaleAt(lineName, inputValue);
+      }
       if (value === null) {
         return this.getScaleNotAnimated();
       }
@@ -4320,7 +4323,7 @@
 
     get matrix() {
       let input = void 0;
-      if (this._activeAnimationLineName !== null) {
+      if (this._activeAnimationLineName != null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
@@ -4382,7 +4385,7 @@
     }
 
 
-    getMatrixAtOrStatic(lineName        , inputValue        ) {
+    getMatrixAtOrStatic(lineName        , inputValue         ) {
       let input = inputValue;
 
       //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
@@ -23870,4 +23873,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-296-gb126-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-297-gc4f9-mod branch: develop';

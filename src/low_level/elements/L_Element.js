@@ -15,7 +15,7 @@ import type GLBoostSystem from '../core/GLBoostSystem';
 export default class L_Element extends GLBoostObject {
   _animationLine: Object;
   _currentAnimationInputValues: Object;
-  _activeAnimationLineName: ?string;
+  _activeAnimationLineName: string;
   _translate: Vector3;
   _rotate: Vector3;
   _scale: Vector3;
@@ -49,7 +49,7 @@ export default class L_Element extends GLBoostObject {
     this._updateCountAsElement = 0;
     this._animationLine = {};
     this._currentAnimationInputValues = {};
-    this._activeAnimationLineName = null;
+    this._activeAnimationLineName = "time";
 
     this._is_trs_matrix_updated = true;
     this._is_translate_updated = true;
@@ -77,7 +77,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  _getCurrentAnimationInputValue(inputName: string): number | null{
+  _getCurrentAnimationInputValue(inputName: ?string): ?number {
     let value = this._currentAnimationInputValues[inputName];
     if (typeof(value) === 'number') {
       return value;
@@ -197,7 +197,7 @@ export default class L_Element extends GLBoostObject {
     return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getTranslateAt(lineName: string, inputValue: number): Vector3 | null{
+  getTranslateAt(lineName: string, inputValue: ?number): ?Vector3 {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
     if (value !== null) {
       this._translate = value;
@@ -206,7 +206,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getTranslateAtOrStatic(lineName: string, inputValue: number) {
+  getTranslateAtOrStatic(lineName: string, inputValue: ?number) {
     let value = this.getTranslateAt(lineName, inputValue);
     if (value === null) {
       return this.getTranslateNotAnimated();
@@ -230,7 +230,7 @@ export default class L_Element extends GLBoostObject {
     return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getRotateAt(lineName: string, inputValue: Vector3) {
+  getRotateAt(lineName: string, inputValue: number) {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
     if (value !== null) {
       this._rotate = value;
@@ -239,10 +239,10 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getRotateAtOrStatic(lineName: string, inputValue: Vector3) {
+  getRotateAtOrStatic(lineName: string, inputValue: ?number) {
     let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+    if (lineName != null && inputValue != null) {
+      value = this.getRotateAt(lineName, inputValue);
     }
     if (value === null) {
       return this.getRotateNotAnimated();
@@ -284,8 +284,11 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getScaleAtOrStatic(lineName: string, inputValue: number) {
-    let value = this.getScaleAt(lineName, inputValue);
+  getScaleAtOrStatic(lineName: string, inputValue: ?number) {
+    let value = null;
+    if (lineName != null && inputValue != null) {
+      value = this.getScaleAt(lineName, inputValue);
+    }
     if (value === null) {
       return this.getScaleNotAnimated();
     }
@@ -321,7 +324,7 @@ export default class L_Element extends GLBoostObject {
 
   get matrix() {
     let input = void 0;
-    if (this._activeAnimationLineName !== null) {
+    if (this._activeAnimationLineName != null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
@@ -383,7 +386,7 @@ export default class L_Element extends GLBoostObject {
   }
 
 
-  getMatrixAtOrStatic(lineName: string, inputValue: number) {
+  getMatrixAtOrStatic(lineName: string, inputValue: ?number) {
     let input = inputValue;
 
     //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
