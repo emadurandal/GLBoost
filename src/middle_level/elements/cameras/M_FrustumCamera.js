@@ -73,9 +73,12 @@ export default class M_FrustumCamera extends M_AbstractCamera {
   }
 
   get aspect() {
-    return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
+    return this._lowLevelCamera.aspect;
   }
 
+  get fovy() {
+    return this._lowLevelCamera.fovy;
+  }
 }
 
 GLBoost['M_FrustumCamera'] = M_FrustumCamera;

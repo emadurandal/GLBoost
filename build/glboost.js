@@ -714,9 +714,10 @@
 
   class L_GLBoostMonitor {
                             
-                                
+                                    
+                                      
 
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
@@ -727,10 +728,11 @@
     }
 
     static getInstance() {
-      if (!this[singleton]) {
-        this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+      const that      = this;
+      if (!(that    )[singleton]) {
+        that[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
       }
-      return this[singleton];
+      return that[singleton];
     }
 
     registerGLBoostObject(glBoostObject        ) {
@@ -844,7 +846,7 @@
     }
 
     getWebGLResources(webglResourceName        ) {
-      let webglResources = this._glResources.filter((glResourceArray)=>{
+      let webglResources = this._glResources.filter((glResourceArray           )=>{
         if (glResourceArray[1].constructor.name === webglResourceName) {
           return true;
         } else {
@@ -1272,15 +1274,25 @@
   GLContext._instances = new Object();
 
   /*       */
+                                                           
+                                                 
+                                                                  
+
+                             
 
   class GLBoostSystem {
                                                
                                         
                           
+                                       
                                       
                                
+                                  
+                                      
+                             
+                                      
 
-    constructor(canvas        , initParameter, gl, width        , height        , glBoostContext) {
+    constructor(canvas        , initParameter       , gl                      , width        , height        , glBoostContext                   ) {
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
       } else {
@@ -1386,6 +1398,9 @@
   /*       */
 
   class GLBoostObject {
+                                
+                                         
+                                  
                                   
                           
                          
@@ -1431,15 +1446,16 @@
       this._objectIndex = -1;
 
       const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
+        const that     = this;
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
         for (let i=0; i<array.length; i++) {
           if (array[i] === void 0) {
-            this['_' + typeName + 'Index'] = i;
+            that['_' + typeName + 'Index'] = i;
             array[i] = true;
             return;
           }
         }
-        this['_' + typeName + 'Index'] = array.length;
+        that['_' + typeName + 'Index'] = array.length;
         array[array.length] = true;
       };
 
@@ -1452,8 +1468,9 @@
     tearDownExistIndexAndArray() {
       const deleteIndex = (typeName)=>{
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
-        delete array[this['_' + typeName + 'Index']];
-        this['_' + typeName + 'Index'] = -1;
+        const that      = this;
+        delete array[that['_' + typeName + 'Index']];
+        that['_' + typeName + 'Index'] = -1;
       };
 
       if (this.className.indexOf('Mesh') !== -1) {
@@ -1501,7 +1518,7 @@
     }
 
     get belongingCanvasId() {
-      return this._glBoostSystem.belongingCanvasId;
+      return this._glContext.belongingCanvasId;
     }
 
     set userFlavorName(name       ) {
@@ -4031,7 +4048,7 @@
       this._updateCountAsElement = 0;
       this._animationLine = {};
       this._currentAnimationInputValues = {};
-      this._activeAnimationLineName = null;
+      this._activeAnimationLineName = "time";
 
       this._is_trs_matrix_updated = true;
       this._is_translate_updated = true;
@@ -4059,7 +4076,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName        )               {
+    _getCurrentAnimationInputValue(inputName         )          {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4140,7 +4157,9 @@
      * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
      */
     setCurrentAnimationValue(inputName        , inputValue                                           ) {
-      this._setDirtyToAnimatedElement(inputName);
+      if ((this     )._setDirtyToAnimatedElement != null) {
+        (this     )._setDirtyToAnimatedElement(inputName);
+      }
       this._currentAnimationInputValues[inputName] = inputValue;
     }
 
@@ -4177,7 +4196,7 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName        , inputValue        )                {
+    getTranslateAt(lineName        , inputValue         )           {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
@@ -4186,7 +4205,7 @@
       return value;
     }
 
-    getTranslateAtOrStatic(lineName        , inputValue        ) {
+    getTranslateAtOrStatic(lineName        , inputValue         ) {
       let value = this.getTranslateAt(lineName, inputValue);
       if (value === null) {
         return this.getTranslateNotAnimated();
@@ -4210,7 +4229,7 @@
       return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getRotateAt(lineName        , inputValue         ) {
+    getRotateAt(lineName        , inputValue        ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
       if (value !== null) {
         this._rotate = value;
@@ -4221,8 +4240,8 @@
 
     getRotateAtOrStatic(lineName        , inputValue         ) {
       let value = null;
-      if (this._activeAnimationLineName) {
-        value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+      if (lineName != null && inputValue != null) {
+        value = this.getRotateAt(lineName, inputValue);
       }
       if (value === null) {
         return this.getRotateNotAnimated();
@@ -4264,8 +4283,11 @@
       return value;
     }
 
-    getScaleAtOrStatic(lineName        , inputValue        ) {
-      let value = this.getScaleAt(lineName, inputValue);
+    getScaleAtOrStatic(lineName        , inputValue         ) {
+      let value = null;
+      if (lineName != null && inputValue != null) {
+        value = this.getScaleAt(lineName, inputValue);
+      }
       if (value === null) {
         return this.getScaleNotAnimated();
       }
@@ -4301,7 +4323,7 @@
 
     get matrix() {
       let input = void 0;
-      if (this._activeAnimationLineName !== null) {
+      if (this._activeAnimationLineName != null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
@@ -4363,7 +4385,7 @@
     }
 
 
-    getMatrixAtOrStatic(lineName        , inputValue        ) {
+    getMatrixAtOrStatic(lineName        , inputValue         ) {
       let input = inputValue;
 
       //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
@@ -9168,11 +9190,11 @@ return mat4(
 
       shaderText += 'if ( isWireframe ) {\n';
       shaderText += '  rt0 = wireframeResult;\n';
+      shaderText += '  if (rt0.a == 0.0) {\n';
+      shaderText += '    discard;\n';
+      shaderText += '  }\n';
       shaderText += '}\n';
 
-      shaderText += '    if (rt0.a < 0.05) {\n';
-      shaderText += '      discard;\n';
-      shaderText += '    }\n';
 
       /*
       //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
@@ -10366,7 +10388,7 @@ albedo.rgb *= (1.0 - metallic);
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
-      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable, alphaCutoff, true);
+      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
       
 
       const ambient = Vector4$1.multiplyVector(new Vector4$1(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
@@ -10495,12 +10517,12 @@ albedo.rgb *= (1.0 - metallic);
       return this._isAlphaTestEnable;
     }
 
-    set alphaCuttoff(value) {
+    set alphaCutoff(value) {
       this._alphaCutoff = value;
     }
 
-    get alphaCuttoff() {
-      return this.alphaCuttoff;
+    get alphaCutoff() {
+      return this._alphaCutoff;
     }
   }
 
@@ -11046,6 +11068,10 @@ albedo.rgb *= (1.0 - metallic);
       return (this.right - this.left) / (this.top - this.bottom);
     }
 
+    get fovy() {
+      return MathUtil.radianToDegree(2 * Math.atan(Math.abs(this.top - this.bottom) / (2 * this.zNear)));
+    }
+
     get allInfo() {
       const info = super.allInfo;
 
@@ -11109,8 +11135,8 @@ albedo.rgb *= (1.0 - metallic);
                                            
                                 
 
-    constructor(glBoostContext, toRegister, lookat, ortho) {
-      super(glBoostContext, toRegister, lookat);
+    constructor(glBoostSystem              , toRegister        , lookat       , ortho       ) {
+      super(glBoostSystem, toRegister, lookat);
 
       this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
       this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
@@ -13750,10 +13776,16 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["Screen"] = Screen;
 
-  //import GLContext from './GLContext';
+  //      
+                                             
+                                             
 
   class GLBoostLowContext {
-    constructor(canvas, initParameter, gl, width, height) {
+                            
+                                  
+                          
+
+    constructor(canvas                   , initParameter        , gl                      , width       , height       ) {
       this._setName();
 
       this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
@@ -13815,23 +13847,23 @@ albedo.rgb *= (1.0 - metallic);
       return new BlendShapeGeometry(this.__system);
     }
 
-    createCube(widthVector, vertexColor) {
+    createCube(widthVector         , vertexColor         ) {
       return new Cube(this.__system, widthVector, vertexColor);
     }
 
-    createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+    createPlane(width        , height        , uSpan        , vSpan        , customVertexAttributes       , isUVRepeat         ) {
       return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
     }
 
-    createSphere(radius, widthSegments, heightSegments, vertexColor) {
+    createSphere(radius        , widthSegments        , heightSegments        , vertexColor        ) {
       return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
     }
 
-    createAxis(length) {
+    createAxis(length        ) {
       return new Axis(this.__system, length);
     }
 
-    createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+    createParticle(centerPointData        , particleWidth        , particleHeight        , customVertexAttributes        , performanceHint        ) {
       return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
     }
 
@@ -13843,39 +13875,39 @@ albedo.rgb *= (1.0 - metallic);
       return new PBRMetallicRoughnessMaterial(this.__system);
     }
 
-    createPerspectiveCamera(lookat, perspective) {
+    createPerspectiveCamera(lookat       , perspective       ) {
       return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
     }
 
-    createFrustumCamera(lookat, perspective) {
+    createFrustumCamera(lookat       , perspective       ) {
       return new L_FrustumCamera(this.__system, true, lookat, perspective);
     }
 
-    createOrthoCamera(lookat, ortho) {
+    createOrthoCamera(lookat       , ortho       ) {
       return new L_OrthoCamera(this.__system, true, lookat, ortho);
     }
 
-    createCameraController(options) {
+    createCameraController(options       ) {
       return new L_CameraController(this.__system, options);
     }
 
-    createWalkThroughCameraController(options) {
+    createWalkThroughCameraController(options       ) {
       return new L_WalkThroughCameraController(this.__system, options);
     }
 
-    createTexture(src, userFlavorName, parameters = null) {
+    createTexture(src       , userFlavorName       , parameters         = null) {
       return new Texture(this.__system, src, userFlavorName, parameters);
     }
 
-    createPhinaTexture(width, height, fillStyle, parameters = null) {
+    createPhinaTexture(width       , height       , fillStyle        , parameters         = null) {
       return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
     }
 
-    createCubeTexture(userFlavorName, parameters) {
+    createCubeTexture(userFlavorName        , parameters        ) {
       return new CubeTexture(this.__system, userFlavorName, parameters);
     }
 
-    createScreen(screen, customVertexAttributes) {
+    createScreen(screen       , customVertexAttributes       ) {
       return new Screen(this.__system, screen, customVertexAttributes);
     }
 
@@ -13886,7 +13918,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param {number} textureNum - the number of creation.
      * @returns {Array} an array of created textures.
      */
-    createTexturesForRenderTarget(width, height, textureNum) {
+    createTexturesForRenderTarget(width        , height       , textureNum       ) {
       var glContext = this.__system._glContext;
       var gl = glContext.gl;
 
@@ -13926,7 +13958,7 @@ albedo.rgb *= (1.0 - metallic);
       return fbo._glboostTextures.concat();
     }
 
-    createDepthTexturesForRenderTarget(width, height) {
+    createDepthTexturesForRenderTarget(width       , height       ) {
       var glContext = this.__system._glContext;
 
       var gl = glContext.gl;
@@ -13993,7 +14025,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glContext.belongingCanvasId;
     }
 
-    set globalStatesUsage(usageMode) {
+    set globalStatesUsage(usageMode        ) {
       this.__system._globalStatesUsage = usageMode;
     }
 
@@ -14004,9 +14036,11 @@ albedo.rgb *= (1.0 - metallic);
     reflectGlobalGLState() {
       let gl = this.__system._glContext.gl;
 
-      this.currentGlobalStates.forEach((state)=>{
-        gl.enable(state);
-      });
+      if (this.currentGlobalStates != null) {
+        this.currentGlobalStates.forEach((state)=>{
+          gl.enable(state);
+        });
+      }
 
       gl.depthFunc( gl.LEQUAL );
 
@@ -14034,7 +14068,7 @@ albedo.rgb *= (1.0 - metallic);
       });
     }
 
-    set currentGlobalStates(states) {
+    set currentGlobalStates(states               ) {
       this.__system._currentGlobalStates = states.concat();
     }
 
@@ -14050,8 +14084,8 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glBoostMonitor;
     }
 
-    setPropertiesFromJson(arg, queryType = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-      let json = arg;
+    setPropertiesFromJson(arg              , queryType        = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+      let json     = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
@@ -14061,9 +14095,10 @@ albedo.rgb *= (1.0 - metallic);
       }
       let objects = null;
       if (queryType === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName     ));
       } else if (queryType === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        const targetInstanceName      = (json        ).targetInstanceName;
+        const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
         if (found != null && found.userFlavorName === json.targetUserFlavorName) {
           objects = [found];
         } else {
@@ -14074,7 +14109,7 @@ albedo.rgb *= (1.0 - metallic);
         objects = [found];
       }
 
-      objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+      objects.forEach((obj    )=>{obj.setPropertiesFromJson(json);});
      
       return objects;
     }
@@ -15336,6 +15371,145 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['Expression'] = Expression;
 
+  class M_FrustumCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set left(value) {
+      this._lowLevelCamera.left = value;
+    }
+
+    get left() {
+      return this._lowLevelCamera.left;
+    }
+
+    set right(value) {
+      this._lowLevelCamera.right = value;
+    }
+
+    get right() {
+      return this._lowLevelCamera.right;
+    }
+
+    set top(value) {
+      this._lowLevelCamera.top = value;
+    }
+
+    get top() {
+      return this._lowLevelCamera.top;
+    }
+
+    set bottom(value) {
+      this._lowLevelCamera.bottom = value;
+    }
+
+    get bottom() {
+      return this._lowLevelCamera.bottom;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+    get aspect() {
+      return this._lowLevelCamera.aspect;
+    }
+
+    get fovy() {
+      return this._lowLevelCamera.fovy;
+    }
+  }
+
+  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
+
+  class M_PerspectiveCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set fovy(value) {
+      this._lowLevelCamera.fovy = value;
+    }
+
+    get fovy() {
+      return this._lowLevelCamera.fovy;
+    }
+
+    set aspect(value) {
+      this._lowLevelCamera.aspect = value;
+    }
+
+    get aspect() {
+      return this._lowLevelCamera.aspect;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+  }
+
+  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
+
   class EffekseerElement$1 extends M_Element {
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -15379,14 +15553,9 @@ albedo.rgb *= (1.0 - metallic);
       
     }
 
-    update() {
+    update(camera) {
       if (this.__handle != null) {
-        const m = this.worldMatrix;
-        this.__handle.setLocation(m.m03, m.m13, m.m23);
-        const eular = m.toEulerAngles();
-        this.__handle.setRotation(eular.x, eular.y, eular.z);
-        const scale = m.getScale();
-        this.__handle.setScale(scale.x, scale.y, scale.z);
+        this.__handle.setMatrix(this.worldMatrix.m);
         this.__handle.setSpeed(this.__speed);
       }
     }
@@ -16065,8 +16234,13 @@ albedo.rgb *= (1.0 - metallic);
       // gather scenes as unique
       for (let renderPass of expression.renderPasses) {
         skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-        effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+  //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+        effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement$1));
         renderPass.scene.updateAmountOfAmbientLightsIntensity();
+        let camera = renderPass.scene.getMainCamera();
+        for (let effekseerElement of effekseerElements) {
+          effekseerElement.update(camera);
+        }
       }
 
       let unique = function(array) {
@@ -16081,10 +16255,6 @@ albedo.rgb *= (1.0 - metallic);
       
       for (let mesh of skeletalMeshes) {
         mesh.geometry.update(mesh);
-      }
-
-      for (let effekseerElement of effekseerElements) {
-        effekseerElement.update();
       }
 
       if (typeof effekseer !== "undefined") {
@@ -16213,11 +16383,11 @@ albedo.rgb *= (1.0 - metallic);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //      glem.drawBuffers(gl, [gl.BACK]);
 
-        if (typeof effekseer !== "undefined") {
-          const projection = (camera === null) ? Matrix44$1.identity().m : camera.projectionRHMatrix().m;
-          const inverseWorld = (camera === null) ? Matrix44$1.identity().m : camera.inverseWorldMatrix.m; 
+        if (typeof effekseer !== "undefined" && camera != null) {
+          const projection = camera.projectionRHMatrix().m;
+          const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
           effekseer.setProjectionMatrix(projection);
-          effekseer.setCameraMatrix(inverseWorld);
+          effekseer.setCameraMatrix(viewing);
           effekseer.draw();
         }
 
@@ -17695,142 +17865,6 @@ albedo.rgb *= (1.0 - metallic);
         return super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, skeletalMesh, derrivedClass, argMaterials);
       }
   }
-
-  class M_PerspectiveCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set fovy(value) {
-      this._lowLevelCamera.fovy = value;
-    }
-
-    get fovy() {
-      return this._lowLevelCamera.fovy;
-    }
-
-    set aspect(value) {
-      this._lowLevelCamera.aspect = value;
-    }
-
-    get aspect() {
-      return this._lowLevelCamera.aspect;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-  }
-
-  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
-
-  class M_FrustumCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set left(value) {
-      this._lowLevelCamera.left = value;
-    }
-
-    get left() {
-      return this._lowLevelCamera.left;
-    }
-
-    set right(value) {
-      this._lowLevelCamera.right = value;
-    }
-
-    get right() {
-      return this._lowLevelCamera.right;
-    }
-
-    set top(value) {
-      this._lowLevelCamera.top = value;
-    }
-
-    get top() {
-      return this._lowLevelCamera.top;
-    }
-
-    set bottom(value) {
-      this._lowLevelCamera.bottom = value;
-    }
-
-    get bottom() {
-      return this._lowLevelCamera.bottom;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-    get aspect() {
-      return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
-    }
-
-  }
-
-  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
 
   class M_OrthoCamera extends M_AbstractCamera {
     constructor(glBoostContext, toRegister, lookat, ortho) {
@@ -23659,8 +23693,7 @@ albedo.rgb *= (1.0 - metallic);
                                         
                          
                             
-
-                           
+                                   
 
     constructor() {
     }
@@ -23760,7 +23793,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__animationMotions;
     }
 
-    set animationMotions(motions    ) {
+    set animationMotions(motions            ) {
       this.__animationMotions = motions;
     }
   }
@@ -23840,4 +23873,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-285-g6fca-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-297-gc4f9-mod branch: develop';

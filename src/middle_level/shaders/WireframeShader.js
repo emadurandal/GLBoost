@@ -102,11 +102,11 @@ export class WireframeShaderSource {
 
     shaderText += 'if ( isWireframe ) {\n';
     shaderText += '  rt0 = wireframeResult;\n';
+    shaderText += '  if (rt0.a == 0.0) {\n';
+    shaderText += '    discard;\n';
+    shaderText += '  }\n';
     shaderText += '}\n';
 
-    shaderText += '    if (rt0.a < 0.05) {\n';
-    shaderText += '      discard;\n';
-    shaderText += '    }\n';
 
     /*
     //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
