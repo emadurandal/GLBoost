@@ -1,6 +1,7 @@
 import GLBoost from '../../globals';
 import Vector4 from '../../low_level/math/Vector4';
 import M_Mesh from '../elements/meshes/M_Mesh';
+import M_Group from '../elements/M_Group';
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -57,14 +58,17 @@ export default class GLBoostGLTFLoaderExtension {
     }
 
     // Transparent Meshes Draw Order
-    if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+    if (asset && asset.extras) {
       rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
-      let meshes = rootGroup.searchElementsByType(M_Mesh);
+      let meshParents = rootGroup.searchElementsByType(M_Group);
       rootGroup.transparentMeshes = [];
       for (let name of rootGroup.transparentMeshesDrawOrder) {
-        for (let mesh of meshes) {
-          if (mesh.userFlavorName === name) {
-            rootGroup.transparentMeshes.push(mesh);
+        for (let parent of meshParents) {
+          if (parent.userFlavorName === name) {
+            const mesh = parent.getChildren()[0];
+            if (mesh.isTransparent) {
+              rootGroup.transparentMeshes.push(mesh);
+            }
             break;
           }
         }

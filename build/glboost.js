@@ -14867,9 +14867,6 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     searchElementsByType(type     , element           = this) {
-      if (element instanceof type) {
-        return element;
-      }
 
       if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
@@ -14891,8 +14888,18 @@ albedo.rgb *= (1.0 - metallic);
             results.push(hitChildOrChildren);
           }
         }
+
+        if (type === M_Group) {
+          results.push(element);
+        }
         return results;
       }
+      
+      if (element instanceof type) {
+        return element;
+      }
+
+      
       return null;
     }
 
@@ -16363,7 +16370,7 @@ albedo.rgb *= (1.0 - metallic);
 
         transparentMeshes.forEach((mesh)=> {
           //console.log(mesh.userFlavorName);
-          if (mesh.isVisible) {
+          if (mesh.isVisible && mesh.isTransparent) {
             mesh.draw({
               expression: expression,
               lights: lights,
@@ -20089,6 +20096,8 @@ albedo.rgb *= (1.0 - metallic);
         this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
       }
 
+      
+
     }
 
     _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
@@ -20126,15 +20135,15 @@ albedo.rgb *= (1.0 - metallic);
         // Animation
         this._loadAnimation(group, buffers, json, glTFVer, options);
 
-        if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-          options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-        }
-
         rootGroup.addChild(group);
 
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
+      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      }
 
       resolve(rootGroup);
     }
@@ -23633,14 +23642,17 @@ albedo.rgb *= (1.0 - metallic);
       }
 
       // Transparent Meshes Draw Order
-      if (asset && asset.extras && asset.extras.transparent_meshes_draw_order) {
+      if (asset && asset.extras) {
         rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
-        let meshes = rootGroup.searchElementsByType(M_Mesh);
+        let meshParents = rootGroup.searchElementsByType(M_Group);
         rootGroup.transparentMeshes = [];
         for (let name of rootGroup.transparentMeshesDrawOrder) {
-          for (let mesh of meshes) {
-            if (mesh.userFlavorName === name) {
-              rootGroup.transparentMeshes.push(mesh);
+          for (let parent of meshParents) {
+            if (parent.userFlavorName === name) {
+              const mesh = parent.getChildren()[0];
+              if (mesh.isTransparent) {
+                rootGroup.transparentMeshes.push(mesh);
+              }
               break;
             }
           }
@@ -23873,4 +23885,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-297-gc4f9-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-298-g3e1c-mod branch: develop';
