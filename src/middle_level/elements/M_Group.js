@@ -200,9 +200,6 @@ export default class M_Group extends M_Element {
   }
 
   searchElementsByType(type: any, element:M_Element = this) {
-    if (element instanceof type) {
-      return element;
-    }
 
     if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
       let gizmos = element._gizmos;
@@ -224,8 +221,18 @@ export default class M_Group extends M_Element {
           results.push(hitChildOrChildren);
         }
       }
+
+      if (type === M_Group) {
+        results.push(element);
+      }
       return results;
     }
+    
+    if (element instanceof type) {
+      return element;
+    }
+
+    
     return null;
   }
 

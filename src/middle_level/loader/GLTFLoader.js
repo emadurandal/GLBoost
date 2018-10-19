@@ -413,6 +413,8 @@ export default class GLTFLoader {
       this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
+    
+
   }
 
   _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
@@ -450,15 +452,15 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer, options);
 
-      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-      }
-
       rootGroup.addChild(group);
 
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
+    if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+    }
 
     resolve(rootGroup);
   }

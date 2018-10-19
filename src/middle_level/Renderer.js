@@ -174,7 +174,7 @@ export default class Renderer extends GLBoostObject {
 
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
-        if (mesh.isVisible) {
+        if (mesh.isVisible && mesh.isTransparent) {
           mesh.draw({
             expression: expression,
             lights: lights,
