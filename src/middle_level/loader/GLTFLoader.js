@@ -462,7 +462,7 @@ export default class GLTFLoader {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
     }
     if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
-      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json);
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
     }
 
     resolve(rootGroup);

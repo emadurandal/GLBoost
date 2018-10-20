@@ -20145,7 +20145,7 @@ albedo.rgb *= (1.0 - metallic);
         options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
       }
       if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
-        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json);
+        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
       }
 
       resolve(rootGroup);
@@ -22171,10 +22171,10 @@ albedo.rgb *= (1.0 - metallic);
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset, glBoostContext);
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
       }
       if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
-        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json);
+        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -23637,7 +23637,7 @@ albedo.rgb *= (1.0 - metallic);
       texture.uvTransform = uvTransform;
     }
 
-    setAssetPropertiesToRootGroup(rootGroup, asset, glBoostContext) {
+    setAssetPropertiesToRootGroup(rootGroup, asset) {
       // Animation FPS
       if (asset && asset.animationFps) {
         rootGroup.animationFps = asset.animationFps;
@@ -23682,7 +23682,7 @@ albedo.rgb *= (1.0 - metallic);
 
     }
 
-    loadExtensionInfoAndSetToRootGroup(rootGroup, json) {
+    loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext) {
       rootGroup['extensions'] = json.extensions;
       if (json.extensions && json.extensions.GLBoost) {
         const ext = json.extensions.GLBoost;
@@ -23926,4 +23926,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-299-g886a-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-300-gab67-mod branch: develop';

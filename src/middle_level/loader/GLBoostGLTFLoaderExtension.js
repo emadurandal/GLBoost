@@ -47,7 +47,7 @@ export default class GLBoostGLTFLoaderExtension {
     texture.uvTransform = uvTransform;
   }
 
-  setAssetPropertiesToRootGroup(rootGroup, asset, glBoostContext) {
+  setAssetPropertiesToRootGroup(rootGroup, asset) {
     // Animation FPS
     if (asset && asset.animationFps) {
       rootGroup.animationFps = asset.animationFps;
@@ -92,7 +92,7 @@ export default class GLBoostGLTFLoaderExtension {
 
   }
 
-  loadExtensionInfoAndSetToRootGroup(rootGroup, json) {
+  loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext) {
     rootGroup['extensions'] = json.extensions;
     if (json.extensions && json.extensions.GLBoost) {
       const ext = json.extensions.GLBoost;
