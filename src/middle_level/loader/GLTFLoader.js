@@ -461,6 +461,9 @@ export default class GLTFLoader {
     if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
     }
+    if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json);
+    }
 
     resolve(rootGroup);
   }

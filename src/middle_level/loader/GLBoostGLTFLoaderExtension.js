@@ -32,6 +32,21 @@ export default class GLBoostGLTFLoaderExtension {
     return this[singleton];
   }
 
+  setUVTransformToTexture(texture, samplerJson) {
+    let uvTransform = new Vector4(1, 1, 0, 0);
+    if (samplerJson.extras && samplerJson.extras.scale) {
+      let scale = samplerJson.extras.scale;
+      uvTransform.x = scale[0];
+      uvTransform.y = scale[1];
+    }
+    if (samplerJson.extras && samplerJson.extras.translation) {
+      let translation = samplerJson.extras.translation;
+      uvTransform.z = translation[0];
+      uvTransform.w = translation[1];
+    }
+    texture.uvTransform = uvTransform;
+  }
+
   setAssetPropertiesToRootGroup(rootGroup, asset, glBoostContext) {
     // Animation FPS
     if (asset && asset.animationFps) {
@@ -40,7 +55,7 @@ export default class GLBoostGLTFLoaderExtension {
 
     // other information
     if (asset && asset.version) {
-      rootGroup.spv_version = asset.version;
+      rootGroup.version = asset.version;
     }
     if (asset && asset.LastSaved_ApplicationVendor) {
       rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
@@ -59,7 +74,7 @@ export default class GLBoostGLTFLoaderExtension {
 
     // Transparent Meshes Draw Order
     if (asset && asset.extras) {
-      rootGroup.transparentMeshesDrawOrder = asset.extras.transparent_meshes_draw_order;
+      rootGroup.transparentMeshesDrawOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
       let meshParents = rootGroup.searchElementsByType(M_Group);
       rootGroup.transparentMeshes = [];
       for (let name of rootGroup.transparentMeshesDrawOrder) {
@@ -75,8 +90,43 @@ export default class GLBoostGLTFLoaderExtension {
       }
     }
 
-    if (asset && asset.extras && asset.extras.effekseerEffects) {
-      for (let effect of asset.extras.effekseerEffects) {
+  }
+
+  loadExtensionInfoAndSetToRootGroup(rootGroup, json) {
+    rootGroup['extensions'] = json.extensions;
+    if (json.extensions && json.extensions.GLBoost) {
+      const ext = json.extensions.GLBoost;
+
+      // Assignment for Backward Compatibility
+      if (ext.animation) {
+        if (ext.animation.fps != null) {
+          rootGroup.animationFps = ext.animation.fps; 
+        }
+        if (ext.animation.tracks != null) {
+          rootGroup.animationTracks = ext.animation.tracks;
+        }
+      }
+
+      // Transparent Meshes Draw Order
+      rootGroup.transparentMeshesDrawOrder = (ext.transparentMeshesDrawOrder != null) ? ext.transparentMeshesDrawOrder : [];
+      let meshParents = rootGroup.searchElementsByType(M_Group);
+      rootGroup.transparentMeshes = [];
+      for (let name of rootGroup.transparentMeshesDrawOrder) {
+        for (let parent of meshParents) {
+          if (parent.userFlavorName === name) {
+            const mesh = parent.getChildren()[0];
+            if (mesh.isTransparent) {
+              rootGroup.transparentMeshes.push(mesh);
+            }
+            break;
+          }
+        }
+      }
+    }
+
+    if (json.extensions && json.extensions.Effekseer) {
+      const ext = json.extensions.Effekseer;
+      for (let effect of ext.effects) {
         const group = rootGroup.searchElement(effect.nodeName, {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING});
         const effekseerElm = glBoostContext.createEffekseerElement();
         const promise = effekseerElm.load(asset.extras.basePath + effect.efkName + '.efk', true, true);
@@ -85,21 +135,6 @@ export default class GLBoostGLTFLoaderExtension {
         });
       }
     }
-  }
-
-  setUVTransformToTexture(texture, samplerJson) {
-    let uvTransform = new Vector4(1, 1, 0, 0);
-    if (samplerJson.extras && samplerJson.extras.scale) {
-      let scale = samplerJson.extras.scale;
-      uvTransform.x = scale[0];
-      uvTransform.y = scale[1];
-    }
-    if (samplerJson.extras && samplerJson.extras.translation) {
-      let translation = samplerJson.extras.translation;
-      uvTransform.z = translation[0];
-      uvTransform.w = translation[1];
-    }
-    texture.uvTransform = uvTransform;
   }
 
 }

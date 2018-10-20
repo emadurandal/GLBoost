@@ -104,6 +104,9 @@ export default class ModelConverter {
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset, glBoostContext);
     }
+    if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json);
+    }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
 
