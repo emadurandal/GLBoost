@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>GLBoost Triangle Strip example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+  <script src="../../../libs/phina.js"></script>
+  <script src="../../../build/glboost.js"></script>
+
+</head>
+
+<body>
+  <header>
+    <p class="header-title">GLBoost Triangle Strip example</p>
+  </header>
+  <main>
+    <canvas id="world" width="600" height="600"></canvas>
+  </main>
+  <script>
+
+    var arg = new Object;
+    var pair = location.search.substring(1).split('&');
+    for (var i = 0; pair[i]; i++) {
+      var kv = pair[i].split('=');
+      arg[kv[0]] = kv[1];
+    }
+
+    GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+    var SCREEN_WIDTH = 640;
+    var SCREEN_HEIGHT = 640;
+
+    phina.globalize();
+
+
+    var canvas = document.getElementById("world");
+    var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+    var scene = glBoostContext.createScene();
+
+    var renderer = glBoostContext.createRenderer({
+      canvas: canvas,
+      clearColor: {
+        red: 0.6,
+        green: 0.6,
+        blue: 0.6,
+        alpha: 1
+      }
+    });
+
+
+    var positions = [
+      new GLBoost.Vector3(-0.5, -0.5, 0.0),
+      new GLBoost.Vector3(0.5, -0.5, 0.0),
+      new GLBoost.Vector3(-0.5, 0.5, 0.0),
+      new GLBoost.Vector3(0.5, 0.5, 0.0)
+    ];
+
+    var colors = [
+      new GLBoost.Vector4(1.0, 1.0, 1.0, 0.7),
+      new GLBoost.Vector4(1.0, 1.0, 1.0, 0.7),
+      new GLBoost.Vector4(0.5, 0.5, 0.5, 0.7),
+      new GLBoost.Vector4(0.5, 0.5, 0.5, 0.7)
+
+    ];
+    var texcoords = [
+      new GLBoost.Vector2(0.0, 1.0),
+      new GLBoost.Vector2(1.0, 1.0),
+      new GLBoost.Vector2(0.0, 0.0),
+      new GLBoost.Vector2(1.0, 0.0)
+    ];
+
+    var geometry = glBoostContext.createGeometry();
+    var texture = glBoostContext.createTexture('resources/texture.png');
+    var material = glBoostContext.createClassicMaterial();
+    material.setTexture(texture);
+    var mesh = glBoostContext.createMesh(geometry, material);
+    geometry.setVerticesData({
+      position: positions,
+      color: colors,
+      texcoord: texcoords
+    }, null, GLBoost.TRIANGLE_STRIP // GLBoost.TRIANGLES GLBoost.POINTS GLBoost.LINES GLBoost.LINE_STRIP GLBoost.LINE_LOOP
+    );
+
+    scene.addChild(mesh);
+
+    var expression = glBoostContext.createExpressionAndRenderPasses(1);
+    expression.renderPasses[0].scene = scene;
+    expression.renderPasses[0].setClearColor(new GLBoost.Vector4(0.8, 0.8, 0.8, 1));
+    expression.prepareToRender();
+
+    var label = Label('phina.jsとGLBoostの\n夢の共演！');
+    label.fill = 'white';
+    label.stroke = 'black';
+    label.fontSize = 32;
+    label.strokeWidth = 4;
+    // label.x = this.gridX.center();
+    // label.y = this.gridY.center();
+
+    var render = function () {
+      renderer.clearCanvas();
+      renderer.update(expression);
+      renderer.draw(expression);
+      requestAnimationFrame(render);
+    };
+    render();  
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  padding: 10px; }
+
+.header-title {
+  margin: 10px;
+  font-size: 1em; 
+  position: absolute;
+  z-index: 1;
+}
+
+.menu .menu-list {
+  display: inline-block;
+  width: 100px;
+  margin: 10px; }
+  .menu .menu-list a {
+    text-decoration: underline; }
