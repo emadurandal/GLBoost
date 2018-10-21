@@ -517,7 +517,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: new Vector3(0.0, 0.0, -1.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -532,7 +532,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: new Vector3(0.0, 0.0, -1.0),
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
