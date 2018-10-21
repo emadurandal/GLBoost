@@ -2406,10 +2406,10 @@
 
     multiply(q) {
       let result = new Quaternion(0, 0, 0, 1);
-      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
-      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
-      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
-      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+      result.x =   q.w*this.x + q.z*this.y + q.y*this.z - q.x*this.w;
+      result.y = - q.z*this.x + q.w*this.y + q.x*this.z - q.y*this.w;
+      result.z =   q.y*this.x + q.x*this.y + q.w*this.z - q.z*this.w;
+      result.w = - q.x*this.x - q.y*this.y - q.z*this.z - q.w*this.w;
       this.x = result.x;
       this.y = result.y;
       this.z = result.z;
@@ -2420,10 +2420,10 @@
 
     static multiply(q1, q2) {
       let result = new Quaternion(0, 0, 0, 1);
-      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
-      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
-      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+      result.x =   q2.w*q1.x + q2.z*q1.y - q2.y*q1.z + q2.x*q1.w;
+      result.y = - q2.z*q1.x + q2.w*q1.y + q2.x*q1.z + q2.y*q1.w;
+      result.z =   q2.y*q1.x - q2.x*q1.y + q2.w*q1.z + q2.z*q1.w;
+      result.w = - q2.x*q1.x - q2.y*q1.y - q2.z*q1.z + q2.w*q1.w;
       return result;
     }
 
@@ -4811,7 +4811,7 @@
         return Matrix44$1.identity();
       }
 
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
+      return this._multiplyMyAndParentTransformMatrices(false, null).clone().invert();
     }
 
     _multiplyMyAndParentRotateMatrices(currentElem                  , withMySelf         ) {
@@ -5047,7 +5047,7 @@
     }
 
     _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
+      if (input === null && this._activeAnimationLineName !== null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
@@ -20195,12 +20195,17 @@ albedo.rgb *= (1.0 - metallic);
         let cameraStr = nodeJson.camera;
         let cameraJson = json.cameras[cameraStr];
         let camera = null;
+
+        let centerVec = new Vector3(0.0, 0.0, -1.0);
+        if (json.asset && json.asset.LastSaved_ApplicationVendor) {
+          centerVec = new Vector3(1.0, 0.0, 0.0);
+        }
         if (cameraJson.type === 'perspective') {
           let perspective = cameraJson.perspective;
           camera = glBoostContext.createPerspectiveCamera(
             {
               eye: new Vector3(0.0, 0.0, 0),
-              center: new Vector3(1.0, 0.0, 0.0),
+              center: centerVec,
               up: new Vector3(0.0, 1.0, 0.0)
             },
             {
@@ -20215,7 +20220,7 @@ albedo.rgb *= (1.0 - metallic);
           camera = glBoostContext.createOrthoCamera(
             {
               eye: new Vector3(0.0, 0.0, 0),
-              center: new Vector3(1.0, 0.0, 0.0),
+              center: centerVec,
               up: new Vector3(0.0, 1.0, 0.0)
             },
             {
@@ -23926,4 +23931,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-300-gab67-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-304-gb080-mod branch: develop';

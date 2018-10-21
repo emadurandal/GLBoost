@@ -512,12 +512,18 @@ export default class GLTFLoader {
       let cameraStr = nodeJson.camera;
       let cameraJson = json.cameras[cameraStr];
       let camera = null;
+
+      let centerVec = new Vector3(0.0, 0.0, -1.0);
+      if (json.asset && json.asset.LastSaved_ApplicationVendor) {
+        // For backwards compatibility
+        centerVec = new Vector3(1.0, 0.0, 0.0);
+      }
       if (cameraJson.type === 'perspective') {
         let perspective = cameraJson.perspective;
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -532,7 +538,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(0.0, 0.0, -1.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
