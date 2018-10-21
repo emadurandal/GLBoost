@@ -65,7 +65,7 @@ export default class GLTF2Loader {
    * @param {Object} options - opition data for loading
    * @return {Promise}
    */
-  loadGLTF(uri, options) {
+  loadGLTF(uri, options = {}) {
     let defaultOptions = {
       files: { 
         //        "foo.gltf": content of file as ArrayBuffer, 
