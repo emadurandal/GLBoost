@@ -180,7 +180,7 @@ export default class M_Element extends L_Element {
       return Matrix44.identity();
     }
 
-    return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
+    return this._multiplyMyAndParentTransformMatrices(false, null).clone().invert();
   }
 
   _multiplyMyAndParentRotateMatrices(currentElem: M_Element | null, withMySelf: boolean) {
@@ -416,7 +416,7 @@ export default class M_Element extends L_Element {
   }
 
   _multiplyMyAndParentTransformMatrices(withMySelf, input) {
-    if (input === void 0 && this._activeAnimationLineName !== null) {
+    if (input === null && this._activeAnimationLineName !== null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
@@ -439,8 +439,6 @@ export default class M_Element extends L_Element {
       this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
       this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
       this.__cache_input_multiplyMyAndParentTransformMatrices = input;
-    } else {
-      let hoge = 10;
     }
     return this.__cache_returnValue_multiplyMyAndParentTransformMatrices;
   
