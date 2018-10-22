@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
-  <script src="../../../libs/phina.js"></script>
   <script src="../../../build/glboost.js"></script>
 </head>
 
@@ -19,8 +18,6 @@
     <canvas id="world" width="600" height="600"></canvas>
   </main>
   <script>
-
-    phina.globalize();
 
     var canvas = document.getElementById("world");
     var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
@@ -97,17 +94,6 @@
         zFar: 1000.0
       });
     scene.addChild(camera);
-
-
-    var label = Label('phina.jsとGLBoostの\n夢の共演！');
-    label.fill = 'white';
-    label.stroke = 'black';
-    label.fontSize = 32;
-    label.strokeWidth = 4;
-    // label.x = this.gridX.center();
-    // label.y = this.gridY.center();
-    this.label = label;
-    scene.addChild(label);
 
     var expression = glBoostContext.createExpressionAndRenderPasses(1);
     expression.renderPasses[0].scene = scene;
