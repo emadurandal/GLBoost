@@ -616,7 +616,11 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
     mesh.userFlavorName = meshStr;
-    group.addChild(mesh);
+
+    if (!(options.ignoreMeshList != null) || options.ignoreMeshList.indexOf(mesh.userFlavorName) === -1) {
+      // if the mesh name is not in ignore list, add it to the group.
+      group.addChild(mesh);
+    }
 
     if (options && options.isMeshTransparentAsDefault) {
       mesh.isTransparentForce = true;
