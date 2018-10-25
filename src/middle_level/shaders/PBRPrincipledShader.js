@@ -34,7 +34,6 @@ export class PBRPrincipledShaderSource {
     
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
-    shaderText += 'uniform vec2 uAlphaTestParameters;\n';
 
     
 
@@ -302,13 +301,6 @@ albedo.rgb *= (1.0 - metallic);
 
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
     
-    uAlphaTestParameters
-
-    shaderText += `
-                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
-                       discard;
-                     }
-    `;
 //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
@@ -325,7 +317,6 @@ albedo.rgb *= (1.0 - metallic);
     material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
     material.setUniform(shaderProgram, 'uniform_IBLParameters', this._glContext.getUniformLocation(shaderProgram, 'uIBLParameters'));
     material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
-    material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
     material.setTexture(this._glBoostSystem._glBoostContext.brdfLutTexture, GLBoost.TEXTURE_PURPOSE_BRDF_LUT);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
@@ -366,7 +357,6 @@ export default class PBRPrincipledShader extends DecalShader {
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
-    this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
     
 
     const ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());

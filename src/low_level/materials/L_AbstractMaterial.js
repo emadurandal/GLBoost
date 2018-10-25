@@ -49,6 +49,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
       "lineWidth": [1.0],
       "polygonOffset": [0.0, 0.0]
     };
+    this._isAlphaTestEnable = true;
+    this._alphaCutoff = 0.001;
 
     this._countOfUpdate = 0;
   }
@@ -296,7 +298,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
   }
 
-  setUpStates() {
+  setUpStates(mesh) {
     let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
     if (this._globalStatesUsage) {
       globalStatesUsage = this._globalStatesUsage;
@@ -317,6 +319,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
       default:
         break;
     }
+
+//    if (mesh.isTransparent) {
+//      this._gl.disable(2929);
+//    }
   }
 
   tearDownStates() {
@@ -431,6 +437,14 @@ export default class L_AbstractMaterial extends GLBoostObject {
 
   getTextureNumAttachedShader() {
     return Object.keys(this._textureSemanticsDic).length;
+  }
+
+  set alphaCutoff(value) {
+    this._alphaCutoff = value;
+  }
+
+  get alphaCutoff() {
+    return this._alphaCutoff;
   }
 
 }

@@ -1,6 +1,6 @@
-version: 0.0.4-319-ga0520-mod
-branch: develop
-04de92206c85884ed415a720be3067d605854e0b68c4afd6c4ddcd5dd0254b9d ./build/glboost.js
-04de92206c85884ed415a720be3067d605854e0b68c4afd6c4ddcd5dd0254b9d ./build/glboost.js
-53b6d4883d8281063875987ad856f6aeec9027a9ce7265af477d1c2bec6bde01 ./build/glboost.min.js
+version: 0.0.4-321-gc36c-mod
+branch: 
+329a7a22385c96d41ac3b644aa5c7b48945dfac549ca8d01d9ad38b0d320c528 ./build/glboost.js
+329a7a22385c96d41ac3b644aa5c7b48945dfac549ca8d01d9ad38b0d320c528 ./build/glboost.js
+2d255f87dd360768fa125a3737876b58833852d4371f72d680a480bc0c8a3ac5 ./build/glboost.min.js
 7bf12109d8a418d29a30c9b5060412dbef549f1f937b6fc469fc4181018e234d ./build/glboost.min.js.map
