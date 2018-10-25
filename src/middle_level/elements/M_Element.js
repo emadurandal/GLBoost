@@ -225,7 +225,7 @@ export default class M_Element extends L_Element {
 
   get isTransparent() {
     let isTransparent = (this._opacity < 1.0) ? true : false;
-    isTransparent |= this._isTransparentForce;
+    isTransparent = isTransparent || this._isTransparentForce;
     return isTransparent;
   }
 

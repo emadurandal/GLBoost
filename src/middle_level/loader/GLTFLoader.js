@@ -622,8 +622,8 @@ export default class GLTFLoader {
       group.addChild(mesh);
     }
 
-    if (options && options.isMeshTransparentAsDefault) {
-      mesh.isTransparentForce = true;
+    if (options && options.isMeshTransparentAsDefault || options && options.defaultStates && options.defaultStates.isTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
@@ -765,7 +765,7 @@ export default class GLTFLoader {
                 group.getChildren().forEach((elem)=>{
                   let isMatch = this.isTargetMatch(statesInfo, elem, target);
                   if (isMatch) {
-                    elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                    elem.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
                     if (statesInfo.states) {
                       material.states = statesInfo.states;
                     }

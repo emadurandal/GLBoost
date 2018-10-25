@@ -49,6 +49,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
       "lineWidth": [1.0],
       "polygonOffset": [0.0, 0.0]
     };
+    this._isAlphaTestEnable = true;
+    this._alphaCutoff = 0.1;
 
     this._countOfUpdate = 0;
   }
@@ -296,7 +298,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
   }
 
-  setUpStates() {
+  setUpStates(mesh) {
     let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
     if (this._globalStatesUsage) {
       globalStatesUsage = this._globalStatesUsage;
@@ -316,6 +318,12 @@ export default class L_AbstractMaterial extends GLBoostObject {
         break;
       default:
         break;
+    }
+
+    if (mesh.isTransparent || this.isTransparent) {
+      //this._gl.disable(2929);
+      this._gl.enable(3042);
+      //this._gl.colorMask(true, true, true, false);
     }
   }
 
@@ -433,6 +441,21 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return Object.keys(this._textureSemanticsDic).length;
   }
 
+  set isAlphaTest(flg){
+    this._isAlphaTestEnable = flg;
+  }
+
+  get isAlphaTest() {
+    return this._isAlphaTestEnable;
+  }
+
+  set alphaCutoff(value) {
+    this._alphaCutoff = value;
+  }
+
+  get alphaCutoff() {
+    return this._alphaCutoff;
+  }
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;

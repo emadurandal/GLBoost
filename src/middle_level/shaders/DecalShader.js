@@ -50,7 +50,8 @@ export class DecalShaderSource {
     }
     shaderText += 'uniform vec4 materialBaseColor;\n';
     shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
-
+    shaderText += 'uniform vec2 uAlphaTestParameters;\n';
+    
     return shaderText;
   }
 
@@ -83,6 +84,17 @@ export class DecalShaderSource {
     return shaderText;
   }
 
+  FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
+    shaderText += `
+                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
+                       discard;
+                     }
+    `;
+
+    return shaderText;
+  }
+
   prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
@@ -107,11 +119,12 @@ export class DecalShaderSource {
       let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
       material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
     }
+    material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
     
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
-
+    
     return vertexAttribsAsResult;
   }
 }
@@ -144,7 +157,10 @@ export default class DecalShader extends WireframeShader {
       material.updateTextureInfo(GLBoost.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
       this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
-
+    
+    const alphaCutoff = material.alphaCutoff;
+    const isAlphaTestEnable = material.isAlphaTest;
+    this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
 
     // For Shadow
     for (let i=0; i<lights.length; i++) {
