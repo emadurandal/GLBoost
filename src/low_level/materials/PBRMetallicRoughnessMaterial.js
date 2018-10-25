@@ -113,22 +113,6 @@ export default class PBRMetallicRoughnessMaterial extends L_AbstractMaterial {
   get IBLSpecularContribution() {
     return this._IBLSpecularContribution;
   }
-
-  set isAlphaTest(flg){
-    this._isAlphaTestEnable = flg;
-  }
-
-  get isAlphaTest() {
-    return this._isAlphaTestEnable;
-  }
-
-  set alphaCutoff(value) {
-    this._alphaCutoff = value;
-  }
-
-  get alphaCutoff() {
-    return this._alphaCutoff;
-  }
 }
 
 GLBoost['PBRMetallicRoughnessMaterial'] = PBRMetallicRoughnessMaterial;

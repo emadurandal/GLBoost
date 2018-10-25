@@ -50,7 +50,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
       "polygonOffset": [0.0, 0.0]
     };
     this._isAlphaTestEnable = true;
-    this._alphaCutoff = 0.001;
+    this._alphaCutoff = 0.1;
 
     this._countOfUpdate = 0;
   }
@@ -320,9 +320,11 @@ export default class L_AbstractMaterial extends GLBoostObject {
         break;
     }
 
-//    if (mesh.isTransparent) {
-//      this._gl.disable(2929);
-//    }
+    if (mesh.isTransparent || this.isTransparent) {
+      //this._gl.disable(2929);
+      this._gl.enable(3042);
+      //this._gl.colorMask(true, true, true, false);
+    }
   }
 
   tearDownStates() {
@@ -439,6 +441,14 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return Object.keys(this._textureSemanticsDic).length;
   }
 
+  set isAlphaTest(flg){
+    this._isAlphaTestEnable = flg;
+  }
+
+  get isAlphaTest() {
+    return this._isAlphaTestEnable;
+  }
+
   set alphaCutoff(value) {
     this._alphaCutoff = value;
   }
@@ -446,7 +456,6 @@ export default class L_AbstractMaterial extends GLBoostObject {
   get alphaCutoff() {
     return this._alphaCutoff;
   }
-
 }
 
 GLBoost['L_AbstractMaterial'] = L_AbstractMaterial;

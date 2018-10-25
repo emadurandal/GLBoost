@@ -224,7 +224,7 @@ export default class DrawKickerWorld {
         let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
-        material.setUpStates();
+        material.setUpStates(mesh);
 
         this._setUpOrTearDownTextures(true, material);
       }

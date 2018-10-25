@@ -4856,7 +4856,7 @@
 
     get isTransparent() {
       let isTransparent = (this._opacity < 1.0) ? true : false;
-      isTransparent |= this._isTransparentForce;
+      isTransparent = isTransparent || this._isTransparentForce;
       return isTransparent;
     }
 
@@ -6343,7 +6343,7 @@
           let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
           material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
-          material.setUpStates();
+          material.setUpStates(mesh);
 
           this._setUpOrTearDownTextures(true, material);
         }
@@ -9393,15 +9393,20 @@ return mat4(
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
 
+      //shaderText += '    float shadowRatio = 0.0;\n';
+
+      //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
+      return shaderText;
+    }
+
+    FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
       shaderText += `
                      if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
                        discard;
                      }
     `;
-
-      //shaderText += '    float shadowRatio = 0.0;\n';
-
-      //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
       return shaderText;
     }
@@ -9469,6 +9474,8 @@ return mat4(
         this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
       }
       
+      const alphaCutoff = material.alphaCutoff;
+      const isAlphaTestEnable = material.isAlphaTest;
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
 
       // For Shadow
@@ -9563,7 +9570,7 @@ return mat4(
         "polygonOffset": [0.0, 0.0]
       };
       this._isAlphaTestEnable = true;
-      this._alphaCutoff = 0.001;
+      this._alphaCutoff = 0.1;
 
       this._countOfUpdate = 0;
     }
@@ -9833,9 +9840,11 @@ return mat4(
           break;
       }
 
-  //    if (mesh.isTransparent) {
-  //      this._gl.disable(2929);
-  //    }
+      if (mesh.isTransparent || this.isTransparent) {
+        //this._gl.disable(2929);
+        this._gl.enable(3042);
+        //this._gl.colorMask(true, true, true, false);
+      }
     }
 
     tearDownStates() {
@@ -9952,6 +9961,14 @@ return mat4(
       return Object.keys(this._textureSemanticsDic).length;
     }
 
+    set isAlphaTest(flg){
+      this._isAlphaTestEnable = flg;
+    }
+
+    get isAlphaTest() {
+      return this._isAlphaTestEnable;
+    }
+
     set alphaCutoff(value) {
       this._alphaCutoff = value;
     }
@@ -9959,7 +9976,6 @@ return mat4(
     get alphaCutoff() {
       return this._alphaCutoff;
     }
-
   }
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
@@ -10399,8 +10415,6 @@ albedo.rgb *= (1.0 - metallic);
       const IBLSpecularTextureMipmapCount = (material.IBLSpecularTextureMipmapCount !== void 0) ? material.IBLSpecularTextureMipmapCount : 9;
       const IBLDiffuseContribution = (material.IBLDiffuseContribution !== void 0) ? material.IBLDiffuseContribution : 0.2;
       const IBLSpecularContribution = (material.IBLSpecularContribution !== void 0) ? material.IBLSpecularContribution : 0.2;
-      const isAlphaTestEnable = material.isAlphaTest;
-      const alphaCutoff = material.alphaCutoff;
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_MetallicRoughnessFactors'), metallic, roughness, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_BaseColorFactor'), baseColor.x, baseColor.y, baseColor.z, true);
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
@@ -10524,22 +10538,6 @@ albedo.rgb *= (1.0 - metallic);
 
     get IBLSpecularContribution() {
       return this._IBLSpecularContribution;
-    }
-
-    set isAlphaTest(flg){
-      this._isAlphaTestEnable = flg;
-    }
-
-    get isAlphaTest() {
-      return this._isAlphaTestEnable;
-    }
-
-    set alphaCutoff(value) {
-      this._alphaCutoff = value;
-    }
-
-    get alphaCutoff() {
-      return this._alphaCutoff;
     }
   }
 
@@ -14372,8 +14370,8 @@ albedo.rgb *= (1.0 - metallic);
 
     get isTransparent() {
       let isTransparent = (this._opacity < 1.0) ? true : false;
-      isTransparent |= this.geometry.isTransparent(this);
-      isTransparent |= this._isTransparentForce;
+      isTransparent = isTransparent || this._isTransparentForce;
+      isTransparent = isTransparent || this._isTransparentForce;
       return isTransparent;
     }
 
@@ -20311,8 +20309,8 @@ albedo.rgb *= (1.0 - metallic);
         group.addChild(mesh);
       }
 
-      if (options && options.isMeshTransparentAsDefault) {
-        mesh.isTransparentForce = true;
+      if (options && options.isMeshTransparentAsDefault || options && options.defaultStates && options.defaultStates.isTransparent) {
+        mesh.isTransparent = true;
       }
 
       let _indicesArray = [];
@@ -20454,7 +20452,7 @@ albedo.rgb *= (1.0 - metallic);
                   group.getChildren().forEach((elem)=>{
                     let isMatch = this.isTargetMatch(statesInfo, elem, target);
                     if (isMatch) {
-                      elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                      elem.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
                       if (statesInfo.states) {
                         material.states = statesInfo.states;
                       }
@@ -22307,7 +22305,7 @@ albedo.rgb *= (1.0 - metallic);
 
         let options = gltfModel.asset.extras.glboostOptions;
         if (options.isMeshTransparentAsDefault) {
-          glboostMeshes.isTransparentForce = true;
+          glboostMeshes.isTransparent = true;
         }
 
         let _indicesArray = [];
@@ -23943,4 +23941,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-321-gc36c-mod branch: ';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-322-gfd0bb-mod branch: feature/change-alphatest-imprement';

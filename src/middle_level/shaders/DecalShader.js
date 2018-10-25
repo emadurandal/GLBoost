@@ -77,15 +77,20 @@ export class DecalShaderSource {
       shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
+    //shaderText += '    float shadowRatio = 0.0;\n';
+
+    //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
+
+    return shaderText;
+  }
+
+  FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = '';
     shaderText += `
                      if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
                        discard;
                      }
     `;
-
-    //shaderText += '    float shadowRatio = 0.0;\n';
-
-    //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
 
     return shaderText;
   }
@@ -153,6 +158,8 @@ export default class DecalShader extends WireframeShader {
       this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
     
+    const alphaCutoff = material.alphaCutoff;
+    const isAlphaTestEnable = material.isAlphaTest;
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
 
     // For Shadow
