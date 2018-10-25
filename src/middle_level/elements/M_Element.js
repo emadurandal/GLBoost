@@ -61,7 +61,7 @@ export default class M_Element extends L_Element {
     this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
     this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-    this._isTransparentForce = null;
+    this._isTransparentForce = false;
     this._opacity = 1.0;
     this._isAffectedByWorldMatrix = true;
     this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -224,10 +224,12 @@ export default class M_Element extends L_Element {
   }
 
   get isTransparent() {
-    return this._isTransparentForce;
+    let isTransparent = (this._opacity < 1.0) ? true : false;
+    isTransparent |= this._isTransparentForce;
+    return isTransparent;
   }
 
-  set isTransparentForce(flg: boolean) {
+  set isTransparent(flg: boolean) {
     this._isTransparentForce = flg;
   }
 

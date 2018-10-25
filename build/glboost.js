@@ -4692,7 +4692,7 @@
       this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
       this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
       this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-      this._isTransparentForce = null;
+      this._isTransparentForce = false;
       this._opacity = 1.0;
       this._isAffectedByWorldMatrix = true;
       this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -4855,10 +4855,12 @@
     }
 
     get isTransparent() {
-      return this._isTransparentForce;
+      let isTransparent = (this._opacity < 1.0) ? true : false;
+      isTransparent |= this._isTransparentForce;
+      return isTransparent;
     }
 
-    set isTransparentForce(flg         ) {
+    set isTransparent(flg         ) {
       this._isTransparentForce = flg;
     }
 
@@ -6341,7 +6343,7 @@
           let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
           material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
-          material.setUpStates(mesh);
+          material.setUpStates();
 
           this._setUpOrTearDownTextures(true, material);
         }
@@ -9364,8 +9366,7 @@ return mat4(
       }
       shaderText += 'uniform vec4 materialBaseColor;\n';
       shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
-      shaderText += 'uniform vec2 uAlphaTestParameters;\n';
-      
+
       return shaderText;
     }
 
@@ -9390,12 +9391,6 @@ return mat4(
       if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
-
-      shaderText += `
-                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
-                       discard;
-                     }
-    `;
 
       //shaderText += '    float shadowRatio = 0.0;\n';
 
@@ -9428,12 +9423,11 @@ return mat4(
         let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
         material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
       }
-      material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
       material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
       
       material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
-      
+
       return vertexAttribsAsResult;
     }
   }
@@ -9466,8 +9460,7 @@ return mat4(
         material.updateTextureInfo(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
         this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
       }
-      
-      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
+
 
       // For Shadow
       for (let i=0; i<lights.length; i++) {
@@ -9560,8 +9553,6 @@ return mat4(
         "lineWidth": [1.0],
         "polygonOffset": [0.0, 0.0]
       };
-      this._isAlphaTestEnable = true;
-      this._alphaCutoff = 0.001;
 
       this._countOfUpdate = 0;
     }
@@ -9809,7 +9800,7 @@ return mat4(
       }
     }
 
-    setUpStates(mesh) {
+    setUpStates() {
       let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
       if (this._globalStatesUsage) {
         globalStatesUsage = this._globalStatesUsage;
@@ -9830,10 +9821,6 @@ return mat4(
         default:
           break;
       }
-
-  //    if (mesh.isTransparent) {
-  //      this._gl.disable(2929);
-  //    }
     }
 
     tearDownStates() {
@@ -9948,14 +9935,6 @@ return mat4(
 
     getTextureNumAttachedShader() {
       return Object.keys(this._textureSemanticsDic).length;
-    }
-
-    set alphaCutoff(value) {
-      this._alphaCutoff = value;
-    }
-
-    get alphaCutoff() {
-      return this._alphaCutoff;
     }
 
   }
@@ -10081,6 +10060,7 @@ return mat4(
       
       shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
 
+      shaderText += 'uniform vec2 uAlphaTestParameters;\n';
 
       
 
@@ -10347,7 +10327,12 @@ albedo.rgb *= (1.0 - metallic);
       shaderText += '  rt0.xyz += emissive;\n';
 
       shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
-      
+
+      shaderText += `
+                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
+                       discard;
+                     }
+    `;
   //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
@@ -10364,6 +10349,7 @@ albedo.rgb *= (1.0 - metallic);
       material.setUniform(shaderProgram, 'uniform_EmissiveFactor', this._glContext.getUniformLocation(shaderProgram, 'uEmissiveFactor'));
       material.setUniform(shaderProgram, 'uniform_IBLParameters', this._glContext.getUniformLocation(shaderProgram, 'uIBLParameters'));
       material.setUniform(shaderProgram, 'uniform_ambient', this._glContext.getUniformLocation(shaderProgram, 'ambient'));
+      material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
       material.setTexture(this._glBoostSystem._glBoostContext.brdfLutTexture, GLBoost.TEXTURE_PURPOSE_BRDF_LUT);
       material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, 'uMetallicRoughnessTexture'); 
@@ -10404,6 +10390,7 @@ albedo.rgb *= (1.0 - metallic);
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
+      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
       
 
       const ambient = Vector4$1.multiplyVector(new Vector4$1(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
@@ -14136,7 +14123,6 @@ albedo.rgb *= (1.0 - metallic);
   //      
 
   class M_Mesh extends M_Element {
-                                 
                          
                               
                      
@@ -14372,15 +14358,12 @@ albedo.rgb *= (1.0 - metallic);
     get isTransparent() {
       let isTransparent = (this._opacity < 1.0) ? true : false;
       isTransparent |= this.geometry.isTransparent(this);
+      isTransparent |= this._isTransparentForce;
       return isTransparent;
     }
 
-    set isTransparentForce(flg         ) {
+    set isTransparent(flg         ) {
       this._isTransparentForce = flg;
-    }
-
-    get isTransparentForce() {
-      return this._isTransparentForce;
     }
 
     get AABBInWorld() {
@@ -16101,17 +16084,10 @@ albedo.rgb *= (1.0 - metallic);
       this._opacityMeshes = [];
       this._transparentMeshes = [];
       this._meshes.forEach((mesh)=>{
-        if (mesh.isTransparentForce === false) {
-          this._opacityMeshes.push(mesh);
-        } else if (mesh.isTransparentForce === true) {
+        if (mesh.isTransparent) {
           this._transparentMeshes.push(mesh);
         } else {
-          if (!mesh.isTransparent) {
-            this._opacityMeshes.push(mesh);
-          } else {
-            this._transparentMeshes.push(mesh);
-          }
-
+          this._opacityMeshes.push(mesh);
         }
       });
 
@@ -16385,9 +16361,7 @@ albedo.rgb *= (1.0 - metallic);
 
         transparentMeshes.forEach((mesh)=> {
           //console.log(mesh.userFlavorName);
-          const gl = glContext.gl;
           if (mesh.isVisible && mesh.isTransparent) {
-
             mesh.draw({
               expression: expression,
               lights: lights,
@@ -20317,7 +20291,10 @@ albedo.rgb *= (1.0 - metallic);
       }
       mesh.userFlavorName = meshStr;
 
-      group.addChild(mesh);
+      if (!(options.ignoreMeshList != null) || options.ignoreMeshList.indexOf(mesh.userFlavorName) === -1) {
+        // if the mesh name is not in ignore list, add it to the group.
+        group.addChild(mesh);
+      }
 
       if (options && options.isMeshTransparentAsDefault) {
         mesh.isTransparentForce = true;
@@ -23951,4 +23928,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-318-ge37d-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-319-ga0520-mod branch: develop';

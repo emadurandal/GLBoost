@@ -11,7 +11,6 @@ import MathClassUtil from '../../../low_level/math/MathClassUtil';
 import is from '../../../low_level/misc/IsUtil';
 
 export default class M_Mesh extends M_Element {
-  _isTransparentForce: boolean;
   _isPickable: boolean;
   _transformedDepth: number;
   _opacity: number;
@@ -247,15 +246,12 @@ export default class M_Mesh extends M_Element {
   get isTransparent() {
     let isTransparent = (this._opacity < 1.0) ? true : false;
     isTransparent |= this.geometry.isTransparent(this);
+    isTransparent |= this._isTransparentForce;
     return isTransparent;
   }
 
-  set isTransparentForce(flg: boolean) {
+  set isTransparent(flg: boolean) {
     this._isTransparentForce = flg;
-  }
-
-  get isTransparentForce() {
-    return this._isTransparentForce;
   }
 
   get AABBInWorld() {
