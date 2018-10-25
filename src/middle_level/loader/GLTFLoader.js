@@ -133,6 +133,7 @@ export default class GLTFLoader {
       defaultMaterial: ClassicMaterial,
       defaultShaderClass: null,
       isMeshTransparentAsDefault: false,
+      ignoreMeshList: [],
       defaultStates: {
         states: {
           enable: [
