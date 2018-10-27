@@ -511,7 +511,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(arg1: number, arg2: number, camera: any, viewport: any) {
+  rayCast(arg1: number, arg2: number, camera: any, viewport: any, ignoreInstanceNameList:Array<any>) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
@@ -521,6 +521,9 @@ export default class M_Group extends M_Element {
         continue;
       }
       if (!mesh.isPickable) {
+        continue;
+      }
+      if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName)) {
         continue;
       }
       let result = null;
